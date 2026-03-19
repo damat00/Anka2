@@ -43,6 +43,7 @@ bool CActorInstance::CanUseSkill()
 
 	DWORD dwCurMotionIndex=__GetCurrentMotionIndex();
 
+	// Locked during attack
 	switch (dwCurMotionIndex)
 	{
 		case CRaceMotionData::NAME_FISHING_THROW:
@@ -55,6 +56,7 @@ bool CActorInstance::CanUseSkill()
 			break;
 	}
 
+	// Locked during using skill
 	if (IsUsingSkill())
 	{
 		if (m_pkCurRaceMotionData->IsCancelEnableSkill())
@@ -167,7 +169,7 @@ bool CActorInstance::InputComboAttackCommand(float fDirRot)
 	}
 	else if (m_pkCurRaceMotionData->IsComboInputTimeData())
 	{
-		float fElapsedTime = GetAttackingElapsedTime();	
+		float fElapsedTime = GetAttackingElapsedTime();
 
 		if (fElapsedTime > m_pkCurRaceMotionData->GetComboInputEndTime())
 		{
@@ -189,7 +191,7 @@ bool CActorInstance::InputComboAttackCommand(float fDirRot)
 	}
 	else
 	{
-		float fElapsedTime = GetAttackingElapsedTime();	
+		float fElapsedTime = GetAttackingElapsedTime();
 		if (fElapsedTime > m_pkCurRaceMotionData->GetMotionDuration()*0.9f)
 		{
 			__RunNextCombo();
@@ -598,8 +600,10 @@ void CActorInstance::__ProcessDataAttackSuccess(const NRaceData::TAttackData & c
 		rVictim.m_fInvisibleTime = CTimer::Instance().GetCurrentSecond() + (c_rAttackData.fInvisibleTime - __GetInvisibleTimeAdjust(uiSkill, c_rAttackData));
 	}
 
+	// Stiffen Time
 	rVictim.InsertDelay(c_rAttackData.fStiffenTime);
 
+	// Hit Effect
 	D3DXVECTOR3 vec3Effect(rVictim.m_x, rVictim.m_y, rVictim.m_z);
 
 	extern bool IS_HUGE_RACE(unsigned int vnum);

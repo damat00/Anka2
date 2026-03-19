@@ -4,8 +4,13 @@
 //#define SPHERELIB_STRICT
 //#include <crtdbg.h>
 
+#ifdef ENABLE_DIRECTX9_UPDATE
+#include <d3d9.h>
+#include <d3dx9.h>
+#else
 #include <d3d8.h>
 #include <d3dx8.h>
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,3 +19,4 @@
 #include <math.h>
 
 #include "../eterBase/StdAfx.h"
+#include "../UserInterface/Locale_inc.h"

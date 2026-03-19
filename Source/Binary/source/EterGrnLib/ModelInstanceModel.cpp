@@ -207,7 +207,11 @@ bool CGrannyModelInstance::__IsDeformableVertexBuffer()
 	return m_kLocalDeformableVertexBuffer.IsEmpty();
 }
 
+#ifdef ENABLE_DIRECTX9_UPDATE
+IDirect3DVertexBuffer9* CGrannyModelInstance::__GetDeformableD3DVertexBufferPtr()
+#else
 IDirect3DVertexBuffer8* CGrannyModelInstance::__GetDeformableD3DVertexBufferPtr()
+#endif
 {
 	return __GetDeformableVertexBufferRef().GetD3DVertexBuffer();
 }

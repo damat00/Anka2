@@ -47,11 +47,18 @@ namespace quest
 			bool OnClick(PC& pc);
 			bool OnKill(PC& pc);
 			bool OnPartyKill(PC& pc);
+#ifdef ENABLE_MELEY_LAIR_DUNGEON
+			bool OnAttack(PC& pc);
+#endif
 			bool OnTimer(PC& pc);
 			bool OnLevelUp(PC& pc);
 			bool OnLogin(PC& pc, const char * c_pszQuestName = NULL);
 			bool OnLogout(PC& pc);
+#ifdef ENABLE_COLLECT_WINDOW
+			bool OnButton(PC& pc, unsigned int quest_index, BYTE buttonIndex);
+#else
 			bool OnButton(PC& pc, unsigned int quest_index);
+#endif
 			bool OnInfo(PC& pc, unsigned int quest_index);
 			bool OnAttrIn(PC& pc);
 			bool OnAttrOut(PC& pc);
@@ -70,11 +77,6 @@ namespace quest
 
 			bool OnPickupItem(PC& pc);
 
-#ifdef ENABLE_EVENT_MANAGER
-			bool OnEventBegin(PC& pc);
-			bool OnEventEnd(PC& pc);
-#endif
-
 			bool OnSIGUse(PC& pc, bool bReceiveAll);
 
 			bool HandleEvent(PC& pc, int EventIndex);
@@ -89,6 +91,8 @@ namespace quest
 		protected:
 			template <typename TQuestMapType, typename FuncMatch, typename FuncMiss>
 				void MatchingQuest(PC& pc, TQuestMapType& QuestMap, FuncMatch& fMatch, FuncMiss& fMiss);
+
+			// true if quest still running, false if ended
 
 			void LoadStateScript(int idx, const char* filename, const char* script_name);
 

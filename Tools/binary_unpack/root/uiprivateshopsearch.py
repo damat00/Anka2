@@ -66,18 +66,21 @@ class PrivateShopSearchDialog(ui.ScriptWindow):
 			currentItemName = itemName
 			itemVnum = self.children["itemData"]["vnum"]
 			metinSlot = self.children["itemData"]["metinSlot"]
-			item.SelectItem(itemVnum)
+			try:
+				item.SelectItem(itemVnum)
 
-			for i in xrange(item.LIMIT_MAX_NUM):
-				(limitType, limitValue) = item.GetLimit(i)
-				if item.LIMIT_TIMER_BASED_ON_WEAR == limitType:
-					itemName = itemName
-				elif item.LIMIT_REAL_TIME == limitType or item.LIMIT_REAL_TIME_START_FIRST_USE == limitType:
-					itemName = itemName
+				for i in xrange(item.LIMIT_MAX_NUM):
+					(limitType, limitValue) = item.GetLimit(i)
+					if item.LIMIT_TIMER_BASED_ON_WEAR == limitType:
+						itemName = itemName
+					elif item.LIMIT_REAL_TIME == limitType or item.LIMIT_REAL_TIME_START_FIRST_USE == limitType:
+						itemName = itemName
 
-			if currentItemName == itemName:
-				if item.GetItemType() == item.ITEM_TYPE_UNIQUE:
-					itemName = itemName
+				if currentItemName == itemName:
+					if item.GetItemType() == item.ITEM_TYPE_UNIQUE:
+						itemName = itemName
+			except:
+				return currentItemName
 
 			return itemName
 
@@ -101,7 +104,10 @@ class PrivateShopSearchDialog(ui.ScriptWindow):
 			item_icon.Show()
 			self.children["renderImages"].append(item_icon)
 
-			item.SelectItem(itemData["vnum"])
+			try:
+				item.SelectItem(itemData["vnum"])
+			except:
+				return
 
 			item_name_text = ui.TextLine()
 			item_name_text.SetParent(item_icon)
@@ -110,7 +116,16 @@ class PrivateShopSearchDialog(ui.ScriptWindow):
 			item_name_text.SetHorizontalAlignLeft()
 			item_name_text.SetPackedFontColor(0xFFF7BD48)
 			if 50300 == itemData["vnum"] or itemData["vnum"] == 70037:
-				item_name_text.SetText("%s %s" % (skill.GetSkillName(itemData["metinSlot"][0]), item.GetItemName()))
+				skillName = ""
+				try:
+					skillName = skill.GetSkillName(itemData["metinSlot"][0])
+				except:
+					skillName = ""
+
+				if skillName:
+					item_name_text.SetText("%s %s" % (skillName, item.GetItemName()))
+				else:
+					item_name_text.SetText(self.SetItemName(item.GetItemName()))
 			elif 70104 == itemData["vnum"]:
 				item_name_text.SetText("%s %s" % (nonplayer.GetMonsterName(itemData["metinSlot"][0]), item.GetItemName()))
 			else:
@@ -234,7 +249,7 @@ class PrivateShopSearchDialog(ui.ScriptWindow):
 			# Tooltip'i göster ve pozisyonunu ayarla
 			self.tooltipItem.ShowToolTip()
 			
-			# Tooltip'in fareyi takip etmesini saðla (normal davranýþ)
+			# Tooltip'in fareyi takip etmesini sa?la (normal davran??)
 			try:
 				if hasattr(self.tooltipItem, 'SetFollow'):
 					self.tooltipItem.SetFollow(True)
@@ -671,12 +686,12 @@ class PrivateShopSearchDialog(ui.ScriptWindow):
 				break
 
 	def OnUpdate(self):
-		# Tooltip kontrolü: Private shop search'teki item tooltip'lerinin ekranda kalmasýný önle
+		# Tooltip kontrolü: Private shop search'teki item tooltip'lerinin ekranda kalmas?n? önle
 		try:
 			import uiToolTip
 			import wndMgr
 			
-			# ListBox'taki tüm item'larý kontrol et
+			# ListBox'taki tüm item'lar? kontrol et
 			if hasattr(self, 'ListBox') and self.ListBox:
 				itemsList = getattr(self.ListBox, 'itemList', [])
 				for searchItem in itemsList:
@@ -693,7 +708,7 @@ class PrivateShopSearchDialog(ui.ScriptWindow):
 								itemIcon = None
 								if hasattr(searchItem, 'children') and searchItem.children.has_key("renderImages"):
 									for img in searchItem.children["renderImages"]:
-										if img != searchItem:  # Kendisi deðilse
+										if img != searchItem:  # Kendisi de?ilse
 											try:
 												(ix, iy) = img.GetGlobalPosition()
 												iw, ih = img.GetWidth(), img.GetHeight()
@@ -703,7 +718,7 @@ class PrivateShopSearchDialog(ui.ScriptWindow):
 											except:
 												pass
 								
-								# Ne tooltip'in üzerinde ne de item icon'unun üzerinde deðilse kapat
+								# Ne tooltip'in üzerinde ne de item icon'unun üzerinde de?ilse kapat
 								if not onTooltip and not itemIcon:
 									tooltipItem.HideToolTip()
 							except:

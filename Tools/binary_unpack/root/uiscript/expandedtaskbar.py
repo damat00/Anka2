@@ -213,10 +213,10 @@ window["children"][0]["children"] = window["children"][0]["children"] + [
 current_x += X_SPACE
 button_count += 1
 
-if app.ENABLE_INGAME_WIKI_SYSTEM:
+if app.ENABLE_WIKI_SYSTEM:
 	window["children"][0]["children"] = window["children"][0]["children"] + [
 					{
-						"name" : "SidebarWikipediaButton",
+						"name" : "WikiButton",
 						"type" : "button",
 						"style" : ("ltr", ),
 
@@ -275,6 +275,28 @@ if app.ENABLE_AUTO_SELL_SYSTEM:
 						"default_image" : "d:/ymir work/ui/game/taskbarnew/sil_1.tga",
 						"over_image" : "d:/ymir work/ui/game/taskbarnew/sil_2.tga",
 						"down_image" : "d:/ymir work/ui/game/taskbarnew/sil_3.tga",
+					},]
+	current_x += X_SPACE
+	button_count += 1
+
+if app.ENABLE_BIOLOGIST_SYSTEM:
+	window["children"][0]["children"] = window["children"][0]["children"] + [
+					{
+						"name" : "BiologistButton",
+						"type" : "button",
+						"style" : ("ltr", ),
+
+						"x" : current_x,
+						"y" : 0,
+
+						"width" : 37,
+						"height" : 37,
+
+						"tooltip_text" : "Biyolog Görevleri",
+
+                        "default_image" : "d:/ymir work/ui/aslan/biologist/taskbar_button_normal.sub",
+                        "over_image" : "d:/ymir work/ui/aslan/biologist/taskbar_button_hover.sub",
+                        "down_image" : "d:/ymir work/ui/aslan/biologist/taskbar_button_down.sub",
 					},]
 	current_x += X_SPACE
 	button_count += 1

@@ -46,7 +46,7 @@ Group MotionEventData
         
         AttachingEnable      1
         AttachingBoneName    "equip_right"
-        flyfilename       "d:/ymir work/pc/assassin/effect/gwangyeoksul_2.msf"
+        FlyFileName       "d:/ymir work/pc/assassin/effect/g_gwangyeoksul_2.msf"
         FlyPosition       0.000000 -100.000000 0.000000
     }
 }

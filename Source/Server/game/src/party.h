@@ -5,7 +5,7 @@
 
 #include "../../common/service.h"
 
-enum
+enum // unit : minute
 {
 	PARTY_ENOUGH_MINUTE_FOR_EXP_BONUS = 60,
 	PARTY_HEAL_COOLTIME_LONG = 60,
@@ -49,8 +49,10 @@ class CPartyManager : public singleton<CPartyManager>
 
 		void		Initialize();
 
-		void		EnablePCParty() { m_bEnablePCParty = true; sys_log(0,"PARTY Enable"); }
-		void		DisablePCParty() { m_bEnablePCParty = false; sys_log(0,"PARTY Disable"); }
+		//void		SendPartyToDB();
+
+		void		EnablePCParty() { m_bEnablePCParty = true; sys_log(0, "PARTY Enable"); }
+		void		DisablePCParty() { m_bEnablePCParty = false; sys_log(0, "PARTY Disable"); }
 		bool		IsEnablePCParty() { return m_bEnablePCParty; }
 
 		LPPARTY		CreateParty(LPCHARACTER pkLeader);
@@ -79,10 +81,10 @@ class CPartyManager : public singleton<CPartyManager>
 
 enum EPartyMessages
 {
-	PM_ATTACK,
-	PM_RETURN,
-	PM_ATTACKED_BY,
-	PM_AGGRO_INCREASE,
+	PM_ATTACK,		// Attack him
+	PM_RETURN,		// Return back to position
+	PM_ATTACKED_BY,	// I was attacked by someone
+	PM_AGGRO_INCREASE,	// My aggro is increased
 };
 
 class CParty
@@ -210,10 +212,13 @@ class CParty
 #ifdef ENABLE_LEVEL_INT
 		void		RequestSetMemberLevel(DWORD pid, int level);
 		void		P2PSetMemberLevel(DWORD pid, int level);
-#else		
+#else
 		void		RequestSetMemberLevel(DWORD pid, BYTE level);
 		void		P2PSetMemberLevel(DWORD pid, BYTE level);
 #endif
+
+		bool		IsPartyInDungeon(int mapIndex);
+		bool		IsPartyInAnyDungeon();
 
 	protected:
 		void		IncreaseOwnership();
@@ -255,11 +260,13 @@ class CParty
 
 		int		m_iLongTimeExpBonus;
 
+		// used in Update
 		int		m_iLeadership;
 		int		m_iExpBonus;
 		int		m_iAttBonus;
 		int		m_iDefBonus;
 
+		// changed only in Update
 		int		m_iCountNearPartyMember;
 
 		bool		m_bPCParty;
@@ -336,7 +343,6 @@ template <class Func> bool CParty::ForEachOnMapMemberBool(Func & f, long lMapInd
 				if(f(ch) == false)
 				{
 					return false;
-			
 				}
 			}
 		}
@@ -413,7 +419,7 @@ struct FPartyDropDiceRoll
 			{
 				continue;
 			}
-			else
+			else // if (pickedNumber < m_lastNumber)
 			{
 			}
 			pParty->ChatPacketToAllMember(CHAT_TYPE_DICE_INFO, 554, "%s#%d", ch->GetName(), pickedNumber);
@@ -422,4 +428,5 @@ struct FPartyDropDiceRoll
 	}
 };
 #endif
+
 #endif

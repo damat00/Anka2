@@ -12,6 +12,7 @@ class CGuildMarkManager : public singleton<CGuildMarkManager>
 			INVALID_MARK_ID = 0xffffffff,
 		};
 
+		// Symbol
 		struct TGuildSymbol
 		{
 			DWORD crc;
@@ -26,6 +27,9 @@ class CGuildMarkManager : public singleton<CGuildMarkManager>
 		void SaveSymbol(const char* filename);
 		void UploadSymbol(DWORD guildID, int iSize, const BYTE* pbyData);
 
+		//
+		// Mark
+		//
 		void SetMarkPathPrefix(const char * prefix);
 
 		bool LoadMarkIndex();
@@ -40,30 +44,38 @@ class CGuildMarkManager : public singleton<CGuildMarkManager>
 		DWORD GetMarkCount() const;
 		DWORD GetMarkID(DWORD guildID);
 
+		// SERVER
 		void CopyMarkIdx(char * pcBuf) const;
 		DWORD SaveMark(DWORD guildID, BYTE * pbMarkImage);
 		void DeleteMark(DWORD guildID);
 		void GetDiffBlocks(DWORD imgIdx, const DWORD * crcList, std::map<BYTE, const SGuildMarkBlock *> & mapDiffBlocks);
 
+		// CLIENT
 		bool SaveBlockFromCompressedData(DWORD imgIdx, DWORD idBlock, const BYTE * pbBlock, DWORD dwSize);
 		bool GetBlockCRCList(DWORD imgIdx, DWORD * crcList);
 
 	private:
-		CGuildMarkImage* __NewImage();
-		void __DeleteImage(CGuildMarkImage* pkImgDel);
+		//
+		// Mark
+		//
+		CGuildMarkImage * __NewImage();
+		void __DeleteImage(CGuildMarkImage * pkImgDel);
 
 		DWORD __AllocMarkID(DWORD guildID);
 
-		CGuildMarkImage* __GetImage(DWORD imgIdx);
-		CGuildMarkImage* __GetImagePtr(DWORD idMark);
+		CGuildMarkImage * __GetImage(DWORD imgIdx);
+		CGuildMarkImage * __GetImagePtr(DWORD idMark);
 
-		std::map<DWORD, CGuildMarkImage *> m_mapIdx_Image;
-		std::map<DWORD, DWORD> m_mapGID_MarkID;
+		std::map<DWORD, CGuildMarkImage *> m_mapIdx_Image; // index = image index
+		std::map<DWORD, DWORD> m_mapGID_MarkID; // index = guild id
 
 		std::set<DWORD> m_setFreeMarkID;
-		std::string m_pathPrefix;
+		std::string		m_pathPrefix;
 
 	private:
+		//
+		// Symbol
+		//
 		std::map<DWORD, TGuildSymbol> m_mapSymbol;
 };
 

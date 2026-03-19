@@ -87,9 +87,6 @@ void SNetworkActorData::__copy__(const SNetworkActorData& src)
 
 	m_sAlignment = src.m_sAlignment;
 	m_byPKMode = src.m_byPKMode;
-#ifdef ENABLE_TITLE_SYSTEM
-	m_iTitleID = src.m_iTitleID;
-#endif
 	m_dwMountVnum = src.m_dwMountVnum;
 
 	m_dwGuildID = src.m_dwGuildID;
@@ -101,7 +98,9 @@ void SNetworkActorData::__copy__(const SNetworkActorData& src)
 	m_dwAIFlag = src.m_dwAIFlag;
 #endif
 	m_stName = src.m_stName;
-
+#ifdef ENABLE_CONQUEROR_LEVEL
+	m_dwConquerorLevel = src.m_dwConquerorLevel;
+#endif
 #ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
 	m_bLanguage = src.m_bLanguage;
 	m_bLanguage2 = src.m_bLanguage2;
@@ -146,11 +145,10 @@ SNetworkActorData::SNetworkActorData()
 
 	m_sAlignment = 0;
 	m_byPKMode = 0;
-#ifdef ENABLE_TITLE_SYSTEM
-	m_iTitleID = 0;
-#endif
 	m_dwMountVnum = 0;
-
+#ifdef ENABLE_CONQUEROR_LEVEL
+	m_dwConquerorLevel=0;
+#endif
 #ifdef ENABLE_SHOW_MOB_INFO
 	m_dwAIFlag = 0;
 #endif
@@ -390,6 +388,9 @@ CInstanceBase* CNetworkActorManager::__AppendCharacterManagerActor(SNetworkActor
 	CInstanceBase::SCreateData kCreateData;
 	kCreateData.m_bType = rkNetActorData.m_bType;
 	kCreateData.m_dwLevel = rkNetActorData.m_dwLevel;
+#ifdef ENABLE_CONQUEROR_LEVEL
+	kCreateData.m_dwConquerorLevel=rkNetActorData.m_dwConquerorLevel;
+#endif
 #ifdef ENABLE_SHOW_MOB_INFO
 	kCreateData.m_dwAIFlag = rkNetActorData.m_dwAIFlag;
 #endif
@@ -410,9 +411,6 @@ CInstanceBase* CNetworkActorManager::__AppendCharacterManagerActor(SNetworkActor
 	kCreateData.m_dwAtkSpd = rkNetActorData.m_dwAtkSpd;
 	kCreateData.m_sAlignment = rkNetActorData.m_sAlignment;
 	kCreateData.m_byPKMode = rkNetActorData.m_byPKMode;
-#ifdef ENABLE_TITLE_SYSTEM
-	kCreateData.m_iTitleID = rkNetActorData.m_iTitleID;
-#endif
 	kCreateData.m_kAffectFlags = rkNetActorData.m_kAffectFlags;
 	kCreateData.m_dwArmor = rkNetActorData.m_dwArmor;
 	kCreateData.m_dwWeapon = rkNetActorData.m_dwWeapon;
@@ -565,11 +563,12 @@ void CNetworkActorManager::UpdateActor(const SNetworkUpdateActorData& c_rkNetUpd
 		pkInstFind->SetAffectFlagContainer(c_rkNetUpdateActorData.m_kAffectFlags);
 		pkInstFind->SetMoveSpeed(c_rkNetUpdateActorData.m_dwMovSpd);
 		pkInstFind->SetAttackSpeed(c_rkNetUpdateActorData.m_dwAtkSpd);
+#ifdef ENABLE_CONQUEROR_LEVEL
+		if(c_rkNetUpdateActorData.m_dwConquerorLevel > 0)
+			pkInstFind->SetConquerorLevelText(c_rkNetUpdateActorData.m_dwConquerorLevel);
+#endif
 		pkInstFind->SetAlignment(c_rkNetUpdateActorData.m_sAlignment);
 		pkInstFind->SetPKMode(c_rkNetUpdateActorData.m_byPKMode);
-#ifdef ENABLE_TITLE_SYSTEM
-		pkInstFind->SetTitleSystem(c_rkNetUpdateActorData.m_iTitleID);
-#endif
 		pkInstFind->SetStateFlags(c_rkNetUpdateActorData.m_dwStateFlags);
 
 #ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
@@ -587,6 +586,9 @@ void CNetworkActorManager::UpdateActor(const SNetworkUpdateActorData& c_rkNetUpd
 #ifdef ENABLE_GUILD_LEADER_TEXTAIL
 	rkNetActorData.m_dwGuildLeader = c_rkNetUpdateActorData.m_dwGuildLeader;
 #endif
+#ifdef ENABLE_CONQUEROR_LEVEL
+	rkNetActorData.m_dwConquerorLevel=c_rkNetUpdateActorData.m_dwConquerorLevel;
+#endif
 	rkNetActorData.m_dwMovSpd = c_rkNetUpdateActorData.m_dwMovSpd;
 	rkNetActorData.m_dwAtkSpd = c_rkNetUpdateActorData.m_dwAtkSpd;
 	rkNetActorData.m_dwArmor = c_rkNetUpdateActorData.m_dwArmor;
@@ -600,9 +602,6 @@ void CNetworkActorManager::UpdateActor(const SNetworkUpdateActorData& c_rkNetUpd
 #endif
 	rkNetActorData.m_sAlignment = c_rkNetUpdateActorData.m_sAlignment;
 	rkNetActorData.m_byPKMode = c_rkNetUpdateActorData.m_byPKMode;
-#ifdef ENABLE_TITLE_SYSTEM
-	rkNetActorData.m_iTitleID = c_rkNetUpdateActorData.m_iTitleID;
-#endif
 
 #ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
 	rkNetActorData.m_bLanguage = c_rkNetUpdateActorData.m_bLanguage;
@@ -616,8 +615,8 @@ void CNetworkActorManager::UpdateActor(const SNetworkUpdateActorData& c_rkNetUpd
 
 void CNetworkActorManager::MoveActor(const SNetworkMoveActorData& c_rkNetMoveActorData)
 {
-	std::map<DWORD, SNetworkActorData>::iterator f=m_kNetActorDict.find(c_rkNetMoveActorData.m_dwVID);
-	if (m_kNetActorDict.end()==f)
+	std::map<DWORD, SNetworkActorData>::iterator f = m_kNetActorDict.find(c_rkNetMoveActorData.m_dwVID);
+	if (m_kNetActorDict.end() == f)
 	{
 #ifdef _DEBUG
 		TraceError("CNetworkActorManager::MoveActor(dwVID=%d) - NOT EXIST VID", c_rkNetMoveActorData.m_dwVID);
@@ -625,29 +624,29 @@ void CNetworkActorManager::MoveActor(const SNetworkMoveActorData& c_rkNetMoveAct
 		return;
 	}
 
-	SNetworkActorData& rkNetActorData=f->second;
+	SNetworkActorData& rkNetActorData = f->second;
 
-	CInstanceBase* pkInstFind=__FindActor(rkNetActorData, c_rkNetMoveActorData.m_lPosX, c_rkNetMoveActorData.m_lPosY);
+	CInstanceBase* pkInstFind = __FindActor(rkNetActorData, c_rkNetMoveActorData.m_lPosX, c_rkNetMoveActorData.m_lPosY);
 	if (pkInstFind)
 	{
 		TPixelPosition kPPosDst;
-		kPPosDst.x=float(c_rkNetMoveActorData.m_lPosX);
-		kPPosDst.y=float(c_rkNetMoveActorData.m_lPosY);
-		kPPosDst.z=0.0f;
+		kPPosDst.x = float(c_rkNetMoveActorData.m_lPosX);
+		kPPosDst.y = float(c_rkNetMoveActorData.m_lPosY);
+		kPPosDst.z = 0.0f;
 
-		pkInstFind->PushTCPState(c_rkNetMoveActorData.m_dwTime, kPPosDst, 
-			c_rkNetMoveActorData.m_fRot, c_rkNetMoveActorData.m_dwFunc, c_rkNetMoveActorData.m_dwArg);	
+		pkInstFind->PushTCPState(c_rkNetMoveActorData.m_dwTime, kPPosDst,
+			c_rkNetMoveActorData.m_fRot, c_rkNetMoveActorData.m_dwFunc, c_rkNetMoveActorData.m_dwArg);
 	}
 
 	rkNetActorData.SetDstPosition(c_rkNetMoveActorData.m_dwTime,
 		c_rkNetMoveActorData.m_lPosX, c_rkNetMoveActorData.m_lPosY, c_rkNetMoveActorData.m_dwDuration);
-	rkNetActorData.m_fRot=c_rkNetMoveActorData.m_fRot;		
+	rkNetActorData.m_fRot = c_rkNetMoveActorData.m_fRot;
 }
 
 void CNetworkActorManager::SyncActor(DWORD dwVID, LONG lPosX, LONG lPosY)
 {
-	std::map<DWORD, SNetworkActorData>::iterator f=m_kNetActorDict.find(dwVID);
-	if (m_kNetActorDict.end()==f)
+	std::map<DWORD, SNetworkActorData>::iterator f = m_kNetActorDict.find(dwVID);
+	if (m_kNetActorDict.end() == f)
 	{
 #ifdef _DEBUG
 		TraceError("CNetworkActorManager::SyncActor(dwVID=%d) - NOT EXIST VID", dwVID);

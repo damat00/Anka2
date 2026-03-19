@@ -110,7 +110,7 @@ class CPythonItem : public CSingleton<CPythonItem>
 #else
 		void	CreateItem(DWORD dwVirtualID, DWORD dwVirtualNumber, float x, float y, float z, bool bDrop = true);
 #endif
-		void	DeleteItem(DWORD dwVirtualID);		
+		void	DeleteItem(DWORD dwVirtualID);
 		void	SetOwnership(DWORD dwVID, const char *c_pszName);
 		bool	GetOwnership(DWORD dwVID, const char ** c_pszName);
 

@@ -25,10 +25,8 @@ void CFSM::Update()
 	// Check New State
 	if (m_pNewState)
 	{
-		if (NULL != m_pCurrentState)
-		{
-			m_pCurrentState->ExecuteEndState();
-		}
+		// Execute End State
+		m_pCurrentState->ExecuteEndState();
 
 		// Set New State
 		m_pCurrentState = m_pNewState;

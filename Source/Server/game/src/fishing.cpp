@@ -29,9 +29,18 @@ namespace fishing
 	enum
 	{
 		MAX_FISH = 37,
-		NUM_USE_RESULT_COUNT = 10,
+		NUM_USE_RESULT_COUNT = 10, // 1 : DEAD 2 : BONE 3 ~ 12 : rest
 		FISH_BONE_VNUM = 27799,
 		SHELLFISH_VNUM = 27987,
+		STONEPIECE_VNUM = 27990,
+		WHITE_PEARL_VNUM = 27992,
+		BLUE_PEARL_VNUM = 27993,
+		RED_PEARL_VNUM = 27994,
+		//@custom021
+		GREEN_PEARL_VNUM = 96010,
+		VIOLET_PEARL_VNUM = 96011,
+		GOLDEN_PEARL_VNUM = 96012,
+		//@end_custom021
 		EARTHWORM_VNUM = 27801,
 		WATER_STONE_VNUM_BEGIN = 28030,
 		WATER_STONE_VNUM_END = 28043,
@@ -89,9 +98,10 @@ namespace fishing
 		int difficulty;
 
 		int time_type;
-		int length_range[3];
+		int length_range[3]; // MIN MAX EXTRA_MAX : 99% MIN~MAX, 1% MAX~EXTRA_MAX
 
 		int used_table[NUM_USE_RESULT_COUNT];
+		// 6000 2000 1000 500 300 100 50 30 10 5 4 1
 	};
 
 	bool operator < ( const SFishInfo& lhs, const SFishInfo& rhs )
@@ -111,11 +121,13 @@ void Initialize()
 
 	memset(fish_info, 0, sizeof(fish_info));
 
-
+	// LOCALE_SERVICE
 	const int FILE_NAME_LEN = 256;
 	char szFishingFileName[FILE_NAME_LEN+1];
-	snprintf(szFishingFileName, sizeof(szFishingFileName), "%s/fishing.txt", LocaleService_GetBasePath().c_str());
+	snprintf(szFishingFileName, sizeof(szFishingFileName),
+			"%s/fishing.txt", LocaleService_GetBasePath().c_str());
 	FILE * fp = fopen(szFishingFileName, "r");
+	// END_OF_LOCALE_SERVICE
 
 	if (*fish_info_bak[0].name)
 		SendLog("Reloading fish table.");
@@ -173,7 +185,7 @@ void Initialize()
 
 			if (!*szCol || *szCol == '\t')
 				iColCount++;
-			else 
+			else
 			{
 				switch (iColCount++)
 				{
@@ -190,18 +202,18 @@ void Initialize()
 					case 10: str_to_number(fish_info[idx].length_range[0], szCol); break;
 					case 11: str_to_number(fish_info[idx].length_range[1], szCol); break;
 					case 12: str_to_number(fish_info[idx].length_range[2], szCol); break;
-					case 13:
-					case 14:
-					case 15:
-					case 16:
-					case 17:
-					case 18:
-					case 19:
-					case 20:
-					case 21:
-					case 22:
-						str_to_number(fish_info[idx].used_table[iColCount-1-12], szCol);
-						break;
+					case 13: // 0
+					case 14: // 1
+					case 15: // 2
+					case 16: // 3
+					case 17: // 4
+					case 18: // 5
+					case 19: // 6
+					case 20: // 7
+					case 21: // 8
+					case 22: // 9
+							 str_to_number(fish_info[idx].used_table[iColCount-1-12], szCol);
+							 break;
 				}
 			}
 
@@ -219,7 +231,7 @@ void Initialize()
 
 	for (int i = 0; i < MAX_FISH; ++i)
 	{
-		sys_log(0, "FISH: %-24s vnum %5lu prob %4d %4d %4d %4d len %d %d %d", 
+		sys_log(0, "FISH: %-24s vnum %5lu prob %4d %4d %4d %4d len %d %d %d",
 				fish_info[i].name,
 				fish_info[i].vnum,
 				fish_info[i].prob[0],
@@ -253,14 +265,14 @@ int DetermineFishByProbIndex(int prob_idx)
 
 int GetProbIndexByMapIndex(int index)
 {
-	if (index > 60)
+	if (index > 91)
 		return -1;
 
 	switch (index)
 	{
-		case 1:
 		case 21:
-		case 41:
+		case 90:
+		case 91:
 			return 0;
 
 		case 3:
@@ -281,13 +293,16 @@ int DetermineFish(LPCHARACTER ch)
 	if (prob_idx < 0)
 		return 0;
 
-	if (ch->GetPremiumRemainSeconds(PREMIUM_FISH_MIND) > 0 || ch->IsEquipUniqueGroup(UNIQUE_GROUP_FISH_MIND))
+	// ADD_PREMIUM
+	if (ch->GetPremiumRemainSeconds(PREMIUM_FISH_MIND) > 0 ||
+			ch->IsEquipUniqueGroup(UNIQUE_GROUP_FISH_MIND))
 	{
 		if (quest::CQuestManager::instance().GetEventFlag("manwoo") != 0)
 			prob_idx = 3;
 		else
 			prob_idx = 2;
 	}
+	// END_OF_ADD_PREMIUM
 
 	int adjust = 0;
 	if (quest::CQuestManager::instance().GetEventFlag("fish_miss_pct") != 0)
@@ -300,11 +315,18 @@ int DetermineFish(LPCHARACTER ch)
 
 	int * p = std::lower_bound(g_prob_accumulate[prob_idx], g_prob_accumulate[prob_idx] + MAX_FISH, rv);
 	int fish_idx = p - g_prob_accumulate[prob_idx];
+	if ( LC_IsYMIR() )
+	{
+		if (fish_info[fish_idx].vnum >= 70040 && fish_info[fish_idx].vnum <= 70052)
+			return 0;
+	}
 
-	DWORD vnum = fish_info[fish_idx].vnum;
+	{
+		DWORD vnum = fish_info[fish_idx].vnum;
 
-	if (vnum == 50008 || vnum == 50009 || vnum == 80008) 
-		return 0;
+		if (vnum == 50008 || vnum == 50009 || vnum == 80008)
+			return 0;
+	}
 
 	return (fish_idx);
 }
@@ -323,16 +345,6 @@ void FishingSuccess(LPCHARACTER ch)
 	TPacketGCFishing p;
 	p.header = HEADER_GC_FISHING;
 	p.subheader = FISHING_SUBHEADER_GC_SUCCESS;
-
-#ifdef ENABLE_FISH_GAME
-	if (quest::CQuestManager::instance().GetEventFlag("fishgame_event") == 1)
-	{
-		ch->SetProtectTime("fish_game_total_click", 0);
-		ch->SetProtectTime("fish_game_total_score", 0);
-		ch->ChatPacket(CHAT_TYPE_COMMAND, "CloseFishGame");
-	}
-#endif
-
 	p.info = ch->GetVID();
 	ch->PacketAround(&p, sizeof(p));
 }
@@ -342,16 +354,6 @@ void FishingFail(LPCHARACTER ch)
 	TPacketGCFishing p;
 	p.header = HEADER_GC_FISHING;
 	p.subheader = FISHING_SUBHEADER_GC_FAIL;
-
-#ifdef ENABLE_FISH_GAME
-	if (quest::CQuestManager::instance().GetEventFlag("fishgame_event") == 1)
-	{
-		ch->SetProtectTime("fish_game_total_click", 0);
-		ch->SetProtectTime("fish_game_total_score", 0);
-		ch->ChatPacket(CHAT_TYPE_COMMAND, "CloseFishGame");
-	}
-#endif
-
 	p.info = ch->GetVID();
 	ch->PacketAround(&p, sizeof(p));
 }
@@ -373,13 +375,18 @@ void FishingPractice(LPCHARACTER ch)
 			}
 		}
 	}
+
 	rod->SetSocket(2, 0);
 }
 
 bool PredictFish(LPCHARACTER ch)
 {
-	if (ch->FindAffect(AFFECT_FISH_MIND_PILL) || ch->GetPremiumRemainSeconds(PREMIUM_FISH_MIND) > 0 || ch->IsEquipUniqueGroup(UNIQUE_GROUP_FISH_MIND))
+	// ADD_PREMIUM
+	if (ch->FindAffect(AFFECT_FISH_MIND_PILL) ||
+			ch->GetPremiumRemainSeconds(PREMIUM_FISH_MIND) > 0 ||
+			ch->IsEquipUniqueGroup(UNIQUE_GROUP_FISH_MIND))
 		return true;
+	// END_OF_ADD_PREMIUM
 
 	return false;
 }
@@ -424,12 +431,6 @@ EVENTFUNC(fishing_event)
 				p.info = fish_info[info->fish_id].vnum;
 				ch->GetDesc()->Packet(&p, sizeof(TPacketGCFishing));
 			}
-
-#ifdef ENABLE_FISH_GAME
-			if (quest::CQuestManager::instance().GetEventFlag("fishgame_event") == 1)
-				return (PASSES_PER_SEC(15));
-#endif
-
 			return (PASSES_PER_SEC(6));
 
 		default:
@@ -452,7 +453,11 @@ LPEVENT CreateFishingEvent(LPCHARACTER ch)
 	info->step = 0;
 	info->hang_time	= 0;
 
+#ifdef ENABLE_FISHING_TIME_INC
+	int time = number(5, 10);
+#else
 	int time = number(10, 40);
+#endif
 
 	TPacketGCFishing p;
 	p.header = HEADER_GC_FISHING;
@@ -460,18 +465,6 @@ LPEVENT CreateFishingEvent(LPCHARACTER ch)
 	p.info = ch->GetVID();
 	p.dir = (BYTE)(ch->GetRotation()/5);
 	ch->PacketAround(&p, sizeof(TPacketGCFishing));
-
-#ifdef ENABLE_FISH_GAME
-	if (quest::CQuestManager::instance().GetEventFlag("fishgame_event") == 1)
-	{
-		int randomKey = number(1, 10000);
-		ch->SetProtectTime("fish_game_key", randomKey);
-		ch->SetProtectTime("fish_game_total_click", 0);
-		ch->SetProtectTime("fish_game_total_score", 0);
-		ch->ChatPacket(CHAT_TYPE_COMMAND, "OpenFishGameWindow %d", randomKey);
-		return event_create(fishing_event, info, PASSES_PER_SEC(0));
-	}
-#endif
 
 	return event_create(fishing_event, info, PASSES_PER_SEC(time));
 }
@@ -494,13 +487,8 @@ int Compute(DWORD fish_id, DWORD ms, DWORD* item, int level)
 	if (fish_id >= MAX_FISH)
 	{
 		sys_err("Wrong FISH ID : %d", fish_id);
-		return -2; 
+		return -2;
 	}
-
-#ifdef ENABLE_FISH_GAME
-	if (quest::CQuestManager::instance().GetEventFlag("fishgame_event") == 1)
-		ms = number(3000, 7000);
-#endif
 
 	if (ms > 6000)
 		return -1;
@@ -524,13 +512,15 @@ int GetFishLength(int fish_id)
 {
 	if (number(0,99))
 	{
-		return (int)(fish_info[fish_id].length_range[0] + 
+		// 99% : normal size
+		return (int)(fish_info[fish_id].length_range[0] +
 				(fish_info[fish_id].length_range[1] - fish_info[fish_id].length_range[0])
 				* (number(0,2000)+number(0,2000)+number(0,2000)+number(0,2000)+number(0,2000))/10000);
 	}
 	else
 	{
-		return (int)(fish_info[fish_id].length_range[1] + 
+		// 1% : extra LARGE size
+		return (int)(fish_info[fish_id].length_range[1] +
 				(fish_info[fish_id].length_range[2] - fish_info[fish_id].length_range[1])
 				* 2 * asin(number(0,10000)/10000.) / M_PI);
 	}
@@ -538,12 +528,6 @@ int GetFishLength(int fish_id)
 
 void Take(fishing_event_info* info, LPCHARACTER ch)
 {
-#ifdef ENABLE_FISH_GAME
-	if (quest::CQuestManager::instance().GetEventFlag("fishgame_event") == 1)
-		if (ch->GetProtectTime("fish_game_total_score") < 3)
-			info->step = 2;
-#endif
-
 	if (info->step == 1)
 	{
 		long ms = (long) ((get_dword_time() - info->hang_time));
@@ -573,7 +557,21 @@ void Take(fishing_event_info* info, LPCHARACTER ch)
 				if (item_vnum)
 				{
 					FishingSuccess(ch);
-
+					if(quest::CQuestManager::instance().GetEventFlag("enable_fish_event"))
+					{
+						if (ch->IsEquipUniqueItem(UNIQUE_ITEM_FISH_MIND))
+						{
+							int r = number(1, 100);
+							if(r <= 10)
+								ch->AutoGiveItem(ITEM_FISH_EVENT_BOX_SPECIAL, 1, -1, false);
+							else
+								ch->AutoGiveItem(ITEM_FISH_EVENT_BOX, 5, -1, false);
+						}
+						else
+						{
+							ch->AutoGiveItem(ITEM_FISH_EVENT_BOX, 5, -1, false);
+						}
+					}
 					TPacketGCFishing p;
 					p.header = HEADER_GC_FISHING;
 					p.subheader = FISHING_SUBHEADER_GC_FISH;
@@ -583,6 +581,35 @@ void Take(fishing_event_info* info, LPCHARACTER ch)
 					LPITEM item = ch->AutoGiveItem(item_vnum, 1, -1, false);
 					if (item)
 					{
+#ifdef ENABLE_BATTLE_PASS
+						if (!ch->v_counts.empty())
+						{
+							for (int i = 0; i < ch->missions_bp.size(); ++i)
+							{
+								if (ch->missions_bp[i].type == 32)
+								{
+									ch->DoMission(i, 1);
+								}
+							}
+						}
+
+						if (!ch->v_counts_premium.empty())
+						{
+							for (int i = 0; i < ch->missions_bp_premium.size(); ++i)
+							{
+								if (ch->missions_bp_premium[i].type == 32)
+								{
+									ch->DoMissionPremium(i, 1);
+								}
+							}
+						}
+#endif
+#ifdef ENABLE_RANKING
+						if ((item->GetType() == ITEM_FISH) || (item->GetType() == ITEM_MATERIAL) || (item->GetType() == ITEM_GIFTBOX) || (item->GetVnum() == 60315))
+						{
+							ch->SetRankPoints(12, ch->GetRankPoints(12) + 1);
+						}
+#endif
 						item->SetSocket(0, GetFishLength(info->fish_id));
 
 						if (test_server)
@@ -602,10 +629,6 @@ void Take(fishing_event_info* info, LPCHARACTER ch)
 							db_clientdesc->DBPacket(HEADER_GD_HIGHSCORE_REGISTER, 0, &p, sizeof(TPacketGDHighscore));
 						}
 					}
-
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-					ch->UpdateExtBattlePassMissionProgress(FISH_FISHING, 1, item_vnum);
-#endif
 
 					int map_idx = ch->GetMapIndex();
 					int prob_idx = GetProbIndexByMapIndex(map_idx);
@@ -641,7 +664,12 @@ void Take(fishing_event_info* info, LPCHARACTER ch)
 		int map_idx = ch->GetMapIndex();
 		int prob_idx = GetProbIndexByMapIndex(map_idx);
 
-		LogManager::instance().FishLog(ch->GetPlayerID(), prob_idx, info->fish_id, GetFishingLevel(ch), 7000);
+		LogManager::instance().FishLog(
+				ch->GetPlayerID(),
+				prob_idx,
+				info->fish_id,
+				GetFishingLevel(ch),
+				7000);
 		FishingFail(ch);
 	}
 	else
@@ -657,6 +685,7 @@ void Take(fishing_event_info* info, LPCHARACTER ch)
 	{
 		FishingPractice(ch);
 	}
+	//Motion(MOTION_FISHING_PULL);
 }
 
 void Simulation(int level, int count, int prob_idx, LPCHARACTER ch)
@@ -685,10 +714,6 @@ void Simulation(int level, int count, int prob_idx, LPCHARACTER ch)
 
 void UseFish(LPCHARACTER ch, LPITEM item)
 {
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-	ch->UpdateExtBattlePassMissionProgress(FISH_CATCH, 1, item->GetVnum());
-#endif
-
 	int idx = item->GetVnum() - fish_info[2].vnum+2;
 
 	if (idx<=1 || idx >= MAX_FISH)
@@ -708,6 +733,7 @@ void UseFish(LPCHARACTER ch, LPITEM item)
 	}
 	else
 	{
+		// 1000 500 300 100 50 30 10 5 4 1
 		static int s_acc_prob[NUM_USE_RESULT_COUNT] = { 1000, 1500, 1800, 1900, 1950, 1980, 1990, 1995, 1999, 2000 };
 		int u_index = std::lower_bound(s_acc_prob, s_acc_prob + NUM_USE_RESULT_COUNT, r) - s_acc_prob;
 
@@ -752,10 +778,6 @@ void Grill(LPCHARACTER ch, LPITEM item)
 	ch->LocaleChatPacket(CHAT_TYPE_INFO, 381, "%s", item->GetLocaleName());
 	item->SetCount(0);
 	ch->AutoGiveItem(fish_info[idx].grill_vnum, count);
-
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-	ch->UpdateExtBattlePassMissionProgress(FISH_GRILL, count, item->GetVnum());
-#endif
 }
 
 bool RefinableRod(LPITEM rod)
@@ -774,6 +796,7 @@ int RealRefineRod(LPCHARACTER ch, LPITEM item)
 	if (!ch || !item)
 		return 2;
 
+	// REFINE_ROD_HACK_BUG_FIX
 	if (!RefinableRod(item))
 	{
 		sys_err("REFINE_ROD_HACK pid(%u) item(%s:%d)", ch->GetPlayerID(), item->GetName(), item->GetID());
@@ -782,8 +805,9 @@ int RealRefineRod(LPCHARACTER ch, LPITEM item)
 
 		return 2;
 	}
+	// END_OF_REFINE_ROD_HACK_BUG_FIX
 
-	LPITEM rod = item;	
+	LPITEM rod = item;
 
 	int iAdv = rod->GetValue(0) / 10;
 
@@ -839,8 +863,8 @@ int main(int argc, char **argv)
 				fish_info[i].vnum,
 				fish_info[i].dead_vnum,
 				fish_info[i].grill_vnum,
-				fish_info[i].prob[0], 
-				fish_info[i].prob[1], 
+				fish_info[i].prob[0],
+				fish_info[i].prob[1],
 				fish_info[i].prob[2],
 				fish_info[i].difficulty,
 				fish_info[i].time_type,

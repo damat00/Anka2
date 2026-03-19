@@ -1,7 +1,4 @@
 #include "stdafx.h"
-
-#include "../../common/service.h"
-
 #include "constants.h"
 #include "utils.h"
 #include "config.h"
@@ -974,48 +971,3 @@ void CGuildManager::ChangeMaster(DWORD dwGID)
     guild->Load(dwGID);
     DBManager::instance().FuncQuery([guild](SQLMsg* msg) { guild->SendGuildDataUpdateToAllMember(msg); }, "SELECT 1");
 }
-
-#ifdef ENABLE_GUILD_TOKEN_AUTH
-#include <msl/random.h>
-uint64_t CGuildManager::GenerateTokenHashNumber()
-{
-	return msl::random_number<uint64_t>(1);
-}
-
-bool CGuildManager::IsCorrectGuildToken(DWORD guildID, uint64_t hashID)
-{
-	if (!guildID || !hashID)
-		return false;
-
-	auto guild = CGuildManager::Instance().FindGuild(guildID);
-	if (!guild)
-		return false;
-
-	return hashID == guild->GetToken();
-}
-
-void CGuildManager::SendGuildToken(LPCHARACTER ch, uint64_t token)
-{
-	if (!ch)
-		return;
-
-	auto d = ch->GetDesc();
-	if (!d)
-		return;
-
-	TPacketGCGuildToken p3{};
-	p3.header = HEADER_GC_GUILD_TOKEN;
-	p3.token = token;
-	d->Packet(&p3, sizeof(p3));
-}
-
-void CGuildManager::GuildRelink(DWORD guildID, LPCHARACTER ch)
-{
-	if (!guildID || !ch)
-		return;
-
-	auto pGuild = FindGuild(guildID);
-	if (pGuild)
-		ch->SetGuild(pGuild);
-}
-#endif

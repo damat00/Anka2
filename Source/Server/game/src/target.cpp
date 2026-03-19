@@ -124,9 +124,18 @@ EVENTFUNC(target_event)
 		return MINMAX(passes_per_sec / 2, iDist / (1500 / passes_per_sec), passes_per_sec * 5);
 }
 
-void CTargetManager::CreateTarget(DWORD dwPID, DWORD dwQuestIndex, const char *c_pszTargetName, int iType, int iArg1, int iArg2, int iMapIndex, const char * c_pszTargetDesc, int iSendFlag)
+void CTargetManager::CreateTarget(DWORD dwPID,
+		DWORD dwQuestIndex,
+		const char * c_pszTargetName,
+		int iType,
+		int iArg1,
+		int iArg2,
+		int iMapIndex,
+		const char * c_pszTargetDesc, 
+		int iSendFlag)
 {
-	sys_log(0, "CreateTarget : target pid %u quest %u name %s arg %d %d %d", dwPID, dwQuestIndex, c_pszTargetName, iType, iArg1, iArg2);
+	sys_log(0, "CreateTarget : target pid %u quest %u name %s arg %d %d %d",
+			dwPID, dwQuestIndex, c_pszTargetName, iType, iArg1, iArg2);
 
 	LPCHARACTER pkChr = CHARACTER_MANAGER::instance().FindByPID(dwPID);
 
@@ -259,7 +268,7 @@ void CTargetManager::DeleteTarget(DWORD dwPID, DWORD dwQuestIndex, const char * 
 			}
 		}
 
-		it2++;
+		++it2;	//@fixme541
 	}
 }
 

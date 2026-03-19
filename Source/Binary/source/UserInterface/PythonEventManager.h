@@ -192,6 +192,7 @@ class CPythonEventManager : public CSingleton<CPythonEventManager>
 		int GetProcessedLineCount(int iIndex);
 		void AllProcessEventSet(int iIndex);
 		int GetTotalLineCount(int iIndex);
+		void SetFontColor(int iIndex, float r, float g, float b);
 #endif
 
 	protected:

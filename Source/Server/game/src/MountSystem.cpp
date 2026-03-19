@@ -85,10 +85,6 @@ bool CMountActor::Mount(LPITEM mountItem)
 
 	if (m_pkOwner->IsHorseRiding())
 		m_pkOwner->StopRiding();
-
-	if (m_pkOwner->GetHorse())
-		m_pkOwner->HorseSummon(false);
-
 	Unmount();
 
 	m_pkOwner->AddAffect(AFFECT_MOUNT, POINT_MOUNT, m_dwVnum, AFF_NONE, (DWORD)mountItem->GetSocket(0) - time(0), 0, true);

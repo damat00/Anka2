@@ -4,8 +4,8 @@ TextureCount 11
 
 Start Texture001
     "d:\ymir work\terrainmaps\trent\field\field 01.dds"
-    5.000000
-    5.000000
+    2.500000
+    2.500000
     0.000000
     0.000000
     0
@@ -14,8 +14,8 @@ Start Texture001
 End Texture001
 Start Texture002
     "d:\ymir work\terrainmaps\trent\field\field 02.dds"
-    6.000000
-    6.000000
+    3.000000
+    3.000000
     0.000000
     0.000000
     0
@@ -34,8 +34,8 @@ Start Texture003
 End Texture003
 Start Texture004
     "d:\ymir work\terrainmaps\trent\grass\grass 01.dds"
-    6.000000
-    6.000000
+    5.000000
+    5.000000
     0.000000
     0.000000
     0
@@ -44,8 +44,8 @@ Start Texture004
 End Texture004
 Start Texture005
     "d:\ymir work\terrainmaps\trent\grass\grass 02.dds"
-    10.000000
-    10.000000
+    5.000000
+    5.000000
     0.000000
     0.000000
     0
@@ -54,8 +54,8 @@ Start Texture005
 End Texture005
 Start Texture006
     "d:\ymir work\terrainmaps\trent\grass\grass 03.dds"
-    10.000000
-    10.000000
+    5.000000
+    5.000000
     0.000000
     0.000000
     0
@@ -74,8 +74,8 @@ Start Texture007
 End Texture007
 Start Texture008
     "d:\ymir work\terrainmaps\trent\stone\stone02.dds"
-    6.000000
-    6.000000
+    2.000000
+    2.000000
     0.000000
     0.000000
     0

@@ -1,0 +1,981 @@
+ScriptType               MotionData
+
+MotionFileName           "D:\Ymir Work\monster2\moonlight_king\special_attack1.GR2"
+MotionDuration           3.000000
+Accumulation           0.00	0.00	0.00
+
+Group MotionEventData
+{
+    MotionEventDataCount     60
+    Group Event00
+    {
+        MotionEventType      1
+        StartingTime         1.820000
+        
+        IndependentFlag      0
+        AttachingEnable      1
+        AttachingBoneName    "eff001"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_head2.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event01
+    {
+        MotionEventType      1
+        StartingTime         1.820000
+        
+        IndependentFlag      0
+        AttachingEnable      1
+        AttachingBoneName    "eff002"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_head2.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event02
+    {
+        MotionEventType      1
+        StartingTime         1.820000
+        
+        IndependentFlag      0
+        AttachingEnable      1
+        AttachingBoneName    "eff003"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_head2.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event03
+    {
+        MotionEventType      1
+        StartingTime         1.820000
+        
+        IndependentFlag      0
+        AttachingEnable      1
+        AttachingBoneName    "eff004"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_head2.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event04
+    {
+        MotionEventType      1
+        StartingTime         1.820000
+        
+        IndependentFlag      0
+        AttachingEnable      1
+        AttachingBoneName    "eff005"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_head2.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event05
+    {
+        MotionEventType      1
+        StartingTime         1.820000
+        
+        IndependentFlag      0
+        AttachingEnable      1
+        AttachingBoneName    "eff006"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_head2.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event06
+    {
+        MotionEventType      1
+        StartingTime         1.820000
+        
+        IndependentFlag      0
+        AttachingEnable      1
+        AttachingBoneName    "eff007"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_head2.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event07
+    {
+        MotionEventType      1
+        StartingTime         1.820000
+        
+        IndependentFlag      0
+        AttachingEnable      1
+        AttachingBoneName    "eff008"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_head2.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event08
+    {
+        MotionEventType      1
+        StartingTime         1.820000
+        
+        IndependentFlag      0
+        AttachingEnable      1
+        AttachingBoneName    "eff009"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_head2.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event09
+    {
+        MotionEventType      1
+        StartingTime         1.820000
+        
+        IndependentFlag      0
+        AttachingEnable      1
+        AttachingBoneName    "eff010"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_head2.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event10
+    {
+        MotionEventType      1
+        StartingTime         1.820000
+        
+        IndependentFlag      0
+        AttachingEnable      1
+        AttachingBoneName    "eff011"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_head2.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event11
+    {
+        MotionEventType      1
+        StartingTime         1.820000
+        
+        IndependentFlag      0
+        AttachingEnable      1
+        AttachingBoneName    "eff012"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_head2.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event12
+    {
+        MotionEventType      1
+        StartingTime         1.800000
+        
+        IndependentFlag      0
+        AttachingEnable      0
+        AttachingBoneName    "Bip001 R Finger41"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_blow.mse"
+        EffectPosition       0.000000 0.000000 100.000000
+    }
+    Group Event13
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      0
+        AttachingEnable      0
+        AttachingBoneName    "Bip001 R Finger41"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_making.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event14
+    {
+        MotionEventType      4
+        StartingTime         1.760000
+        DuringTime           0.200000
+        EnableHitProcess     1
+        
+        AttackType           0
+        HittingType          2
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           500.000000
+            Position         0.000000 -0.000000 100.000000
+        }
+    }
+    Group Event15
+    {
+        MotionEventType      4
+        StartingTime         2.211679
+        DuringTime           0.200000
+        EnableHitProcess     1
+        
+        AttackType           0
+        HittingType          2
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           76.000000
+            Position         0.000000 -750.000000 100.000000
+        }
+    }
+    Group Event16
+    {
+        MotionEventType      4
+        StartingTime         2.211679
+        DuringTime           0.200000
+        EnableHitProcess     1
+        
+        AttackType           0
+        HittingType          2
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           76.000000
+            Position         750.000000 0.000000 100.000000
+        }
+    }
+    Group Event17
+    {
+        MotionEventType      4
+        StartingTime         2.211679
+        DuringTime           0.200000
+        EnableHitProcess     1
+        
+        AttackType           0
+        HittingType          2
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           76.000000
+            Position         649.500000 -375.000000 100.000000
+        }
+    }
+    Group Event18
+    {
+        MotionEventType      4
+        StartingTime         2.211679
+        DuringTime           0.200000
+        EnableHitProcess     1
+        
+        AttackType           0
+        HittingType          1
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           76.000000
+            Position         375.000000 -649.500000 100.000000
+        }
+    }
+    Group Event19
+    {
+        MotionEventType      4
+        StartingTime         2.211679
+        DuringTime           0.200000
+        EnableHitProcess     1
+        
+        AttackType           0
+        HittingType          2
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           76.000000
+            Position         0.000000 750.000000 100.000000
+        }
+    }
+    Group Event20
+    {
+        MotionEventType      4
+        StartingTime         2.211679
+        DuringTime           0.200000
+        EnableHitProcess     1
+        
+        AttackType           0
+        HittingType          2
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           76.000000
+            Position         649.500000 375.000000 100.000000
+        }
+    }
+    Group Event21
+    {
+        MotionEventType      4
+        StartingTime         2.211679
+        DuringTime           0.200000
+        EnableHitProcess     1
+        
+        AttackType           0
+        HittingType          1
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           76.000000
+            Position         375.000000 649.500000 100.000000
+        }
+    }
+    Group Event22
+    {
+        MotionEventType      4
+        StartingTime         2.211679
+        DuringTime           0.200000
+        EnableHitProcess     1
+        
+        AttackType           0
+        HittingType          2
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           76.000000
+            Position         -750.000000 0.000000 100.000000
+        }
+    }
+    Group Event23
+    {
+        MotionEventType      4
+        StartingTime         2.211679
+        DuringTime           0.200000
+        EnableHitProcess     1
+        
+        AttackType           0
+        HittingType          2
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           76.000000
+            Position         -649.500000 375.000000 100.000000
+        }
+    }
+    Group Event24
+    {
+        MotionEventType      4
+        StartingTime         2.211679
+        DuringTime           0.200000
+        EnableHitProcess     1
+        
+        AttackType           0
+        HittingType          1
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           76.000000
+            Position         -375.000000 -649.500000 100.000000
+        }
+    }
+    Group Event25
+    {
+        MotionEventType      4
+        StartingTime         2.211679
+        DuringTime           0.200000
+        EnableHitProcess     1
+        
+        AttackType           0
+        HittingType          2
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           76.000000
+            Position         -649.500000 -375.000000 100.000000
+        }
+    }
+    Group Event26
+    {
+        MotionEventType      4
+        StartingTime         2.211679
+        DuringTime           0.200000
+        EnableHitProcess     1
+        
+        AttackType           0
+        HittingType          1
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           76.000000
+            Position         -375.000000 649.500000 100.000000
+        }
+    }
+    Group Event27
+    {
+        MotionEventType      2
+        StartingTime         1.861314
+        
+        DuringTime           0.300000
+        Power                300
+        AffectingRange       200
+    }
+    Group Event28
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      0
+        AttachingEnable      1
+        AttachingBoneName    "eff001"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_head.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event29
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      0
+        AttachingEnable      1
+        AttachingBoneName    "eff002"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_head.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event30
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      0
+        AttachingEnable      1
+        AttachingBoneName    "eff003"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_head.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event31
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      0
+        AttachingEnable      1
+        AttachingBoneName    "eff004"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_head.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event32
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      0
+        AttachingEnable      1
+        AttachingBoneName    "eff005"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_head.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event33
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      0
+        AttachingEnable      1
+        AttachingBoneName    "eff006"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_head.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event34
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      0
+        AttachingEnable      1
+        AttachingBoneName    "eff007"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_head.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event35
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      0
+        AttachingEnable      1
+        AttachingBoneName    "eff008"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_head.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event36
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      0
+        AttachingEnable      1
+        AttachingBoneName    "eff009"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_head.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event37
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      0
+        AttachingEnable      1
+        AttachingBoneName    "eff010"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_head.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event38
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      0
+        AttachingEnable      1
+        AttachingBoneName    "eff011"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_head.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event39
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      0
+        AttachingEnable      1
+        AttachingBoneName    "eff012"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_head.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event40
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      0
+        AttachingEnable      0
+        AttachingBoneName    "Bip001 R Finger41"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_blow.mse"
+        EffectPosition       0.000000 0.000000 100.000000
+    }
+    Group Event41
+    {
+        MotionEventType      4
+        StartingTime         0.000000
+        DuringTime           0.200000
+        EnableHitProcess     1
+        
+        AttackType           0
+        HittingType          2
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           500.000000
+            Position         0.000000 -0.000000 100.000000
+        }
+    }
+    Group Event42
+    {
+        MotionEventType      4
+        StartingTime         0.400000
+        DuringTime           0.200000
+        EnableHitProcess     1
+        
+        AttackType           0
+        HittingType          2
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           76.000000
+            Position         0.000000 -750.000000 100.000000
+        }
+    }
+    Group Event43
+    {
+        MotionEventType      4
+        StartingTime         0.400000
+        DuringTime           0.200000
+        EnableHitProcess     1
+        
+        AttackType           0
+        HittingType          2
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           76.000000
+            Position         750.000000 0.000000 100.000000
+        }
+    }
+    Group Event44
+    {
+        MotionEventType      4
+        StartingTime         0.400000
+        DuringTime           0.200000
+        EnableHitProcess     1
+        
+        AttackType           0
+        HittingType          2
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           76.000000
+            Position         649.500000 -375.000000 100.000000
+        }
+    }
+    Group Event45
+    {
+        MotionEventType      4
+        StartingTime         0.400000
+        DuringTime           0.200000
+        EnableHitProcess     1
+        
+        AttackType           0
+        HittingType          1
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           76.000000
+            Position         375.000000 -649.500000 100.000000
+        }
+    }
+    Group Event46
+    {
+        MotionEventType      4
+        StartingTime         0.400000
+        DuringTime           0.200000
+        EnableHitProcess     1
+        
+        AttackType           0
+        HittingType          2
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           76.000000
+            Position         0.000000 750.000000 100.000000
+        }
+    }
+    Group Event47
+    {
+        MotionEventType      4
+        StartingTime         0.400000
+        DuringTime           0.200000
+        EnableHitProcess     1
+        
+        AttackType           0
+        HittingType          2
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           76.000000
+            Position         649.500000 375.000000 100.000000
+        }
+    }
+    Group Event48
+    {
+        MotionEventType      4
+        StartingTime         0.400000
+        DuringTime           0.200000
+        EnableHitProcess     1
+        
+        AttackType           0
+        HittingType          1
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           76.000000
+            Position         375.000000 649.500000 100.000000
+        }
+    }
+    Group Event49
+    {
+        MotionEventType      4
+        StartingTime         0.400000
+        DuringTime           0.200000
+        EnableHitProcess     1
+        
+        AttackType           0
+        HittingType          2
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           76.000000
+            Position         -750.000000 0.000000 100.000000
+        }
+    }
+    Group Event50
+    {
+        MotionEventType      4
+        StartingTime         0.400000
+        DuringTime           0.200000
+        EnableHitProcess     1
+        
+        AttackType           0
+        HittingType          2
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           76.000000
+            Position         -649.500000 375.000000 100.000000
+        }
+    }
+    Group Event51
+    {
+        MotionEventType      4
+        StartingTime         0.400000
+        DuringTime           0.200000
+        EnableHitProcess     1
+        
+        AttackType           0
+        HittingType          1
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           76.000000
+            Position         -375.000000 -649.500000 100.000000
+        }
+    }
+    Group Event52
+    {
+        MotionEventType      4
+        StartingTime         0.400000
+        DuringTime           0.200000
+        EnableHitProcess     1
+        
+        AttackType           0
+        HittingType          2
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           76.000000
+            Position         -649.500000 -375.000000 100.000000
+        }
+    }
+    Group Event53
+    {
+        MotionEventType      4
+        StartingTime         0.400000
+        DuringTime           0.200000
+        EnableHitProcess     1
+        
+        AttackType           0
+        HittingType          1
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           76.000000
+            Position         -375.000000 649.500000 100.000000
+        }
+    }
+    Group Event54
+    {
+        MotionEventType      1
+        StartingTime         1.820000
+        
+        IndependentFlag      0
+        AttachingEnable      0
+        AttachingBoneName    "Bip001 R Finger41"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_making.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event55
+    {
+        MotionEventType      2
+        StartingTime         0.043796
+        
+        DuringTime           1.300000
+        Power                300
+        AffectingRange       300
+    }
+    Group Event56
+    {
+        MotionEventType      2
+        StartingTime         1.850000
+        
+        DuringTime           1.300000
+        Power                300
+        AffectingRange       300
+    }
+    Group Event57
+    {
+        MotionEventType      1
+        StartingTime         0.000000
+        
+        IndependentFlag      0
+        AttachingEnable      0
+        AttachingBoneName    "Bip001 R Finger41"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_making2.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event58
+    {
+        MotionEventType      1
+        StartingTime         1.710219
+        
+        IndependentFlag      0
+        AttachingEnable      0
+        AttachingBoneName    "Bip001 R Finger41"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/light_emissive4.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event59
+    {
+        MotionEventType      1
+        StartingTime         1.710219
+        
+        IndependentFlag      0
+        AttachingEnable      0
+        AttachingBoneName    "Bip001 R Finger41"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/effect/monster2/moonlight_king_s1_blow2.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+}

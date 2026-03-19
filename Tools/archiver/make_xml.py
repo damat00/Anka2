@@ -1,11 +1,30 @@
+# -*- coding: utf-8 -*-
 import os
+import sys
 
-fileString = ""
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+XML_DIR = os.path.join(BASE_DIR, "make_xml")
+ARCHIVER = os.path.join(BASE_DIR, "tools", "Archiver.exe")
 
-for file in os.listdir("make_xml"):
-    if file.endswith(".xml"):
-        fileString += "make_xml/%s " % (str(file))
+xml_files = [
+    os.path.join("make_xml", f)
+    for f in os.listdir(XML_DIR)
+    if f.endswith(".xml")
+]
 
-os.system('"archiver" %s' % fileString)
+if not xml_files:
+    print "ERROR: XML yok"
+    sys.exit(1)
 
-print "XML Files were created"
+os.chdir(BASE_DIR)
+
+cmd = '"%s" %s' % (ARCHIVER, " ".join(xml_files))
+print "RUN:", cmd
+
+ret = os.system(cmd)
+
+if ret != 0:
+    print "Archiver FAILED"
+    sys.exit(1)
+
+print "Archiver finished (output kontrol et)"

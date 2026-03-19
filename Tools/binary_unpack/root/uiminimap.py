@@ -8,6 +8,7 @@ net = __import__(pyapi.GetModuleName("net"))
 
 import ui
 import uiScriptLocale
+import uiCommon
 import wndMgr
 import miniMap
 import localeInfo
@@ -15,11 +16,12 @@ import colorInfo
 import constInfo
 import background
 import time
+import interfacemodule
 
-if app.ENABLE_BIOLOG_SYSTEM:
-	import biologmgr
+if app.ENABLE_BIOLOGIST_SYSTEM:
+	import uiBiyolog
 
-if app.ENABLE_RENEWAL_REGEN:
+if app.ENABLE_ULTIMATE_REGEN:
 	def FormatTime(seconds):
 		if seconds <= 0:
 			return "0s"
@@ -93,7 +95,7 @@ class AtlasWindow(ui.ScriptWindow):
 		self.tooltipInfo = MapTextToolTip()
 		self.tooltipInfo.Hide()
 
-		if app.ENABLE_RENEWAL_REGEN:
+		if app.ENABLE_ULTIMATE_REGEN:
 			self.tooltipInfoEx = MapTextToolTip()
 			self.tooltipInfoEx.Hide()
 
@@ -135,7 +137,7 @@ class AtlasWindow(ui.ScriptWindow):
 		self.AtlasMainWindow.SetParent(self.board)
 		self.AtlasMainWindow.SetPosition(7, 30)
 		self.tooltipInfo.SetParent(self.board)
-		if app.ENABLE_RENEWAL_REGEN:
+		if app.ENABLE_ULTIMATE_REGEN:
 			self.tooltipInfoEx.SetParent(self.board)
 		self.infoGuildMark.SetParent(self.board)
 		self.SetPosition(wndMgr.GetScreenWidth() - 136 - 256 - 10 - 165, 78)
@@ -151,7 +153,7 @@ class AtlasWindow(ui.ScriptWindow):
 		self.AtlasMainWindow = None
 		self.tooltipAtlasClose = 0
 		self.tooltipInfo = None
-		if app.ENABLE_RENEWAL_REGEN:
+		if app.ENABLE_ULTIMATE_REGEN:
 			self.tooltipInfoEx = None
 		self.infoGuildMark = None
 		self.board = None
@@ -165,14 +167,14 @@ class AtlasWindow(ui.ScriptWindow):
 
 		self.infoGuildMark.Hide()
 		self.tooltipInfo.Hide()
-		if app.ENABLE_RENEWAL_REGEN:
+		if app.ENABLE_ULTIMATE_REGEN:
 			self.tooltipInfoEx.Hide()
 
 		if FALSE == self.board.IsIn():
 			return
 
 		(mouseX, mouseY) = wndMgr.GetMousePosition()
-		if app.ENABLE_RENEWAL_REGEN:
+		if app.ENABLE_ULTIMATE_REGEN:
 			(bFind, sName, iPosX, iPosY, dwTextColor, dwGuildID, diRegenTime) = miniMap.GetAtlasInfo(mouseX, mouseY)
 		else:
 			(bFind, sName, iPosX, iPosY, dwTextColor, dwGuildID) = miniMap.GetAtlasInfo(mouseX, mouseY)
@@ -185,7 +187,7 @@ class AtlasWindow(ui.ScriptWindow):
 		if "empty_guild_area" == sName:
 			sName = localeInfo.GUILD_EMPTY_AREA
 
-		if app.ENABLE_RENEWAL_REGEN:
+		if app.ENABLE_ULTIMATE_REGEN:
 			if diRegenTime != 0:
 				self.tooltipInfo.SetText(localeInfo.MINIMAP_BOSS_RESPAWN_TIME % FormatTime(diRegenTime))
 
@@ -236,7 +238,7 @@ class AtlasWindow(ui.ScriptWindow):
 	if app.ENABLE_MAP_TELEPORT:
 		def OnMouseLeftButtonUpEvent(self):
 			(mouseX, mouseY) = wndMgr.GetMousePosition()
-			if app.ENABLE_RENEWAL_REGEN:
+			if app.ENABLE_ULTIMATE_REGEN:
 				(bFind, sName, iPosX, iPosY, dwTextColor, dwGuildID, diRegenTime) = miniMap.GetAtlasInfo(mouseX, mouseY)
 			else:
 				(bFind, sName, iPosX, iPosY, dwTextColor, dwGuildID) = miniMap.GetAtlasInfo(mouseX, mouseY)
@@ -248,6 +250,330 @@ class AtlasWindow(ui.ScriptWindow):
 		self.Hide()
 		return TRUE
 
+if app.ENABLE_SUNG_MAHI_TOWER:
+	class MovableText(ui.TextLine):
+		def __init__(self):
+			ui.TextLine.__init__(self)
+
+			try:
+				self.__Initialize()
+				self.__LoadObjects()
+
+			except:
+				import exception
+				exception.Abort("MovableText.__init__")
+
+		def __del__(self):
+			ui.TextLine.__del__(self)
+
+		def __Initialize(self):
+			self.posX = 0
+			self.posY = 0
+
+			self.defaultText = ""
+			self.default_x_pos = 0
+			self.default_y_pos = 0
+
+			self.updateContor = 0
+			self.defaultTextSize = 0
+
+			self.hideParameter = 0
+
+		def __LoadObjects(self):
+			self.SetPosition(115, 57)
+			self.SetText("")
+			self.Show()
+
+			self.defaultTextSize = self.GetTextSize()[0]
+
+		def SetPos(self, x, y, hide_parameter):
+			self.SetPosition(x, y)
+
+			self.posX = x
+			self.posY = y
+
+			self.default_x_pos = x
+			self.default_y_pos = y
+
+			self.hideParameter = hide_parameter
+
+		def SetTextInfo(self, text):
+			self.SetText(text)
+			self.defaultText = text
+			self.defaultTextSize = self.GetTextSize()[0]
+
+		def GetTextX(self):
+			return self.posX
+
+		def GetTextY(self):
+			return self.posY
+
+		def SetTextPos(self, value):
+			self.posX = value
+
+		def GetDefaultText(self):
+			return self.defaultText
+
+		def GetLevelDescriptionUpdate(self):
+			return self.updateContor
+
+		def SeUpdateContor(self, value):
+			self.updateContor = value
+
+		def GetDefaultTextSize(self):
+			return self.defaultTextSize
+
+		def UpdateRender(self):
+			defaultText = self.GetDefaultText()
+
+			if not self.IsShow():
+				self.Show()
+
+			if self.GetTextX() < (self.hideParameter - self.GetDefaultTextSize()):
+				self.SetTextPos(self.default_x_pos)
+				self.SeUpdateContor(0)
+
+				self.SetText(self.GetDefaultText())
+				self.Hide()
+
+			if self.GetTextX() < self.hideParameter:
+				if self.GetTextX() % 5 == 0:
+					textSize = len(defaultText)
+					self.SeUpdateContor(self.GetLevelDescriptionUpdate() + 1)
+
+					self.SetTextPos(self.GetTextX() + (self.GetCharSize() - 1))
+					self.SetText(defaultText[self.GetLevelDescriptionUpdate():textSize])
+
+			self.SetPosition((self.GetTextX() - 1), self.GetTextY())
+			self.SetTextPos(self.GetTextX() - 1)
+
+	class SungMahiCover(ui.ImageBox):
+		def __init__(self):
+			ui.ImageBox.__init__(self)
+			
+			try:
+				self.__Initialize()
+				self.__LoadObjects()
+			
+			except:
+				import exception
+				exception.Abort("SungMahiCover.__init__")
+
+		def __del__(self):
+			ui.ImageBox.__del__(self)
+
+		def __Initialize(self):
+			self.levelDescription = None
+			self.levelCurse = None
+
+			self.minimapBG = None
+			self.roomLevel = []
+
+			self.levelInfo = None
+			self.timeGauge = None
+			self.timeGaugeText = None
+
+			self.exitDlgBox = None
+			self.dlgBoxText = None
+			self.dlgBoxAcceptButton = None
+			self.exitButton = None
+
+			self.levelCurseBG = None
+			self.levelCurseIcon = None
+
+			self.textUpdateTime = 0
+			self.gaugeUpTime = 0
+			self.gaugeGlobalTime = 0
+
+		def __LoadObjects(self):
+			self.LoadImage("d:/ymir work/ui/game/sungmahee_tower/information_bg.sub")
+
+			self.levelDescription = MovableText()
+			self.levelDescription.SetParent(self)
+			self.levelDescription.Hide()
+
+			self.minimapBG = ui.ImageBox()
+			self.minimapBG.SetParent(self)
+			self.minimapBG.LoadImage("d:/ymir work/ui/game/sungmahee_tower/smhtower_bg.png")
+			self.minimapBG.Show()
+
+			roomLevelPos = [[17, 18], [47, 12], [88, 18]]
+			for index in xrange(3):
+				roomLevel = ui.ImageBox()
+				roomLevel.SetParent(self)
+				roomLevel.LoadImage("d:/ymir work/ui/game/sungmahee_tower/{}stage_clear_icon.sub".format(index + 1))
+				roomLevel.SetPosition(roomLevelPos[index][0], roomLevelPos[index][1])
+				roomLevel.Hide()
+
+				self.roomLevel.append(roomLevel)
+
+			self.levelInfo = ui.TextLine()
+			self.levelInfo.SetParent(self)
+			self.levelInfo.SetPosition(68, 36)
+			self.levelInfo.SetHorizontalAlignCenter()
+			self.levelInfo.SetPackedFontColor(0xffffaf00)
+			self.levelInfo.SetText("L50")
+			self.levelInfo.Show()
+
+			self.timeGauge = ui.ExpandedImageBox()
+			self.timeGauge.SetParent(self)
+			self.timeGauge.SetPosition(16, 78)
+			self.timeGauge.LoadImage("d:/ymir work/ui/game/sungmahee_tower/information_gauge.sub")
+			self.timeGauge.SetPercentage(0, 0)
+			self.timeGauge.Show()
+
+			self.timeGaugeText = ui.TextLine()
+			self.timeGaugeText.SetParent(self.timeGauge)
+			self.timeGaugeText.SetPosition(53, 0)
+			self.timeGaugeText.SetHorizontalAlignCenter()
+			self.timeGaugeText.Show()
+
+			self.exitDlgBox = ui.Board()
+			self.exitDlgBox.SetSize(300, 100)
+			self.exitDlgBox.SetPosition((wndMgr.GetScreenWidth() / 2) - 150, (wndMgr.GetScreenHeight() / 2) - 100)
+			# self.exitDlgBox.SetCloseEvent(self.DenyExit)
+
+			self.dlgBoxText = ui.TextLine()
+			self.dlgBoxText.SetParent(self.exitDlgBox)
+			self.dlgBoxText.SetPosition(150, 30)
+			self.dlgBoxText.SetHorizontalAlignCenter()
+			self.dlgBoxText.SetText(uiScriptLocale.SUNGMAHEE_TOWER_DUNGEON_EXIT_QUESTION)
+			self.dlgBoxText.Show()
+
+			self.dlgBoxDenyButton = ui.Button()
+			self.dlgBoxDenyButton.SetParent(self.exitDlgBox)
+			self.dlgBoxDenyButton.SetUpVisual("d:/ymir work/ui/public/middle_button_01.sub")
+			self.dlgBoxDenyButton.SetOverVisual("d:/ymir work/ui/public/middle_button_02.sub")
+			self.dlgBoxDenyButton.SetDownVisual("d:/ymir work/ui/public/middle_button_03.sub")
+			self.dlgBoxDenyButton.SetPosition(155, 55)
+			self.dlgBoxDenyButton.SetEvent(ui.__mem_func__(self.DenyExit))
+			self.dlgBoxDenyButton.SetText(uiScriptLocale.NO)
+			self.dlgBoxDenyButton.Show()
+
+			self.dlgBoxAcceptButton = ui.Button()
+			self.dlgBoxAcceptButton.SetParent(self.exitDlgBox)
+			self.dlgBoxAcceptButton.SetUpVisual("d:/ymir work/ui/public/middle_button_01.sub")
+			self.dlgBoxAcceptButton.SetOverVisual("d:/ymir work/ui/public/middle_button_02.sub")
+			self.dlgBoxAcceptButton.SetDownVisual("d:/ymir work/ui/public/middle_button_03.sub")
+			self.dlgBoxAcceptButton.SetPosition(75, 55)
+			self.dlgBoxAcceptButton.SetEvent(ui.__mem_func__(self.AcceptExit))
+			self.dlgBoxAcceptButton.SetText(uiScriptLocale.YES)
+			self.dlgBoxAcceptButton.Show()
+
+			self.exitDlgBox.Hide()
+
+			self.exitButton = ui.Button()
+			self.exitButton.SetParent(self)
+			self.exitButton.SetUpVisual("d:/ymir work/ui/game/sungmahee_tower/exit_button_default.sub")
+			self.exitButton.SetOverVisual("d:/ymir work/ui/game/sungmahee_tower/exit_button_over.sub")
+			self.exitButton.SetDownVisual("d:/ymir work/ui/game/sungmahee_tower/exit_button_down.sub")
+			self.exitButton.SetPosition(54, 98)
+			self.exitButton.SetEvent(ui.__mem_func__(self.ShowExitDialog))
+			self.exitButton.Show()
+
+			self.levelCurseBG = ui.ImageBox()
+			self.levelCurseBG.SetParent(self)
+			self.levelCurseBG.LoadImage("d:/ymir work/ui/game/sungmahee_tower/buff_debuff.sub")
+			self.levelCurseBG.SetPosition(15, 140)
+			self.levelCurseBG.Hide()
+
+			self.levelCurse = MovableText()
+			self.levelCurse.SetParent(self)
+			self.levelCurse.Hide()
+
+			self.levelCurseIcon = ui.ExpandedImageBox()
+			self.levelCurseIcon.SetParent(self)
+			self.levelCurseIcon.LoadImage("d:/ymir work/ui/skill/common/affect/sungmahee_tower_debuff.sub")
+			self.levelCurseIcon.SetScale(0.7, 0.7)
+			self.levelCurseIcon.SetPosition(-7, 141)
+			self.levelCurseIcon.Hide()
+
+			self.Show()
+
+		def Destroy(self):
+			self.__Initialize()
+
+		def SetLevelInfo(self, level):
+			self.levelInfo.SetText(uiScriptLocale.SUNGMAHEE_TOWER_INFO_BOARD_FLOOR % int(level))
+
+		def UpdateRoomTime(self, roomTime):
+			roomTime = int(roomTime)
+
+			self.timeGauge.SetPercentage(roomTime, roomTime)
+			self.timeGaugeText.Show()
+
+			self.gaugeUpTime = roomTime
+			self.gaugeGlobalTime = app.GetGlobalTimeStamp()
+
+		def SetRoomLevel(self, level):
+			for roomIndex in self.roomLevel:
+				roomIndex.Hide()
+
+			for index in xrange(int(level)):
+				self.roomLevel[index].Show()
+
+			#since it's completing a stage, reset the gauge
+			self.timeGauge.SetPercentage(0, 0)
+			self.timeGaugeText.Hide()
+			self.gaugeUpTime = 0
+
+		def SetLevelDescriptionText(self, noticeText):
+			self.levelDescription.SetPos(115, 57, 17)
+			self.levelDescription.SetTextInfo(noticeText)
+			self.levelDescription.Show()
+
+		def SetLevelCurseText(self, noticeText, noticeType = 2):
+			self.levelCurse.SetPos(134, 144, 5)
+			self.levelCurse.SetTextInfo(noticeText)
+
+			self.levelCurse.Show()
+			self.levelCurseBG.Show()
+
+			iconPath = (noticeType > 2 and "d:/ymir work/ui/skill/common/affect/sungmahee_tower_debuff.sub" or "d:/ymir work/ui/skill/common/affect/sungmahee_tower_buff.sub")
+			self.levelCurseIcon.LoadImage(iconPath)
+			self.levelCurseIcon.SetScale(0.7, 0.7)
+
+			self.levelCurseIcon.Show()
+
+		def SungMahiClearNotice(self, noticeType):
+			if noticeType == 1:
+				self.SetLevelDescriptionText("")
+			else:
+				self.SetLevelCurseText("")
+
+				self.levelCurse.Hide()
+				self.levelCurseBG.Hide()
+				self.levelCurseIcon.Hide()
+
+		def AcceptExit(self):
+			net.SendChatPacket("/restart_here")
+			self.DenyExit()
+
+		def DenyExit(self):
+			if self.exitDlgBox.IsShow():
+				self.exitDlgBox.Hide()
+
+		def ShowExitDialog(self):
+			self.exitDlgBox.Show()
+
+		def Update(self):
+			curTime = app.GetTime()
+			if (self.textUpdateTime - curTime) <= 1:
+				self.textUpdateTime = (curTime + 1.01)
+
+				actualTime = (app.GetGlobalTimeStamp() - self.gaugeGlobalTime)
+				if actualTime <= self.gaugeUpTime:
+					self.timeGauge.SetPercentage((self.gaugeUpTime - actualTime), self.gaugeUpTime)
+					endTime = self.gaugeUpTime - actualTime
+
+					self.timeGaugeText.SetText("{}".format(localeInfo.SecondToM(endTime)))
+					if endTime < 60:
+						self.timeGaugeText.SetText("< {}".format(localeInfo.SecondToM(endTime)))
+
+				self.levelDescription.UpdateRender()
+				self.levelCurse.UpdateRender()
+
+
 def __RegisterMiniMapColor(type, rgb):
 	miniMap.RegisterColor(type, rgb[0], rgb[1], rgb[2])
 
@@ -257,11 +583,21 @@ class MiniMap(ui.ScriptWindow):
 		"metin2_map_monkeydungeon_02" : FALSE,
 		"metin2_map_monkeydungeon_03" : FALSE,
 		"metin2_map_devilsCatacomb" : FALSE,
-		"metin2_12zi_stage" : FALSE,
 		"metin2_map_maze_dungeon1" : FALSE,
 		"metin2_map_maze_dungeon2" : FALSE,
 		"metin2_map_maze_dungeon3" : FALSE,
 	}
+
+	MAPS_GLOBAL = {
+		"metin2_map_a1",
+		"metin2_map_c1",
+		"metin2_map_b1",
+		"metin2_map_battleroyale"
+	}
+	if app.ENABLE_ZODIAC_MISSION:
+		CANNOT_SEE_INFO_MAP_DICT.update({
+			"metin2_12zi_stage" : FALSE,
+		})
 
 	def __init__(self):
 		ui.ScriptWindow.__init__(self)
@@ -274,6 +610,14 @@ class MiniMap(ui.ScriptWindow):
 		self.AtlasWindow = AtlasWindow()
 		self.AtlasWindow.LoadWindow()
 		self.AtlasWindow.Hide()
+
+		if app.ENABLE_SUNG_MAHI_TOWER:
+			self.sungMahiCover = SungMahiCover()
+			self.sungMahiCover.SetParent(self)
+			self.sungMahiCover.SetPosition(3, 0)
+			self.sungMahiCover.Hide()
+
+		self.interface = None
 
 		self.tooltipMiniMapOpen = MapTextToolTip()
 		self.tooltipMiniMapOpen.SetText(localeInfo.MINIMAP)
@@ -291,6 +635,23 @@ class MiniMap(ui.ScriptWindow):
 		self.tooltipAtlasOpen.SetText(localeInfo.MINIMAP_SHOW_AREAMAP)
 		self.tooltipAtlasOpen.Show()
 
+		self.tooltipDungeonInfo = MapTextToolTip()
+		self.tooltipDungeonInfo.SetText(localeInfo.SYSTEM_DUNGEON_BUTTON)
+		#self.tooltipDungeonInfo.Show()
+
+		self.tooltiprank = MapTextToolTip()
+		self.tooltiprank.SetText(localeInfo.RANK_TITLE)
+
+		if app.ENABLE_BIOLOGIST_SYSTEM:
+			self.tooltipBiologist = MapTextToolTip()
+			#self.tooltipBiologist.SetText("Biyolog")
+			self.tooltipBiologist.SetText(localeInfo.BIO_TITLE)
+
+		if app.ENABLE_OFFLINESHOP_SEARCH_SYSTEM:
+			self.tooltipOfflineShopSearch = MapTextToolTip()
+			#self.tooltipOfflineShopSearch.SetText("Dükkan Ara")
+			self.tooltipOfflineShopSearch.SetText(localeInfo.SEARCH_TITLE)
+
 		self.tooltipInfo = MapTextToolTip()
 		self.tooltipInfo.Show()
 
@@ -298,9 +659,6 @@ class MiniMap(ui.ScriptWindow):
 			self.tooltipAtlasOpen.SetText(localeInfo.MINIMAP_SHOW_AREAMAP)
 		else:
 			self.tooltipAtlasOpen.SetText(localeInfo.MINIMAP_CAN_NOT_SHOW_AREAMAP)
-
-		self.tooltipInfo = MapTextToolTip()
-		self.tooltipInfo.Show()
 
 		self.mapName = ""
 
@@ -317,8 +675,8 @@ class MiniMap(ui.ScriptWindow):
 		miniMap.Destroy()
 		ui.ScriptWindow.__del__(self)
 
-		if app.ENABLE_EVENT_MANAGER or app.ENABLE_DUNGEON_TRACKING_SYSTEM:
-			self.interface = None
+	def BindInterface(self, interface):
+		self.interface = interface
 
 	def __Initialize(self):
 		self.positionInfo = 0
@@ -343,20 +701,23 @@ class MiniMap(ui.ScriptWindow):
 
 		self.FPSInfo = 0
 
-		if app.ENABLE_BIOLOG_SYSTEM:
-			self.BiologButton = 0
+		if app.ENABLE_BIOLOGIST_SYSTEM:
+			self.BiologistButton = 0
+			self.tooltipBiologist = 0
 
-		if app.ENABLE_DUNGEON_TRACKING_SYSTEM:
-			self.DungeonInfoShowButton = 0
-
-		if app.ENABLE_RENEWAL_BATTLE_PASS:
-			self.BattlePassButton = 0
+		self.tooltipDungeonInfo = 0
+		self.tooltiprank = 0
+		self.btnRank = 0
 
 		if app.ENABLE_OFFLINESHOP_SEARCH_SYSTEM:
 			self.OfflineShopSearchButton = 0
+			self.tooltipOfflineShopSearch = 0
 
-		if app.ENABLE_EVENT_MANAGER:
-			self.InGameEventButton = 0
+		self.battlepassButton = 0
+		self.wndBattlePassMenu = None
+
+		if app.ENABLE_SUNG_MAHI_TOWER:
+			self.sungMahiCover = None
 
 	def SetMapName(self, mapName):
 		self.mapName = mapName
@@ -417,28 +778,34 @@ class MiniMap(ui.ScriptWindow):
 			self.positionInfo = self.GetChild("PositionInfo")
 			self.observerCount = self.GetChild("ObserverCount")
 			self.serverInfo = self.GetChild("ServerInfo")
+			if app.ENABLE_ZODIAC_MISSION:
+				self.bead = self.GetChild("bead")
+				self.beadInfo = self.GetChild("beadInfo")
 
-			if app.ENABLE_BIOLOG_SYSTEM:
-				self.BiologButton = self.GetChild("PortableBiologButton")
+			if app.ENABLE_BIOLOGIST_SYSTEM:
+				self.BiologistButton = self.GetChild("BiologistButton")
 
-			if app.ENABLE_DUNGEON_TRACKING_SYSTEM:
-				self.DungeonInfoShowButton = self.GetChild("PortableDungeonInfoButton")
-
-			if app.ENABLE_EVENT_MANAGER:
-				self.InGameEventButton = self.GetChild("InGameEventButton")
-				self.InGameEventButton.SetEvent(ui.__mem_func__(self.ToggleInGameEvent))
-
-			if app.ENABLE_RENEWAL_BATTLE_PASS:
-				self.BattlePassButton = self.GetChild("PortableBattlePassButton")
+			if app.__DUNGEON_INFO__:
+				self.btnDungeonSystem = self.GetChild("DungeonSystemButton")
 
 			if app.ENABLE_OFFLINESHOP_SEARCH_SYSTEM:
 				self.OfflineShopSearchButton = self.GetChild("PortableSearchButton")
+
+			self.btnRank = self.GetChild("OpenRewardWindow")
 
 			self.FPSInfo = self.GetChild("FPSInfo")
 
 		except:
 			import exception
 			exception.Abort("MiniMap.LoadWindow.Bind")
+
+		try:
+			self.battlepassButton = self.GetChild("battlepass")
+		except (KeyError, TypeError):
+			try:
+				self.battlepassButton = self.OpenWindow.GetChild("battlepass")
+			except (KeyError, TypeError):
+				self.battlepassButton = None
 
 		if constInfo.MINIMAP_POSITIONINFO_ENABLE == 0:
 			self.positionInfo.Hide()
@@ -449,17 +816,20 @@ class MiniMap(ui.ScriptWindow):
 		self.MiniMapHideButton.SetEvent(ui.__mem_func__(self.HideMiniMap))
 		self.MiniMapShowButton.SetEvent(ui.__mem_func__(self.ShowMiniMap))
 
-		if app.ENABLE_BIOLOG_SYSTEM:
-			self.BiologButton.SetEvent(ui.__mem_func__(self.BiologWindow))
+		if app.ENABLE_BIOLOGIST_SYSTEM:
+			self.BiologistButton.SetEvent(ui.__mem_func__(self.OpenBiyologDialog))
 
-		if app.ENABLE_DUNGEON_TRACKING_SYSTEM:
-			self.DungeonInfoShowButton.SetEvent(ui.__mem_func__(self.ShowDungeonInfo))
-
-		if app.ENABLE_RENEWAL_BATTLE_PASS:
-			self.BattlePassButton.SetEvent(ui.__mem_func__(self.ToggleBattlePass))
+		if app.__DUNGEON_INFO__:
+			self.btnDungeonSystem.SetEvent(ui.__mem_func__(self.OpenTableDungeonInfo))
 
 		if app.ENABLE_OFFLINESHOP_SEARCH_SYSTEM:
 			self.OfflineShopSearchButton.SetEvent(ui.__mem_func__(self.OfflineShopSearch))
+
+		self.btnRank.SetEvent(ui.__mem_func__(self.OpenRanking))
+
+		if self.battlepassButton:
+			self.battlepassButton.SetEvent(ui.__mem_func__(self.OpenBattlePassMenu))
+			self.__CreateBattlePassMenu()
 
 		if miniMap.IsAtlas():
 			self.AtlasShowButton.SetEvent(ui.__mem_func__(self.ShowAtlas))
@@ -479,10 +849,113 @@ class MiniMap(ui.ScriptWindow):
 		(ButtonPosX, ButtonPosY) = self.AtlasShowButton.GetGlobalPosition()
 		self.tooltipAtlasOpen.SetTooltipPosition(ButtonPosX, ButtonPosY)
 
+		if app.__DUNGEON_INFO__:
+			if self.btnDungeonSystem:
+				(ButtonPosX, ButtonPosY) = self.btnDungeonSystem.GetGlobalPosition()
+				self.tooltipDungeonInfo.SetTooltipPosition(ButtonPosX, ButtonPosY)
+
+		(ButtonPosX, ButtonPosY) = self.btnRank.GetGlobalPosition()
+		self.tooltiprank.SetTooltipPosition(ButtonPosX, ButtonPosY)
+
+		if app.ENABLE_BIOLOGIST_SYSTEM:
+			if self.BiologistButton:
+				(ButtonPosX, ButtonPosY) = self.BiologistButton.GetGlobalPosition()
+				self.tooltipBiologist.SetTooltipPosition(ButtonPosX, ButtonPosY)
+
+		if app.ENABLE_OFFLINESHOP_SEARCH_SYSTEM:
+			if self.OfflineShopSearchButton:
+				(ButtonPosX, ButtonPosY) = self.OfflineShopSearchButton.GetGlobalPosition()
+				self.tooltipOfflineShopSearch.SetTooltipPosition(ButtonPosX, ButtonPosY)
+
 		self.ShowMiniMap()
+
+		self.GetMapsGlobal()
+
+	if app.ENABLE_RANKING:
+		def OpenRanking(self):
+			if self.interface:
+				self.interface.OpenRanking()
+
+		def RankingClearData(self):
+			if self.interface:
+				self.interface.RankingClearData()
+
+		def RankingAddRank(self, position, level, points, name, realPosition):
+			if self.interface:
+				self.interface.RankingAddRank(position, level, points, name, realPosition)
+
+		def RankingRefresh(self):
+			if self.interface:
+				self.interface.RankingRefresh()
+
+	def __CreateBattlePassMenu(self):
+		if self.wndBattlePassMenu:
+			return
+		self.wndBattlePassMenu = uiCommon.QuestionDialog()
+		self.wndBattlePassMenu.SetText("Savaþ Bileti Seçiniz")
+		self.wndBattlePassMenu.SetAcceptText("Ücretsiz")
+		self.wndBattlePassMenu.SetCancelText("Premium")
+		self.wndBattlePassMenu.SetAcceptEvent(ui.__mem_func__(self._OnBattlePassAccept))
+		self.wndBattlePassMenu.SetCancelEvent(ui.__mem_func__(self._OnBattlePassCancel))
+
+	def _OnBattlePassAccept(self):
+		self.wndBattlePassMenu.Close()
+		net.SendChatPacket("/open_battlepass")
+
+	def _OnBattlePassCancel(self):
+		self.wndBattlePassMenu.Close()
+		net.SendChatPacket("/open_battlepass_premium")
+
+	def OpenBattlePassMenu(self):
+		if not self.battlepassButton or not self.wndBattlePassMenu:
+			return
+		self.wndBattlePassMenu.Open()
+
+	def BattlePassMenu(self):
+		pass
+
+	def BattlePassPremiumMenu(self):
+		pass
+
+	def GetMapsGlobal(self):
+		for x in self.MAPS_GLOBAL:
+			if background.GetCurrentMapName() == x:
+				text = net.GetServerInfo().split(",")
+				self.serverInfo.SetText("{}, Ortak Kanal".format(text[0]))
+				break
+			else:
+				self.serverInfo.SetText(net.GetServerInfo())
+
+	if app.__DUNGEON_INFO__:
+		def OpenTableDungeonInfo(self):
+			try:
+				if self.interface:
+					if hasattr(self.interface, 'OpenDungeonInfo'):
+						self.interface.OpenDungeonInfo()
+					else:
+						import dbg
+						dbg.TraceError("OpenTableDungeonInfo: self.interface.OpenDungeonInfo not found")
+				else:
+					interface = constInfo.GetInterfaceInstance()
+					if interface:
+						if hasattr(interface, 'OpenDungeonInfo'):
+							interface.OpenDungeonInfo()
+						else:
+							import dbg
+							dbg.TraceError("OpenTableDungeonInfo: interface.OpenDungeonInfo not found")
+			except Exception, e:
+				import dbg
+				dbg.TraceError("OpenTableDungeonInfo Error: %s" % str(e))
+
+	def OpenWikiWindow(self):
+		interface = constInfo.GetInterfaceInstance()
+		if interface != None:
+			interface.OpenWikiWindow()
 
 	def Destroy(self):
 		self.HideMiniMap()
+		if self.wndBattlePassMenu and self.wndBattlePassMenu.IsShow():
+			self.wndBattlePassMenu.Hide()
 
 		self.AtlasWindow.Destroy()
 		self.AtlasWindow = None
@@ -558,6 +1031,33 @@ class MiniMap(ui.ScriptWindow):
 		else:
 			self.tooltipAtlasOpen.Hide()
 
+		if app.ENABLE_SUNG_MAHI_TOWER:
+			if self.sungMahiCover.IsShow():
+				self.sungMahiCover.Update()
+
+		if app.__DUNGEON_INFO__:
+			if self.btnDungeonSystem and True == self.btnDungeonSystem.IsIn():
+				self.tooltipDungeonInfo.Show()
+			else:
+				self.tooltipDungeonInfo.Hide()
+
+		if True == self.btnRank.IsIn():
+			self.tooltiprank.Show()
+		else:
+			self.tooltiprank.Hide()
+
+		if app.ENABLE_BIOLOGIST_SYSTEM:
+			if self.BiologistButton and True == self.BiologistButton.IsIn():
+				self.tooltipBiologist.Show()
+			else:
+				self.tooltipBiologist.Hide()
+
+		if app.ENABLE_OFFLINESHOP_SEARCH_SYSTEM:
+			if self.OfflineShopSearchButton and True == self.OfflineShopSearchButton.IsIn():
+				self.tooltipOfflineShopSearch.Show()
+			else:
+				self.tooltipOfflineShopSearch.Hide()
+
 	def OnRender(self):
 		(x, y) = self.GetGlobalPosition()
 		fx = float(x)
@@ -571,7 +1071,13 @@ class MiniMap(ui.ScriptWindow):
 		miniMap.Hide()
 		self.OpenWindow.Hide()
 		self.CloseWindow.Show()
+		if app.ENABLE_SUNG_MAHI_TOWER:
+			if self.sungMahiCover:
+				self.sungMahiCover.Hide()
 
+		if app.ENABLE_SUNG_MAHI_TOWER:
+			if self.sungMahiCover:
+				self.sungMahiCover.Hide()
 	def ShowMiniMap(self):
 		if not self.canSeeInfo:
 			return
@@ -579,6 +1085,18 @@ class MiniMap(ui.ScriptWindow):
 		miniMap.Show()
 		self.OpenWindow.Show()
 		self.CloseWindow.Hide()
+
+		if app.ENABLE_SUNG_MAHI_TOWER:
+			if self.sungMahiCover and self.mapName == "metin2_map_smhdungeon_02":
+				self.HideMiniMap()
+				self.CloseWindow.Hide()
+				self.sungMahiCover.Show()
+				self.GetChild("bio").Hide()
+				self.btnDungeonSystem.Hide()
+				# self.evenimente.Hide()
+				self.btnSearch.Hide()
+				self.btnRank.Hide()
+				self.btnWiki.Hide()
 
 	def isShowMiniMap(self):
 		return miniMap.isShow()
@@ -609,21 +1127,15 @@ class MiniMap(ui.ScriptWindow):
 		from _weakref import proxy
 		self.interface = proxy(interface)
 
-	if app.ENABLE_BIOLOG_SYSTEM:
-		def BiologWindow(self):
-			biologmgr.SendPacket(net.BIOLOG_MANAGER_OPEN)
+	if app.ENABLE_BIOLOGIST_SYSTEM:
+		def SetBiyologMission(self, mission, missionState, givenCount, needCount, remainingTime):
+			if self.wndBiyologWindow:
+				self.wndBiyologWindow.SetMission(mission, missionState, givenCount, needCount, remainingTime)
 
-	if app.ENABLE_DUNGEON_TRACKING_SYSTEM:
-		def ShowDungeonInfo(self):
-			self.interface.OpenTrackWindow()
+		def OpenBiyologDialog(self):
+			if self.interface and hasattr(self.interface, 'OpenBiyologDialog'):
+				self.interface.OpenBiyologDialog()
 
-	if app.ENABLE_EVENT_MANAGER:
-		def ToggleInGameEvent(self):
-			self.interface.ToggleInGameEvent()
-
-	if app.ENABLE_RENEWAL_BATTLE_PASS:
-		def ToggleBattlePass(self):
-			self.interface.ToggleBattlePassExtended()
 
 	if app.ENABLE_OFFLINESHOP_SEARCH_SYSTEM:
 		def OfflineShopSearch(self):

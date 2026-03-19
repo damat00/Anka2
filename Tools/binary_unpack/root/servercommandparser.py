@@ -1,6 +1,7 @@
 if __USE_DYNAMIC_MODULE__:
 	import pyapi
 
+app = __import__(pyapi.GetModuleName("app"))
 net = __import__(pyapi.GetModuleName("net"))
 
 import background
@@ -13,21 +14,39 @@ class ServerCommandParser(object):
 		net.SetServerCommandParserWindow(self)
 		self.__ServerCommand_Build()
 
-	def __ServerCommand_Build(self):
-		serverCommandList={
-			"DayMode"				: self.__DayMode_Update, 
-			"xmas_snow"				: self.__XMasSnow_Enable,
-			"xmas_boom"				: self.__XMasBoom_Enable,
-			"xmas_tree"				: self.__XMasTree_Enable,
-			"newyear_boom"			: self.__XMasBoom_Enable,
-			"item_mall"				: self.__ItemMall_Open,
-		}
+	if app.ENABLE_SOUL_ROULETTE_SYSTEM:
+		def __ServerCommand_Build(self):
+			serverCommandList={
+				"DayMode"				: self.__DayMode_Update,
+				"xmas_snow"				: self.__XMasSnow_Enable,
+				"xmas_boom"				: self.__XMasBoom_Enable,
+				"xmas_tree"				: self.__XMasTree_Enable,
+				"newyear_boom"			: self.__XMasBoom_Enable,
+				"item_mall"				: self.__ItemMall_Open,
+				"xmas_soul"				: self.__XMasSoul_Enable,
+			}
 
-		self.serverCommander=stringCommander.Analyzer()
-		for serverCommandItem in serverCommandList.items():
-			self.serverCommander.SAFE_RegisterCallBack(
-				serverCommandItem[0], serverCommandItem[1]
-			)
+			self.serverCommander=stringCommander.Analyzer()
+			for serverCommandItem in serverCommandList.items():
+				self.serverCommander.SAFE_RegisterCallBack(
+					serverCommandItem[0], serverCommandItem[1]
+				)
+	else:
+		def __ServerCommand_Build(self):
+			serverCommandList={
+				"DayMode"				: self.__DayMode_Update, 
+				"xmas_snow"				: self.__XMasSnow_Enable,
+				"xmas_boom"				: self.__XMasBoom_Enable,
+				"xmas_tree"				: self.__XMasTree_Enable,
+				"newyear_boom"			: self.__XMasBoom_Enable,
+				"item_mall"				: self.__ItemMall_Open,
+			}
+
+			self.serverCommander=stringCommander.Analyzer()
+			for serverCommandItem in serverCommandList.items():
+				self.serverCommander.SAFE_RegisterCallBack(
+					serverCommandItem[0], serverCommandItem[1]
+				)
 
 	def BINARY_ServerCommand_Run(self, line):
 		try:
@@ -39,7 +58,7 @@ class ServerCommandParser(object):
 			return 0
 
 	def __PreserveCommand(self, line):
-		net.PreserveServerCommand(line)	
+		net.PreserveServerCommand(line)
 
 	def __DayMode_Update(self, mode):
 		self.__PreserveCommand("PRESERVE_DayMode " + mode)
@@ -52,9 +71,18 @@ class ServerCommandParser(object):
 			self.__PreserveCommand("PRESERVE_DayMode dark")
 		else:
 			self.__PreserveCommand("PRESERVE_DayMode light")
+
 	def __XMasSnow_Enable(self, mode):
 		self.__PreserveCommand("xmas_snow " + mode)
+
 	def __XMasTree_Enable(self, grade):
 		self.__PreserveCommand("xmas_tree " + grade)
+
+	if app.ENABLE_SOUL_ROULETTE_SYSTEM:
+		def __XMasSoul_Enable(self, mode):
+			if "1"==mode:
+				self.__PreserveCommand("PRESERVE_DayMode red")
+			else:
+				self.__PreserveCommand("PRESERVE_DayMode light")
 
 parserWnd = ServerCommandParser()

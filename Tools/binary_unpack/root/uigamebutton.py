@@ -25,6 +25,7 @@ class GameButtonWindow(ui.ScriptWindow):
 		try:
 			pyScrLoader = ui.PythonScriptLoader()
 			pyScrLoader.LoadScriptFile(self, filename)
+
 		except Exception, msg:
 			import dbg
 			dbg.TraceError("GameButtonWindow.LoadScript - %s" % (msg))
@@ -32,12 +33,14 @@ class GameButtonWindow(ui.ScriptWindow):
 			return FALSE
 
 		try:
-			self.gameButtonDict={
+			self.gameButtonDict = {
 				"STATUS" : self.GetChild("StatusPlusButton"),
 				"SKILL" : self.GetChild("SkillPlusButton"),
 				"QUEST" : self.GetChild("QuestButton"),
 				"BUILD" : self.GetChild("BuildGuildBuilding"),
 				"EXIT_OBSERVER" : self.GetChild("ExitObserver"),
+				#"BATTLEPASS" : self.GetChild("BattlePass"),##ENABLE_BATTLE_PASS
+				#"BATTLEPASSPREMIUM" : self.GetChild("BattlePassPremium"),##ENABLE_BATTLE_PASS
 			}
 
 			if app.ENABLE_SECOND_GUILDRENEWAL_SYSTEM:
@@ -45,6 +48,19 @@ class GameButtonWindow(ui.ScriptWindow):
 				self.gameButtonDict["GUILDWAR"].SetEvent(ui.__mem_func__(self.__RequestGuildWarEnter))
 
 			self.gameButtonDict["EXIT_OBSERVER"].SetEvent(ui.__mem_func__(self.__OnClickExitObserver))
+			#if app.ENABLE_BATTLE_PASS:
+			#	self.gameButtonDict["BATTLEPASS"].SetEvent(ui.__mem_func__(self.__OnClickBattlePass))
+			#	self.gameButtonDict["BATTLEPASSPREMIUM"].SetEvent(ui.__mem_func__(self.__OnClickBattlePassPremium))
+
+			if app.ENABLE_GAYA_SYSTEM:
+				posx, posy = self.gameButtonDict["SKILL"].GetGlobalPosition()
+				self.gameButtonDict["SKILL"].SetPosition(posx, posy - 25 )
+
+				posx, posy = self.gameButtonDict["BUILD"].GetGlobalPosition()
+				self.gameButtonDict["BUILD"].SetPosition(posx, posy - 25 )
+
+				posx, posy = self.gameButtonDict["EXIT_OBSERVER"].GetGlobalPosition()
+				self.gameButtonDict["EXIT_OBSERVER"].SetPosition(posx, posy - 25 )
 
 		except Exception, msg:
 			import dbg
@@ -97,6 +113,7 @@ class GameButtonWindow(ui.ScriptWindow):
 	def SetButtonEvent(self, name, event):
 		try:
 			self.gameButtonDict[name].SetEvent(event)
+
 		except Exception, msg:
 			print "GameButtonWindow.LoadScript - %s" % (msg)
 			app.Abort()
@@ -107,6 +124,19 @@ class GameButtonWindow(ui.ScriptWindow):
 
 	def HideBuildButton(self):
 		self.gameButtonDict["BUILD"].Hide()
+
+	#if app.ENABLE_BATTLE_PASS:
+	#	def ShowPassButton(self):
+	#		self.gameButtonDict["BATTLEPASS"].Show()
+	#
+	#	def HidePassButton(self):
+	#		self.gameButtonDict["BATTLEPASS"].Hide()
+	#
+	#	def ShowPassButtonPremium(self):
+	#		self.gameButtonDict["BATTLEPASSPREMIUM"].Show()
+	#
+	#	def HidePassButtonPremium(self):
+	#		self.gameButtonDict["BATTLEPASSPREMIUM"].Hide()
 
 	def CheckGameButton(self):
 
@@ -152,3 +182,10 @@ class GameButtonWindow(ui.ScriptWindow):
 				self.gameButtonDict["EXIT_OBSERVER"].Show()
 			else:
 				self.gameButtonDict["EXIT_OBSERVER"].Hide()
+
+	#if app.ENABLE_BATTLE_PASS:
+	#	def __OnClickBattlePass(self):
+	#		net.SendChatPacket("/open_battlepass")
+	#
+	#	def __OnClickBattlePassPremium(self):
+	#		net.SendChatPacket("/open_battlepass_premium")

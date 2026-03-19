@@ -283,8 +283,8 @@ void CActorInstance::ProcessMotionEventSpecialAttacking(int iMotionEventIndex, c
 	const CRaceMotionData::TMotionAttackingEventData * c_pAttackingData = (const CRaceMotionData::TMotionAttackingEventData *)c_pData;
 
 	float fRadian = D3DXToRadian(270.0f + 360.0f - GetRotation());
-	m_kSplashArea.isEnableHitProcess=c_pAttackingData->isEnableHitProcess;
-	m_kSplashArea.uSkill=m_kCurMotNode.uSkill;
+	m_kSplashArea.isEnableHitProcess = c_pAttackingData->isEnableHitProcess;
+	m_kSplashArea.uSkill = m_kCurMotNode.uSkill;
 	m_kSplashArea.MotionKey = m_kCurMotNode.dwMotionKey;
 	m_kSplashArea.fDisappearingTime = GetLocalTime() + c_pAttackingData->fDurationTime;
 	m_kSplashArea.c_pAttackingEvent = c_pAttackingData;
@@ -294,13 +294,13 @@ void CActorInstance::ProcessMotionEventSpecialAttacking(int iMotionEventIndex, c
 	m_kSplashArea.SphereInstanceVector.resize(c_pAttackingData->CollisionData.SphereDataVector.size());
 	for (DWORD i = 0; i < c_pAttackingData->CollisionData.SphereDataVector.size(); ++i)
 	{
-		const TSphereData & c_rSphereData = c_pAttackingData->CollisionData.SphereDataVector[i].GetAttribute();
-		CDynamicSphereInstance & rSphereInstance = m_kSplashArea.SphereInstanceVector[i];
+		const TSphereData& c_rSphereData = c_pAttackingData->CollisionData.SphereDataVector[i].GetAttribute();
+		CDynamicSphereInstance& rSphereInstance = m_kSplashArea.SphereInstanceVector[i];
 
 		rSphereInstance.fRadius = c_rSphereData.fRadius;
 
-		rSphereInstance.v3Position.x = m_x + c_rSphereData.v3Position.x*sinf(fRadian) + c_rSphereData.v3Position.y*cosf(fRadian);
-		rSphereInstance.v3Position.y = m_y + c_rSphereData.v3Position.x*cosf(fRadian) - c_rSphereData.v3Position.y*sinf(fRadian);
+		rSphereInstance.v3Position.x = m_x + c_rSphereData.v3Position.x * sinf(fRadian) + c_rSphereData.v3Position.y * cosf(fRadian);
+		rSphereInstance.v3Position.y = m_y + c_rSphereData.v3Position.x * cosf(fRadian) - c_rSphereData.v3Position.y * sinf(fRadian);
 		rSphereInstance.v3Position.z = m_z + c_rSphereData.v3Position.z;
 		rSphereInstance.v3LastPosition = rSphereInstance.v3Position;
 	}

@@ -152,8 +152,12 @@ class MainStream(object):
 	def SetLoginPhase(self):
 		net.Disconnect()
 
-		import introLogin
-		self.SetPhaseWindow(introLogin.LoginWindow(self))
+		import constInfo
+		if constInfo.ENABLE_UI_DEBUG_WINDOW:
+			self.SetPhaseWindow(DebugWindow(self))
+		else:
+			import introLogin
+			self.SetPhaseWindow(introLogin.LoginWindow(self))
 
 	def SameLogin_SetLoginPhase(self):
 		net.Disconnect()
@@ -297,3 +301,204 @@ class MainStream(object):
 
 	def EmptyFunction(self):
 		pass
+
+import dbg, ime, time, ui, constInfo, wndMgr
+class DebugWindow(ui.ScriptWindow):
+    def __init__(self, stream):
+        ui.ScriptWindow.__init__(self)
+        net.SetPhaseWindow(net.PHASE_WINDOW_LOGIN, self)
+        net.SetAccountConnectorHandler(self)
+        self.stream=stream
+        # extra
+        self.autoUpdate = True
+        self.lastUpdate = 0
+        self.debugUpdate = 0
+        self.hideTipUI = False
+        self.squares = [[0,0],[0,0]]
+        self.mousePress = False
+
+    def __del__(self):
+        net.ClearPhaseWindow(net.PHASE_WINDOW_LOGIN, self)
+        net.SetAccountConnectorHandler(0)
+        ui.ScriptWindow.__del__(self)
+
+    def LoadDefaultWindow(self):
+        self.blackboard = ui.Bar("GAME")#bottom ui
+        self.blackboard.AddFlag("attach")
+        self.blackboard.SetPosition(0, 0)
+        self.blackboard.SetSize(wndMgr.GetScreenWidth(), wndMgr.GetScreenHeight())
+        self.blackboard.SetColor(0xFF7f7f7f)#0xFF000000)
+        self.blackboard.Show()
+        self.infotips = ui.TextLine()
+        self.infotips.SetParent(self.blackboard)
+        self.infotips.SetPackedFontColor(0xFFffaaaa)
+        self.infotips.SetOutline()
+        self.infotips.SetFontName("Arial:24")
+        self.infotips.SetText("F5 MANUAL-REFRESH - F6 AUTOMATIC-REFRESH - F7 HIDE TIPS")
+        self.infotips.SetPosition(wndMgr.GetScreenWidth() / 2 - self.infotips.GetTextSize()[0] / 2, 20)
+        self.infotips.Show()
+        self.updatetips = ui.TextLine()
+        self.updatetips.SetParent(self.blackboard)
+        self.updatetips.SetPackedFontColor(0xFFff6666)
+        self.updatetips.SetOutline()
+        self.updatetips.SetFontName("Arial:20")
+        self.updatetips.SetText("AUTOREFRESH STATUS: {}".format("ON" if self.autoUpdate else "OFF"))
+        self.updatetips.SetPosition(wndMgr.GetScreenWidth() / 2 - self.updatetips.GetTextSize()[0] / 2, 40)
+        self.updatetips.Show()
+        self.debugtips = ui.TextLine()
+        self.debugtips.SetParent(self.blackboard)
+        self.debugtips.SetPackedFontColor(0xFF66ff66)
+        self.debugtips.SetOutline()
+        self.debugtips.SetFontName("Arial:20")
+        self.debugtips.SetText("ScreenWidth {}, ScreenHeight {}, MouseX {}, MouseY {}")
+        self.debugtips.SetPosition(wndMgr.GetScreenWidth() / 2 - self.debugtips.GetTextSize()[0] / 2, 60)
+        self.debugtips.Show()
+        self.squaretips = ui.TextLine()
+        self.squaretips.SetParent(self.blackboard)
+        self.squaretips.SetPackedFontColor(0xFF6666ff)
+        self.squaretips.SetOutline()
+        self.squaretips.SetFontName("Arial:20")
+        self.squaretips.SetText("Selected Box: Pos [xxx,xxx],[xxx,xxx] Size [xxx,xxx]")
+        self.squaretips.SetPosition(wndMgr.GetScreenWidth() / 2 - self.squaretips.GetTextSize()[0] / 2, 80)
+        self.squaretips.Hide()
+        self.squarebox = ui.Box("CURTAIN")#top ui
+        self.squarebox.AddFlag("attach")
+        self.squarebox.SetPosition(0, 0)
+        self.squarebox.SetSize(10, 10)
+        self.squarebox.SetColor(0xFF6666ff)
+        self.squarebox.Hide()
+        self.blackboard.OnMouseLeftButtonDown = self.OnMouseLeftButtonDown
+        self.blackboard.OnMouseLeftButtonUp = self.OnMouseLeftButtonUp
+
+    def OnMouseLeftButtonDown(self):
+        xMouse, yMouse = wndMgr.GetMousePosition()
+        xBoard, yBoard = self.blackboard.GetGlobalPosition()
+        realX = xMouse-xBoard
+        realY = yMouse-yBoard
+        if realX < 0 or realX > wndMgr.GetScreenWidth():
+            return False
+        if realY < 0 or realY > wndMgr.GetScreenHeight():
+            return False
+        self.squares[0] = [realX, realY]
+        self.squares[1] = [0, 0]
+        self.mousePress = True
+
+    def OnMouseLeftButtonUp(self):
+        def run():
+            xMouse, yMouse = wndMgr.GetMousePosition()
+            xBoard, yBoard = self.blackboard.GetGlobalPosition()
+            realX = xMouse-xBoard
+            realY = yMouse-yBoard
+            if realX < 0 or realX > wndMgr.GetScreenWidth():
+                self.squares[1] = [0,0]
+                return False
+            if realY < 0 or realY > wndMgr.GetScreenHeight():
+                self.squares[1] = [0,0]
+                return False
+            self.squares[1] = [realX, realY]
+            if self.squares[0] == self.squares[1]:
+                self.squares[1] = [0,0]
+        run()
+        self.mousePress = False
+        self.RefreshSquareBox()
+
+    def RefreshDebugInfo(self):
+        xMouse, yMouse = wndMgr.GetMousePosition()
+        xBoard, yBoard = self.blackboard.GetGlobalPosition()
+        self.debugtips.SetText("ScreenWidth {}, ScreenHeight {}, X {}, Y {}".format(
+            wndMgr.GetScreenWidth(), wndMgr.GetScreenHeight(), xMouse-xBoard, yMouse-yBoard
+        ))
+
+    def RefreshSquareBox(self):
+        squares = list(self.squares)
+        if squares[0] != [0,0] and squares[1] != [0,0]:
+            if squares[0] > squares[1]:
+                squares[0], squares[1] = squares[1], squares[0]
+            sizes = [squares[1][i] - squares[0][i] for i in range(len(squares[0]))]
+            self.squarebox.SetPosition(*squares[0])
+            self.squarebox.SetSize(*sizes)
+            self.squarebox.Show()
+            self.squaretips.SetText("Selected Box: Pos {} Des {} Size {}".format(str(squares[0]), str(squares[1]), str(sizes)))
+            self.squaretips.Show()
+        else:
+            self.squarebox.Hide()
+            self.squaretips.Hide()
+
+    def LoadWindow(self):
+        try:
+            pyScrLoader = ui.PythonScriptLoader()
+            pyScrLoader.LoadScriptData(self, open("DebugWindow.py", "rb").read())
+        except SystemExit as e:
+            dbg.TraceError("MakeWindow::LoadWindow SystemExit: {}".format(e))
+        except Exception as e:
+            dbg.TraceError("MakeWindow::LoadWindow Error: {}".format(e))
+
+    def Open(self):
+        self.SetSize(wndMgr.GetScreenWidth(), wndMgr.GetScreenHeight())
+        self.SetWindowName("MakeWindow")
+        # load default ui
+        self.LoadDefaultWindow()
+        self.LoadWindow()
+        self.Show()
+        app.ShowCursor()
+
+    def Close(self):
+        ime.ClearExceptKey()
+        app.HideCursor()
+
+    def OnPressExitKey(self):
+        if self.stream.popupWindow:
+            self.stream.popupWindow.Close()
+        self.stream.SetPhaseWindow(0)
+        return True
+
+    def Refresh(self):
+        self.ClearDictionary()
+        del self.Children
+        self.LoadWindow()
+        def SetOnMouseChildren(child):
+            child.OnMouseLeftButtonDown = self.OnMouseLeftButtonDown
+            child.OnMouseLeftButtonUp = self.OnMouseLeftButtonUp
+            if hasattr(child, "Children") and isinstance(child.Children, list):
+                for child2 in child.Children:
+                    SetOnMouseChildren(child2)
+        SetOnMouseChildren(self)
+
+    def OnKeyDown(self, key):
+        if app.DIK_F5 == key:
+            self.Refresh()
+        elif app.DIK_F6 == key:
+            self.autoUpdate = not self.autoUpdate
+            self.updatetips.SetText("AUTOREFRESH STATUS: {}".format("ON" if self.autoUpdate else "OFF"))
+            dbg.LogBox("AutoUpdate {}".format("activated" if self.autoUpdate else "disabled"))
+        elif app.DIK_F7 == key:
+            self.hideTipUI = not self.hideTipUI
+            if self.hideTipUI:
+                self.infotips.Hide()
+                self.updatetips.Hide()
+                self.debugtips.Hide()
+                self.squaretips.Hide()
+                self.squaretips.Hide()
+            else:
+                self.infotips.Show()
+                self.updatetips.Show()
+                self.debugtips.Show()
+                self.squaretips.Show()
+        return True
+
+    def OnUpdate(self):
+        if self.autoUpdate:
+            if self.lastUpdate < time.clock():
+                self.Refresh()
+                self.lastUpdate = time.clock()+1
+        if self.debugUpdate < time.clock():
+            self.debugUpdate = time.clock()+0.05
+            self.RefreshDebugInfo()
+            if self.mousePress:
+                xMouse, yMouse = wndMgr.GetMousePosition()
+                xBoard, yBoard = self.blackboard.GetGlobalPosition()
+                realX = xMouse-xBoard
+                realY = yMouse-yBoard
+                self.squares[1] = [realX, realY]
+                self.RefreshSquareBox()
+        return True

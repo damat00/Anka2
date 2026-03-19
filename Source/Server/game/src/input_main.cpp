@@ -39,24 +39,13 @@
 #include "OXEvent.h"
 #include "locale_service.h"
 #include "DragonSoul.h"
-#include "belt_inventory_helper.h"
+#include "belt_inventory_helper.h" // @fixme119
+#include "start_position.h"
 #include <unordered_map>
 
 #include "../../common/service.h"
 #ifdef ENABLE_RENEWAL_SWITCHBOT
 	#include "switchbot_manager.h"
-#endif
-
-#ifdef ENABLE_BIOLOG_SYSTEM
-	#include "biolog_manager.h"
-#endif
-
-#ifdef ENABLE_EVENT_MANAGER
-	#include "event_manager.h"
-#endif
-
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-	#include "battlepass_manager.h"
 #endif
 
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
@@ -73,10 +62,27 @@
 #endif
 
 #ifdef ENABLE_BOT_PLAYER
-#include "BotPlayer.h"
+	#include "BotPlayer.h"
 #endif
+
 #ifdef ENABLE_RIDING_EXTENDED
 	#include "mount_up_grade.h"
+#endif
+
+#ifdef ENABLE_DUNGEON_INFO
+	#include "dungeon_info.h"
+#endif
+
+#ifdef ENABLE_QUEEN_NETHIS
+	#include "SnakeLair.h"
+#endif
+
+#ifdef ENABLE_RESP_SYSTEM
+	#include "resp_manager.h"
+#endif
+
+#ifdef ENABLE_ATTENDANCE_EVENT
+	#include "minigame.h"
 #endif
 
 extern void SendShout(const char * szText, BYTE bEmpire
@@ -128,25 +134,6 @@ void CInputMain::TargetInfoLoad(LPCHARACTER ch, const char* c_pData)
 			pInfo.count = iter->second;
 			ch->GetDesc()->Packet(&pInfo, sizeof(TPacketGCTargetInfo));
 		}
-	}
-}
-#endif
-
-#ifdef ENABLE_EVENT_MANAGER
-void CInputMain::RequestEventQuest(LPCHARACTER ch, const void* c_pData)
-{
-	TPacketCGRequestEventQuest* p = (TPacketCGRequestEventQuest*)c_pData;
-
-	if (ch && ch->GetDesc())
-		quest::CQuestManager::instance().RequestEventQuest(p->szName, ch->GetPlayerID());
-}
-
-void CInputMain::RequestEventData(LPCHARACTER ch, const char* c_pData)
-{
-	if (ch && ch->GetDesc())
-	{
-		const TPacketCGRequestEventData* p = reinterpret_cast<const TPacketCGRequestEventData*>(c_pData);
-		CEventManager::Instance().SendEventInfo(ch, p->bMonth);
 	}
 }
 #endif
@@ -551,6 +538,32 @@ int CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 	}
 	else
 	{
+#ifdef ENABLE_BOT_PLAYER
+		// Bot karakter kontrolü - eðer hedef bir bot ise, "xxx fýsýldamayý blokladý" mesajýný whisper paketi ile gönder
+		if (pkChr && (pkChr->IsBotCharacter() || CBotCharacterManager::instance().IsBotCharacter(pinfo->szNameTo)))
+		{
+			if (ch->GetDesc())
+			{
+				char blockedMsg[CHAT_MAX_LEN + 1];
+				snprintf(blockedMsg, sizeof(blockedMsg), "%s fýsýldamayý blokladý.", pinfo->szNameTo);
+				
+				TPacketGCWhisper pack;
+				pack.bHeader = HEADER_GC_WHISPER;
+				pack.bType = WHISPER_TYPE_SYSTEM;
+				pack.wSize = sizeof(TPacketGCWhisper) + strlen(blockedMsg) + 1;
+				strlcpy(pack.szNameFrom, pinfo->szNameTo, sizeof(pack.szNameFrom));
+				
+				TEMP_BUFFER tmpbuf;
+				tmpbuf.write(&pack, sizeof(pack));
+				tmpbuf.write(blockedMsg, strlen(blockedMsg) + 1);
+				ch->GetDesc()->Packet(tmpbuf.read_peek(), tmpbuf.size());
+			}
+			
+			if (pkDesc)
+				pkDesc->SetRelay("");
+			return iExtraLen;
+		}
+#endif
 		if (ch->IsBlockMode(BLOCK_WHISPER))
 		{
 			if (ch->GetDesc())
@@ -618,7 +631,9 @@ int CInputMain::Whisper(LPCHARACTER ch, const char * data, size_t uiBytes)
 			if (g_bEmpireWhisper)
 				if (!ch->IsEquipUniqueGroup(UNIQUE_GROUP_RING_OF_LANGUAGE))
 					if (!(pkChr && pkChr->IsEquipUniqueGroup(UNIQUE_GROUP_RING_OF_LANGUAGE)))
-						if (bOpponentEmpire != ch->GetEmpire() && ch->GetEmpire() && bOpponentEmpire && ch->GetGMLevel() == GM_PLAYER && gm_get_level(pinfo->szNameTo) == GM_PLAYER)
+						if (bOpponentEmpire != ch->GetEmpire() && ch->GetEmpire() && bOpponentEmpire
+							&& ch->GetGMLevel() == GM_PLAYER && gm_get_level(pinfo->szNameTo) == GM_PLAYER)
+
 						{
 							if (!pkChr)
 							{
@@ -717,6 +732,10 @@ struct FEmpireChatPacket
 
 	void operator () (LPDESC d)
 	{
+#ifdef ENABLE_ANALYZE_CLOSE_FIX
+		if (!d)
+			return;
+#endif
 		if (!d->GetCharacter())
 			return;
 
@@ -779,6 +798,10 @@ struct FYmirChatPacket
 
 	void operator() (LPDESC d)
 	{
+#ifdef ENABLE_ANALYZE_CLOSE_FIX
+		if (!d)
+			return;
+#endif
 		if (!d->GetCharacter())
 			return;
 
@@ -886,20 +909,33 @@ int CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
 		snprintf(szGlobalChat, sizeof(szGlobalChat), "|cFFFFA200|H|h[GM]|h|r |Hpm:%s|h%s|h|r : %s", ch->GetName(), ch->GetName(), buf);
 #endif
 	}
-#ifdef ENABLE_RENEWAL_PREMIUM_SYSTEM
-	else if (ch->IsPremium())
-	{
-#ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
-		snprintf(szGlobalChat, sizeof(szGlobalChat), "%s %s |cFFFFC125|H|h[VIP]|h|r |Hpm:%s|h%s|h|r : %s", szLocaleName, strEmpireFlagToken.c_str(), ch->GetName(), ch->GetName(), buf);
-#else
-		snprintf(szGlobalChat, sizeof(szGlobalChat), "%s |cFFFFC125|H|h[VIP]|h|r |Hpm:%s|h%s|h|r : %s", strEmpireFlagToken.c_str(), ch->GetName(), ch->GetName(), buf);
-#endif
-	}
-#endif
 	else
 	{
 		if (CHAT_TYPE_SHOUT == pinfo->type)
 		{
+#ifdef ENABLE_BATTLE_PASS
+			if (!ch->v_counts.empty())
+			{
+				for (int i = 0; i < ch->missions_bp.size(); ++i)
+				{
+					if (ch->missions_bp[i].type == 8)
+					{
+						ch->DoMission(i, 1);
+					}
+				}
+			}
+	
+			if (!ch->v_counts_premium.empty())
+			{
+				for (int i = 0; i < ch->missions_bp_premium.size(); ++i)
+				{
+					if (ch->missions_bp_premium[i].type == 8)
+					{
+						ch->DoMissionPremium(i, 1);
+					}
+				}
+			}
+#endif
 #ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
 			snprintf(szGlobalChat, sizeof(szGlobalChat), "%s %s |Hpm:%s|h%s|h|r : %s", szLocaleName, strEmpireFlagToken.c_str(), ch->GetName(), ch->GetName(), buf);
 #else
@@ -967,7 +1003,6 @@ int CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
 			return (iExtraLen);
 
 		ch->SetLastShoutPulse(thecore_heart->pulse);
-
 		TPacketGGShout p;
 
 		p.bHeader = HEADER_GG_SHOUT;
@@ -978,7 +1013,7 @@ int CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
 #endif
 
 		P2P_MANAGER::instance().Send(&p, sizeof(TPacketGGShout));
- 
+
 		SendShout(chatbuf, ch->GetEmpire()
 #ifdef ENABLE_MESSENGER_BLOCK
 			, ch->GetName()
@@ -1050,7 +1085,8 @@ int CInputMain::Chat(LPCHARACTER ch, const char * data, size_t uiBytes)
 
 void CInputMain::ItemUse(LPCHARACTER ch, const char * data)
 {
-	ch->UseItem(((struct command_item_use *) data)->Cell);
+	TPacketCGItemUse * p = (TPacketCGItemUse *) data;
+	ch->UseItem(p->Cell);
 }
 
 void CInputMain::ItemToItem(LPCHARACTER ch, const char * pcData)
@@ -1243,7 +1279,7 @@ int CInputMain::Messenger(LPCHARACTER ch, const char* c_pData, size_t uiBytes)
 #ifdef ENABLE_BOT_PLAYER
 				if (ch_companion->IsBotCharacter())
 				{
-					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("TXT_2"));
+					ch->LocaleChatPacket(CHAT_TYPE_INFO, 175, "");
 					return sizeof(TPacketCGMessengerAddByVID);
 				}
 #endif
@@ -1557,6 +1593,42 @@ int CInputMain::Messenger(LPCHARACTER ch, const char* c_pData, size_t uiBytes)
 	return 0;
 }
 
+#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
+void CInputMain::SoulRoulette(LPCHARACTER ch, const char* data)
+{
+	if (!ch)
+		return;
+
+	const TPacketCGSoulRoulette* pinfo = reinterpret_cast<const TPacketCGSoulRoulette*>(data);
+	enum { CLOSE, TURN, GIVE };
+
+	switch (pinfo->option) {
+	case CLOSE:
+		if (ch->GetSoulRoulette()) {
+			if (ch->GetSoulRoulette()->GetGiftVnum())
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Please wait, <Soul Roulette> is active now."));
+			else
+			{
+				ch->GetSoulRoulette()->SendPacket(CSoulRoulette::Packet::CLOSE);
+				ch->SetSoulRoulette(NULL);
+			}
+		}
+		break;
+	case TURN:
+		if (ch->GetSoulRoulette())
+			ch->GetSoulRoulette()->TurnWheel();
+		break;
+	case GIVE:
+		if (ch->GetSoulRoulette())
+			ch->GetSoulRoulette()->GiveGift();
+		break;
+	default:
+		sys_err("CInputMain::SoulRoulette : Unknown option %d : %s", pinfo->option, ch->GetName());
+		break;
+	}
+}
+#endif
+
 #ifdef ENABLE_STACK_LIMIT
 typedef struct fckOFF
 {
@@ -1656,6 +1728,54 @@ void CInputMain::OnClick(LPCHARACTER ch, const char * data)
 	}
 }
 
+#ifdef ENABLE_FISH_EVENT
+int CInputMain::FishEvent(LPCHARACTER ch, const char * data, size_t uiBytes)
+{
+	TPacketCGFishEvent * p = (TPacketCGFishEvent *) data;
+
+	if (uiBytes < sizeof(TPacketCGFishEvent))
+		return -1;
+
+	const char * c_pData = data + sizeof(TPacketCGFishEvent);
+	uiBytes -= sizeof(TPacketCGFishEvent);
+
+	switch (p->bSubheader)
+	{
+		case FISH_EVENT_SUBHEADER_BOX_USE:
+			{
+				if (uiBytes < sizeof(BYTE) + sizeof(WORD))
+					return -1;
+
+				BYTE bWindow = *(c_pData++);
+				WORD wCell = *(c_pData);
+
+				sys_log(0, "INPUT: %s FISH_EVENT: USE_BOX", ch->GetName());
+				
+				ch->FishEventUseBox(TItemPos(bWindow, wCell));
+				return (sizeof(BYTE) + sizeof(WORD));
+			}
+			
+		case FISH_EVENT_SUBHEADER_SHAPE_ADD:
+			{
+				if (uiBytes < sizeof(BYTE))
+					return -1;
+
+				BYTE shapePos = *c_pData;
+
+				sys_log(0, "INPUT: %s FISH_EVENT: ADD_SHAPE", ch->GetName());
+				
+				ch->FishEventAddShape(shapePos);
+				return sizeof(BYTE);
+			}
+
+		default:
+			sys_err("CInputMain::FishEvent : Unknown subheader %d : %s", p->bSubheader, ch->GetName());
+			break;
+	}
+
+	return 0;
+}
+#endif
 void CInputMain::Exchange(LPCHARACTER ch, const char * data)
 {
 	struct command_exchange * pinfo = (struct command_exchange *) data;
@@ -1877,6 +1997,9 @@ DWORD ClacValidComboInterval( LPCHARACTER ch, BYTE bArg )
 
 bool CheckComboHack(LPCHARACTER ch, BYTE bArg, DWORD dwTime, bool CheckSpeedHack)
 {
+	if (!gHackCheckEnable)
+		return false;
+
 	if (ch->IsStun() || ch->IsDead())
 		return false;
 
@@ -1885,7 +2008,7 @@ bool CheckComboHack(LPCHARACTER ch, BYTE bArg, DWORD dwTime, bool CheckSpeedHack
 
 #if 0
 	sys_log(0, "COMBO: %s arg:%u seq:%u delta:%d checkspeedhack:%d",
-			ch->GetName(), bArg, ch->GetComboSequence(), ComboInterval - ch->GetValidComboInterval(), CheckSpeedHack);
+		ch->GetName(), bArg, ch->GetComboSequence(), ComboInterval - ch->GetValidComboInterval(), CheckSpeedHack);
 #endif
 	if (bArg == 14)
 	{
@@ -1920,11 +2043,11 @@ bool CheckComboHack(LPCHARACTER ch, BYTE bArg, DWORD dwTime, bool CheckSpeedHack
 			ch->SetValidComboInterval(300);
 
 			sys_log(0, "COMBO_HACK: 3 %s arg:%u valid:%u combo_idx:%d combo_seq:%d",
-					ch->GetName(),
-					bArg,
-					ComboSequenceBySkillLevel[idx][ch->GetComboSequence()],
-					idx,
-					ch->GetComboSequence());
+				ch->GetName(),
+				bArg,
+				ComboSequenceBySkillLevel[idx][ch->GetComboSequence()],
+				idx,
+				ch->GetComboSequence());
 		}
 		else
 		{
@@ -1933,12 +2056,12 @@ bool CheckComboHack(LPCHARACTER ch, BYTE bArg, DWORD dwTime, bool CheckSpeedHack
 				HackScalar = 1 + (ch->GetValidComboInterval() - ComboInterval) / 100;
 
 				sys_log(0, "COMBO_HACK: 2 %s arg:%u interval:%d valid:%u atkspd:%u riding:%s",
-						ch->GetName(),
-						bArg,
-						ComboInterval,
-						ch->GetValidComboInterval(),
-						ch->GetPoint(POINT_ATT_SPEED),
-						ch->IsRiding() ? "yes" : "no");
+					ch->GetName(),
+					bArg,
+					ComboInterval,
+					ch->GetValidComboInterval(),
+					ch->GetPoint(POINT_ATT_SPEED),
+					ch->IsRiding() ? "yes" : "no");
 			}
 
 			if (ch->IsRiding())
@@ -1961,10 +2084,34 @@ bool CheckComboHack(LPCHARACTER ch, BYTE bArg, DWORD dwTime, bool CheckSpeedHack
 		}
 		else
 		{
+			/*
+			There is a nonsense combo. Possible hackers?
+			if (ch->GetDesc()->DelayedDisconnect(number(2, 9)))
+			{
+				LogManager::Instance().HackLog("Hacker", ch);
+				sys_log(0, "HACKER: %s arg %u", ch->GetName(), bArg);
+			}
+
+			With the code above, if you attack while unraveling the polymorph,
+			Sometimes it is recognized as a nucleus.
+
+			In detail,
+			The server handled poly 0, but
+			Before receiving that packet from the claret, attack the mob. <- That is, attack while being a mob.
+
+			Then, the clar sends a command to the server that it attacked in a mob state (arg == 13)
+
+			On the server, race is human, but the attack type is a mob! He said he had a nuclear check.
+
+			In fact, the attack pattern is not judged by the client and sent,
+			The server would have to judge... why did he do this?
+			by rtsummit
+			*/
 		}
 	}
 	else
 	{
+		// There is a nonsense combo. Possible hackers?
 		if (ch->GetDesc()->DelayedDisconnect(number(2, 9)))
 		{
 			LogManager::instance().HackLog("Hacker", ch);
@@ -1977,6 +2124,7 @@ bool CheckComboHack(LPCHARACTER ch, BYTE bArg, DWORD dwTime, bool CheckSpeedHack
 
 	if (HackScalar)
 	{
+		// When riding or landing on a horse, an attack for 1.5 seconds is not considered nuclear, but has no attack power.
 		if (get_dword_time() - ch->GetLastMountTime() > 1500)
 			ch->IncreaseComboHackCount(1 + HackScalar);
 
@@ -2000,8 +2148,8 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 	}
 
 	const float fDist = DISTANCE_SQRT((ch->GetX() - pinfo->lX) / 100, (ch->GetY() - pinfo->lY) / 100);
-
-	if (((false == ch->IsRiding() && fDist > 25) || fDist > 60) && OXEVENT_MAP_INDEX != ch->GetMapIndex())
+	// @fixme106 (changed 40 to 80)
+	if (((false == ch->IsRiding() && fDist > 25) || fDist > 80) && OXEVENT_MAP_INDEX != ch->GetMapIndex())
 	{
 		sys_log(0, "MOVE: %s trying to move too far (dist: %.1fm) Riding(%d)", ch->GetName(), fDist, ch->IsRiding());
 
@@ -2100,6 +2248,11 @@ void CInputMain::Move(LPCHARACTER ch, const char * data)
 	pack.dwDuration = (pinfo->bFunc == FUNC_MOVE) ? ch->GetCurrentMoveDuration() : 0;
 
 	ch->PacketAround(&pack, sizeof(TPacketGCMove), ch);
+
+#ifdef ENABLE_MOB_FOLLOW_SYSTEM
+	if (pinfo->bFunc == FUNC_WAIT)
+		ch->NotifyEnemyNPCs();
+#endif
 }
 
 #ifdef ENABLE_SKILL_COLOR_SYSTEM
@@ -2184,8 +2337,18 @@ void CInputMain::Attack(LPCHARACTER ch, const BYTE header, const char* data)
 			case SKILL_TUSOK:
 			case SKILL_MAHWAN:
 			case SKILL_BIPABU:
+#ifdef ENABLE_PVP_BALANCE
+			// Shaman Ejderha Atisi Cift Damage Sorunu Fix
+			case SKILL_YONGBI:
+#endif
 			case SKILL_NOEJEON:
 			case SKILL_CHAIN:
+#ifdef ENABLE_NINETH_SKILL
+			case SKILL_ILGWANGPYO: // 177 ninja job 1
+			case SKILL_PUNGLOEPO: // 178 sura job 2
+			case SKILL_MABEOBAGGWI: // 180 sura job 2
+			case SKILL_METEO: // 181 shaman job 1
+#endif
 			case SKILL_HORSE_WILDATTACK_RANGE:
 				if (HEADER_CG_SHOOT != type->header)
 				{
@@ -2249,6 +2412,12 @@ void CInputMain::Attack(LPCHARACTER ch, const BYTE header, const char* data)
 				ch->Shoot(packShoot->bType);
 			}
 			break;
+
+#ifdef ENABLE_ATTENDANCE_EVENT
+		case HEADER_CG_ATTENDANCE_REWARD:
+			CMiniGame::instance().AttendanceEventRequestReward(ch);
+			break;
+#endif
 	}
 }
 
@@ -2422,55 +2591,66 @@ int CInputMain::SyncPosition(LPCHARACTER ch, const char * c_pcData, size_t uiByt
 
 void CInputMain::FlyTarget(LPCHARACTER ch, const char * pcData, BYTE bHeader)
 {
-	TPacketCGFlyTargeting * p = (TPacketCGFlyTargeting *) pcData;
+	if (!ch)
+		return;
+
+	const TPacketCGFlyTargeting* p = (TPacketCGFlyTargeting*)pcData;
 	ch->FlyTarget(p->dwTargetVID, p->x, p->y, bHeader);
 }
 
-void CInputMain::UseSkill(LPCHARACTER ch, const char * pcData)
+void CInputMain::UseSkill(LPCHARACTER ch, const char* pcData)
 {
-	TPacketCGUseSkill * p = (TPacketCGUseSkill *) pcData;
+	if (!ch)
+		return;
+
+	const TPacketCGUseSkill* p = (TPacketCGUseSkill*)pcData;
 	ch->UseSkill(p->dwVnum, CHARACTER_MANAGER::instance().Find(p->dwVID));
 }
 
 void CInputMain::ScriptButton(LPCHARACTER ch, const void* c_pData)
 {
-	TPacketCGScriptButton * p = (TPacketCGScriptButton *) c_pData;
+	if (!ch)
+		return;
+
+	const TPacketCGScriptButton* p = (TPacketCGScriptButton*)c_pData;
 	sys_log(0, "QUEST ScriptButton pid %d idx %u", ch->GetPlayerID(), p->idx);
 
-	quest::PC* pc = quest::CQuestManager::instance().GetPCForce(ch->GetPlayerID());
+	const quest::PC* pc = quest::CQuestManager::instance().GetPCForce(ch->GetPlayerID());
 	if (pc && pc->IsConfirmWait())
-	{
 		quest::CQuestManager::instance().Confirm(ch->GetPlayerID(), quest::CONFIRM_TIMEOUT);
-	}
-	else if (p->idx & 0x80000000)
-	{
+	else if (p->idx & 0x80000000) // Click here in the quest window (__SelectQuest)
 		quest::CQuestManager::Instance().QuestInfo(ch->GetPlayerID(), p->idx & 0x7fffffff);
-	}
 	else
 	{
+#ifdef ENABLE_COLLECT_WINDOW
+		quest::CQuestManager::Instance().QuestButton(ch->GetPlayerID(), p->idx, p->button);
+#else
 		quest::CQuestManager::Instance().QuestButton(ch->GetPlayerID(), p->idx);
+#endif
 	}
 }
 
 void CInputMain::ScriptAnswer(LPCHARACTER ch, const void* c_pData)
 {
-	TPacketCGScriptAnswer * p = (TPacketCGScriptAnswer *) c_pData;
+	if (!ch)
+		return;
+
+	const TPacketCGScriptAnswer* p = (TPacketCGScriptAnswer*)c_pData;
 	sys_log(0, "QUEST ScriptAnswer pid %d answer %d", ch->GetPlayerID(), p->answer);
 
-	if (p->answer > 250)
-	{
+	if (p->answer > 250) // If the packet came in response to the next button
 		quest::CQuestManager::Instance().Resume(ch->GetPlayerID());
-	}
-	else
-	{
-		quest::CQuestManager::Instance().Select(ch->GetPlayerID(),  p->answer);
-	}
+	else // In the case of a packet sent by selecting the select button
+		quest::CQuestManager::Instance().Select(ch->GetPlayerID(), p->answer);
 }
 
 // SCRIPT_SELECT_ITEM
 void CInputMain::ScriptSelectItem(LPCHARACTER ch, const void* c_pData)
 {
-	TPacketCGScriptSelectItem* p = (TPacketCGScriptSelectItem*) c_pData;
+	if (!ch)
+		return;
+
+	const TPacketCGScriptSelectItem* p = (TPacketCGScriptSelectItem*)c_pData;
 	sys_log(0, "QUEST ScriptSelectItem pid %d answer %d", ch->GetPlayerID(), p->selection);
 	quest::CQuestManager::Instance().SelectItem(ch->GetPlayerID(), p->selection);
 }
@@ -2478,7 +2658,10 @@ void CInputMain::ScriptSelectItem(LPCHARACTER ch, const void* c_pData)
 
 void CInputMain::QuestInputString(LPCHARACTER ch, const void* c_pData)
 {
-	TPacketCGQuestInputString * p = (TPacketCGQuestInputString*) c_pData;
+	if (!ch)
+		return;
+
+	const TPacketCGQuestInputString* p = (TPacketCGQuestInputString*)c_pData;
 
 	char msg[65];
 	strlcpy(msg, p->msg, sizeof(msg));
@@ -2489,26 +2672,32 @@ void CInputMain::QuestInputString(LPCHARACTER ch, const void* c_pData)
 
 void CInputMain::QuestConfirm(LPCHARACTER ch, const void* c_pData)
 {
-	TPacketCGQuestConfirm* p = (TPacketCGQuestConfirm*) c_pData;
+	if (!ch)
+		return;
+
+	TPacketCGQuestConfirm* p = (TPacketCGQuestConfirm*)c_pData;
 	LPCHARACTER ch_wait = CHARACTER_MANAGER::instance().FindByPID(p->requestPID);
 	if (p->answer)
 		p->answer = quest::CONFIRM_YES;
-	sys_log(0, "QuestConfirm from %s pid %u name %s answer %d", ch->GetName(), p->requestPID, (ch_wait)?ch_wait->GetName():"", p->answer);
+
+	sys_log(0, "QuestConfirm from %s pid %u name %s answer %d", ch->GetName(), p->requestPID, (ch_wait) ? ch_wait->GetName() : "", p->answer);
+
 	if (ch_wait)
-	{
-		quest::CQuestManager::Instance().Confirm(ch_wait->GetPlayerID(), (quest::EQuestConfirmType) p->answer, ch->GetPlayerID());
-	}
+		quest::CQuestManager::Instance().Confirm(ch_wait->GetPlayerID(), (quest::EQuestConfirmType)p->answer, ch->GetPlayerID());
 }
 
-void CInputMain::Target(LPCHARACTER ch, const char * pcData)
+void CInputMain::Target(LPCHARACTER ch, const char* pcData)
 {
-	TPacketCGTarget * p = (TPacketCGTarget *) pcData;
+	if (!ch)
+		return;
 
-	building::LPOBJECT pkObj = building::CManager::instance().FindObjectByVID(p->dwVID);
+	const TPacketCGTarget* p = (TPacketCGTarget*)pcData;
+
+	const building::LPOBJECT pkObj = building::CManager::instance().FindObjectByVID(p->dwVID);
 
 	if (pkObj)
 	{
-		TPacketGCTarget pckTarget;
+		TPacketGCTarget pckTarget{};
 		pckTarget.header = HEADER_GC_TARGET;
 		pckTarget.dwVID = p->dwVID;
 		ch->GetDesc()->Packet(&pckTarget, sizeof(TPacketGCTarget));
@@ -2517,17 +2706,21 @@ void CInputMain::Target(LPCHARACTER ch, const char * pcData)
 		ch->SetTarget(CHARACTER_MANAGER::instance().Find(p->dwVID));
 }
 
-void CInputMain::Warp(LPCHARACTER ch, const char * pcData)
+void CInputMain::Warp(LPCHARACTER ch, const char* pcData)
 {
-	ch->WarpEnd();
+	if (ch)
+		ch->WarpEnd();
 }
 
 void CInputMain::SafeboxCheckin(LPCHARACTER ch, const char * c_pData)
 {
+	if (!ch)
+		return;
+
 	if (quest::CQuestManager::instance().GetPCForce(ch->GetPlayerID())->IsRunning() == true)
 		return;
 
-	TPacketCGSafeboxCheckin * p = (TPacketCGSafeboxCheckin *) c_pData;
+	const TPacketCGSafeboxCheckin* p = (TPacketCGSafeboxCheckin*)c_pData;
 
 	if (!ch->CanHandleItem())
 		return;
@@ -2537,6 +2730,17 @@ void CInputMain::SafeboxCheckin(LPCHARACTER ch, const char * c_pData)
 
 	if (!pkSafebox || !pkItem)
 		return;
+
+	// Güvenlik: SwitchBot'tan depoya transfer engeli (Item Duplication önleme)
+#ifdef ENABLE_RENEWAL_SWITCHBOT
+	if (p->ItemPos.IsSwitchbotPosition())
+	{
+		sys_err("[SECURITY] Player %s (PID:%u) attempted to transfer item from SwitchBot to Safebox (Cell:%u, ItemID:%u). Item duplication prevented.",
+			ch->GetName(), ch->GetPlayerID(), p->ItemPos.cell, pkItem->GetID());
+		ch->LocaleChatPacket(CHAT_TYPE_INFO, 78, "");
+		return;
+	}
+#endif
 
 #ifdef ENABLE_EQUIPPED_ITEM_STORAGE_FIX
 	if (true == pkItem->IsEquipped())
@@ -2627,12 +2831,15 @@ void CInputMain::SafeboxCheckin(LPCHARACTER ch, const char * c_pData)
 
 void CInputMain::SafeboxCheckout(LPCHARACTER ch, const char * c_pData, bool bMall)
 {
-	TPacketCGSafeboxCheckout * p = (TPacketCGSafeboxCheckout *) c_pData;
+	if (!ch)
+		return;
+
+	TPacketCGSafeboxCheckout* p = (TPacketCGSafeboxCheckout*)c_pData;
 
 	if (!ch->CanHandleItem())
 		return;
 
-	CSafebox * pkSafebox;
+	CSafebox* pkSafebox;
 
 	if (bMall)
 		pkSafebox = ch->GetMall();
@@ -2649,6 +2856,17 @@ void CInputMain::SafeboxCheckout(LPCHARACTER ch, const char * c_pData, bool bMal
 
 	if (!ch->IsEmptyItemGrid(p->ItemPos, pkItem->GetSize()))
 		return;
+
+	// Güvenlik: Depodan SwitchBot'a transfer engeli (Item Duplication önleme)
+#ifdef ENABLE_RENEWAL_SWITCHBOT
+	if (p->ItemPos.IsSwitchbotPosition())
+	{
+		sys_err("[SECURITY] Player %s (PID:%u) attempted to transfer item from Safebox to SwitchBot (SafePos:%u, ItemID:%u). Item duplication prevented.",
+			ch->GetName(), ch->GetPlayerID(), p->bSafePos, pkItem->GetID());
+		ch->LocaleChatPacket(CHAT_TYPE_INFO, 78, "");
+		return;
+	}
+#endif
 
 #ifdef ENABLE_SPECIAL_INVENTORY
 	if (p->ItemPos.IsSkillBookInventoryPosition() && !pkItem->IsSkillBook())
@@ -2667,6 +2885,9 @@ void CInputMain::SafeboxCheckout(LPCHARACTER ch, const char * c_pData, bool bMal
 		return;
 #endif
 
+	// DragonSoulStone special treatment in the part that is transferred from Item Mall to Inventory
+	// (Items made in the mall have attributes as defined in item_proto,
+		// In the case of DragonSoulStone, if this treatment is not performed, none of the attributes will be attached.)
 	if (pkItem->IsDragonSoul())
 	{
 		if (bMall)
@@ -2699,6 +2920,13 @@ void CInputMain::SafeboxCheckout(LPCHARACTER ch, const char * c_pData, bool bMal
 	else
 	{
 		if (DRAGON_SOUL_INVENTORY == p->ItemPos.window_type)
+		{
+			ch->LocaleChatPacket(CHAT_TYPE_INFO, 189, "");
+			return;
+		}
+
+		// @fixme119
+		if (p->ItemPos.IsBeltInventoryPosition() && false == CBeltInventoryHelper::CanMoveIntoBeltInventory(pkItem))
 		{
 			ch->LocaleChatPacket(CHAT_TYPE_INFO, 189, "");
 			return;
@@ -2744,6 +2972,8 @@ void CInputMain::SafeboxCheckout(LPCHARACTER ch, const char * c_pData, bool bMal
 
 void CInputMain::SafeboxItemMove(LPCHARACTER ch, const char * data)
 {
+	if (!ch || !ch->GetDesc()) { return; }
+
 	struct command_item_move * pinfo = (struct command_item_move *) data;
 
 	if (!ch->CanHandleItem())
@@ -2755,8 +2985,11 @@ void CInputMain::SafeboxItemMove(LPCHARACTER ch, const char * data)
 	ch->GetSafebox()->MoveItem(pinfo->Cell.cell, pinfo->CellTo.cell, pinfo->count);
 }
 
+// PARTY_JOIN_BUG_FIX
 void CInputMain::PartyInvite(LPCHARACTER ch, const char * c_pData)
 {
+	if (!ch || !ch->GetDesc()) { return; }
+
 	if (ch->GetArena())
 	{
 		ch->LocaleChatPacket(CHAT_TYPE_INFO, 192, "");
@@ -2767,9 +3000,12 @@ void CInputMain::PartyInvite(LPCHARACTER ch, const char * c_pData)
 
 	LPCHARACTER pInvitee = CHARACTER_MANAGER::instance().Find(p->vid);
 
-	if (!pInvitee || !ch->GetDesc() || !pInvitee->GetDesc())
+	if (ch == pInvitee)
+		return;
+
+	if (!pInvitee || !ch->GetDesc() || !pInvitee->GetDesc() || !pInvitee->IsPC() || !ch->IsPC())
 	{
-		sys_err("PARTY Cannot find invited character");
+		sys_log(0, "PARTY Cannot find invited character");
 		return;
 	}
 
@@ -2796,6 +3032,8 @@ void CInputMain::PartyInvite(LPCHARACTER ch, const char * c_pData)
 
 void CInputMain::PartyInviteAnswer(LPCHARACTER ch, const char * c_pData)
 {
+	if (!ch || !ch->GetDesc()) { return; }
+
 	if (ch->GetArena())
 	{
 		ch->LocaleChatPacket(CHAT_TYPE_INFO, 192, "");
@@ -2806,16 +3044,29 @@ void CInputMain::PartyInviteAnswer(LPCHARACTER ch, const char * c_pData)
 
 	LPCHARACTER pInviter = CHARACTER_MANAGER::instance().Find(p->leader_vid);
 
-	if (!pInviter)
+	if (!pInviter || !pInviter->IsPC())
 		ch->LocaleChatPacket(CHAT_TYPE_INFO, 55, "");
+	// @fixme301 BEGIN
+	else if (!pInviter->GetParty() && pInviter->GetMapIndex() >= 10000)
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Party> The party leader is inside a dungeon."));
+
+	else if (pInviter->GetParty() && pInviter->GetParty()->IsPartyInAnyDungeon())
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Party> The party can't invite people if members are inside a dungeon."));
+		pInviter->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Party> The party can't invite people if members are inside a dungeon."));
+	}
+	// @fixme301 END
 	else if (!p->accept)
 		pInviter->PartyInviteDeny(ch->GetPlayerID());
 	else
 		pInviter->PartyInviteAccept(ch);
 }
+// END_OF_PARTY_JOIN_BUG_FIX
 
 void CInputMain::PartySetState(LPCHARACTER ch, const char* c_pData)
 {
+	if (!ch || !ch->GetDesc()) { return; }
+
 	if (!CPartyManager::instance().IsEnablePCParty())
 	{
 		ch->LocaleChatPacket(CHAT_TYPE_INFO, 30, "");
@@ -2862,6 +3113,8 @@ void CInputMain::PartySetState(LPCHARACTER ch, const char* c_pData)
 				pack.bFlag = p->flag;
 				db_clientdesc->DBPacket(HEADER_GD_PARTY_STATE_CHANGE, 0, &pack, sizeof(pack));
 			}
+			/* else
+			   ch->ChatPacket(CHAT_TYPE_INFO, "769"); */
 			break;
 
 		default:
@@ -2872,6 +3125,9 @@ void CInputMain::PartySetState(LPCHARACTER ch, const char* c_pData)
 
 void CInputMain::PartyRemove(LPCHARACTER ch, const char* c_pData)
 {
+	if (!ch)
+		return;
+
 	if (ch->GetArena())
 	{
 		ch->LocaleChatPacket(CHAT_TYPE_INFO, 192, "");
@@ -2896,6 +3152,9 @@ void CInputMain::PartyRemove(LPCHARACTER ch, const char* c_pData)
 		return;
 
 	LPPARTY pParty = ch->GetParty();
+	if (!pParty)
+		return;
+
 	if (pParty->GetLeaderPID() == ch->GetPlayerID())
 	{
 		if (ch->GetDungeon())
@@ -2904,8 +3163,25 @@ void CInputMain::PartyRemove(LPCHARACTER ch, const char* c_pData)
 		}
 		else
 		{
+			// Prevent the party leader from disbanding the party outside the dungeon at Red Dragon Castle (metin2_map_n_flame_dungeon_01)
+			if(pParty->IsPartyInDungeon(351))
+			{
+				ch->ChatPacket(CHAT_TYPE_INFO, "772");
+				return;
+			}
+
+#ifdef ENABLE_QUEEN_NETHIS
+			if (SnakeLair::CSnk::instance().IsSnakeMap(ch->GetMapIndex()))
+			{
+				ch->ChatPacket(CHAT_TYPE_INFO, "[LS;531]");
+				return;
+			}
+#endif
+
+			// leader can remove any member
 			if (p->pid == ch->GetPlayerID() || pParty->GetMemberCount() == 2)
 			{
+				// party disband
 				CPartyManager::instance().DeleteParty(pParty);
 			}
 			else
@@ -2921,6 +3197,7 @@ void CInputMain::PartyRemove(LPCHARACTER ch, const char* c_pData)
 	}
 	else
 	{
+		// otherwise, only remove itself
 		if (p->pid == ch->GetPlayerID())
 		{
 			if (ch->GetDungeon())
@@ -2929,8 +3206,17 @@ void CInputMain::PartyRemove(LPCHARACTER ch, const char* c_pData)
 			}
 			else
 			{
+#ifdef ENABLE_QUEEN_NETHIS
+				if (SnakeLair::CSnk::instance().IsSnakeMap(ch->GetMapIndex()))
+				{
+					ch->ChatPacket(CHAT_TYPE_INFO, "[LS;676]");
+					return;
+				}
+#endif
+
 				if (pParty->GetMemberCount() == 2)
 				{
+					// party disband
 					CPartyManager::instance().DeleteParty(pParty);
 				}
 				else
@@ -2945,6 +3231,74 @@ void CInputMain::PartyRemove(LPCHARACTER ch, const char* c_pData)
 			ch->LocaleChatPacket(CHAT_TYPE_INFO, 198, "");
 		}
 	}
+}
+
+void CInputMain::AnswerMakeGuild(LPCHARACTER ch, const char* c_pData)
+{
+	if (!ch)
+		return;
+
+	TPacketCGAnswerMakeGuild* p = (TPacketCGAnswerMakeGuild*) c_pData;
+
+	if (ch->GetGold() < 200000)
+		return;
+
+	if (ch->GetLevel() < 40)	//@fixme463
+		return;
+
+	if (get_global_time() - ch->GetQuestFlag("guild_manage.new_disband_time") <
+			CGuildManager::instance().GetDisbandDelay())
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "776 %d",
+				quest::CQuestManager::instance().GetEventFlag("guild_disband_delay"));
+		return;
+	}
+
+	if (get_global_time() - ch->GetQuestFlag("guild_manage.new_withdraw_time") <
+			CGuildManager::instance().GetWithdrawDelay())
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "777 %d",
+				quest::CQuestManager::instance().GetEventFlag("guild_withdraw_delay"));
+		return;
+	}
+
+	if (ch->GetGuild())
+		return;
+
+	CGuildManager& gm = CGuildManager::instance();
+
+	TGuildCreateParameter cp;
+	memset(&cp, 0, sizeof(cp));
+
+	cp.master = ch;
+	strlcpy(cp.name, p->guild_name, sizeof(cp.name));
+
+	if (cp.name[0] == 0 || !check_name(cp.name))
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "571");
+		return;
+	}
+
+	DWORD dwGuildID = gm.CreateGuild(cp);
+
+	if (dwGuildID)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "778 %s", cp.name);
+
+		int GuildCreateFee = 200000;
+
+		ch->PointChange(POINT_GOLD, -GuildCreateFee);
+		DBManager::instance().SendMoneyLog(MONEY_LOG_GUILD, ch->GetPlayerID(), -GuildCreateFee);
+
+		char Log[128];
+		snprintf(Log, sizeof(Log), "GUILD_NAME %s MASTER %s", cp.name, ch->GetName());
+		LogManager::instance().CharLog(ch, 0, "MAKE_GUILD", Log);
+
+		ch->RemoveSpecifyItem(GUILD_CREATE_ITEM_VNUM, 1);
+		//ch->SendGuildName(dwGuildID);
+	}
+	else
+		ch->ChatPacket(CHAT_TYPE_INFO, "779");
 }
 
 void CInputMain::PartyUseSkill(LPCHARACTER ch, const char* c_pData)
@@ -2991,7 +3345,11 @@ void CInputMain::PartyParameter(LPCHARACTER ch, const char * c_pData)
 {
 	TPacketCGPartyParameter * p = (TPacketCGPartyParameter *) c_pData;
 
+#ifdef ENABLE_EXP_GROUP_FIX
+	if (ch->GetParty() && ch->GetParty()->GetLeaderPID() == ch->GetPlayerID())
+#else
 	if (ch->GetParty())
+#endif
 		ch->GetParty()->SetParameter(p->bDistributeMode);
 }
 
@@ -3126,6 +3484,16 @@ int CInputMain::Guild(LPCHARACTER ch, const char * data, size_t uiBytes)
 					return SubPacketLen;
 				}
 #endif
+
+#ifdef ENABLE_BOT_PLAYER
+				// Bot karakter kontrolü - eðer hedef bir bot ise, lonca daveti engelleme mesajýný gönder
+				if (newmember && newmember->IsBotCharacter())
+				{
+					ch->LocaleChatPacket(CHAT_TYPE_INFO, 391, "");
+					return SubPacketLen;
+				}
+#endif
+
 				pGuild->Invite(ch, newmember);
 			}
 			return SubPacketLen;
@@ -3534,50 +3902,136 @@ void CInputMain::Refine(LPCHARACTER ch, const char* c_pData)
 	if (p->type == REFINE_TYPE_NORMAL)
 	{
 		sys_log (0, "refine_type_noraml");
-		ch->DoRefine(item);
+		ch->DoRefine(item, false
+#ifdef ENABLE_PITTY_REFINE
+, p->seal_of_god
+#endif
+		);
 	}
-	else if (p->type == REFINE_TYPE_SCROLL || p->type == REFINE_TYPE_HYUNIRON || p->type == REFINE_TYPE_MUSIN || p->type == REFINE_TYPE_BDRAGON)
+	else if (p->type == REFINE_TYPE_SCROLL
+				|| p->type == REFINE_TYPE_HYUNIRON
+				|| p->type == REFINE_TYPE_MUSIN
+				|| p->type == REFINE_TYPE_BDRAGON
+			)
 	{
 		sys_log (0, "refine_type_scroll, ...");
-		ch->DoRefineWithScroll(item);
+		ch->DoRefineWithScroll(item
+#ifdef ENABLE_PITTY_REFINE
+, p->seal_of_god
+#endif
+		);
 	}
 	else if (p->type == REFINE_TYPE_MONEY_ONLY)
 	{
-		const LPITEM item = ch->GetInventoryItem(p->pos);
-
-		if (NULL != item)
+		if (500 <= item->GetRefineSet())
 		{
-			if (500 <= item->GetRefineSet())
+			LogManager::instance().HackLog("DEVIL_TOWER_REFINE_HACK", ch);
+		}
+		else
+		{
+#ifdef ENABLE_QUEEN_NETHIS
+			if (SnakeLair::CSnk::Instance().IsSnakeMap(ch->GetMapIndex()))
 			{
-				LogManager::instance().HackLog("DEVIL_TOWER_REFINE_HACK", ch);
+				if (get_global_time() > ch->GetQuestFlag("snake_lair.refine_time"))
+				{
+					if (ch->DoRefineSerpent(item
+#ifdef ENABLE_PITTY_REFINE
+, p->seal_of_god
+#endif
+					))
+					{
+						ch->SetQuestFlag("snake_lair.refine_time", get_global_time() + 60 * 60 * 24);
+					}
+				}
+				else
+				{
+					ch->ChatPacket(CHAT_TYPE_INFO, "Yýlan Tapýnaðý Demircisi'nden ödülü yalnýzca her 24 saatte bir alabilirsin.");
+				}
 			}
 			else
 			{
+#endif
 #ifdef ENABLE_DEMON_TOWER_SMALL_FIX
 				if (ch->GetQuestFlag("deviltower_zone.can_refine"))
 				{
-					if (ch->DoRefine(item, true))
+					if (ch->DoRefine(
+							item,
+							true
+#ifdef ENABLE_PITTY_REFINE
+							, p->seal_of_god
+#endif
+						))
 					{
 						ch->SetQuestFlag("deviltower_zone.can_refine", 0);
 					}
 				}
-#else
-				if (ch->GetQuestFlag("deviltower_zone.can_refine"))
-				{
-					ch->DoRefine(item, true);
-					ch->SetQuestFlag("deviltower_zone.can_refine", 0);
-				}
-#endif
 				else
 				{
 					ch->LocaleChatPacket(CHAT_TYPE_INFO, 117, "");
 				}
+#else
+				if (ch->GetQuestFlag("deviltower_zone.can_refine"))
+				{
+					ch->DoRefine(
+						item,
+						true
+#ifdef ENABLE_PITTY_REFINE
+						, p->seal_of_god
+#endif
+					);
+					ch->SetQuestFlag("deviltower_zone.can_refine", 0);
+				}
+				else
+				{
+					ch->LocaleChatPacket(CHAT_TYPE_INFO, 117, "");
+				}
+#endif
+#ifdef ENABLE_QUEEN_NETHIS
 			}
+#endif
 		}
 	}
 
 	ch->ClearRefineMode();
 }
+
+
+#ifdef ENABLE_DUNGEON_INFO
+void CInputMain::DungeonInfoSend(LPCHARACTER ch, const char * data)
+{
+	
+	struct packet_send_dungeon_info_system * pinfo = (struct packet_send_dungeon_info_system *) data;
+	switch (pinfo->subheader)
+	{
+		case DUNGEON_INFO_SUB_HEADER_OPEN:
+		{
+			CDungeonInfoExtern::instance().Open(ch);
+		}
+		break;
+
+		case DUNGEON_INFO_SUB_HEADER_TELEPORT:
+		{
+			int index_teleport = pinfo->index;
+			CDungeonInfoExtern::instance().Teleport(ch,index_teleport);
+		}
+		break;
+
+		case DUNGEON_INFO_SUB_HEADER_MISION:
+		{
+			int index = pinfo->index;
+			CDungeonInfoExtern::instance().GetLlaveDungeon(ch,index);
+
+		}	
+		break;
+
+		case DUNGEON_INFO_SUB_HEADER_RANKING:
+		{
+			int index = pinfo->index;
+			CDungeonInfoExtern::instance().SetDateDungeonRanking(ch, index);
+		}
+	}
+}
+#endif
 
 #ifdef ENABLE_RENEWAL_CUBE
 void CInputMain::CubeRenewalSend(LPCHARACTER ch, const char* data)
@@ -3642,103 +4096,6 @@ void CInputMain::Acce(LPCHARACTER pkChar, const char* c_pData)
 }
 #endif
 
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-int CInputMain::ReciveExtBattlePassActions(LPCHARACTER ch, const char* data, size_t uiBytes)
-{
-	TPacketCGExtBattlePassAction* p = (TPacketCGExtBattlePassAction*)data;
-
-	if (uiBytes < sizeof(TPacketCGExtBattlePassAction))
-		return -1;
-
-	const char* c_pData = data + sizeof(TPacketCGExtBattlePassAction);
-	uiBytes -= sizeof(TPacketCGExtBattlePassAction);
-
-	switch (p->bAction)
-	{
-		case 1:
-			CBattlePassManager::instance().BattlePassRequestOpen(ch);
-			return 0;
-
-		case 2:
-			if(get_dword_time() < ch->GetLastReciveExtBattlePassOpenRanking())
-			{
-				ch->LocaleChatPacket(CHAT_TYPE_INFO, 77, "%d", ((ch->GetLastReciveExtBattlePassOpenRanking() - get_dword_time()) / 1000) + 1 );
-				return 0;
-			}
-
-			ch->SetLastReciveExtBattlePassOpenRanking(get_dword_time() + 10000);
-
-			for (BYTE bBattlePassType = 1; bBattlePassType <= 3 ; ++bBattlePassType)
-			{
-				BYTE bBattlePassID;
-				if (bBattlePassType == 1)
-					bBattlePassID = CBattlePassManager::instance().GetNormalBattlePassID();
-
-				if (bBattlePassType == 2)
-				{
-					bBattlePassID = CBattlePassManager::instance().GetPremiumBattlePassID();
-					if (bBattlePassID != ch->GetExtBattlePassPremiumID())
-						continue;
-				}
-
-				std::unique_ptr<SQLMsg> pMsg(DBManager::instance().DirectQuery("SELECT player_name, battlepass_type+0, battlepass_id, UNIX_TIMESTAMP(start_time), UNIX_TIMESTAMP(end_time) FROM player.battlepass_playerindex WHERE battlepass_type = %d and battlepass_id = %d and battlepass_completed = 1 and not player_name LIKE '[%%' ORDER BY (UNIX_TIMESTAMP(end_time)-UNIX_TIMESTAMP(start_time)) ASC LIMIT 40", bBattlePassType, bBattlePassID));
-				if (pMsg->uiSQLErrno)
-					return 0;
-
-				MYSQL_ROW row;
-
-				while ((row = mysql_fetch_row(pMsg->Get()->pSQLResult)))
-				{
-					TPacketGCExtBattlePassRanking pack;
-					pack.bHeader = HEADER_GC_EXT_BATTLE_PASS_SEND_RANKING;
-					strlcpy(pack.szPlayerName, row[0], sizeof(pack.szPlayerName));
-					pack.bBattlePassType = std::atoi(row[1]);
-					pack.bBattlePassID = std::atoll(row[2]);
-					pack.dwStartTime = std::atoll(row[3]);
-					pack.dwEndTime = std::atoll(row[4]);
-
-					ch->GetDesc()->Packet(&pack, sizeof(pack));
-				}
-			}
-			break;
-
-		case 10:
-			CBattlePassManager::instance().BattlePassRequestReward(ch, 1);
-			return 0;
-
-		case 11:
-			CBattlePassManager::instance().BattlePassRequestReward(ch, 2);
-			return 0;
-
-		default:
-			break;
-	}
-
-	return 0;
-}
-
-int CInputMain::ReciveExtBattlePassPremiumItem(LPCHARACTER ch, const char* data, size_t uiBytes)
-{
-	TPacketCGExtBattlePassSendPremiumItem* p = (TPacketCGExtBattlePassSendPremiumItem*)data;
-
-	if (uiBytes < sizeof(TPacketCGExtBattlePassSendPremiumItem))
-		return -1;
-
-	const char* c_pData = data + sizeof(TPacketCGExtBattlePassSendPremiumItem);
-	uiBytes -= sizeof(TPacketCGExtBattlePassSendPremiumItem);
-
-	LPITEM item = ch->GetInventoryItem(p->iSlotIndex);
-	if (item != NULL and item->GetVnum() == 93100)
-	{
-		ch->PointChange(POINT_BATTLE_PASS_PREMIUM_ID, CBattlePassManager::instance().GetPremiumBattlePassID());
-		CBattlePassManager::instance().BattlePassRequestOpen(ch);
-		item->SetCount(item->GetCount() - 1);
-		ch->LocaleChatPacket(CHAT_TYPE_INFO, 345, "");
-	}
-	return 0;
-}
-#endif
-
 #ifdef ENABLE_RIDING_EXTENDED
 void CInputMain::MountUpGrade(LPCHARACTER ch, const char* c_pData)
 {
@@ -3781,13 +4138,22 @@ void CInputMain::ItemNewAttributes(LPCHARACTER ch, const char* pcData)
 
 int CInputMain::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 {
+#ifdef ENABLE_ANALYZE_CLOSE_FIX
+	if (!d)
+		return -1;
+#endif
+
 	LPCHARACTER ch;
 
 	if (!(ch = d->GetCharacter()))
 	{
 		sys_err("no character on desc");
 		d->SetPhase(PHASE_CLOSE);
+#if defined(ENABLE_ANALYZE_CLOSE_FIX)
 		return -1;
+#else
+		return (0);
+#endif
 	}
 
 	if (ch->GetDesc()->GetPhase() != PHASE_GAME && ch->GetDesc()->GetPhase() != PHASE_DEAD)
@@ -3806,7 +4172,7 @@ int CInputMain::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 	switch (bHeader)
 	{
 		case HEADER_CG_PONG:
-			Pong(d); 
+			Pong(d);
 			break;
 
 		case HEADER_CG_TIME_SYNC:
@@ -3819,7 +4185,7 @@ int CInputMain::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 				char* pBuf = (char*)c_pData;
 				sys_log(0, "%s", pBuf + sizeof(TPacketCGChat));
 			}
-	
+
 			if ((iExtraLen = Chat(ch, c_pData, m_iBufferLeft)) < 0)
 				return -1;
 			break;
@@ -3831,6 +4197,7 @@ int CInputMain::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 
 		case HEADER_CG_MOVE:
 			Move(ch, c_pData);
+			// @fixme103 (removed CheckClientVersion since useless in here)
 			break;
 
 		case HEADER_CG_CHARACTER_POSITION:
@@ -3948,6 +4315,13 @@ int CInputMain::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 				return -1;
 			break;
 
+#ifdef ENABLE_FISH_EVENT
+		case HEADER_CG_FISH_EVENT_SEND:
+			if ((iExtraLen = FishEvent(ch, c_pData, m_iBufferLeft)) < 0)
+				return -1;
+			break;
+#endif
+
 		case HEADER_CG_MESSENGER:
 			if ((iExtraLen = Messenger(ch, c_pData, m_iBufferLeft))<0)
 				return -1;
@@ -4033,6 +4407,14 @@ int CInputMain::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 
 		case HEADER_CG_PARTY_PARAMETER:
 			PartyParameter(ch, c_pData);
+			break;
+
+		case HEADER_CG_ANSWER_MAKE_GUILD:
+#ifdef ENABLE_NEWGUILDMAKE
+			ch->ChatPacket(CHAT_TYPE_INFO, "<%s> AnswerMakeGuild disabled", __FUNCTION__);
+#else
+			AnswerMakeGuild(ch, c_pData);
+#endif
 			break;
 
 		case HEADER_CG_GUILD:
@@ -4134,9 +4516,9 @@ int CInputMain::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 			break;
 #endif
 
-#ifdef ENABLE_BIOLOG_SYSTEM
-		case HEADER_CG_BIOLOG_MANAGER:
-			if ((iExtraLen = BiologManager(ch, c_pData, m_iBufferLeft)) < 0)
+#ifdef ENABLE_RESP_SYSTEM
+		case HEADER_CG_RESP:
+			if ((iExtraLen = Resp(ch, c_pData, m_iBufferLeft)) < 0)
 				return -1;
 			break;
 #endif
@@ -4152,28 +4534,6 @@ int CInputMain::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 #ifdef ENABLE_VIEW_CHEST_DROP
 		case HEADER_CG_CHEST_DROP_INFO:
 			ChestDropInfo(ch, c_pData);
-			break;
-#endif
-
-#ifdef ENABLE_EVENT_MANAGER
-		case HEADER_CG_REQUEST_EVENT_QUEST:
-			RequestEventQuest(ch, c_pData);
-			break;
-
-		case HEADER_CG_REQUEST_EVENT_DATA:
-			RequestEventData(ch, c_pData);
-			break;
-#endif
-
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-		case HEADER_CG_EXT_BATTLE_PASS_ACTION:
-			if ((iExtraLen = ReciveExtBattlePassActions(ch, c_pData, m_iBufferLeft)) < 0)
-				return -1;
-			break;
-
-		case HEADER_CG_EXT_SEND_BP_PREMIUM_ITEM:
-			if ((iExtraLen = ReciveExtBattlePassPremiumItem(ch, c_pData, m_iBufferLeft)) < 0)
-				return -1;
 			break;
 #endif
 
@@ -4288,18 +4648,54 @@ int CInputMain::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 			MountUpGrade(ch, c_pData);
 			break;
 #endif
+
+#ifdef ENABLE_DUNGEON_INFO
+		case HEADER_CG_DUNGEON_INFO_SYSTEM:
+			DungeonInfoSend(ch, c_pData);
+			break;
+#endif
+
+#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
+		case HEADER_CG_SOUL_ROULETTE:
+			if (!ch->IsObserverMode())
+				SoulRoulette(ch, c_pData);
+			break;
+#endif
+
+#ifdef ENABLE_ATTENDANCE_EVENT
+		case HEADER_CG_ATTENDANCE_REWARD:
+			CMiniGame::instance().AttendanceEventRequestReward(ch);
+			break;
+#endif
+
+#ifdef ENABLE_MINI_GAME_CATCH_KING
+		case HEADER_CG_MINI_GAME_CATCH_KING:
+			if ((iExtraLen = CMiniGame::instance().MiniGameCatchKing(ch, c_pData, m_iBufferLeft)) < 0)
+				return -1;
+			break;
+#endif
+
 	}
 	return (iExtraLen);
 }
 
 int CInputDead::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 {
+#ifdef ENABLE_ANALYZE_CLOSE_FIX
+	if (!d)
+		return -1;
+#endif
+
 	LPCHARACTER ch;
 
 	if (!(ch = d->GetCharacter()))
 	{
 		sys_err("no character on desc");
+#if defined(ENABLE_ANALYZE_CLOSE_FIX)
 		return -1;
+#else
+		return 0;
+#endif
 	}
 
 	if (ch && ch->IsPC())
@@ -4350,7 +4746,11 @@ int CInputDead::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 			break;
 
 		default:
+#if defined(ENABLE_ANALYZE_CLOSE_FIX)
 			return -1;
+#else
+			return (0);
+#endif
 	}
 
 	return (iExtraLen);
@@ -4467,27 +4867,6 @@ int CInputMain::Switchbot(LPCHARACTER ch, const char* data, size_t uiBytes)
 	}
 
 	return 0;
-}
-#endif
-
-#ifdef ENABLE_BIOLOG_SYSTEM
-int CInputMain::BiologManager(LPCHARACTER ch, const char* c_pData, size_t uiBytes)
-{
-	if (!ch)
-	{
-		return -1;
-	}
-
-	TPacketCGBiologManagerAction* p = (TPacketCGBiologManagerAction*)c_pData;
-	c_pData += sizeof(TPacketCGBiologManagerAction);
-
-	CBiologSystem* pkBiologManager = ch->GetBiologManager();
-	if (!pkBiologManager)
-	{
-		return -1;
-	}
-
-	return pkBiologManager->RecvClientPacket(p->bSubHeader, c_pData, uiBytes);
 }
 #endif
 
@@ -5091,5 +5470,59 @@ void CInputMain::AutoSellStatus(LPCHARACTER ch, const char* data)
 		return;
 		
 	ch->SetAutoSellStatus(p->status != 0);
+}
+#endif
+
+#ifdef ENABLE_RESP_SYSTEM
+int CInputMain::Resp(LPCHARACTER ch, const char* c_pData, size_t uiBytes)
+{
+	if (!ch || !ch->GetDesc())
+		return -1;
+
+	TPacketCGRespHeader* p = (TPacketCGRespHeader*)c_pData;
+
+	if (uiBytes < sizeof(TPacketCGRespHeader))
+		return -1;
+
+	c_pData += sizeof(TPacketCGRespHeader);
+	uiBytes -= sizeof(TPacketCGRespHeader);
+
+	switch (p->subheader)
+	{
+		case RESP_CG_SUBHEADER_FETCH_RESP:
+		case RESP_CG_SUBHEADER_FETCH_DROP:
+		{
+			if (uiBytes < sizeof(uint32_t))
+				return -1;
+
+			uint32_t mobVnum = *(uint32_t*)c_pData;
+			c_pData += sizeof(uint32_t);
+			uiBytes -= sizeof(uint32_t);
+
+			// Always process FetchData, CanActRespManager check is only for teleport
+			CRespManager::instance().FetchData(ch, p->subheader, mobVnum);
+
+			return sizeof(uint32_t);
+		}
+
+		case RESP_CG_SUBHEADER_TELEPORT:
+		{
+			if (uiBytes < sizeof(size_t))
+				return -1;
+
+			size_t id = *(size_t*)c_pData;
+			c_pData += sizeof(size_t);
+			uiBytes -= sizeof(size_t);
+
+			// Allow teleport on all maps
+			CRespManager::instance().Teleport(ch, id);
+
+			return sizeof(size_t);
+		}
+
+		default:
+			sys_err("Unknown subheader %d", p->subheader);
+			return -1;
+	}
 }
 #endif

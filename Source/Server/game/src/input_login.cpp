@@ -48,6 +48,29 @@
 	#include "maintenance.h"
 #endif
 
+#ifdef ENABLE_DUNGEON_INFO
+	#include "dungeon_info.h"
+#endif
+
+#ifdef ENABLE_RESP_SYSTEM
+	#include "resp_manager.h"
+#endif
+
+#ifdef __ENABLE_COLLECTIONS_SYSTEM__
+	#include "CollectionsSystem.hpp"
+#endif
+
+#ifdef ENABLE_ATTENDANCE_EVENT
+	#include "minigame.h"
+#endif
+
+#ifdef ENABLE_STONE_EVENT_SYSTEM
+	#include "stone_event.h"
+#endif
+#ifdef ENABLE_EVENT_SYSTEM
+	#include "auto_event_list.h"
+#endif
+
 static void _send_bonus_info(LPCHARACTER ch)
 {
 	int	item_drop_bonus = 0;
@@ -76,17 +99,37 @@ static void _send_bonus_info(LPCHARACTER ch)
 	{
 		ch->LocaleChatPacket(CHAT_TYPE_NOTICE, 109, "%d", exp_bonus);
 	}
+
+#ifdef __LEADERSHIP__BONUS__
+	float kLeaderShip = (float) ch->GetSkillPowerByLevel( MIN(SKILL_MAX_LEVEL, ch->GetLeadershipSkillLevel() ) )/ 100.0f;
+	ch->ChatPacket(CHAT_TYPE_COMMAND, "SkillPowerLeadership %f", kLeaderShip);
+#endif
 }
+
+#ifdef ENABLE_HALLOWEEN_EVENT_SYSTEM
+static void send_event_halloween(LPCHARACTER ch)
+{	
+	if (ch->GetHalounPoints() > 0)
+	{
+		ch->OpenHalloween();
+		ch->ChatPacket(CHAT_TYPE_COMMAND, "eveniment_haloun %d", 1);
+	}
+	if (ch->GetHalounPoints() == 0)
+	{
+		ch->ChatPacket(CHAT_TYPE_COMMAND, "eveniment_haloun %d", 0);
+	}
+}
+#endif
 
 static bool FN_is_battle_zone(LPCHARACTER ch)
 {
 	switch (ch->GetMapIndex())
 	{
-		case 1:
+		case 90:
 		case 2:
 		case 21:
 		case 23:
-		case 41:
+		case 91:
 		case 43:
 		case 113:
 			return false;
@@ -97,6 +140,10 @@ static bool FN_is_battle_zone(LPCHARACTER ch)
 
 void CInputLogin::LoginByKey(LPDESC d, const char * data)
 {
+#ifdef ENABLE_ANALYZE_CLOSE_FIX
+	if (!d)
+		return;
+#endif
 	TPacketCGLogin2 * pinfo = (TPacketCGLogin2 *) data;
 
 	char login[LOGIN_MAX_LEN + 1];
@@ -149,6 +196,10 @@ void CInputLogin::LoginByKey(LPDESC d, const char * data)
 
 void CInputLogin::ChangeName(LPDESC d, const char * data)
 {
+#ifdef ENABLE_ANALYZE_CLOSE_FIX
+	if (!d)
+		return;
+#endif
 	TPacketCGChangeName * p = (TPacketCGChangeName *) data;
 	const TAccountTable & c_r = d->GetAccountTable();
 
@@ -158,16 +209,14 @@ void CInputLogin::ChangeName(LPDESC d, const char * data)
 		return;
 	}
 
-	// Fix
-	if (p->index >= PLAYER_PER_ACCOUNT)
+	if (p->index >= PLAYER_PER_ACCOUNT) // @fixme190
 	{
 		sys_err("index overflow %d, login: %s", p->index, c_r.login);
 		d->SetPhase(PHASE_CLOSE);
 		return;
 	}
 
-	// Fix
-	if (!c_r.players[p->index].dwID)
+	if (!c_r.players[p->index].dwID) // @fixme190
 	{
 		sys_err("player index not found, login: %s", c_r.login);
 		d->SetPhase(PHASE_CLOSE);
@@ -195,6 +244,10 @@ void CInputLogin::ChangeName(LPDESC d, const char * data)
 
 void CInputLogin::CharacterSelect(LPDESC d, const char * data)
 {
+#ifdef ENABLE_ANALYZE_CLOSE_FIX
+	if (!d)
+		return;
+#endif
 	struct command_player_select * pinfo = (struct command_player_select *) data;
 	const TAccountTable & c_r = d->GetAccountTable();
 
@@ -214,17 +267,17 @@ void CInputLogin::CharacterSelect(LPDESC d, const char * data)
 		return;
 	}
 
-	// Fix
-	if (!c_r.players[pinfo->index].dwID)
+	if (!c_r.players[pinfo->index].dwID) // fixme190
 	{
-		sys_err("No player id for login %s", c_r.login);
+		sys_err("player index not found, login: %s", c_r.login);
 		d->SetPhase(PHASE_CLOSE);
 		return;
 	}
 
 	if (c_r.players[pinfo->index].bChangeName)
 	{
-		sys_err("name must be changed idx %d, login %s, name %s", pinfo->index, c_r.login, c_r.players[pinfo->index].szName);
+		sys_err("name must be changed idx %d, login %s, name %s",
+			pinfo->index, c_r.login, c_r.players[pinfo->index].szName);
 		return;
 	}
 
@@ -355,6 +408,10 @@ bool NewPlayerTable(TPlayerTable * table, const char * name, BYTE race, BYTE sha
 
 void CInputLogin::CharacterCreate(LPDESC d, const char * data)
 {
+#ifdef ENABLE_ANALYZE_CLOSE_FIX
+	if (!d)
+		return;
+#endif
 	struct command_player_create * pinfo = (struct command_player_create *) data;
 
 	const TAccountTable& c_rAccountTable = d->GetAccountTable();
@@ -368,7 +425,11 @@ void CInputLogin::CharacterCreate(LPDESC d, const char * data)
 
 	TPlayerCreatePacket player_create_packet;
 
-	sys_log(0, "PlayerCreate: name %s pos %d job %d shape %d", pinfo->name, pinfo->index, pinfo->job, pinfo->shape);
+	sys_log(0, "PlayerCreate: name %s pos %d job %d shape %d",
+		pinfo->name,
+		pinfo->index,
+		pinfo->job,
+		pinfo->shape);
 
 	TPacketGCLoginFailure packFailure;
 	memset(&packFailure, 0, sizeof(packFailure));
@@ -447,6 +508,10 @@ void CInputLogin::CharacterCreate(LPDESC d, const char * data)
 
 void CInputLogin::CharacterDelete(LPDESC d, const char * data)
 {
+#ifdef ENABLE_ANALYZE_CLOSE_FIX
+	if (!d)
+		return;
+#endif
 	struct command_player_delete * pinfo = (struct command_player_delete *) data;
 	const TAccountTable & c_rAccountTable = d->GetAccountTable();
 
@@ -485,6 +550,15 @@ void CInputLogin::CharacterDelete(LPDESC d, const char * data)
 
 void CInputLogin::Entergame(LPDESC d, const char * data)
 {
+#ifdef ENABLE_ANALYZE_CLOSE_FIX
+	if (!d)
+	{
+		sys_err("EnterGame: No Desc!!");
+		d->SetPhase(PHASE_CLOSE);
+		return;
+	}
+#endif
+
 	// Fix
 	const TAccountTable& c_rAccountTable = d->GetAccountTable();
 
@@ -510,7 +584,11 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 		PIXEL_POSITION pos2;
 		SECTREE_MANAGER::instance().GetRecallPositionByEmpire(ch->GetMapIndex(), ch->GetEmpire(), pos2);
 
-		sys_err("!GetMovablePosition (name %s %dx%d map %d changed to %dx%d)", ch->GetName(), pos.x, pos.y, ch->GetMapIndex(), pos2.x, pos2.y);
+		sys_err("!GetMovablePosition (name %s %dx%d map %d changed to %dx%d)",
+			ch->GetName(),
+			pos.x, pos.y,
+			ch->GetMapIndex(),
+			pos2.x, pos2.y);
 		pos = pos2;
 	}
 
@@ -582,12 +660,27 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 	ch->StartSaveEvent();
 	ch->StartRecoveryEvent();
 	ch->StartCheckSpeedHackEvent();
-
+#ifdef __DUNGEON_INFO__
+	ch->SendDungeonCooldown(0);
+#endif
+#ifdef ENABLE_KILL_STATISTICS
+	ch->SendKillStatisticsPacket();
+#endif
+#ifdef ENABLE_DUNGEON_INFO
+	if (ch->GetMapIndex() < 10000)
+	{
+		CDungeonInfoExtern::instance().CheckBossKill(ch);
+		CDungeonInfoExtern::instance().SetTimeRespawn(ch);
+	}
+#endif
 	ch->SetQuestFlag("item.last_time", get_global_time()); // Fix
 
 	CPVPManager::instance().Connect(ch);
 	CPVPManager::instance().SendList(d);
 
+#ifdef ENABLE_STONE_EVENT_SYSTEM
+	CStoneEvent::instance().StoneInformation(ch);
+#endif
 	MessengerManager::instance().Login(ch->GetName());
 
 	CPartyManager::instance().SetParty(ch);
@@ -601,16 +694,13 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 	CHARACTER_MANAGER::instance().CheckMultiFarmAccount(d->GetHostName(), ch->GetPlayerID(), ch->GetName(), true, false);
 #endif
 
-	if (ch->GetGuild() != nullptr)
-	{
-		if (ch->GetGuild()->GetMasterPID() == ch->GetPlayerID())
-		{
-			TPacketMarkPass markpack;
-			markpack.header = HEADER_GC_GUILDMARK_PASS;
-			markpack.markpass = ch->GetGuild()->GetMarkPass();
-			ch->GetDesc()->Packet(&markpack, sizeof(markpack));
-		}
-	}
+#ifdef __ENABLE_COLLECTIONS_SYSTEM__
+	CSystemCollections::instance().SendCollections(ch);
+#endif
+
+#ifdef ENABLE_EVENT_SYSTEM
+	CGameEventsManager::instance().SendEventCharacter(ch);
+#endif
 
 	TPacketGCTime p;
 	p.bHeader = HEADER_GC_TIME;
@@ -624,14 +714,29 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 	p2.anti_exp = ch->GetAntiExp();
 #endif
 	d->Packet(&p2, sizeof(p2));
-
-#ifdef ENABLE_GUILD_TOKEN_AUTH
-	ch->SendGuildToken();
+#ifdef ENABLE_ZODIAC_MISSION
+	ch->BeadCount(ch);
 #endif
-
 	ch->SendGreetMessage();
 
 	_send_bonus_info(ch);
+#ifdef ENABLE_BATTLE_PASS
+	ch->ExternBattlePass();
+	ch->Load_BattlePass();
+	ch->ExternBattlePassPremium();
+	ch->Load_BattlePassPremium();
+#endif
+#ifdef ENABLE_DUNGEON_INFO
+	CDungeonInfoExtern::instance().LoadDateDungeonRanking();
+#endif
+
+#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
+	CSoulRoulette::StateError(CSoulRoulette::Error::GIVE, ch);
+#endif
+
+#ifdef ENABLE_HALLOWEEN_EVENT_SYSTEM
+	send_event_halloween(ch);
+#endif
 
 	std::unique_ptr<SQLMsg> pMsg(DBManager::instance().DirectQuery("UPDATE player%s SET `last_play` = NOW() WHERE `name` = '%s'", get_table_postfix(), ch->GetName()));
 
@@ -743,6 +848,24 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 		}
 	}
 
+#ifdef ENABLE_CONQUEROR_LEVEL
+	if (ch->IsConquerorMap(ch->GetMapIndex()) && ch->IsPC())
+	{
+		const BYTE bSTR = SECTREE_MANAGER::instance().GetSungmaValueAffectByRegion(ch->GetMapIndex(), AFFECT_SUNGMA_STR);
+		const BYTE bHP = SECTREE_MANAGER::instance().GetSungmaValueAffectByRegion(ch->GetMapIndex(), AFFECT_SUNGMA_HP);
+		const BYTE bMOVE = SECTREE_MANAGER::instance().GetSungmaValueAffectByRegion(ch->GetMapIndex(), AFFECT_SUNGMA_MOVE);
+		const BYTE bIMMUNE = SECTREE_MANAGER::instance().GetSungmaValueAffectByRegion(ch->GetMapIndex(), AFFECT_SUNGMA_IMMUNE);
+		TPacketGCSungmaAttrUpdate p;
+
+		p.bHeader = HEADER_GC_SUNGMA_ATTR_UPDATE;
+		p.bSTR = bSTR;
+		p.bHP = bHP;
+		p.bMOVE = bMOVE;
+		p.bIMMUNE = bIMMUNE;
+		ch->GetDesc()->Packet(&p, sizeof(p));	
+	}
+#endif
+
 #ifdef ENABLE_MOUNT_LEVEL_BUG_FIX
 	if (ch->GetHorseLevel() > 0)
 	{
@@ -783,12 +906,16 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 		ch->CheckPet();
 #endif
 
-#ifdef ENABLE_RENEWAL_SWITCHBOT
-	CSwitchbotManager::Instance().EnterGame(ch);
+#ifdef ENABLE_FISH_EVENT
+	ch->FishEventGeneralInfo();
 #endif
 
-#ifdef ENABLE_RENEWAL_PREMIUM_SYSTEM
-	ch->CheckPremium();
+#ifdef ENABLE_RESP_SYSTEM
+	CRespManager::instance().LoginToMap(ch);
+#endif
+
+#ifdef ENABLE_RENEWAL_SWITCHBOT
+	CSwitchbotManager::Instance().EnterGame(ch);
 #endif
 
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
@@ -814,10 +941,66 @@ void CInputLogin::Entergame(LPDESC d, const char * data)
 #ifdef ENABLE_HUNTING_SYSTEM
 	ch->CheckHunting();
 #endif
+
+#ifdef __DOJANG_SRC_FUNCTIONS__
+	if (ch->GetMapIndex() == DOJANG_MAPINDEX)
+	{
+		if (ch->GetParty())
+		{
+			if (ch->GetParty()->GetMemberCount() == 2)
+				CPartyManager::instance().DeleteParty(ch->GetParty());
+			else
+				ch->GetParty()->Quit(ch->GetPlayerID());
+		}
+	}
+#endif
+
+#ifdef ENABLE_PITTY_REFINE
+	ch->LoadRefineFlags();
+#endif
+
+#ifdef ENABLE_MINI_GAME_CATCH_KING
+	CMiniGame::instance().MiniGameCatchKingEventInfo(ch);
+#endif
+
+#ifdef ENABLE_ATTENDANCE_EVENT
+	CMiniGame::instance().AttendanceEventInfo(ch);
+#endif
+
+#ifdef ENABLE_BIOLOGIST_SYSTEM
+	{
+		int biodurum = ch->GetQuestFlag("bio.durum");
+		if (biodurum == 0 && ch->GetLevel() >= 30)
+		{
+			ch->SetQuestFlag("bio.durum", 1);
+			ch->SetQuestFlag("bio.verilen", 0);
+			ch->SetQuestFlag("bio.ruhtasi", 0);
+			ch->SetQuestFlag("bio.kalan", 0);
+
+			int bioverilen = ch->GetQuestFlag("bio.verilen");
+			int biokalan = ch->GetQuestFlag("bio.kalan");
+			int biostate = ch->GetQuestFlag("bio.ruhtasi");
+			biodurum = ch->GetQuestFlag("bio.durum");
+			ch->ChatPacket(CHAT_TYPE_COMMAND, "biyolog_update %d %d %d %d %d", biodurum, biostate, bioverilen, BiyologSistemi[biodurum][1], biokalan);
+		}
+		else
+		{
+			int bioverilen = ch->GetQuestFlag("bio.verilen");
+			int biokalan = ch->GetQuestFlag("bio.kalan")-get_global_time();
+			int biostate = ch->GetQuestFlag("bio.ruhtasi");
+			biodurum = ch->GetQuestFlag("bio.durum");
+			ch->ChatPacket(CHAT_TYPE_COMMAND, "biyolog_update %d %d %d %d %d", biodurum, biostate, bioverilen, BiyologSistemi[biodurum][1], biokalan);
+		}
+	}
+#endif
 }
 
 void CInputLogin::Empire(LPDESC d, const char * c_pData)
 {
+#ifdef ENABLE_ANALYZE_CLOSE_FIX
+	if (!d)
+		return;
+#endif
 	const TPacketCGEmpire* p = reinterpret_cast<const TPacketCGEmpire*>(c_pData);
 
 	// Fix
@@ -852,6 +1035,10 @@ void CInputLogin::Empire(LPDESC d, const char * c_pData)
 
 int CInputLogin::GuildSymbolUpload(LPDESC d, const char* c_pData, size_t uiBytes)
 {
+#ifdef ENABLE_ANALYZE_CLOSE_FIX
+	if (!d)
+		return -1;
+#endif
 	if (uiBytes < sizeof(TPacketCGGuildSymbolUpload))
 		return -1;
 
@@ -861,15 +1048,6 @@ int CInputLogin::GuildSymbolUpload(LPDESC d, const char* c_pData, size_t uiBytes
 
 	if (uiBytes < p->size)
 		return -1;
-
-#ifdef ENABLE_GUILD_TOKEN_AUTH
-	if (!p->guild_id || !CGuildManager::instance().IsCorrectGuildToken(p->guild_id, p->token))
-	{
-		sys_err("MARK_SERVER: GuildSymbolUpload: invalid token. guild_id %u token %u", p->guild_id, p->token);
-		d->SetPhase(PHASE_CLOSE);
-		return 0;
-	}
-#endif
 
 	int iSymbolSize = p->size - sizeof(TPacketCGGuildSymbolUpload);
 
@@ -882,19 +1060,6 @@ int CInputLogin::GuildSymbolUpload(LPDESC d, const char* c_pData, size_t uiBytes
 	}
 
 	// If the guild does not own the land.
-
-	CGuildManager& rkGuildMgr = CGuildManager::instance();
-	CGuild* pkGuild;
-
-	if (!(pkGuild = rkGuildMgr.FindGuild(p->guild_id)))
-	{
-		sys_err("MARK_SERVER: GuildSymbolUpload: no guild. gid %u", p->guild_id);
-		return 0;
-	}
-
-	if (pkGuild->GetMarkPass() != p->markpass)
-		return 0;
-
 	if (!test_server)
 		if (!building::CManager::instance().FindLandByGuild(p->guild_id))
 		{
@@ -911,6 +1076,10 @@ int CInputLogin::GuildSymbolUpload(LPDESC d, const char* c_pData, size_t uiBytes
 
 void CInputLogin::GuildSymbolCRC(LPDESC d, const char* c_pData)
 {
+#ifdef ENABLE_ANALYZE_CLOSE_FIX
+	if (!d)
+		return;
+#endif
 	const TPacketCGSymbolCRC & CGPacket = *((TPacketCGSymbolCRC *) c_pData);
 
 	sys_log(0, "GuildSymbolCRC %u %u %u", CGPacket.guild_id, CGPacket.crc, CGPacket.size);
@@ -941,15 +1110,6 @@ void CInputLogin::GuildSymbolCRC(LPDESC d, const char* c_pData)
 void CInputLogin::GuildMarkUpload(LPDESC d, const char* c_pData)
 {
 	TPacketCGMarkUpload * p = (TPacketCGMarkUpload *) c_pData;
-
-#ifdef ENABLE_GUILD_TOKEN_AUTH
-	if (!p->gid || !CGuildManager::instance().IsCorrectGuildToken(p->gid, p->token))
-	{
-		sys_err("MARK_SERVER: GuildMarkUpload: invalid token. gid %u token %u", p->gid, p->token);
-		return;
-	}
-#endif
-
 	CGuildManager& rkGuildMgr = CGuildManager::instance();
 	CGuild * pkGuild{};
 
@@ -964,9 +1124,6 @@ void CInputLogin::GuildMarkUpload(LPDESC d, const char* c_pData)
 		sys_log(0, "MARK_SERVER: GuildMarkUpload: level < %u (%u)", guild_mark_min_level, pkGuild->GetLevel());
 		return;
 	}
-
-	if (pkGuild->GetMarkPass() != p->markpass)
-		return;
 
 	CGuildMarkManager & rkMarkMgr = CGuildMarkManager::instance();
 
@@ -986,6 +1143,10 @@ void CInputLogin::GuildMarkUpload(LPDESC d, const char* c_pData)
 
 void CInputLogin::GuildMarkIDXList(LPDESC d, const char* c_pData)
 {
+#ifdef ENABLE_ANALYZE_CLOSE_FIX
+	if (!d)
+		return;
+#endif
 	CGuildMarkManager & rkMarkMgr = CGuildMarkManager::instance();
 
 	DWORD bufSize = sizeof(WORD) * 2 * rkMarkMgr.GetMarkCount();
@@ -1017,6 +1178,10 @@ void CInputLogin::GuildMarkIDXList(LPDESC d, const char* c_pData)
 
 void CInputLogin::GuildMarkCRCList(LPDESC d, const char* c_pData)
 {
+#ifdef ENABLE_ANALYZE_CLOSE_FIX
+	if (!d)
+		return;
+#endif
 	TPacketCGMarkCRCList * pCG = (TPacketCGMarkCRCList *) c_pData;
 
 	std::map<BYTE, const SGuildMarkBlock *> mapDiffBlocks;
@@ -1136,11 +1301,22 @@ int CInputLogin::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 			ChangeName(d, c_pData);
 			break;
 
+		// @fixme120
+		case HEADER_CG_ITEM_USE:
+		case HEADER_CG_SCRIPT_BUTTON:
+			// ScriptButton paketi login phase'de ignore edilir (karakter henüz yüklenmemiþ olabilir)
+			// Bu paket game phase'de handle edilir
+			break;
+
 		default:
 			sys_err("login phase does not handle this packet! header %d", bHeader);
+			//d->SetPhase(PHASE_CLOSE);
+#if defined(ENABLE_ANALYZE_CLOSE_FIX)
 			return -1;
+#else
+			return (0);
+#endif
 	}
 
 	return (iExtraLen);
 }
-

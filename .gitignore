@@ -1,40 +1,71 @@
-# Prerequisites
+#############################################
+# PREREQUISITES
+#############################################
 *.d
 
-# Compiled Object files
+#############################################
+# OBJECT FILES
+#############################################
 *.slo
 *.lo
 *.o
 *.obj
 
-# Precompiled Headers
+#############################################
+# PRECOMPILED HEADERS
+#############################################
 *.gch
 *.pch
 
-# Compiled Dynamic libraries
+#############################################
+# DYNAMIC LIBRARIES
+#############################################
 *.so
 *.dylib
 *.dll
 
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
+#############################################
+# STATIC LIBRARIES
+#############################################
 *.lai
 *.la
 *.a
 *.lib
-# Exception: FoxFS_Src library files (tracked with Git LFS)
+
+# ÖZEL: FoxFS lib'leri hariç
 !FoxFS_Src/**/*.lib
 
-# Executables
+#############################################
+# EXECUTABLES
+#############################################
 *.exe
 *.out
 *.app
-# Client folder is now tracked (large files use Git LFS)
 
-# Visual Studio cache files
+#############################################
+# DEBUG / BUILD FILES (KRİTİK)
+#############################################
+*.pdb
+*.ilk
+*.exp
+*.idb
+*.iobj
+*.ipdb
+
+#############################################
+# BUILD FOLDERS
+#############################################
+Debug/
+Release/
+x64/
+x86/
+build/
+bin/
+obj/
+
+#############################################
+# VISUAL STUDIO
+#############################################
 .vs/
 *.ipch
 *.db
@@ -44,4 +75,22 @@
 *.opensdf
 *.db-shm
 *.db-wal
-*.db-wal
+
+#############################################
+# LOG / CACHE
+#############################################
+*.log
+*.cache
+*.tmp
+
+#############################################
+# SYSTEM FILES
+#############################################
+Thumbs.db
+.DS_Store
+
+#############################################
+# OPTIONAL (isteğe bağlı aç/kapat)
+#############################################
+# Client büyük assetleri LFS ile kullanıyorsan burayı açma
+# Client/

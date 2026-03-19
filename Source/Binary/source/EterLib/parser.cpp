@@ -15,7 +15,7 @@ const char *LocaleString_FindChar(const char *base, int len, char test)
 		return NULL;
 
 	DWORD codePage = GetDefaultCodePage();
-	
+
 	int pos = 0;
 	while (pos < len)
 	{
@@ -46,21 +46,21 @@ int LocaleString_RightTrim(char *base, int len)
 	DWORD codePage = GetDefaultCodePage();
 
 	int pos = len;
-	
+
 	while (pos > 0)
 	{
 		char *cur = base + pos;
 		char *prev = CharPrevExA(codePage, base, cur , 0);
-		
+
 		int prev_len = cur - prev;
 		if (prev_len != 1)
 			break;
-		
+
 		if (!isspace((unsigned char) *prev) && *prev != '\n' && *prev != '\r')
-			break;				
-		
+			break;
+
 		*prev = '\0';
-		
+
 		pos -= prev_len;
 	}
 
@@ -90,9 +90,9 @@ void OLD_rtrim(char *base)
 		{
 			if (!isnhspace((unsigned char) *end) && *end != '\n' && *end != '\r' || (end!=base && *((unsigned char *)end-1)>0xa0))
 				break;
-			
+
 			*end = '\0';
-			
+
 			end = CharPrevExA(codePage, base, end, 0);
 		}
 	}
@@ -109,10 +109,10 @@ void OLD_rtrim(char *base)
 				break;
 
 			if (!isspace((unsigned char) *prev) && *prev != '\n' && *prev != '\r')
-				break;				
-			
+				break;
+
 			*prev = '\0';
-			
+
 			end = prev;
 		}
 	}
@@ -220,11 +220,9 @@ bool Group::GetArg(const char *c_arg_base, int arg_len, TArgList & argList)
 			{
 				isValue = true;
 			}
-			// 값이 아니고, 이름이 시작되지 않았을 경우 빈칸은 건너 뛴다.
 			else if (!isValue && iNameLen == 0 && isspace((unsigned char) c))
 			{
 			}
-			// 엔터는 건너 뛴다
 			else if (c == '\r' || c == '\n')
 			{
 			}

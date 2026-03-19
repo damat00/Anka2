@@ -61,7 +61,7 @@ Group MotionEventData
         SphereDataCount      1
         Group SphereData00
         {
-            Radius           120.000000
+            Radius           170.000000
             Position         0.000000 -200.000000 100.000000
         }
     }
@@ -83,7 +83,7 @@ Group MotionEventData
         SphereDataCount      1
         Group SphereData00
         {
-            Radius           120.000000
+            Radius           170.000000
             Position         0.000000 -200.000000 100.000000
         }
     }

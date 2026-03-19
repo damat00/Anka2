@@ -164,7 +164,7 @@ class ShopDialog(ui.ScriptWindow):
 		def __SetReworkedTabNames(self, groupSize):
 			for buttonNumb in xrange(groupSize):
 				self.reworkedRadioButtonGroup.SetText(buttonNumb, constInfo.NumberToStrRomanNumerals((buttonNumb + 1)))
-				self.reworkedRadioButtonGroup.SetTextPosition(buttonNumb, 1, -1)
+				self.reworkedRadioButtonGroup.SetTextPosition(buttonNumb, 0, 0)
 				self.reworkedRadioButtonGroup.SetToolTipText(buttonNumb, shop.GetTabName(buttonNumb).replace("_", " "))
 
 	def __HideBuySellButton(self):

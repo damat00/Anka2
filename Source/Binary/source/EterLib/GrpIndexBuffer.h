@@ -25,7 +25,11 @@ class CGraphicIndexBuffer : public CGraphicBase
 
 		void SetIndices(int startIndex=0) const;
 
+#ifdef ENABLE_DIRECTX9_UPDATE
+		LPDIRECT3DINDEXBUFFER9 GetD3DIndexBuffer() const;
+#else
 		LPDIRECT3DINDEXBUFFER8 GetD3DIndexBuffer() const;
+#endif
 
 		int GetIndexCount() const {return m_iidxCount;}
 
@@ -33,7 +37,11 @@ class CGraphicIndexBuffer : public CGraphicBase
 		void Initialize();
 
 	protected:
+#ifdef ENABLE_DIRECTX9_UPDATE
+		LPDIRECT3DINDEXBUFFER9	m_lpd3dIdxBuf;
+#else
 		LPDIRECT3DINDEXBUFFER8	m_lpd3dIdxBuf;
+#endif
 		DWORD					m_dwBufferSize;
 		D3DFORMAT				m_d3dFmt;
 		int						m_iidxCount;

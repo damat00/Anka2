@@ -152,6 +152,7 @@ void CParticleSystemInstance::CreateParticles(float fElapsedTime)
 				break;
 		}
 
+		// Position
 		D3DXVECTOR3 v3TimePosition=_v3TimePosition;
 
 		pInstance->m_v3Position += v3TimePosition;
@@ -161,16 +162,17 @@ void CParticleSystemInstance::CreateParticles(float fElapsedTime)
 			D3DXVec3TransformCoord(&pInstance->m_v3Position,&pInstance->m_v3Position,mc_pmatLocal);
 			D3DXVec3TransformCoord(&v3TimePosition, &v3TimePosition, mc_pmatLocal);
 		}
-
 		pInstance->m_v3StartPosition = v3TimePosition;
+
+		// Direction & Velocity
 		pInstance->m_v3Velocity.x = 0.0f;
 		pInstance->m_v3Velocity.y = 0.0f;
 		pInstance->m_v3Velocity.z = 0.0f;
 
 		if (CEmitterProperty::EMITTER_ADVANCED_TYPE_INNER == m_pEmitterProperty->GetEmitterAdvancedType())
 		{
-			auto d3dd = (pInstance->m_v3Position - v3TimePosition);
-			D3DXVec3Normalize(&pInstance->m_v3Velocity, &d3dd);
+			auto val = (pInstance->m_v3Position-v3TimePosition);
+			D3DXVec3Normalize(&pInstance->m_v3Velocity, &val);
 			pInstance->m_v3Velocity *= -100.0f;
 		}
 		else if (CEmitterProperty::EMITTER_ADVANCED_TYPE_OUTER == m_pEmitterProperty->GetEmitterAdvancedType())
@@ -183,8 +185,8 @@ void CParticleSystemInstance::CreateParticles(float fElapsedTime)
 			}
 			else
 			{
-				auto d3dd = (pInstance->m_v3Position - v3TimePosition);
-				D3DXVec3Normalize(&pInstance->m_v3Velocity, &d3dd);
+				auto val = (pInstance->m_v3Position-v3TimePosition);
+				D3DXVec3Normalize(&pInstance->m_v3Velocity, &val);
 				pInstance->m_v3Velocity *= 100.0f;
 			}
 		}
@@ -206,7 +208,11 @@ void CParticleSystemInstance::CreateParticles(float fElapsedTime)
 			pInstance->m_v3Velocity.z += frandom(-m_pEmitterProperty->m_v3EmittingDirection.z/2.0f, m_pEmitterProperty->m_v3EmittingDirection.z/2.0f) * 1000.0f;
 
 		pInstance->m_v3Velocity *= fVelocity;
+
+		// Size
 		pInstance->m_v2HalfSize = v2HalfSize;
+
+		// Rotation
 		pInstance->m_fRotation = m_pParticleProperty->m_wRotationRandomStartingBegin;
 		pInstance->m_fRotation = frandom(m_pParticleProperty->m_wRotationRandomStartingBegin,m_pParticleProperty->m_wRotationRandomStartingEnd);
 
@@ -215,6 +221,7 @@ void CParticleSystemInstance::CreateParticles(float fElapsedTime)
 			pInstance->m_fRotation += fLieRotation;
 		}
 
+		// Texture Animation
 		pInstance->m_byFrameIndex = 0;
 		pInstance->m_byTextureAnimationType = m_pParticleProperty->GetTextureAnimationType();
 
@@ -239,11 +246,20 @@ void CParticleSystemInstance::CreateParticles(float fElapsedTime)
 			}
 		}
 
+		// Simple Update
 		{
 			pInstance->m_v3LastPosition = pInstance->m_v3Position - (pInstance->m_v3Velocity * fElapsedTime);
 			pInstance->m_v2Scale.x = m_pParticleProperty->m_TimeEventScaleX.front().m_Value;
 			pInstance->m_v2Scale.y= m_pParticleProperty->m_TimeEventScaleY.front().m_Value;
+			//pInstance->m_v2Scale = m_pParticleProperty->m_TimeEventScaleXY.front().m_Value;
+#ifdef WORLD_EDITOR
+			pInstance->m_Color.r = m_pParticleProperty->m_TimeEventColorRed.front().m_Value;
+			pInstance->m_Color.g = m_pParticleProperty->m_TimeEventColorGreen.front().m_Value;
+			pInstance->m_Color.b = m_pParticleProperty->m_TimeEventColorBlue.front().m_Value;
+			pInstance->m_Color.a = m_pParticleProperty->m_TimeEventAlpha.front().m_Value;
+#else
 			pInstance->m_dcColor = m_pParticleProperty->m_TimeEventColor.front().m_Value;
+#endif
 		}
 
 		if (!pFirstInstance)
@@ -290,8 +306,8 @@ bool CParticleSystemInstance::OnUpdate(float fElapsedTime)
 
 	if (fAngularVelocity && !m_pParticleProperty->m_bAttachFlag)
 	{
-		auto d3dd = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
-		D3DXVec3TransformNormal(&m_pParticleProperty->m_v3ZAxis, &d3dd, mc_pmatLocal);
+		auto val = D3DXVECTOR3(0.0f,0.0f,1.0f);
+		D3DXVec3TransformNormal(&m_pParticleProperty->m_v3ZAxis,&val,mc_pmatLocal);
 	}
 
 	for (dwFrameIndex = 0; dwFrameIndex < dwFrameCount; dwFrameIndex++)
@@ -320,8 +336,20 @@ bool CParticleSystemInstance::OnUpdate(float fElapsedTime)
 			}
 		}
 	}
-	if (isActive() && bMakeParticle)
-		CreateParticles(fElapsedTime);
+
+#ifdef USE_EFFECTS_LOD
+    if (isActive() && (!IsHiddenByLod()
+#ifdef ENABLE_WIKI_SYSTEM
+                        || m_wikiIgnoreFrustum
+#endif
+                        || m_ignoreFrustum)
+        && bMakeParticle)
+#else
+    if (isActive() && bMakeParticle)
+#endif
+    {
+        CreateParticles(fElapsedTime);
+    }
 
 	for (dwFrameIndex = 0; dwFrameIndex < dwFrameCount; ++dwFrameIndex)
 	{
@@ -400,44 +428,38 @@ void CParticleSystemInstance::OnRender()
 	CScreen::Identity();
 	STATEMANAGER.SetRenderState(D3DRS_SRCBLEND, m_pParticleProperty->m_bySrcBlendType);
 	STATEMANAGER.SetRenderState(D3DRS_DESTBLEND, m_pParticleProperty->m_byDestBlendType);
-	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLOROP, m_pParticleProperty->m_byColorOperationType);
+	STATEMANAGER.SetTextureStageState(0,D3DTSS_COLOROP,m_pParticleProperty->m_byColorOperationType);
 	if (m_pParticleProperty->m_byBillboardType < BILLBOARD_TYPE_2FACE)
 	{
 		if (!m_pParticleProperty->m_bAttachFlag)
 		{
-			auto obj = NParticleRenderer::NormalRenderer();
-			ForEachParticleRendering(obj);
+			ForEachParticleRendering(NParticleRenderer::NormalRenderer());
 		}
 		else
 		{
-			auto obj = NParticleRenderer::AttachRenderer(mc_pmatLocal);
-			ForEachParticleRendering(obj);
+			ForEachParticleRendering(NParticleRenderer::AttachRenderer(mc_pmatLocal));
 		}
 	}
 	else if (m_pParticleProperty->m_byBillboardType == BILLBOARD_TYPE_2FACE)
 	{
 		if (!m_pParticleProperty->m_bAttachFlag)
 		{
-			auto obj = NParticleRenderer::TwoSideRenderer();
-			ForEachParticleRendering(obj);
+			ForEachParticleRendering(NParticleRenderer::TwoSideRenderer());
 		}
 		else
 		{
-			auto obj = NParticleRenderer::TwoSideRenderer(mc_pmatLocal);
-			ForEachParticleRendering(obj);
+			ForEachParticleRendering(NParticleRenderer::TwoSideRenderer(mc_pmatLocal));
 		}
 	}
 	else if (m_pParticleProperty->m_byBillboardType == BILLBOARD_TYPE_3FACE)
 	{
 		if (!m_pParticleProperty->m_bAttachFlag)
 		{
-			auto obj = NParticleRenderer::ThreeSideRenderer();
-			ForEachParticleRendering(obj);
+			ForEachParticleRendering(NParticleRenderer::ThreeSideRenderer());
 		}
 		else
 		{
-			auto obj = NParticleRenderer::ThreeSideRenderer(mc_pmatLocal);
-			ForEachParticleRendering(obj);
+			ForEachParticleRendering(NParticleRenderer::ThreeSideRenderer(mc_pmatLocal));
 		}
 	}
 }

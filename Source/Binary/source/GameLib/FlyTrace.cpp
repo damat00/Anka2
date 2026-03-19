@@ -5,7 +5,7 @@
 #include "FlyingData.h"
 #include "FlyTrace.h"
 
-CDynamicPool<CFlyTrace>		CFlyTrace::ms_kPool;		
+CDynamicPool<CFlyTrace>		CFlyTrace::ms_kPool;
 
 void CFlyTrace::DestroySystem()
 {
@@ -31,7 +31,7 @@ CFlyTrace::CFlyTrace()
 	// Code for texture
 	CGraphicImage * pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer("d:/ray.jpg");
 	m_ImageInstance.SetImagePointer(pImage);
-	
+
 	CGraphicTexture * pTexture = m_ImageInstance.GetTexturePointer();
 	m_lpTexture = pTexture->GetD3DTexture();
 	*/
@@ -42,13 +42,13 @@ CFlyTrace::~CFlyTrace()
 	Destroy();
 }
 
-				
+
 void CFlyTrace::__Initialize()
 {
 	m_bRectShape=false;
 	m_dwColor=0;
 	m_fSize=0.0f;
-	m_fTailLength=0.0f;	
+	m_fTailLength=0.0f;
 }
 
 void CFlyTrace::Destroy()
@@ -79,12 +79,10 @@ void CFlyTrace::Create(const CFlyingData::TFlyingAttachData & rFlyingAttachData)
 
 
 void CFlyTrace::Update()
-{ 
-	
+{
+
 }
 
-//1. 알파를 쓰려면 색깔만 줄수있다.
-//2. 텍스쳐를 쓰려면 알파 없다-_-
 
 
 struct TFlyVertex
@@ -128,11 +126,15 @@ void CFlyTrace::Render()
 
 	D3DXMATRIX matWorld;
 	D3DXMatrixIdentity(&matWorld);
-	
+
 	STATEMANAGER.SaveTransform(D3DTS_WORLD, &matWorld);
+#ifdef ENABLE_DIRECTX9_UPDATE
+	STATEMANAGER.SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
+#else
 	STATEMANAGER.SaveVertexShader(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
+#endif
 	STATEMANAGER.SaveRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-	
+
 	STATEMANAGER.SaveRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 	STATEMANAGER.SaveRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	STATEMANAGER.SaveRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
@@ -143,7 +145,7 @@ void CFlyTrace::Render()
 
 	STATEMANAGER.SaveRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD );
 	//STATEMANAGER.SaveRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD );
-	
+
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_DIFFUSE);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_TEXTURE);
 	//STATEMANAGER.SetTextureStageState(0, D3DTSS_COLOROP, /*(m_bUseTexture)?D3DTOP_SELECTARG2:*/D3DTOP_SELECTARG2);
@@ -158,8 +160,7 @@ void CFlyTrace::Render()
 	STATEMANAGER.SetRenderState(D3DRS_LIGHTING, FALSE);
 	STATEMANAGER.SetTexture(0, nullptr);
 	STATEMANAGER.SetTexture(1, nullptr);
-	
-	
+
 	D3DXMATRIX m;
 	CScreen s;s.UpdateViewMatrix();
 	CCamera * pCurrentCamera = CCameraManager::Instance().GetCurrentCamera();
@@ -184,7 +185,7 @@ void CFlyTrace::Render()
 		const D3DXVECTOR3& rkOld=it1->second;
 		const D3DXVECTOR3& rkNew=it2->second;
 		D3DXVECTOR3 B = rkNew - rkOld;
-		
+
 		float radius = max(fabs(B.x),max(fabs(B.y),fabs(B.z)))/2;
 		Vector3d c(it1->second.x+B.x*0.5f,
 			it1->second.y+B.y*0.5f,
@@ -202,7 +203,7 @@ void CFlyTrace::Render()
 			size1 *= rate1;
 			size2 *= rate2;
 		}
-		TFlyVertex v[6] = 
+		TFlyVertex v[6] =
 		{
 			TFlyVertex(D3DXVECTOR3(0.0f,size1,0.0f), m_dwColor,D3DXVECTOR2(0.0f,0.0f)),
 			TFlyVertex(D3DXVECTOR3(-size1,0.0f,0.0f),m_dwColor,D3DXVECTOR2(0.0f,0.5f)),
@@ -210,7 +211,7 @@ void CFlyTrace::Render()
 			TFlyVertex(D3DXVECTOR3(-size2,0.0f,0.0f),m_dwColor,D3DXVECTOR2(0.5f,1.0f)),
 			TFlyVertex(D3DXVECTOR3(size2,0.0f,0.0f), m_dwColor,D3DXVECTOR2(1.0f,0.5f)),
 			TFlyVertex(D3DXVECTOR3(0.0f,-size2,0.0f),m_dwColor,D3DXVECTOR2(1.0f,1.0f)),
-	
+
 			/*TVertex(D3DXVECTOR3(0.0f,size1,0.0f), ((DWORD)(0x40*rate1)<<24) + 0x0000ff,D3DXVECTOR2(0.0f,0.0f)),
 			TVertex(D3DXVECTOR3(-size1,0.0f,0.0f),((DWORD)(0x40*rate1)<<24) + 0x0000ff,D3DXVECTOR2(0.0f,0.0f)),
 			TVertex(D3DXVECTOR3(size1,0.0f,0.0f), ((DWORD)(0x40*rate1)<<24) + 0x0000ff,D3DXVECTOR2(0.0f,0.0f)),
@@ -262,10 +263,10 @@ void CFlyTrace::Render()
 			v[i].p += it2->second;
 		//for(i=0;i<6;i++)
 		//	Tracenf("#%d:%f %f %f", i, v[i].p.x,v[i].p.y,v[i].p.z);
-		
+
 		VSVector.push_back(std::make_pair(-D3DXVec3Dot(&E,&pCurrentCamera->GetView()),TFlyVertexSet(v)));
 		//OLD: STATEMANAGER.DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 4, v, sizeof(TVertex));
-		//OLD: STATEMANAGER.DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, v+1, sizeof(TVertex));		
+		//OLD: STATEMANAGER.DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, v+1, sizeof(TVertex));
 	}
 
 	std::sort(VSVector.begin(),VSVector.end());
@@ -278,7 +279,11 @@ void CFlyTrace::Render()
 	STATEMANAGER.RestoreRenderState(D3DRS_SRCBLEND);
 	STATEMANAGER.RestoreRenderState(D3DRS_ALPHABLENDENABLE);
 	STATEMANAGER.RestoreRenderState(D3DRS_CULLMODE);
+#ifdef ENABLE_DIRECTX9_UPDATE
+	STATEMANAGER.RestoreFVF();
+#else
 	STATEMANAGER.RestoreVertexShader();
+#endif
 	STATEMANAGER.RestoreTransform(D3DTS_WORLD);
 	//STATEMANAGER.RestoreRenderState(D3DRS_ZWRITEENABLE);
 	STATEMANAGER.RestoreRenderState(D3DRS_ZFUNC);

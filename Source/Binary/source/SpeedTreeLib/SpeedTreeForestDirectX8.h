@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CSpeedTreeForestOpenGL Class
 //
 //	(c) 2003 IDV, Inc.
@@ -30,7 +30,7 @@
 #pragma once
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	Include Files
 
 //#include <map>
@@ -39,7 +39,7 @@
 #include "SpeedTreeForest.h"
 #include "SpeedTreeMaterial.h"
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	class CSpeedTreeForestDirectX8 declaration
 class CSpeedTreeForestDirectX8 : public CSpeedTreeForest, public CGraphicBase, public CSingleton<CSpeedTreeForestDirectX8>
 {
@@ -47,18 +47,27 @@ class CSpeedTreeForestDirectX8 : public CSpeedTreeForest, public CGraphicBase, p
 		CSpeedTreeForestDirectX8();
 		virtual ~CSpeedTreeForestDirectX8();
 
-		void			UploadWindMatrix(unsigned int uiLocation, const float *pMatrix) const;
+		void			UploadWindMatrix(unsigned int uiLocation, const float* pMatrix) const;
 		void			UpdateCompundMatrix(const D3DXVECTOR3 & c_rEyeVec, const D3DXMATRIX & c_rmatView, const D3DXMATRIX & c_rmatProj);
 
 		void			Render(unsigned long ulRenderBitVector = Forest_RenderAll);
-		bool			SetRenderingDevice(LPDIRECT3DDEVICE8 pDevice);
-		
+#ifdef ENABLE_DIRECTX9_UPDATE
+        bool SetRenderingDevice(LPDIRECT3DDEVICE9 pDevice);
+#else
+        bool SetRenderingDevice(LPDIRECT3DDEVICE8 pDevice);
+#endif
+
 	private:
 		bool			InitVertexShaders();
-		
-	private:
-		LPDIRECT3DDEVICE8		m_pDx;							// the rendering context
 
-		DWORD					m_dwBranchVertexShader;			// branch/frond vertex shaders		
-		DWORD					m_dwLeafVertexShader;			// leaf vertex shader
+	private:
+#ifdef ENABLE_DIRECTX9_UPDATE
+        LPDIRECT3DDEVICE9 m_pDx;                                // the rendering context
+        LPDIRECT3DVERTEXDECLARATION9 m_dwBranchVertexShader;    // branch/frond vertex shaders
+        LPDIRECT3DVERTEXDECLARATION9 m_dwLeafVertexShader;      // leaf vertex shader
+#else
+        LPDIRECT3DDEVICE8 m_pDx;                                // the rendering context
+        DWORD m_dwBranchVertexShader;                           // branch/frond vertex shaders
+        DWORD m_dwLeafVertexShader;                             // leaf vertex shader
+#endif
 };

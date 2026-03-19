@@ -3,7 +3,6 @@
 #include "ParticleInstance.h"
 namespace NEffectUpdateDecorator
 {
-
 	CBaseDecorator* CAirResistanceDecorator::__Clone(CParticleInstance* pfi, CParticleInstance* pi)
 	{
 		pi->m_fAirResistance = pfi->m_fAirResistance;
@@ -35,5 +34,4 @@ namespace NEffectUpdateDecorator
 	{
 		d.pInstance->m_fRotation += d.pInstance->m_fRotationSpeed * d.fElapsedTime;
 	}
-
 }

@@ -35,7 +35,11 @@ class CParticleInstance
 		D3DXVECTOR2			m_v2Scale;
 
 		float				m_fRotation;
+#ifdef WORLD_EDITOR
+		D3DXCOLOR			m_Color;
+#else
 		DWORDCOLOR			m_dcColor;
+#endif
 
 		BYTE				m_byTextureAnimationType;
 		float				m_fLastFrameTime;

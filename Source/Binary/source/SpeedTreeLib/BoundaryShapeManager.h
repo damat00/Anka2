@@ -13,28 +13,28 @@
 //      Web:   http://www.idvinc.com
 //
 //  This software is supplied under the terms of a license agreement or
-//  nondisclosure agreement with Interactive Data Visualization and may not 
-//  be copied or disclosed except in accordance with the terms of that 
+//  nondisclosure agreement with Interactive Data Visualization and may not
+//  be copied or disclosed except in accordance with the terms of that
 //  agreement.
 //
 //      Release version 1.0
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	Preprocessor
 #include <vector>
 #include <string>
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	SPoint
 struct SPoint
 {
-		float&      operator[](int i) { return m_afData[i]; }     
+		float&      operator[](int i) { return m_afData[i]; }
 		float       m_afData[3];
 };
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	SBoundaryShape
 struct SBoundaryShape
 {
@@ -44,7 +44,7 @@ struct SBoundaryShape
 };
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CBoundaryShapeManager
 class CBoundaryShapeManager
 {
@@ -52,7 +52,7 @@ public:
 		CBoundaryShapeManager( );
 		virtual ~CBoundaryShapeManager( );
 
-		bool						LoadBsfFile(const char *pFilename);
+		bool						LoadBsfFile(const char* pFilename);
 
 		bool						PointInside(float fX, float fY);
 		bool						RandomPoint(float& fX, float& fY);

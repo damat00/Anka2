@@ -1,6 +1,10 @@
 #pragma once
 
+#ifdef ENABLE_DIRECTX9_UPDATE
+#include <d3dx9.h>
+#else
 #include <d3dx8.h>
+#endif
 
 #include "../eterlib/GrpScreen.h"
 #include "../eterlib/Resource.h"

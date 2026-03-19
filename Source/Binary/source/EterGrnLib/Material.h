@@ -2,7 +2,11 @@
 
 #include <granny.h>
 #include <windows.h>
-#include <d3d8.h>
+#ifdef ENABLE_DIRECTX9_UPDATE
+#include <d3d9.h>
+#else
+#include <d3dx8.h>
+#endif
 
 #include "../eterlib/ReferenceObject.h"
 #include "../eterlib/Ref.h"
@@ -52,13 +56,17 @@ class CGrannyMaterial : public CReferenceObject
 		bool					CreateFromGrannyMaterialPointer(granny_material* pgrnMaterial);
 		void					SetImagePointer(int iStage, CGraphicImage* pImage);
 
-		CGrannyMaterial::EType	GetType() const;		
+		CGrannyMaterial::EType	GetType() const;
 		CGraphicImage *			GetImagePointer(int iStage) const;
 
 		const CGraphicTexture * GetDiffuseTexture() const;
 		const CGraphicTexture * GetOpacityTexture() const;
 
+#ifdef ENABLE_DIRECTX9_UPDATE
+		LPDIRECT3DTEXTURE9		GetD3DTexture(int iStage) const;
+#else
 		LPDIRECT3DTEXTURE8		GetD3DTexture(int iStage) const;
+#endif
 
 		bool					IsTwoSided() const		{ return m_bTwoSideRender; }
 

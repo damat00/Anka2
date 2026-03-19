@@ -21,7 +21,7 @@ class CParticleSystemInstance : public CEffectElementBaseInstance
 
 	public:
 		template <typename T>
-		inline void ForEachParticleRendering(T & FunObj)
+		inline void ForEachParticleRendering(T && FunObj)
 		{
 			DWORD dwFrameIndex;
 			for(dwFrameIndex=0; dwFrameIndex<m_kVct_pkImgInst.size(); dwFrameIndex++)
@@ -30,15 +30,17 @@ class CParticleSystemInstance : public CEffectElementBaseInstance
 				TParticleInstanceList::iterator itor = m_ParticleInstanceListVector[dwFrameIndex].begin();
 				for (; itor != m_ParticleInstanceListVector[dwFrameIndex].end(); ++itor)
 				{
-					if (!InFrustum(*itor)
-#ifdef ENABLE_RENDER_TARGET
-							&& !m_ignoreFrustum
+#if defined(ENABLE_RENDER_TARGET) && defined(ENABLE_WIKI_SYSTEM)
+					if (!InFrustum(*itor) && !m_wikiIgnoreFrustum && !m_ignoreFrustum)
+#elif defined(ENABLE_RENDER_TARGET)
+					if (!InFrustum(*itor) && !m_ignoreFrustum)
+#elif defined(ENABLE_WIKI_SYSTEM)
+					if (!InFrustum(*itor) && !m_wikiIgnoreFrustum)
+#else
+					if (!InFrustum(*itor))
 #endif
-#ifdef ENABLE_INGAME_WIKI_SYSTEM
-							&& !m_wikiIgnoreFrustum
-#endif
-						)
 						return;
+
 					FunObj(*itor);
 				}
 			}

@@ -3,4 +3,4 @@
 //	stdafx.obj will contain the pre-compiled type information
 
 #include "stdafx.h"
-
+namespace { char dummy; }; // solve warning lnk4221

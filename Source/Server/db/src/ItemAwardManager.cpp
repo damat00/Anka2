@@ -118,8 +118,9 @@ void ItemAwardManager::Load(SQLMsg * pMsg)
 			strcpy(cmdStr,whyStr);
 
 			char command[20] = "";
-			strcpy(command,CClientManager::instance().GetCommand(cmdStr));
-
+			// @fixme203 directly GetCommand instead of strcpy
+			CClientManager::instance().GetCommand(cmdStr, command);
+			//sys_err("%d,  %s",pItemAward->dwID,command);
 			if( !(strcmp(command,"GIFT") ))
 			{
 				TPacketItemAwardInfromer giftData;
@@ -165,9 +166,14 @@ void ItemAwardManager::Taken(DWORD dwAwardID, DWORD dwItemID)
 	TItemAward * k = it->second;
 	k->bTaken = true;
 
+	//
+	// Update taken_time in database to prevent not to give him again.
+	//
 	char szQuery[QUERY_MAX_LEN];
 
-	snprintf(szQuery, sizeof(szQuery), "UPDATE item_award SET taken_time=NOW(),item_id=%u WHERE id=%u AND taken_time IS NULL", dwItemID, dwAwardID);
+	snprintf(szQuery, sizeof(szQuery),
+			"UPDATE item_award SET taken_time=NOW(),item_id=%u WHERE id=%u AND taken_time IS NULL",
+			dwItemID, dwAwardID);
 
 	CDBManager::instance().ReturnQuery(szQuery, QID_ITEM_AWARD_TAKEN, 0, NULL);
 }

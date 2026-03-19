@@ -100,12 +100,13 @@ void CBuffOnAttributes::ChangeBuffValue(BYTE bNewValue)
 		Off();
 	else
 	{
-		for (TMapAttr::iterator it = m_map_additional_attrs.begin(); it != m_map_additional_attrs.end(); it++)
+		for (TMapAttr::iterator it = m_map_additional_attrs.begin(); it != m_map_additional_attrs.end(); ++it)	//@fixme541
 		{
 			int& sum_of_attr_value = it->second;
 			int old_value = sum_of_attr_value * m_bBuffValue / 100;
 			int new_value = sum_of_attr_value * bNewValue / 100;
-
+			(void)old_value;
+			(void)new_value;
 			m_pBuffOwner->ApplyPoint(it->first, -sum_of_attr_value * m_bBuffValue / 100);
 		}
 		m_bBuffValue = bNewValue;
@@ -154,11 +155,11 @@ bool CBuffOnAttributes::On(BYTE bValue)
 		}
 	}
 
-	for (TMapAttr::iterator it = m_map_additional_attrs.begin(); it != m_map_additional_attrs.end(); it++)
+	for (TMapAttr::iterator it = m_map_additional_attrs.begin(); it != m_map_additional_attrs.end(); ++it)	//@fixme541
 	{
 		m_pBuffOwner->ApplyPoint(it->first, it->second * bValue / 100);
 	}
-	
+
 	m_bBuffValue = bValue;
 
 	return true;

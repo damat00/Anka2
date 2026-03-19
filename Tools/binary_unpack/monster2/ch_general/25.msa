@@ -66,7 +66,7 @@ Group AttackingData
             0.911009 -46.540199 -99.873108 153.928940 -121.524445 -72.886482 146.924240
             0.919343 -56.704849 -118.337830 155.139130 -136.097153 -112.648148 147.221634
             0.927676 -62.196373 -138.377823 156.317596 -140.205368 -153.727112 147.599838
-            0.936009 -63.006882 -159.338318 157.464325 -134.136871 -194.714371 148.058609monster2
+            0.936009 -63.006882 -159.338318 157.464325 -134.136871 -194.714371 148.058609
             0.944343 -59.022659 -179.838165 158.562393 -118.272453 -232.674698 148.696671
             0.952676 -51.242126 -197.689041 159.579712 -95.632202 -263.502655 149.704544
             0.961009 -40.896309 -212.397598 160.515488 -68.999435 -286.703217 151.087799
@@ -78,17 +78,39 @@ Group AttackingData
 
 Group MotionEventData
 {
-    MotionEventDataCount     1
+    MotionEventDataCount     2
     Group Event00
     {
         MotionEventType      1
-        StartingTime         0.985402
+        StartingTime         0.459854
         
         IndependentFlag      0
         AttachingEnable      1
-        AttachingBoneName    "Bip01 R Hand"
+        AttachingBoneName    "Bip01"
         FollowingEnable      1
-        EffectFileName       "d:/ymir work/monster2/ch_general/general_skill2.mse"
+        EffectFileName       "d:/ymir work/pc/warrior/effect/palbang_4_spin.mse"
         EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event01
+    {
+        MotionEventType      4
+        StartingTime         0.445255
+        DuringTime           0.200000
+        EnableHitProcess     0
+        
+        AttackType           0
+        HittingType          1
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           300.000000
+            Position         0.000000 -0.000000 0.000000
+        }
     }
 }

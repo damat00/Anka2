@@ -6,6 +6,7 @@
 #include "mob_manager.h"
 #include "char.h"
 
+// POLYMORPH_BUG_FIX
 static float MSA_GetNormalAttackDuration(const char* msaPath)
 {
 	float duration = 99.0f;
@@ -66,6 +67,7 @@ static float MOB_GetNormalAttackDuration(TMobTable* mobTable)
 
 	return minDuration;
 }
+// END_OF_POLYMORPH_BUG_FIX
 
 static const char* GetMotionFileName(TMobTable* mobTable, EPublicMotion motion)
 {
@@ -120,10 +122,10 @@ static const char* GetMotionFileName(TMobTable* mobTable, EPublicMotion motion)
 
 		fclose(fp);
 	}
-	else
-	{
-		sys_err("Motion: %s have not motlist.txt vnum(%d) folder(%s)", folder, mobTable->dwVnum, mobTable->szFolder);
-	}
+	// else
+	// {
+		// sys_err("Motion: %s have not motlist.txt vnum(%d) folder(%s)", folder, mobTable->dwVnum, mobTable->szFolder);
+	// }
 
 	return NULL;
 }
@@ -143,14 +145,14 @@ static void LoadMotion(CMotionSet* pMotionSet, TMobTable* mob_table, EPublicMoti
 	{
 		if (motion == MOTION_RUN)
 			if (0.0f == pMotion->GetAccumVector().y)
-				sys_err("cannot find accumulation data in file '%s'", cpFileName);
+				//sys_err("cannot find accumulation data in file '%s'", cpFileName);
 
 		pMotionSet->Insert(MAKE_MOTION_KEY(MOTION_MODE_GENERAL, motion), pMotion);
 	}
 	else
 	{
 		M2_DELETE(pMotion);
-		sys_err("Motion: Load failed vnum(%d) motion(%d) file(%s)", mob_table->dwVnum, motion, cpFileName);
+		//sys_err("Motion: Load failed vnum(%d) motion(%d) file(%s)", mob_table->dwVnum, motion, cpFileName);
 	}
 }
 
@@ -167,7 +169,7 @@ static void LoadSkillMotion(CMotionSet* pMotionSet, CMob* pMob, EPublicMotion mo
 		case MOTION_SPECIAL_5 : idx = 4; break;
 
 		default :
-			return;					
+			return;
 	}
 
 	TMobTable* mob_table = &pMob->m_table;
@@ -232,6 +234,7 @@ float CMotionManager::GetMotionDuration(DWORD dwVnum, DWORD dwKey)
 	return pkMotion ? pkMotion->GetDuration() : 0.0f;
 }
 
+// POLYMORPH_BUG_FIX
 float	CMotionManager::GetNormalAttackDuration(DWORD dwVnum)
 {
 	std::map<DWORD, float>::iterator f = m_map_normalAttackDuration.find(dwVnum);
@@ -240,21 +243,22 @@ float	CMotionManager::GetNormalAttackDuration(DWORD dwVnum)
 	else
 		return f->second;
 }
+// END_OF_POLYMORPH_BUG_FIX
 
 enum EMotionEventType
 {
-	MOTION_EVENT_TYPE_NONE,
-	MOTION_EVENT_TYPE_EFFECT,
-	MOTION_EVENT_TYPE_SCREEN_WAVING,
-	MOTION_EVENT_TYPE_SCREEN_FLASHING,
-	MOTION_EVENT_TYPE_SPECIAL_ATTACKING,
-	MOTION_EVENT_TYPE_SOUND,
-	MOTION_EVENT_TYPE_FLY,
-	MOTION_EVENT_TYPE_CHARACTER_SHOW,
-	MOTION_EVENT_TYPE_CHARACTER_HIDE,
-	MOTION_EVENT_TYPE_WARP,
-	MOTION_EVENT_TYPE_EFFECT_TO_TARGET,
-	MOTION_EVENT_TYPE_MAX_NUM,
+	MOTION_EVENT_TYPE_NONE,					// 0
+	MOTION_EVENT_TYPE_EFFECT,				// 1
+	MOTION_EVENT_TYPE_SCREEN_WAVING,		// 2
+	MOTION_EVENT_TYPE_SCREEN_FLASHING,		// 3
+	MOTION_EVENT_TYPE_SPECIAL_ATTACKING,	// 4
+	MOTION_EVENT_TYPE_SOUND,				// 5
+	MOTION_EVENT_TYPE_FLY,					// 6
+	MOTION_EVENT_TYPE_CHARACTER_SHOW,		// 7
+	MOTION_EVENT_TYPE_CHARACTER_HIDE,		// 8
+	MOTION_EVENT_TYPE_WARP,					// 9
+	MOTION_EVENT_TYPE_EFFECT_TO_TARGET,		// 10
+	MOTION_EVENT_TYPE_MAX_NUM,				// 11
 };
 
 bool CMotionManager::Build()
@@ -268,9 +272,12 @@ bool CMotionManager::Build()
 		"data/pc2/warrior",
 		"data/pc2/assassin",
 		"data/pc2/sura",
-		"data/pc2/shaman"
+		"data/pc2/shaman",
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		"data/pc3/wolfman",
+#endif
 	};
-	
+
 	for (int i = 0; i < MAIN_RACE_MAX_NUM; ++i)
 	{
 		CMotionSet * pkMotionSet = M2_NEW CMotionSet;
@@ -317,6 +324,12 @@ bool CMotionManager::Build()
 		pkMotionSet->Load(sz, MOTION_MODE_HORSE, MOTION_RUN);
 		snprintf(sz, sizeof(sz), "%s/horse/walk.msa", c_apszFolderName[i]);
 		pkMotionSet->Load(sz, MOTION_MODE_HORSE, MOTION_WALK);
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		snprintf(sz, sizeof(sz), "%s/claw/run.msa", c_apszFolderName[i]);
+		pkMotionSet->Load(sz, MOTION_MODE_CLAW, MOTION_RUN);
+		snprintf(sz, sizeof(sz), "%s/claw/walk.msa", c_apszFolderName[i]);
+		pkMotionSet->Load(sz, MOTION_MODE_CLAW, MOTION_WALK);
+#endif
 	}
 
 	CMobManager::iterator it = CMobManager::instance().begin();
@@ -341,9 +354,11 @@ bool CMotionManager::Build()
 			LoadSkillMotion(pkMotionSet, pkMob, MOTION_SPECIAL_4);
 			LoadSkillMotion(pkMotionSet, pkMob, MOTION_SPECIAL_5);
 
+			// POLYMORPH_BUG_FIX
 			float normalAttackDuration = MOB_GetNormalAttackDuration(t);
 			sys_log(0, "mob_normal_attack_duration:%d:%s:%.2f", t->dwVnum, t->szFolder, normalAttackDuration);
 			m_map_normalAttackDuration.insert(std::map<DWORD, float>::value_type(t->dwVnum, normalAttackDuration));
+			// END_OF_POLYMORPH_BUG_FIX
 		}
 	}
 
@@ -397,7 +412,7 @@ CMotion::CMotion() : m_isEmpty(true), m_fDuration(0.0f), m_isAccumulation(false)
 	m_vec3Accumulation.x = 0.0f;
 	m_vec3Accumulation.y = 0.0f;
 	m_vec3Accumulation.z = 0.0f;
-}  
+}
 
 CMotion::~CMotion()
 {

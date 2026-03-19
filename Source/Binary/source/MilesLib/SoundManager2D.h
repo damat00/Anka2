@@ -18,7 +18,7 @@ class CSoundManager2D : public CSoundBase
 		bool				Initialize();
 		void				Destroy();
 
-		ISoundInstance *	GetInstance(const char *filename);
+		ISoundInstance *	GetInstance(const char* filename);
 
 	protected:
 		CSoundInstance2D	ms_Instances[INSTANCE_MAX_COUNT];

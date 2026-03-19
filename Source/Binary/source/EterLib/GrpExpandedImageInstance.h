@@ -3,6 +3,20 @@
 #include "StdAfx.h"
 #include "GrpImageInstance.h"
 
+#ifdef INSIDE_RENDER
+typedef struct tagExpandedRECT
+{
+	LONG	left_top;
+	LONG	left_bottom;
+	LONG	top_left;
+	LONG	top_right;
+	LONG	right_top;
+	LONG	right_bottom;
+	LONG	bottom_left;
+	LONG	bottom_right;
+} ExpandedRECT, * PEXPANDEDRECT;
+#endif
+
 class CGraphicExpandedImageInstance : public CGraphicImageInstance
 {
 	public:
@@ -35,10 +49,22 @@ class CGraphicExpandedImageInstance : public CGraphicImageInstance
 		void SetRenderingRect(float fLeft, float fTop, float fRight, float fBottom);
 		void SetRenderingRectWithScale(float fLeft, float fTop, float fRight, float fBottom);
 		void SetRenderingMode(int iMode);
-#ifdef ENABLE_NEW_DUNGEON_LIB
-		void OnRenderCoolTime(float fCoolTime);
-		void RenderCoolTime(float fCoolTime);
+#ifdef INSIDE_RENDER
+		void SetRenderBox(RECT& renderBox);
+		DWORD GetPixelColor(DWORD x, DWORD y);
+		int GetRenderWidth();
+		int GetRenderHeight();
+
+		void SetExpandedRenderingRect(float fLeftTop, float fLeftBottom, float fTopLeft, float fTopRight, float fRightTop, float fRightBottom, float fBottomLeft, float fBottomRight);
+		void iSetRenderingRect(int iLeft, int iTop, int iRight, int iBottom);
+		void iSetExpandedRenderingRect(int iLeftTop, int iLeftBottom, int iTopLeft, int iTopRight, int iRightTop, int iRightBottom, int iBottomLeft, int iBottomRight);
+		void SetTextureRenderingRect(float fLeft, float fTop, float fRight, float fBottom);
 #endif
+/* wtf?
+#ifdef ENABLE_NEW_DUNGEON_LIB
+        void RenderCoolTime(float fCoolTime);
+#endif
+*/
 #ifdef ENABLE_FISH_GAME
 		float GetRotation() { return m_fRotation; }
 #endif
@@ -47,24 +73,44 @@ class CGraphicExpandedImageInstance : public CGraphicImageInstance
 		void Initialize();
 
 #ifdef ENABLE_CLIP_MASKING
-		void OnRender(RECT* pClipRect);
+        void OnRender(RECT* pClipRect);
 #else
-		void OnRender();
+        void OnRender();
 #endif
+/* wtf?
+#ifdef ENABLE_NEW_DUNGEON_LIB
+        void OnRenderCoolTime(float fCoolTime);
+#endif
+*/
+
 		void OnSetImagePointer();
 
 		BOOL OnIsType(DWORD dwType);
 
 	protected:
+		/*
 		float m_fDepth;
 		D3DXVECTOR2 m_v2Origin;
-#ifndef ENABLE_RENDER_TARGET
 		D3DXVECTOR2 m_v2Scale;
-#endif
+		float m_fRotation;
+		*/
+		float m_fDepth;
+		D3DXVECTOR2 m_v2Origin;
 		float m_fRotation;
 
+#ifdef INSIDE_RENDER
+		ExpandedRECT m_RenderingRect;
+		RECT m_TextureRenderingRect;
+		RECT m_renderBox;
+		DWORD* m_pColorMap;
+#else
 		RECT m_RenderingRect;
+#endif
 		int m_iRenderingMode;
+#ifdef INSIDE_RENDER
+	private:
+		void SaveColorMap();
+#endif
 
 	public:
 		static void CreateSystem(UINT uCapacity);

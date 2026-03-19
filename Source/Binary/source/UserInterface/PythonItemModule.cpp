@@ -2,9 +2,10 @@
 #include "PythonItem.h"
 
 #include "../gamelib/ItemManager.h"
-
+#include "../gamelib/ItemData.h"
 #include "InstanceBase.h"
 #include "AbstractApplication.h"
+#include "Locale_inc.h"
 
 extern int TWOHANDED_WEWAPON_ATT_SPEED_DECREASE_VALUE;
 
@@ -13,7 +14,7 @@ PyObject *itemSetUseSoundFileName(PyObject *poSelf, PyObject *poArgs)
 	int iUseSound;
 	if (!PyTuple_GetInteger(poArgs, 0, &iUseSound))
 		return Py_BadArgument();
-	
+
 	char *szFileName;
 	if (!PyTuple_GetString(poArgs, 1, &szFileName))
 		return Py_BadArgument();
@@ -28,7 +29,7 @@ PyObject *itemSetDropSoundFileName(PyObject *poSelf, PyObject *poArgs)
 	int iDropSound;
 	if (!PyTuple_GetInteger(poArgs, 0, &iDropSound))
 		return Py_BadArgument();
-	
+
 	char *szFileName;
 	if (!PyTuple_GetString(poArgs, 1, &szFileName))
 		return Py_BadArgument();
@@ -362,7 +363,7 @@ PyObject *itemGetUseType(PyObject *poSelf, PyObject *poArgs)
 	CItemData * pItemData = CItemManager::Instance().GetSelectedItemDataPointer();
 	if (!pItemData)
 		return Py_BuildException("Can't find select item data");
-	
+
 	return Py_BuildValue("s", pItemData->GetUseTypeString());	
 }
 
@@ -379,14 +380,14 @@ PyObject *itemIsRefineScroll(PyObject *poSelf, PyObject *poArgs)
 
 	if (pItemData->GetType() != CItemData::ITEM_TYPE_USE)
 		return Py_BuildValue("i", FALSE);
-	
+
 	switch (pItemData->GetSubType())
 	{
 		case CItemData::USE_TUNING:
 			return Py_BuildValue("i", TRUE);
 			break;
 	}
-	
+
 	return Py_BuildValue("i", FALSE);
 }
 
@@ -487,7 +488,7 @@ PyObject *itemUpdate(PyObject *poSelf, PyObject *poArgs)
 	IAbstractApplication& rkApp=IAbstractApplication::GetSingleton();
 
 	POINT ptMouse;
-	rkApp.GetMousePosition(&ptMouse);	
+	rkApp.GetMousePosition(&ptMouse);
 
 	CPythonItem::Instance().Update(ptMouse);
 	return Py_BuildNone();
@@ -511,7 +512,7 @@ PyObject *itemCreateItem(PyObject *poSelf, PyObject *poArgs)
 	float z;
 	if (!PyTuple_GetFloat(poArgs, 4, &z))
 		return Py_BadArgument();
-	
+
 	bool bDrop = true;
 	PyTuple_GetBoolean(poArgs, 5, &bDrop);
 
@@ -591,6 +592,171 @@ PyObject *itemIsWeddingItem(PyObject *poSelf, PyObject *poArgs)
 	return Py_BuildValue("i", FALSE);
 }
 
+#if defined(__BL__DETAILS_UI__)
+#include "Packet.h"
+
+static BYTE __GetApplyPointType(BYTE bApplyType)
+{
+	switch (bApplyType)
+	{
+		// Generated from constants.cpp(aApplyInfo)
+		case CItemData::EApplyTypes::APPLY_NONE:	return EPointTypes::POINT_NONE;
+		case CItemData::EApplyTypes::APPLY_MAX_HP:	return EPointTypes::POINT_MAX_HP;
+		case CItemData::EApplyTypes::APPLY_MAX_SP:	return EPointTypes::POINT_MAX_SP;
+		case CItemData::EApplyTypes::APPLY_CON:	return EPointTypes::POINT_HT;
+		case CItemData::EApplyTypes::APPLY_INT:	return EPointTypes::POINT_IQ;
+		case CItemData::EApplyTypes::APPLY_STR:	return EPointTypes::POINT_ST;
+		case CItemData::EApplyTypes::APPLY_DEX:	return EPointTypes::POINT_DX;
+		case CItemData::EApplyTypes::APPLY_ATT_SPEED:	return EPointTypes::POINT_ATT_SPEED;
+		case CItemData::EApplyTypes::APPLY_MOV_SPEED:	return EPointTypes::POINT_MOV_SPEED;
+		case CItemData::EApplyTypes::APPLY_CAST_SPEED:	return EPointTypes::POINT_CASTING_SPEED;
+		case CItemData::EApplyTypes::APPLY_HP_REGEN:	return EPointTypes::POINT_HP_REGEN;
+		case CItemData::EApplyTypes::APPLY_SP_REGEN:	return EPointTypes::POINT_SP_REGEN;
+		case CItemData::EApplyTypes::APPLY_POISON_PCT:	return EPointTypes::POINT_POISON_PCT;
+		case CItemData::EApplyTypes::APPLY_STUN_PCT:	return EPointTypes::POINT_STUN_PCT;
+		case CItemData::EApplyTypes::APPLY_SLOW_PCT:	return EPointTypes::POINT_SLOW_PCT;
+		case CItemData::EApplyTypes::APPLY_CRITICAL_PCT:	return EPointTypes::POINT_CRITICAL_PCT;
+		case CItemData::EApplyTypes::APPLY_PENETRATE_PCT:	return EPointTypes::POINT_PENETRATE_PCT;
+		case CItemData::EApplyTypes::APPLY_ATTBONUS_HUMAN:	return EPointTypes::POINT_ATTBONUS_HUMAN;
+		case CItemData::EApplyTypes::APPLY_ATTBONUS_ANIMAL:	return EPointTypes::POINT_ATTBONUS_ANIMAL;
+		case CItemData::EApplyTypes::APPLY_ATTBONUS_ORC:	return EPointTypes::POINT_ATTBONUS_ORC;
+		case CItemData::EApplyTypes::APPLY_ATTBONUS_MILGYO:	return EPointTypes::POINT_ATTBONUS_MILGYO;
+		case CItemData::EApplyTypes::APPLY_ATTBONUS_UNDEAD:	return EPointTypes::POINT_ATTBONUS_UNDEAD;
+		case CItemData::EApplyTypes::APPLY_ATTBONUS_DEVIL:	return EPointTypes::POINT_ATTBONUS_DEVIL;
+		case CItemData::EApplyTypes::APPLY_STEAL_HP:	return EPointTypes::POINT_STEAL_HP;
+		case CItemData::EApplyTypes::APPLY_STEAL_SP:	return EPointTypes::POINT_STEAL_SP;
+		case CItemData::EApplyTypes::APPLY_MANA_BURN_PCT:	return EPointTypes::POINT_MANA_BURN_PCT;
+		case CItemData::EApplyTypes::APPLY_DAMAGE_SP_RECOVER:	return EPointTypes::POINT_DAMAGE_SP_RECOVER;
+		case CItemData::EApplyTypes::APPLY_BLOCK:	return EPointTypes::POINT_BLOCK;
+		case CItemData::EApplyTypes::APPLY_DODGE:	return EPointTypes::POINT_DODGE;
+		case CItemData::EApplyTypes::APPLY_RESIST_SWORD:	return EPointTypes::POINT_RESIST_SWORD;
+		case CItemData::EApplyTypes::APPLY_RESIST_TWOHAND:	return EPointTypes::POINT_RESIST_TWOHAND;
+		case CItemData::EApplyTypes::APPLY_RESIST_DAGGER:	return EPointTypes::POINT_RESIST_DAGGER;
+		case CItemData::EApplyTypes::APPLY_RESIST_BELL:	return EPointTypes::POINT_RESIST_BELL;
+		case CItemData::EApplyTypes::APPLY_RESIST_FAN:	return EPointTypes::POINT_RESIST_FAN;
+		case CItemData::EApplyTypes::APPLY_RESIST_BOW:	return EPointTypes::POINT_RESIST_BOW;
+		case CItemData::EApplyTypes::APPLY_RESIST_FIRE:	return EPointTypes::POINT_RESIST_FIRE;
+		case CItemData::EApplyTypes::APPLY_RESIST_ELEC:	return EPointTypes::POINT_RESIST_ELEC;
+		case CItemData::EApplyTypes::APPLY_RESIST_MAGIC:	return EPointTypes::POINT_RESIST_MAGIC;
+		case CItemData::EApplyTypes::APPLY_RESIST_WIND:	return EPointTypes::POINT_RESIST_WIND;
+		case CItemData::EApplyTypes::APPLY_REFLECT_MELEE:	return EPointTypes::POINT_REFLECT_MELEE;
+		case CItemData::EApplyTypes::APPLY_REFLECT_CURSE:	return EPointTypes::POINT_REFLECT_CURSE;
+		case CItemData::EApplyTypes::APPLY_POISON_REDUCE:	return EPointTypes::POINT_POISON_REDUCE;
+		case CItemData::EApplyTypes::APPLY_KILL_SP_RECOVER:	return EPointTypes::POINT_KILL_SP_RECOVER;
+		case CItemData::EApplyTypes::APPLY_EXP_DOUBLE_BONUS:	return EPointTypes::POINT_EXP_DOUBLE_BONUS;
+		case CItemData::EApplyTypes::APPLY_GOLD_DOUBLE_BONUS:	return EPointTypes::POINT_GOLD_DOUBLE_BONUS;
+		case CItemData::EApplyTypes::APPLY_ITEM_DROP_BONUS:	return EPointTypes::POINT_ITEM_DROP_BONUS;
+		case CItemData::EApplyTypes::APPLY_POTION_BONUS:	return EPointTypes::POINT_POTION_BONUS;
+		case CItemData::EApplyTypes::APPLY_KILL_HP_RECOVER:	return EPointTypes::POINT_KILL_HP_RECOVER;
+		case CItemData::EApplyTypes::APPLY_IMMUNE_STUN:	return EPointTypes::POINT_IMMUNE_STUN;
+		case CItemData::EApplyTypes::APPLY_IMMUNE_SLOW:	return EPointTypes::POINT_IMMUNE_SLOW;
+		case CItemData::EApplyTypes::APPLY_IMMUNE_FALL:	return EPointTypes::POINT_IMMUNE_FALL;
+		case CItemData::EApplyTypes::APPLY_SKILL:	return EPointTypes::POINT_SKILL;
+		case CItemData::EApplyTypes::APPLY_BOW_DISTANCE:	return EPointTypes::POINT_BOW_DISTANCE;
+		case CItemData::EApplyTypes::APPLY_ATT_GRADE_BONUS:	return EPointTypes::POINT_ATT_GRADE_BONUS;
+		case CItemData::EApplyTypes::APPLY_DEF_GRADE_BONUS:	return EPointTypes::POINT_DEF_GRADE_BONUS;
+		case CItemData::EApplyTypes::APPLY_MAGIC_ATT_GRADE:	return EPointTypes::POINT_MAGIC_ATT_GRADE_BONUS;
+		case CItemData::EApplyTypes::APPLY_MAGIC_DEF_GRADE:	return EPointTypes::POINT_MAGIC_DEF_GRADE_BONUS;
+		case CItemData::EApplyTypes::APPLY_CURSE_PCT:	return EPointTypes::POINT_CURSE_PCT;
+		case CItemData::EApplyTypes::APPLY_MAX_STAMINA:	return EPointTypes::POINT_MAX_STAMINA;
+		case CItemData::EApplyTypes::APPLY_ATT_BONUS_TO_WARRIOR:	return EPointTypes::POINT_ATTBONUS_WARRIOR;
+		case CItemData::EApplyTypes::APPLY_ATT_BONUS_TO_ASSASSIN:	return EPointTypes::POINT_ATTBONUS_ASSASSIN;
+		case CItemData::EApplyTypes::APPLY_ATT_BONUS_TO_SURA:	return EPointTypes::POINT_ATTBONUS_SURA;
+		case CItemData::EApplyTypes::APPLY_ATT_BONUS_TO_SHAMAN:	return EPointTypes::POINT_ATTBONUS_SHAMAN;
+		case CItemData::EApplyTypes::APPLY_ATT_BONUS_TO_MONSTER:	return EPointTypes::POINT_ATTBONUS_MONSTER;
+		case CItemData::EApplyTypes::APPLY_MALL_ATTBONUS:	return EPointTypes::POINT_ATT_BONUS;
+		case CItemData::EApplyTypes::APPLY_MALL_DEFBONUS:	return EPointTypes::POINT_MALL_DEFBONUS;
+		case CItemData::EApplyTypes::APPLY_MALL_EXPBONUS:	return EPointTypes::POINT_MALL_EXPBONUS;
+		case CItemData::EApplyTypes::APPLY_MALL_ITEMBONUS:	return EPointTypes::POINT_MALL_ITEMBONUS;
+		case CItemData::EApplyTypes::APPLY_MALL_GOLDBONUS:	return EPointTypes::POINT_MALL_GOLDBONUS;
+		case CItemData::EApplyTypes::APPLY_MAX_HP_PCT:	return EPointTypes::POINT_MAX_HP_PCT;
+		case CItemData::EApplyTypes::APPLY_MAX_SP_PCT:	return EPointTypes::POINT_MAX_SP_PCT;
+		case CItemData::EApplyTypes::APPLY_SKILL_DAMAGE_BONUS:	return EPointTypes::POINT_SKILL_DAMAGE_BONUS;
+		case CItemData::EApplyTypes::APPLY_NORMAL_HIT_DAMAGE_BONUS:	return EPointTypes::POINT_NORMAL_HIT_DAMAGE_BONUS;
+		case CItemData::EApplyTypes::APPLY_SKILL_DEFEND_BONUS:	return EPointTypes::POINT_SKILL_DEFEND_BONUS;
+		case CItemData::EApplyTypes::APPLY_NORMAL_HIT_DEFEND_BONUS:	return EPointTypes::POINT_NORMAL_HIT_DEFEND_BONUS;
+		case CItemData::EApplyTypes::APPLY_EXTRACT_HP_PCT:	return EPointTypes::POINT_NONE;
+		//case CItemData::EApplyTypes::APPLY_PC_BANG_EXP_BONUS:	return EPointTypes::POINT_PC_BANG_EXP_BONUS;
+		//case CItemData::EApplyTypes::APPLY_PC_BANG_DROP_BONUS:	return EPointTypes::POINT_PC_BANG_DROP_BONUS;
+		case CItemData::EApplyTypes::APPLY_RESIST_WARRIOR:	return EPointTypes::POINT_RESIST_WARRIOR;
+		case CItemData::EApplyTypes::APPLY_RESIST_ASSASSIN:	return EPointTypes::POINT_RESIST_ASSASSIN;
+		case CItemData::EApplyTypes::APPLY_RESIST_SURA:	return EPointTypes::POINT_RESIST_SURA;
+		case CItemData::EApplyTypes::APPLY_RESIST_SHAMAN:	return EPointTypes::POINT_RESIST_SHAMAN;
+		case CItemData::EApplyTypes::APPLY_ENERGY:	return EPointTypes::POINT_ENERGY;
+		case CItemData::EApplyTypes::APPLY_DEF_GRADE:	return EPointTypes::POINT_DEF_GRADE;
+		case CItemData::EApplyTypes::APPLY_COSTUME_ATTR_BONUS:	return EPointTypes::POINT_COSTUME_ATTR_BONUS;
+		case CItemData::EApplyTypes::APPLY_MAGIC_ATTBONUS_PER:	return EPointTypes::POINT_MAGIC_ATT_BONUS_PER;
+		case CItemData::EApplyTypes::APPLY_MELEE_MAGIC_ATTBONUS_PER:	return EPointTypes::POINT_MELEE_MAGIC_ATT_BONUS_PER;
+		case CItemData::EApplyTypes::APPLY_RESIST_ICE:	return EPointTypes::POINT_RESIST_ICE;
+		case CItemData::EApplyTypes::APPLY_RESIST_EARTH:	return EPointTypes::POINT_RESIST_EARTH;
+		case CItemData::EApplyTypes::APPLY_RESIST_DARK:	return EPointTypes::POINT_RESIST_DARK;
+		case CItemData::EApplyTypes::APPLY_ANTI_CRITICAL_PCT:	return EPointTypes::POINT_RESIST_CRITICAL;
+		case CItemData::EApplyTypes::APPLY_ANTI_PENETRATE_PCT:	return EPointTypes::POINT_RESIST_PENETRATE;
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	case CItemData::EApplyTypes::APPLY_BLEEDING_REDUCE:	return EPointTypes::POINT_BLEEDING_REDUCE;
+	case CItemData::EApplyTypes::APPLY_BLEEDING_PCT:	return EPointTypes::POINT_BLEEDING_PCT;
+	case CItemData::EApplyTypes::APPLY_ATT_BONUS_TO_WOLFMAN:	return EPointTypes::POINT_ATTBONUS_WOLFMAN;
+	case CItemData::EApplyTypes::APPLY_RESIST_WOLFMAN:	return EPointTypes::POINT_RESIST_WOLFMAN;
+	case CItemData::EApplyTypes::APPLY_RESIST_CLAW:	return EPointTypes::POINT_RESIST_CLAW;
+#endif
+#ifdef ENABLE_MAGIC_REDUCTION_SYSTEM
+	case CItemData::EApplyTypes::APPLY_RESIST_MAGIC_REDUCTION:	return EPointTypes::POINT_RESIST_MAGIC_REDUCTION;
+#endif
+	case CItemData::EApplyTypes::APPLY_ENCHANT_ELECT:	return EPointTypes::POINT_ENCHANT_ELECT;
+	case CItemData::EApplyTypes::APPLY_ENCHANT_FIRE:	return EPointTypes::POINT_ENCHANT_FIRE;
+	case CItemData::EApplyTypes::APPLY_ENCHANT_ICE:	return EPointTypes::POINT_ENCHANT_ICE;
+	case CItemData::EApplyTypes::APPLY_ENCHANT_WIND:	return EPointTypes::POINT_ENCHANT_WIND;
+	case CItemData::EApplyTypes::APPLY_ENCHANT_EARTH:	return EPointTypes::POINT_ENCHANT_EARTH;
+	case CItemData::EApplyTypes::APPLY_ENCHANT_DARK:	return EPointTypes::POINT_ENCHANT_DARK;
+	case CItemData::EApplyTypes::APPLY_ATTBONUS_CZ:	return EPointTypes::POINT_ATTBONUS_CZ;
+	case CItemData::EApplyTypes::APPLY_ATTBONUS_DESERT:	return EPointTypes::POINT_ATTBONUS_DESERT;
+	case CItemData::EApplyTypes::APPLY_ATTBONUS_INSECT:	return EPointTypes::POINT_ATTBONUS_INSECT;
+	case CItemData::EApplyTypes::APPLY_ATTBONUS_SWORD:	return EPointTypes::POINT_ATTBONUS_SWORD;
+	case CItemData::EApplyTypes::APPLY_ATTBONUS_TWOHAND:	return EPointTypes::POINT_ATTBONUS_TWOHAND;
+	case CItemData::EApplyTypes::APPLY_ATTBONUS_DAGGER:	return EPointTypes::POINT_ATTBONUS_DAGGER;
+	case CItemData::EApplyTypes::APPLY_ATTBONUS_BELL:	return EPointTypes::POINT_ATTBONUS_BELL;
+	case CItemData::EApplyTypes::APPLY_ATTBONUS_FAN:	return EPointTypes::POINT_ATTBONUS_FAN;
+	case CItemData::EApplyTypes::APPLY_ATTBONUS_BOW:	return EPointTypes::POINT_ATTBONUS_BOW;
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	case CItemData::EApplyTypes::APPLY_ATTBONUS_CLAW:	return EPointTypes::POINT_ATTBONUS_CLAW;
+#endif
+	case CItemData::EApplyTypes::APPLY_RESIST_HUMAN:	return EPointTypes::POINT_RESIST_HUMAN;
+	case CItemData::EApplyTypes::APPLY_RESIST_MOUNT_FALL:	return EPointTypes::POINT_RESIST_MOUNT_FALL;
+#ifdef ENABLE_NEW_BONUS_SYSTEM
+	case CItemData::EApplyTypes::APPLY_ATTBONUS_STONE:	return EPointTypes::POINT_ATTBONUS_STONE;
+	case CItemData::EApplyTypes::APPLY_ATTBONUS_BOSS:	return EPointTypes::POINT_ATTBONUS_BOSS;
+	case CItemData::EApplyTypes::APPLY_ATTBONUS_ELEMENTS:	return EPointTypes::POINT_ATTBONUS_ELEMENTS;
+	case CItemData::EApplyTypes::APPLY_ENCHANT_ELEMENTS:	return EPointTypes::POINT_ENCHANT_ELEMENTS;
+	case CItemData::EApplyTypes::APPLY_ATTBONUS_CHARACTERS:	return EPointTypes::POINT_ATTBONUS_CHARACTERS;
+	case CItemData::EApplyTypes::APPLY_ENCHANT_CHARACTERS:	return EPointTypes::POINT_ENCHANT_CHARACTERS;
+	case CItemData::EApplyTypes::APPLY_RESIST_MONSTER:	return EPointTypes::POINT_RESIST_MONSTER;
+#endif
+#ifdef ENABLE_AVG_PVM
+	case CItemData::EApplyTypes::APPLY_ATTBONUS_MEDI_PVM:	return EPointTypes::POINT_ATTBONUS_MEDI_PVM;
+#endif
+	case CItemData::EApplyTypes::APPLY_ATTBONUS_PVM_STR:	return EPointTypes::POINT_ATTBONUS_PVM_STR;
+	case CItemData::EApplyTypes::APPLY_ATTBONUS_PVM_BERSERKER:	return EPointTypes::POINT_ATTBONUS_PVM_BERSERKER;
+	}
+
+	return POINT_MAX_NUM;
+}
+
+PyObject* itemGetApplyPoint(PyObject* poSelf, PyObject* poArgs)
+{
+	BYTE bApplyType;
+	if (!PyTuple_GetByte(poArgs, 0, &bApplyType))
+		return Py_BuildException();
+
+	const BYTE bApplyPointType{ __GetApplyPointType(bApplyType) };
+	// Bazı server/derlemelerde yeni apply type'lar gelebilir.
+	// Burada syserr spam yerine güvenli şekilde POINT_NONE döndür.
+	if (bApplyPointType == POINT_MAX_NUM)
+		return Py_BuildValue("i", POINT_NONE);
+
+	return Py_BuildValue("i", bApplyPointType);
+}
+#endif
+
 PyObject *itemGetItemNameByVnum(PyObject *poSelf, PyObject *poArgs)
 {
 	DWORD dwVirtualNumber;
@@ -604,7 +770,7 @@ PyObject *itemGetItemNameByVnum(PyObject *poSelf, PyObject *poArgs)
 	return Py_BuildValue("s", pItemData->GetName());
 }
 
-#ifdef ENABLE_INGAME_WIKI_SYSTEM
+#ifdef ENABLE_WIKI_SYSTEM
 PyObject *itemGetRefineSet(PyObject *poSelf, PyObject *poArgs)
 {
 	CItemData* pItemData = CItemManager::Instance().GetSelectedItemDataPointer();
@@ -754,7 +920,7 @@ void initItem()
 		{ "GetIconInstance",				itemGetIconInstance,					METH_VARARGS },
 		{ "GetUseType",						itemGetUseType,							METH_VARARGS },
 		{ "DeleteIconInstance",				itemDeleteIconInstance,					METH_VARARGS },
-		{ "IsEquipmentVID",					itemIsEquipmentVID,						METH_VARARGS },		
+		{ "IsEquipmentVID",					itemIsEquipmentVID,						METH_VARARGS },
 		{ "IsRefineScroll",					itemIsRefineScroll,						METH_VARARGS },
 		{ "IsDetachScroll",					itemIsDetachScroll,						METH_VARARGS },
 		{ "IsKey",							itemIsKey,								METH_VARARGS },
@@ -772,7 +938,7 @@ void initItem()
 		{ "IsWeddingItem",					itemIsWeddingItem,						METH_VARARGS },
 		{ "GetItemNameByVnum",				itemGetItemNameByVnum,					METH_VARARGS },
 
-#ifdef ENABLE_INGAME_WIKI_SYSTEM
+#ifdef ENABLE_WIKI_SYSTEM
 		{ "SelectItemWiki",					itemSelectItemWiki,						METH_VARARGS },
 		{ "GetRefineSet",					itemGetRefineSet,						METH_VARARGS },
 		{ "GetRefinedVnum",					itemGetRefinedVnum,						METH_VARARGS },
@@ -787,6 +953,9 @@ void initItem()
 		{ "IsPossibleChangeLookRight",		itemIsPossibleChangeLookRight,			METH_VARARGS },
 		{ "IsChangeLookFreePassYangItem",	itemIsChangeLookFreePassYangItem,		METH_VARARGS },
 		{ "IsChangeLookClearScroll",		itemIsChangeLookClearScroll,			METH_VARARGS },
+#endif
+#if defined(__BL__DETAILS_UI__)
+		{ "GetApplyPoint",					itemGetApplyPoint,						METH_VARARGS },
 #endif
 
 		{ nullptr, nullptr },
@@ -831,14 +1000,19 @@ void initItem()
 #ifdef ENABLE_PET_SYSTEM
 	PyModule_AddIntConstant(poModule, "EQUIPMENT_PET", c_Equipment_Pet);
 #endif
-#ifdef ENABLE_TITLE_SYSTEM
-	PyModule_AddIntConstant(poModule, "EQUIPMENT_TITLE", c_Equipment_Title);
-#endif
 #ifdef ENABLE_PENDANT_SYSTEM
 	PyModule_AddIntConstant(poModule, "EQUIPMENT_PENDANT", c_Equipment_Pendant);
 #endif
 #endif
-
+#ifdef ENABLE_CONQUEROR_LEVEL
+	PyModule_AddIntConstant(poModule, "APPLY_SUNGMA_STR", CItemData::APPLY_SUNGMA_STR);
+	PyModule_AddIntConstant(poModule, "APPLY_SUNGMA_HP", CItemData::APPLY_SUNGMA_HP);
+	PyModule_AddIntConstant(poModule, "APPLY_SUNGMA_MOVE", CItemData::APPLY_SUNGMA_MOVE);
+	PyModule_AddIntConstant(poModule, "APPLY_SUNGMA_IMMUNE", CItemData::APPLY_SUNGMA_IMMUNE);
+#endif
+#ifdef ENABLE_PASSIVE_SYSTEM
+	PyModule_AddIntConstant(poModule, "EQUIPMENT_PASSIVE",		c_Equipment_Passive);
+#endif
 	PyModule_AddIntConstant(poModule, "ITEM_TYPE_NONE", CItemData::ITEM_TYPE_NONE);
 	PyModule_AddIntConstant(poModule, "ITEM_TYPE_WEAPON", CItemData::ITEM_TYPE_WEAPON);
 	PyModule_AddIntConstant(poModule, "ITEM_TYPE_ARMOR", CItemData::ITEM_TYPE_ARMOR);
@@ -873,10 +1047,12 @@ void initItem()
 #ifdef ENABLE_PET_SYSTEM
 	PyModule_AddIntConstant(poModule, "ITEM_TYPE_PET", CItemData::ITEM_TYPE_PET);
 #endif
-#ifdef ENABLE_TITLE_SYSTEM
-	PyModule_AddIntConstant(poModule, "ITEM_TYPE_TITLE", CItemData::ITEM_TYPE_TITLE);
+#ifdef ENABLE_NEW_ITEM_TYPE_GACHA
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_GACHA", CItemData::ITEM_TYPE_GACHA);
 #endif
-
+#ifdef ENABLE_PASSIVE_SYSTEM
+	PyModule_AddIntConstant(poModule, "ITEM_TYPE_PASSIVE",		CItemData::ITEM_TYPE_PASSIVE);
+#endif
 #ifdef ENABLE_COSTUME_SYSTEM
 	PyModule_AddIntConstant(poModule, "ITEM_TYPE_COSTUME", CItemData::ITEM_TYPE_COSTUME);
 	PyModule_AddIntConstant(poModule, "COSTUME_TYPE_BODY", CItemData::COSTUME_BODY);
@@ -955,6 +1131,9 @@ void initItem()
 	PyModule_AddIntConstant(poModule, "USE_DETACHMENT", CItemData::USE_DETACHMENT);
 	PyModule_AddIntConstant(poModule, "USE_TIME_CHARGE_PER", CItemData::USE_TIME_CHARGE_PER);
 	PyModule_AddIntConstant(poModule, "USE_TIME_CHARGE_FIX", CItemData::USE_TIME_CHARGE_FIX);
+#ifdef ENABLE_TITLE_SYSTEM
+	PyModule_AddIntConstant(poModule, "USE_TITLE", CItemData::USE_TITLE);
+#endif
 #ifdef ENABLE_RENEWAL_AFFECT
 	PyModule_AddIntConstant(poModule, "USE_AFFECT_PLUS", CItemData::USE_AFFECT_PLUS);
 #endif
@@ -962,9 +1141,19 @@ void initItem()
 	PyModule_AddIntConstant(poModule, "USE_PUT_INTO_AURA_SOCKET", CItemData::USE_PUT_INTO_AURA_SOCKET);
 #endif
 
+#ifdef ENABLE_PASSIVE_SYSTEM
+	PyModule_AddIntConstant(poModule, "PASSIVE_JOB", CItemData::PASSIVE_JOB);
+#endif
+
 	PyModule_AddIntConstant(poModule, "MATERIAL_DS_REFINE_NORMAL", CItemData::MATERIAL_DS_REFINE_NORMAL);
 	PyModule_AddIntConstant(poModule, "MATERIAL_DS_REFINE_BLESSED", CItemData::MATERIAL_DS_REFINE_BLESSED);
 	PyModule_AddIntConstant(poModule, "MATERIAL_DS_REFINE_HOLLY", CItemData::MATERIAL_DS_REFINE_HOLLY);
+#ifdef ENABLE_PASSIVE_SYSTEM
+	PyModule_AddIntConstant(poModule, "MATERIAL_PASSIVE_WEAPON", CItemData::MATERIAL_PASSIVE_WEAPON);
+	PyModule_AddIntConstant(poModule, "MATERIAL_PASSIVE_ARMOR", CItemData::MATERIAL_PASSIVE_ARMOR);
+	PyModule_AddIntConstant(poModule, "MATERIAL_PASSIVE_ACCE", CItemData::MATERIAL_PASSIVE_ACCE);
+	PyModule_AddIntConstant(poModule, "MATERIAL_PASSIVE_ELEMENT", CItemData::MATERIAL_PASSIVE_ELEMENT);
+#endif
 
 	PyModule_AddIntConstant(poModule, "METIN_NORMAL", CItemData::METIN_NORMAL);
 	PyModule_AddIntConstant(poModule, "METIN_GOLD", CItemData::METIN_GOLD);
@@ -999,12 +1188,19 @@ void initItem()
 	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_STACK", CItemData::ITEM_ANTIFLAG_STACK);
 	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_MYSHOP", CItemData::ITEM_ANTIFLAG_MYSHOP);
 	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_SAFEBOX", CItemData::ITEM_ANTIFLAG_SAFEBOX);
+#ifdef ENABLE_CONQUEROR_LEVEL
+	PyModule_AddIntConstant(poModule, "APPLY_SUNGMA_STR", CItemData::APPLY_SUNGMA_STR);
+	PyModule_AddIntConstant(poModule, "APPLY_SUNGMA_HP", CItemData::APPLY_SUNGMA_HP);
+	PyModule_AddIntConstant(poModule, "APPLY_SUNGMA_MOVE", CItemData::APPLY_SUNGMA_MOVE);
+	PyModule_AddIntConstant(poModule, "APPLY_SUNGMA_IMMUNE", CItemData::APPLY_SUNGMA_IMMUNE);
+#endif
 #ifdef ENABLE_DESTROY_DIALOG
 	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_DESTROY", CItemData::ITEM_ANTIFLAG_DESTROY);
 #endif
 	PyModule_AddIntConstant(poModule, "ITEM_ANTIFLAG_RT_REMOVE", CItemData::ITEM_ANTIFLAG_RT_REMOVE);
-
+#ifdef ENABLE_ITEMSHOP
 	PyModule_AddIntConstant(poModule, "ITEM_FLAG_STACKABLE", CItemData::ITEM_FLAG_STACKABLE);
+#endif
 
 	PyModule_AddIntConstant(poModule, "ITEM_FLAG_RARE", CItemData::ITEM_FLAG_RARE);
 	PyModule_AddIntConstant(poModule, "ITEM_FLAG_UNIQUE", CItemData::ITEM_FLAG_UNIQUE);
@@ -1140,6 +1336,9 @@ void initItem()
 	PyModule_AddIntConstant(poModule, "APPLY_SKILL_DEFEND_BONUS", CItemData::APPLY_SKILL_DEFEND_BONUS);
 	PyModule_AddIntConstant(poModule, "APPLY_NORMAL_HIT_DEFEND_BONUS", CItemData::APPLY_NORMAL_HIT_DEFEND_BONUS);
 
+	PyModule_AddIntConstant(poModule, "APPLY_PC_BANG_EXP_BONUS", CItemData::APPLY_PC_BANG_EXP_BONUS);
+	PyModule_AddIntConstant(poModule, "APPLY_PC_BANG_DROP_BONUS", CItemData::APPLY_PC_BANG_DROP_BONUS);
+
 	PyModule_AddIntConstant(poModule, "APPLY_RESIST_WARRIOR", CItemData::APPLY_RESIST_WARRIOR);
 	PyModule_AddIntConstant(poModule, "APPLY_RESIST_ASSASSIN", CItemData::APPLY_RESIST_ASSASSIN);
 	PyModule_AddIntConstant(poModule, "APPLY_RESIST_SURA", CItemData::APPLY_RESIST_SURA);
@@ -1154,26 +1353,65 @@ void initItem()
 	PyModule_AddIntConstant(poModule, "APPLY_RESIST_DARK", CItemData::APPLY_RESIST_DARK);
 	PyModule_AddIntConstant(poModule, "APPLY_ANTI_CRITICAL_PCT", CItemData::APPLY_ANTI_CRITICAL_PCT);
 	PyModule_AddIntConstant(poModule, "APPLY_ANTI_PENETRATE_PCT", CItemData::APPLY_ANTI_PENETRATE_PCT);
-
-#ifdef ENABLE_PENDANT_SYSTEM
-	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_ELEC", CItemData::APPLY_ATTBONUS_ELEC);
-	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_FIRE", CItemData::APPLY_ATTBONUS_FIRE);
-	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_ICE", CItemData::APPLY_ATTBONUS_ICE);
-	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_WIND", CItemData::APPLY_ATTBONUS_WIND);
-	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_EARTH", CItemData::APPLY_ATTBONUS_EARTH);
-	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_DARK", CItemData::APPLY_ATTBONUS_DARK);
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	PyModule_AddIntConstant(poModule, "APPLY_BLEEDING_PCT", CItemData::APPLY_BLEEDING_PCT);
+	PyModule_AddIntConstant(poModule, "APPLY_BLEEDING_REDUCE", CItemData::APPLY_BLEEDING_REDUCE);
+	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_WOLFMAN", CItemData::APPLY_ATT_BONUS_TO_WOLFMAN);
+	PyModule_AddIntConstant(poModule, "APPLY_RESIST_WOLFMAN", CItemData::APPLY_RESIST_WOLFMAN);
+	PyModule_AddIntConstant(poModule, "APPLY_RESIST_CLAW", CItemData::APPLY_RESIST_CLAW);
 #endif
 
 #ifdef ENABLE_ACCE_COSTUME_SYSTEM
 	PyModule_AddIntConstant(poModule, "APPLY_ACCEDRAIN_RATE", CItemData::APPLY_ACCEDRAIN_RATE);
 #endif
-
-#ifdef ENABLE_ATTBONUS_METIN
-	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_METIN", CItemData::APPLY_ATTBONUS_METIN);
+#ifdef ENABLE_MAGIC_REDUCTION_SYSTEM
+	PyModule_AddIntConstant(poModule, "APPLY_RESIST_MAGIC_REDUCTION", CItemData::APPLY_RESIST_MAGIC_REDUCTION);
 #endif
 
-#ifdef ENABLE_ATTBONUS_BOSS
+	PyModule_AddIntConstant(poModule, "APPLY_ENCHANT_ELECT", CItemData::APPLY_ENCHANT_ELECT);
+	PyModule_AddIntConstant(poModule, "APPLY_ENCHANT_FIRE", CItemData::APPLY_ENCHANT_FIRE);
+	PyModule_AddIntConstant(poModule, "APPLY_ENCHANT_ICE", CItemData::APPLY_ENCHANT_ICE);
+	PyModule_AddIntConstant(poModule, "APPLY_ENCHANT_WIND", CItemData::APPLY_ENCHANT_WIND);
+	PyModule_AddIntConstant(poModule, "APPLY_ENCHANT_EARTH", CItemData::APPLY_ENCHANT_EARTH);
+	PyModule_AddIntConstant(poModule, "APPLY_ENCHANT_DARK", CItemData::APPLY_ENCHANT_DARK);
+
+	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_CZ", CItemData::APPLY_ATTBONUS_CZ);
+	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_INSECT", CItemData::APPLY_ATTBONUS_INSECT);
+	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_DESERT", CItemData::APPLY_ATTBONUS_DESERT);
+	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_SWORD", CItemData::APPLY_ATTBONUS_SWORD);
+	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_TWOHAND", CItemData::APPLY_ATTBONUS_TWOHAND);
+	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_DAGGER", CItemData::APPLY_ATTBONUS_DAGGER);
+	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_BELL", CItemData::APPLY_ATTBONUS_BELL);
+	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_FAN", CItemData::APPLY_ATTBONUS_FAN);
+	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_BOW", CItemData::APPLY_ATTBONUS_BOW);
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_CLAW", CItemData::APPLY_ATTBONUS_CLAW);
+#endif
+	PyModule_AddIntConstant(poModule, "APPLY_RESIST_HUMAN", CItemData::APPLY_RESIST_HUMAN);
+	PyModule_AddIntConstant(poModule, "APPLY_RESIST_MOUNT_FALL", CItemData::APPLY_RESIST_MOUNT_FALL);
+#ifdef ENABLE_MOUNT_COSTUME_SYSTEM
+	PyModule_AddIntConstant(poModule, "APPLY_MOUNT", CItemData::APPLY_MOUNT);
+#endif
+
+#ifdef ENABLE_NEW_BONUS_SYSTEM
+	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_STONE", CItemData::APPLY_ATTBONUS_STONE);
 	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_BOSS", CItemData::APPLY_ATTBONUS_BOSS);
+	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_ELEMENTS", CItemData::APPLY_ATTBONUS_ELEMENTS);
+	PyModule_AddIntConstant(poModule, "APPLY_ENCHANT_ELEMENTS", CItemData::APPLY_ENCHANT_ELEMENTS);
+	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_CHARACTERS", CItemData::APPLY_ATTBONUS_CHARACTERS);
+	PyModule_AddIntConstant(poModule, "APPLY_ENCHANT_CHARACTERS", CItemData::APPLY_ENCHANT_CHARACTERS);
+	PyModule_AddIntConstant(poModule, "APPLY_RESIST_MONSTER", CItemData::APPLY_RESIST_MONSTER);
+#endif
+
+#ifdef ENABLE_AVG_PVM
+	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_MEDI_PVM", CItemData::APPLY_ATTBONUS_MEDI_PVM);
+#endif
+
+	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_PVM_STR",CItemData::APPLY_ATTBONUS_PVM_STR);
+	PyModule_AddIntConstant(poModule, "APPLY_ATTBONUS_PVM_BERSERKER",CItemData::APPLY_ATTBONUS_PVM_BERSERKER);
+
+#ifdef ENABLE_COLLECTIONS_SYSTEM
+	PyModule_AddIntConstant(poModule, "USE_COLLECTION_SCROLL", CItemData::USE_COLLECTION_SCROLL);
 #endif
 
 #ifdef ENABLE_AURA_COSTUME_SYSTEM

@@ -57,7 +57,7 @@ class CArea
 				return lhs.dwCRC < rhs.dwCRC;
 			}
 		};
-		
+
 		typedef std::vector<TObjectData>				TObjectDataVector;
 		typedef TObjectDataVector::iterator				TObjectDataIterator;
 
@@ -161,7 +161,7 @@ class CArea
 		typedef std::vector<CDungeonBlock *>				TDungeonBlockInstanceVector;
 		typedef std::vector<TObjectInstance *>				TObjectInstanceVector;
 		typedef std::vector<TAmbienceInstance *>			TAmbienceInstanceVector;
-		typedef std::map<CGraphicThingInstance *, DWORD>	TGraphicThingInstanceCRCMap;	// 최적화용 by 동현
+		typedef std::map<CGraphicThingInstance *, DWORD>	TGraphicThingInstanceCRCMap;
 		typedef std::set<int>								TShowingPortalIDSet;
 
 		typedef struct SCRCWithNumber
@@ -176,7 +176,7 @@ class CArea
 		{
 
 			FFindIfCRC(DWORD dwCRC) { m_dwCRC = dwCRC; }
-			
+
 			bool operator() (TCRCWithNumber & rCRCWithNumber)
 			{
 				if (rCRCWithNumber.dwCRC == m_dwCRC)
@@ -194,7 +194,7 @@ class CArea
 				return lhs.dwNumber > rhs.dwNumber;
 			}
 		};
-		
+
 	public:
 		CArea();
 		virtual ~CArea();
@@ -279,7 +279,7 @@ class CArea
 
 	protected:
 		// Static Data
-		TObjectDataVector				m_ObjectDataVector;		// Area 상에 있는 오브젝트들
+		TObjectDataVector				m_ObjectDataVector;
 
 		// Rendering Instances
 		TObjectInstanceVector			m_ObjectInstanceVector;

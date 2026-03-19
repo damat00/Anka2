@@ -1,6 +1,6 @@
 ScriptType            RaceDataScript
 
-BaseModelFileName     "D:\YMIR WORK\npc\backchon\backchon.GR2"
+BaseModelFileName	"d:\ymir work\npc\backchon\backchon.gr2"
 
 Group ShapeData
 {

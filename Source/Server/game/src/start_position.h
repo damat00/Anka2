@@ -7,6 +7,7 @@ extern char g_nation_name[4][32];
 extern DWORD g_start_position[4][2];
 extern long g_start_map[4];
 extern DWORD g_create_position[4][2];
+extern DWORD g_create_position_canada[4][2];
 extern DWORD arena_return_position[4][2];
 
 
@@ -54,12 +55,22 @@ inline DWORD ARENA_RETURN_POINT_Y(BYTE e)
 
 inline DWORD CREATE_START_X(BYTE e)
 {
-	return g_create_position[e][0];
+	if (1 <= e && e <= 3)
+	{
+		return g_create_position[e][0];
+	}
+
+	return 0;
 }
 
 inline DWORD CREATE_START_Y(BYTE e)
 {
-	return g_create_position[e][1];
+	if (1 <= e && e <= 3)
+	{
+		return g_create_position[e][1];
+	}
+
+	return 0;
 }
 
 #endif

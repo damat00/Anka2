@@ -129,7 +129,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "flame.dds"
+            "D:\Ymir Work\effect\monster2\flame.dds"
         }
     }
 }

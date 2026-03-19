@@ -5,7 +5,7 @@
 # ==============================================================================
 
 # >> DERLEYICI VE VERSIYON <<
-CC = ccache clang++-devel
+CC = clang++
 GAME_VERSION = 40250
 
 # >> DOSYA SISTEMI YAPILANDIRMASI <<
@@ -45,11 +45,12 @@ LIBS += -lssl -lcrypto -lcryptopp
 # DevIL Grafik Kutuphanesi
 INCDIR += -I../../library/libdevil
 LIBDIR += -L../../library/libdevil
-LIBS += -lIL -lpng -ltiff -lmng -llcms -ljpeg
+# lcms: FreeBSD'de pkg install lcms (veya lcms2 ise -llcms2 kullan)
+LIBS += -lIL -lpng -ltiff -lmng -ljpeg
 
 # MySQL Veritabani
 INCDIR += -I/usr/local/include/mysql
-LIBS += /usr/local/lib/mysql/libmysqlclient.a /usr/lib/libz.a
+LIBS += /usr/local/lib/mysql/libmariadbclient.a /usr/lib/libz.a
 
 # >> PROJE KUTUPHANELERI <<
 INCDIR += -I/usr/local/include
@@ -69,36 +70,184 @@ TARGET = $(BINDIR)/game
 MAINCPP = main.cpp
 CFILE = minilzo.c
 
-CPPFILE =	BattleArena.cpp FSM.cpp MarkConvert.cpp MarkImage.cpp MarkManager.cpp OXEvent.cpp TrafficProfiler.cpp ani.cpp\
-			arena.cpp banword.cpp battle.cpp blend_item.cpp cube_renewal.cpp buffer_manager.cpp building.cpp\
-			char.cpp char_affect.cpp char_aura.cpp char_battle.cpp char_change_empire.cpp char_horse.cpp char_item.cpp char_manager.cpp\
-			char_quickslot.cpp char_resist.cpp char_skill.cpp char_state.cpp PetSystem.cpp cmd.cpp cmd_emotion.cpp cmd_general.cpp\
-			cmd_gm.cpp cmd_oxevent.cpp config.cpp constants.cpp crc32.cpp db.cpp desc.cpp\
-			desc_client.cpp desc_manager.cpp desc_p2p.cpp dungeon.cpp empire_text_convert.cpp entity.cpp\
-			entity_view.cpp event.cpp event_queue.cpp exchange.cpp file_loader.cpp fishing.cpp gm.cpp guild.cpp\
-			guild_manager.cpp guild_war.cpp horse_rider.cpp horsename_manager.cpp input.cpp input_auth.cpp input_db.cpp\
-			input_login.cpp input_main.cpp input_p2p.cpp input_udp.cpp ip_ban.cpp\
-			item.cpp item_addon.cpp item_attribute.cpp item_manager.cpp item_manager_idrange.cpp locale.cpp\
-			locale_service.cpp log.cpp login_data.cpp lzo_manager.cpp marriage.cpp\
-			messenger_manager.cpp mining.cpp mob_manager.cpp motion.cpp p2p.cpp packet_info.cpp\
-			party.cpp polymorph.cpp priv_manager.cpp pvp.cpp\
-			questevent.cpp questlua.cpp questlua_affect.cpp questlua_arena.cpp questlua_ba.cpp questlua_building.cpp\
-			questlua_danceevent.cpp questlua_dungeon.cpp questlua_game.cpp questlua_global.cpp\
-			questlua_guild.cpp questlua_horse.cpp questlua_pet.cpp questlua_item.cpp questlua_marriage.cpp\
-			questlua_npc.cpp questlua_oxevent.cpp questlua_party.cpp questlua_pc.cpp\
-			questlua_quest.cpp questlua_target.cpp questmanager.cpp questnpc.cpp questpc.cpp\
-			refine.cpp regen.cpp safebox.cpp sectree.cpp sectree_manager.cpp shop.cpp\
-			skill.cpp start_position.cpp target.cpp text_file_loader.cpp trigger.cpp utils.cpp vector.cpp war_map.cpp\
-			wedding.cpp xmas_event.cpp version.cpp map_location.cpp\
-			BlueDragon.cpp BlueDragon_Binder.cpp DragonLair.cpp questlua_dragonlair.cpp\
-			skill_power.cpp affect.cpp MountSystem.cpp switchbot_manager.cpp CsvReader.cpp\
-			buff_on_attributes.cpp dragon_soul_table.cpp DragonSoul.cpp\
-			group_text_parse_tree.cpp char_dragonsoul.cpp questlua_dragonsoul.cpp\
-			shop_manager.cpp shopEx.cpp item_manager_read_tables.cpp biolog_manager.cpp event_function_handler.cpp\
-			event_manager.cpp char_cards.cpp battlepass_manager.cpp char_premium.cpp mob_timer_manager.cpp\
-			offline_shop.cpp offlineshop_manager.cpp offlineshop_search_manager.cpp maintenance.cpp growth_pet.cpp changelook.cpp char_hunting.cpp\
-			BotPlayer.cpp mount_up_grade.cpp
-
+CPPFILE =	affect.cpp\
+			ani.cpp\
+			arena.cpp\
+			auto_event_list.cpp\
+			auto_event_manager.cpp\
+			BattleArena.cpp\
+			banword.cpp\
+			battle.cpp\
+			blend_item.cpp\
+			BlueDragon_Binder.cpp\
+			BlueDragon.cpp\
+			BotPlayer.cpp\
+			buffer_manager.cpp\
+			buff_on_attributes.cpp\
+			building.cpp\
+			char_affect.cpp\
+			char_aura.cpp\
+			char_battle.cpp\
+			char_cards.cpp\
+			char_change_empire.cpp\
+			char_dragonsoul.cpp\
+			char_gem.cpp\
+			char_horse.cpp\
+			char_hunting.cpp\
+			char_item.cpp\
+			char_manager.cpp\
+			char_pass.cpp\
+			char_pass_premium.cpp\
+			char_quickslot.cpp\
+			char_resist.cpp\
+			char_skill.cpp\
+			char_state.cpp\
+			char.cpp\
+			changelook.cpp\
+			cmd_emotion.cpp\
+			cmd_general.cpp\
+			cmd_gm.cpp\
+			cmd_oxevent.cpp\
+			cmd.cpp\
+			CollectionsSystem.cpp\
+			config.cpp\
+			constants.cpp\
+			crc32.cpp\
+			cube_renewal.cpp\
+			CsvReader.cpp\
+			db.cpp\
+			desc_client.cpp\
+			desc_manager.cpp\
+			desc_p2p.cpp\
+			desc.cpp\
+			dragon_soul_table.cpp\
+			DragonLair.cpp\
+			DragonSoul.cpp\
+			dungeon_info.cpp\
+			dungeon.cpp\
+			empire_text_convert.cpp\
+			entity_view.cpp\
+			entity.cpp\
+			event_queue.cpp\
+			event.cpp\
+			exchange.cpp\
+			file_loader.cpp\
+			fishing.cpp\
+			FSM.cpp\
+			gm.cpp\
+			group_text_parse_tree.cpp\
+			growth_pet.cpp\
+			guild_manager.cpp\
+			guild_war.cpp\
+			guild.cpp\
+			halloween.cpp\
+			horsename_manager.cpp\
+			horse_rider.cpp\
+			input_auth.cpp\
+			input_db.cpp\
+			input_login.cpp\
+			input_main.cpp\
+			input_p2p.cpp\
+			input_udp.cpp\
+			input.cpp\
+			ip_ban.cpp\
+			item_addon.cpp\
+			item_attribute.cpp\
+			item_manager_idrange.cpp\
+			item_manager_read_tables.cpp\
+			item_manager.cpp\
+			item.cpp\
+			locale_service.cpp\
+			locale.cpp\
+			log.cpp\
+			login_data.cpp\
+			lzo_manager.cpp\
+			maintenance.cpp\
+			map_location.cpp\
+			MarkConvert.cpp\
+			MarkImage.cpp\
+			MarkManager.cpp\
+			marriage.cpp\
+			messenger_manager.cpp\
+			minigame_attendance.cpp\
+			minigame_catch_king.cpp\
+			mining.cpp\
+			mob_manager.cpp\
+			motion.cpp\
+			mount_up_grade.cpp\
+			MountSystem.cpp\
+			new_mob_timer.cpp\
+			offlineshop_manager.cpp\
+			offlineshop_search_manager.cpp\
+			offline_shop.cpp\
+			OXEvent.cpp\
+			p2p.cpp\
+			packet_info.cpp\
+			party.cpp\
+			PetSystem.cpp\
+			polymorph.cpp\
+			priv_manager.cpp\
+			pvp.cpp\
+			questevent.cpp\
+			questlua_affect.cpp\
+			questlua_arena.cpp\
+			questlua_ba.cpp\
+			questlua_building.cpp\
+			questlua_danceevent.cpp\
+			questlua_dragonlair.cpp\
+			questlua_dragonsoul.cpp\
+			questlua_dungeon.cpp\
+			questlua_dungeoninfo.cpp\
+			questlua_game.cpp\
+			questlua_global.cpp\
+			questlua_guild.cpp\
+			questlua_horse.cpp\
+			questlua_item.cpp\
+			questlua_marriage.cpp\
+			questlua_npc.cpp\
+			questlua_oxevent.cpp\
+			questlua_party.cpp\
+			questlua_pc.cpp\
+			questlua_pet.cpp\
+			questlua_quest.cpp\
+			questlua_snakelair.cpp\
+			questlua_target.cpp\
+			questlua_TempleOchao.cpp\
+			questlua_whitedragon.cpp\
+			questlua_zodiac.cpp\
+			questlua.cpp\
+			questmanager.cpp\
+			questnpc.cpp\
+			questpc.cpp\
+			RealTimeRegen.cpp\
+			refine.cpp\
+			regen.cpp\
+			resp_manager.cpp\
+			safebox.cpp\
+			sectree_manager.cpp\
+			sectree.cpp\
+			shop_manager.cpp\
+			shopEx.cpp\
+			shop.cpp\
+			skill_power.cpp\
+			skill.cpp\
+			SnakeLair.cpp\
+			soulroulette.cpp\
+			start_position.cpp\
+			stone_event.cpp\
+			switchbot_manager.cpp\
+			target.cpp\
+			TempleOchao.cpp\
+			text_file_loader.cpp\
+			TrafficProfiler.cpp\
+			trigger.cpp\
+			utils.cpp\
+			version.cpp\
+			vector.cpp\
+			war_map.cpp\
+			wedding.cpp\
+			WhiteDragon.cpp\
+			xmas_event.cpp
 
 # >> HEDEF DOSYA DONUSUMLERI <<
 COBJS = $(CFILE:%.c=$(OBJDIR)/%.o)

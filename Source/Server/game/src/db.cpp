@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include <sstream>
-
 #include "../../common/length.h"
 #include "../../common/service.h"
 
@@ -48,11 +47,13 @@ bool DBManager::Connect(const char * host, const int port, const char * user, co
 void DBManager::Query(const char * c_pszFormat, ...)
 {
 	char szQuery[4096];
-
 	va_list args;
+
 	va_start(args, c_pszFormat);
 	vsnprintf(szQuery, sizeof(szQuery), c_pszFormat, args);
 	va_end(args);
+
+	//m_sql.AsyncQuery(szQuery);
 	std::string sQuery(szQuery);
 	m_sql.AsyncQuery(sQuery.substr(0, sQuery.find_first_of(";") == std::string::npos ? sQuery.length() : sQuery.find_first_of(";")).c_str());
 }
@@ -61,6 +62,7 @@ SQLMsg * DBManager::DirectQuery(const char * c_pszFormat, ...)
 {
 	char szQuery[4096];
 	va_list args;
+
 	va_start(args, c_pszFormat);
 	vsnprintf(szQuery, sizeof(szQuery), c_pszFormat, args);
 	va_end(args);
@@ -246,6 +248,11 @@ void DBManager::SendAuthLogin(LPDESC d)
 
 void DBManager::LoginPrepare(LPDESC d, DWORD * pdwClientKey, int * paiPremiumTimes)
 {
+#ifdef ENABLE_ANALYZE_CLOSE_FIX
+	if (!d)
+		return;
+#endif
+
 	const TAccountTable & r = d->GetAccountTable();
 
 	CLoginData * pkLD = M2_NEW CLoginData;
@@ -278,16 +285,18 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 					M2_DELETE(pinfo);
 					break;
 				}
-
+				//Change location - By SeMinZ
 				d->SetLogin(pinfo->login);
 
 				sys_log(0, "QID_AUTH_LOGIN: START %u %p", qi->dwIdent, get_pointer(d));
 
 				if (pMsg->Get()->uiNumRows == 0)
 				{
-					sys_log(0, "   NOID");
-					LoginFailure(d, "NOID");
-					M2_DELETE(pinfo);
+					{
+						sys_log(0, " NOID");
+						LoginFailure(d, "NOID");
+						M2_DELETE(pinfo);
+					}
 				}
 				else
 				{
@@ -312,7 +321,7 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 
 					strlcpy(szEncrytPassword, row[col++], sizeof(szEncrytPassword));
 
-					if (!row[col]) 
+					if (!row[col])
 					{
 						sys_err("error column %d", col);
 						M2_DELETE(pinfo);
@@ -323,7 +332,7 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 
 					if (!row[col])
 					{
-						sys_err("error column %d", col); 
+						sys_err("error column %d", col);
 						M2_DELETE(pinfo);
 						break;
 					}
@@ -341,7 +350,7 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 
 					if (!row[col])
 					{
-						sys_err("error column %d", col); 
+						sys_err("error column %d", col);
 						M2_DELETE(pinfo);
 						break;
 					}
@@ -391,7 +400,7 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 					if (nPasswordDiff)
 					{
 						LoginFailure(d, "WRONGPWD");
-						sys_log(0, "   WRONGPWD");
+						sys_log(0, " WRONGPWD");
 						M2_DELETE(pinfo);
 					}
 					else if (bNotAvail)
@@ -509,6 +518,38 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 			}
 			break;
 
+		case QID_LOTTO:
+			{
+				LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(qi->dwIdent);
+				DWORD * pdw = (DWORD *) qi->pvData;
+
+				if (ch)
+				{
+					if (pMsg->Get()->uiAffectedRows == 0 || pMsg->Get()->uiAffectedRows == (uint32_t)-1)
+					{
+						sys_log(0, "GIVE LOTTO FAIL TO pid %u", ch->GetPlayerID());
+					}
+					else
+					{
+						LPITEM pkItem = ch->AutoGiveItem(pdw[0], pdw[1]);
+
+						if (pkItem)
+						{
+							sys_log(0, "GIVE LOTTO SUCCESS TO %s (pid %u)", ch->GetName(), qi->dwIdent);
+							//ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("¾ÆÀÌÅÛ È¹µæ: %s"), pkItem->GetName());
+
+							pkItem->SetSocket(0, pMsg->Get()->uiInsertID);
+							pkItem->SetSocket(1, pdw[2]);
+						}
+						else
+							sys_log(0, "GIVE LOTTO FAIL2 TO pid %u", ch->GetPlayerID());
+					}
+				}
+
+				M2_DELETE_ARRAY(pdw);
+			}
+			break;
+
 		case QID_HIGHSCORE_REGISTER:
 			{
 				THighscoreRegisterQueryInfo * info = (THighscoreRegisterQueryInfo *) qi->pvData;
@@ -524,14 +565,14 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 						str_to_number(iCur, row[0]);
 
 						if ((info->bOrder && iCur >= info->iValue) ||
-								(!info->bOrder && iCur <= info->iValue))
+							(!info->bOrder && iCur <= info->iValue))
 							bQuery = false;
 					}
 				}
 
 				if (bQuery)
 					Query("REPLACE INTO highscore%s VALUES('%s', %u, %d)",
-							get_table_postfix(), info->szBoard, info->dwPID, info->iValue);
+						get_table_postfix(), info->szBoard, info->dwPID, info->iValue);
 
 				M2_DELETE(info);
 			}
@@ -542,6 +583,7 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 			}
 			break;
 
+			// BLOCK_CHAT
 		case QID_BLOCK_CHAT_LIST:
 			{
 				LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(qi->dwIdent);
@@ -562,6 +604,7 @@ void DBManager::AnalyzeReturnQuery(SQLMsg * pMsg)
 				}
 			}
 			break;
+			// END_OF_BLOCK_CHAT
 
 		default:
 			sys_err("FATAL ERROR!!! Unhandled return query id %d", qi->iType);
@@ -611,7 +654,13 @@ size_t DBManager::EscapeString(char* dst, size_t dstSize, const char *src, size_
 	return m_sql_direct.EscapeString(dst, dstSize, src, srcSize);
 }
 
-AccountDB::AccountDB() : m_IsConnect(false) {}
+//
+// Common SQL
+//
+AccountDB::AccountDB() :
+	m_IsConnect(false)
+{
+}
 
 bool AccountDB::IsConnected()
 {
@@ -708,10 +757,12 @@ enum EAccountQID
 	QID_SPAM_DB,
 };
 
+// reload every 10 minutes
 static LPEVENT s_pkReloadSpamEvent = NULL;
 
 EVENTINFO(reload_spam_event_info)
 {
+	// used to send command
 	DWORD empty;
 };
 

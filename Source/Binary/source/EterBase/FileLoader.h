@@ -1,6 +1,6 @@
 #pragma once
 
-#pragma warning(disable:4786)	// character 255 넘어가는거 끄기
+#pragma warning(disable:4786)
 
 #include <windows.h>
 #include <vector>
@@ -17,8 +17,8 @@ class CMemoryTextFileLoader
 		void				Bind(int bufSize, const void* c_pvBuf);
 		DWORD				GetLineCount();
 		bool				CheckLineIndex(DWORD dwLine);
-		bool				SplitLine(DWORD dwLine, CTokenVector * pstTokenVector, const char *c_szDelimeter = " \t");
-		int					SplitLine2(DWORD dwLine, CTokenVector * pstTokenVector, const char *c_szDelimeter = " \t");
+		bool				SplitLine(DWORD dwLine, CTokenVector * pstTokenVector, const char * c_szDelimeter = " \t");
+		int					SplitLine2(DWORD dwLine, CTokenVector * pstTokenVector, const char * c_szDelimeter = " \t");
 		bool				SplitLineByTab(DWORD dwLine, CTokenVector* pstTokenVector);
 		const std::string &	GetLineString(DWORD dwLine);
 
@@ -34,9 +34,9 @@ class CMemoryFileLoader
 
 		bool Read(int size, void* pvDst);
 
-		int				GetPosition();		
+		int				GetPosition();
 		int				GetSize();
-		
+
 	protected:
 		bool			IsReadableSize(int size);
 		const char *	GetCurrentPositionPointer();
@@ -55,7 +55,7 @@ class CDiskFileLoader
 		virtual ~CDiskFileLoader();
 
 		void Close();
-		bool Open(const char *c_szFileName);
+		bool Open(const char * c_szFileName);
 		bool Read(int size, void * pvDst);
 
 		int GetSize();

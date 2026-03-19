@@ -46,16 +46,30 @@ void CMapOutdoor::RenderWater()
 	D3DXMatrixMultiply(&matTexTransformWater, &m_matViewInverse, &matTexTransformWater);
 
 	STATEMANAGER.SaveTransform(D3DTS_TEXTURE0, &matTexTransformWater);
-	STATEMANAGER.SaveVertexShader(D3DFVF_XYZ|D3DFVF_DIFFUSE);
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+    STATEMANAGER.SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE);
+#else
+    STATEMANAGER.SaveVertexShader(D3DFVF_XYZ | D3DFVF_DIFFUSE);
+#endif
 
 	STATEMANAGER.SaveTextureStageState(0, D3DTSS_TEXCOORDINDEX, D3DTSS_TCI_CAMERASPACEPOSITION);
 	STATEMANAGER.SaveTextureStageState(0, D3DTSS_TEXTURETRANSFORMFLAGS, D3DTTFF_COUNT2);
-	STATEMANAGER.SaveTextureStageState(0, D3DTSS_MINFILTER, D3DTEXF_LINEAR);
-	STATEMANAGER.SaveTextureStageState(0, D3DTSS_MAGFILTER, D3DTEXF_LINEAR);
-	STATEMANAGER.SaveTextureStageState(0, D3DTSS_MIPFILTER, D3DTEXF_LINEAR);
-	STATEMANAGER.SaveTextureStageState(0, D3DTSS_ADDRESSU, D3DTADDRESS_WRAP);
-	STATEMANAGER.SaveTextureStageState(0, D3DTSS_ADDRESSV, D3DTADDRESS_WRAP);
-	
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+    STATEMANAGER.SaveSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+    STATEMANAGER.SaveSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+    STATEMANAGER.SaveSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+    STATEMANAGER.SaveSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
+    STATEMANAGER.SaveSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
+#else
+    STATEMANAGER.SaveTextureStageState(0, D3DTSS_MINFILTER, D3DTEXF_LINEAR);
+    STATEMANAGER.SaveTextureStageState(0, D3DTSS_MAGFILTER, D3DTEXF_LINEAR);
+    STATEMANAGER.SaveTextureStageState(0, D3DTSS_MIPFILTER, D3DTEXF_LINEAR);
+    STATEMANAGER.SaveTextureStageState(0, D3DTSS_ADDRESSU, D3DTADDRESS_WRAP);
+    STATEMANAGER.SaveTextureStageState(0, D3DTSS_ADDRESSV, D3DTADDRESS_WRAP);
+#endif
+
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_DIFFUSE);
@@ -69,14 +83,12 @@ void CMapOutdoor::RenderWater()
 	// RenderState
 	//////////////////////////////////////////////////////////////////////////
 
-	// 물 위 아래 애니시키기...
 	static float s_fWaterHeightCurrent = 0;
 	static float s_fWaterHeightBegin = 0;
 	static float s_fWaterHeightEnd = 0;
 	static DWORD s_dwLastHeightChangeTime = CTimer::Instance().GetCurrentMillisecond();
 	static DWORD s_dwBlendtime = 300;
 
-	// 1.5초 마다 변경
 	if ((CTimer::Instance().GetCurrentMillisecond() - s_dwLastHeightChangeTime) > s_dwBlendtime)
 	{
 		s_dwBlendtime = random_range(1000, 3000);
@@ -101,35 +113,49 @@ void CMapOutdoor::RenderWater()
 
 	float fFogDistance = __GetFogDistance();
 
-	std::vector<std::pair<float, long>>::iterator i;
+	std::vector<std::pair<float, long> >::iterator i;
 
-	for (i = m_PatchVector.begin(); i != m_PatchVector.end(); ++i)
+	for(i = m_PatchVector.begin();i != m_PatchVector.end(); ++i)
 	{
-		if (i->first < fFogDistance)
+		if (i->first<fFogDistance)
 			DrawWater(i->second);
 	}
 
 	STATEMANAGER.SetTexture(0, nullptr);
 	STATEMANAGER.SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 
-	for (i = m_PatchVector.begin(); i != m_PatchVector.end(); ++i)
+	for(i = m_PatchVector.begin();i != m_PatchVector.end(); ++i)
 	{
-		if (i->first >= fFogDistance)
+		if (i->first>=fFogDistance)
 			DrawWater(i->second);
 	}
 
-	// 렌더링 한 후에는 물 z 위치를 복구
 	m_matWorldForCommonUse._43 = 0.0f;
 
 	//////////////////////////////////////////////////////////////////////////
 	// RenderState
-	STATEMANAGER.RestoreVertexShader();
+#ifdef ENABLE_DIRECTX9_UPDATE
+    STATEMANAGER.RestoreFVF();
+#else
+    STATEMANAGER.RestoreVertexShader();
+#endif
+
 	STATEMANAGER.RestoreTransform(D3DTS_TEXTURE0);
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+    STATEMANAGER.RestoreSamplerState(0, D3DSAMP_MINFILTER);
+    STATEMANAGER.RestoreSamplerState(0, D3DSAMP_MAGFILTER);
+    STATEMANAGER.RestoreSamplerState(0, D3DSAMP_MIPFILTER);
+    STATEMANAGER.RestoreSamplerState(0, D3DSAMP_ADDRESSU);
+    STATEMANAGER.RestoreSamplerState(0, D3DSAMP_ADDRESSV);
+#else
 	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_MINFILTER);
 	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_MAGFILTER);
 	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_MIPFILTER);
 	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_ADDRESSU);
 	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_ADDRESSV);
+#endif
+
 	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_TEXCOORDINDEX);
 	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_TEXTURETRANSFORMFLAGS);
 
@@ -146,7 +172,7 @@ void CMapOutdoor::DrawWater(long patchnum)
 	if (!m_pTerrainPatchProxyList)
 		return;
 
-	CTerrainPatchProxy & rkTerrainPatchProxy = m_pTerrainPatchProxyList[patchnum];
+	CTerrainPatchProxy& rkTerrainPatchProxy = m_pTerrainPatchProxyList[patchnum];
 
 	if (!rkTerrainPatchProxy.isUsed())
 		return;
@@ -154,7 +180,7 @@ void CMapOutdoor::DrawWater(long patchnum)
 	if (!rkTerrainPatchProxy.isWaterExists())
 		return;
 
-	CGraphicVertexBuffer * pkVB = rkTerrainPatchProxy.GetWaterVertexBufferPointer();
+	CGraphicVertexBuffer* pkVB=rkTerrainPatchProxy.GetWaterVertexBufferPointer();
 	if (!pkVB)
 		return;
 

@@ -2,7 +2,6 @@
 
 #include "../../common/service.h"
 #include "../../common/VnumHelper.h"
-
 #include <stack>
 #include "utils.h"
 #include "config.h"
@@ -48,12 +47,17 @@
 #include "growth_pet.h"
 #endif
 
+#ifdef ENABLE_QUEEN_NETHIS
+	#include "SnakeLair.h"
+#endif
+
 const int ITEM_BROKEN_METIN_VNUM = 28960;
 
+// CHANGE_ITEM_ATTRIBUTES
 const DWORD CHARACTER::msc_dwDefaultChangeItemAttrCycle = 10;
 const char CHARACTER::msc_szLastChangeItemAttrFlag[] = "Item.LastChangeItemAttr";
 const char CHARACTER::msc_szChangeItemAttrCycleFlag[] = "change_itemattr_cycle";
-
+// END_OF_CHANGE_ITEM_ATTRIBUTES
 const BYTE g_aBuffOnAttrPoints[] = { POINT_ENERGY, POINT_COSTUME_ATTR_BONUS };
 
 struct FFindStone
@@ -152,11 +156,22 @@ bool IS_BOTARYABLE_ZONE(int nMapIndex)
 	return false;
 }
 
-static bool FN_check_item_socket(LPITEM item)
+#ifdef ENABLE_SUNG_MAHI_TOWER
+bool IS_SUNG_MAHI_ENABLE_ITEM(int iMapIndex, DWORD dwVnum)
 {
-	if (!item)
+	bool isDungeonMap = (iMapIndex >= 3540000 && iMapIndex < 3550000);
+	if (isDungeonMap && !(dwVnum >= 79707 && dwVnum <= 79712))
 		return false;
 
+	if ((dwVnum >= 79707 && dwVnum <= 79712) && !isDungeonMap)
+		return false;
+
+	return true;
+}
+#endif
+
+static bool FN_check_item_socket(LPITEM item)
+{
 	for (int i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
 	{
 		if (item->GetSocket(i) != item->GetProto()->alSockets[i])
@@ -168,9 +183,6 @@ static bool FN_check_item_socket(LPITEM item)
 
 static void FN_copy_item_socket(LPITEM dest, LPITEM src)
 {
-	if (!dest || !src)
-		return;
-
 	for (int i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
 	{
 		dest->SetSocket(i, src->GetSocket(i));
@@ -179,18 +191,15 @@ static void FN_copy_item_socket(LPITEM dest, LPITEM src)
 
 static bool FN_check_item_sex(LPCHARACTER ch, LPITEM item)
 {
-	if (!ch || !item)
-		return false;
-
 	if (IS_SET(item->GetAntiFlag(), ITEM_ANTIFLAG_MALE))
 	{
-		if (SEX_MALE==GET_SEX(ch))
+		if (SEX_MALE == GET_SEX(ch))
 			return false;
 	}
 
-	if (IS_SET(item->GetAntiFlag(), ITEM_ANTIFLAG_FEMALE)) 
+	if (IS_SET(item->GetAntiFlag(), ITEM_ANTIFLAG_FEMALE))
 	{
-		if (SEX_FEMALE==GET_SEX(ch))
+		if (SEX_FEMALE == GET_SEX(ch))
 			return false;
 	}
 
@@ -236,6 +245,18 @@ bool CHARACTER::CanHandleItem(bool bSkipCheckRefine, bool bSkipObserver)
 
 #ifdef ENABLE_CHANGE_LOOK_SYSTEM
 	if (GetTransmutation())
+		return false;
+#endif
+
+#ifdef ENABLE_ITEM_DUPE_FIX
+	if ((thecore_pulse() - iWarpTime) < PASSES_PER_SEC(10))
+	{
+		return false;
+	}
+
+	itemPushTime = thecore_pulse();
+
+	if ((thecore_pulse() - g_nPortalLimitTime) < PASSES_PER_SEC(10))
 		return false;
 #endif
 
@@ -593,6 +614,16 @@ void CHARACTER::SetWear(UINT bCell, LPITEM item)
 
 	SetItem(TItemPos (INVENTORY, INVENTORY_MAX_NUM + bCell), item);
 
+#ifdef ENABLE_TELEPORT_SKILL
+	/*if (!item && bCell == WEAR_WEAPON)
+	{
+		if (IsAffectFlag(AFF_GWIGUM))
+			RemoveAffect(SKILL_GWIGEOM);
+
+		if (IsAffectFlag(AFF_GEOMGYEONG))
+			RemoveAffect(SKILL_GEOMKYUNG);
+	}*/
+#else
 	if (!item && bCell == WEAR_WEAPON)
 	{
 		if (IsAffectFlag(AFF_GWIGUM))
@@ -601,6 +632,7 @@ void CHARACTER::SetWear(UINT bCell, LPITEM item)
 		if (IsAffectFlag(AFF_GEOMGYEONG))
 			RemoveAffect(SKILL_GEOMKYUNG);
 	}
+#endif
 }
 
 void CHARACTER::ClearItem()
@@ -1324,6 +1356,7 @@ int CHARACTER::CountEmptyInventory() const
 
 void TransformRefineItem(LPITEM pkOldItem, LPITEM pkNewItem)
 {
+	// ACCESSORY_REFINE
 	if (pkOldItem->IsAccessoryForSocket())
 	{
 		for (int i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
@@ -1331,6 +1364,7 @@ void TransformRefineItem(LPITEM pkOldItem, LPITEM pkNewItem)
 			pkNewItem->SetSocket(i, pkOldItem->GetSocket(i));
 		}
 	}
+	// END_OF_ACCESSORY_REFINE
 	else
 	{
 		for (int i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
@@ -1387,13 +1421,27 @@ void CHARACTER::SetRefineNPC(LPCHARACTER ch)
 	}
 }
 
-bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly)
+bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly/* = false*/
+#ifdef ENABLE_PITTY_REFINE
+, bool bUseSealOfGod/* = false*/
+#endif
+)
 {
 	if (!CanHandleItem(true))
 	{
 		ClearRefineMode();
 		return false;
 	}
+
+#ifdef ENABLE_STONES_STACKFIX
+	DWORD pos = GetEmptyInventory(item->GetSize());
+
+	if (-1 == pos)
+	{
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Çok fazla eþya taþýyorsun."));
+		return false;
+	}
+#endif
 
 	if (quest::CQuestManager::instance().GetEventFlag("update_refine_time") != 0)
 	{
@@ -1419,6 +1467,7 @@ bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly)
 
 	DWORD result_vnum = item->GetRefinedVnum();
 
+	// REFINE_COST
 	int cost = ComputeRefineFee(prt->cost);
 
 	int RefineChance = GetQuestFlag("main_quest_lv7.refine_chance");
@@ -1434,6 +1483,7 @@ bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly)
 		cost = 0;
 		SetQuestFlag("main_quest_lv7.refine_chance", RefineChance - 1);
 	}
+	// END_OF_REFINE_COST
 
 	if (result_vnum == 0)
 	{
@@ -1453,6 +1503,7 @@ bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly)
 		return false;
 	}
 
+	// REFINE_COST
 	if (GetGold() < cost)
 	{
 		LocaleChatPacket(CHAT_TYPE_INFO, 70, "");
@@ -1490,27 +1541,97 @@ bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly)
 	if (IsRefineThroughGuild() || bMoneyOnly)
 		prob -= 10;
 
+#ifdef ENABLE_PITTY_REFINE
+	if (bUseSealOfGod && CountSpecifyItem(ITEM_VNUM_SEAL_OF_GOD) > 0)
+	{
+		RemoveSpecifyItem(ITEM_VNUM_SEAL_OF_GOD, 1);
+		prob -= EXTRA_CHANCE_SEAL_OF_GOD;
+		if (prob <= 0)
+		{
+			prob = 1;
+		}
+	}
+#endif
+
+
+	// END_OF_REFINE_COST
+
 	if (prob <= prt->prob)
 	{
 		LPITEM pkNewItem = ITEM_MANAGER::instance().CreateItem(result_vnum, 1, 0, false);
 
 		if (pkNewItem)
 		{
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-			UpdateExtBattlePassMissionProgress(BP_ITEM_REFINE, 1, item->GetVnum());
-#endif
+#ifdef ENABLE_BATTLE_PASS
+			if (!v_counts.empty())
+			{
+				for (int i = 0; i < missions_bp.size(); ++i)
+				{
+					if (missions_bp[i].type == 6)
+					{
+						DoMission(i, 1);
+					}
+				}
+			}
 
+			if (!v_counts_premium.empty())
+			{
+				for (int i = 0; i < missions_bp_premium.size(); ++i)
+				{
+					if (missions_bp_premium[i].type == 6)
+					{
+						DoMissionPremium(i, 1);
+					}
+				}
+			}
+#endif
+#ifdef ENABLE_RANKING
+			SetRankPoints(10, GetRankPoints(10) + 1);
+#endif
 			ITEM_MANAGER::CopyAllAttrTo(item, pkNewItem);
 			LogManager::instance().ItemLog(this, pkNewItem, "REFINE SUCCESS", pkNewItem->GetName());
 
 			UINT bCell = item->GetCell();
 
+			// DETAIL_REFINE_LOG
 			NotifyRefineSuccess(this, item, IsRefineThroughGuild() ? "GUILD" : "POWER");
 			DBManager::instance().SendMoneyLog(MONEY_LOG_REFINE, item->GetVnum(), -cost);
-			ITEM_MANAGER::instance().RemoveItem(item, "REMOVE (REFINE SUCCESS)");
 
-			pkNewItem->AddToCharacter(this, TItemPos(INVENTORY, bCell)); 
-			ITEM_MANAGER::instance().FlushDelayedSave(pkNewItem);
+#ifdef ENABLE_STONES_STACKFIX
+			DWORD dwStonesVnum = item->GetVnum();
+
+			if (dwStonesVnum >= 28000 && dwStonesVnum <= 29000)
+			{
+				item->SetCount(item->GetCount() - 1);
+				pkNewItem->AddToCharacter(this, TItemPos(INVENTORY, pos));
+				ITEM_MANAGER::instance().FlushDelayedSave(pkNewItem);
+			}
+			else
+			{
+				ITEM_MANAGER::instance().RemoveItem(item, "REMOVE (REFINE SUCCESS)");
+#ifdef ENABLE_ITEM_UPGRADE_NOTICE
+				if (pkNewItem->GetRefineLevel() >= ITEM_UPGRADE_NOTICE_MIN_LEVEL) 
+				{
+					char gelistirmeduyuru[QUERY_MAX_LEN];
+					snprintf(gelistirmeduyuru, sizeof(gelistirmeduyuru), "|cff00FF7F[%s]|r isimli oyuncu |cffffcc00[%s]|r elde etti.", GetName(), pkNewItem->GetName()); 
+					BroadcastNotice(gelistirmeduyuru);
+				}
+#endif
+				ITEM_MANAGER::instance().FlushDelayedSave(pkNewItem);
+				pkNewItem->AddToCharacter(this, TItemPos(INVENTORY, bCell));
+			}
+#else
+			pkNewItem->AddToCharacter(this, TItemPos(INVENTORY, bCell));
+			ITEM_MANAGER::instance().RemoveItem(item, "REMOVE (REFINE SUCCESS)");
+#ifdef ENABLE_ITEM_UPGRADE_NOTICE
+			if (pkNewItem->GetRefineLevel() >= ITEM_UPGRADE_NOTICE_MIN_LEVEL) 
+			{
+				char gelistirmeduyuru[QUERY_MAX_LEN];
+				snprintf(gelistirmeduyuru, sizeof(gelistirmeduyuru), "|cff00FF7F[%s]|r isimli oyuncu |cffffcc00[%s]|r elde etti.", GetName(), pkNewItem->GetName()); 
+				BroadcastNotice(gelistirmeduyuru);
+			}
+#endif
+#endif
 
 			sys_log(0, "Refine Success %d", cost);
 			pkNewItem->AttrLog();
@@ -1520,8 +1641,10 @@ bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly)
 		}
 		else
 		{
+			// DETAIL_REFINE_LOG
 			sys_err("cannot create item %u", result_vnum);
 			NotifyRefineFail(this, item, IsRefineThroughGuild() ? "GUILD" : "POWER");
+			// END_OF_DETAIL_REFINE_LOG
 		}
 	}
 	else
@@ -1529,7 +1652,11 @@ bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly)
 		DBManager::instance().SendMoneyLog(MONEY_LOG_REFINE, item->GetVnum(), -cost);
 		NotifyRefineFail(this, item, IsRefineThroughGuild() ? "GUILD" : "POWER");
 		item->AttrLog();
+#ifdef ENABLE_STONES_STACKFIX
+		item->SetCount(item->GetCount() - 1);
+#else
 		ITEM_MANAGER::instance().RemoveItem(item, "REMOVE (REFINE FAIL)");
+#endif
 
 		PayRefineFee(cost);
 	}
@@ -1539,22 +1666,35 @@ bool CHARACTER::DoRefine(LPITEM item, bool bMoneyOnly)
 
 enum enum_RefineScrolls
 {
-	CHUKBOK_SCROLL = 0,
-	HYUNIRON_CHN = 1,
-	YONGSIN_SCROLL = 2,
-	MUSIN_SCROLL = 3,
-	YAGONG_SCROLL = 4,
-	MEMO_SCROLL = 5,
-	BDRAGON_SCROLL = 6,
+	CHUKBOK_SCROLL			= 0,	// 0%	Segenssschriftrolle [25040, 72301, 76016]
+	HYUNIRON_CHN			= 1,	// 0%	Magischer Stein [39001, 25041]
+	YONGSIN_SCROLL			= 2,	// 10%	Schriftrolle des Drachen	[39022, 71032, 72314, 76009]
+	MUSIN_SCROLL			= 3,	// 100%	Schriftrolle des Krieges [39014, 71021]									-> Nur bis +4
+	YAGONG_SCROLL			= 4,	// 20%	Schmiede-Handbuch [39007, 70039, 72309]
+	MEMO_SCROLL				= 5,	// 100%	Notiz des Schmieds, Notiz des Weisen [-[70027, 72306], [70028, 72307]-]	-> Nur +4 Items
+	BDRAGON_SCROLL			= 6,	// 
 };
 
-bool CHARACTER::DoRefineWithScroll(LPITEM item)
+bool CHARACTER::DoRefineWithScroll(LPITEM item
+#ifdef ENABLE_PITTY_REFINE
+, bool bUseSealOfGod/* = false*/
+#endif
+)
 {
 	if (!CanHandleItem(true))
 	{
 		ClearRefineMode();
 		return false;
 	}
+
+#ifdef ENABLE_STONES_STACKFIX
+	DWORD pos = GetEmptyInventory(item->GetSize());
+
+	if (-1 == pos) {
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Çok fazla eþya taþýyorsun."));
+		return false;
+	}
+#endif
 
 	ClearRefineMode();
 
@@ -1674,8 +1814,8 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item)
 
 	const char* szRefineType = "SCROLL";
 
-	if (pkItemScroll->GetValue(0) == HYUNIRON_CHN || 
-		pkItemScroll->GetValue(0) == YONGSIN_SCROLL || 
+	if (pkItemScroll->GetValue(0) == HYUNIRON_CHN ||
+		pkItemScroll->GetValue(0) == YONGSIN_SCROLL ||
 		pkItemScroll->GetValue(0) == YAGONG_SCROLL)
 	{
 		const char hyuniron_prob[9] = { 100, 75, 65, 55, 45, 40, 35, 25, 20 };
@@ -1694,13 +1834,11 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item)
 			sys_err("REFINE : Unknown refine scroll item. Value0: %d", pkItemScroll->GetValue(0));
 		}
 
-		if (test_server) 
-		{
-			ChatPacket(CHAT_TYPE_INFO, "[Only Test] Success_Prob %d, RefineLevel %d ", success_prob, item->GetRefineLevel());
-		}
 		if (pkItemScroll->GetValue(0) == HYUNIRON_CHN)
 			bDestroyWhenFail = true;
 
+
+		// DETAIL_REFINE_LOG
 		if (pkItemScroll->GetValue(0) == HYUNIRON_CHN)
 		{
 			szRefineType = "HYUNIRON";
@@ -1713,15 +1851,16 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item)
 		{
 			szRefineType = "YAGONG_SCROLL";
 		}
+		// END_OF_DETAIL_REFINE_LOG
 	}
-
+	// DETAIL_REFINE_LOG
 	if (pkItemScroll->GetValue(0) == MUSIN_SCROLL)
 	{
 		success_prob = 100;
 
 		szRefineType = "MUSIN_SCROLL";
 	}
-
+	// END_OF_DETAIL_REFINE_LOG
 	else if (pkItemScroll->GetValue(0) == MEMO_SCROLL)
 	{
 		success_prob = 100;
@@ -1733,7 +1872,51 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item)
 		szRefineType = "BDRAGON_SCROLL";
 	}
 
+	// fix pergaminos
+	if (pkItemScroll->GetVnum() == 39022 || pkItemScroll->GetVnum() == 71032 || pkItemScroll->GetVnum() == 76009)
+		success_prob = prt->prob + 10;
+
+	if (test_server)
+	{
+		ChatPacket(CHAT_TYPE_INFO, "[Only Test] Success_Prob %d, RefineLevel %d ", success_prob, item->GetRefineLevel());
+	}
+
 	pkItemScroll->SetCount(pkItemScroll->GetCount() - 1);
+
+#ifdef ENABLE_PITTY_REFINE
+	if (bUseSealOfGod && CountSpecifyItem(ITEM_VNUM_SEAL_OF_GOD) > 0)
+	{
+		RemoveSpecifyItem(ITEM_VNUM_SEAL_OF_GOD, 1);
+
+		success_prob = success_prob + EXTRA_CHANCE_SEAL_OF_GOD;
+		if (success_prob > 100)
+		{
+			success_prob = 100;
+		}
+	}
+
+	int iMaxPittyLevel = item->GetLimitPittyRefine();
+	int iGetPittyRefineLevel = GetPittyRefineLevel(item->GetVnum(), item->GetRefineLevel());
+
+	if (iMaxPittyLevel != 0)
+	{
+		// If you are pitty level, then make 100% chance of success...
+		if (iMaxPittyLevel == iGetPittyRefineLevel)
+			prob = success_prob;
+
+		if (prob <= success_prob) // succesed
+			SetPittyRefineLevel(item->GetVnum(), item->GetRefineLevel(), 0);
+		else if (!bDestroyWhenFail && result_fail_vnum) // should downgrade item-1
+			SetPittyRefineLevel(item->GetVnum(), item->GetRefineLevel(), 0);
+		else
+		{
+			if (iGetPittyRefineLevel < iMaxPittyLevel)
+				SetPittyRefineLevel(item->GetVnum(), item->GetRefineLevel(), iGetPittyRefineLevel + 1);
+		}
+
+		SendPittyInfoClient(item->GetVnum(), item->GetRefineLevel());
+	}
+#endif
 
 	if (prob <= success_prob)
 	{
@@ -1741,10 +1924,32 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item)
 
 		if (pkNewItem)
 		{
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-			UpdateExtBattlePassMissionProgress(BP_ITEM_REFINE, 1, item->GetVnum());
-#endif
+#ifdef ENABLE_BATTLE_PASS
+			if (!v_counts.empty())
+			{
+				for (int i = 0; i < missions_bp.size(); ++i)
+				{
+					if (missions_bp[i].type == 6)
+					{
+						DoMission(i, 1);
+					}
+				}
+			}
 
+			if (!v_counts_premium.empty())
+			{
+				for (int i = 0; i < missions_bp_premium.size(); ++i)
+				{
+					if (missions_bp_premium[i].type == 6)
+					{
+						DoMissionPremium(i, 1);
+					}
+				}
+			}
+#endif
+#ifdef ENABLE_RANKING
+			SetRankPoints(10, GetRankPoints(10) + 1);
+#endif
 			ITEM_MANAGER::CopyAllAttrTo(item, pkNewItem);
 			LogManager::instance().ItemLog(this, pkNewItem, "REFINE SUCCESS", pkNewItem->GetName());
 
@@ -1752,11 +1957,43 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item)
 
 			NotifyRefineSuccess(this, item, szRefineType);
 			DBManager::instance().SendMoneyLog(MONEY_LOG_REFINE, item->GetVnum(), -prt->cost);
-			ITEM_MANAGER::instance().RemoveItem(item, "REMOVE (REFINE SUCCESS)");
+#ifdef ENABLE_STONES_STACKFIX
+			DWORD dwStonesVnum = item->GetVnum();
 
-			pkNewItem->AddToCharacter(this, TItemPos(INVENTORY, bCell)); 
-			ITEM_MANAGER::instance().FlushDelayedSave(pkNewItem);
+			if (dwStonesVnum >= 28000 && dwStonesVnum <= 29000)
+			{
+				item->SetCount(item->GetCount() - 1);
+				pkNewItem->AddToCharacter(this, TItemPos(INVENTORY, pos));
+				ITEM_MANAGER::instance().FlushDelayedSave(pkNewItem);
+			}
+			else
+			{
+				ITEM_MANAGER::instance().RemoveItem(item, "REMOVE (REFINE SUCCESS)");
+#ifdef ENABLE_ITEM_UPGRADE_NOTICE
+				if (pkNewItem->GetRefineLevel() >= ITEM_UPGRADE_NOTICE_MIN_LEVEL) 
+				{
+					char gelistirmeduyuru[QUERY_MAX_LEN];
+					snprintf(gelistirmeduyuru, sizeof(gelistirmeduyuru), "|cff00FF7F[%s]|r isimli oyuncu |cffffcc00[%s]|r elde etti.", GetName(), pkNewItem->GetName()); 
+					BroadcastNotice(gelistirmeduyuru);
+				}
+#endif
+				ITEM_MANAGER::instance().FlushDelayedSave(pkNewItem);
+				pkNewItem->AddToCharacter(this, TItemPos(INVENTORY, bCell));
+			}
+#else
+			pkNewItem->AddToCharacter(this, TItemPos(INVENTORY, bCell));
+			ITEM_MANAGER::instance().RemoveItem(item, "REMOVE (REFINE SUCCESS)");
+#ifdef ENABLE_ITEM_UPGRADE_NOTICE
+			if (pkNewItem->GetRefineLevel() >= ITEM_UPGRADE_NOTICE_MIN_LEVEL) 
+			{
+				char gelistirmeduyuru[QUERY_MAX_LEN];
+				snprintf(gelistirmeduyuru, sizeof(gelistirmeduyuru), "|cff00FF7F[%s]|r isimli oyuncu |cffffcc00[%s]|r elde etti.", GetName(), pkNewItem->GetName()); 
+				BroadcastNotice(gelistirmeduyuru);
+			}
+#endif
+#endif
 			pkNewItem->AttrLog();
+			//PointChange(POINT_GOLD, -prt->cost);
 			PayRefineFee(prt->cost);
 		}
 		else
@@ -1778,12 +2015,30 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item)
 
 			DBManager::instance().SendMoneyLog(MONEY_LOG_REFINE, item->GetVnum(), -prt->cost);
 			NotifyRefineFail(this, item, szRefineType, -1);
+#ifdef ENABLE_STONES_STACKFIX
+			DWORD dwStonesVnum = item->GetVnum();
+
+			if (dwStonesVnum >= 28000 && dwStonesVnum <= 29000)
+			{
+				item->SetCount(item->GetCount() - 1);
+				pkNewItem->AddToCharacter(this, TItemPos(INVENTORY, pos));
+				ITEM_MANAGER::instance().FlushDelayedSave(pkNewItem);
+			}
+			else
+			{
+				ITEM_MANAGER::instance().RemoveItem(item, "REMOVE (REFINE FAIL)");
+				ITEM_MANAGER::instance().FlushDelayedSave(pkNewItem);
+				pkNewItem->AddToCharacter(this, TItemPos(INVENTORY, bCell));
+			}
+#else
+			pkNewItem->AddToCharacter(this, TItemPos(INVENTORY, bCell));
 			ITEM_MANAGER::instance().RemoveItem(item, "REMOVE (REFINE FAIL)");
+#endif
 
-			pkNewItem->AddToCharacter(this, TItemPos(INVENTORY, bCell)); 
 			ITEM_MANAGER::instance().FlushDelayedSave(pkNewItem);
-
 			pkNewItem->AttrLog();
+
+			//PointChange(POINT_GOLD, -prt->cost);
 			PayRefineFee(prt->cost);
 		}
 		else
@@ -1795,12 +2050,144 @@ bool CHARACTER::DoRefineWithScroll(LPITEM item)
 	else
 	{
 		NotifyRefineFail(this, item, szRefineType);
-		
+
 		PayRefineFee(prt->cost);
 	}
 
 	return true;
 }
+
+#ifdef ENABLE_QUEEN_NETHIS
+bool CHARACTER::DoRefineSerpent(LPITEM item
+#ifdef ENABLE_PITTY_REFINE
+, bool bUseSealOfGod/* = false*/
+#endif
+
+)
+{
+	if (!item || !CanHandleItem(true))
+	{
+		ClearRefineMode();
+		return false;
+	}
+
+#ifdef USE_CRYSTAL_SYSTEM
+	if (item->GetType() == ITEM_CRYSTAL)
+	{
+		const auto* pProto = ITEM_MANAGER::instance().GetTable(MAGIC_SPIRAL_VNUM);
+		if (pProto)
+		{
+			char szItemName[ITEM_NAME_MAX_LEN + 1] = {};
+			snprintf(szItemName, sizeof(szItemName), "I%u", MAGIC_SPIRAL_VNUM);
+			ChatPacket(CHAT_TYPE_INFO, "1518 %s %s", item->GetName(), szItemName);
+			// ChatPacket(CHAT_TYPE_INFO, LC_TEXT("%s can be improved just through %s."), item->GetName(), pProto->szLocaleName);
+		}
+
+		ClearRefineMode();
+		return false;
+	}
+#endif
+
+	const TRefineTable* prt = CRefineManager::Instance().GetRefineRecipe(item->GetRefineSet());
+	if (!prt)
+		return false;
+
+	const uint32_t result_vnum = item->GetRefinedVnum();
+
+	// REFINE_COST
+	const int cost = ComputeRefineFee(prt->cost);
+	// END_OF_REFINE_COST
+
+	if (result_vnum == 0)
+	{
+		ChatPacket(CHAT_TYPE_INFO, "[LS;991]");
+		return false;
+	}
+
+	if (item->GetType() == ITEM_USE && item->GetSubType() == USE_TUNING)
+		return false;
+
+	const TItemTable* pProto = ITEM_MANAGER::Instance().GetTable(item->GetRefinedVnum());
+	if (!pProto)
+	{
+		sys_err("DoRefineSerpent NOT GET ITEM PROTO %d", item->GetRefinedVnum());
+		ChatPacket(CHAT_TYPE_INFO, "[LS;1002]");
+		return false;
+	}
+
+	// REFINE_COST
+	if (GetGold() < cost)
+	{
+		ChatPacket(CHAT_TYPE_INFO, "[LS;67]");
+		return false;
+	}
+
+	int prob = number(1, 100);
+	prob -= 10;
+	// END_OF_REFINE_COST
+
+#ifdef ENABLE_PITTY_REFINE
+	if (bUseSealOfGod && CountSpecifyItem(ITEM_VNUM_SEAL_OF_GOD) > 0)
+	{
+		RemoveSpecifyItem(ITEM_VNUM_SEAL_OF_GOD, 1);
+		prob -= EXTRA_CHANCE_SEAL_OF_GOD;
+		if (prob <= 0)
+			prob = 1;
+	}
+#endif
+
+	if (prob <= prt->prob)
+	{
+		// Success! All items disappear, and other items with the same attribute are acquired
+		LPITEM pkNewItem = ITEM_MANAGER::Instance().CreateItem(result_vnum, 1, 0, false);
+
+		if (pkNewItem)
+		{
+#ifdef ENABLE_SEALBIND_SYSTEM
+			pkNewItem->SetSealDate(item->GetSealDate());
+#endif
+			ITEM_MANAGER::CopyAllAttrTo(item, pkNewItem);
+			LogManager::Instance().ItemLog(this, pkNewItem, "REFINE SUCCESS", pkNewItem->GetName());
+
+			const uint16_t wCell = item->GetCell();	//@fixme519
+
+			// DETAIL_REFINE_LOG
+			NotifyRefineSuccess(this, item, "SERPENT");
+			DBManager::Instance().SendMoneyLog(MONEY_LOG_REFINE, item->GetVnum(), -cost);
+
+			ITEM_MANAGER::Instance().RemoveItem(item, "REMOVE (REFINE SUCCESS)");
+			// END_OF_DETAIL_REFINE_LOG
+
+			pkNewItem->AddToCharacter(this, TItemPos(INVENTORY, wCell));
+			ITEM_MANAGER::Instance().FlushDelayedSave(pkNewItem);
+
+			sys_log(0, "Refine Success %d", cost);
+			pkNewItem->AttrLog();
+			//PointChange(POINT_GOLD, -cost);
+			sys_log(0, "PayPee %d", cost);
+			PayRefineFee(cost);
+			sys_log(0, "PayPee End %d", cost);
+		}
+		else
+		{
+			// DETAIL_REFINE_LOG
+			// Failed to create item -> Considered as improvement failure
+			// sys_err("cannot create item %u", result_vnum);
+			NotifyRefineFail(this, item, "SERPENT");
+			// END_OF_DETAIL_REFINE_LOG
+		}
+	}
+	else
+	{
+		// Failure! All items disappear.
+		DBManager::Instance().SendMoneyLog(MONEY_LOG_REFINE, item->GetVnum(), -cost);
+		NotifyRefineFail(this, item, "SERPENT");
+		PayRefineFee(cost);
+	}
+
+	return true;
+}
+#endif
 
 bool CHARACTER::RefineInformation(BYTE bCell, BYTE bType, int iAdditionalCell)
 {
@@ -1810,10 +2197,37 @@ bool CHARACTER::RefineInformation(BYTE bCell, BYTE bType, int iAdditionalCell)
 	LPITEM item = GetInventoryItem(bCell);
 
 	if (!item)
-		return false;
-
-	if (bType == REFINE_TYPE_MONEY_ONLY && !GetQuestFlag("deviltower_zone.can_refine"))
 	{
+		return false;
+	}
+
+	// REFINE_COST
+	if (bType == REFINE_TYPE_MONEY_ONLY)
+	{
+#ifdef ENABLE_QUEEN_NETHIS
+		if (SnakeLair::CSnk::Instance().IsSnakeMap(GetMapIndex()))
+		{
+			if (get_global_time() < GetQuestFlag("snake_lair.refine_time"))
+			{
+				ChatPacket(CHAT_TYPE_INFO, "Yýlan Tapýnaðý Demircisi için her 24 saatte bir ödül alabilirsin."); // Custom
+				return false;
+			}
+		}
+		else
+#endif
+		{
+			if (!GetQuestFlag("deviltower_zone.can_refine"))
+			{
+				LocaleChatPacket(CHAT_TYPE_INFO, 117, "");
+				return false;
+			}
+		}
+	}
+	// END_OF_REFINE_COST
+
+	if (item->GetRefinedVnum() == 0)
+	{
+		sys_err("RefineInformation p.result_vnum == 0 (%u)", item->GetVnum());
 		LocaleChatPacket(CHAT_TYPE_INFO, 117, "");
 		return false;
 	}
@@ -1862,6 +2276,7 @@ bool CHARACTER::RefineInformation(BYTE bCell, BYTE bType, int iAdditionalCell)
 		return false;
 	}
 
+	//MAIN_QUEST_LV7
 	if (GetQuestFlag("main_quest_lv7.refine_chance") > 0)
 	{
 		if (!item->CheckItemUseLevel(20) || item->GetType() != ITEM_WEAPON)
@@ -1874,6 +2289,7 @@ bool CHARACTER::RefineInformation(BYTE bCell, BYTE bType, int iAdditionalCell)
 	else
 		p.cost = ComputeRefineFee(prt->cost);
 
+	//END_MAIN_QUEST_LV7
 	p.prob = prt->prob;
 	if (bType == REFINE_TYPE_MONEY_ONLY)
 	{
@@ -1885,10 +2301,21 @@ bool CHARACTER::RefineInformation(BYTE bCell, BYTE bType, int iAdditionalCell)
 		p.material_count = prt->material_count;
 		thecore_memcpy(&p.materials, prt->materials, sizeof(prt->materials));
 	}
+	// END_OF_REFINE_COST
 
 	GetDesc()->Packet(&p, sizeof(TPacketGCRefineInformation));
 
 	SetRefineMode(iAdditionalCell);
+
+#ifdef ENABLE_PITTY_REFINE
+	int iMaxPittyLevel = item->GetLimitPittyRefine();
+
+	if (iMaxPittyLevel != 0)
+	{
+		SendPittyInfoClient(item->GetVnum(), item->GetRefineLevel());
+	}
+#endif
+
 	return true;
 }
 
@@ -1899,8 +2326,10 @@ bool CHARACTER::RefineItem(LPITEM pkItem, LPITEM pkTarget)
 
 	if (pkItem->GetSubType() == USE_TUNING)
 	{
+		// MUSIN_SCROLL
 		if (pkItem->GetValue(0) == MUSIN_SCROLL)
 			RefineInformation(pkTarget->GetCell(), REFINE_TYPE_MUSIN, pkItem->GetCell());
+		// END_OF_MUSIN_SCROLL
 		else if (pkItem->GetValue(0) == HYUNIRON_CHN)
 			RefineInformation(pkTarget->GetCell(), REFINE_TYPE_HYUNIRON, pkItem->GetCell());
 		else if (pkItem->GetValue(0) == BDRAGON_SCROLL)
@@ -2150,8 +2579,8 @@ int CalculateConsume(LPCHARACTER ch)
 
 	int consumeLife = 0;
 	{
-		const int curLife = ch->GetHP();
-		const int needPercent = WARP_NEED_LIFE_PERCENT;
+		const int curLife		= ch->GetHP();
+		const int needPercent	= WARP_NEED_LIFE_PERCENT;
 		const int needLife = ch->GetMaxHP() * needPercent / 100;
 
 		if (curLife < needLife)
@@ -2171,7 +2600,7 @@ int CalculateConsume(LPCHARACTER ch)
 		if (consumeLife < 0)
 			consumeLife = 0;
 	}
-
+	// END_OF_CONSUME_LIFE_WHEN_USE_WARP_ITEM
 	return consumeLife;
 }
 
@@ -2250,9 +2679,23 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 		sys_log(0, "USE_ITEM %s, Inven %d, Cell %d, ItemType %d, SubType %d", item->GetName(), bDestInven, wDestCell, item->GetType(), item->GetSubType());
 	}
 
+#ifdef ENABLE_ITEM_DUPE_FIX
+	if (!CanHandleItem())
+	{
+		return false;
+	}
+#endif
+
 	if (CArenaManager::instance().IsLimitedItem( GetMapIndex(), item->GetVnum() ) == true)
 	{
 		LocaleChatPacket(CHAT_TYPE_INFO, 400, "");
+		return false;
+	}
+
+	// @fixme402 (IsLoadedAffect to block affect hacking)
+	if (!IsLoadedAffect())
+	{
+		ChatPacket(CHAT_TYPE_INFO, "Etkiler henüz yüklenmedi!");
 		return false;
 	}
 
@@ -2261,10 +2704,13 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 		iLimitRealtimeStartFirstUseFlagIndex = -1;
 #endif
 
+	// After the initial use of an item, time is deducted even if it is not used.
 	if (-1 != iLimitRealtimeStartFirstUseFlagIndex)
 	{
+		// Whether the item has been used even once is determined by looking at Socket1. (Record the number of uses in Socket1)
 		if (0 == item->GetSocket(1))
 		{
+			// Use the limit value as the default value for the available time, but if there is a value in Socket0, use that value. (Unit is seconds)
 			long duration = (0 != item->GetSocket(0)) ? item->GetSocket(0) : item->GetProto()->aLimits[iLimitRealtimeStartFirstUseFlagIndex].lValue;
 
 			if (0 == duration)
@@ -2436,25 +2882,33 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 			return ItemProcess_Polymorph(item);
 
 		case ITEM_QUEST:
+			if (GetArena() != NULL || IsObserverMode() == true)
+			{
+				if (item->GetVnum() == 50051 || item->GetVnum() == 50052 || item->GetVnum() == 50053 || item->GetVnum() == 50049)
+				{
+					LocaleChatPacket(CHAT_TYPE_INFO, 400, "");
+					return false;
+				}
+			}
 #ifdef __AUTO_HUNT__
 			if (item->GetVnum() == 49324)
 			{
 				if (FindAffect(AFFECT_AUTO_HUNT))
 				{
-					ChatPacket(CHAT_TYPE_INFO, "You already has affect");
+					ChatPacket(CHAT_TYPE_INFO, "Bu etkiye zaten sahipsin.");
 					return false;
 				}
 				AddAffect(AFFECT_AUTO_HUNT, POINT_NONE, 0, AFF_NONE, 60 * 60 * 24 * item->GetValue(0), 0, false);
-				ChatPacket(CHAT_TYPE_INFO, "Affect added for %d day.", item->GetValue(0));
+				ChatPacket(CHAT_TYPE_INFO, "Etki %d gün süreyle eklendi.", item->GetValue(0));
 				item->SetCount(item->GetCount() - 1);
 				return true;
 			}
 #endif
-			if (GetArena() != NULL || IsObserverMode() == true)
+			if (GetWear(WEAR_MOUNT))
 			{
-				if (item->GetVnum() == 50051 || item->GetVnum() == 50052 || item->GetVnum() == 50053)
+				if (item->GetVnum() == 50051 || item->GetVnum() == 50052 || item->GetVnum() == 50053 || item->GetVnum() == 50049)
 				{
-					LocaleChatPacket(CHAT_TYPE_INFO, 400, "");
+					ChatPacket(CHAT_TYPE_INFO, "Bineðin Varken Atýný Çaðýramazsýn.");
 					return false;
 				}
 			}
@@ -2474,6 +2928,11 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 		case ITEM_CAMPFIRE:
 			{
+				if (thecore_pulse() < LastCampFireUse + 60)	{	//@fixme502
+					LocaleChatPacket(CHAT_TYPE_INFO, 789, "");
+					return false;
+				}
+
 				float fx, fy;
 				GetDeltaByDegree(GetRotation(), 100.0f, &fx, &fy);
 
@@ -2491,17 +2950,6 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 					return false;
 				}
 
-#ifdef ENABLE_CAMPFIRE_BUG_FIX
-				// Performans optimizasyonu: GetQuestFlag yerine direkt member variable
-				if (GetCampfireFlag() > 0 && get_global_time() - GetCampfireFlag() < 60)
-				{
-					LocaleChatPacket(CHAT_TYPE_INFO, 789, "");
-					return false;
-				}
-
-				SetCampfireFlag(get_global_time());
-#endif
-
 				LPCHARACTER campfire = CHARACTER_MANAGER::instance().SpawnMob(fishing::CAMPFIRE_MOB, GetMapIndex(), (long)(GetX()+fx), (long)(GetY()+fy), 0, false, number(0, 359));
 
 				char_event_info* info = AllocEventInfo<char_event_info>();
@@ -2511,6 +2959,8 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 				campfire->m_pkMiningEvent = event_create(kill_campfire_event, info, PASSES_PER_SEC(40));
 
 				item->SetCount(item->GetCount() - 1);
+
+				LastCampFireUse = thecore_pulse();	//@fixme502
 			}
 			break;
 
@@ -2602,32 +3052,20 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 #ifdef ENABLE_MULTI_FARM_BLOCK
 								if (item->GetVnum() >= 55610 && item->GetVnum() <= 55615)
 								{
-#ifdef ENABLE_RENEWAL_PREMIUM_SYSTEM
-									if (IsPremium())
+									if (FindAffect(AFFECT_MULTI_FARM_PREMIUM))
 									{
-#endif
-										if (FindAffect(AFFECT_MULTI_FARM_PREMIUM))
-										{
-											LocaleChatPacket(CHAT_TYPE_INFO, 421, "");
-											return false;
-										}
-										else
-										{
-											AddAffect(AFFECT_MULTI_FARM_PREMIUM, POINT_NONE, item->GetValue(1), AFF_NONE, item->GetValue(0), 0, false);
-											item->SetCount(item->GetCount() - 1);
-											CHARACTER_MANAGER::Instance().CheckMultiFarmAccount(GetDesc()->GetHostName(), GetPlayerID(), GetName(), GetRewardStatus());
-											LocaleChatPacket(CHAT_TYPE_INFO, 422, "");
-											LocaleChatPacket(CHAT_TYPE_INFO, 423, "");
-										}
-#ifdef ENABLE_RENEWAL_PREMIUM_SYSTEM
+										LocaleChatPacket(CHAT_TYPE_INFO, 421, "");
+										return false;
 									}
 									else
 									{
-										LocaleChatPacket(CHAT_TYPE_INFO, 424, "");
-										return false;
+										AddAffect(AFFECT_MULTI_FARM_PREMIUM, POINT_NONE, item->GetValue(1), AFF_NONE, item->GetValue(0), 0, false);
+										item->SetCount(item->GetCount() - 1);
+										CHARACTER_MANAGER::Instance().CheckMultiFarmAccount(GetDesc()->GetHostName(), GetPlayerID(), GetName(), GetRewardStatus());
+										LocaleChatPacket(CHAT_TYPE_INFO, 422, "");
+										LocaleChatPacket(CHAT_TYPE_INFO, 423, "");
 									}
-#endif
-								}
+							}
 #endif
 
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
@@ -2677,10 +3115,10 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 #ifdef ENABLE_PET_SYSTEM
 		case ITEM_PET:
 #endif
-#ifdef ENABLE_TITLE_SYSTEM
-		case ITEM_TITLE:
-#endif
 		case ITEM_PICK:
+#ifdef ENABLE_PASSIVE_SYSTEM
+		case ITEM_PASSIVE:
+#endif
 			if (!item->IsEquipped())
 				EquipItem(item);
 			else
@@ -2820,6 +3258,15 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 				std::vector <LPITEM> item_gets;
 				int count = 0;
 
+				if (dwBoxVnum == 50033 && LC_IsYMIR())
+				{
+					if (GetLevel() < 15)
+					{
+						ChatPacket(CHAT_TYPE_INFO, "15·¹º§ ÀÌÇÏ¿¡¼­´Â »ç¿ëÇÒ ¼ö ¾ø½À´Ï´Ù.");
+						return false;
+					}
+				}
+
 #ifdef ENABLE_DRAGONSOUL_SYSTEM
 				if( (dwBoxVnum > 51500 && dwBoxVnum < 52000) || (dwBoxVnum >= 50255 && dwBoxVnum <= 50260) )
 				{
@@ -2832,7 +3279,33 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 #endif
 				if (GiveItemFromSpecialItemGroup(dwBoxVnum, dwVnums, dwCounts, item_gets, count))
 				{
+#ifdef ENABLE_RANKING
+					SetRankPoints(15, GetRankPoints(15) + 1);
+#endif
 					item->SetCount(item->GetCount()-1);
+#ifdef ENABLE_BATTLE_PASS
+				if (!v_counts.empty())
+				{
+					for (int i = 0; i < missions_bp.size(); ++i)
+					{
+						if (missions_bp[i].type == 34)
+						{
+							DoMission(i, 1);
+						}
+					}
+				}
+
+				if (!v_counts_premium.empty())
+				{
+					for (int i = 0; i < missions_bp_premium.size(); ++i)
+					{
+						if (missions_bp_premium[i].type == 34)
+						{
+							DoMissionPremium(i, 1);
+						}
+					}
+				}
+#endif
 
 					for (int i = 0; i < count; i++)
 					{
@@ -2917,6 +3390,8 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 					return false;
 				}
 
+				DWORD dwVnum = 0;
+
 #ifdef ENABLE_SKILL_BOOK_READING
 				if (item->GetVnum() == 50300)
 					ChatPacket(CHAT_TYPE_COMMAND, "bkekranac");
@@ -2939,22 +3414,40 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 					{
 						dwVnum = item->GetValue(0);
 					}
-	
+
 					if (0 == dwVnum)
 					{
 						ITEM_MANAGER::instance().RemoveItem(item);
-	
+
 						return false;
 					}
+
+#ifdef ENABLE_NINETH_SKILL
+					if (IsNineSkill(dwVnum))
+					{
+						const auto bSkillGroup = static_cast<uint8_t>(item->GetValue(3));
+						if (LearnNineSkillByBook(dwVnum, bSkillGroup))
+						{
+#ifdef ENABLE_BOOKS_STACKFIX
+							item->SetCount(item->GetCount() - 1);
+#else
+							ITEM_MANAGER::Instance().RemoveItem(item);
+#endif
+						}
+						return false;
+					}
+#endif
 
 					if (true == LearnSkillByBook(dwVnum))
 					{
 #ifndef DEFAULT_REMOVE_ALL_BOOKSS
 						item->SetCount(item->GetCount() - 1);
-#else	
+#else
 						ITEM_MANAGER::instance().RemoveItem(item);
-#endif	
+#endif
 						int iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
+
+						if (distribution_test_server)
 						SetSkillNextReadTime(dwVnum, get_global_time() + iReadDelay);
 					}
 				}
@@ -2964,6 +3457,109 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 		case ITEM_USE:
 			{
+#ifdef ENABLE_COLLECT_WINDOW
+				switch(item->GetVnum())
+				{
+					case 72348:
+					case 72349:
+						{
+							if (GetExchange() || IsOpenSafebox() || GetShopOwner() || GetMyShop() || IsCubeOpen() || GetShop())
+							{
+								ChatPacket(CHAT_TYPE_INFO, "Tüm pencereleri kapat!");
+								return false;
+							}
+							int val = item->GetValue(0);
+							int type = item->GetValue(1);
+							if (type == 0) {
+								time_t item_delay = GetQuestFlag("biologist.item_delay");
+								time_t current_time = get_global_time();
+								time_t remaining_time = item_delay - current_time;
+				
+								time_t reduced_time = remaining_time - (remaining_time * val / 100);
+				
+								if (reduced_time > 10) {
+									SetQuestFlag("biologist.item_delay", current_time + reduced_time);
+				
+									ChatPacket(CHAT_TYPE_COMMAND, "Güncelleme Zamaný 0 %d", reduced_time);
+									item->SetCount(item->GetCount() - 1);
+				
+									ChatPacket(CHAT_TYPE_INFO, "Eþyayý teslim etme bekleme süresi baþarýyla kýsaltýldý.");
+								} else {
+									ChatPacket(CHAT_TYPE_INFO, "Bekleme süresi zaten maksimum düzeyde kýsaltýldý.");
+									return false;
+								}
+							} else if (type == 1) {
+								int collector_state = GetQuestFlag("collector.state");
+				
+								std::string delay_flag_key = "collector.item_delay" + std::to_string(collector_state);
+				
+								time_t item_delay = GetQuestFlag(delay_flag_key);
+								time_t current_time = get_global_time();
+								time_t remaining_time = item_delay - current_time;
+				
+								time_t reduced_time = remaining_time - (remaining_time * val / 100); 
+				
+								if (reduced_time > 10) {
+									SetQuestFlag(delay_flag_key, current_time + reduced_time);
+				
+									ChatPacket(CHAT_TYPE_COMMAND, "Güncelleme Zamaný 1 %d", reduced_time);
+									item->SetCount(item->GetCount() - 1);
+				
+									ChatPacket(CHAT_TYPE_INFO, "Eþyayý teslim etme bekleme süresi baþarýyla kýsaltýldý.");
+								} else {
+									ChatPacket(CHAT_TYPE_INFO, "Bekleme süresi zaten maksimum düzeyde kýsaltýldý.");
+									return false;
+								}
+							}
+							break;
+						}
+				
+					case 71036:
+					case 71037:
+						{
+							if (GetExchange() || IsOpenSafebox() || GetShopOwner() || GetMyShop() || IsCubeOpen() || GetShop())
+							{
+								ChatPacket(CHAT_TYPE_INFO, "Tüm pencereleri kapat!");
+								return false;
+							}
+							int val = item->GetValue(0);
+							int type = item->GetValue(1);
+							int max_increase = item->GetValue(2);
+							if (type == 0) {
+								int take_chance = GetQuestFlag("biologist.take_chance");
+								if (take_chance == max_increase || take_chance > max_increase) {
+									ChatPacket(CHAT_TYPE_INFO, "Teslim etme þansý zaten maksimum seviyede!");
+									return false;
+								}
+								SetQuestFlag("biologist.take_chance", take_chance+val);
+								item->SetCount(item->GetCount()-1);
+				
+								ChatPacket(CHAT_TYPE_INFO, "Teslim etme þansý %25 artýrýldý.");
+				
+								int new_chance = GetQuestFlag("biologist.take_chance");
+				
+								ChatPacket(CHAT_TYPE_INFO, "Mevcut Þans: %d", new_chance);
+								ChatPacket(CHAT_TYPE_COMMAND, "Güncelleme Þansý 0 %d", new_chance);
+							} else if (type == 1) {
+								int take_chance = GetQuestFlag("collector.take_chance");
+								if (take_chance == max_increase || take_chance > max_increase) {
+									ChatPacket(CHAT_TYPE_INFO, "Teslim etme þansý zaten maksimum seviyeye çýkarýldý!");
+									return false;
+								}
+								SetQuestFlag("collector.take_chance", take_chance+val);
+								item->SetCount(item->GetCount()-1);
+				
+								ChatPacket(CHAT_TYPE_INFO, "Teslim etme þansý %25 artýrýldý.");
+				
+								int new_chance = GetQuestFlag("collector.take_chance");
+				
+								ChatPacket(CHAT_TYPE_INFO, "Mevcut Þans: %d", new_chance);
+								ChatPacket(CHAT_TYPE_COMMAND, "Güncelleme Þansý 1 %d", new_chance);
+							}
+							break;
+						}
+				}
+#endif
 				if (item->GetVnum() > 50800 && item->GetVnum() <= 50820)
 				{
 					if (test_server)
@@ -3038,6 +3634,13 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 					case USE_POTION_NODELAY:
 						{
+#ifdef ENABLE_SUNG_MAHI_TOWER
+							if (!IS_SUNG_MAHI_ENABLE_ITEM(GetMapIndex(), item->GetVnum()))
+							{
+								ChatPacket(CHAT_TYPE_INFO, "Bu tür iksiri burada kullanamazsýn.");
+								return false;
+							}
+#endif
 							if (CArenaManager::instance().IsArenaMap(GetMapIndex()) == true)
 							{
 								if (quest::CQuestManager::instance().GetEventFlag("arena_potion_limit") > 0)
@@ -3116,7 +3719,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								if (item->GetVnum() == 50085 || item->GetVnum() == 50086)
 								{
 									if (test_server)
-										ChatPacket(CHAT_TYPE_INFO, "Used Moon Cake or Seed.");
+										ChatPacket(CHAT_TYPE_INFO, "Ay Keki veya Tohum kullanýldý.");
 
 									SetUseSeedOrMoonBottleTime();
 								}
@@ -3237,35 +3840,6 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 					case USE_SPECIAL:
 						switch (item->GetVnum())
 						{
-#ifdef ENABLE_RENEWAL_PREMIUM_SYSTEM
-							case 90013:
-							case 90014:
-							case 90015:
-							{
-								if (IsPremium())
-								{
-									LocaleChatPacket(CHAT_TYPE_INFO, 101, "");
-									return false;
-								}
-
-								time_t seconds = 0;
-								if (item->GetVnum() == 90013)
-									seconds = 7 * (60*60*24); // 7 days
-								else if (item->GetVnum() == 90014)
-									seconds = 15 * (60*60*24); // 15 days
-								else if (item->GetVnum() == 90015)
-									seconds = 30 * (60*60*24); // 30 days
-								else
-									return false;
-
-								if (seconds == 0)
-									return false;
-
-								ActivatePremium(seconds);
-								item->SetCount(item->GetCount() - 1);
-							}
-							break;
-#endif
 #ifdef ENABLE_AUTOMATIC_PICK_UP_SYSTEM
 							case 70002:
 							{
@@ -3304,6 +3878,60 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								item->SetCount(item->GetCount() - 1);
 								break;
 #endif
+#ifdef ENABLE_ZODIAC_MISSION
+							case 33031: // 12 Bead 
+							{
+								int bCount = GetQuestFlag("Bead.Count");
+								SetQuestFlag("Bead.Count", GetQuestFlag("Bead.Count") + 12);
+								bCount = GetQuestFlag("Bead.Count"); // Update
+								ChatPacket(CHAT_TYPE_COMMAND, "SetBeadCount %d", bCount);
+								item->SetCount(item->GetCount() - 1);
+								ChatPacket(CHAT_TYPE_INFO, ("%d Adet Animasfer eklendi. "), 12);
+							}
+							break;
+							case 33032: // 24 Bead 
+							{
+								int bCount = GetQuestFlag("Bead.Count");
+								SetQuestFlag("Bead.Count", GetQuestFlag("Bead.Count") + 24);
+								bCount = GetQuestFlag("Bead.Count"); // Update
+								ChatPacket(CHAT_TYPE_COMMAND, "SetBeadCount %d", bCount);
+								item->SetCount(item->GetCount() - 1);
+								ChatPacket(CHAT_TYPE_INFO, ("%d Adet Animasfer eklendi. "), 24);
+							}
+							break;
+							case 33033: // 36 Bead 
+							{
+								int bCount = GetQuestFlag("Bead.Count");
+								SetQuestFlag("Bead.Count", GetQuestFlag("Bead.Count") + 36);
+								bCount = GetQuestFlag("Bead.Count"); // Update
+								ChatPacket(CHAT_TYPE_COMMAND, "SetBeadCount %d", bCount);
+								item->SetCount(item->GetCount() - 1);
+								ChatPacket(CHAT_TYPE_INFO, ("%d Adet Animasfer eklendi. "), 36);
+							}
+							break;
+				
+							case 33034: // 48 Bead 
+							{
+								int bCount = GetQuestFlag("Bead.Count");
+								SetQuestFlag("Bead.Count", GetQuestFlag("Bead.Count") + 12);
+								bCount = GetQuestFlag("Bead.Count"); // Update
+								ChatPacket(CHAT_TYPE_COMMAND, "SetBeadCount %d", bCount);
+								item->SetCount(item->GetCount() - 1);
+								ChatPacket(CHAT_TYPE_INFO, ("%d Adet Animasfer eklendi. "), 12);
+							}
+							break;
+				
+							case 33035: // 60 Bead 
+							{
+								int bCount = GetQuestFlag("Bead.Count");
+								SetQuestFlag("Bead.Count", GetQuestFlag("Bead.Count") + 60);
+								bCount = GetQuestFlag("Bead.Count"); // Update
+								ChatPacket(CHAT_TYPE_COMMAND, "SetBeadCount %d", bCount);
+								item->SetCount(item->GetCount() - 1);
+								ChatPacket(CHAT_TYPE_INFO, ("%d Adet Animasfer eklendi. "), 60);
+							}
+							break;
+#endif
 							case ITEM_NOG_POCKET:
 								{
 									if (FindAffect(AFFECT_NOG_ABILITY))
@@ -3325,6 +3953,11 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 							case ITEM_RAMADAN_CANDY:
 								{
+									if (FindAffect(AFFECT_RAMADAN_ABILITY)) // @fixme61
+									{
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("BU_ETKI_DEVAM_EDIYOR"));
+										return false;
+									}
 									long time = item->GetValue(0);
 									long moveSpeedPer	= item->GetValue(1);
 									long attPer	= item->GetValue(2);
@@ -3624,6 +4257,10 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 														pdw[0] = info[i].dwVnum;
 														pdw[1] = info[i].count;
+
+														DBManager::instance().ReturnQuery(QID_LOTTO, GetPlayerID(), pdw,
+																"INSERT INTO lotto_list VALUES(0, 'server%s', %u, NOW())", 
+																get_table_postfix(), GetPlayerID());
 													}
 													else
 														AutoGiveItem(info[i].dwVnum, info[i].count);
@@ -3731,7 +4368,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 													max = dist;
 													pTarget = stone->second;
 												}
-												stone++;
+												++stone;	//@fixme541
 											}
 
 											if (pTarget != NULL)
@@ -3769,10 +4406,70 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								ChatPacket(CHAT_TYPE_COMMAND, "ruhtasiekranac");
 								break;
 #endif
-
 							case 27996:
 								item->SetCount(item->GetCount() - 1);
 								break;
+
+#ifdef ENABLE_BATTLE_PASS
+							case ITEM_BATTLE_PASS:
+							{
+								if (!v_counts.empty())
+								{
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("1073"));
+									return false;
+								}
+
+								FILE* fileID;
+								char file_name[256 + 1];
+
+								snprintf(file_name, sizeof(file_name), "%s/battlepass_players/%s.txt", LocaleService_GetBasePath().c_str(), GetName());
+								fileID = fopen(file_name, "w");
+
+								if (NULL == fileID)
+									return false;
+
+								for (int i = 0; i < missions_bp.size(); ++i)
+								{
+									fprintf(fileID, "MISSION	%d	%d\n", 0, 0);
+								}
+
+								fclose(fileID);
+
+								Load_BattlePass();
+								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("1074"));
+								item->SetCount(item->GetCount() - 1);
+							}
+							break;
+							case ITEM_BATTLE_PASS_PREMIUM:
+							{
+								if (!v_counts_premium.empty())
+								{
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("1073"));
+									return false;
+								}
+
+								FILE* fileID;
+								char file_name[256 + 1];
+
+								snprintf(file_name, sizeof(file_name), "%s/battlepass_premium_players/%s.txt", LocaleService_GetBasePath().c_str(), GetName());
+								fileID = fopen(file_name, "w");
+				
+								if (NULL == fileID)
+									return false;
+
+								for (int i = 0; i < missions_bp_premium.size(); ++i)
+								{
+									fprintf(fileID, "MISSION	%d	%d\n", 0, 0);
+								}
+
+								fclose(fileID);
+
+								Load_BattlePassPremium();
+								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("1074"));
+								item->SetCount(item->GetCount() - 1);
+							}
+							break;
+#endif
 
 							case 27987:
 								{
@@ -3871,6 +4568,8 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										ITEM_MANAGER::instance().RemoveItem(item);
 
 										int iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
+										if (distribution_test_server) iReadDelay /= 3;
+
 										SetSkillNextReadTime(SKILL_LEADERSHIP, get_global_time() + iReadDelay);
 									}
 								}
@@ -3910,6 +4609,8 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										ITEM_MANAGER::instance().RemoveItem(item);
 
 										int iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
+										if (distribution_test_server) iReadDelay /= 3;
+
 										SetSkillNextReadTime(SKILL_COMBO, get_global_time() + iReadDelay);
 									}
 								}
@@ -3935,9 +4636,11 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 									if (LearnSkillByBook(dwSkillVnum, iPct))
 									{
-										ITEM_MANAGER::instance().RemoveItem(item);
+										item->SetCount(item->GetCount() - 1);
 
 										int iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
+										if (distribution_test_server) iReadDelay /= 3;
+
 										SetSkillNextReadTime(dwSkillVnum, get_global_time() + iReadDelay);
 									}
 								}
@@ -3965,6 +4668,8 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										ITEM_MANAGER::instance().RemoveItem(item);
 
 										int iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
+										if (distribution_test_server) iReadDelay /= 3;
+
 										SetSkillNextReadTime(dwSkillVnum, get_global_time() + iReadDelay);
 									}
 								}
@@ -4036,6 +4741,8 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										ITEM_MANAGER::instance().RemoveItem(item);
 
 										int iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
+										if (distribution_test_server) iReadDelay /= 3;
+
 										SetSkillNextReadTime(dwSkillVnum, get_global_time() + iReadDelay);
 									}
 								}
@@ -4065,11 +4772,26 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										ITEM_MANAGER::instance().RemoveItem(item);
 
 										int iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
+										if (distribution_test_server) iReadDelay /= 3;
+
 										SetSkillNextReadTime(dwSkillVnum, get_global_time() + iReadDelay);
+
+										if (test_server) 
+										{
+											ChatPacket(CHAT_TYPE_INFO, "[TEST_SERVER] Success to learn skill ");
+										}
+									}
+									else
+									{
+										if (test_server) 
+										{
+											ChatPacket(CHAT_TYPE_INFO, "[TEST_SERVER] Failed to learn skill ");
+										}
 									}
 								}
 								break;
 
+								// MINING
 							case ITEM_MINING_SKILL_TRAIN_BOOK:
 								{
 									if (IsPolymorphed())
@@ -4092,10 +4814,13 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										ITEM_MANAGER::instance().RemoveItem(item);
 
 										int iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
+										if (distribution_test_server) iReadDelay /= 3;
+
 										SetSkillNextReadTime(dwSkillVnum, get_global_time() + iReadDelay);
 									}
 								}
 								break;
+								// END_OF_MINING
 
 							case ITEM_HORSE_SKILL_TRAIN_BOOK:
 								{
@@ -4143,6 +4868,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										PointChange(POINT_HORSE_SKILL, 1);
 
 										int iReadDelay = number(SKILLBOOK_DELAY_MIN, SKILLBOOK_DELAY_MAX);
+										if (distribution_test_server) iReadDelay /= 3;
 
 										if (!test_server)
 											SetSkillNextReadTime(dwSkillVnum, get_global_time() + iReadDelay);
@@ -4182,8 +4908,23 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									int val = item->GetValue(0);
 									int interval = item->GetValue(1);
 									quest::PC* pPC = quest::CQuestManager::instance().GetPC(GetPlayerID());
+									if (!pPC)// @fixme208
+										return false;
 									int last_use_time = pPC->GetFlag("mythical_peach.last_use_time");
 
+									if (get_global_time() - last_use_time < interval * 60 * 60)
+									{
+										if (test_server == false)
+										{
+											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("¾ÆÁ÷ »ç¿ëÇÒ ¼ö ¾ø½À´Ï´Ù."));
+											return false;
+										}
+										else
+										{
+											ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Å×½ºÆ® ¼­¹ö ½Ã°£Á¦ÇÑ Åë°ú"));
+										}
+									}
+									
 									if (GetAlignment() == 200000)
 										return false;
 
@@ -4214,7 +4955,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									if (!IsValidItemPosition(DestCell) || !(item2 = GetItem(DestCell)))
 										return false;
 
-									if (item2->IsExchanging() == true)
+									if (item2->IsExchanging() || item2->IsEquipped()) // @fixme114
 										return false;
 
 									if (item2->GetSocketCount() == 0)
@@ -4274,7 +5015,8 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										item2->SetSocket(idx, 1);
 
 										char buf[256+1];
-										snprintf(buf, sizeof(buf), "%s(%u) %s(%u)", item2->GetName(), item2->GetID(), pItemReward->GetName(), pItemReward->GetID());
+										snprintf(buf, sizeof(buf), "%s(%u) %s(%u)", 
+												item2->GetName(), item2->GetID(), pItemReward->GetName(), pItemReward->GetID());
 										LogManager::instance().ItemLog(this, item, "USE_DETACHMENT_ONE", buf);
 
 										item->SetCount(item->GetCount() - 1);
@@ -4289,10 +5031,12 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							case 70205:
 							case 70206:
 								{
+									// NEW_HAIR_STYLE_ADD
 									if (GetPart(PART_HAIR) >= 1001)
 									{
 										LocaleChatPacket(CHAT_TYPE_INFO, 459, "");
 									}
+									// END_NEW_HAIR_STYLE_ADD
 									else
 									{
 										quest::CQuestManager& q = quest::CQuestManager::instance();
@@ -4355,7 +5099,9 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									std::vector <LPITEM> item_gets;
 									int count = 0;
 
-									if (item->GetVnum() == ITEM_VALENTINE_ROSE && SEX_MALE==GET_SEX(this) || item->GetVnum() == ITEM_VALENTINE_CHOCOLATE && SEX_FEMALE==GET_SEX(this))
+
+									if (((item->GetVnum() == ITEM_VALENTINE_ROSE) && (SEX_MALE==GET_SEX(this))) ||
+										((item->GetVnum() == ITEM_VALENTINE_CHOCOLATE) && (SEX_FEMALE==GET_SEX(this))))
 									{
 										LocaleChatPacket(CHAT_TYPE_INFO, 461, "");
 										return false;
@@ -4375,7 +5121,9 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									std::vector <LPITEM> item_gets;
 									int count = 0;
 
-									if (item->GetVnum() == ITEM_WHITEDAY_CANDY && SEX_MALE==GET_SEX(this) || item->GetVnum() == ITEM_WHITEDAY_ROSE && SEX_FEMALE==GET_SEX(this))
+
+									if (((item->GetVnum() == ITEM_WHITEDAY_CANDY) && (SEX_MALE==GET_SEX(this))) ||
+										((item->GetVnum() == ITEM_WHITEDAY_ROSE) && (SEX_FEMALE==GET_SEX(this))))
 									{
 										LocaleChatPacket(CHAT_TYPE_INFO, 461, "");
 										return false;
@@ -4510,9 +5258,66 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								}
 								break;
 
+#ifdef ENABLE_GAYA_TICKET_SYSTEM
+							case 50000:
+							{
+								if (GetExchange() || GetMyShop() || GetShopOwner() || IsOpenSafebox() || IsCubeOpen())
+								{
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("°Å·¡Ã¢,Ã¢°í µîÀ» ¿¬ »óÅÂ¿¡¼­´Â ±ÍÈ¯ºÎ,±ÍÈ¯±â¾ïºÎ ¸¦ »ç¿ëÇÒ¼ö ¾ø½À´Ï´Ù."));
+									return false;
+								}
+								
+								int iGem = item->GetSocket(0);
+								if (iGem == 0)
+								{
+									char buf[128];
+									snprintf(buf, sizeof(buf), "OpenGemTicket %d", item->GetCell());
+									ChatPacket(CHAT_TYPE_COMMAND, buf);
+								}
+								else
+								{
+									if (GetGem() + iGem > 999999)
+									{
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Envanterinde fazla gaya tasiyorsun."));
+										return false;
+									}
+									ITEM_MANAGER::instance().RemoveItem(item);
+									PointChange(POINT_GEM, iGem, true);
+								}
+							}
+							break;
+#endif
+
+#ifdef __SYSTEM_SEARCH_ITEM_MOB__
+							case 93101: 
+								{
+
+									ChatPacket(CHAT_TYPE_COMMAND, "open_searched");
+								}
+								break;
+#endif
+
 							case 27995: {}
 								break;
 
+#ifdef ENABLE_HALLOWEEN_EVENT_SYSTEM
+							case 70604:
+								{
+									if (GetHalounPoints() > 0)
+									{
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Halloween_Etkin"));
+										return false;
+									}
+									
+									ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Halloween_10_Puan_Aldin"));
+									PointChange(POINT_HALOUN, 10);
+
+									OpenHalloween();
+									
+									item->SetCount(item->GetCount()-1);
+								}
+								break;
+#endif
 							case 71092 :
 								{
 									if (m_pkChrTarget != NULL)
@@ -4575,6 +5380,9 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 												item->GetOriginalVnum());
 
 										item->SetCount(item->GetCount() - 1);
+#ifndef ENABLE_RANKING
+										SetRankPoints(13, GetRankPoints(13) + 1);
+#endif
 									}
 									else
 									{
@@ -4612,6 +5420,9 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										LogManager::instance().ItemLog(this, item, "CHANGE_RARE_ATTR", buf);
 
 										item->SetCount(item->GetCount() - 1);
+#ifndef ENABLE_RANKING
+										SetRankPoints(13, GetRankPoints(13) + 1);
+#endif
 									}
 									else
 									{
@@ -4901,6 +5712,14 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 					case USE_POTION_NODELAY:
 						{
+#ifdef ENABLE_SUNG_MAHI_TOWER
+							if (!IS_SUNG_MAHI_ENABLE_ITEM(GetMapIndex(), item->GetVnum()))
+							{
+								ChatPacket(CHAT_TYPE_INFO, "Bu tür iksiri burada kullanamazsýn.");
+								return false;
+							}
+#endif
+
 							if (CArenaManager::instance().IsArenaMap(GetMapIndex()) == true)
 							{
 								if (quest::CQuestManager::instance().GetEventFlag("arena_potion_limit") > 0)
@@ -4992,6 +5811,13 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 						break;
 
 					case USE_POTION:
+#ifdef ENABLE_SUNG_MAHI_TOWER
+						if (!IS_SUNG_MAHI_ENABLE_ITEM(GetMapIndex(), item->GetVnum()))
+						{
+							ChatPacket(CHAT_TYPE_INFO, "Bu tür iksiri burada kullanamazsýn.");
+							return false;
+						}
+#endif
 						if (CArenaManager::instance().IsArenaMap(GetMapIndex()) == true)
 						{
 							if (quest::CQuestManager::instance().GetEventFlag("arena_potion_limit") > 0)
@@ -5237,12 +6063,9 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							if (!IsValidItemPosition(DestCell) || !(item2 = GetItem(DestCell)))
 								return false;
 
-							if (item2->IsExchanging())
+							if (item2->IsExchanging() || item2->IsEquipped()) // @fixme114
 								return false;
-	
-							if (item2->IsEquipped()) // Fix
-								return false;
-	
+
 							if (item2->GetVnum() >= 28330 && item2->GetVnum() <= 28343)
 							{
 								LocaleChatPacket(CHAT_TYPE_INFO, 78, "");
@@ -5373,6 +6196,12 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								BuffOnAttr_RemoveBuffsFromItem(item2);
 							}
 
+							if (item2->GetVnum() == 50201 || item2->GetVnum() == 50202 || item2->GetVnum() == 11901 || item2->GetVnum() == 11902 || item2->GetVnum() == 11903 || item2->GetVnum() == 11904 || item2->GetVnum() == 11911 || item2->GetVnum() == 11912 || item2->GetVnum() == 11913 || item2->GetVnum() == 11914)
+							{
+								ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Buket Gelinlik ve Smokinlere efsun basilamaz."));
+								return false;
+							}
+
 							if (ITEM_COSTUME == item2->GetType())
 #ifdef ENABLE_AURA_COSTUME_SYSTEM
 							if (item->GetSubType() != USE_PUT_INTO_AURA_SOCKET)
@@ -5385,7 +6214,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							if (item2->IsExchanging())
 								return false;
 
-							if (item2->IsEquipped()) // Fix
+							if (item2->IsExchanging() || item2->IsEquipped()) // @fixme114
 								return false;
 
 							switch (item->GetSubType())
@@ -5488,7 +6317,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										}
 										else
 										{
-											ChatPacket(CHAT_TYPE_INFO, "Bu eÅŸyayÄ± sadece Ortalama ve Becerili silahlarda kullanabilirsiniz.");
+											ChatPacket(CHAT_TYPE_INFO, "Bu nesneyi sadece Ortalama ve Becerili silahlarda kullanabilirsiniz.");
 											return false;
 										}
 									}
@@ -5504,7 +6333,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										}
 										else
 										{
-											ChatPacket(CHAT_TYPE_INFO, "Bu eÅŸyayÄ± sadece Ortalama ve Becerili silahlarda kullanabilirsiniz.");
+											ChatPacket(CHAT_TYPE_INFO, "Bu nesneyi sadece Ortalama ve Becerili silahlarda kullanabilirsiniz.");
 											return false;
 										}
 									}
@@ -5513,7 +6342,8 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									{
 										if (item->GetVnum() == 71151 || item->GetVnum() == 76023)
 										{
-											if ((item2->GetType() == ITEM_WEAPON) || (item2->GetType() == ITEM_ARMOR && item2->GetSubType() == ARMOR_BODY))
+											if ((item2->GetType() == ITEM_WEAPON)
+												|| (item2->GetType() == ITEM_ARMOR && item2->GetSubType() == ARMOR_BODY))
 											{
 												bool bCanUse = true;
 												for (int i = 0; i < ITEM_LIMIT_MAX_NUM; ++i)
@@ -5548,9 +6378,21 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									}
 
 									item->SetCount(item->GetCount() - 1);
+#ifndef ENABLE_RANKING
+									SetRankPoints(12, GetRankPoints(12) + 1);
+#endif
 									break;
 
 								case USE_ADD_ATTRIBUTE:
+									if (ITEM_COSTUME == item2->GetType())
+									{
+										ChatPacket(CHAT_TYPE_INFO, LC_TEXT("¨ùO¨ù¨¬A¡í ¨¬?¡Æ©¡CO ¨ùo ¨ú©ª¢¥A ¨ú¨¡AIAUAO¢¥I¢¥U."));
+										return false;
+									}
+
+									if (item2->IsExchanging() || item2->IsEquipped()) // @fixme114
+										return false;
+
 									if (item2->GetAttributeSetIndex() == -1)
 									{
 										LocaleChatPacket(CHAT_TYPE_INFO, 462, "");
@@ -5568,7 +6410,8 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									{
 										if (item->GetVnum() == 71152 || item->GetVnum() == 76024)
 										{
-											if ((item2->GetType() == ITEM_WEAPON) || (item2->GetType() == ITEM_ARMOR && item2->GetSubType() == ARMOR_BODY))
+											if ((item2->GetType() == ITEM_WEAPON)
+												|| (item2->GetType() == ITEM_ARMOR && item2->GetSubType() == ARMOR_BODY))
 											{
 												bool bCanUse = true;
 												for (int i = 0; i < ITEM_LIMIT_MAX_NUM; ++i)
@@ -5595,9 +6438,15 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										char buf[21];
 										snprintf(buf, sizeof(buf), "%u", item2->GetID());
 
-										if (number(1, 100) <= aiItemAttributeAddPercent[item2->GetAttributeCount()])
+										//if (number(1, 100) <= aiItemAttributeAddPercent[item2->GetAttributeCount()])
+										if (number(1, 100) <= 100)
 										{
+#ifdef ENABLE_MULTI_AFFIX_APPLY_SYSTEM
+											while (item2->GetAttributeCount() < 5)//tekefsunda 5 efsun gelsin.
+												item2->AddAttribute();
+#else
 											item2->AddAttribute();
+#endif
 											LocaleChatPacket(CHAT_TYPE_INFO, 472, "");
 
 											int iAddedIdx = item2->GetAttributeCount() - 1;
@@ -5636,9 +6485,16 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										char buf[21];
 										snprintf(buf, sizeof(buf), "%u", item2->GetID());
 
-										if (number(1, 100) <= aiItemAttributeAddPercent[item2->GetAttributeCount()])
+										// 5. efsun duzenlemesi
+										//if ((number(1, 100) <= aiItemAttributeAddPercent[4]))
+										if (number(1, 100) <= 100)
 										{
+#ifdef ENABLE_MULTI_AFFIX_APPLY_SYSTEM
+											while (item2->GetAttributeCount() < 5)//tekefsunda 5 efsun gelsin.
+												item2->AddAttribute();
+#else
 											item2->AddAttribute();
+#endif
 											LocaleChatPacket(CHAT_TYPE_INFO, 472, "");
 
 											int iAddedIdx = item2->GetAttributeCount() - 1;
@@ -5683,7 +6539,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 										{
 											if (item2->GetAccessorySocketMaxGrade() < ITEM_ACCESSORY_SOCKET_MAX_NUM)
 											{
-												if (number(1, 100) <= 50)
+												if (number(1, 100) <= 100)
 												{
 													item2->SetAccessorySocketMaxGrade(item2->GetAccessorySocketMaxGrade() + 1);
 													LocaleChatPacket(CHAT_TYPE_INFO, 477, "");
@@ -5815,6 +6671,141 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 					case USE_TREASURE_BOX:
 					case USE_MONEYBAG:
 						break;
+
+#ifdef ENABLE_TITLE_SYSTEM
+					case USE_TITLE:
+					{
+						int iDuration = item->GetValue(1);
+						if (iDuration <= 0)
+							iDuration = item->GetValue(2);
+
+						const DWORD dwVnum = item->GetVnum();
+						const int iBundle0[5] = { 1000, 1001, 1002, 1003, 1004 };
+						const int iBundle1[5] = { 1005, 2000, 2001, 2002, 2003 };
+						const int iBundle2[5] = { 3000, 3001, 3002, 3003, 3004 };
+
+						const int* pBundle = NULL;
+						int iBundleCount = 0;
+						switch (dwVnum)
+						{
+							case 57000: pBundle = iBundle0; iBundleCount = 5; break;
+							case 57001: pBundle = iBundle1; iBundleCount = 5; break;
+							case 57002: pBundle = iBundle2; iBundleCount = 5; break;
+						}
+
+						if (pBundle && iBundleCount > 0)
+						{
+							int iUnlockedCount = 0;
+							for (int i = 0; i < iBundleCount; ++i)
+							{
+								const int iTitleID = pBundle[i];
+								char szOwned[64];
+								char szExpire[64];
+								snprintf(szOwned, sizeof(szOwned), "title_system.owned.%d", iTitleID);
+								snprintf(szExpire, sizeof(szExpire), "title_system.expire.%d", iTitleID);
+
+								if (GetQuestFlag(szOwned) > 0)
+									continue;
+
+								SetQuestFlag(szOwned, 1);
+								if (iDuration > 0)
+									SetQuestFlag(szExpire, get_global_time() + iDuration);
+								else
+									SetQuestFlag(szExpire, 0);
+								++iUnlockedCount;
+							}
+
+							if (iUnlockedCount <= 0)
+							{
+								ChatPacket(CHAT_TYPE_INFO, "You already own all titles in this package.");
+								break;
+							}
+
+							item->SetCount(item->GetCount() - 1);
+							ChatPacket(CHAT_TYPE_INFO, "Title package unlocked: %d new titles.", iUnlockedCount);
+							break;
+						}
+
+						int iTitleID = item->GetValue(0);
+						if (iTitleID <= 0)
+						{
+							ChatPacket(CHAT_TYPE_INFO, "Invalid title certificate.");
+							break;
+						}
+
+						char szOwned[64];
+						char szExpire[64];
+						snprintf(szOwned, sizeof(szOwned), "title_system.owned.%d", iTitleID);
+						snprintf(szExpire, sizeof(szExpire), "title_system.expire.%d", iTitleID);
+						if (GetQuestFlag(szOwned) > 0)
+						{
+							ChatPacket(CHAT_TYPE_INFO, "You already own this title.");
+							break;
+						}
+
+						const int iActiveTitle = GetQuestFlag("title_system.active");
+						if (iActiveTitle > 0 && iActiveTitle != iTitleID)
+						{
+							ChatPacket(CHAT_TYPE_INFO, "Remove your current title first.");
+							break;
+						}
+
+						SetQuestFlag(szOwned, 1);
+						if (iDuration > 0)
+							SetQuestFlag(szExpire, get_global_time() + iDuration);
+						else
+							SetQuestFlag(szExpire, 0);
+
+						SetQuestFlag("title_system.active", iTitleID);
+						const char* c_szTitleEffect = "";
+						switch (iTitleID)
+						{
+							case 1000: c_szTitleEffect = "d:/ymir work/effect/etc/title/title_05_medal.mse"; break;
+							case 1001: c_szTitleEffect = "d:/ymir work/effect/etc/title/title_06_banner_gold.mse"; break;
+							case 1002: c_szTitleEffect = "d:/ymir work/effect/etc/title/title_07_banner_red.mse"; break;
+							case 1003: c_szTitleEffect = "d:/ymir work/effect/etc/title/title_08_banner_blue.mse"; break;
+							case 1004: c_szTitleEffect = "d:/ymir work/effect/etc/title/title_02_dragon.mse"; break;
+							case 1005: c_szTitleEffect = "d:/ymir work/effect/etc/title/title_01_shield.mse"; break;
+							case 2000: c_szTitleEffect = "d:/ymir work/effect/etc/title/title_04_trophy.mse"; break;
+							case 2001: c_szTitleEffect = "d:/ymir work/effect/etc/title/title_03_fist.mse"; break;
+							case 2002: c_szTitleEffect = "d:/ymir work/effect/etc/title/title_02_dragon.mse"; break;
+							case 2003: c_szTitleEffect = "d:/ymir work/effect/etc/title/title_01_shield.mse"; break;
+							case 3000: c_szTitleEffect = "d:/ymir work/effect/etc/title/title_06_banner_gold.mse"; break;
+							case 3001: c_szTitleEffect = "d:/ymir work/effect/etc/title/title_07_banner_red.mse"; break;
+							case 3002: c_szTitleEffect = "d:/ymir work/effect/etc/title/title_08_banner_blue.mse"; break;
+							case 3003: c_szTitleEffect = "d:/ymir work/effect/etc/title/title_02_dragon.mse"; break;
+							case 3004: c_szTitleEffect = "d:/ymir work/effect/etc/title/title_05_medal.mse"; break;
+						}
+
+						if (c_szTitleEffect && *c_szTitleEffect)
+							SpecificEffectPacket(c_szTitleEffect);
+
+						ChatPacket(CHAT_TYPE_INFO, "Title unlocked and equipped (ID: %d)", iTitleID);
+						item->SetCount(item->GetCount() - 1);
+					}
+					break;
+#endif
+
+#ifdef __ENABLE_COLLECTIONS_SYSTEM__
+					case USE_COLLECTION_SCROLL:
+					{
+						if (!CanHandleItem() || item->IsExchanging())
+						{
+							return false;
+						}
+			
+						if (GetQuestFlag("collection.percent_up"))
+						{
+							ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Zaten yüzdesini artýrdýn."));
+							return false;
+						}
+			
+						SetQuestFlag("collection.percent_up", 1);
+						ChatPacket(CHAT_TYPE_COMMAND, "RECV_CollectionIncrease %d", 1);
+						item->SetCount(item->GetCount() - 1);
+					}
+					break;
+#endif
 
 					case USE_AFFECT:
 						{
@@ -5954,10 +6945,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 				if (!IsValidItemPosition(DestCell) || !(item2 = GetItem(DestCell)))
 					return false;
 
-				if (item2->IsExchanging())
-					return false;
-
-				if (item2->IsEquipped()) //Fix
+				if (item2->IsExchanging() || item2->IsEquipped()) // @fixme114
 					return false;
 
 				if (item2->GetType() == ITEM_PICK) return false;
@@ -6049,6 +7037,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 			if ((CheckTimeUsed(item) == false))
 				return false;
 
+			sys_log(0,"ITEM_BLEND!!");
 			if (Blend_Item_find(item->GetVnum()))
 			{
 				int affect_type = AFFECT_BLEND;
@@ -6058,9 +7047,9 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 					return false;
 				}
 
-				int apply_type = aApplyInfo[item->GetSocket(0)].bPointType;
-				int apply_value = item->GetSocket(1);
-				int apply_duration = item->GetSocket(2);
+				int		apply_type		= aApplyInfo[item->GetSocket(0)].bPointType;
+				int		apply_value		= item->GetSocket(1);
+				int		apply_duration	= item->GetSocket(2);
 
 				if (FindAffect(affect_type, apply_type))
 				{
@@ -6110,6 +7099,64 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 			}
 			break;
 
+#ifdef ENABLE_NEW_ITEM_TYPE_GACHA
+		case ITEM_GACHA:
+			{
+				DWORD dwBoxVnum = item->GetVnum();
+				std::vector <DWORD> dwVnums;
+				std::vector <DWORD> dwCounts;
+				std::vector <LPITEM> item_gets(0);
+				int count = 0;
+
+				// int pos = GetEmptyInventory(item->GetSize());
+				// if(pos == -1)
+				// {
+					// ChatPacket(CHAT_TYPE_INFO, LC_TEXT("yer_yok_haci"));
+					// return false;
+				// }
+
+				if (GiveItemFromSpecialItemGroup(dwBoxVnum, dwVnums, dwCounts, item_gets, count))
+				{
+					long lOpenCount = item->GetSocket(0);
+					WORD wCount = lOpenCount / item->GetLimitValue(1), wRest = (lOpenCount % item->GetLimitValue(1));
+					item->SetSocket(0, item->GetSocket(0) - 1);
+					if (wRest == 1)
+						if (IS_SET(item->GetFlag(), ITEM_FLAG_STACKABLE) && !IS_SET(item->GetAntiFlag(), ITEM_ANTIFLAG_STACK) && item->GetCount() > 1)
+							item->SetCount(item->GetCount() - 1);
+						else
+							ITEM_MANAGER::instance().RemoveItem(item);
+
+					for (int i = 0; i < count; i++)
+					{
+						switch (dwVnums[i])
+						{
+						case CSpecialItemGroup::GOLD:
+							ChatPacket(CHAT_TYPE_INFO, LC_TEXT("µ· %lld HATA_VERDIGINDE_LOCALE_EKLE."), static_cast<long long>(dwCounts[i]));
+							break;
+						case CSpecialItemGroup::EXP:
+							break;
+						case CSpecialItemGroup::MOB:
+							break;
+						case CSpecialItemGroup::SLOW:
+							break;
+						case CSpecialItemGroup::DRAIN_HP:
+							break;
+						case CSpecialItemGroup::POISON:
+							break;
+						case CSpecialItemGroup::MOB_GROUP:
+							break;
+						}
+					}
+				}
+				else
+				{
+					ChatPacket(CHAT_TYPE_TALKING, LC_TEXT("lCa«°Íµ?lnR?L?lrlú¨R??."));
+					return false;
+				}
+			}
+			break;
+#endif
+
 		case ITEM_NONE:
 			sys_err("Item type NONE %s", item->GetName());
 			break;
@@ -6154,8 +7201,8 @@ bool CHARACTER::UseItem(TItemPos Cell, TItemPos DestCell)
 {
 	WORD wCell = Cell.cell;
 	BYTE window_type = Cell.window_type;
-	WORD wDestCell = DestCell.cell;
-	BYTE bDestInven = DestCell.window_type;
+	//WORD wDestCell = DestCell.cell;
+	//BYTE bDestInven = DestCell.window_type;
 	LPITEM item;
 
 	if (!CanHandleItem())
@@ -6163,8 +7210,6 @@ bool CHARACTER::UseItem(TItemPos Cell, TItemPos DestCell)
 
 	if (!IsValidItemPosition(Cell) || !(item = GetItem(Cell)))
 			return false;
-
-	sys_log(0, "%s: USE_ITEM %s (inven %d, cell: %d)", GetName(), item->GetName(), window_type, wCell);
 
 	if (item->IsExchanging())
 		return false;
@@ -6345,6 +7390,60 @@ bool CHARACTER::UseItem(TItemPos Cell, TItemPos DestCell)
 	}
 #endif
 
+	// @fixme150 BEGIN
+	if (quest::CQuestManager::instance().GetPCForce(GetPlayerID())->IsRunning() == true)
+	{
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You cannot use this item if you're using quests"));
+		return false;
+	}
+	// @fixme150 END
+
+#ifdef ENABLE_PASSIVE_SYSTEM
+	if (item->GetVnum() == 100100 || item->GetVnum() == 100101)
+	{
+		LPITEM pkRelic = GetWear(WEAR_PASSIVE);
+		if (!pkRelic)
+		{
+			ChatPacket(CHAT_TYPE_INFO, "Equip a relic first.");
+			return false;
+		}
+
+		const int iSuccessChance = (item->GetVnum() == 100101) ? 100 : 30;
+		const int iEmptyPos = GetEmptyInventory(pkRelic->GetSize());
+		if (iEmptyPos < 0)
+		{
+			LocaleChatPacket(CHAT_TYPE_INFO, 191, "");
+			return false;
+		}
+
+		if (item->GetCount() > 0)
+			item->SetCount(item->GetCount() - 1);
+
+		if (pkRelic->GetSocket(1) != 0)
+		{
+			pkRelic->ModifyPoints(false);
+			pkRelic->SetSocket(1, 0);
+			RemoveAffect(AFFECT_PASSIVE_RELIC_STONE_DEF);
+			RemoveAffect(AFFECT_PASSIVE_RELIC_DISMOUNT_SPEED);
+			ComputeBattlePoints();
+			UpdatePacket();
+		}
+
+		if (number(1, 100) > iSuccessChance)
+		{
+			pkRelic->RemoveFromCharacter();
+			pkRelic->SetCount(0);
+			ChatPacket(CHAT_TYPE_INFO, "Relic extraction failed. The relic was destroyed.");
+			return true;
+		}
+
+		pkRelic->RemoveFromCharacter();
+		pkRelic->AddToCharacter(this, TItemPos(INVENTORY, iEmptyPos));
+		ChatPacket(CHAT_TYPE_INFO, "Relic extraction succeeded.");
+		return true;
+	}
+#endif
+
 	if (IS_SET(item->GetFlag(), ITEM_FLAG_LOG))
 	{
 		DWORD vid = item->GetVID();
@@ -6359,11 +7458,6 @@ bool CHARACTER::UseItem(TItemPos Cell, TItemPos DestCell)
 
 		bool ret = UseItemEx(item, DestCell);
 
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-		if (ret and item->GetType() == ITEM_USE or ret and item->GetType() == ITEM_SKILLBOOK or ret and item->GetType() == ITEM_GIFTBOX)
-			UpdateExtBattlePassMissionProgress(BP_ITEM_USE, 1, item->GetVnum());
-#endif
-
 		if (NULL == ITEM_MANAGER::instance().FindByVID(vid))
 		{
 			LogManager::instance().ItemLog(this, vid, vnum, "REMOVE", hint);
@@ -6373,21 +7467,14 @@ bool CHARACTER::UseItem(TItemPos Cell, TItemPos DestCell)
 			snprintf(hint + len, sizeof(hint) - len, " %u", oldCount - 1);
 			LogManager::instance().ItemLog(this, vid, vnum, "USE_ITEM", hint);
 		}
-		return (ret);
+
+		return ret;
 	}
 	else
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
 	{
 		bool ret = UseItemEx(item, DestCell);
-
-		if (ret and item->GetType() == ITEM_USE or ret and item->GetType() == ITEM_SKILLBOOK or ret and item->GetType() == ITEM_GIFTBOX)
-			UpdateExtBattlePassMissionProgress(BP_ITEM_USE, 1, item->GetVnum());
-
-		return (ret);
+		return ret;
 	}
-#else
-		return UseItemEx(item, DestCell);
-#endif
 }
 
 #ifdef ENABLE_STACK_LIMIT
@@ -6396,7 +7483,7 @@ bool CHARACTER::DropItem(TItemPos Cell, WORD bCount)
 bool CHARACTER::DropItem(TItemPos Cell, BYTE bCount)
 #endif
 {
-	LPITEM item = NULL; 
+	LPITEM item = NULL;
 
 	if (!CanHandleItem())
 	{
@@ -6456,6 +7543,7 @@ bool CHARACTER::DropItem(TItemPos Cell, BYTE bCount)
 
 		pkItemToDrop = ITEM_MANAGER::instance().CreateItem(item->GetVnum(), bCount);
 
+		// copy item socket -- by mhh
 		FN_copy_item_socket(pkItemToDrop, item);
 
 		char szBuf[51 + 1];
@@ -6631,6 +7719,9 @@ bool CHARACTER::SellItem(TItemPos Cell)
 
 	item->SetCount(item->GetCount() - item->GetCount());
 	PointChange(POINT_GOLD, dwPrice, false);
+#ifndef ENABLE_RANKING
+	SetRankPoints(10, GetRankPoints(10) + dwPrice);
+#endif
 
 	char buf[1024];
 	char itemlink[256];
@@ -6659,6 +7750,7 @@ bool CHARACTER::SellItem(TItemPos Cell)
 
 bool CHARACTER::DropGold(int gold)
 {
+#ifdef ENABLE_DROP_GOLD
 	if (gold <= 0 || gold > GetGold())
 		return false;
 
@@ -6667,7 +7759,7 @@ bool CHARACTER::DropGold(int gold)
 
 	if (0 != g_GoldDropTimeLimitValue)
 	{
-		if (get_dword_time() < m_dwLastGoldDropTime+g_GoldDropTimeLimitValue)
+		if (get_dword_time() < m_dwLastGoldDropTime + g_GoldDropTimeLimitValue)
 		{
 			LocaleChatPacket(CHAT_TYPE_INFO, 313, "");
 			return false;
@@ -6680,22 +7772,26 @@ bool CHARACTER::DropGold(int gold)
 
 	if (item)
 	{
-		PIXEL_POSITION pos = GetXYZ();
+		const PIXEL_POSITION pos = GetXYZ();
 
 		if (item->AddToGround(GetMapIndex(), pos))
 		{
+			//Motion(MOTION_PICKUP);
 			PointChange(POINT_GOLD, -gold, true);
 
-			if (gold > 1000)
+			if (gold > DROPABLE_GOLD_LIMIT) // Records over 1,000 won.
 				LogManager::instance().CharLog(this, gold, "DROP_GOLD", "");
 
-			item->StartDestroyEvent(150);
+			item->StartDestroyEvent();
 			LocaleChatPacket(CHAT_TYPE_INFO, 511, "%d", 150/60);
 		}
 
 		Save();
 		return true;
 	}
+#else
+	ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You can't drop gold."));
+#endif
 
 	return false;
 }
@@ -6785,6 +7881,39 @@ bool CHARACTER::MoveItem(TItemPos Cell, TItemPos DestCell, BYTE count)
 		LocaleChatPacket(CHAT_TYPE_INFO, 512, "");
 		return false;
 	}
+
+	// Güvenlik: SwitchBot'tan Special Inventory'ye transfer engeli (Item Duplication önleme)
+#ifdef ENABLE_SPECIAL_INVENTORY
+	if (Cell.IsSwitchbotPosition())
+	{
+		if (DestCell.IsSkillBookInventoryPosition() ||
+			DestCell.IsUpgradeItemsInventoryPosition() ||
+			DestCell.IsStoneInventoryPosition() ||
+			DestCell.IsGiftBoxInventoryPosition() ||
+			DestCell.IsChangersInventoryPosition())
+		{
+			sys_err("[SECURITY] Player %s (PID:%u) attempted to transfer item from SwitchBot to Special Inventory (Cell:%u, DestCell:%u, ItemID:%u). Item duplication prevented.",
+				GetName(), GetPlayerID(), Cell.cell, DestCell.cell, item->GetID());
+			LocaleChatPacket(CHAT_TYPE_INFO, 78, "");
+			return false;
+		}
+	}
+
+	if (DestCell.IsSwitchbotPosition())
+	{
+		if (Cell.IsSkillBookInventoryPosition() ||
+			Cell.IsUpgradeItemsInventoryPosition() ||
+			Cell.IsStoneInventoryPosition() ||
+			Cell.IsGiftBoxInventoryPosition() ||
+			Cell.IsChangersInventoryPosition())
+		{
+			sys_err("[SECURITY] Player %s (PID:%u) attempted to transfer item from Special Inventory to SwitchBot (Cell:%u, DestCell:%u, ItemID:%u). Item duplication prevented.",
+				GetName(), GetPlayerID(), Cell.cell, DestCell.cell, item->GetID());
+			LocaleChatPacket(CHAT_TYPE_INFO, 78, "");
+			return false;
+		}
+	}
+#endif
 #endif
 
 #ifdef ENABLE_SPECIAL_INVENTORY
@@ -6929,7 +8058,9 @@ bool CHARACTER::MoveItem(TItemPos Cell, TItemPos DestCell, BYTE count)
 
 		LPITEM item2;
 
-		if ((item2 = GetItem(DestCell)) && item != item2 && item2->IsStackable() && !IS_SET(item2->GetAntiFlag(), ITEM_ANTIFLAG_STACK) && item2->GetVnum() == item->GetVnum())
+		if ((item2 = GetItem(DestCell)) && item != item2 && item2->IsStackable() &&
+				!IS_SET(item2->GetAntiFlag(), ITEM_ANTIFLAG_STACK) &&
+				item2->GetVnum() == item->GetVnum())
 		{
 			for (int i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
 				if (item2->GetSocket(i) != item->GetSocket(i))
@@ -6981,17 +8112,13 @@ bool CHARACTER::MoveItem(TItemPos Cell, TItemPos DestCell, BYTE count)
 				quest::CQuestManager::instance().UseItem(GetPlayerID(), item, false);
 #endif
 
-#ifdef ENABLE_TITLE_SYSTEM
-			if(ITEM_TITLE == item->GetType())
-				quest::CQuestManager::instance().UseItem(GetPlayerID(), item, false);
-#endif
-
 			if (INVENTORY == Cell.window_type && INVENTORY == DestCell.window_type)
 				SyncQuickslot(QUICKSLOT_TYPE_ITEM, Cell.cell, DestCell.cell);
 		}
 		else if (count < item->GetCount())
 		{
-			sys_log(0, "%s: ITEM_SPLIT %s (window: %d, cell : %d) -> (window:%d, cell %d) count %d", GetName(), item->GetName(), Cell.window_type, Cell.cell, DestCell.window_type, DestCell.cell, count);
+			sys_log(0, "%s: ITEM_SPLIT %s (window: %d, cell : %d) -> (window:%d, cell %d) count %d", GetName(), item->GetName(), Cell.window_type, Cell.cell, 
+				DestCell.window_type, DestCell.cell, count);
 
 			item->SetCount(item->GetCount() - count);
 			LPITEM item2 = ITEM_MANAGER::instance().CreateItem(item->GetVnum(), count);
@@ -7073,6 +8200,33 @@ namespace NPartyPickupDistribute
 				}
 		}
 	};
+
+#ifdef ENABLE_GAYA_SYSTEM
+	struct FGemDistributor
+	{
+		int		total;
+		LPCHARACTER	c;
+		int		x, y;
+		int		iGem;
+
+		FGemDistributor(LPCHARACTER center, int iGem)
+			: total(0), c(center), x(center->GetX()), y(center->GetY()), iGem(iGem)
+		{
+		}
+
+		void operator ()(LPCHARACTER ch)
+		{
+			if (ch != c)
+				if (DISTANCE_APPROX(ch->GetX() - x, ch->GetY() - y) <= PARTY_DEFAULT_RANGE)
+				{
+					ch->PointChange(POINT_GEM, iGem, true);
+
+					if (iGem > 1000)
+						LogManager::instance().CharLog(ch, iGem, "GET_GEM", "");
+				}
+		}
+	};
+#endif
 }
 
 #ifdef ENABLE_GOLD_LIMIT
@@ -7093,6 +8247,8 @@ void CHARACTER::GiveGold(int iAmount)
 	if (GetParty())
 	{
 		LPPARTY pParty = GetParty();
+		if (!pParty)
+			return;
 
 #ifdef ENABLE_GOLD_LIMIT
 		long long dwTotal = iAmount;
@@ -7103,7 +8259,7 @@ void CHARACTER::GiveGold(int iAmount)
 #endif
 
 		NPartyPickupDistribute::FCountNearMember funcCountNearMember(this);
-		pParty->ForEachOnMapMember(funcCountNearMember, GetMapIndex());
+		pParty->ForEachOnMapMember(funcCountNearMember, GetMapIndex());	//@fixme522
 
 		if (funcCountNearMember.total > 1)
 		{
@@ -7111,34 +8267,79 @@ void CHARACTER::GiveGold(int iAmount)
 			dwMyAmount -= dwShare * (funcCountNearMember.total - 1);
 
 			NPartyPickupDistribute::FMoneyDistributor funcMoneyDist(this, dwShare);
-
-			pParty->ForEachOnMapMember(funcMoneyDist, GetMapIndex());
+			pParty->ForEachOnMapMember(funcMoneyDist, GetMapIndex());	//@fixme522
 		}
 
 		PointChange(POINT_GOLD, dwMyAmount, true);
 
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-		UpdateExtBattlePassMissionProgress(YANG_COLLECT, dwMyAmount, GetMapIndex());
-#endif
-
-		if (dwMyAmount > 1000)
+		if (dwMyAmount > 1000) // Records over 1,000 won.
 			LogManager::instance().CharLog(this, dwMyAmount, "GET_GOLD", "");
 	}
 	else
 	{
 		PointChange(POINT_GOLD, iAmount, true);
 
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-		UpdateExtBattlePassMissionProgress(YANG_COLLECT, iAmount, GetMapIndex());
-#endif
-
 		if (iAmount > 1000)
 			LogManager::instance().CharLog(this, iAmount, "GET_GOLD", "");
 	}
 }
 
+#ifdef ENABLE_GAYA_SYSTEM
+void CHARACTER::GiveGem(int iAmount)
+{
+	if (iAmount <= 0)
+		return;
+
+	sys_log(0, "GIVE_GEM: %s %lld", GetName(), iAmount);
+
+	if (GetParty())
+	{
+		LPPARTY pParty = GetParty();
+
+		DWORD dwTotal = iAmount;
+		DWORD dwMyAmount = dwTotal;
+
+		NPartyPickupDistribute::FCountNearMember funcCountNearMember(this);
+		pParty->ForEachOnlineMember(funcCountNearMember);
+
+		if (funcCountNearMember.total > 1)
+		{
+			DWORD dwShare = dwTotal / funcCountNearMember.total;
+			dwMyAmount -= dwShare * (funcCountNearMember.total - 1);
+
+			NPartyPickupDistribute::FGemDistributor funcGemDist(this, dwShare);
+
+			pParty->ForEachOnlineMember(funcGemDist);
+		}
+
+		PointChange(POINT_GEM, dwMyAmount, true);
+
+		if (dwMyAmount > 1000)
+			LogManager::instance().CharLog(this, dwMyAmount, "GET_GEM", "");
+	}
+	else
+	{
+		PointChange(POINT_GEM, iAmount, true);
+
+		if (LC_IsBrazil() == true)
+		{
+			if (iAmount >= 213)
+				LogManager::instance().CharLog(this, iAmount, "GET_GEM", "");
+		}
+		else
+		{
+			if (iAmount > 1000)
+				LogManager::instance().CharLog(this, iAmount, "GET_GEM", "");
+		}
+	}
+}
+#endif
+
 bool CHARACTER::PickupItem(DWORD dwVID)
 {
+	if (IsPC() && IsDead())// @fixme243
+		return false;
+
 	LPITEM item = ITEM_MANAGER::instance().FindByVID(dwVID);
 
 	if (IsObserverMode())
@@ -7149,6 +8350,16 @@ bool CHARACTER::PickupItem(DWORD dwVID)
 
 	if (item->DistanceValid(this))
 	{
+		// @fixme150 BEGIN
+		if (item->GetType() == ITEM_QUEST)
+		{
+			if (quest::CQuestManager::instance().GetPCForce(GetPlayerID())->IsRunning() == true)
+			{
+				ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You cannot pickup this item if you're using quests"));
+				return false;
+			}
+		}
+		// @fixme150 END
 		if (item->IsOwnership(this))
 		{
 
@@ -7167,6 +8378,10 @@ bool CHARACTER::PickupItem(DWORD dwVID)
 			{
 				GiveGold(item->GetCount());
 				item->RemoveFromGround();
+#ifndef ENABLE_RANKING
+				SetRankPoints(10, GetRankPoints(10) + item->GetCount());
+#endif
+
 				M2_DESTROY_ITEM(item);
 
 				Save();
@@ -7406,7 +8621,7 @@ bool CHARACTER::PickupItem(DWORD dwVID)
 				else
 					item->AddToCharacter(this, TItemPos(INVENTORY, iEmptyCell));
 
-				char szHint[32+1];
+				char szHint[32 + 1];
 				snprintf(szHint, sizeof(szHint), "%s %u %u", item->GetName(), item->GetCount(), item->GetOriginalVnum());
 				LogManager::instance().ItemLog(this, item, "GET", szHint);
 #ifdef ENABLE_RENEWAL_SPECIAL_CHAT
@@ -7419,16 +8634,19 @@ bool CHARACTER::PickupItem(DWORD dwVID)
 					quest::CQuestManager::instance().PickupItem (GetPlayerID(), item);
 			}
 
+			//Motion(MOTION_PICKUP);
 			return true;
 		}
 		else if (!IS_SET(item->GetAntiFlag(), ITEM_ANTIFLAG_GIVE | ITEM_ANTIFLAG_DROP) && GetParty())
 		{
+			// If you want to give another party member ownership item
 			NPartyPickupDistribute::FFindOwnership funcFindOwnership(item);
-
-			GetParty()->ForEachOnMapMember(funcFindOwnership, GetMapIndex());
+			GetParty()->ForEachOnMapMember(funcFindOwnership, GetMapIndex());	//@fixme522
 
 			LPCHARACTER owner = funcFindOwnership.owner;
-
+			// @fixme115
+			if (!owner)
+				return false;
 			int iEmptyCell;
 
 			if (item->IsDragonSoul())
@@ -7577,17 +8795,22 @@ bool CHARACTER::SwapItem(UINT bCell, UINT bDestCell)
 
 	TItemPos srcCell(INVENTORY, bCell), destCell(INVENTORY, bDestCell);
 
+	// Check for correct cell
+	// Dragon Spirit Stone cannot be swapped, so it gets stuck here.
+	//if (wCell >= INVENTORY_MAX_NUM + WEAR_MAX_NUM || wDestCell >= INVENTORY_MAX_NUM + WEAR_MAX_NUM)
 	if (srcCell.IsDragonSoulEquipPosition() || destCell.IsDragonSoulEquipPosition())
 		return false;
 
 	if (bCell == bDestCell)
 		return false;
 
+	// If both are in the equipment window, you cannot swap.
 	if (srcCell.IsEquipPosition() && destCell.IsEquipPosition())
 		return false;
 
 	LPITEM item1, item2;
 
+	// so that item2 is in the equipment window.
 	if (srcCell.IsEquipPosition())
 	{
 		item1 = GetInventoryItem(bDestCell);
@@ -7608,18 +8831,33 @@ bool CHARACTER::SwapItem(UINT bCell, UINT bDestCell)
 		return false;
 	}
 
+	// Check if item2 can enter the wCell location.
 	if (!IsEmptyItemGrid(TItemPos (INVENTORY, item1->GetCell()), item2->GetSize(), item1->GetCell()))
+	{
+#ifdef ENABLE_FIX_SWAP_ITEM
+		if (TItemPos(EQUIPMENT, item2->GetCell()).IsEquipPosition())
+		{
+			int iEquipCell = item2->GetCell() - INVENTORY_MAX_NUM;
+			if (UnequipItem(item2))
+				return EquipItem(item1, iEquipCell);
+		}
 		return false;
+#else
+		return false;
+#endif
+    }
 
+	// If the item to be changed is in the equipment window
 	if (TItemPos(EQUIPMENT, item2->GetCell()).IsEquipPosition())
 	{
 		BYTE bEquipCell = item2->GetCell() - INVENTORY_MAX_NUM;
 		BYTE bInvenCell = item1->GetCell();
 
+		// The item being worn can be removed, and the item to be worn must be in a wearable state.
 		if (false == CanUnequipNow(item2) || false == CanEquipNow(item1))
 			return false;
 
-		if (bEquipCell != item1->FindEquipCell(this))
+		if (bEquipCell != item1->FindEquipCell(this)) // Allowed only in the same location
 			return false;
 
 #ifdef ENABLE_MOUNT_SYSTEM
@@ -7632,15 +8870,10 @@ bool CHARACTER::SwapItem(UINT bCell, UINT bDestCell)
 			quest::CQuestManager::instance().UseItem(GetPlayerID(), item2, false);
 #endif
 
-#ifdef ENABLE_TITLE_SYSTEM
-		if(ITEM_TITLE == item2->GetType())
-			quest::CQuestManager::instance().UseItem(GetPlayerID(), item2, false);
-#endif
-
 		item2->RemoveFromCharacter();
 
 #ifdef ENABLE_ITEM_SWAP_FIX
-		if (item1->EquipTo(this, bEquipCell)) 
+		if (item1->EquipTo(this, bEquipCell))
 		{
 #ifdef ENABLE_PICKUP_ITEM_EFFECT
 			item2->AddToCharacter(this, TItemPos(INVENTORY, bInvenCell), false);
@@ -7733,11 +8966,6 @@ bool CHARACTER::UnequipItem(LPITEM item)
 
 #ifdef ENABLE_PET_SYSTEM
 	if(ITEM_PET == item->GetType())
-		quest::CQuestManager::instance().UseItem(GetPlayerID(), item, false);
-#endif
-
-#ifdef ENABLE_TITLE_SYSTEM
-	if(ITEM_TITLE == item->GetType())
 		quest::CQuestManager::instance().UseItem(GetPlayerID(), item, false);
 #endif
 
@@ -7981,6 +9209,59 @@ bool CHARACTER::EquipItem(LPITEM item, int iCandidateCell)
 		{
 			this->EffectPacket(SE_EQUIP_LOVE_PENDANT);
 		}
+#ifdef ENABLE_PASSIVE_SYSTEM
+		else if (true == CItemVnumHelper::IsPassive(dwVnum))
+		{
+			this->EffectPacket(SE_PASSIVE_EFFECT);
+			this->SpecificEffectPacket("d:/ymir work/effect/etc/buff/buff_passive_01.mse");
+		}
+#endif
+#ifdef ENABLE_EQUIPMENT_HAND_EFFECT
+		else if (item->GetVnum() == 72703)
+			SpecificEffectPacket("d:/ymir work/effect/etc/buff/kemikeff/buff_kaplan_kemigi_kupe_1.mse");
+		else if (item->GetVnum() == 727003)
+			SpecificEffectPacket("d:/ymir work/effect/etc/buff/kemikeff/buff_kaplan_kemigi_kupe_1.mse");
+		else if (item->GetVnum() == 727005)
+			SpecificEffectPacket("d:/ymir work/effect/etc/buff/kemikeff/buff_kaplan_kemigi_kupe_2.mse");
+		else if (item->GetVnum() == 727007)
+			SpecificEffectPacket("d:/ymir work/effect/etc/buff/kemikeff/buff_kaplan_kemigi_kupe_3.mse");
+		else if (item->GetVnum() == 72704)
+			SpecificEffectPacket("d:/ymir work/effect/etc/buff/kemikeff/buff_ejder_kemigi_kupe_1.mse");
+		else if (item->GetVnum() == 727004)
+			SpecificEffectPacket("d:/ymir work/effect/etc/buff/kemikeff/buff_ejder_kemigi_kupe_1.mse");
+		else if (item->GetVnum() == 727006)
+			SpecificEffectPacket("d:/ymir work/effect/etc/buff/kemikeff/buff_ejder_kemigi_kupe_2.mse");
+		else if (item->GetVnum() == 727008)
+			SpecificEffectPacket("d:/ymir work/effect/etc/buff/kemikeff/buff_ejder_kemigi_kupe_3.mse");
+		else if (item->GetVnum() == 727009)
+			SpecificEffectPacket("d:/ymir work/effect/etc/buff/kemikeff/buff_kaplan_kemik_bileklik_1.mse");
+		else if (item->GetVnum() == 72705)
+			SpecificEffectPacket("d:/ymir work/effect/etc/buff/kemikeff/buff_kaplan_kemik_bileklik_1.mse");
+		else if (item->GetVnum() == 727015)
+			SpecificEffectPacket("d:/ymir work/effect/etc/buff/kemikeff/buff_kaplan_kemik_bileklik_1.mse");
+		else if (item->GetVnum() == 727011)
+			SpecificEffectPacket("d:/ymir work/effect/etc/buff/kemikeff/buff_kaplan_kemik_bileklik_2.mse");
+		else if (item->GetVnum() == 727017)
+			SpecificEffectPacket("d:/ymir work/effect/etc/buff/kemikeff/buff_kaplan_kemik_bileklik_2.mse");
+		else if (item->GetVnum() == 727013)
+			SpecificEffectPacket("d:/ymir work/effect/etc/buff/kemikeff/buff_kaplan_kemik_bileklik_3.mse");
+		else if (item->GetVnum() == 727019)
+			SpecificEffectPacket("d:/ymir work/effect/etc/buff/kemikeff/buff_kaplan_kemik_bileklik_3.mse");
+		else if (item->GetVnum() == 727010)
+			SpecificEffectPacket("d:/ymir work/effect/etc/buff/kemikeff/buff_ejder_kemik_bilezik_1.mse");
+		else if (item->GetVnum() == 72706)
+			SpecificEffectPacket("d:/ymir work/effect/etc/buff/kemikeff/buff_ejder_kemik_bilezik_1.mse");
+		else if (item->GetVnum() == 727016)
+			SpecificEffectPacket("d:/ymir work/effect/etc/buff/kemikeff/buff_ejder_kemik_bilezik_1.mse");
+		else if (item->GetVnum() == 727012)
+			SpecificEffectPacket("d:/ymir work/effect/etc/buff/kemikeff/buff_ejder_kemik_bilezik_2.mse");
+		else if (item->GetVnum() == 727018)
+			SpecificEffectPacket("d:/ymir work/effect/etc/buff/kemikeff/buff_ejder_kemik_bilezik_2.mse");
+		else if (item->GetVnum() == 727014)
+			SpecificEffectPacket("d:/ymir work/effect/etc/buff/kemikeff/buff_ejder_kemik_bilezik_3.mse");
+		else if (item->GetVnum() == 727020)
+			SpecificEffectPacket("d:/ymir work/effect/etc/buff/kemikeff/buff_ejder_kemik_bilezik_3.mse");
+#endif
 		else if (ITEM_UNIQUE == item->GetType() && 0 != item->GetSIGVnum())
 		{
 			const CSpecialItemGroup* pGroup = ITEM_MANAGER::instance().GetSpecialItemGroup(item->GetSIGVnum());
@@ -8016,11 +9297,6 @@ bool CHARACTER::EquipItem(LPITEM item, int iCandidateCell)
 #ifdef ENABLE_ACCE_COSTUME_SYSTEM
 		else if ((item->GetType() == ITEM_COSTUME) && (item->GetSubType() == COSTUME_ACCE))
 			this->EffectPacket(SE_EFFECT_ACCE_EQUIP);
-#endif
-
-#ifdef ENABLE_TITLE_SYSTEM
-		else if(ITEM_TITLE == item->GetType())
-			quest::CQuestManager::instance().UseItem(GetPlayerID(), item, false);
 #endif
 	}
 
@@ -8465,7 +9741,7 @@ void CHARACTER::AutoGiveItem(LPITEM item, bool longOwnerShip)
 		sys_err ("NULL point.");
 		return;
 	}
-	
+
 	// Güvenlik: Ölü, stun veya NPC karakterlere item verilemez
 	if (IsDead() || IsStun() || !IsPC())
 	{
@@ -9005,20 +10281,22 @@ LPITEM CHARACTER::AutoGiveItem(DWORD dwItemVnum, BYTE bCount, int iRarePct, bool
 
 	if (item->GetType() == ITEM_BLEND)
 	{
-		if (item->IsStackable())
+		for (int i=0; i < INVENTORY_AND_EQUIP_SLOT_MAX; i++)
 		{
-			for (int i=0; i < INVENTORY_MAX_NUM; i++)
+			LPITEM inv_item = GetInventoryItem(i);
+
+			if (inv_item == NULL) continue;
+
+			if (inv_item->GetType() == ITEM_BLEND)
 			{
-				LPITEM inv_item = GetInventoryItem(i);
-
-				if (inv_item == NULL) continue;
-
-				if (inv_item->GetType() == ITEM_BLEND && inv_item->GetVnum() == item->GetVnum())
+				if (inv_item->GetVnum() == item->GetVnum())
 				{
-					const DWORD dwTotalCount = inv_item->GetCount() + item->GetCount();
-					if (dwTotalCount <= ITEM_MAX_COUNT && FN_compare_item_socket(inv_item, item))
+					if (inv_item->GetSocket(0) == item->GetSocket(0) &&
+						inv_item->GetSocket(1) == item->GetSocket(1) &&
+						inv_item->GetSocket(2) == item->GetSocket(2) &&
+						inv_item->GetCount() < ITEM_MAX_COUNT)
 					{
-						inv_item->SetCount(dwTotalCount);
+						inv_item->SetCount(inv_item->GetCount() + item->GetCount());
 						M2_DESTROY_ITEM(item);
 						return inv_item;
 					}
@@ -9029,7 +10307,9 @@ LPITEM CHARACTER::AutoGiveItem(DWORD dwItemVnum, BYTE bCount, int iRarePct, bool
 
 	int iEmptyCell;
 	if (item->IsDragonSoul())
+	{
 		iEmptyCell = GetEmptyDragonSoulInventory(item);
+	}
 #ifdef ENABLE_SPECIAL_INVENTORY
 	else if (item->IsSkillBook())
 		iEmptyCell = GetEmptySkillBookInventory(item->GetSize());
@@ -9121,7 +10401,6 @@ LPITEM CHARACTER::AutoGiveItem(DWORD dwItemVnum, BYTE bCount, int iRarePct, bool
 		else
 			item->SetOwnership(this, 60);
 		LogManager::instance().ItemLog(this, item, "SYSTEM_DROP", item->GetName());
-		sys_log(0, "AutoGiveItem: %s inventory full, dropping item %u (count: %u) to ground", GetName(), dwItemVnum, bCount);
 	}
 
 	sys_log(0, 
@@ -9133,6 +10412,14 @@ bool CHARACTER::GiveItem(LPCHARACTER victim, TItemPos Cell)
 {
 	if (!CanHandleItem())
 		return false;
+
+	// @fixme150 BEGIN
+	if (quest::CQuestManager::instance().GetPCForce(GetPlayerID())->IsRunning() == true)
+	{
+		ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You cannot take this item if you're using quests"));
+		return false;
+	}
+	// @fixme150 END
 
 	LPITEM item = GetItem(Cell);
 
@@ -9153,8 +10440,10 @@ bool CHARACTER::CanReceiveItem(LPCHARACTER from, LPITEM item) const
 	if (IsPC())
 		return false;
 
+	// TOO_LONG_DISTANCE_EXCHANGE_BUG_FIX
 	if (DISTANCE_APPROX(GetX() - from->GetX(), GetY() - from->GetY()) > 2000)
 		return false;
+	// END_OF_TOO_LONG_DISTANCE_EXCHANGE_BUG_FIX
 
 	switch (GetRaceNum())
 	{
@@ -9169,6 +10458,7 @@ bool CHARACTER::CanReceiveItem(LPCHARACTER from, LPITEM item) const
 				return true;
 			break;
 
+			// BUILDING_NPC
 		case BLACKSMITH_WEAPON_MOB:
 		case DEVILTOWER_BLACKSMITH_WEAPON_MOB:
 			if (item->GetType() == ITEM_WEAPON && 
@@ -9201,6 +10491,7 @@ bool CHARACTER::CanReceiveItem(LPCHARACTER from, LPITEM item) const
 			else
 				return false;
 			break;
+			// END_OF_BUILDING_NPC
 
 		case BLACKSMITH_MOB:
 			if (item->GetRefinedVnum() && item->GetRefineSet() < 500)
@@ -9230,6 +10521,7 @@ bool CHARACTER::CanReceiveItem(LPCHARACTER from, LPITEM item) const
 		case 20101:
 		case 20102:
 		case 20103:
+
 			if (item->GetVnum() == ITEM_REVIVE_HORSE_1)
 			{
 				if (!IsDead())
@@ -9256,6 +10548,7 @@ bool CHARACTER::CanReceiveItem(LPCHARACTER from, LPITEM item) const
 		case 20104:
 		case 20105:
 		case 20106:
+
 			if (item->GetVnum() == ITEM_REVIVE_HORSE_2)
 			{
 				if (!IsDead())
@@ -9358,11 +10651,68 @@ void CHARACTER::ReceiveItem(LPCHARACTER from, LPITEM item)
 				fishing::Grill(from, item);
 			else
 			{
+				// TAKE_ITEM_BUG_FIX
 				from->SetQuestNPCID(GetVID());
+				// END_OF_TAKE_ITEM_BUG_FIX
 				quest::CQuestManager::instance().TakeItem(from->GetPlayerID(), GetRaceNum(), item);
 			}
 			break;
 
+#ifdef ENABLE_QUEEN_NETHIS
+	case SnakeLair::PILAR_STEP_4:
+	{
+		if (from->IsPC())
+		{
+			if (SnakeLair::CSnk::instance().IsSnakeMap(from->GetMapIndex()))
+				if (item || from || this)
+					SnakeLair::CSnk::instance().OnKillPilar(item, from, this);
+		}
+	}
+	break;
+
+	case SnakeLair::BLACKSMITH_5:
+	{
+		if (from->IsPC())
+		{
+			if (SnakeLair::CSnk::instance().IsSnakeMap(from->GetMapIndex()))
+				if (item || from || this)
+					SnakeLair::CSnk::instance().OnKillBlackSmith(item, from, this);
+		}
+	}
+	break;
+
+	case SnakeLair::SNAKE_STATUE1:
+	case SnakeLair::SNAKE_STATUE2:
+	case SnakeLair::SNAKE_STATUE3:
+	case SnakeLair::SNAKE_STATUE4:
+	{
+		if (from->IsPC())
+		{
+			if (SnakeLair::CSnk::instance().IsSnakeMap(from->GetMapIndex()))
+				if (item || from || this)
+					SnakeLair::CSnk::instance().OnStatueSetRotation(item, from, this);
+		}
+	}
+	break;
+
+	case SnakeLair::VNUM_BLACKSMITH_SERPENT:
+	{
+#ifdef ENABLE_GLOVE_SYSTEM
+		if (item->GetType() == ITEM_ARMOR && item->GetSubType() == ARMOR_GLOVE)
+		{
+			from->SetRefineNPC(this);
+			from->RefineInformation(item->GetCell(), REFINE_TYPE_MONEY_ONLY);
+		}
+		else
+#endif
+		{
+			from->ChatPacket(CHAT_TYPE_INFO, "[LS;1002]");
+		}
+	}
+	break;
+#endif
+
+		// DEVILTOWER_NPC
 		case DEVILTOWER_BLACKSMITH_WEAPON_MOB:
 		case DEVILTOWER_BLACKSMITH_ARMOR_MOB:
 		case DEVILTOWER_BLACKSMITH_ACCESSORY_MOB:
@@ -9376,6 +10726,7 @@ void CHARACTER::ReceiveItem(LPCHARACTER from, LPITEM item)
 				from->LocaleChatPacket(CHAT_TYPE_INFO, 409, "");
 			}
 			break;
+			// END_OF_DEVILTOWER_NPC
 
 		case BLACKSMITH_MOB:
 		case BLACKSMITH2_MOB:
@@ -9402,13 +10753,17 @@ void CHARACTER::ReceiveItem(LPCHARACTER from, LPITEM item)
 		case 20107:
 		case 20108:
 		case 20109:
-			if (item->GetVnum() == ITEM_REVIVE_HORSE_1 || item->GetVnum() == ITEM_REVIVE_HORSE_2 || item->GetVnum() == ITEM_REVIVE_HORSE_3)
+			if (item->GetVnum() == ITEM_REVIVE_HORSE_1 ||
+					item->GetVnum() == ITEM_REVIVE_HORSE_2 ||
+					item->GetVnum() == ITEM_REVIVE_HORSE_3)
 			{
 				from->ReviveHorse();
 				item->SetCount(item->GetCount()-1);
 				from->LocaleChatPacket(CHAT_TYPE_INFO, 516, "");
 			}
-			else if (item->GetVnum() == ITEM_HORSE_FOOD_1 || item->GetVnum() == ITEM_HORSE_FOOD_2 || item->GetVnum() == ITEM_HORSE_FOOD_3)
+			else if (item->GetVnum() == ITEM_HORSE_FOOD_1 ||
+					item->GetVnum() == ITEM_HORSE_FOOD_2 ||
+					item->GetVnum() == ITEM_HORSE_FOOD_3)
 			{
 				from->FeedHorse();
 				from->LocaleChatPacket(CHAT_TYPE_INFO, 517, "");
@@ -9504,6 +10859,7 @@ bool CHARACTER::IsEquipUniqueGroup(DWORD dwGroupVnum) const
 
 	return false;
 }
+// END_OF_CHECK_UNIQUE_GROUP
 
 void CHARACTER::SetRefineMode(int iAdditionalCell)
 {
@@ -9524,7 +10880,7 @@ bool CHARACTER::GiveItemFromSpecialItemGroup(DWORD dwGroupNum, std::vector<DWORD
 
 	if (!pGroup)
 	{
-		sys_err("cannot find special item group %d", dwGroupNum);
+		//sys_err("cannot find special item group %d", dwGroupNum);
 		return false;
 	}
 
@@ -9637,6 +10993,7 @@ bool CHARACTER::GiveItemFromSpecialItemGroup(DWORD dwGroupNum, std::vector<DWORD
 	return bSuccess;
 }
 
+// NEW_HAIR_STYLE_ADD
 bool CHARACTER::ItemProcess_Hair(LPITEM item, int iDestCell)
 {
 	if (item->CheckItemUseLevel(GetLevel()) == false)
@@ -9683,6 +11040,8 @@ bool CHARACTER::ItemProcess_Hair(LPITEM item, int iDestCell)
 
 	return true;
 }
+
+// END_NEW_HAIR_STYLE_ADD
 
 bool CHARACTER::ItemProcess_Polymorph(LPITEM item)
 {
@@ -9761,6 +11120,9 @@ bool CHARACTER::ItemProcess_Polymorph(LPITEM item)
 				{
 					CPolymorphUtils::instance().UpdateBookPracticeGrade(this, item);
 				}
+				else
+				{
+				}
 			}
 			break;
 
@@ -9833,6 +11195,16 @@ void CHARACTER::AutoRecoveryItemProcess(const EAffectTypes type)
 
 	if (AFFECT_AUTO_HP_RECOVERY != type && AFFECT_AUTO_SP_RECOVERY != type)
 		return;
+
+#ifdef __DOJANG_SRC_FUNCTIONS__
+	if (type == AFFECT_AUTO_HP_RECOVERY && GetMapIndex() == DOJANG_MAPINDEX)
+		return;
+#endif
+#ifdef ENABLE_SUNG_MAHI_TOWER
+	bool isDungeonMap = (GetMapIndex() >= 3540000 && GetMapIndex() < 3550000);
+	if (isDungeonMap)
+		return;
+#endif
 
 	if (NULL != FindAffect(AFFECT_STUN))
 		return;
@@ -10053,7 +11425,8 @@ bool CHARACTER::CanEquipNow(const LPITEM item, const TItemPos& srcCell, const TI
 			return false;
 		}
 
-		if (marriage::CManager::instance().IsMarriageUniqueItem(item->GetVnum()) && !marriage::CManager::instance().IsMarried(GetPlayerID()))
+		if (marriage::CManager::instance().IsMarriageUniqueItem(item->GetVnum()) &&
+			!marriage::CManager::instance().IsMarried(GetPlayerID()))
 		{
 			LocaleChatPacket(CHAT_TYPE_INFO, 497, "");
 			return false;
@@ -10111,6 +11484,7 @@ bool CHARACTER::CanEquipNow(const LPITEM item, const TItemPos& srcCell, const TI
 			{
 				if (ring[i]->GetVnum() == item->GetVnum())
 				{
+					ChatPacket(CHAT_TYPE_INFO, LC_TEXT("iki kez bu objeyi takamazsin!"));
 					return false;
 				}
 			}
@@ -10120,8 +11494,19 @@ bool CHARACTER::CanEquipNow(const LPITEM item, const TItemPos& srcCell, const TI
 	return true;
 }
 
-bool CHARACTER::CanUnequipNow(const LPITEM item, const TItemPos& srcCell, const TItemPos& destCell)
+bool CHARACTER::CanUnequipNow(const LPITEM item, const TItemPos & srcCell, const TItemPos & destCell) /*const*/
 {
+#ifdef ENABLE_TELEPORT_SKILL
+	if (item->GetType() == ITEM_WEAPON)
+	{
+		if (IsAffectFlag(AFF_GWIGUM))
+			RemoveAffect(SKILL_GWIGEOM);
+
+		if (IsAffectFlag(AFF_GEOMGYEONG))
+			RemoveAffect(SKILL_GEOMKYUNG);
+	}
+#endif
+
 #ifdef DEFAULT_BELT_SYSTEM
 	if (ITEM_ARMOR == item->GetType() && ARMOR_BELT == item->GetSubType())
 	{

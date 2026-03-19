@@ -9,6 +9,24 @@
 #include <stack>
 #include <set>
 
+/* C++17'de kaldirilan std::unary_function / binary_function - sadece C++17+ icin tanimla.
+ * DB C++14 ile derlendiginde libc++ zaten unary_function saglar; burada tanimlarsak ambiguous olur. */
+#if __cplusplus >= 201703L
+namespace std {
+template <class _Arg, class _Result>
+struct unary_function {
+    typedef _Arg argument_type;
+    typedef _Result result_type;
+};
+template <class _Arg1, class _Arg2, class _Result>
+struct binary_function {
+    typedef _Arg1 first_argument_type;
+    typedef _Arg2 second_argument_type;
+    typedef _Result result_type;
+};
+}
+#endif
+
 #ifndef itertype
 #define itertype(v) __typeof((v).begin())
 #endif

@@ -477,12 +477,16 @@ struct name_with_desc_func
 
 	bool operator () (LPDESC d)
 	{
+#ifdef ENABLE_DESC_FIND_PC_FIX
+		return d->GetCharacter() && boost::algorithm::to_lower_copy(std::string(d->GetCharacter()->GetName())) == boost::algorithm::to_lower_copy(std::string(m_name));
+#else
 		auto tolowerlocal = [](std::string sz)
 		{
 			std::transform(sz.begin(), sz.end(), sz.begin(), ::tolower);
 			return sz;
 		};
 		return d->GetCharacter() && tolowerlocal(std::string(m_name)) == tolowerlocal(std::string(d->GetCharacter()->GetName()));
+#endif
 	}
 };
 

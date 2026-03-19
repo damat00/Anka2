@@ -39,17 +39,61 @@ Group AttackingData
 
 Group MotionEventData
 {
-    MotionEventDataCount     1
+    MotionEventDataCount     3
     Group Event00
     {
         MotionEventType      1
-        StartingTime         0.615977
+        StartingTime         0.581914
         
         IndependentFlag      0
-        AttachingEnable      1
-        AttachingBoneName    "equip_right"
-        FollowingEnable      1
-        EffectFileName       "d:/ymir work/monster2/ch_general/general_skill2.mse"
-        EffectPosition       0.000000 50.000000 0.000000
+        AttachingEnable      0
+        AttachingBoneName    "Bip01 HeadNub"
+        FollowingEnable      0
+        EffectFileName       "D:/Ymir Work/monster2/ch_general/general_skill2.mse"
+        EffectPosition       0.000000 0.000000 30.000000
+    }
+    Group Event01
+    {
+        MotionEventType      4
+        StartingTime         0.573398
+        DuringTime           0.200000
+        EnableHitProcess     0
+        
+        AttackType           0
+        HittingType          1
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           200.000000
+            Position         0.000000 -200.000000 0.000000
+        }
+    }
+    Group Event02
+    {
+        MotionEventType      4
+        StartingTime         0.567721
+        DuringTime           0.200000
+        EnableHitProcess     0
+        
+        AttackType           0
+        HittingType          1
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           200.000000
+            Position         0.000000 -400.000000 0.000000
+        }
     }
 }

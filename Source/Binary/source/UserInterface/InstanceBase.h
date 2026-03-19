@@ -21,6 +21,9 @@ class CInstanceBase
 			DWORD m_dwEmpireID;
 			DWORD m_dwGuildID;
 			DWORD m_dwLevel;
+#ifdef ENABLE_CONQUEROR_LEVEL
+			DWORD m_dwConquerorLevel;
+#endif
 #ifdef ENABLE_SHOW_MOB_INFO
 			DWORD m_dwAIFlag;
 #endif
@@ -57,10 +60,6 @@ class CInstanceBase
 			CAffectFlagContainer m_kAffectFlags;
 
 			std::string m_stName;
-
-#ifdef ENABLE_TITLE_SYSTEM
-			int m_iTitleID;
-#endif
 
 #ifdef ENABLE_GROWTH_PET_SYSTEM
 			BYTE m_bCharacterSize;
@@ -126,6 +125,30 @@ class CInstanceBase
 			FUNC_SKILL = 0x80,
 		};
 
+		enum eFlyTypes
+		{
+			FLY_NONE,
+			FLY_EXP,
+			FLY_HP_MEDIUM,
+			FLY_HP_BIG,
+			FLY_SP_SMALL,
+			FLY_SP_MEDIUM,
+			FLY_SP_BIG,
+			FLY_FIREWORK1,
+			FLY_FIREWORK2,
+			FLY_FIREWORK3,
+			FLY_FIREWORK4,
+			FLY_FIREWORK5,
+			FLY_FIREWORK6,
+			FLY_FIREWORK_XMAS,
+			FLY_CHAIN_LIGHTNING,
+			FLY_HP_SMALL,
+			FLY_SKILL_MUYEONG,
+#ifdef ENABLE_CONQUEROR_LEVEL
+			FLY_CONQUEROR_EXP,
+#endif
+		};
+
 		enum
 		{
 			AFFECT_YMIR,						// 0
@@ -171,17 +194,33 @@ class CInstanceBase
 			AFFECT_PREMIUM_GOLD,				// 40
 			AFFECT_RAMADAN_RING,				// 41
 #ifdef ENABLE_RENEWAL_TEAM_AFFECT
-			AFFECT_TEAM_SA,
-			AFFECT_TEAM_GA,
-			AFFECT_TEAM_GM,
-			AFFECT_TEAM_TGM,
-#endif
-#ifdef ENABLE_RENEWAL_PREMIUM_SYSTEM
-			AFFECT_PREMIUM,
+			AFFECT_TEAM_SA,						// 42
+			AFFECT_TEAM_GA,						// 43
+			AFFECT_TEAM_GM,						// 44
+			AFFECT_TEAM_TGM,					// 45
 #endif
 #ifdef __AUTO_HUNT__
-			AFFECT_AUTO_HUNT,
+			AFFECT_AUTO_HUNT,					// 47
 #endif
+#ifdef ENABLE_MELEY_LAIR_DUNGEON
+			AFFECT_STATUE1,						// 48
+			AFFECT_STATUE2,						// 49
+			AFFECT_STATUE3,						// 50
+			AFFECT_STATUE4,						// 51
+#endif
+#ifdef ENABLE_EQUIPMENT_HAND_EFFECT
+			AFF_DBONE_BRONZE,					// 52
+			AFF_DBONE_SILVER,					// 53
+			AFF_DBONE_GOLD,						// 54
+			AFF_DBONE_DIAMOND,					// 55
+			AFF_DBONE_PLATIN,					// 56
+			AFF_DBONE_EMERALD,					// 57
+#endif
+#ifdef ENABLE_NINETH_SKILL
+			AFFECT_CHEONUN,						// 58
+			AFFECT_CHUNWOON,					// 59
+#endif
+
 			AFFECT_NUM = 64,
 
 			AFFECT_HWAYEOM = AFFECT_GEOMGYEONG,
@@ -242,20 +281,41 @@ class CInstanceBase
 			NEW_AFFECT_MALL_PLUS = 549,
 			NEW_AFFECT_BLEND_PLUS = 550,
 #endif
+
+#ifdef ENABLE_ATTENDANCE_EVENT
+			NEW_AFFECT_EXP_BONUS_EVENT = 557,
+			NEW_AFFECT_ATT_SPEED_SLOW = 558,
+#endif
+
+#ifdef ENABLE_EQUIPMENT_HAND_EFFECT
+			AFFECT_DBONE_BRONZE = 590,
+			AFFECT_DBONE_SILVER = 591,
+#endif
+#ifdef ENABLE_EQUIPMENT_HAND_EFFECT
+		AFFECT_DBONE_GOLD = 602,
+		AFFECT_DBONE_DIAMOND = 603,
+		AFFECT_DBONE_PLATIN = 604,
+		AFFECT_DBONE_EMERALD = 605,
+#endif
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
 			NEW_AFFECT_DECORATION = 703,
 #endif
 #ifdef ENABLE_MULTI_FARM_BLOCK
 			NEW_AFFECT_MULTI_FARM = 704,
 #endif
-#ifdef ENABLE_RENEWAL_PREMIUM_SYSTEM
-			NEW_AFFECT_PREMIUM_ACCOUNT = 705,
-#endif
 #ifdef ENABLE_AUTOMATIC_PICK_UP_SYSTEM
 			NEW_AFFECT_AUTO_PICK_UP = 706,
 #endif
+#ifdef ENABLE_QUEEN_NETHIS
+			NEW_AFFECT_SUNGMA_MOVE_DEBUFF = 815,
+			NEW_AFFECT_SUNGMA_STR_DEBUFF = 816,
+#endif
 #ifdef __AUTO_HUNT__
 			NEW_AFFECT_AUTO_HUNT = 830,
+#endif
+#ifdef ENABLE_SUNG_MAHI_TOWER
+			NEW_AFFECT_SUNG_MAHI_BP,
+			NEW_AFFECT_SUNG_MAHI_CURSE,
 #endif
 			NEW_AFFECT_QUEST_START_IDX = 1000,
 		};
@@ -317,6 +377,12 @@ class CInstanceBase
 			NAMECOLOR_PARTY,
 			NAMECOLOR_WARP,
 			NAMECOLOR_WAYPOINT,
+#ifdef ENABLE_CONQUEROR_LEVEL
+			NAMECOLOR_CONQUEROR,
+#endif
+#ifdef NAMECOLOR_BOSS_CLIENT
+			NAMECOLOR_BOSS,
+#endif
 #ifdef ENABLE_METIN_STONES_MINIMAP
 			NAMECOLOR_METIN,
 #endif
@@ -343,34 +409,6 @@ class CInstanceBase
 			TITLE_NUM = 9,
 			TITLE_NONE = 4,
 		};
-
-#ifdef ENABLE_TITLE_SYSTEM
-		enum
-		{
-			TITLE_SYSTEM_NONE,
-			TITLE_SYSTEM_1,
-			TITLE_SYSTEM_2,
-			TITLE_SYSTEM_3,
-			TITLE_SYSTEM_4,
-			TITLE_SYSTEM_5,
-			TITLE_SYSTEM_6,
-			TITLE_SYSTEM_7,
-			TITLE_SYSTEM_8,
-			TITLE_SYSTEM_9,
-			TITLE_SYSTEM_10,
-			TITLE_SYSTEM_11,
-			TITLE_SYSTEM_12,
-			TITLE_SYSTEM_13,
-			TITLE_SYSTEM_14,
-			TITLE_SYSTEM_15,
-			TITLE_SYSTEM_16,
-			TITLE_SYSTEM_17,
-			TITLE_SYSTEM_18,
-			TITLE_SYSTEM_19,
-			TITLE_SYSTEM_20,
-			TITLE_SYSTEM_NUM,
-		};
-#endif
 
 		enum
 		{
@@ -570,15 +608,37 @@ class CInstanceBase
 #ifdef ENABLE_BOSS_EFFECT_OVER_HEAD
 			EFFECT_BOSS,
 #endif
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-			EFFECT_BP_NORMAL_MISSION_COMPLETED,
-			EFFECT_BP_PREMIUM_MISSION_COMPLETED,
-			EFFECT_BP_NORMAL_BATTLEPASS_COMPLETED,
-			EFFECT_BP_PREMIUM_BATTLEPASS_COMPLETED,
-#endif
-#ifdef ENABLE_GROWTH_PET_SYSTEM
+#if defined(ENABLE_GROWTH_PET_SYSTEM) && defined(ENABLE_PVP_BALANCE)
+			EFFECT_FEATHER_WALK,
 			EFFECT_GYEONGGONG_BOOM,
 #endif
+#ifdef ENABLE_OCHAO_TEMPLE_SYSTEM
+			EFFECT_HEALER,
+#endif
+#ifdef ENABLE_ZODIAC_MISSION
+			EFFECT_SKILL_DAMAGE_ZONE,
+			EFFECT_SKILL_DAMAGE_ZONE_BUYUK,
+			EFFECT_SKILL_DAMAGE_ZONE_ORTA,
+			EFFECT_SKILL_DAMAGE_ZONE_KUCUK,
+			EFFECT_SKILL_SAFE_ZONE,
+			EFFECT_SKILL_SAFE_ZONE_BUYUK,
+			EFFECT_SKILL_SAFE_ZONE_ORTA,
+			EFFECT_SKILL_SAFE_ZONE_KUCUK,
+			EFFECT_METEOR,
+			EFFECT_BEAD_RAIN,
+			EFFECT_FALL_ROCK,
+			EFFECT_ARROW_RAIN,
+			EFFECT_HORSE_DROP,
+			EFFECT_EGG_DROP,
+			EFFECT_DEAPO_BOOM,
+#endif
+#ifdef ENABLE_QUEEN_NETHIS
+			EFFECT_SNAKE_REGEN,
+#endif
+#ifdef ENABLE_PASSIVE_SYSTEM
+			EFFECT_PASSIVE,
+#endif
+
 			EFFECT_NUM,
 		};
 
@@ -618,11 +678,6 @@ class CInstanceBase
 		static void RegisterTitleName(int iIndex, const char *c_szTitleName);
 		static bool RegisterNameColor(UINT uIndex, UINT r, UINT g, UINT b);
 		static bool RegisterTitleColor(UINT uIndex, UINT r, UINT g, UINT b);
-
-#ifdef ENABLE_TITLE_SYSTEM
-		static void RegisterTitleSystemName(int iIndex, const char *c_szTitleName);
-		static bool RegisterTitleSystemColor(UINT uIndex, UINT r, UINT g, UINT b);
-#endif
 
 		static bool ChangeEffectTexture(UINT eEftType, const char *c_szSrcFileName, const char *c_szDstFileName);
 
@@ -668,6 +723,10 @@ class CInstanceBase
 			, float fScale = 1.0f
 #endif
 		);
+#ifdef ENABLE_TITLE_SYSTEM
+		void AttachSpecialEffectOverHead(DWORD effect);
+		void ClearSpecialEffectOverHead();
+#endif
 
 	protected:
 		static std::string ms_astAffectEffectAttachBone[EFFECT_NUM];
@@ -684,10 +743,11 @@ class CInstanceBase
 		void MountHorse(UINT eRace);
 		void DismountHorse();
 
-		void SCRIPT_SetAffect(UINT eAffect, bool isVisible); 
+		void SCRIPT_SetAffect(UINT eAffect, bool isVisible);
 
 		float CalculateDistanceSq3d(const TPixelPosition& c_rkPPosDst);
 
+		// Instance Data
 		bool IsFlyTargetObject();
 		void ClearFlyTargetInstance();
 		void SetFlyTargetInstance(CInstanceBase& rkInstDst);
@@ -703,7 +763,9 @@ class CInstanceBase
 		void AttachTextTail();
 		void DetachTextTail();
 		void UpdateTextTailLevel(DWORD level);
-
+#ifdef ENABLE_CONQUEROR_LEVEL
+		void UpdateTextTailConquerorLevel(DWORD level);
+#endif
 		void RefreshTextTail();
 		void RefreshTextTailTitle();
 
@@ -734,6 +796,9 @@ class CInstanceBase
 		void SetVirtualNumber(DWORD dwVirtualNumber);
 		void SetInstanceType(int iInstanceType);
 		void SetAlignment(short sAlignment);
+#ifdef ENABLE_CONQUEROR_LEVEL
+		void SetConquerorLevelText(int iLevel);
+#endif
 		void SetPKMode(BYTE byPKMode);
 		void SetKiller(bool bFlag);
 		void SetPartyMemberFlag(bool bFlag);
@@ -846,9 +911,6 @@ class CInstanceBase
 		BOOL IsInvisibility();
 		BOOL IsParalysis();
 		BOOL IsGameMaster();
-#ifdef ENABLE_RENEWAL_PREMIUM_SYSTEM
-		BOOL IsPremium();
-#endif
 		BOOL IsSameEmpire(CInstanceBase& rkInstDst);
 		BOOL IsBowMode();
 		BOOL IsHandMode();
@@ -864,9 +926,17 @@ class CInstanceBase
 #ifdef ENABLE_STANDING_MOUNT
 		BOOL IsMountingHoverBoard();
 #endif
+#ifdef NAMECOLOR_BOSS_CLIENT
+		BOOL IsBoss();
+#endif
 		BOOL IsNewMount();
 		BOOL IsForceVisible();
 		BOOL IsInSafe();
+
+#ifdef ENABLE_EVENT_BANNER_FLAG
+		BOOL IsBannerFlag();
+#endif
+
 		BOOL IsEnemy();
 		BOOL IsStone();
 		BOOL IsResource();
@@ -876,7 +946,7 @@ class CInstanceBase
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
 		BOOL IsShop();
 #endif
-#ifdef ENABLE_SHIP_DEFENCE_DUNGEON
+#ifdef ENABLE_DEFENSAWESHIP
 		BOOL IsHydraNPC();
 #endif
 		BOOL IsWarp();
@@ -988,11 +1058,6 @@ class CInstanceBase
 		bool AvoidObject(const CGraphicObjectInstance& c_rkBGObj);
 		bool IsBlockObject(const CGraphicObjectInstance& c_rkBGObj);
 		void BlockMovement();
-
-#ifdef ENABLE_TITLE_SYSTEM
-		void SetTitleSystem(int iTitle);
-		int GetTitleID();
-#endif
 
 	public:
 		BOOL CheckAttacking(CInstanceBase& rkInstVictim);
@@ -1109,6 +1174,9 @@ class CInstanceBase
 		void __Shaman_SetParalysis(bool isParalysis);
 		void __Warrior_SetGeomgyeongAffect(bool isVisible);
 		void __Assassin_SetEunhyeongAffect(bool isVisible);
+#ifdef ENABLE_PVP_BALANCE
+		void __Assassin_SetGyeongGongAffect(bool isVisible);
+#endif
 		void __SetReviveInvisibilityAffect(bool isVisible);
 
 		BOOL __CanProcessNetworkStatePacket();
@@ -1201,16 +1269,15 @@ class CInstanceBase
 		std::string m_stName;
 
 		DWORD m_awPart[CRaceData::PART_MAX_NUM];
-
 		DWORD m_dwLevel;
+#ifdef ENABLE_CONQUEROR_LEVEL
+		DWORD m_dwConquerorLevel;
+#endif
 #ifdef ENABLE_SHOW_MOB_INFO
 		DWORD m_dwAIFlag;
 #endif
 		DWORD m_dwEmpireID;
 		DWORD m_dwGuildID;
-#ifdef ENABLE_GUILD_TOKEN_AUTH
-		uint64_t m_dwGuildToken{};
-#endif
 #ifdef ENABLE_GUILD_LEADER_TEXTAIL
 		BYTE m_dwGuildLeader;
 #endif
@@ -1304,6 +1371,9 @@ class CInstanceBase
 		DWORD m_swordRefineEffectRight;
 		DWORD m_swordRefineEffectLeft;
 		DWORD m_armorRefineEffect[2];
+#ifdef ENABLE_TITLE_SYSTEM
+		DWORD m_dwOverHeadSpecialEffect;
+#endif
 
 #ifdef ENABLE_MDE_EFFECT
 		DWORD m_dwSpecialEffect;
@@ -1312,10 +1382,6 @@ class CInstanceBase
 
 #ifdef ENABLE_ACCE_COSTUME_SYSTEM
 		DWORD m_dwAcceEffect;
-#endif
-
-#ifdef ENABLE_TITLE_SYSTEM
-		int m_iTitleID;
 #endif
 
 		struct SMoveAfterFunc
@@ -1396,6 +1462,18 @@ class CInstanceBase
 
 		void __Warrior_Initialize();
 
+#ifdef ENABLE_PVP_BALANCE
+	protected:
+		struct SAssassin
+		{
+			DWORD m_dwGyeongGongEffect;
+		};
+
+		SAssassin m_kAssassin;
+
+		void __Assassin_Initialize();
+#endif
+
 	public:
 		static void ClearPVPKeySystem();
 
@@ -1412,10 +1490,6 @@ class CInstanceBase
 
 		const D3DXCOLOR& GetNameColor();
 		const D3DXCOLOR& GetTitleColor();
-
-#ifdef ENABLE_TITLE_SYSTEM
-		const D3DXCOLOR& GetTitleSystemColor();
-#endif
 
 	protected:
 		static DWORD __GetPVPKey(DWORD dwSrcVID, DWORD dwDstVID);

@@ -215,10 +215,20 @@ BOOL CParticleSystemData::OnLoadScript(CTextFileLoader & rTextFileLoader)
 
 	if (!GetTokenTimeEventFloat(rTextFileLoader, "timeeventscalex", &m_ParticleProperty.m_TimeEventScaleX))
 		return FALSE;
-
 	if (!GetTokenTimeEventFloat(rTextFileLoader, "timeeventscaley", &m_ParticleProperty.m_TimeEventScaleY))
 		return FALSE;
 
+#ifdef WORLD_EDITOR
+	if (!GetTokenTimeEventFloat(rTextFileLoader, "timeeventcolorred", &m_ParticleProperty.m_TimeEventColorRed))
+		return FALSE;
+	if (!GetTokenTimeEventFloat(rTextFileLoader, "timeeventcolorgreen", &m_ParticleProperty.m_TimeEventColorGreen))
+		return FALSE;
+	if (!GetTokenTimeEventFloat(rTextFileLoader, "timeeventcolorblue", &m_ParticleProperty.m_TimeEventColorBlue))
+		return FALSE;
+
+	if (!GetTokenTimeEventFloat(rTextFileLoader, "timeeventalpha", &m_ParticleProperty.m_TimeEventAlpha))
+		return FALSE;
+#endif
 	TTimeEventTableFloat TimeEventR;
 	TTimeEventTableFloat TimeEventB;
 	TTimeEventTableFloat TimeEventG;
@@ -338,20 +348,30 @@ void CParticleSystemData::BuildDecorator(CParticleInstance * pInstance)
 	{
 		pInstance->m_pDecorator = pInstance->m_pDecorator->AddChainFront(new CGravityDecorator);
 		pInstance->m_pDecorator = pInstance->m_pDecorator->AddChainFront(
-			new CGravityValueDecorator(m_ParticleProperty.m_TimeEventGravity, &pInstance->m_fGravity));
+			new CGravityValueDecorator(m_ParticleProperty.m_TimeEventGravity, &pInstance->m_fGravity)
+			);
 	}
 	else if (m_ParticleProperty.m_TimeEventGravity.size() == 1)
 	{
 		pInstance->m_fGravity = m_ParticleProperty.m_TimeEventGravity[0].m_Value;
 		pInstance->m_pDecorator = pInstance->m_pDecorator->AddChainFront(new CGravityDecorator);
 	}
-
+#ifdef WORLD_EDITOR
+	pInstance->m_pDecorator = pInstance->m_pDecorator->AddChainFront(
+	new CColorValueDecorator(m_ParticleProperty.m_TimeEventColorRed, &pInstance->m_Color.r));
+	pInstance->m_pDecorator = pInstance->m_pDecorator->AddChainFront(
+	new CColorValueDecorator(m_ParticleProperty.m_TimeEventColorGreen, &pInstance->m_Color.g));
+	pInstance->m_pDecorator = pInstance->m_pDecorator->AddChainFront(
+	new CColorValueDecorator(m_ParticleProperty.m_TimeEventColorBlue, &pInstance->m_Color.b));
+	pInstance->m_pDecorator = pInstance->m_pDecorator->AddChainFront(
+	new CColorValueDecorator(m_ParticleProperty.m_TimeEventAlpha, &pInstance->m_Color.a));
+#else
 	pInstance->m_pDecorator = pInstance->m_pDecorator->AddChainFront(
 		new CColorAllDecorator(m_ParticleProperty.m_TimeEventColor, &pInstance->m_dcColor));
+#endif
 
 	pInstance->m_pDecorator = pInstance->m_pDecorator->AddChainFront(
 		new CScaleValueDecorator(m_ParticleProperty.m_TimeEventScaleX, &pInstance->m_v2Scale.x));
-
 	pInstance->m_pDecorator = pInstance->m_pDecorator->AddChainFront(
 		new CScaleValueDecorator(m_ParticleProperty.m_TimeEventScaleY, &pInstance->m_v2Scale.y));
 

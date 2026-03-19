@@ -1,6 +1,5 @@
 #pragma once
 
-#include "StdAfx.h"
 #include "../eterGrnLib/Thing.h"
 
 class CRaceMotionData;
@@ -16,6 +15,7 @@ class CRaceData
 	public:
 		enum EParts
 		{
+			// Share index with server
 			PART_MAIN,
 			PART_WEAPON,
 			PART_HEAD,
@@ -42,12 +42,17 @@ class CRaceData
 
 		enum
 		{
-			SMOKE_NUM = 4, 
+			SMOKE_NUM = 4,
 		};
 
+		/////////////////////////////////////////////////////////////////////////////////
+		// Graphic Resource
+
+		// Model
 		typedef std::map<WORD, CGraphicThing*> TGraphicThingMap;
 		typedef std::map<DWORD, std::string> TAttachingBoneNameMap;
 
+		// Motion
 		typedef struct SMotion
 		{
 			BYTE byPercentage;
@@ -62,13 +67,15 @@ class CRaceData
 			WORD wMotionModeIndex;
 
 			TMotionVectorMap MotionVectorMap;
-			
+
 			SMotionModeData() {}
 			virtual ~SMotionModeData() {}
 		} TMotionModeData;
 		typedef std::map<WORD, TMotionModeData*> TMotionModeDataMap;
-		typedef TMotionModeDataMap::iterator TMotionModeDataIterator; 
+		typedef TMotionModeDataMap::iterator TMotionModeDataIterator;
 
+		/////////////////////////////////////////////////////////////////////////////////
+		// Model Data
 		typedef struct SModelData
 		{
 			NRaceData::TAttachingDataVector AttachingDataVector;
@@ -76,8 +83,12 @@ class CRaceData
 		typedef std::map<DWORD, TModelData> TModelDataMap;
 		typedef TModelDataMap::iterator TModelDataMapIterator;
 
+		/////////////////////////////////////////////////////////////////////////////////
+		// Motion Data
 		typedef std::map<DWORD, CRaceMotionData*> TMotionDataMap;
 
+		/////////////////////////////////////////////////////////////////////////////////
+		// Combo Data
 		typedef std::vector<DWORD> TComboIndexVector;
 		typedef struct SComboAttackData
 		{
@@ -138,11 +149,12 @@ class CRaceData
 
 		void Destroy();
 
-		const char *GetBaseModelFileName() const;
-		const char *GetAttributeFileName() const;
-		const char *GetMotionListFileName() const;
+		// Codes For Client
+		const char* GetBaseModelFileName() const;
+		const char* GetAttributeFileName() const;
+		const char* GetMotionListFileName() const;
 		CGraphicThing * GetBaseModelThing();
-		CGraphicThing * GetLODModelThing();
+		CGraphicThing* GetLODModelThing();
 		CAttributeData * GetAttributeDataPtr();
 		BOOL GetAttachingBoneName(DWORD dwPartIndex, const char ** c_pszBoneName);
 		BOOL CreateMotionModeIterator(TMotionModeDataIterator & itor);
@@ -166,19 +178,23 @@ class CRaceData
 		BOOL GetBodyCollisionDataPointer(const NRaceData::TAttachingData ** c_ppAttachingData);
 
 		BOOL IsTree();
-		const char *GetTreeFileName();
+		const char * GetTreeFileName();
 
-		BOOL LoadRaceData(const char *c_szFileName);
+		///////////////////////////////////////////////////////////////////
+		// Setup by Script
+		BOOL LoadRaceData(const char * c_szFileName);
 
-		CGraphicThing* RegisterMotionData(WORD wMotionMode, WORD wMotionIndex, const char *c_szFileName, BYTE byPercentage = 100);
+		CGraphicThing* RegisterMotionData(WORD wMotionMode, WORD wMotionIndex, const char * c_szFileName, BYTE byPercentage = 100);
 
+		///////////////////////////////////////////////////////////////////
+		// Setup by Python
 		void SetRace(DWORD dwRaceIndex);
 		void RegisterAttachingBoneName(DWORD dwPartIndex, const char *c_szBoneName);
 
 		void RegisterMotionMode(WORD wMotionModeIndex);
 		void SetMotionModeParent(WORD wParentMotionModeIndex, WORD wMotionModeIndex);
-		void OLD_RegisterMotion(WORD wMotionModeIndex, WORD wMotionIndex, const char *c_szFileName, BYTE byPercentage = 100);
-		CGraphicThing* NEW_RegisterMotion(CRaceMotionData* pkMotionData, WORD wMotionModeIndex, WORD wMotionIndex, const char *c_szFileName, BYTE byPercentage = 100);
+		void OLD_RegisterMotion(WORD wMotionModeIndex, WORD wMotionIndex, const char * c_szFileName, BYTE byPercentage = 100);
+		CGraphicThing* NEW_RegisterMotion(CRaceMotionData* pkMotionData, WORD wMotionModeIndex, WORD wMotionIndex, const char * c_szFileName, BYTE byPercentage = 100);
 		bool SetMotionRandomWeight(WORD wMotionModeIndex, WORD wMotionIndex, WORD wMotionSubIndex, BYTE byPercentage);
 
 		void RegisterNormalAttack(WORD wMotionModeIndex, WORD wMotionIndex);
@@ -210,7 +226,7 @@ class CRaceData
 	protected:
 		DWORD m_dwRaceIndex;
 		DWORD m_adwSmokeEffectID[SMOKE_NUM];
-		
+
 		CGraphicThing * m_pBaseModelThing;
 		CGraphicThing * m_pLODModelThing;
 
@@ -225,7 +241,7 @@ class CRaceData
 		TAttachingBoneNameMap m_AttachingBoneNameMap;
 		TComboAttackDataMap m_ComboAttackDataMap;
 		TNormalAttackIndexMap m_NormalAttackIndexMap;
-	
+
 		std::map<DWORD, SHair> m_kMap_dwHairKey_kHair;
 		std::map<DWORD, SShape> m_kMap_dwShapeKey_kShape;
 

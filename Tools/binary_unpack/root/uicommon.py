@@ -338,6 +338,44 @@ class QuestionDialog2(QuestionDialog):
 
 			return (0, 0)
 
+class QuestionDialog2(QuestionDialog):
+
+	def __init__(self):
+		QuestionDialog.__init__(self)
+		self.__CreateDialog()
+
+	def __del__(self):
+		QuestionDialog.__del__(self)
+
+	def __CreateDialog(self):
+		pyScrLoader = ui.PythonScriptLoader()
+		pyScrLoader.LoadScriptFile(self, "uiscript/questiondialog2.py")
+
+		self.board = self.GetChild("board")
+		self.textLine1 = self.GetChild("message1")
+		self.textLine2 = self.GetChild("message2")
+		self.acceptButton = self.GetChild("accept")
+		self.cancelButton = self.GetChild("cancel")
+
+	def SetText1(self, text):
+		self.textLine1.SetText(text)
+
+	def SetText2(self, text):
+		self.textLine2.SetText(text)
+
+	if app.ENABLE_GROWTH_PET_SYSTEM:
+		def GetTextSize1(self):
+			if self.textLine1:
+				return self.textLine1.GetTextSize()
+				
+			return (0,0)
+			
+		def GetTextSize2(self):
+			if self.textLine2:
+				return self.textLine2.GetTextSize()
+				
+			return (0,0)
+
 class QuestionDialogWithTimeLimit(QuestionDialog2):
 	def __init__(self):
 		ui.ScriptWindow.__init__(self)
@@ -556,7 +594,8 @@ class ItemQuestionDialog(ui.ScriptWindow):
 		self.titleBar.SetParent(self.board)
 		self.titleBar.MakeTitleBar(254, "yellow")
 		self.titleBar.SetPosition(8, 7)
-		self.titleBar.CloseButton("hide")
+		if getattr(self.titleBar, "CloseButtonHide", None):
+			self.titleBar.CloseButtonHide()
 		self.titleBar.Show()
 
 		self.titleName = ui.TextLine()
@@ -847,3 +886,151 @@ if app.ENABLE_RIDING_EXTENDED:
 	
 		def SetText2(self, text):
 			self.textLine2.SetText(text)
+
+if app.ENABLE_EVENT_SYSTEM:
+	class EventInformationDialog(ui.ScriptWindow):
+		def __init__(self):
+			ui.ScriptWindow.__init__(self)
+			self.__CreateDialog()
+			
+			self.tooltipItem = uiToolTip.ItemToolTip()
+			self.itemVnum = 0
+			
+		def __del__(self):
+			ui.ScriptWindow.__del__(self)
+	
+		def __CreateDialog(self):
+			pyScrLoader = ui.PythonScriptLoader()
+			pyScrLoader.LoadScriptFile(self, "uiscript/QuestionDialog4.py")
+	
+			self.board = self.GetChild("board")
+			self.circle = self.GetChild("circle")
+			self.textLine = self.GetChild("message")
+	
+			self.titleBar = ui.TitleBar()
+			self.titleBar.SetParent(self.board)
+			self.titleBar.MakeTitleBar(244, "yellow")
+			self.titleBar.SetPosition(8, 7)
+			self.titleBar.Show()
+	
+			self.titleName = ui.TextLine()
+			self.titleName.SetParent(self.titleBar)
+			self.titleName.SetPosition(0, 4)
+			self.titleName.SetWindowHorizontalAlignCenter()
+			self.titleName.SetHorizontalAlignCenter()
+			self.titleName.Show()
+	
+			self.slotList = []
+			for i in xrange(3):
+				slot = ui.ImageBox()
+				slot.LoadImage("d:/ymir work/ui/public/slot_base.sub")
+				slot.SetParent(self)
+				slot.SetWindowHorizontalAlignCenter()
+				self.slotList.append(slot)
+	
+		def Open(self, vnum, title, text="", text2=""):
+			self.titleName.SetText(title)
+			self.itemVnum = vnum
+			item.SelectItem(vnum)
+			xSlotCount, ySlotCount = item.GetItemSize()
+			
+			if text:
+				textLine2 = ui.TextLine()
+				textLine2.SetPosition(0, 80 + 32*ySlotCount)
+				textLine2.SetWindowHorizontalAlignCenter()
+				textLine2.SetHorizontalAlignCenter()
+				textLine2.SetVerticalAlignCenter()
+				textLine2.SetParent(self.board)
+				textLine2.SetParent(self.circle)
+				textLine2.SetText(text)
+				textLine2.Show()
+				self.textLine2 = textLine2
+				
+			if text2:
+				textLine3 = ui.TextLine()
+				textLine3.SetPosition(0, 100 + 32*ySlotCount)
+				textLine3.SetWindowHorizontalAlignCenter()
+				textLine3.SetHorizontalAlignCenter()
+				textLine3.SetVerticalAlignCenter()
+				textLine3.SetParent(self.board)
+				textLine3.SetParent(self.circle)
+				textLine3.SetText(text2)
+				textLine3.Show()
+				self.textLine3 = textLine3			
+	
+			slotGrid = ui.SlotWindow()
+			slotGrid.SetParent(self)
+			slotGrid.SetPosition(-16, 64)
+			slotGrid.SetWindowHorizontalAlignCenter()
+			slotGrid.AppendSlot(0, 0, 0, 32*xSlotCount, 32*ySlotCount)
+			slotGrid.AddFlag("not_pick")
+			slotGrid.Show()
+			self.slotGrid = slotGrid
+			self.slotGrid.SetItemSlot(0, vnum)
+	
+			if text:
+				self.height -= 10
+				
+			if text2:
+				self.height += 30
+
+			self.SetSize(260, 155 + 32*ySlotCount + self.height)
+			self.board.SetSize(260, 155 + 32*ySlotCount + self.height)
+			self.circle.SetSize(236, 112 + 32*ySlotCount + self.height)
+			self.textLine.SetPosition(0, 44)
+
+			for i in xrange(min(3, ySlotCount)):
+				self.slotList[i].SetPosition(0, 32 + ySlotCount*32 - i*32)
+				self.slotList[i].OnMouseOverIn = self.OverInItem
+				self.slotList[i].OnMouseOverOut = lambda arg = self.tooltipItem: self.OverOutItem(arg)
+				self.slotList[i].Show()
+
+			self.titleBar.SetCloseEvent(ui.__mem_func__(self.Close))
+
+			self.SetCenterPosition()
+			self.SetTop()
+			self.Show()
+
+			constInfo.IS_OPEN_EVENT_INFORMATION = 1
+	
+		def SetCloseEvent(self, event):
+			self.titleBar.SetCloseEvent(event)
+			
+		def SetMessage(self, text):
+			self.textLine.SetText(text)
+	
+		def OverInItem(self):
+			self.tooltipItem.AddItemData(self.itemVnum, 0, 0)
+			
+		def OverOutItem(self, tooltipItem):
+			if 0 != tooltipItem:
+				self.tooltipItem.HideToolTip()
+				self.tooltipItem.ClearToolTip()
+		
+		def Close(self):
+			self.ClearDictionary()
+			self.slotList = []
+			self.titleBar = None
+			self.titleName = None
+			self.textLine2 = None
+			self.textLine3 = None
+			self.slotGrid = None
+			
+			self.tooltipItem = 0
+			self.Hide()
+			
+			constInfo.IS_OPEN_EVENT_INFORMATION = 0
+			
+		def SetWidth(self, width):
+			height = self.GetHeight()
+			self.SetSize(width, height)
+			self.board.SetSize(width, height)
+			self.SetCenterPosition()
+			self.UpdateRect()
+	
+		def SetText(self, text):
+			self.textLine.SetText(text)
+	
+		def OnPressEscapeKey(self):
+			self.Close()
+			return True

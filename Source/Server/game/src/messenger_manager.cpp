@@ -435,7 +435,7 @@ void MessengerManager::RemoveAllBlockList(keyB account)
 	DBManager::Instance().Query("DELETE FROM messenger_block_list%s WHERE account='%s' OR companion='%s'",
 		get_table_postfix(), account.c_str(), account.c_str());
 
-	for (std::set<keyBL>::iterator iter = company.begin(); iter != company.end(); ++iter) // Fix
+	for (std::set<keyBL>::iterator iter = company.begin(); iter != company.end(); ++iter)	//@fixme541
 	{
 		this->RemoveFromBlockList(account, *iter);
 	}
@@ -810,7 +810,7 @@ void MessengerManager::RemoveAllList(keyA account)
 
 	for (std::set<keyT>::iterator iter = company.begin();
 			iter != company.end();
-			iter++ )
+			++iter)	//@fixme541
 	{
 		this->RemoveFromList(account, *iter);
 	}
@@ -852,7 +852,7 @@ void MessengerManager::SendList(MessengerManager::keyA account)
 	TPacketGCMessengerListOffline pack_offline;
 	TPacketGCMessengerListOnline pack_online;
 
-	TEMP_BUFFER buf(128 * 1024);
+	TEMP_BUFFER buf(128 * 1024); // 128k
 
 	itertype(m_Relation[account]) it = m_Relation[account].begin(), eit = m_Relation[account].end();
 
@@ -861,14 +861,20 @@ void MessengerManager::SendList(MessengerManager::keyA account)
 		if (m_set_loginAccount.find(*it) != m_set_loginAccount.end())
 		{
 			pack_online.connected = 1;
+
+			// Online
 			pack_online.length = it->size();
+
 			buf.write(&pack_online, sizeof(TPacketGCMessengerListOnline));
 			buf.write(it->c_str(), it->size());
 		}
 		else
 		{
 			pack_offline.connected = 0;
+
+			// Offline
 			pack_offline.length = it->size();
+
 			buf.write(&pack_offline, sizeof(TPacketGCMessengerListOffline));
 			buf.write(it->c_str(), it->size());
 		}

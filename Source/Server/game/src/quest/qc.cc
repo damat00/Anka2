@@ -7,34 +7,10 @@ extern "C" {
 #include "../../../library/liblua/src/lzio.h"
 #include "../../../library/liblua/src/llex.h"
 #include "../../../library/liblua/src/lstring.h"
-
-#if LUA_VERSION_NUM >= 502
-	#define luaL_reg		luaL_Reg
-
-	#define lua_dobuffer	luaL_loadbuffer
-	#define lua_dofile		luaL_dofile
-	#define lua_dostring	luaL_dostring
-	#define luaL_getn		lua_rawlen
-	#define lua_resume(a,b)	lua_resume(a,0,b)
-	#define luaX_lex		llex
-
-	#define zname(z)		"quest"
-	#define luaZ_init(a,b,c,d)	luaZ_init(L,a,b,c)
-	#define luaX_setinput(a,b,c,d)	luaX_setinput(a,b,c,d,0)
-
-	#define lua_ref(L,lock)	((lock) ? luaL_ref(L, LUA_REGISTRYINDEX) : \
-	  (lua_pushstring(L, "unlocked references are obsolete"), lua_error(L), 0))
-	#define lua_unref(L,ref)	luaL_unref(L, LUA_REGISTRYINDEX, (ref))
-#elif LUA_VERSION_NUM == 500
-#else
-	#error "lua version not found"
-#endif
-
 #if !defined(_MSC_VER) && defined(__cplusplus)
 }
 #endif
 
-#include <cstring>
 #include <algorithm>
 #include <iostream>
 #include <set>
@@ -243,7 +219,7 @@ void CheckUsedFunction()
 		{
 			cout << *it << endl;
 		}
-		//abort();
+		abort();
 	}
 }
 
@@ -529,80 +505,6 @@ void parse(char * filename)
 								os << t;
 								lookahead(&lexstate);
 							}
-
-							// ADAPTION_MULTI_LANGUAGE_SYSTEM
-							const char TK_OPEN_PARENTHESIS = '(', TK_CLOSE_PARENTHESIS = ')';
-							const char TK_OPEN_BRACKETS = '[', TK_CLOSE_BRACKETS = ']';
-
-							if (lexstate.lookahead.token == TK_OPEN_PARENTHESIS)
-							{
-								int funcDepth = 0;
-								while (lexstate.lookahead.token != TK_CLOSE_PARENTHESIS || funcDepth > 1)
-								{
-									if (lexstate.lookahead.token == TK_OPEN_PARENTHESIS)
-										funcDepth++;
-									else if (lexstate.lookahead.token == TK_CLOSE_PARENTHESIS)
-										funcDepth--;
-
-									next(&lexstate);
-									t = lexstate.t;
-									os << t;
-									lookahead(&lexstate);
-								}
-								os << TK_CLOSE_PARENTHESIS;
-								lookahead(&lexstate);
-							}
-							else if (lexstate.lookahead.token == TK_OPEN_BRACKETS)
-							{
-								int arrDepth = 0;
-								while (lexstate.lookahead.token != TK_CLOSE_BRACKETS || arrDepth > 1)
-								{
-									if (lexstate.lookahead.token == TK_OPEN_BRACKETS)
-										arrDepth++;
-									else if (lexstate.lookahead.token == TK_CLOSE_BRACKETS)
-										arrDepth--;
-
-									next(&lexstate);
-									t = lexstate.t;
-									os << t;
-									lookahead(&lexstate);
-								}
-								os << TK_CLOSE_BRACKETS;
-								lookahead(&lexstate);
-							}
-
-							if (lexstate.lookahead.token == TK_OPEN_BRACKETS)
-							{
-								int arrDepth = 0;
-								while (lexstate.lookahead.token != TK_CLOSE_BRACKETS || arrDepth > 1)
-								{
-									if (lexstate.lookahead.token == TK_OPEN_BRACKETS)
-										arrDepth++;
-									else if (lexstate.lookahead.token == TK_CLOSE_BRACKETS)
-										arrDepth--;
-
-									next(&lexstate);
-									t = lexstate.t;
-									os << t;
-									lookahead(&lexstate);
-								}
-								os << TK_CLOSE_BRACKETS;
-								lookahead(&lexstate);
-							}
-							else
-							{
-								while (lexstate.lookahead.token == '.')
-								{
-									next(&lexstate);
-									os << '.';
-									next(&lexstate);
-									t = lexstate.t;
-									os << t;
-									lookahead(&lexstate);
-								}
-							}
-							// END_OF_ADAPTION_MULTI_LANGUAGE_SYSTEM
-
 							current_when_argument += os.str();
 						}
 						cout << "WHEN  : " << current_when_name ;
@@ -1070,27 +972,10 @@ void parse(char * filename)
 	CheckUsedFunction();
 }
 
-//@fixme1000	QC error message for special characters next to apostrophes
-void print_exception()	//@fixme1000
-{
-	int top = lua_gettop(L);
-	if (0 != top && LUA_TSTRING == lua_type(L, top))
-	{
-		std::cerr << lua_tostring(L, top);
-	}
-}
-
 int main(int argc, char* argv[])
 {
-	atexit(&print_exception);	//@fixme1000
 	mkdir(OUTPUT_FOLDER, 0700);
-#if LUA_V == 503
 	L = lua_open();
-#elif LUA_V == 523
-		L = luaL_newstate();
-#else
-	#error "lua version not found"
-#endif
 	luaX_init(L);
 
 	if (argc > 1)

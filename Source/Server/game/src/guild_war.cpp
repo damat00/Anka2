@@ -272,20 +272,12 @@ bool GuildWar_IsWarMap(unsigned type)
 	return false;
 }
 
-void CGuild::NotifyGuildMaster(BYTE type, DWORD id, const char* format, ...)
+void CGuild::NotifyGuildMaster(const char* msg)
 {
 	LPCHARACTER ch = GetMasterCharacter();
 
 	if (ch)
-	{
-		char chatbuf[256];
-		va_list args;
-		va_start(args, format);
-		vsnprintf(chatbuf, sizeof(chatbuf), format, args);
-		va_end(args);
-
-		ch->LocaleChatPacket(type, id, chatbuf);
-	}
+		ch->ChatPacket(CHAT_TYPE_INFO, msg);
 }
 
 extern void map_allow_log();
@@ -313,7 +305,7 @@ void CGuild::RequestDeclareWar(DWORD dwOppGID, BYTE type)
 					GetID(), dwOppGID, type, GuildWar_GetTypeMapIndex(type));
 
 			map_allow_log();
-			NotifyGuildMaster(CHAT_TYPE_INFO, 306, "");
+			NotifyGuildMaster("306");
 			return;
 		}
 
@@ -351,7 +343,7 @@ void CGuild::RequestDeclareWar(DWORD dwOppGID, BYTE type)
 							GetID(), dwOppGID, type, GuildWar_GetTypeMapIndex(type));
 
 					map_allow_log();
-					NotifyGuildMaster(CHAT_TYPE_INFO, 306, "");
+					NotifyGuildMaster("306");
 					return;
 				}
 
@@ -377,7 +369,7 @@ void CGuild::RequestDeclareWar(DWORD dwOppGID, BYTE type)
 			break;
 		case GUILD_WAR_SEND_DECLARE:
 			{
-				NotifyGuildMaster(CHAT_TYPE_INFO, 300, "");
+				NotifyGuildMaster("300");
 			}
 			break;
 		default:
@@ -593,17 +585,9 @@ void CGuild::EndWar(DWORD dwOppGID)
 
 		if (!UnderAnyWar())
 		{
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-			for (itertype(m_memberOnline) it_char = m_memberOnline.begin(); it_char != m_memberOnline.end(); ++it_char)
-			{
-				LPCHARACTER ch = *it_char;
-				TGuildWar & gw(it->second);
-				ch->UpdateExtBattlePassMissionProgress(GUILD_PLAY_GUILDWAR, 1, gw.type+1);
-#else
 			for (itertype(m_memberOnline) it = m_memberOnline.begin(); it != m_memberOnline.end(); ++it)
 			{
 				LPCHARACTER ch = *it;
-#endif
 				ch->RemoveAffect(GUILD_SKILL_BLOOD);
 				ch->RemoveAffect(GUILD_SKILL_BLESS);
 				ch->RemoveAffect(GUILD_SKILL_SEONGHWI);
@@ -640,7 +624,11 @@ void CGuild::GuildWarEntryAccept(DWORD dwOppGID, LPCHARACTER ch)
 	if (gw.type == GUILD_WAR_TYPE_FIELD)
 		return;
 
+#ifdef ENABLE_CH_CRASH_CORE_FIX
+	if (ch && gw.state != GUILD_WAR_ON_WAR)
+#else
 	if (gw.state != GUILD_WAR_ON_WAR)
+#endif
 	{
 		ch->LocaleChatPacket(CHAT_TYPE_INFO, 148, "");
 		return;
@@ -655,10 +643,23 @@ void CGuild::GuildWarEntryAccept(DWORD dwOppGID, LPCHARACTER ch)
 		return;
 
 	quest::PC * pPC = quest::CQuestManager::instance().GetPC(ch->GetPlayerID());
-	pPC->SetFlag("war.is_war_member", 1);
 
+#ifdef ENABLE_CH_CRASH_CORE_FIX
+	if (ch && pPC)
+	{
+		pPC->SetFlag("war.is_war_member", 1);
+		ch->SaveExitLocation();
+		ch->WarpSet(pos.x, pos.y, gw.map_index);
+	}
+	else
+	{
+		return;
+	}
+#else
+	pPC->SetFlag("war.is_war_member", 1);
 	ch->SaveExitLocation();
 	ch->WarpSet(pos.x, pos.y, gw.map_index);
+#endif
 }
 
 void CGuild::GuildWarEntryAsk(DWORD dwOppGID)
@@ -717,6 +718,8 @@ void CGuild::SetLadderPoint(int point)
 {
 	if (m_data.ladder_point != point)
 	{
+		char buf[256];
+		snprintf(buf, sizeof(buf), "720 %d", point);
 		for (itertype(m_memberOnline) it = m_memberOnline.begin(); it!=m_memberOnline.end();++it)
 		{
 			LPCHARACTER ch = (*it);

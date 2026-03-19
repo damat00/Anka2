@@ -458,6 +458,26 @@ PyObject *backgroundGlobalPositionToMapInfo(PyObject *poSelf, PyObject *poArgs)
 		return Py_BuildValue("sii", "", 0, 0);
 }
 
+#ifdef ENABLE_COLLECT_WINDOW
+PyObject *backgroundGlobalPositionToMapSize(PyObject *poSelf, PyObject *poArgs)
+{
+	int iX;
+	if (!PyTuple_GetInteger(poArgs, 0, &iX))
+		return Py_BadArgument();
+
+	int iY;
+	if (!PyTuple_GetInteger(poArgs, 1, &iY))
+		return Py_BadArgument();
+
+	CPythonBackground& rkBG = CPythonBackground::Instance();
+	CPythonBackground::TMapInfo* pkMapInfo = rkBG.GlobalPositionToMapInfo(iX, iY);
+
+	if (pkMapInfo)
+		return Py_BuildValue("ii", pkMapInfo->m_dwEndX - pkMapInfo->m_dwBaseX, pkMapInfo->m_dwEndY - pkMapInfo->m_dwBaseY);
+	else
+		return Py_BuildValue("ii", 0, 0);
+}
+#endif
 
 PyObject *backgroundWarpTest(PyObject *poSelf, PyObject *poArgs)
 {
@@ -604,6 +624,9 @@ void initBackground()
 		{ "EnableSnow",							backgroundEnableSnow,						METH_VARARGS }, 
 		{ "GlobalPositionToLocalPosition",		backgroundGlobalPositionToLocalPosition,	METH_VARARGS }, 
 		{ "GlobalPositionToMapInfo",			backgroundGlobalPositionToMapInfo,			METH_VARARGS }, 
+#ifdef ENABLE_COLLECT_WINDOW
+		{ "GlobalPositionToMapSize",			backgroundGlobalPositionToMapSize,			METH_VARARGS },
+#endif
 		{ "GetRenderShadowTime",				backgroundGetRenderShadowTime,				METH_VARARGS },
 		{ "LoadMap",							backgroundLoadMap,							METH_VARARGS },
 		{ "Destroy",							backgroundDestroy,							METH_VARARGS },

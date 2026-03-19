@@ -8,7 +8,7 @@ CPathStack::CPathStack()
 
 CPathStack::~CPathStack()
 {
-	MoveBase();	
+	MoveBase();
 }
 
 void CPathStack::GetCurrentPathName(std::string* pstCurPathName)
@@ -22,7 +22,7 @@ void CPathStack::GetCurrentPathName(std::string* pstCurPathName)
 }
 
 void CPathStack::Push()
-{	
+{
 	char szPathName[MAX_PATH+1];
 	_getcwd(szPathName, MAX_PATH);
 
@@ -31,7 +31,7 @@ void CPathStack::Push()
 
 bool CPathStack::Pop()
 {
-	if (m_stPathNameDeque.empty()) 
+	if (m_stPathNameDeque.empty())
 	{
 		assert(!"CPathStack::Pop Empty Stack");
 		return false;
@@ -50,7 +50,7 @@ void CPathStack::MoveBase()
 
 void CPathStack::SetBase()
 {
-	GetCurrentPathName(&m_stBasePathName);	
+	GetCurrentPathName(&m_stBasePathName);
 }
 
 void CPathStack::Move(const char *c_szPathName)

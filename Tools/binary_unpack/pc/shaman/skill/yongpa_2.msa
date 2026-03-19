@@ -2,6 +2,7 @@ ScriptType               MotionData
 
 MotionFileName           "D:\YMIR WORK\pc\shaman\skill\shoot.GR2"
 MotionDuration           1.500000
+Accumulation           0.00	0.00	0.00
 
 Group MotionEventData
 {
@@ -33,7 +34,7 @@ Group MotionEventData
         MotionEventType      1
         StartingTime         1.131387
         
-        IndependentFlag      0
+        IndependentFlag      1
         AttachingEnable      0
         AttachingBoneName    "Bip01 Head"
         FollowingEnable      0

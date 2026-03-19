@@ -19,9 +19,9 @@ namespace quest
 		} type;
 
 		DWORD value1;
-		int value2;	
+		int value2;
 
-		RewardData(RewardType t, DWORD value1, int value2 = 0) : 
+		RewardData(RewardType t, DWORD value1, int value2 = 0) :
 			type(t),
 			value1(value1),
 			value2(value2)
@@ -32,15 +32,15 @@ namespace quest
 	class PC
 	{
 		public:
-			enum 
+			enum
 			{
-				QUEST_SEND_ISBEGIN = (1 << 0),
-				QUEST_SEND_TITLE = (1 << 1),
-				QUEST_SEND_CLOCK_NAME = (1 << 2),
-				QUEST_SEND_CLOCK_VALUE = (1 << 3),
-				QUEST_SEND_COUNTER_NAME = (1 << 4),
-				QUEST_SEND_COUNTER_VALUE = (1 << 5),
-				QUEST_SEND_ICON_FILE = (1 << 6),
+				QUEST_SEND_ISBEGIN			= (1 << 0),
+				QUEST_SEND_TITLE			= (1 << 1),
+				QUEST_SEND_CLOCK_NAME		= (1 << 2),
+				QUEST_SEND_CLOCK_VALUE		= (1 << 3),
+				QUEST_SEND_COUNTER_NAME		= (1 << 4),
+				QUEST_SEND_COUNTER_VALUE	= (1 << 5),
+				QUEST_SEND_ICON_FILE		= (1 << 6),
 			};
 
 			typedef map<unsigned int, QuestState> QuestInfo;

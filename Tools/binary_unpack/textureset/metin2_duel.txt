@@ -2,9 +2,9 @@ TextureSet
 
 TextureCount 5
 Start Texture001
-    "D:\YMIR WORK\terrainmaps\G\field\field 01.dds"
-    5.000000
-    5.000000
+    "D:\YMIR WORK\terrainmaps\b\field\field 02.dds"
+    3.000000
+    3.000000
     0.000000
     0.000000
     0
@@ -12,9 +12,9 @@ Start Texture001
     0
 End Texture001
 Start Texture002
-    "d:\ymir work\terrainmaps\B\tile\tile01.DDS"
-    8.000000
-    8.000000
+    "d:\ymir work\terrainmaps\b\tile\tile01.dds"
+    2.000000
+    2.000000
     0.000000
     0.000000
     0
@@ -22,9 +22,9 @@ Start Texture002
     0
 End Texture002
 Start Texture003
-    "d:\ymir work\terrainmaps\B\grass\grass 03.DDS"
-    9.000000
-    9.000000
+    "d:\ymir work\terrainmaps\B\field\field 04.DDS"
+    3.000000
+    3.000000
     0.000000
     0.000000
     0

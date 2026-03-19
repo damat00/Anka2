@@ -46,9 +46,1001 @@
 	#include "maintenance.h"
 #endif
 
+#ifdef ENABLE_QUEEN_NETHIS
+#	include "SnakeLair.h"
+#endif
+
+#ifdef ENABLE_REMOTE_SHOP_SYSTEM
+#include "shop.h"
+#include "shop_manager.h"
+#endif
+
+#ifdef __SYSTEM_SEARCH_ITEM_MOB__
+	#include <string>
+	#include <boost/algorithm/string.hpp>
+#endif
+
+#ifdef __ENABLE_COLLECTIONS_SYSTEM__
+	#include "CollectionsSystem.hpp"
+#endif
+
+
+
 extern int g_server_id;
 
 extern int g_nPortalLimitTime;
+
+#ifdef ENABLE_PASSIVE_SYSTEM
+namespace
+{
+	enum EPassiveRelicSockets
+	{
+		PASSIVE_RELIC_SOCKET_REMAIN = ITEM_SOCKET_REMAIN_SEC,
+		PASSIVE_RELIC_SOCKET_ACTIVE = 1,
+		PASSIVE_RELIC_SOCKET_PROC = 2,
+	};
+
+	enum EPassiveRelicMaterialIndex
+	{
+		PASSIVE_RELIC_MATERIAL_WEAPON,
+		PASSIVE_RELIC_MATERIAL_ELEMENT,
+		PASSIVE_RELIC_MATERIAL_ARMOR,
+		PASSIVE_RELIC_MATERIAL_ACCE,
+		PASSIVE_RELIC_MATERIAL_MAX,
+	};
+
+	struct TPassiveRelicMaterialInfo
+	{
+		BYTE bSubType;
+		DWORD dwVnum;
+	};
+
+	struct TPassiveRelicBonusInfo
+	{
+		BYTE bBonusType;
+		BYTE bApply;
+		BYTE bValueCount;
+		short sValues[10];
+	};
+
+	enum EPassiveRelicBonusTypes
+	{
+		PASSIVE_RELIC_BONUS_DIRECT,
+	};
+
+	const DWORD PASSIVE_RELIC_VNUM_MIN = 30272;
+	const DWORD PASSIVE_RELIC_VNUM_MAX = 30276;
+	const char* PASSIVE_RELIC_COOLDOWN_FLAG = "passive_relic.cooldown";
+	const char* PASSIVE_RELIC_DECK_SELECTED_FLAG = "passive_relic.deck.selected";
+	const char* PASSIVE_RELIC_DECK_INIT_FLAG = "passive_relic.deck.init";
+	const char* PASSIVE_RELIC_DECK_ATTR_TYPE_FLAG_FMT = "passive_relic.deck%d.attr.type%d";
+	const char* PASSIVE_RELIC_DECK_ATTR_VALUE_FLAG_FMT = "passive_relic.deck%d.attr.value%d";
+	const char* PASSIVE_RELIC_DECK_PROC_STONE_FLAG_FMT = "passive_relic.deck%d.proc.stone";
+	const char* PASSIVE_RELIC_DECK_PROC_DISMOUNT_FLAG_FMT = "passive_relic.deck%d.proc.dismount";
+	const BYTE PASSIVE_RELIC_MAX_BONUS_COUNT = 4;
+	const int PASSIVE_RELIC_DIRECT_UNEQUIP_SUCCESS_CHANCE = 20;
+	const int PASSIVE_RELIC_FALLBACK_DURATION = 60 * 60 * 24 * 7;
+
+	enum EPassiveRelicDeck
+	{
+		PASSIVE_RELIC_DECK_EARTH = 0,
+		PASSIVE_RELIC_DECK_SKY = 1,
+		PASSIVE_RELIC_DECK_MAX = 2,
+	};
+
+	const TPassiveRelicMaterialInfo kPassiveRelicMaterials[PASSIVE_RELIC_MATERIAL_MAX] =
+	{
+		{ MATERIAL_PASSIVE_WEAPON, 30255 },
+		{ MATERIAL_PASSIVE_ELEMENT, 30258 },
+		{ MATERIAL_PASSIVE_ARMOR, 30256 },
+		{ MATERIAL_PASSIVE_ACCE, 30257 },
+	};
+
+	// https://tr-wiki.metin2.gameforge.com/index.php/Kalynty_Sistemi
+	// Bonus de?erleri resmi oyuna göre düzenledim de?i?tirmek isterseniz a?a?ydaki de?erleri de?i?tirin
+	/*
+	SungMa STR/RES/VIT/INT için sabit 15
+	Metin savunma için 1,2,3,4,5,6,8,10
+	Metin ta?yna kar?y güç için 1,2,3,4,5,6,7,8,10
+	Patron drop ?ansy için 1,2,3,4,5,6,7,8,10
+	Patronlara kar?y gücü için 1,2,3,4,5,6,7,8,10
+	*/
+
+	const TPassiveRelicBonusInfo kPassiveRelicBonusPool[] =
+	{
+		{ PASSIVE_RELIC_BONUS_DIRECT, APPLY_SUNGMA_STR, 1, { 15 } },
+		{ PASSIVE_RELIC_BONUS_DIRECT, APPLY_SUNGMA_HP, 1, { 15 } },
+		{ PASSIVE_RELIC_BONUS_DIRECT, APPLY_SUNGMA_MOVE, 1, { 15 } },
+		{ PASSIVE_RELIC_BONUS_DIRECT, APPLY_SUNGMA_IMMUNE, 1, { 15 } },
+		{ PASSIVE_RELIC_BONUS_DIRECT, APPLY_ATTBONUS_STONE, 9, { 1, 2, 3, 4, 5, 6, 7, 8, 10 } },
+		{ PASSIVE_RELIC_BONUS_DIRECT, APPLY_ATTBONUS_BOSS, 9, { 1, 2, 3, 4, 5, 6, 7, 8, 10 } },
+		{ PASSIVE_RELIC_BONUS_DIRECT, APPLY_ITEM_DROP_BONUS, 9, { 1, 2, 3, 4, 5, 6, 7, 8, 10 } },
+	};
+
+	LPITEM GetEquippedPassiveRelic(LPCHARACTER ch)
+	{
+		if (!ch)
+			return NULL;
+
+		return ch->GetWear(WEAR_PASSIVE);
+	}
+
+	bool IsPassiveRelicActive(LPITEM pkItem)
+	{
+		return pkItem && pkItem->GetSocket(PASSIVE_RELIC_SOCKET_ACTIVE) != 0;
+	}
+	int GetPassiveRelicDurationSeconds(LPITEM pkItem)
+	{
+		if (!pkItem)
+			return 0;
+
+		const int iDuration = pkItem->GetDuration();
+		if (iDuration > 0)
+			return iDuration;
+
+		const int iRemain = pkItem->GetSocket(PASSIVE_RELIC_SOCKET_REMAIN);
+		if (iRemain > 0)
+			return iRemain;
+
+		return PASSIVE_RELIC_FALLBACK_DURATION;
+	}
+
+	long GetPassiveRelicProcSocket(LPITEM pkItem)
+	{
+		return pkItem ? pkItem->GetSocket(PASSIVE_RELIC_SOCKET_PROC) : 0;
+	}
+
+	short GetPassiveRelicStoneDefProcValue(LPITEM pkItem)
+	{
+		return static_cast<short>(GetPassiveRelicProcSocket(pkItem) & 0xFFFF);
+	}
+
+	short GetPassiveRelicDismountMoveProcValue(LPITEM pkItem)
+	{
+		return static_cast<short>((GetPassiveRelicProcSocket(pkItem) >> 16) & 0xFFFF);
+	}
+
+	void SetPassiveRelicStoneDefProcValue(LPITEM pkItem, short sValue)
+	{
+		if (!pkItem)
+			return;
+
+		const long lCurrent = GetPassiveRelicProcSocket(pkItem);
+		const long lUpdated = (lCurrent & 0xFFFF0000L) | (static_cast<long>(sValue) & 0xFFFFL);
+		pkItem->SetSocket(PASSIVE_RELIC_SOCKET_PROC, lUpdated);
+	}
+
+	void SetPassiveRelicDismountMoveProcValue(LPITEM pkItem, short sValue)
+	{
+		if (!pkItem)
+			return;
+
+		const long lCurrent = GetPassiveRelicProcSocket(pkItem);
+		const long lUpdated = (lCurrent & 0x0000FFFFL) | ((static_cast<long>(sValue) & 0xFFFFL) << 16);
+		pkItem->SetSocket(PASSIVE_RELIC_SOCKET_PROC, lUpdated);
+	}
+
+	int GetPassiveRelicBonusCount(LPITEM pkItem)
+	{
+		if (!pkItem)
+			return 0;
+
+		return pkItem->GetAttributeCount();
+	}
+
+	void RefreshPassiveRelicState(LPCHARACTER ch, LPITEM pkItem);
+
+	int ClampPassiveRelicDeckIndex(int iDeck)
+	{
+		if (iDeck < PASSIVE_RELIC_DECK_EARTH || iDeck >= PASSIVE_RELIC_DECK_MAX)
+			return PASSIVE_RELIC_DECK_EARTH;
+		return iDeck;
+	}
+
+	std::string BuildPassiveRelicDeckAttrTypeFlag(int iDeck, int iAttrIndex)
+	{
+		char szFlag[64];
+		snprintf(szFlag, sizeof(szFlag), PASSIVE_RELIC_DECK_ATTR_TYPE_FLAG_FMT, iDeck, iAttrIndex);
+		return szFlag;
+	}
+
+	std::string BuildPassiveRelicDeckAttrValueFlag(int iDeck, int iAttrIndex)
+	{
+		char szFlag[64];
+		snprintf(szFlag, sizeof(szFlag), PASSIVE_RELIC_DECK_ATTR_VALUE_FLAG_FMT, iDeck, iAttrIndex);
+		return szFlag;
+	}
+
+	std::string BuildPassiveRelicDeckProcStoneFlag(int iDeck)
+	{
+		char szFlag[64];
+		snprintf(szFlag, sizeof(szFlag), PASSIVE_RELIC_DECK_PROC_STONE_FLAG_FMT, iDeck);
+		return szFlag;
+	}
+
+	std::string BuildPassiveRelicDeckProcDismountFlag(int iDeck)
+	{
+		char szFlag[64];
+		snprintf(szFlag, sizeof(szFlag), PASSIVE_RELIC_DECK_PROC_DISMOUNT_FLAG_FMT, iDeck);
+		return szFlag;
+	}
+
+	int GetPassiveRelicSelectedDeck(LPCHARACTER ch)
+	{
+		if (!ch)
+			return PASSIVE_RELIC_DECK_EARTH;
+
+		return ClampPassiveRelicDeckIndex(ch->GetQuestFlag(PASSIVE_RELIC_DECK_SELECTED_FLAG));
+	}
+
+	void SetPassiveRelicSelectedDeck(LPCHARACTER ch, int iDeck)
+	{
+		if (!ch)
+			return;
+
+		ch->SetQuestFlag(PASSIVE_RELIC_DECK_SELECTED_FLAG, ClampPassiveRelicDeckIndex(iDeck));
+	}
+
+	void SavePassiveRelicDeckState(LPCHARACTER ch, LPITEM pkRelic, int iDeck)
+	{
+		if (!ch || !pkRelic)
+			return;
+
+		iDeck = ClampPassiveRelicDeckIndex(iDeck);
+
+		for (int i = 0; i < ITEM_ATTRIBUTE_MAX_NUM; ++i)
+		{
+			const TPlayerItemAttribute& rAttr = pkRelic->GetAttribute(i);
+			ch->SetQuestFlag(BuildPassiveRelicDeckAttrTypeFlag(iDeck, i), rAttr.bType);
+			ch->SetQuestFlag(BuildPassiveRelicDeckAttrValueFlag(iDeck, i), rAttr.sValue);
+		}
+
+		ch->SetQuestFlag(BuildPassiveRelicDeckProcStoneFlag(iDeck), GetPassiveRelicStoneDefProcValue(pkRelic));
+		ch->SetQuestFlag(BuildPassiveRelicDeckProcDismountFlag(iDeck), GetPassiveRelicDismountMoveProcValue(pkRelic));
+	}
+
+	void ClearPassiveRelicBonuses(LPITEM pkRelic)
+	{
+		if (!pkRelic)
+			return;
+
+		while (pkRelic->GetAttributeCount() > 0)
+		{
+			if (!pkRelic->RemoveAttributeAt(pkRelic->GetAttributeCount() - 1))
+				break;
+		}
+
+		SetPassiveRelicStoneDefProcValue(pkRelic, 0);
+		SetPassiveRelicDismountMoveProcValue(pkRelic, 0);
+	}
+
+	void LoadPassiveRelicDeckState(LPCHARACTER ch, LPITEM pkRelic, int iDeck)
+	{
+		if (!ch || !pkRelic)
+			return;
+
+		iDeck = ClampPassiveRelicDeckIndex(iDeck);
+		ClearPassiveRelicBonuses(pkRelic);
+
+		for (int i = 0; i < ITEM_ATTRIBUTE_MAX_NUM; ++i)
+		{
+			const int iType = ch->GetQuestFlag(BuildPassiveRelicDeckAttrTypeFlag(iDeck, i));
+			const int iValue = ch->GetQuestFlag(BuildPassiveRelicDeckAttrValueFlag(iDeck, i));
+			if (iType <= 0 || iValue == 0)
+				continue;
+
+			pkRelic->AddAttribute(static_cast<BYTE>(iType), static_cast<short>(iValue));
+		}
+
+		SetPassiveRelicStoneDefProcValue(pkRelic, static_cast<short>(ch->GetQuestFlag(BuildPassiveRelicDeckProcStoneFlag(iDeck))));
+		SetPassiveRelicDismountMoveProcValue(pkRelic, static_cast<short>(ch->GetQuestFlag(BuildPassiveRelicDeckProcDismountFlag(iDeck))));
+	}
+
+	void ResetPassiveRelicDeckState(LPCHARACTER ch, int iDeck)
+	{
+		if (!ch)
+			return;
+
+		iDeck = ClampPassiveRelicDeckIndex(iDeck);
+		for (int i = 0; i < ITEM_ATTRIBUTE_MAX_NUM; ++i)
+		{
+			ch->SetQuestFlag(BuildPassiveRelicDeckAttrTypeFlag(iDeck, i), 0);
+			ch->SetQuestFlag(BuildPassiveRelicDeckAttrValueFlag(iDeck, i), 0);
+		}
+
+		ch->SetQuestFlag(BuildPassiveRelicDeckProcStoneFlag(iDeck), 0);
+		ch->SetQuestFlag(BuildPassiveRelicDeckProcDismountFlag(iDeck), 0);
+	}
+
+	void InitializePassiveRelicDeckState(LPCHARACTER ch, LPITEM pkRelic)
+	{
+		if (!ch || !pkRelic)
+			return;
+
+		if (ch->GetQuestFlag(PASSIVE_RELIC_DECK_INIT_FLAG) != 0)
+			return;
+
+		SavePassiveRelicDeckState(ch, pkRelic, PASSIVE_RELIC_DECK_EARTH);
+		ResetPassiveRelicDeckState(ch, PASSIVE_RELIC_DECK_SKY);
+		SetPassiveRelicSelectedDeck(ch, PASSIVE_RELIC_DECK_EARTH);
+		ch->SetQuestFlag(PASSIVE_RELIC_DECK_INIT_FLAG, 1);
+	}
+
+	void SwitchPassiveRelicDeck(LPCHARACTER ch, LPITEM pkRelic, int iNextDeck)
+	{
+		if (!ch || !pkRelic)
+			return;
+
+		InitializePassiveRelicDeckState(ch, pkRelic);
+
+		const int iCurrentDeck = GetPassiveRelicSelectedDeck(ch);
+		iNextDeck = ClampPassiveRelicDeckIndex(iNextDeck);
+
+		if (iCurrentDeck == iNextDeck)
+			return;
+
+		const bool bWasActive = pkRelic->IsEquipped() && IsPassiveRelicActive(pkRelic);
+		if (bWasActive)
+			pkRelic->ModifyPoints(false);
+
+		SavePassiveRelicDeckState(ch, pkRelic, iCurrentDeck);
+		LoadPassiveRelicDeckState(ch, pkRelic, iNextDeck);
+		SetPassiveRelicSelectedDeck(ch, iNextDeck);
+
+		if (bWasActive)
+		{
+			ch->RemoveAffect(AFFECT_PASSIVE_RELIC_STONE_DEF);
+			ch->RemoveAffect(AFFECT_PASSIVE_RELIC_DISMOUNT_SPEED);
+			pkRelic->ModifyPoints(true);
+		}
+
+		RefreshPassiveRelicState(ch, pkRelic);
+	}
+
+	bool CanUsePassiveRelicCommand(LPCHARACTER ch)
+	{
+		if (!ch || !ch->IsPC())
+			return false;
+
+		if (ch->IsDead() || ch->IsStun())
+			return false;
+
+		if (ch->GetExchange() || ch->GetMyShop() || ch->GetShopOwner() || ch->IsOpenSafebox() || ch->IsCubeOpen())
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "You cannot use the relic right now.");
+			return false;
+		}
+
+		if (ch->GetQuestFlag(PASSIVE_RELIC_COOLDOWN_FLAG) > get_global_time())
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "Please wait a moment and try again.");
+			return false;
+		}
+
+		return true;
+	}
+
+	void TouchPassiveRelicCooldown(LPCHARACTER ch)
+	{
+		if (ch)
+			ch->SetQuestFlag(PASSIVE_RELIC_COOLDOWN_FLAG, get_global_time() + 1);
+	}
+
+	void RefreshPassiveRelicState(LPCHARACTER ch, LPITEM pkItem)
+	{
+		if (!ch || !pkItem)
+			return;
+
+		if (pkItem->IsEquipped())
+		{
+			ch->ComputeBattlePoints();
+			ch->UpdatePacket();
+		}
+
+		pkItem->UpdatePacket();
+	}
+
+	void SetPassiveRelicActive(LPCHARACTER ch, LPITEM pkItem, bool bActive)
+	{
+		if (!ch || !pkItem)
+			return;
+
+		const bool bWasActive = IsPassiveRelicActive(pkItem);
+		if (bWasActive == bActive)
+			return;
+
+		if (pkItem->IsEquipped() && bWasActive)
+			pkItem->ModifyPoints(false);
+
+		pkItem->SetSocket(PASSIVE_RELIC_SOCKET_ACTIVE, bActive ? 1 : 0);
+
+		if (pkItem->IsEquipped() && bActive)
+		{
+			pkItem->ModifyPoints(true);
+			ch->EffectPacket(SE_PASSIVE_EFFECT);
+			ch->SpecificEffectPacket("d:/ymir work/effect/etc/buff/buff_passive_01.mse");
+		}
+		else if (!bActive)
+		{
+			ch->RemoveAffect(AFFECT_PASSIVE_RELIC_STONE_DEF);
+			ch->RemoveAffect(AFFECT_PASSIVE_RELIC_DISMOUNT_SPEED);
+		}
+
+		RefreshPassiveRelicState(ch, pkItem);
+	}
+
+	bool ParsePassiveRelicMaterialCells(const char* argument, int aiCells[PASSIVE_RELIC_MATERIAL_MAX])
+	{
+		if (!argument)
+			return false;
+
+		for (int i = 0; i < PASSIVE_RELIC_MATERIAL_MAX; ++i)
+		{
+			char arg[256];
+			argument = one_argument(argument, arg, sizeof(arg));
+			if (!*arg)
+				return false;
+
+			str_to_number(aiCells[i], arg);
+		}
+
+		return true;
+	}
+
+	LPITEM GetPassiveRelicMaterialItem(LPCHARACTER ch, int iCell, const TPassiveRelicMaterialInfo& rInfo)
+	{
+		if (!ch)
+			return NULL;
+
+		if (iCell < 0 || iCell >= INVENTORY_AND_EQUIP_SLOT_MAX)
+			return NULL;
+
+		LPITEM pkItem = ch->GetInventoryItem(iCell);
+		if (!pkItem)
+			return NULL;
+
+		if (pkItem->GetType() != ITEM_MATERIAL)
+			return NULL;
+
+		if (pkItem->GetSubType() != rInfo.bSubType)
+			return NULL;
+
+		if (pkItem->GetVnum() != rInfo.dwVnum)
+			return NULL;
+
+		if (pkItem->GetCount() <= 0)
+			return NULL;
+
+		return pkItem;
+	}
+
+	bool CollectPassiveRelicMaterialItems(LPCHARACTER ch, const int aiCells[PASSIVE_RELIC_MATERIAL_MAX], LPITEM apItems[PASSIVE_RELIC_MATERIAL_MAX])
+	{
+		for (int i = 0; i < PASSIVE_RELIC_MATERIAL_MAX; ++i)
+		{
+			for (int j = i + 1; j < PASSIVE_RELIC_MATERIAL_MAX; ++j)
+			{
+				if (aiCells[i] == aiCells[j])
+					return false;
+			}
+
+			apItems[i] = GetPassiveRelicMaterialItem(ch, aiCells[i], kPassiveRelicMaterials[i]);
+			if (!apItems[i])
+				return false;
+		}
+
+		return true;
+	}
+
+	void ConsumePassiveRelicMaterialItems(LPITEM apItems[PASSIVE_RELIC_MATERIAL_MAX])
+	{
+		for (int i = 0; i < PASSIVE_RELIC_MATERIAL_MAX; ++i)
+		{
+			if (!apItems[i])
+				continue;
+
+			if (apItems[i]->GetCount() > 1)
+				apItems[i]->SetCount(apItems[i]->GetCount() - 1);
+			else
+				apItems[i]->SetCount(0);
+		}
+	}
+
+	bool AddRandomPassiveRelicBonus(LPITEM pkRelic)
+	{
+		if (!pkRelic)
+			return false;
+
+		std::vector<int> vecAvailableIndexes;
+		for (int i = 0; i < static_cast<int>(sizeof(kPassiveRelicBonusPool) / sizeof(kPassiveRelicBonusPool[0])); ++i)
+		{
+			const TPassiveRelicBonusInfo& rBonusInfo = kPassiveRelicBonusPool[i];
+			switch (rBonusInfo.bBonusType)
+			{
+				case PASSIVE_RELIC_BONUS_DIRECT:
+					if (!pkRelic->HasAttr(rBonusInfo.bApply))
+						vecAvailableIndexes.push_back(i);
+					break;
+			}
+		}
+
+		if (vecAvailableIndexes.empty())
+			return false;
+
+		const int iSelectedIndex = vecAvailableIndexes[number(0, vecAvailableIndexes.size() - 1)];
+		const TPassiveRelicBonusInfo& rBonusInfo = kPassiveRelicBonusPool[iSelectedIndex];
+		const short sValue = rBonusInfo.sValues[number(0, rBonusInfo.bValueCount - 1)];
+		switch (rBonusInfo.bBonusType)
+		{
+			case PASSIVE_RELIC_BONUS_DIRECT:
+				pkRelic->AddAttribute(rBonusInfo.bApply, sValue);
+				return true;
+		}
+
+		return false;
+	}
+}
+
+ACMD(do_passive_relic)
+{
+	char arg1[256];
+	argument = one_argument(argument, arg1, sizeof(arg1));
+
+	if (!*arg1)
+		return;
+
+	const bool bIsUnequipCommand = !str_cmp(arg1, "unequip");
+	if (!bIsUnequipCommand && !CanUsePassiveRelicCommand(ch))
+		return;
+
+	LPITEM pkRelic = GetEquippedPassiveRelic(ch);
+	if (!pkRelic)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "Equip your passive relic first.");
+		return;
+	}
+
+	InitializePassiveRelicDeckState(ch, pkRelic);
+
+	if (!str_cmp(arg1, "earth") || !str_cmp(arg1, "sky"))
+	{
+		const int iNextDeck = !str_cmp(arg1, "sky") ? PASSIVE_RELIC_DECK_SKY : PASSIVE_RELIC_DECK_EARTH;
+		SwitchPassiveRelicDeck(ch, pkRelic, iNextDeck);
+		TouchPassiveRelicCooldown(ch);
+		ch->ChatPacket(CHAT_TYPE_INFO, iNextDeck == PASSIVE_RELIC_DECK_SKY ? "Sky relic deck selected." : "Earth relic deck selected.");
+		return;
+	}
+
+	if (!str_cmp(arg1, "extract"))
+	{
+		char argCell[256];
+		one_argument(argument, argCell, sizeof(argCell));
+		if (!*argCell)
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "Place a valid pincer item on the relic.");
+			return;
+		}
+
+		int iExtractCell = -1;
+		str_to_number(iExtractCell, argCell);
+		if (iExtractCell < 0 || iExtractCell >= INVENTORY_AND_EQUIP_SLOT_MAX)
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "Invalid extraction item slot.");
+			return;
+		}
+
+		LPITEM pkExtractItem = ch->GetInventoryItem(iExtractCell);
+		if (!pkExtractItem || (pkExtractItem->GetVnum() != 100100 && pkExtractItem->GetVnum() != 100101))
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "You need Dragon Pincer or Dragon Pincer+.");
+			return;
+		}
+
+		const int iSuccessChance = (pkExtractItem->GetVnum() == 100101) ? 100 : 30;
+		const int iEmptyPos = ch->GetEmptyInventory(pkRelic->GetSize());
+		if (iEmptyPos < 0)
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "You need an empty inventory slot to extract the relic.");
+			return;
+		}
+
+		pkExtractItem->SetCount(pkExtractItem->GetCount() - 1);
+
+		if (IsPassiveRelicActive(pkRelic))
+			SetPassiveRelicActive(ch, pkRelic, false);
+
+		if (number(1, 100) > iSuccessChance)
+		{
+			SavePassiveRelicDeckState(ch, pkRelic, GetPassiveRelicSelectedDeck(ch));
+			pkRelic->RemoveFromCharacter();
+			pkRelic->SetCount(0);
+			ch->ChatPacket(CHAT_TYPE_INFO, "Relic extraction failed. The relic was destroyed.");
+			TouchPassiveRelicCooldown(ch);
+			return;
+		}
+
+		SavePassiveRelicDeckState(ch, pkRelic, GetPassiveRelicSelectedDeck(ch));
+		pkRelic->RemoveFromCharacter();
+		pkRelic->AddToCharacter(ch, TItemPos(INVENTORY, iEmptyPos));
+		ch->ChatPacket(CHAT_TYPE_INFO, "Relic extraction succeeded.");
+		TouchPassiveRelicCooldown(ch);
+		return;
+	}
+
+	if (!str_cmp(arg1, "unequip"))
+	{
+		if (IsPassiveRelicActive(pkRelic))
+			SetPassiveRelicActive(ch, pkRelic, false);
+
+		if (number(1, 100) > PASSIVE_RELIC_DIRECT_UNEQUIP_SUCCESS_CHANCE)
+		{
+			SavePassiveRelicDeckState(ch, pkRelic, GetPassiveRelicSelectedDeck(ch));
+			pkRelic->RemoveFromCharacter();
+			pkRelic->SetCount(0);
+			ch->ChatPacket(CHAT_TYPE_INFO, "Direct relic extraction failed. The relic was destroyed.");
+			return;
+		}
+
+		int iEmptyPos = ch->GetEmptyInventory(pkRelic->GetSize());
+		if (iEmptyPos < 0)
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "You need an empty inventory slot to unequip the relic.");
+			return;
+		}
+
+		SavePassiveRelicDeckState(ch, pkRelic, GetPassiveRelicSelectedDeck(ch));
+		pkRelic->RemoveFromCharacter();
+		pkRelic->AddToCharacter(ch, TItemPos(INVENTORY, iEmptyPos));
+		ch->ChatPacket(CHAT_TYPE_INFO, "The relic has been removed from the slot.");
+		return;
+	}
+
+	if (!str_cmp(arg1, "charge"))
+	{
+		int aiCells[PASSIVE_RELIC_MATERIAL_MAX];
+		LPITEM apItems[PASSIVE_RELIC_MATERIAL_MAX] = {};
+		if (!ParsePassiveRelicMaterialCells(argument, aiCells) || !CollectPassiveRelicMaterialItems(ch, aiCells, apItems))
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "Place the four spirit items into the relic slots first.");
+			return;
+		}
+
+		const int iDuration = GetPassiveRelicDurationSeconds(pkRelic);
+		if (iDuration <= 0)
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "This relic cannot be charged.");
+			return;
+		}
+
+		if (pkRelic->GetSocket(PASSIVE_RELIC_SOCKET_REMAIN) >= iDuration)
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "The relic is already fully charged.");
+			return;
+		}
+
+		TouchPassiveRelicCooldown(ch);
+
+		if (pkRelic->IsEquipped() && -1 != pkRelic->GetProto()->cLimitTimerBasedOnWearIndex)
+			pkRelic->StopTimerBasedOnWearExpireEvent();
+
+		pkRelic->SetSocket(PASSIVE_RELIC_SOCKET_REMAIN, iDuration);
+
+		if (pkRelic->IsEquipped() && -1 != pkRelic->GetProto()->cLimitTimerBasedOnWearIndex)
+			pkRelic->StartTimerBasedOnWearExpireEvent();
+
+		ConsumePassiveRelicMaterialItems(apItems);
+		RefreshPassiveRelicState(ch, pkRelic);
+		ch->ChatPacket(CHAT_TYPE_INFO, "The relic time has been restored.");
+		return;
+	}
+
+	if (!str_cmp(arg1, "add"))
+	{
+		int aiCells[PASSIVE_RELIC_MATERIAL_MAX];
+		LPITEM apItems[PASSIVE_RELIC_MATERIAL_MAX] = {};
+		if (!ParsePassiveRelicMaterialCells(argument, aiCells) || !CollectPassiveRelicMaterialItems(ch, aiCells, apItems))
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "Place the four spirit items into the relic slots first.");
+			return;
+		}
+
+		if (GetPassiveRelicBonusCount(pkRelic) >= PASSIVE_RELIC_MAX_BONUS_COUNT)
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "The relic cannot receive more bonuses.");
+			return;
+		}
+
+		const bool bWasActive = pkRelic->IsEquipped() && IsPassiveRelicActive(pkRelic);
+		if (bWasActive)
+			pkRelic->ModifyPoints(false);
+
+		const bool bAdded = AddRandomPassiveRelicBonus(pkRelic);
+
+		if (bWasActive)
+			pkRelic->ModifyPoints(true);
+
+		if (!bAdded)
+		{
+			RefreshPassiveRelicState(ch, pkRelic);
+			ch->ChatPacket(CHAT_TYPE_INFO, "The relic already has every available bonus.");
+			return;
+		}
+
+		TouchPassiveRelicCooldown(ch);
+		ConsumePassiveRelicMaterialItems(apItems);
+		RefreshPassiveRelicState(ch, pkRelic);
+		ch->ChatPacket(CHAT_TYPE_INFO, "A random relic bonus has been added.");
+		return;
+	}
+
+	if (!str_cmp(arg1, "activate"))
+	{
+		if (GetPassiveRelicBonusCount(pkRelic) <= 0)
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "Add a relic bonus first.");
+			return;
+		}
+
+		const int iDuration = GetPassiveRelicDurationSeconds(pkRelic);
+		if (iDuration > 0 && pkRelic->GetSocket(PASSIVE_RELIC_SOCKET_REMAIN) <= 0)
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "Charge the relic before activation.");
+			return;
+		}
+
+		TouchPassiveRelicCooldown(ch);
+
+		const bool bNextState = !IsPassiveRelicActive(pkRelic);
+		SetPassiveRelicActive(ch, pkRelic, bNextState);
+		ch->ChatPacket(CHAT_TYPE_INFO, bNextState ? "The relic is now active." : "The relic is now inactive.");
+		return;
+	}
+}
+#endif
+
+#ifdef ENABLE_TITLE_SYSTEM
+namespace
+{
+	struct STitleSystemDef
+	{
+		int iTitleID;
+		const char* c_szName;
+		const char* c_szEffect;
+	};
+
+	const STitleSystemDef kTitleSystemDefs[] =
+	{
+		{ 1000, "Sansli", "d:/ymir work/effect/etc/title/title_05_medal.mse" },
+		{ 1001, "Metin+", "d:/ymir work/effect/etc/title/title_06_banner_gold.mse" },
+		{ 1002, "Destansi", "d:/ymir work/effect/etc/title/title_07_banner_red.mse" },
+		{ 1003, "Efsanevi", "d:/ymir work/effect/etc/title/title_08_banner_blue.mse" },
+		{ 1004, "Mistik", "d:/ymir work/effect/etc/title/title_02_dragon.mse" },
+		{ 1005, "Gunessever", "d:/ymir work/effect/etc/title/title_01_shield.mse" },
+		{ 2000, "Son kurtulan", "d:/ymir work/effect/etc/title/title_04_trophy.mse" },
+		{ 2001, "Yenilmez", "d:/ymir work/effect/etc/title/title_03_fist.mse" },
+		{ 2002, "Savas habercisi", "d:/ymir work/effect/etc/title/title_02_dragon.mse" },
+		{ 2003, "Kasap", "d:/ymir work/effect/etc/title/title_01_shield.mse" },
+		{ 3000, "Metin+", "d:/ymir work/effect/etc/title/title_06_banner_gold.mse" },
+		{ 3001, "Destansi", "d:/ymir work/effect/etc/title/title_07_banner_red.mse" },
+		{ 3002, "Efsanevi", "d:/ymir work/effect/etc/title/title_08_banner_blue.mse" },
+		{ 3003, "Mistik", "d:/ymir work/effect/etc/title/title_02_dragon.mse" },
+		{ 3004, "Sansli", "d:/ymir work/effect/etc/title/title_05_medal.mse" },
+	};
+
+	const char* TITLE_SYSTEM_CLEAR_EFFECT_TOKEN = "__TITLE_EFFECT_CLEAR__";
+	const char* TITLE_SYSTEM_ACTIVE_FLAG = "title_system.active";
+	const char* TITLE_SYSTEM_OWNED_FLAG_FMT = "title_system.owned.%d";
+	const char* TITLE_SYSTEM_EXPIRE_FLAG_FMT = "title_system.expire.%d";
+
+	void BuildTitleSystemOwnedFlag(int iTitleID, char* szFlag, size_t stSize)
+	{
+		snprintf(szFlag, stSize, TITLE_SYSTEM_OWNED_FLAG_FMT, iTitleID);
+	}
+
+	void BuildTitleSystemExpireFlag(int iTitleID, char* szFlag, size_t stSize)
+	{
+		snprintf(szFlag, stSize, TITLE_SYSTEM_EXPIRE_FLAG_FMT, iTitleID);
+	}
+
+	const STitleSystemDef* FindTitleSystemDef(int iTitleID)
+	{
+		for (size_t i = 0; i < sizeof(kTitleSystemDefs) / sizeof(kTitleSystemDefs[0]); ++i)
+		{
+			if (kTitleSystemDefs[i].iTitleID == iTitleID)
+				return &kTitleSystemDefs[i];
+		}
+
+		return NULL;
+	}
+
+	int GetTitleSystemExpireTime(LPCHARACTER ch, int iTitleID)
+	{
+		if (!ch)
+			return 0;
+
+		char szFlag[64];
+		BuildTitleSystemExpireFlag(iTitleID, szFlag, sizeof(szFlag));
+		return ch->GetQuestFlag(szFlag);
+	}
+
+	bool IsTitleSystemOwned(LPCHARACTER ch, int iTitleID)
+	{
+		if (!ch)
+			return false;
+
+		char szFlag[64];
+		BuildTitleSystemOwnedFlag(iTitleID, szFlag, sizeof(szFlag));
+		return ch->GetQuestFlag(szFlag) > 0;
+	}
+
+	void ClearTitleSystemOwnership(LPCHARACTER ch, int iTitleID)
+	{
+		if (!ch)
+			return;
+
+		char szOwned[64];
+		char szExpire[64];
+		BuildTitleSystemOwnedFlag(iTitleID, szOwned, sizeof(szOwned));
+		BuildTitleSystemExpireFlag(iTitleID, szExpire, sizeof(szExpire));
+		ch->SetQuestFlag(szOwned, 0);
+		ch->SetQuestFlag(szExpire, 0);
+
+		if (ch->GetQuestFlag(TITLE_SYSTEM_ACTIVE_FLAG) == iTitleID)
+			ch->SetQuestFlag(TITLE_SYSTEM_ACTIVE_FLAG, 0);
+	}
+
+	bool IsTitleSystemExpired(LPCHARACTER ch, int iTitleID)
+	{
+		const int iExpireAt = GetTitleSystemExpireTime(ch, iTitleID);
+		if (iExpireAt <= 0)
+			return false;
+
+		if (iExpireAt > get_global_time())
+			return false;
+
+		ClearTitleSystemOwnership(ch, iTitleID);
+		return true;
+	}
+
+	void SetTitleSystemActive(LPCHARACTER ch, int iTitleID)
+	{
+		if (!ch)
+			return;
+
+		ch->SetQuestFlag(TITLE_SYSTEM_ACTIVE_FLAG, iTitleID);
+	}
+}
+
+ACMD(do_title)
+{
+	char arg1[256];
+	argument = one_argument(argument, arg1, sizeof(arg1));
+
+	if (!*arg1)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "Title commands: /title list, /title equip <id>, /title clear, /title status");
+		return;
+	}
+
+	if (!str_cmp(arg1, "list"))
+	{
+		ch->ChatPacket(CHAT_TYPE_COMMAND, "TitleSyncReset");
+		ch->ChatPacket(CHAT_TYPE_INFO, "Unlocked titles:");
+		for (size_t i = 0; i < sizeof(kTitleSystemDefs) / sizeof(kTitleSystemDefs[0]); ++i)
+		{
+			const int iTitleID = kTitleSystemDefs[i].iTitleID;
+			if (!IsTitleSystemOwned(ch, iTitleID))
+				continue;
+
+			if (IsTitleSystemExpired(ch, iTitleID))
+				continue;
+
+			const int iExpireAt = GetTitleSystemExpireTime(ch, iTitleID);
+			ch->ChatPacket(CHAT_TYPE_COMMAND, "TitleSyncAdd %d", iTitleID);
+			if (iExpireAt > 0)
+				ch->ChatPacket(CHAT_TYPE_INFO, "- %d: %s (expires in %d sec)", iTitleID, kTitleSystemDefs[i].c_szName, iExpireAt - get_global_time());
+			else
+				ch->ChatPacket(CHAT_TYPE_INFO, "- %d: %s", iTitleID, kTitleSystemDefs[i].c_szName);
+		}
+		return;
+	}
+
+	if (!str_cmp(arg1, "status"))
+	{
+		const int iActive = ch->GetQuestFlag(TITLE_SYSTEM_ACTIVE_FLAG);
+		ch->ChatPacket(CHAT_TYPE_COMMAND, "TitleSyncActive %d", iActive);
+		if (iActive <= 0)
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "No active title.");
+			return;
+		}
+
+		const STitleSystemDef* pkDef = FindTitleSystemDef(iActive);
+		if (!pkDef)
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "Active title id: %d", iActive);
+			return;
+		}
+
+		ch->ChatPacket(CHAT_TYPE_INFO, "Active title: %d (%s)", iActive, pkDef->c_szName);
+		return;
+	}
+
+
+	if (!str_cmp(arg1, "sync"))
+	{
+		ch->ChatPacket(CHAT_TYPE_COMMAND, "TitleSyncReset");
+		for (size_t i = 0; i < sizeof(kTitleSystemDefs) / sizeof(kTitleSystemDefs[0]); ++i)
+		{
+			const int iTitleID = kTitleSystemDefs[i].iTitleID;
+			if (!IsTitleSystemOwned(ch, iTitleID))
+				continue;
+
+			if (IsTitleSystemExpired(ch, iTitleID))
+				continue;
+
+			ch->ChatPacket(CHAT_TYPE_COMMAND, "TitleSyncAdd %d", iTitleID);
+		}
+		ch->ChatPacket(CHAT_TYPE_COMMAND, "TitleSyncActive %d", ch->GetQuestFlag(TITLE_SYSTEM_ACTIVE_FLAG));
+		return;
+	}
+
+	if (!str_cmp(arg1, "clear"))
+	{
+		SetTitleSystemActive(ch, 0);
+		ch->SpecificEffectPacket(TITLE_SYSTEM_CLEAR_EFFECT_TOKEN);
+		// no restart for title clear (client sync command handles UI state)
+		ch->ChatPacket(CHAT_TYPE_COMMAND, "TitleSyncActive 0");
+		ch->ChatPacket(CHAT_TYPE_INFO, "Title unequipped.");
+		return;
+	}
+
+	if (!str_cmp(arg1, "equip"))
+	{
+		char arg2[256];
+		one_argument(argument, arg2, sizeof(arg2));
+		if (!*arg2)
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "Usage: /title equip <id>");
+			return;
+		}
+
+		int iTitleID = 0;
+		str_to_number(iTitleID, arg2);
+		const STitleSystemDef* pkDef = FindTitleSystemDef(iTitleID);
+		if (!pkDef)
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "Unknown title id.");
+			return;
+		}
+
+		if (!IsTitleSystemOwned(ch, iTitleID) || IsTitleSystemExpired(ch, iTitleID))
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "You do not own this title or it has expired.");
+			return;
+		}
+		const int iActiveTitle = ch->GetQuestFlag(TITLE_SYSTEM_ACTIVE_FLAG);
+		if (iActiveTitle == iTitleID)
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "This title is already active.");
+			return;
+		}
+		if (iActiveTitle > 0)
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "Remove your current title first.");
+			return;
+		}
+		ch->SpecificEffectPacket(TITLE_SYSTEM_CLEAR_EFFECT_TOKEN);
+		SetTitleSystemActive(ch, iTitleID);
+		ch->ChatPacket(CHAT_TYPE_COMMAND, "TitleSyncActive %d", iTitleID);
+		if (pkDef->c_szEffect && *pkDef->c_szEffect) ch->SpecificEffectPacket(pkDef->c_szEffect);
+		ch->ChatPacket(CHAT_TYPE_INFO, "%s was equipped.", pkDef->c_szName);
+		return;
+	}
+
+	ch->ChatPacket(CHAT_TYPE_INFO, "Unknown title command.");
+}
+#endif
 
 #ifdef __AUTO_HUNT__
 ACMD(do_auto_hunt)
@@ -56,7 +1048,6 @@ ACMD(do_auto_hunt)
 	ch->GetAutoHuntCommand(argument);
 }
 #endif
-
 
 #ifdef ENABLE_HORSE_SPAWN_EXPLOIT_FIX
 ACMD(do_user_horse_ride)
@@ -258,6 +1249,11 @@ struct DisconnectFunc
 {
 	void operator () (LPDESC d)
 	{
+#ifdef ENABLE_ANALYZE_CLOSE_FIX
+		if (!d)
+			return;
+#endif
+
 		if (d->GetType() == DESC_TYPE_CONNECTOR)
 			return;
 
@@ -276,7 +1272,7 @@ EVENTINFO(shutdown_event_data)
 	int seconds;
 
 	shutdown_event_data()
-	: seconds( 0 )
+		: seconds(0)
 	{
 	}
 };
@@ -297,7 +1293,7 @@ EVENTFUNC(shutdown_event)
 	{
 		sys_log(0, "shutdown_event sec %d", *pSec);
 
-		if (--*pSec == -10)
+		if (-- * pSec == -10)
 		{
 			const DESC_MANAGER::DESC_SET & c_set_desc = DESC_MANAGER::instance().GetClientSet();
 			std::for_each(c_set_desc.begin(), c_set_desc.end(), DisconnectFunc());
@@ -551,6 +1547,16 @@ ACMD(do_console)
 
 ACMD(do_restart)
 {
+
+#ifdef ENABLE_SUNG_MAHI_TOWER
+	LPDUNGEON dungeonInstance = ch->GetDungeon();
+	if (dungeonInstance && dungeonInstance->GetFlag("isSungMahiDungeon") > 0)
+	{
+		ch->WarpSet((9216 * 100), (6144*100));
+		return;
+	}
+#endif
+
 	if (false == ch->IsDead())
 	{
 		ch->ChatPacket(CHAT_TYPE_COMMAND, "CloseRestartWindow");
@@ -656,6 +1662,38 @@ ACMD(do_restart)
 			return;
 		}
 	}
+
+#ifdef ENABLE_QUEEN_NETHIS
+	if (SnakeLair::CSnk::instance().IsSnakeMap(ch->GetMapIndex()))
+	{
+		switch (subcmd)
+		{
+			case SCMD_RESTART_TOWN:
+				sys_log(0, "do_restart: restart town");
+				//PIXEL_POSITION pos;
+
+				ch->RestartAtSamePos();
+
+				ch->PointChange(POINT_HP, ch->GetMaxHP() - ch->GetHP());
+				ch->PointChange(POINT_SP, ch->GetMaxSP() - ch->GetSP());
+				ch->ReviveInvisible(3);
+				break;
+
+			case SCMD_RESTART_HERE:
+				sys_log(0, "do_restart: restart here");
+				ch->RestartAtSamePos();
+				ch->PointChange(POINT_HP, ch->GetMaxHP() - ch->GetHP());
+				ch->PointChange(POINT_SP, ch->GetMaxSP() - ch->GetSP());
+				ch->ReviveInvisible(3);
+				break;
+
+			default:
+				break;
+		}
+
+		return;
+	}
+#endif
 
 	switch (subcmd)
 	{
@@ -779,19 +1817,35 @@ ACMD(do_stat_minus) // Fix
 ACMD(do_stat)
 {
 	char arg1[256];
+#ifdef ENABLE_STATUS_UP_RENEWAL
+	char arg2[256];
+	two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
+#else
 	one_argument(argument, arg1, sizeof(arg1));
+#endif
 
 	if (!*arg1)
 		return;
 
+#ifdef ENABLE_STATUS_UP_RENEWAL
+	int iStatUp = 1;
+	if (*arg2)
+		iStatUp = atoi(arg2);
+#endif
+
 	if (ch->IsPolymorphed())
 	{
 		ch->LocaleChatPacket(CHAT_TYPE_INFO, 245, "");
 		return;
 	}
 
+#ifdef ENABLE_STATUS_UP_RENEWAL
+	if (ch->GetPoint(POINT_STAT) < iStatUp)
+		iStatUp = ch->GetPoint(POINT_STAT);
+#else
 	if (ch->GetPoint(POINT_STAT) <= 0)
 		return;
+#endif
 
 	BYTE idx = 0;
 
@@ -806,11 +1860,23 @@ ACMD(do_stat)
 	else
 		return;
 
-	if (ch->GetRealPoint(idx) >= MAX_STAT)
-		return;
+	// ch->ChatPacket(CHAT_TYPE_INFO, "%s GRP(%d) idx(%u), MAX_STAT(%d), expr(%d)", __FUNCTION__, ch->GetRealPoint(idx), idx, MAX_STAT, ch->GetRealPoint(idx) >= MAX_STAT);
+#ifdef ENABLE_STATUS_UP_RENEWAL
+	if ((ch->GetRealPoint(idx) + iStatUp) > MAX_STAT)
+		iStatUp = MAX_STAT - ch->GetRealPoint(idx);
 
+	if (iStatUp < 1)
+#else
+	if (ch->GetRealPoint(idx) >= MAX_STAT)
+#endif
+		return;
+#ifdef ENABLE_STATUS_UP_RENEWAL
+	ch->SetRealPoint(idx, ch->GetRealPoint(idx) + iStatUp);
+	ch->SetPoint(idx, ch->GetPoint(idx) + iStatUp);
+#else
 	ch->SetRealPoint(idx, ch->GetRealPoint(idx) + 1);
 	ch->SetPoint(idx, ch->GetPoint(idx) + 1);
+#endif
 	ch->ComputePoints();
 	ch->PointChange(idx, 0);
 
@@ -822,64 +1888,11 @@ ACMD(do_stat)
 	{
 		ch->PointChange(POINT_MAX_SP, 0);
 	}
-
+#ifdef ENABLE_STATUS_UP_RENEWAL
+	ch->PointChange(POINT_STAT, -iStatUp);
+#else
 	ch->PointChange(POINT_STAT, -1);
-	ch->ComputePoints();
-}
-
-ACMD(do_stat_val)
-{
-	char arg1[256], arg2[256];
-	two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
-
-	int val = 0;
-	str_to_number(val, arg2);
-
-	if (!*arg1 || val <= 0)
-		return;
-
-	if (ch->IsPolymorphed())
-	{
-		ch->LocaleChatPacket(CHAT_TYPE_INFO, 245, "");
-		return;
-	}
-
-	if (ch->GetPoint(POINT_STAT) <= 0)
-		return;
-
-	BYTE idx = 0;
-
-	if (!strcmp(arg1, "st"))
-		idx = POINT_ST;
-	else if (!strcmp(arg1, "dx"))
-		idx = POINT_DX;
-	else if (!strcmp(arg1, "ht"))
-		idx = POINT_HT;
-	else if (!strcmp(arg1, "iq"))
-		idx = POINT_IQ;
-	else
-		return;
-
-	if (ch->GetRealPoint(idx) >= MAX_STAT)
-		return;
-
-	if (val > ch->GetPoint(POINT_STAT))
-		val = ch->GetPoint(POINT_STAT);
-
-	if (ch->GetRealPoint(idx) + val > MAX_STAT)
-		val = MAX_STAT - ch->GetRealPoint(idx);
-
-	ch->SetRealPoint(idx, ch->GetRealPoint(idx) + val);
-	ch->SetPoint(idx, ch->GetPoint(idx) + val);
-	ch->ComputePoints();
-	ch->PointChange(idx, 0);
-
-	if (idx == POINT_IQ)
-		ch->PointChange(POINT_MAX_HP, 0);
-	else if (idx == POINT_HT)
-		ch->PointChange(POINT_MAX_SP, 0);
-
-	ch->PointChange(POINT_STAT, -val);
+#endif
 	ch->ComputePoints();
 }
 
@@ -1099,6 +2112,9 @@ ACMD(do_new_mall_open)
 
 ACMD(do_ungroup)
 {
+	if (!ch)
+		return;
+
 	if (!ch->GetParty())
 		return;
 
@@ -1114,10 +2130,21 @@ ACMD(do_ungroup)
 		return;
 	}
 
+#ifdef ENABLE_QUEEN_NETHIS
+	if (SnakeLair::CSnk::instance().IsSnakeMap(ch->GetMapIndex()))
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "[LS;676]");
+		return;
+	}
+#endif
+
 	LPPARTY pParty = ch->GetParty();
+	if (!pParty)
+		return;
 
 	if (pParty->GetMemberCount() == 2)
 	{
+		// party disband
 		CPartyManager::instance().DeleteParty(pParty);
 	}
 	else
@@ -1138,36 +2165,48 @@ ACMD(do_close_shop)
 
 ACMD(do_set_walk_mode)
 {
+	if (!ch)
+		return;
+
 	ch->SetNowWalking(true);
 	ch->SetWalking(true);
 }
 
 ACMD(do_set_run_mode)
 {
+	if (!ch)
+		return;
+
 	ch->SetNowWalking(false);
 	ch->SetWalking(false);
 }
 
 ACMD(do_war)
 {
-	CGuild * g = ch->GetGuild();
+	if (!ch)
+		return;
+
+	//get my guild information
+	CGuild* g = ch->GetGuild();
 
 	if (!g)
 		return;
 
+	//Check if there is a war!
 	if (g->UnderAnyWar())
 	{
 		ch->LocaleChatPacket(CHAT_TYPE_INFO, 297, "");
 		return;
 	}
 
+	//Divide the parameter by two
+
 	char arg1[256], arg2[256];
-	int type = GUILD_WAR_TYPE_FIELD;
+	int type = GUILD_WAR_TYPE_FIELD; //fixme102 base int modded uint
 	two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
 
 	if (!*arg1)
 		return;
-
 
 #ifdef ENABLE_WAR_CRASHER_PROTECTION_FIX
 	if (*arg2)
@@ -1509,6 +2548,17 @@ ACMD(do_unmount)
 
 ACMD(do_observer_exit)
 {
+#ifdef ENABLE_DRAGON_LAIR
+	if(ch->GetMapIndex() == 208)
+	{
+		if (ch->IsObserverMode())
+		{
+			ch->SetObserverMode(false);
+			ch->WarpSet(180000,1220000);
+			return;
+		}
+	}
+#endif
 	if (ch->IsObserverMode())
 	{
 		if (ch->GetWarMap())
@@ -1687,6 +2737,9 @@ static const char* FN_point_string(int apply_number)
 		case POINT_HP_REGEN:						return "Energy Recovery +%d";
 		case POINT_SP_REGEN:						return "Spell Point Recovery +%d";
 		case POINT_POISON_PCT:						return "Poison Attack %d";
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		case POINT_BLEEDING_PCT:					return "??? %d";
+#endif
 		case POINT_STUN_PCT:						return "Star +%d";
 		case POINT_SLOW_PCT:						return "Speed Reduction +%d";
 		case POINT_CRITICAL_PCT:					return "Critical Attack with a chance of %d%%";
@@ -1711,9 +2764,15 @@ static const char* FN_point_string(int apply_number)
 		case POINT_RESIST_BELL:						return "Bell Defence %d%%";
 		case POINT_RESIST_FAN:						return "Fan Defence %d%%";
 		case POINT_RESIST_BOW:						return "Distant Attack Resistance %d%%";
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		case POINT_RESIST_CLAW:						return "??? ?? %d%%";
+#endif
 		case POINT_RESIST_FIRE:						return "Fire Resistance %d%%";
 		case POINT_RESIST_ELEC:						return "Lightning Resistance %d%%";
 		case POINT_RESIST_MAGIC:					return "Magic Resistance %d%%";
+#ifdef ENABLE_MAGIC_REDUCTION_SYSTEM
+		case POINT_RESIST_MAGIC_REDUCTION:			return "¸¶¹y ÀúÇ× %d%%";
+#endif
 		case POINT_RESIST_WIND:						return "Wind Resistance %d%%";
 		case POINT_RESIST_ICE:						return "Ice Resistance %d%%";
 		case POINT_RESIST_EARTH:					return "Earth Resistance %d%%";
@@ -1721,6 +2780,9 @@ static const char* FN_point_string(int apply_number)
 		case POINT_REFLECT_MELEE:					return "Reflect Direct Hit: %d%%";
 		case POINT_REFLECT_CURSE:					return "Reflect Curse: %d%%";
 		case POINT_POISON_REDUCE:					return "Poison Resistance %d%%";
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	case POINT_BLEEDING_REDUCE:						return "? ?? %d%%";
+#endif
 		case POINT_KILL_SP_RECOVER:					return "Spell Points (SP) will be increased by %d%% if you win.";
 		case POINT_EXP_DOUBLE_BONUS:				return "Experience increases by %d%% if you win against an opponent.";
 		case POINT_GOLD_DOUBLE_BONUS:				return "Increase of Yang up to %d%% if you win.";
@@ -1736,6 +2798,9 @@ static const char* FN_point_string(int apply_number)
 		case POINT_ATTBONUS_ASSASSIN:				return "Strong against Ninjas + %d%%";
 		case POINT_ATTBONUS_SURA:					return "Strong against Sura + %d%%";
 		case POINT_ATTBONUS_SHAMAN:					return "Strong against Shamans + %d%%";
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		case POINT_ATTBONUS_WOLFMAN:				return "???? ?? +%d%%";
+#endif
 		case POINT_ATTBONUS_MONSTER:				return "Strength against monsters + %d%%";
 		case POINT_MALL_ATTBONUS:					return "Attack + %d%%";
 		case POINT_MALL_DEFBONUS:					return "Defence + %d%%";
@@ -1752,21 +2817,18 @@ static const char* FN_point_string(int apply_number)
 		case POINT_RESIST_ASSASSIN:					return "%d%% Resistance against Ninja Attacks";
 		case POINT_RESIST_SURA:						return "%d%% Resistance against Sura Attacks";
 		case POINT_RESIST_SHAMAN:					return "%d%% Resistance against Shaman Attacks";
-#ifdef ENABLE_PENDANT_SYSTEM
-		case POINT_ATTBONUS_ELEC:					return "Strong against Elec + %d%%";
-		case POINT_ATTBONUS_FIRE:					return "Strong against Fire + %d%%";
-		case POINT_ATTBONUS_ICE:					return "Strong against Ice + %d%%";
-		case POINT_ATTBONUS_WIND:					return "Strong against Wind + %d%%";
-		case POINT_ATTBONUS_EARTH:					return "Strong against Earth + %d%%";
-		case POINT_ATTBONUS_DARK:					return "Strong against Dark + %d%%";
+#ifdef ENABLE_WOLFMAN_CHARACTER
+		case POINT_RESIST_WOLFMAN:					return "????? %d%% ??";
 #endif
-#ifdef ENABLE_ATTBONUS_METIN
-		case POINT_ATTBONUS_METIN:					return "Strong against Metin Stones + %d%%";
+#ifdef ENABLE_CONQUEROR_LEVEL
+		case POINT_SUNGMA_STR:						return "POINT_SUNGMA_STR %d%%";
+		case POINT_SUNGMA_HP:						return "POINT_SUNGMA_HP %d%%";
+		case POINT_SUNGMA_MOVE:						return "POINT_SUNGMA_MOVE %d%%";
+		case POINT_SUNGMA_IMMUNE:					return "POINT_SUNGMA_IMMUNE %d%%";
+		case POINT_CONQUEROR_POINT:					return "POINT_CONQUEROR_POINT %d%%";
 #endif
-#ifdef ENABLE_ATTBONUS_BOSS
-		case POINT_ATTBONUS_BOSS:					return "Strong against Boss + %d%%";
-#endif
-		default:									return NULL;
+
+		default:									return "UNK_ID %d%%"; // @fixme180
 	}
 }
 
@@ -1791,6 +2853,7 @@ static bool FN_hair_affect_string(LPCHARACTER ch, char *buf, size_t bufsiz)
 	if (expire < get_global_time())
 		return false;
 
+	// set apply string
 	offset = snprintf(buf, bufsiz, FN_point_string(aff->bApplyOn), aff->lApplyValue);
 
 	if (offset < 0 || offset >= (int) bufsiz)
@@ -1964,6 +3027,44 @@ ACMD(do_cube)
 
 ACMD(do_in_game_mall)
 {
+#ifdef ENABLE_ITEMSHOP
+	ch->ChatPacket(CHAT_TYPE_COMMAND, "open_ishop");
+#else
+	if (LC_IsEurope() == true)
+	{
+		char country_code[3];
+
+		switch (LC_GetLocalType())
+		{
+			case LC_GERMANY:	country_code[0] = 'd'; country_code[1] = 'e'; country_code[2] = '\0'; break;
+			case LC_FRANCE:		country_code[0] = 'f'; country_code[1] = 'r'; country_code[2] = '\0'; break;
+			case LC_ITALY:		country_code[0] = 'i'; country_code[1] = 't'; country_code[2] = '\0'; break;
+			case LC_SPAIN:		country_code[0] = 'e'; country_code[1] = 's'; country_code[2] = '\0'; break;
+			case LC_UK:			country_code[0] = 'e'; country_code[1] = 'n'; country_code[2] = '\0'; break;
+			case LC_TURKEY:		country_code[0] = 't'; country_code[1] = 'r'; country_code[2] = '\0'; break;
+			case LC_POLAND:		country_code[0] = 'p'; country_code[1] = 'l'; country_code[2] = '\0'; break;
+			case LC_PORTUGAL:	country_code[0] = 'p'; country_code[1] = 't'; country_code[2] = '\0'; break;
+			case LC_GREEK:		country_code[0] = 'g'; country_code[1] = 'r'; country_code[2] = '\0'; break;
+			case LC_RUSSIA:		country_code[0] = 'r'; country_code[1] = 'u'; country_code[2] = '\0'; break;
+			case LC_DENMARK:	country_code[0] = 'd'; country_code[1] = 'k'; country_code[2] = '\0'; break;
+			case LC_BULGARIA:	country_code[0] = 'b'; country_code[1] = 'g'; country_code[2] = '\0'; break;
+			case LC_CROATIA:	country_code[0] = 'h'; country_code[1] = 'r'; country_code[2] = '\0'; break;
+			case LC_MEXICO:		country_code[0] = 'm'; country_code[1] = 'x'; country_code[2] = '\0'; break;
+			case LC_ARABIA:		country_code[0] = 'a'; country_code[1] = 'e'; country_code[2] = '\0'; break;
+			case LC_CZECH:		country_code[0] = 'c'; country_code[1] = 'z'; country_code[2] = '\0'; break;
+			case LC_ROMANIA:	country_code[0] = 'r'; country_code[1] = 'o'; country_code[2] = '\0'; break;
+			case LC_HUNGARY:	country_code[0] = 'h'; country_code[1] = 'u'; country_code[2] = '\0'; break;
+			case LC_NETHERLANDS: country_code[0] = 'n'; country_code[1] = 'l'; country_code[2] = '\0'; break;
+			case LC_USA:		country_code[0] = 'u'; country_code[1] = 's'; country_code[2] = '\0'; break;
+			case LC_CANADA:	country_code[0] = 'c'; country_code[1] = 'a'; country_code[2] = '\0'; break;
+			default:
+				if (test_server == true)
+				{
+					country_code[0] = 'd'; country_code[1] = 'e'; country_code[2] = '\0';
+				}
+				break;
+		}
+
 	char buf[512+1];
 	char sas[33];
 	MD5_CTX ctx;
@@ -2001,6 +3102,7 @@ ACMD(do_in_game_mall)
 	snprintf(buf, sizeof(buf), "mall https://www.%s/shop?pid=%u&lang=%s&sid=%d&sas=%s", g_strWebMallURL.c_str(), ch->GetPlayerID(), language, g_server_id, sas);
 
 	ch->ChatPacket(CHAT_TYPE_COMMAND, buf);
+#endif
 }
 
 ACMD(do_dice)
@@ -2062,12 +3164,7 @@ ACMD(do_dice)
 
 ACMD(do_click_safebox)
 {
-	if ((ch->GetGMLevel() <= GM_PLAYER) && (ch->GetDungeon() || ch->GetWarMap()))
-	{
-		ch->LocaleChatPacket(CHAT_TYPE_INFO, 311, "");
-		return;
-	}
-
+	// Depo tüm core'lerde, tüm kanallarda ve zindan/sava? haritalar?nda aç?labilir
 	ch->SetSafeboxOpenPosition();
 	ch->ChatPacket(CHAT_TYPE_COMMAND, "ShowMeSafeboxPassword");
 }
@@ -2838,65 +3935,6 @@ ACMD(do_restart_now)
 }
 #endif
 
-#ifdef ENABLE_MINIGAME_OKEY_CARDS_SYSTEM
-ACMD(do_cards)
-{
-	const char *line;
-	char arg1[256], arg2[256];
-
-	line = two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
-	switch (LOWER(arg1[0]))
-	{
-		case 'o':
-			if (isdigit(*arg2))
-			{
-				DWORD safemode;
-				str_to_number(safemode, arg2);
-				ch->Cards_open(safemode);
-			}
-			break;
-
-		case 'p':
-			ch->Cards_pullout();
-			break;
-
-		case 'e':
-			ch->CardsEnd();
-			break;
-
-		case 'd':
-			if (isdigit(*arg2))
-			{
-				DWORD destroy_index;
-				str_to_number(destroy_index, arg2);
-				ch->CardsDestroy(destroy_index);
-			}
-			break;
-
-		case 'a':
-			if (isdigit(*arg2))
-			{
-				DWORD accpet_index;
-				str_to_number(accpet_index, arg2);
-				ch->CardsAccept(accpet_index);
-			}
-			break;
-
-		case 'r':
-			if (isdigit(*arg2))
-			{
-				DWORD restore_index;
-				str_to_number(restore_index, arg2);
-				ch->CardsRestore(restore_index);
-			}
-			break;
-
-		default:
-			return;
-	}
-}
-#endif
-
 #ifdef ENABLE_ANTI_EXP
 ACMD(do_anti_exp)
 {
@@ -3016,21 +4054,30 @@ ACMD(do_renewal_skill_select)
 }
 #endif
 
-#ifdef ENABLE_RENEWAL_INGAME_ITEMSHOP
+#ifdef ENABLE_ITEMSHOP
 ACMD(do_ishop)
 {
 	std::vector<std::string> vecArgs;
 	split_argument(argument, vecArgs);
 
-	if (vecArgs.size() < 2) { return; }
+	if (vecArgs.size() < 2)
+	{
+		return;
+	}
 	else if (vecArgs[1] == "data")
 	{
 		if (ch->GetProtectTime("itemshop.load") == 1)
+		{
 			return;
+		}
 
 		ch->SetProtectTime("itemshop.load", 1);
 
-		if (vecArgs.size() < 3) { return; }
+		if (vecArgs.size() < 3)
+		{
+			return;
+		}
+
 		int updateTime;
 		str_to_number(updateTime, vecArgs[2].c_str());
 
@@ -3039,36 +4086,58 @@ ACMD(do_ishop)
 	else if (vecArgs[1] == "log")
 	{
 		if (ch->GetProtectTime("itemshop.log") == 1)
+		{
 			return;
+		}
+
 		ch->SetProtectTime("itemshop.log", 1);
 
 		CHARACTER_MANAGER::Instance().LoadItemShopLog(ch);
 	}
 	else if (vecArgs[1] == "buy")
 	{
-		if (vecArgs.size() < 4) { return; }
+		if (vecArgs.size() < 4)
+		{
+			return;
+		}
+
 		int itemID;
 		str_to_number(itemID, vecArgs[2].c_str());
 
 		int itemCount;
 		str_to_number(itemCount, vecArgs[3].c_str());
-		if(itemCount < 1 || itemCount > 20)
-			return;
 
+/* check already in: LoadItemShopBuy
+		if (itemCount < 1 || itemCount > 20)
+		{
+			return;
+		}
+*/
 		CHARACTER_MANAGER::Instance().LoadItemShopBuy(ch, itemID, itemCount);
 	}
 	else if (vecArgs[1] == "wheel")
 	{
-		if (vecArgs.size() < 3) { return; }
+		if (vecArgs.size() < 3)
+		{
+			return;
+		}
 		else if (vecArgs[2] == "start")
 		{
-			if (vecArgs.size() < 4) { return; }
+			if (vecArgs.size() < 4)
+			{
+				return;
+			}
+
 			BYTE ticketType;
 			if (!str_to_number(ticketType, vecArgs[3].c_str()))
+			{
 				return;
+			}
 
 			if (ticketType > 1)
+			{
 				return;
+			}
 			else if (ch->GetProtectTime("WheelWorking") != 0)
 			{
 				ch->LocaleChatPacket(CHAT_TYPE_INFO, 683, "");
@@ -3087,41 +4156,49 @@ ACMD(do_ishop)
 			}
 			else if (ticketType == 1)
 			{
-				long long dragonCoin = ch->GetCoins();
-				if(dragonCoin-10 < 0)
+				long long act_lldCoins;
+#ifdef USE_ITEMSHOP_RENEWED
+				long long act_lldJCoins;
+				ch->GetAccountMoney(act_lldCoins, act_lldJCoins);
+#else
+				ch->GetAccountMoney(act_lldCoins);
+#endif
+
+				if (act_lldCoins < 10)
 				{
-					ch->LocaleChatPacket(CHAT_TYPE_INFO, 685, "");
+					ch->ChatPacket(CHAT_TYPE_INFO, "997");
 					return;
 				}
 
-				ch->SetCoins(dragonCoin - 10);
-				ch->ChatPacket(CHAT_TYPE_COMMAND, "SetDragonCoin %lld", dragonCoin - 10);
+#ifdef USE_ITEMSHOP_RENEWED
+				ch->SetAccountMoney(10, 0, false);
+				ch->GetAccountMoney(act_lldCoins, act_lldJCoins);
+#else
+				ch->SetAccountMoney(10, false);
+				ch->GetAccountMoney(act_lldCoins);
+#endif
 
-				BYTE subIndex = ITEMSHOP_LOG_ADD;
-				DWORD accountID = ch->GetDesc()->GetAccountTable().id;
-
-				char playerName[CHARACTER_NAME_MAX_LEN+1];
-				char ipAdress[16];
-
-				strlcpy(playerName,ch->GetName(),sizeof(playerName));
-				strlcpy(ipAdress,ch->GetDesc()->GetHostName(),sizeof(ipAdress));
-
-				db_clientdesc->DBPacketHeader(HEADER_GD_ITEMSHOP, ch->GetDesc()->GetHandle(), sizeof(BYTE)+sizeof(DWORD)+sizeof(playerName)+sizeof(ipAdress));
-				db_clientdesc->Packet(&subIndex, sizeof(BYTE));
-				db_clientdesc->Packet(&accountID, sizeof(DWORD));
-				db_clientdesc->Packet(&playerName, sizeof(playerName));
-				db_clientdesc->Packet(&ipAdress, sizeof(ipAdress));
-
-				if (ch->GetProtectTime("itemshop.log") == 1)
+				LPDESC d = ch->GetDesc();
+				if (d)
 				{
-					char timeText[21];
-					time_t now = time(0);
-					struct tm tstruct = *localtime(&now);
-					strftime(timeText, sizeof(timeText), "%Y-%m-%d %X", &tstruct);
-					ch->ChatPacket(CHAT_TYPE_COMMAND, "ItemShopAppendLog %s %d %s %s 1 1 10", timeText, time(0), playerName, ipAdress);
+					LogManager::Instance().WheelOfFortuneLog(d->GetAccountTable().id, ch->GetPlayerID(), ch->GetMapIndex(), ch->GetX(), ch->GetY(), 10);
+
+					if (ch->GetProtectTime("itemshop.log") == 1)
+					{
+						char szIP[16] = {};
+						strlcpy(szIP, d->GetHostName(), sizeof(szIP));
+
+						char szTime[21];
+						time_t now = time(0);
+						struct tm tstruct = *localtime(&now);
+						strftime(szTime, sizeof(szTime), "%Y-%m-%d %X", &tstruct);
+
+						ch->ChatPacket(CHAT_TYPE_COMMAND, "ItemShopAppendLog %s %d %s %s 1 1 5", szTime, time(0), ch->GetName(), szIP);
+					}
 				}
 			}
 
+			// Important items
 			std::vector<std::pair<long, long>> m_important_item = {
 				{72320, 1},
 				{72320, 2},
@@ -3132,6 +4209,7 @@ ACMD(do_ishop)
 				{84014, 1},
 			};
 
+			// normal items
 			std::map<std::pair<long, long>, int> m_normal_item = {
 				{{71084, 5}, 30},
 				 {{71084, 10}, 30},
@@ -3160,10 +4238,10 @@ ACMD(do_ishop)
 			{
 				for (auto it = m_normal_item.begin(); it != m_normal_item.end(); ++it)
 				{
-					int randomEx = number(0, 4);
+					int randomEx = number(0,4);
 					if (randomEx == 4)
 					{
-						int random = number(0, 100);
+						int random = number(0,100);
 						if (it->second >= random)
 						{
 							auto itFind = std::find(m_send_items.begin(), m_send_items.end(), it->first);
@@ -3171,17 +4249,23 @@ ACMD(do_ishop)
 							{
 								m_send_items.emplace_back(it->first.first, it->first.second);
 								if (m_send_items.size() >= 10)
+								{
 									break;
+								}
 							}
 						}
 					}
 				}
+
 				if (m_send_items.size() >= 10)
+				{
 					break;
+				}
 			}
 
 			std::string cmd_wheel = "";
-			if (m_send_items.size())
+
+			if (!m_send_items.empty())
 			{
 				for (auto it = m_send_items.begin(); it != m_send_items.end(); ++it)
 				{
@@ -3193,14 +4277,19 @@ ACMD(do_ishop)
 			}
 
 			int luckyWheel = number(0, 9);
-			if (luckyWheel == 0)
-				if (number(0, 1) == 0)
-					luckyWheel = number(0, 9);
+			{
+				if (luckyWheel == 0)
+				{
+					if (number(0, 1) == 0)
+					{
+						luckyWheel = number(0, 9);
+					}
+				}
+			}
 
 			ch->SetProtectTime("WheelLuckyIndex", luckyWheel);
 			ch->SetProtectTime("WheelLuckyItemVnum", m_send_items[luckyWheel].first);
 			ch->SetProtectTime("WheelLuckyItemCount", m_send_items[luckyWheel].second);
-
 			ch->SetProtectTime("WheelWorking", 1);
 
 			ch->ChatPacket(CHAT_TYPE_COMMAND, "SetWheelItemData %s", cmd_wheel.c_str());
@@ -3209,79 +4298,23 @@ ACMD(do_ishop)
 		else if (vecArgs[2] == "done")
 		{
 			if (ch->GetProtectTime("WheelWorking") == 0)
+			{
 				return;
+			}
 
 			ch->AutoGiveItem(ch->GetProtectTime("WheelLuckyItemVnum"), ch->GetProtectTime("WheelLuckyItemCount"));
+
 			ch->ChatPacket(CHAT_TYPE_COMMAND, "GetWheelGiftData %d %d", ch->GetProtectTime("WheelLuckyItemVnum"), ch->GetProtectTime("WheelLuckyItemCount"));
+
 			ch->SetProtectTime("WheelLuckyIndex", 0);
 			ch->SetProtectTime("WheelLuckyItemVnum", 0);
 			ch->SetProtectTime("WheelLuckyItemCount", 0);
 			ch->SetProtectTime("WheelWorking", 0);
 		}
 	}
-}
-#endif
-
-#ifdef ENABLE_FISH_GAME
-#include "fishing.h"
-
-ACMD(do_fish_game)
-{
-	if (!ch->m_pkFishingEvent)
-		return;
-	else if (quest::CQuestManager::instance().GetEventFlag("fishgame_event") != 1)
-		return;
-
-	LPITEM rod = ch->GetWear(WEAR_WEAPON);
-	if (!rod)
-		return;
-
-	std::vector<std::string> vecArgs;
-	split_argument(argument, vecArgs);
-	if (vecArgs.size() < 3) { return; }
-
-	int gameKey;
-	if(!str_to_number(gameKey, vecArgs[1].c_str()))
-		return;
-	if (ch->GetProtectTime("fish_game_key") != gameKey)
+	else if (vecArgs[1] == "currency")
 	{
-		ch->ChatPacket(CHAT_TYPE_COMMAND, "CloseFishGame");
-		return;
-	}
-	else if (vecArgs[2] == "close")
-	{
-		fishing::FishingFail(ch);
-	}
-	else if (vecArgs[2] == "score")
-	{
-		if (vecArgs.size() < 4) { return; }
-		int scoreType;
-		if(!str_to_number(scoreType, vecArgs[3].c_str()))
-			return;
-
-		int totalClick = ch->GetProtectTime("fish_game_total_click");
-		totalClick += 1;
-		ch->SetProtectTime("fish_game_total_click", totalClick);
-
-		int totalScore = ch->GetProtectTime("fish_game_total_score");
-		if (scoreType == 1)
-		{
-			totalScore += 1;
-			ch->SetProtectTime("fish_game_total_score", totalScore);
-		}
-
-		if (totalClick == 3)
-		{
-			if(totalScore == 3)
-				ch->fishing_take();
-			else
-			{
-				event_cancel(&ch->m_pkFishingEvent);
-				fishing::FishingFail(ch);
-			}
-		}
-		else
-			ch->ChatPacket(CHAT_TYPE_COMMAND, "SetFishGameGoal %d", totalScore);
+		ch->RefreshAccountMoney();
 	}
 }
 #endif
@@ -3375,9 +4408,351 @@ ACMD(do_warp_on)
 }
 #endif
 
-#ifdef ENABLE_DUNGEON_TRACKING_SYSTEM
-#include "mob_timer_manager.h"
+#ifdef ENABLE_ZODIAC_MISSION
+ACMD(do_cz_reward)
+{
+	if (ch->GetProtectTime("Zodiac12ZiReward") > get_global_time())
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "Biraz beklemelisin.");
+		return;
+	}
+	ch->SetProtectTime("Zodiac12ZiReward",get_global_time()+1);
 
+	char arg1[256];
+	one_argument(argument, arg1, sizeof(arg1));
+
+	if (!*arg1)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "Eksik islem uygulandi!");
+		return;
+	}
+
+	BYTE type = 0;
+	str_to_number(type, arg1);
+	int FYellow = ch->GetQuestFlag("Quest_ZodiacTemple.YellowReward");
+	int FGreen = ch->GetQuestFlag("Quest_ZodiacTemple.GreenReward");
+
+	if (type == 1)
+	{
+		if (ch->GetQuestFlag("Quest_ZodiacTemple.YellowMark") == 1073741823)
+		{
+			ch->AutoGiveItem(33026, 1);
+			ch->SetQuestFlag("Quest_ZodiacTemple.YellowMark",0);
+			ch->SetQuestFlag("Quest_ZodiacTemple.YellowReward",FYellow+1);
+		}
+		else
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "Yeterince sar? sanduka puan?n yok!");
+			return;
+		}
+	}
+	else if (type == 2)
+	{
+		if (ch->GetQuestFlag("Quest_ZodiacTemple.GreenMark") == 1073741823)
+		{
+			ch->AutoGiveItem(33027, 1);
+			ch->SetQuestFlag("Quest_ZodiacTemple.GreenReward",FGreen+1);
+			ch->SetQuestFlag("Quest_ZodiacTemple.GreenMark",0);
+		}
+		else
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "Yeterince Ye?il sanduka puan?n yok!");
+			return;
+		}
+	}
+	else if (type == 3)
+	{
+		if(FYellow >= 1 && FGreen >= 1)
+		{
+			ch->AutoGiveItem(33028, 1);
+			ch->SetQuestFlag("Quest_ZodiacTemple.YellowReward",FYellow-1);
+			ch->SetQuestFlag("Quest_ZodiacTemple.GreenReward",FGreen-1);
+		}
+	}
+	ch->ChatPacket(CHAT_TYPE_COMMAND, "OpenUI12zi %d %d %d %d", ch->GetQuestFlag("Quest_ZodiacTemple.YellowMark"), ch->GetQuestFlag("Quest_ZodiacTemple.GreenMark"), ch->GetQuestFlag("Quest_ZodiacTemple.YellowReward"), ch->GetQuestFlag("Quest_ZodiacTemple.GreenReward"));
+}
+
+ACMD(do_cz_check_box)
+{
+	if (!ch)
+		return;
+
+
+	if (ch->GetProtectTime("Zodiac12ZiTable") > get_global_time())
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "Biraz beklemelisin.");
+		return;
+	}
+	ch->SetProtectTime("Zodiac12ZiTable",get_global_time()+1);
+
+	char arg1[256];
+	char arg2[256];
+	two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
+
+	if (!*arg1 || !*arg2)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "Eksik islem uygulandi!");
+		return;
+	}
+
+	BYTE type = 0, value = 0, zero = 0;
+	str_to_number(type, arg1);
+	str_to_number(value, arg2);
+
+	DWORD column_item_list_yellow[] = { 33001, 33003, 33005, 33007, 33009, 33011 };
+	DWORD column_item_list_green[] = { 33002, 33004, 33006, 33008, 33010, 33012 };
+
+	DWORD row_item_list_yellow[] = { 33013, 33015, 33017, 33019, 33021 };
+	DWORD row_item_list_green[] = { 33014, 33016, 33018, 33020, 33022 };
+
+	{
+		if (type == 0)
+		{
+			if (value == 0 || value == 6 || value == 12 || value == 18 || value == 24)
+			{
+				if (ch->CountSpecifyItem(column_item_list_yellow[0]) >= 50)
+					ch->RemoveSpecifyItem(column_item_list_yellow[0], 50);
+				else
+				{
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Yeterince zodyak tilsimin yok!"));
+					return;
+				}
+			}
+			else if (value == 1 || value == 7 || value == 13 || value == 19 || value == 25)
+			{
+				if (ch->CountSpecifyItem(column_item_list_yellow[1]) >= 50)
+					ch->RemoveSpecifyItem(column_item_list_yellow[1], 50);
+				else
+				{
+					 ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Yeterince zodyak tilsimin yok!"));
+					return;
+				}
+			}
+			else if (value == 2 || value == 8 || value == 14 || value == 20 || value == 26)
+			{
+				if (ch->CountSpecifyItem(column_item_list_yellow[2]) >= 50)
+					ch->RemoveSpecifyItem(column_item_list_yellow[2], 50);
+				else
+				{
+					 ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Yeterince zodyak tilsimin yok!"));
+					return;
+				}
+			}
+			else if (value == 3 || value == 9 || value == 15 || value == 21 || value == 27)
+			{
+				if (ch->CountSpecifyItem(column_item_list_yellow[3]) >= 50)
+					ch->RemoveSpecifyItem(column_item_list_yellow[3], 50);
+				else
+				{
+					 ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Yeterince zodyak tilsimin yok!"));
+					return;
+				}
+			}
+			else if (value == 4 || value == 10 || value == 16 || value == 22 || value == 28)
+			{
+				if (ch->CountSpecifyItem(column_item_list_yellow[4]) >= 50)
+					ch->RemoveSpecifyItem(column_item_list_yellow[4], 50);
+				else
+				{
+					 ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Yeterince zodyak tilsimin yok!"));
+					return;
+				}
+			}
+			else if (value == 5 || value == 11 || value == 17 || value == 23 || value == 29)
+			{
+				if (ch->CountSpecifyItem(column_item_list_yellow[5]) >= 50)
+					ch->RemoveSpecifyItem(column_item_list_yellow[5], 50);
+				else
+				{
+					 ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Yeterince zodyak tilsimin yok!"));
+					return;
+				}
+			}
+
+			/////////////////////////////////////////////////////////////////////////////////
+			if (value >= zero && value <= 5)
+			{
+				if (ch->CountSpecifyItem(row_item_list_yellow[0]) >= 50)
+					ch->RemoveSpecifyItem(row_item_list_yellow[0], 50);
+				else
+				{
+					 ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Yeterince zodyak tilsimin yok!"));
+					return;
+				}
+			}
+			else if (value >= 6 && value <= 11)
+			{
+				if (ch->CountSpecifyItem(row_item_list_yellow[1]) >= 50)
+					ch->RemoveSpecifyItem(row_item_list_yellow[1], 50);
+				else
+				{
+					 ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Yeterince zodyak tilsimin yok!"));
+					return;
+				}
+			}
+			else if (value >= 12 && value <= 17)
+			{
+				if (ch->CountSpecifyItem(row_item_list_yellow[2]) >= 50)
+					ch->RemoveSpecifyItem(row_item_list_yellow[2], 50);
+				else
+				{
+					 ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Yeterince zodyak tilsimin yok!"));
+					return;
+				}
+			}
+			else if (value >= 18 && value <= 23)
+			{
+				if (ch->CountSpecifyItem(row_item_list_yellow[3]) >= 50)
+					ch->RemoveSpecifyItem(row_item_list_yellow[3], 50);
+				else
+				{
+					 ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Yeterince zodyak tilsimin yok!"));
+					return;
+				}
+			}
+			else if (value >= 24 && value <= 29)
+			{
+				if (ch->CountSpecifyItem(row_item_list_yellow[4]) >= 50)
+					ch->RemoveSpecifyItem(row_item_list_yellow[4], 50);
+				else
+				{
+					 ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Yeterince zodyak tilsimin yok!"));
+					return;
+				}
+			}
+		}
+		else///////////////////////////////////////////////////////////////////////////////////
+		{
+			if (value == 0 || value == 6 || value == 12 || value == 18 || value == 24)
+			{
+				if (ch->CountSpecifyItem(column_item_list_green[0]) >= 50)
+					ch->RemoveSpecifyItem(column_item_list_green[0], 50);
+				else
+				{
+					 ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Yeterince zodyak tilsimin yok!"));
+					return;
+				}
+			}
+			else if (value == 1 || value == 7 || value == 13 || value == 19 || value == 25)
+			{
+				if (ch->CountSpecifyItem(column_item_list_green[1]) >= 50)
+					ch->RemoveSpecifyItem(column_item_list_green[1], 50);
+				else
+				{
+					 ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Yeterince zodyak tilsimin yok!"));
+					return;
+				}
+			}
+			else if (value == 2 || value == 8 || value == 14 || value == 20 || value == 26)
+			{
+				if (ch->CountSpecifyItem(column_item_list_green[2]) >= 50)
+					ch->RemoveSpecifyItem(column_item_list_green[2], 50);
+				else
+				{
+					 ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Yeterince zodyak tilsimin yok!"));
+					return;
+				}
+			}
+			else if (value == 3 || value == 9 || value == 15 || value == 21 || value == 27)
+			{
+				if (ch->CountSpecifyItem(column_item_list_green[3]) >= 50)
+					ch->RemoveSpecifyItem(column_item_list_green[3], 50);
+				else
+				{
+					 ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Yeterince zodyak tilsimin yok!"));
+					return;
+				}
+			}
+			else if (value == 4 || value == 10 || value == 16 || value == 22 || value == 28)
+			{
+				if (ch->CountSpecifyItem(column_item_list_green[4]) >= 50)
+					ch->RemoveSpecifyItem(column_item_list_green[4], 50);
+				else
+				{
+					 ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Yeterince zodyak tilsimin yok!"));
+					return;
+				}
+			}
+			else if (value == 5 || value == 11 || value == 17 || value == 23 || value == 29)
+			{
+				if (ch->CountSpecifyItem(column_item_list_green[5]) >= 50)
+					ch->RemoveSpecifyItem(column_item_list_green[5], 50);
+				else
+				{
+					 ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Yeterince zodyak tilsimin yok!"));
+					return;
+				}
+			}
+
+			/////////////////////////////////////////////////////////////////////////////////
+			if (value >= zero && value <= 5)
+			{
+				if (ch->CountSpecifyItem(row_item_list_green[0]) >= 50)
+					ch->RemoveSpecifyItem(row_item_list_green[0], 50);
+				else
+				{
+					 ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Yeterince zodyak tilsimin yok!"));
+					return;
+				}
+			}
+			else if (value >= 6 && value <= 11)
+			{
+				if (ch->CountSpecifyItem(row_item_list_green[1]) >= 50)
+					ch->RemoveSpecifyItem(row_item_list_green[1], 50);
+				else
+				{
+					 ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Yeterince zodyak tilsimin yok!"));
+					return;
+				}
+			}
+			else if (value >= 12 && value <= 17)
+			{
+				if (ch->CountSpecifyItem(row_item_list_green[2]) >= 50)
+					ch->RemoveSpecifyItem(row_item_list_green[2], 50);
+				else
+				{
+					 ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Yeterince zodyak tilsimin yok!"));
+					return;
+				}
+			}
+			else if (value >= 18 && value <= 23)
+			{
+				if (ch->CountSpecifyItem(row_item_list_green[3]) >= 50)
+					ch->RemoveSpecifyItem(row_item_list_green[3], 50);
+				else
+				{
+					 ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Yeterince zodyak tilsimin yok!"));
+					return;
+				}
+			}
+			else if (value >= 24 && value <= 29)
+			{
+				if (ch->CountSpecifyItem(row_item_list_green[4]) >= 50)
+					ch->RemoveSpecifyItem(row_item_list_green[4], 50);
+				else
+				{
+					 ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Yeterince zodyak tilsimin yok!"));
+					return;
+				}
+			}
+		}
+	}
+
+	int size = 1;
+	for (BYTE b = 0; b < value; ++b)
+		size *= 2;
+
+	if (type == 0)
+		ch->SetQuestFlag("Quest_ZodiacTemple.YellowMark",ch->GetQuestFlag("Quest_ZodiacTemple.YellowMark")+size);
+	else
+		ch->SetQuestFlag("Quest_ZodiacTemple.GreenMark",ch->GetQuestFlag("Quest_ZodiacTemple.GreenMark")+size);
+
+	ch->ChatPacket(CHAT_TYPE_COMMAND, "OpenUI12zi %d %d %d %d", ch->GetQuestFlag("Quest_ZodiacTemple.YellowMark"), ch->GetQuestFlag("Quest_ZodiacTemple.GreenMark"), ch->GetQuestFlag("Quest_ZodiacTemple.YellowReward"), ch->GetQuestFlag("Quest_ZodiacTemple.GreenReward"));
+}
+#endif
+
+#ifdef ENABLE_TRACK_WINDOW
+#include "new_mob_timer.h"
 ACMD(do_track_window)
 {
 	std::vector<std::string> vecArgs;
@@ -3396,8 +4771,7 @@ ACMD(do_track_window)
 			WORD globalBossID;
 			if (!str_to_number(globalBossID, vecArgs[i].c_str()))
 				continue;
-
-			CMobTimerManager::Instance().GetTrackData(ch, globalBossID);
+			CNewMobTimer::Instance().GetTrackData(ch, globalBossID);
 		}
 
 		ch->SetProtectTime("track_dungeon", 1);
@@ -3444,19 +4818,22 @@ ACMD(do_track_window)
 		if (!str_to_number(mobIndex, vecArgs[2].c_str()))
 			return;
 
+		//PORTAL WARP I PUT ONLY FOR FLAME B
 		const std::map<WORD, std::pair<std::pair<long, long>,std::pair<WORD, std::pair<BYTE,BYTE>>>> m_TeleportData = {
-			//{mobindex - {{X, Y}, {PORT, {MINLVL, MAXLVL},}}},
-			{9836, { {3840, 14323}, {0, {40, 60}} }},
-			{9844, { {17268, 23855}, {0, {65, 85}} }},
+			//{mobindex - {{X, Y}, {PORT, {MINLVL,MAXLVL},}}},
+			{9844, { {3840, 14323}, {0, {40, 60}} }},
+			{9836, { {3327, 14848}, {0, {65, 85}} }},
 			{9838, { {3840, 14861}, {0, {80, 100}} }},
 			{9840, { {4350, 14850}, {0, {95, 115}} }},
 			{9842, { {3327, 15384}, {0, {105, 120}} }},
+			// {4140, { {9341, 4134}, {0, {105, 120}} }},
 			{1093, { {5905, 1105}, {0, {40, 120}} }},
 			{2092, { {689, 6111}, {0, {70, 120}} }},
 			{2493, { {1800, 12199}, {0, {75, 120}} }},
 			{2598, { {5918, 993}, {0, {80, 120}} }},
 			{6091, { {5984, 7073}, {0, {90, 120}} }},
 			{6191, { {4319, 1647}, {0, {90, 120}} }},
+			{6192, { {8277, 14187}, {0, {105, 120}} }},
 			{9018, { {11082, 17824}, {0, {105, 120}} }},
 			{20442, { {7358, 6237}, {0, {110, 120}} }},
 		};
@@ -3473,6 +4850,242 @@ ACMD(do_track_window)
 			ch->WarpSet(it->second.first.first * 100, it->second.first.second * 100, it->second.second.first);
 		}
 	}
+}
+#endif
+
+#ifdef __DUNGEON_INFO__
+ACMD(do_dungeon_info)
+{
+	std::vector<std::string> vecArgs;
+	split_argument(argument, vecArgs);
+	if (vecArgs.size() < 2) { return; }
+	else if (vecArgs[1] == "rank")
+	{
+		if (vecArgs.size() < 4) { return; }
+		DWORD mobIdx, rankIdx;
+		if (!str_to_number(mobIdx, vecArgs[2].c_str()) || !str_to_number(rankIdx, vecArgs[3].c_str()))
+			return;
+		CHARACTER_MANAGER::Instance().SendDungeonRank(ch, mobIdx, rankIdx);
+	}
+	else if (vecArgs[1] == "test_cooldown" && ch->IsGM())
+	{
+		ch->SetQuestFlag("jotun.cooldown", time(0) + 90);
+		ch->SetQuestFlag("deviltower.cooldown", time(0) + 30);
+		ch->SetQuestFlag("hydra.cooldown", time(0) + 90);
+		ch->SetQuestFlag("MeleyDungeon.cooldown", time(0) + 90);
+		ch->SetQuestFlag("spider.cooldown", time(0) + 60);
+		ch->SetQuestFlag("devil.cooldown", time(0) + 30);
+		ch->SetQuestFlag("nemere.cooldown", time(0) + 60);
+		ch->SetQuestFlag("azrael.cooldown", time(0) + 60);
+		ch->SetQuestFlag("dragonlair.cooldown", time(0) + 60);
+		ch->SetQuestFlag("nightmare.cooldown", time(0) + 60);
+		ch->SetQuestFlag("razador.cooldown", time(0) + 60);
+		ch->SetQuestFlag("duratus.cooldown", time(0) + 90);
+		ch->SetQuestFlag("alastoreasy.cooldown", time(0) + 90);
+		ch->SetQuestFlag("alastorhard.cooldown", time(0) + 90);
+		ch->SetQuestFlag("serpent.cooldown", time(0) + 90);
+		ch->SetQuestFlag("zodiactemple.cooldown", time(0) + 90);
+		ch->SetQuestFlag("rxdragonlair.cooldown", time(0) + 240);
+
+		ch->SendDungeonCooldown(0);
+	}
+	else if (vecArgs[1] == "update" && ch->IsGM())
+		ch->SendDungeonCooldown(0);
+}
+#endif
+
+#ifdef ENABLE_AFFECT_BUFF_REMOVE
+ACMD(do_remove_buff)
+{
+	char arg1[256];
+	one_argument(argument, arg1, sizeof(arg1));
+
+	if (!*arg1)
+		return;
+
+	if (!ch)
+		return;
+
+	int affect = 0;
+	str_to_number(affect, arg1);
+	CAffect* pAffect = ch->FindAffect(affect);
+
+	if (pAffect)
+		ch->RemoveAffect(affect);
+}
+#endif
+
+#ifdef ENABLE_WORD_GAME_EVENT
+ACMD(do_word_game)
+{
+	if (!ch)
+		return;
+
+	if (!ch->IsPC())
+		return;
+
+	if (ch->IsDead() || ch->IsStun())
+		return;
+
+	if (ch->IsHack())
+		return;
+
+	if(ch->GetExchange() || ch->GetMyShop() || ch->GetShopOwner() || ch->IsOpenSafebox() || ch->IsCubeOpen()
+#ifdef ENABLE_RENEWAL_OFFLINESHOP
+		|| ch->GetShopOwner()
+#endif
+		)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("kelime_event_kpt"));
+		return;
+	}
+
+	if(ch->CountSpecifyItem(30216) == 0 || ch->CountSpecifyItem(30213) == 0 || ch->CountSpecifyItem(30219) == 0 || ch->CountSpecifyItem(30214) == 0 || ch->CountSpecifyItem(30217) == 0 || ch->CountSpecifyItem(30210) == 0)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("kelime_event_yk"));
+		return;
+	}
+	ch->RemoveSpecifyItem(30216, 1);
+	ch->RemoveSpecifyItem(30213, 1);
+	ch->RemoveSpecifyItem(30219, 1);
+	ch->RemoveSpecifyItem(30214, 1);
+	ch->RemoveSpecifyItem(30217, 1);
+	ch->RemoveSpecifyItem(30210, 1);
+	ch->AutoGiveItem(50128, 1);
+}
+#endif
+
+#ifdef ENABLE_SOCCER_BALL_EVENT
+ACMD(do_top_ver)
+{
+	if (!ch)
+		return;
+
+	if (!ch->IsPC())
+		return;
+
+	if (ch->IsDead() || ch->IsStun())
+		return;
+
+	if (ch->IsHack())
+		return;
+
+	if(ch->GetExchange() || ch->GetMyShop() || ch->GetShopOwner() || ch->IsOpenSafebox() || ch->IsCubeOpen()
+#ifdef ENABLE_RENEWAL_OFFLINESHOP
+		|| ch->GetShopOwner()
+#endif
+		)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("kelime_event_kpt"));
+		return;
+	}
+
+	if(ch->CountSpecifyItem(50096) < 20)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("kelime_event_yk"));
+		return;
+	}
+	ch->RemoveSpecifyItem(50096, 20);
+	ch->AutoGiveItem(50265, 1);
+}
+#endif
+
+#ifdef ENABLE_HALLOWEEN_EVENT_SYSTEM
+int iConfigReqcmd[18][3] = 
+{
+	{	0,	0,	0},
+	{	8701,	1, 10000},
+	{	8701,	1, 10000},
+	{	8701,	1, 10000},
+	{	8701,	2, 50000},
+	{	8701,	2, 50000},
+	{	8701,	2, 50000},
+	{	8701,	2, 50000},
+	{	8701,	2, 50000},
+	{	8701,	3, 100000},
+	{	8701,	3, 100000},
+	{	8701,	3, 100000},
+	{	8701,	3, 100000},
+	{	8701,	4, 200000},
+	{	8701,	4, 200000},
+	{	8701,	4, 200000},
+	{	8701,	4, 200000},
+	{	8701,	4, 200000}
+};
+
+int iConfigRewardHalouncmd[3][2] = 
+{
+	{	8706,	1},
+	{	8706,	1},
+	{	8706,	1}
+};
+
+ACMD(take_reward_halloween)
+{
+	if (ch->GetHalounLv() == 0){	return;}
+	if (ch->GetRewardHaloun() == 0){	return;}
+
+	if (ch->IsObserverMode() || ch->IsDead() || ch->GetDungeon() || ch->GetExchange() || ch->IsOpenSafebox() || ch->IsCubeOpen() || ch->GetShop() || ch->GetMyShop()
+#ifdef ENABLE_RENEWAL_OFFLINESHOP
+		|| ch->GetShopOwner()
+#endif
+		)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("yapamazsin_hallowen"));
+		return;
+	}
+
+	if (ch->GetHalounLv() == 4){	ch->AutoGiveItem(iConfigRewardHalouncmd[0][0], iConfigRewardHalouncmd[0][1]);}
+	if (ch->GetHalounLv() == 9){	ch->AutoGiveItem(iConfigRewardHalouncmd[1][0], iConfigRewardHalouncmd[1][1]);}
+	if (ch->GetHalounLv() == 13){	ch->AutoGiveItem(iConfigRewardHalouncmd[2][0], iConfigRewardHalouncmd[2][1]);}
+
+	ch->PointChange(POINT_RHALOUN, -1);
+}
+
+ACMD(do_increase_halloween)
+{
+	if (ch->IsObserverMode() || ch->IsDead() || ch->GetDungeon() || ch->GetExchange() || ch->IsOpenSafebox() || ch->IsCubeOpen() || ch->GetShop() || ch->GetMyShop()
+#ifdef ENABLE_RENEWAL_OFFLINESHOP
+		|| ch->GetShopOwner()
+#endif
+		)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("yapamazsin_hallowen"));
+		return;
+	}
+	
+	if (ch->GetHalounPoints() == 0)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("etkinlik_kapali"));
+		return;
+	}
+
+	if (ch->GetHalounLv() > 17){	return;}
+	
+	if (ch->GetRewardHaloun() > 0)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("sonraki_icin_sandik_al"));
+		return;
+	}
+
+	ch->PointChange(POINT_HALOUNLV, 1);
+
+	if (ch->CountSpecifyItem(iConfigReqcmd[ch->GetHalounLv()][0]) >= iConfigReqcmd[ch->GetHalounLv()][1])
+	{
+		ch->RemoveSpecifyItem(iConfigReqcmd[ch->GetHalounLv()][0], iConfigReqcmd[ch->GetHalounLv()][1]);
+
+		int iRandom = number(1, 15);
+		ch->PointChange(POINT_HALOUN, iRandom);
+	}	
+	else
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("yang_item_yok_hallowen"));
+
+		ch->PointChange(POINT_HALOUNLV, -1);
+		return;
+	}
+
+	ch->IncreaseNivel();
 }
 #endif
 
@@ -3638,12 +5251,12 @@ ACMD(do_ruhoku)
 		return;
 
 	if(ch->GetExchange() || ch->GetMyShop() || ch->GetShopOwner() || ch->IsOpenSafebox() || ch->IsCubeOpen()
-#ifdef ENABLE_OFFLINE_PRIVATE_SHOP_SYSTEM
-		|| ch->GetOfflineShopOwner()
+#ifdef ENABLE_RENEWAL_OFFLINESHOP
+		|| ch->GetShopOwner()
 #endif
 		)
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("´Ù¸¥ °Å·¡Áß(Ã¢°í,±³È¯,»óÁ¡)¿¡´Â °³ÀÎ»óÁ¡À» »ç¿ëÇÒ ¼ö ¾ø½À´Ï´Ù."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("?u anda özel depoyu kullanamazsyn. "));
 		return;
 	}
 
@@ -3933,12 +5546,12 @@ ACMD(do_bkoku)
 		return;
 
 	if(ch->GetExchange() || ch->GetMyShop() || ch->GetShopOwner() || ch->IsOpenSafebox() || ch->IsCubeOpen()
-#ifdef ENABLE_OFFLINE_PRIVATE_SHOP_SYSTEM
-		|| ch->GetOfflineShopOwner()
+#ifdef ENABLE_RENEWAL_OFFLINESHOP
+		|| ch->GetShopOwner()
 #endif
 		)
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("´Ù¸¥ °Å·¡Áß(Ã¢°í,±³È¯,»óÁ¡)¿¡´Â °³ÀÎ»óÁ¡À» »ç¿ëÇÒ ¼ö ¾ø½À´Ï´Ù."));
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("?u anda özel depoyu kullanamazsyn. "));
 		return;
 	}
 
@@ -4123,7 +5736,7 @@ ACMD(do_auto_sell)
 
 	if (!*arg1)
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, "Kullan©¥m: /autosell <0|1>");
+		ch->ChatPacket(CHAT_TYPE_INFO, "Kullan?m: /autosell <0|1>");
 		return;
 	}
 
@@ -4132,7 +5745,7 @@ ACMD(do_auto_sell)
 	else if (!strcmp(arg1, "1"))
 		ch->SetAutoSellStatus(false);
 	else
-		ch->ChatPacket(CHAT_TYPE_INFO, "Kullan©¥m: /autosell <0|1>");
+		ch->ChatPacket(CHAT_TYPE_INFO, "Kullan?m: /autosell <0|1>");
 }
 #endif
 
@@ -4151,3 +5764,1719 @@ ACMD(do_players_online){
 }
 #endif
 
+#ifdef ENABLE_NPC_LOCATION_TRACE
+ACMD(do_find_npc)
+{
+	char arg1[256];
+	one_argument(argument, arg1, sizeof(arg1));
+
+	if (!*arg1)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "usage: find_npc <vnum>");
+		return;
+	}
+
+	DWORD npcVnum = atoi(arg1);
+	std::vector<std::pair<long, long>> npcPositions;
+
+	if (SECTREE_MANAGER::instance().GetNpcLocationByVnum(ch->GetMapIndex(), npcVnum, npcPositions))
+	{
+		int positionIndex = 1;
+
+		ch->ChatPacket(CHAT_TYPE_INFO, "Haritada NPC bulundu (%d)", npcVnum);
+		for (const auto& position : npcPositions)
+		{
+			//DEBUG INFO
+			ch->ChatPacket(CHAT_TYPE_INFO, "[%d] - Konum: %d, %d", positionIndex, position.first, position.second);
+			positionIndex++;
+		}
+	}
+	else
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "Bu haritada NPC(%d) bulunamad?.", npcVnum);
+	}
+}
+
+ACMD(do_find_near_npc)
+{
+	char arg1[256];
+	one_argument(argument, arg1, sizeof(arg1));
+
+	if (!*arg1)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "usage: find_near_npc <vnum>");
+		return;
+	}
+
+	DWORD npcVnum = atoi(arg1);
+	std::vector<std::pair<long, long>> npcPositions;
+
+	if (SECTREE_MANAGER::instance().GetNpcLocationByVnum(ch->GetMapIndex(), npcVnum, npcPositions))
+	{
+		if (npcPositions.empty())
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "Bu haritada NPC(%d) bulunamad?.", npcVnum);
+			return;
+		}
+
+		std::sort(npcPositions.begin(), npcPositions.end(),
+			[ch](const std::pair<long, long>& a, const std::pair<long, long>& b)
+			{
+				return DISTANCE_APPROX(a.first - ch->GetX(), a.second - ch->GetY()) < DISTANCE_APPROX(b.first - ch->GetX(), b.second - ch->GetY());
+			});
+
+		//DEBUG INFO
+		ch->ChatPacket(CHAT_TYPE_INFO, "Bu haritada NPC(%d) bulundu.", npcVnum);
+		ch->ChatPacket(CHAT_TYPE_INFO, "Bize en yak?n NPC konumu: X=%ld, Y=%ld, Distance=%d", npcPositions[0].first, npcPositions[0].second, DISTANCE_APPROX(npcPositions[0].first - ch->GetX(), npcPositions[0].second - ch->GetY()));
+	}
+	else
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "Bu haritada NPC(%d) bulunamad?.", npcVnum);
+	}
+}
+#endif
+
+#ifdef ENABLE_BIOLOGIST_SYSTEM
+LPEVENT biyologtimer = NULL;
+
+EVENTINFO(TMainEventInfo5)
+{
+	LPCHARACTER	kim;
+	int deger;
+	int itemim1;
+	int itemim2;
+	TMainEventInfo5() 
+	: kim( NULL )
+	, deger( 0 )
+	, itemim1( 0 )
+	, itemim2( 0 )
+	{
+	}
+} ;
+
+EVENTFUNC(biyolog_event)
+{
+	TMainEventInfo5 * info = dynamic_cast<TMainEventInfo5 *>(  event->info );
+	if ( info == NULL )
+	{
+		sys_err( "biyolog_event> <Factor> Null pointer" );
+		return 0;
+	}
+
+	LPCHARACTER	ch = info->kim;
+	int deger = info->deger;
+	int itemim1 = info->itemim1;
+	int itemim2 = info->itemim2;
+
+	if (NULL == ch || deger == 0 || itemim1 == 0 || itemim2 == 0)
+		return 0;
+
+	if (!ch)
+		return 0;
+
+	if (!ch->GetDesc())
+		return 0;
+
+	int sans =  BiyologSistemi[ch->GetQuestFlag("bio.durum")][3];
+
+	if (ch)
+	{
+		LPITEM item = ch->GetItem(TItemPos(INVENTORY, itemim1));
+		if (item != NULL)
+		{
+			if (item->GetVnum() == 70022)
+			{
+				if(ch->GetQuestFlag("bio.durum") > 10)
+				{
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Biyolog görevlerini tamamlamy?syn!"));
+					return 0;
+				}
+
+				if (ch->CountSpecifyItem(70022) < 1)
+				{
+					return 0;
+				}
+
+				if(int(ch->GetQuestFlag("bio.sure")) == 1)
+				{
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Zaten süre e?yasy kullanmy?syn!"));
+				}
+				else if(ch->GetQuestFlag("bio.ruhtasi") == 2)
+				{
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Bunu ruh ta?y görevinde yapamazsyn."));
+				}
+				else
+				{
+					item->SetCount(item->GetCount() - 1);
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Süre i?ledi."));
+					ch->SetQuestFlag("bio.sure",1);
+					ch->SetQuestFlag("bio.kalan",get_global_time()+0);
+					ch->ChatPacket(CHAT_TYPE_COMMAND, "biyolog_update %d %d %d %d %d", ch->GetQuestFlag("bio.durum"), ch->GetQuestFlag("bio.ruhtasi"), ch->GetQuestFlag("bio.verilen"), BiyologSistemi[ch->GetQuestFlag("bio.durum")][1], ch->GetQuestFlag("bio.kalan") - get_global_time());
+				}
+			}
+		}
+
+		LPITEM item2 = ch->GetItem(TItemPos(INVENTORY, itemim2));
+		if (item2 != NULL)
+		{
+			if(ch->GetQuestFlag("bio.durum") > 10)
+			{
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Biyolog görevlerini tamamlamy?syn!"));
+				return 0;
+			}
+
+			int SANS_ITEMLER[3] = 
+			{
+				71035,
+				76020,
+				39023,
+			};
+
+			for (int it = 0; it <= 3; it++)
+			{
+				if (item2->GetVnum() == SANS_ITEMLER[it])
+				{
+					if (ch->CountSpecifyItem(SANS_ITEMLER[it]) < 1)
+					{
+						return 0;
+					}
+
+					if(int(ch->GetQuestFlag("bio.sans")) == 1)
+					{
+						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Zaten ?ans e?yasyny kullanmy?syn."));
+					}
+					else if(ch->GetQuestFlag("bio.ruhtasi") == 2)
+					{
+						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Bunu ruh ta?y görevinde yapamazsyn."));
+					}
+					else
+					{
+						item2->SetCount(item2->GetCount() - 1);
+						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> ?ans i?ledi."));
+						ch->SetQuestFlag("bio.sans", 1);
+					}
+				}
+			}
+		}
+
+		if(ch->GetQuestFlag("bio.kalan") > get_global_time())
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Görev süresi dolmady."));
+			return 0;
+		}
+
+		if(ch->GetQuestFlag("bio.durum") == 1 || ch->GetQuestFlag("bio.durum") == 2 || ch->GetQuestFlag("bio.durum") == 3 || ch->GetQuestFlag("bio.durum") == 4 || ch->GetQuestFlag("bio.durum") == 5 || ch->GetQuestFlag("bio.durum") == 6 || ch->GetQuestFlag("bio.durum") == 7 || ch->GetQuestFlag("bio.durum") == 8 || ch->GetQuestFlag("bio.durum") == 9 || ch->GetQuestFlag("bio.durum") == 10)
+		{
+			if(ch->GetQuestFlag("bio.durum") > 10)
+			{
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Biyolog görevlerini tamamlamy?syn!"));
+				return 0;
+			}
+
+			if (ch->CountSpecifyItem(BiyologSistemi[ch->GetQuestFlag("bio.durum")][0]) < 1)
+			{
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Gereken miktarda biyolog nesnesine sahip de?ilsin."));
+				return 0;
+			}
+			else
+			{
+				int prob = number(1,100);
+				if(ch->GetQuestFlag("bio.sans") == 1)
+				{
+					sans = sans +100;
+				}
+				if(ch->GetQuestFlag("bio.sure") == 1)
+				{
+					ch->SetQuestFlag("bio.sure",0);
+				}
+
+				if(sans >= prob)
+				{
+					if (ch->GetQuestFlag("bio.verilen") >= BiyologSistemi[ch->GetQuestFlag("bio.durum")][1])
+					{
+						return 0;
+					}
+
+					ch->SetQuestFlag("bio.verilen",ch->GetQuestFlag("bio.verilen")+1);
+
+					if(ch->GetQuestFlag("bio.sans") == 1)
+					{
+						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Görevi tamamlamak için ara?tyrmacynyn özütü kullanyldy."));
+						ch->SetQuestFlag("bio.sans",0);
+					}
+
+					if(ch->GetQuestFlag("bio.verilen") == BiyologSistemi[ch->GetQuestFlag("bio.durum")][1])
+					{
+						if (ch->GetQuestFlag("bio.durum") == 9)
+						{
+							ch->SetQuestFlag("bio.ruhtasi",3);
+							ch->SetQuestFlag("bio.odulvakti",1);
+						}
+						else
+						{
+							TItemTable* pTable = ITEM_MANAGER::instance().GetTable(BiyologSistemi[ch->GetQuestFlag("bio.durum")][4]);
+							ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> %s Ruh ta?yny bulmalysyn."), pTable->szLocaleName);
+							ch->SetQuestFlag("bio.ruhtasi",2);
+						}
+					}
+					else
+					{
+						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> %d adet e?ya kaldy."), (BiyologSistemi[ch->GetQuestFlag("bio.durum")][1]-ch->GetQuestFlag("bio.verilen")));
+						ch->SetQuestFlag("bio.kalan",get_global_time()+(BiyologSistemi[ch->GetQuestFlag("bio.durum")][2]*60));
+					}
+				}
+				else
+				{
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Görev ba?arysyz."));
+					ch->SetQuestFlag("bio.kalan",get_global_time()+(BiyologSistemi[ch->GetQuestFlag("bio.durum")][2]*60));
+				}
+				ch->RemoveSpecifyItem(BiyologSistemi[ch->GetQuestFlag("bio.durum")][0],1);
+			}
+		}
+
+		ch->ChatPacket(CHAT_TYPE_COMMAND, "biyolog_update %d %d %d %d %d", ch->GetQuestFlag("bio.durum"), ch->GetQuestFlag("bio.ruhtasi"), ch->GetQuestFlag("bio.verilen"), BiyologSistemi[ch->GetQuestFlag("bio.durum")][1], ch->GetQuestFlag("bio.kalan") - get_global_time());
+		return 1;
+	}
+
+	return 0;
+}
+
+ACMD(do_biyolog)
+{
+	if (quest::CQuestManager::instance().GetEventFlag("biyolog_disable") == 1)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "Sistem suan icin devre disi!");
+		return;
+	}
+
+	char arg1[256], arg2[256], arg3[256];
+	three_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2), arg3, sizeof(arg3));
+
+	if (!*arg1 && !*arg2 && !*arg3)
+		return;
+
+	if (!ch->IsPC())
+		return;
+
+#ifdef ENABLE_OFFLINE_SHOP_SYSTEM
+	if (ch->GetExchange() || ch->GetViewingShopOwner() || ch->IsOpenSafebox() || ch->IsCubeOpen())
+#else
+	if (ch->GetExchange() || ch->GetMyShop() || ch->GetShopOwner() || ch->IsOpenSafebox() || ch->IsCubeOpen())
+#endif
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Pencere açykken bu i?lemi yapamazsyn."));
+		return;
+	}
+
+	int sans =  BiyologSistemi[ch->GetQuestFlag("bio.durum")][3];
+	int toplam =  BiyologSistemi[ch->GetQuestFlag("bio.durum")][1];
+	int level =  ch->GetLevel();
+
+	int affectvnum =  BiyologSistemi[ch->GetQuestFlag("bio.durum")][6];
+	int affectvalue =  BiyologSistemi[ch->GetQuestFlag("bio.durum")][7];
+	int affectvnum2 =  BiyologSistemi[ch->GetQuestFlag("bio.durum")][8];
+	int affectvalue2 =  BiyologSistemi[ch->GetQuestFlag("bio.durum")][9];
+	int affectvnum3 =  BiyologSistemi[ch->GetQuestFlag("bio.durum")][10];
+	int affectvalue3 =  BiyologSistemi[ch->GetQuestFlag("bio.durum")][11];
+	int affectvnum4 =  BiyologSistemi[ch->GetQuestFlag("bio.durum")][12];
+	int affectvalue4 =  BiyologSistemi[ch->GetQuestFlag("bio.durum")][13];
+	int unlimited = 60*60*60*365;
+
+	if(level < 30)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> 30. seviyeden dü?ük iken görevleri tamamlayamazsyn."));
+		return;
+	}
+
+	if(ch->GetQuestFlag("bio.durum") > 10)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Biyolog görevlerini tamamlamy?syn!"));
+		return;
+	}
+
+	DWORD dwVnum = 0;
+	DWORD dwVnum2 = 0;
+	str_to_number(dwVnum, arg2);
+	str_to_number(dwVnum2, arg3);
+
+	const std::string& strArg1 = std::string(arg1);
+	if(strArg1 == "request")
+	{
+		LPITEM item = ch->GetItem(TItemPos(INVENTORY, dwVnum));
+		if (item != NULL)
+		{
+			if (item->GetVnum() == 70022)
+			{
+				if(ch->GetQuestFlag("bio.durum") > 10)
+				{
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Biyolog görevlerini tamamlamy?syn!"));
+					return;
+				}
+
+				if (ch->CountSpecifyItem(70022) < 1)
+				{
+					return;
+				}
+
+				if(int(ch->GetQuestFlag("bio.sure")) == 1)
+				{
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Zaten süre e?yasy kullanmy?syn!"));
+				}
+				else if(ch->GetQuestFlag("bio.ruhtasi") == 2)
+				{
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Bunu ruh ta?y görevinde yapamazsyn."));
+				}
+				else
+				{
+					item->SetCount(item->GetCount() - 1);
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Süre i?ledi."));
+					ch->SetQuestFlag("bio.sure",1);
+					ch->SetQuestFlag("bio.kalan",get_global_time()+0);
+					ch->ChatPacket(CHAT_TYPE_COMMAND, "biyolog_update %d %d %d %d %d", ch->GetQuestFlag("bio.durum"), ch->GetQuestFlag("bio.ruhtasi"), ch->GetQuestFlag("bio.verilen"), BiyologSistemi[ch->GetQuestFlag("bio.durum")][1], ch->GetQuestFlag("bio.kalan") - get_global_time());
+				}
+			}
+		}
+
+		LPITEM item2 = ch->GetItem(TItemPos(INVENTORY, dwVnum2));
+		if (item2 != NULL)
+		{
+			if(ch->GetQuestFlag("bio.durum") > 10)
+			{
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Biyolog görevlerini tamamlamy?syn!"));
+				return;
+			}
+
+			int SANS_ITEMLER[3] = 
+			{
+				71035,
+				76020,
+				39023,
+			};
+
+			for (int it = 0; it <= 3; it++)
+			{
+				if (item2->GetVnum() == SANS_ITEMLER[it])
+				{
+					if (ch->CountSpecifyItem(SANS_ITEMLER[it]) < 1)
+					{
+						return;
+					}
+
+					if(int(ch->GetQuestFlag("bio.sans")) == 1)
+					{
+						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Zaten ?ans e?yasyny kullanmy?syn."));
+					}
+					else if(ch->GetQuestFlag("bio.ruhtasi") == 2)
+					{
+						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Bunu ruh ta?y görevinde yapamazsyn."));
+					}
+					else
+					{
+						item2->SetCount(item2->GetCount() - 1);
+						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> ?ans i?ledi."));
+						ch->SetQuestFlag("bio.sans", 1);
+					}
+				}
+			}
+		}
+
+		if(ch->GetQuestFlag("bio.kalan") > get_global_time())
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Görev süresi dolmady."));
+			return;
+		}
+
+		if(ch->GetQuestFlag("bio.durum") == 1 || ch->GetQuestFlag("bio.durum") == 2 || ch->GetQuestFlag("bio.durum") == 3 || ch->GetQuestFlag("bio.durum") == 4 || ch->GetQuestFlag("bio.durum") == 5 || ch->GetQuestFlag("bio.durum") == 6 || ch->GetQuestFlag("bio.durum") == 7 || ch->GetQuestFlag("bio.durum") == 8 || ch->GetQuestFlag("bio.durum") == 9 || ch->GetQuestFlag("bio.durum") == 10)
+		{
+			if(ch->GetQuestFlag("bio.durum") > 10)
+			{
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Biyolog görevlerini tamamlamy?syn!"));
+				return;
+			}
+
+			if (ch->CountSpecifyItem(BiyologSistemi[ch->GetQuestFlag("bio.durum")][0]) < 1)
+			{
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Gereken miktarda biyolog nesnesine sahip de?ilsin."));
+				return;
+			}
+			else
+			{
+				int prob = number(1,100);
+				if(ch->GetQuestFlag("bio.sans") == 1)
+				{
+					sans = sans +100;
+				}
+				if(ch->GetQuestFlag("bio.sure") == 1)
+				{
+					ch->SetQuestFlag("bio.sure",0);
+				}
+
+				if(sans >= prob)
+				{
+					if (ch->GetQuestFlag("bio.verilen") >= BiyologSistemi[ch->GetQuestFlag("bio.durum")][1])
+					{
+						return;
+					}
+
+					ch->SetQuestFlag("bio.verilen",ch->GetQuestFlag("bio.verilen")+1);
+					if(ch->GetQuestFlag("bio.sans") == 1)
+					{
+						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Görevi tamamlamak için ara?tyrmacynyn özütü kullanyldy."));
+						ch->SetQuestFlag("bio.sans",0);
+					}
+
+					if(ch->GetQuestFlag("bio.verilen") == toplam)
+					{
+						if (ch->GetQuestFlag("bio.durum") == 9)
+						{
+							ch->SetQuestFlag("bio.ruhtasi",3);
+							ch->SetQuestFlag("bio.odulvakti",1);
+						}
+						else
+						{
+							TItemTable* pTable = ITEM_MANAGER::instance().GetTable(BiyologSistemi[ch->GetQuestFlag("bio.durum")][4]);
+							ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> %s Ruh ta?yny bulmalysyn."), pTable->szLocaleName);
+							ch->SetQuestFlag("bio.ruhtasi",2);
+						}
+					}
+					else
+					{
+						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("biogecti %d"), (toplam-ch->GetQuestFlag("bio.verilen")));
+						ch->SetQuestFlag("bio.kalan",get_global_time()+(BiyologSistemi[ch->GetQuestFlag("bio.durum")][2]*60));
+					}			
+				}
+				else
+				{
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Görev ba?arysyz."));
+					ch->SetQuestFlag("bio.kalan",get_global_time()+(BiyologSistemi[ch->GetQuestFlag("bio.durum")][2]*60));
+				}
+				ch->RemoveSpecifyItem(BiyologSistemi[ch->GetQuestFlag("bio.durum")][0],1);
+			}
+		}
+
+		ch->ChatPacket(CHAT_TYPE_COMMAND, "biyolog_update %d %d %d %d %d", ch->GetQuestFlag("bio.durum"), ch->GetQuestFlag("bio.ruhtasi"), ch->GetQuestFlag("bio.verilen"), BiyologSistemi[ch->GetQuestFlag("bio.durum")][1], ch->GetQuestFlag("bio.kalan") - get_global_time());
+		return;
+	}
+
+	if(strArg1 == "stone")
+	{
+		if(ch->GetQuestFlag("bio.durum") > 10)
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Biyolog görevlerini tamamlamy?syn!"));
+			return;
+		}
+
+		if(ch->GetQuestFlag("bio.durum") == 1 || ch->GetQuestFlag("bio.durum") == 2 || ch->GetQuestFlag("bio.durum") == 3 || ch->GetQuestFlag("bio.durum") == 4 || ch->GetQuestFlag("bio.durum") == 5 || ch->GetQuestFlag("bio.durum") == 6 || ch->GetQuestFlag("bio.durum") == 7 || ch->GetQuestFlag("bio.durum") == 8 || ch->GetQuestFlag("bio.durum") == 9 || ch->GetQuestFlag("bio.durum") == 10)
+		{
+			if (ch->GetQuestFlag("bio.verilen") >= BiyologSistemi[ch->GetQuestFlag("bio.durum")][1] && ch->GetQuestFlag("bio.ruhtasi") == 2)
+			{
+				if (ch->CountSpecifyItem(BiyologSistemi[ch->GetQuestFlag("bio.durum")][4]) < 1)
+				{
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("bioruhtasiyok"));
+					return;
+				}
+				else
+				{
+					ch->RemoveSpecifyItem(BiyologSistemi[ch->GetQuestFlag("bio.durum")][4],1);
+
+					if(ch->GetQuestFlag("bio.durum") == 9 || ch->GetQuestFlag("bio.durum") == 10)
+					{
+						ch->SetQuestFlag("bio.ruhtasi",3);
+						ch->SetQuestFlag("bio.odulvakti",1);
+					}
+					else
+					{
+						ch->SetQuestFlag("bio.ruhtasi",3);
+					}
+				}
+			}
+		}
+
+
+		ch->ChatPacket(CHAT_TYPE_COMMAND, "biyolog_update %d %d %d %d %d", ch->GetQuestFlag("bio.durum"), ch->GetQuestFlag("bio.ruhtasi"), ch->GetQuestFlag("bio.verilen"), BiyologSistemi[ch->GetQuestFlag("bio.durum")][1], ch->GetQuestFlag("bio.kalan") - get_global_time());
+		return;
+	}
+
+	if(strArg1 == "complate")
+	{
+		if(ch->GetQuestFlag("bio.durum") > 10)
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Biyolog görevlerini tamamlamy?syn!"));
+			return;
+		}
+
+
+		if(ch->GetQuestFlag("bio.durum") == 1)
+		{
+			if (ch->GetQuestFlag("bio.verilen") >= (int)BiyologSistemi[ch->GetQuestFlag("bio.durum")][1] && ch->GetQuestFlag("bio.ruhtasi") == 3)
+			{
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Görev tamamlandy!"));
+				ch->AutoGiveItem(BiyologSistemi[ch->GetQuestFlag("bio.durum")][5], 1);
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Yeni görev eklendi."));
+
+				ch->AddAffect(AFFECT_BIO, aApplyInfo[affectvnum].bPointType, affectvalue, 0, 60*60*24*365*60, 0, false);
+
+				ch->SetQuestFlag("bio.durum",ch->GetQuestFlag("bio.durum")+1);
+				ch->SetQuestFlag("bio.verilen",0);
+				ch->SetQuestFlag("bio.kalan",get_global_time()+0);
+				ch->SetQuestFlag("bio.ruhtasi",1);
+				ch->SetQuestFlag("bio.30",1);
+				ch->SetQuestFlag("bio.bildiri",ch->GetQuestFlag("bio.bildiri")+1);
+				ch->ChatPacket(CHAT_TYPE_COMMAND, "biyolog_update %d %d %d %d %d", ch->GetQuestFlag("bio.durum"), ch->GetQuestFlag("bio.ruhtasi"), ch->GetQuestFlag("bio.verilen"), BiyologSistemi[ch->GetQuestFlag("bio.durum")][1], ch->GetQuestFlag("bio.kalan") - get_global_time());
+				return;
+			}
+		}
+
+		if(ch->GetQuestFlag("bio.durum") == 2)
+		{
+			if (ch->GetQuestFlag("bio.verilen") >= (int)BiyologSistemi[ch->GetQuestFlag("bio.durum")][1] && ch->GetQuestFlag("bio.ruhtasi") == 3)
+			{
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Görev tamamlandy!"));
+				ch->AutoGiveItem(BiyologSistemi[ch->GetQuestFlag("bio.durum")][5], 1);
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Yeni görev eklendi."));
+
+				ch->AddAffect(AFFECT_BIO, aApplyInfo[affectvnum].bPointType, affectvalue, 0, 60*60*24*365*60, 0, false);
+
+				ch->SetQuestFlag("bio.durum",ch->GetQuestFlag("bio.durum")+1);
+				ch->SetQuestFlag("bio.verilen",0);
+				ch->SetQuestFlag("bio.kalan",get_global_time()+0);
+				ch->SetQuestFlag("bio.ruhtasi",1);
+				ch->SetQuestFlag("bio.40",1);
+				ch->SetQuestFlag("bio.bildiri",ch->GetQuestFlag("bio.bildiri")+1);
+				ch->ChatPacket(CHAT_TYPE_COMMAND, "biyolog_update %d %d %d %d %d", ch->GetQuestFlag("bio.durum"), ch->GetQuestFlag("bio.ruhtasi"), ch->GetQuestFlag("bio.verilen"), BiyologSistemi[ch->GetQuestFlag("bio.durum")][1], ch->GetQuestFlag("bio.kalan") - get_global_time());
+				return;
+			}
+		}
+
+		if(ch->GetQuestFlag("bio.durum") == 3)
+		{
+			if (ch->GetQuestFlag("bio.verilen") >= (int)BiyologSistemi[ch->GetQuestFlag("bio.durum")][1] && ch->GetQuestFlag("bio.ruhtasi") == 3)
+			{
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Görev tamamlandy!"));
+				ch->AutoGiveItem(BiyologSistemi[ch->GetQuestFlag("bio.durum")][5], 1);
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Yeni görev eklendi."));
+
+				ch->AddAffect(AFFECT_BIO, aApplyInfo[affectvnum].bPointType, affectvalue, 0, 60*60*24*365*60, 0, false);
+
+				ch->SetQuestFlag("bio.durum",ch->GetQuestFlag("bio.durum")+1);
+				ch->SetQuestFlag("bio.verilen",0);
+				ch->SetQuestFlag("bio.kalan",get_global_time()+0);
+				ch->SetQuestFlag("bio.ruhtasi",1);
+				ch->SetQuestFlag("bio.50",1);
+				ch->SetQuestFlag("bio.bildiri",ch->GetQuestFlag("bio.bildiri")+1);
+				ch->ChatPacket(CHAT_TYPE_COMMAND, "biyolog_update %d %d %d %d %d", ch->GetQuestFlag("bio.durum"), ch->GetQuestFlag("bio.ruhtasi"), ch->GetQuestFlag("bio.verilen"), BiyologSistemi[ch->GetQuestFlag("bio.durum")][1], ch->GetQuestFlag("bio.kalan") - get_global_time());
+				return;
+			}
+		}
+
+		if(ch->GetQuestFlag("bio.durum") == 4)
+		{
+			if (ch->GetQuestFlag("bio.verilen") >= (int)BiyologSistemi[ch->GetQuestFlag("bio.durum")][1] && ch->GetQuestFlag("bio.ruhtasi") == 3)
+			{
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Görev tamamlandy!"));
+				ch->AutoGiveItem(BiyologSistemi[ch->GetQuestFlag("bio.durum")][5], 1);
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Yeni görev eklendi."));
+
+				ch->AddAffect(AFFECT_BIO, aApplyInfo[affectvnum].bPointType, affectvalue, 0, 60*60*24*365*60, 0, false);
+
+				ch->SetQuestFlag("bio.durum",ch->GetQuestFlag("bio.durum")+1);
+				ch->SetQuestFlag("bio.verilen",0);
+				ch->SetQuestFlag("bio.kalan",get_global_time()+0);
+				ch->SetQuestFlag("bio.ruhtasi",1);
+				ch->SetQuestFlag("bio.60",1);
+				ch->SetQuestFlag("bio.bildiri",ch->GetQuestFlag("bio.bildiri")+1);
+				ch->ChatPacket(CHAT_TYPE_COMMAND, "biyolog_update %d %d %d %d %d", ch->GetQuestFlag("bio.durum"), ch->GetQuestFlag("bio.ruhtasi"), ch->GetQuestFlag("bio.verilen"), BiyologSistemi[ch->GetQuestFlag("bio.durum")][1], ch->GetQuestFlag("bio.kalan") - get_global_time());
+				return;
+			}
+		}
+
+		if(ch->GetQuestFlag("bio.durum") == 5)
+		{
+			if (ch->GetQuestFlag("bio.verilen") >= (int)BiyologSistemi[ch->GetQuestFlag("bio.durum")][1] && ch->GetQuestFlag("bio.ruhtasi") == 3)
+			{
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Görev tamamlandy!"));
+				ch->AutoGiveItem(BiyologSistemi[ch->GetQuestFlag("bio.durum")][5], 1);
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Yeni görev eklendi."));
+
+				ch->AddAffect(AFFECT_BIO, aApplyInfo[affectvnum].bPointType, affectvalue, 0, 60*60*24*365*60, 0, false);
+				ch->AddAffect(AFFECT_BIO, aApplyInfo[affectvnum2].bPointType, affectvalue2, 0, 60*60*24*365*60, 0, false);
+
+				ch->SetQuestFlag("bio.durum",ch->GetQuestFlag("bio.durum")+1);
+				ch->SetQuestFlag("bio.verilen",0);
+				ch->SetQuestFlag("bio.kalan",get_global_time()+0);
+				ch->SetQuestFlag("bio.ruhtasi",1);
+				ch->SetQuestFlag("bio.70",1);
+				ch->SetQuestFlag("bio.bildiri",ch->GetQuestFlag("bio.bildiri")+1);
+				ch->ChatPacket(CHAT_TYPE_COMMAND, "biyolog_update %d %d %d %d %d", ch->GetQuestFlag("bio.durum"), ch->GetQuestFlag("bio.ruhtasi"), ch->GetQuestFlag("bio.verilen"), BiyologSistemi[ch->GetQuestFlag("bio.durum")][1], ch->GetQuestFlag("bio.kalan") - get_global_time());
+				return;
+			}
+		}
+
+		if(ch->GetQuestFlag("bio.durum") == 6)
+		{
+			if (ch->GetQuestFlag("bio.verilen") >= (int)BiyologSistemi[ch->GetQuestFlag("bio.durum")][1] && ch->GetQuestFlag("bio.ruhtasi") == 3)
+			{
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Görev tamamlandy!"));
+				ch->AutoGiveItem(BiyologSistemi[ch->GetQuestFlag("bio.durum")][5], 1);
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Yeni görev eklendi."));
+
+				ch->AddAffect(AFFECT_BIO, aApplyInfo[affectvnum].bPointType, affectvalue, 0, 60*60*24*365*60, 0, false);
+				ch->AddAffect(AFFECT_BIO, aApplyInfo[affectvnum2].bPointType, affectvalue2, 0, 60*60*24*365*60, 0, false);
+
+				ch->SetQuestFlag("bio.durum",ch->GetQuestFlag("bio.durum")+1);
+				ch->SetQuestFlag("bio.verilen",0);
+				ch->SetQuestFlag("bio.kalan",get_global_time()+0);
+				ch->SetQuestFlag("bio.ruhtasi",1);
+				ch->SetQuestFlag("bio.80",1);
+				ch->SetQuestFlag("bio.bildiri",ch->GetQuestFlag("bio.bildiri")+1);
+				ch->ChatPacket(CHAT_TYPE_COMMAND, "biyolog_update %d %d %d %d %d", ch->GetQuestFlag("bio.durum"), ch->GetQuestFlag("bio.ruhtasi"), ch->GetQuestFlag("bio.verilen"), BiyologSistemi[ch->GetQuestFlag("bio.durum")][1], ch->GetQuestFlag("bio.kalan") - get_global_time());
+				return;
+			}
+		}
+
+		if(ch->GetQuestFlag("bio.durum") == 7)
+		{
+			if (ch->GetQuestFlag("bio.verilen") >= (int)BiyologSistemi[ch->GetQuestFlag("bio.durum")][1] && ch->GetQuestFlag("bio.ruhtasi") == 3)
+			{
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Görev tamamlandy!"));
+				ch->AutoGiveItem(BiyologSistemi[ch->GetQuestFlag("bio.durum")][5], 1);
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Yeni görev eklendi."));
+
+				ch->AddAffect(AFFECT_BIO, aApplyInfo[affectvnum].bPointType, affectvalue, 0, 60*60*24*365*60, 0, false);
+				ch->AddAffect(AFFECT_BIO, aApplyInfo[affectvnum2].bPointType, affectvalue2, 0, 60*60*24*365*60, 0, false);
+				ch->AddAffect(AFFECT_BIO, aApplyInfo[affectvnum3].bPointType, affectvalue3, 0, 60*60*24*365*60, 0, false);
+				ch->AddAffect(AFFECT_BIO, aApplyInfo[affectvnum4].bPointType, affectvalue4, 0, 60*60*24*365*60, 0, false);
+
+				ch->SetQuestFlag("bio.durum",ch->GetQuestFlag("bio.durum")+1);
+				ch->SetQuestFlag("bio.verilen",0);
+				ch->SetQuestFlag("bio.kalan",get_global_time()+0);
+				ch->SetQuestFlag("bio.ruhtasi",1);
+				ch->SetQuestFlag("bio.85",1);
+				ch->SetQuestFlag("bio.bildiri",ch->GetQuestFlag("bio.bildiri")+1);
+				ch->ChatPacket(CHAT_TYPE_COMMAND, "biyolog_update %d %d %d %d %d", ch->GetQuestFlag("bio.durum"), ch->GetQuestFlag("bio.ruhtasi"), ch->GetQuestFlag("bio.verilen"), BiyologSistemi[ch->GetQuestFlag("bio.durum")][1], ch->GetQuestFlag("bio.kalan") - get_global_time());
+				return;
+			}
+		}
+
+		if(ch->GetQuestFlag("bio.durum") == 8)
+		{
+			if (ch->GetQuestFlag("bio.verilen") >= (int)BiyologSistemi[ch->GetQuestFlag("bio.durum")][1] && ch->GetQuestFlag("bio.ruhtasi") == 3)
+			{
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Görev tamamlandy!"));
+				ch->AutoGiveItem(BiyologSistemi[ch->GetQuestFlag("bio.durum")][5], 1);
+				ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Yeni görev eklendi."));
+
+				ch->AddAffect(AFFECT_BIO, aApplyInfo[affectvnum].bPointType, affectvalue, 0, 60*60*24*365*60, 0, false);
+
+				ch->SetQuestFlag("bio.durum",ch->GetQuestFlag("bio.durum")+1);
+				ch->SetQuestFlag("bio.verilen",0);
+				ch->SetQuestFlag("bio.kalan",get_global_time()+0);
+				ch->SetQuestFlag("bio.ruhtasi",1);
+				ch->SetQuestFlag("bio.90",1);
+				ch->SetQuestFlag("bio.bildiri",ch->GetQuestFlag("bio.bildiri")+1);
+				ch->ChatPacket(CHAT_TYPE_COMMAND, "biyolog_update %d %d %d %d %d", ch->GetQuestFlag("bio.durum"), ch->GetQuestFlag("bio.ruhtasi"), ch->GetQuestFlag("bio.verilen"), BiyologSistemi[ch->GetQuestFlag("bio.durum")][1], ch->GetQuestFlag("bio.kalan") - get_global_time());
+				return;
+			}
+		}
+
+		if(ch->GetQuestFlag("bio.durum") == 9)
+		{
+			if (ch->GetQuestFlag("bio.odulvakti") == 0)
+			{
+				return;
+			}
+
+			if (ch->GetQuestFlag("bio.odulvakti") == 1 and level >= 92)
+            {
+				if (ch->GetQuestFlag("bio.verilen") >= BiyologSistemi[ch->GetQuestFlag("bio.durum")][1] && ch->GetQuestFlag("bio.ruhtasi") == 3)
+				{
+					if(dwVnum == 1)
+					{
+						ch->AddAffect(AFFECT_BIO_92, aApplyInfo[affectvnum].bPointType, affectvalue, 0, unlimited, 0, false);
+						ch->SetQuestFlag("bio.durum",10);
+						ch->SetQuestFlag("bio.92",1);
+						ch->SetQuestFlag("bio.verilen",0);
+						ch->SetQuestFlag("bio.kalan",get_global_time()+0);
+						ch->SetQuestFlag("bio.ruhtasi",1);
+						ch->SetQuestFlag("bio.odulvakti",0);
+						ch->SetQuestFlag("bio.bildiri",ch->GetQuestFlag("bio.bildiri")+1);
+						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Görev tamamlandy!"));
+						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Yeni görev eklendi."));
+						ch->ChatPacket(CHAT_TYPE_COMMAND, "biyolog_update %d %d %d %d %d", ch->GetQuestFlag("bio.durum"), ch->GetQuestFlag("bio.ruhtasi"), ch->GetQuestFlag("bio.verilen"), BiyologSistemi[ch->GetQuestFlag("bio.durum")][1], ch->GetQuestFlag("bio.kalan") - get_global_time());
+						return;
+					}
+
+					if(dwVnum == 2)
+					{
+						ch->AddAffect(AFFECT_BIO_92, aApplyInfo[affectvnum2].bPointType, affectvalue2, 0, unlimited, 0, false);
+						ch->SetQuestFlag("bio.durum",10);
+						ch->SetQuestFlag("bio.92",1);
+						ch->SetQuestFlag("bio.verilen",0);
+						ch->SetQuestFlag("bio.kalan",get_global_time()+0);
+						ch->SetQuestFlag("bio.ruhtasi",1);
+						ch->SetQuestFlag("bio.odulvakti",0);
+						ch->SetQuestFlag("bio.bildiri",ch->GetQuestFlag("bio.bildiri")+1);
+						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Görev tamamlandy!"));
+						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Yeni görev eklendi."));
+						ch->ChatPacket(CHAT_TYPE_COMMAND, "biyolog_update %d %d %d %d %d", ch->GetQuestFlag("bio.durum"), ch->GetQuestFlag("bio.ruhtasi"), ch->GetQuestFlag("bio.verilen"), BiyologSistemi[ch->GetQuestFlag("bio.durum")][1], ch->GetQuestFlag("bio.kalan") - get_global_time());
+						return;
+					}
+
+					if(dwVnum == 3)
+					{
+						ch->AddAffect(AFFECT_BIO_92, aApplyInfo[affectvnum3].bPointType, affectvalue3, 0, unlimited, 0, false);
+						ch->SetQuestFlag("bio.durum",10);
+						ch->SetQuestFlag("bio.92",1);
+						ch->SetQuestFlag("bio.verilen",0);
+						ch->SetQuestFlag("bio.kalan",get_global_time()+0);
+						ch->SetQuestFlag("bio.ruhtasi",1);
+						ch->SetQuestFlag("bio.odulvakti",0);
+						ch->SetQuestFlag("bio.bildiri",ch->GetQuestFlag("bio.bildiri")+1);
+						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Görev tamamlandy!"));
+						ch->ChatPacket(CHAT_TYPE_COMMAND, "biyolog_update %d %d %d %d %d", ch->GetQuestFlag("bio.durum"), ch->GetQuestFlag("bio.ruhtasi"), ch->GetQuestFlag("bio.verilen"), BiyologSistemi[ch->GetQuestFlag("bio.durum")][1], ch->GetQuestFlag("bio.kalan") - get_global_time());
+						return;
+					}
+				}
+            }
+		}
+
+		if(ch->GetQuestFlag("bio.durum") == 10)
+		{
+			if (ch->GetQuestFlag("bio.odulvakti") == 0)
+			{
+				return;
+			}
+
+			if (ch->GetQuestFlag("bio.odulvakti") == 1 and level >= 94)
+            {
+				if (ch->GetQuestFlag("bio.verilen") >= BiyologSistemi[ch->GetQuestFlag("bio.durum")][1] && ch->GetQuestFlag("bio.ruhtasi") == 3)
+				{
+					if(dwVnum == 1)
+					{
+						ch->AddAffect(AFFECT_BIO_94, aApplyInfo[affectvnum].bPointType, affectvalue, 0, unlimited, 0, false);
+						ch->SetQuestFlag("bio.durum",11);
+						ch->SetQuestFlag("bio.94",1);
+						ch->SetQuestFlag("bio.verilen",0);
+						ch->SetQuestFlag("bio.kalan",get_global_time()+0);
+						ch->SetQuestFlag("bio.ruhtasi",1);
+						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Görev tamamlandy!"));
+						ch->ChatPacket(CHAT_TYPE_COMMAND, "biyolog_update %d %d %d %d %d", ch->GetQuestFlag("bio.durum"), ch->GetQuestFlag("bio.ruhtasi"), ch->GetQuestFlag("bio.verilen"), BiyologSistemi[ch->GetQuestFlag("bio.durum")][1], ch->GetQuestFlag("bio.kalan") - get_global_time());
+						return;
+					}
+
+					if(dwVnum == 2)
+					{
+						ch->AddAffect(AFFECT_BIO_94, aApplyInfo[affectvnum2].bPointType, affectvalue2, 0, unlimited, 0, false);
+						ch->SetQuestFlag("bio.durum",11);
+						ch->SetQuestFlag("bio.94",1);
+						ch->SetQuestFlag("bio.verilen",0);
+						ch->SetQuestFlag("bio.kalan",get_global_time()+0);
+						ch->SetQuestFlag("bio.ruhtasi",1);
+						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Görev tamamlandy!"));
+						ch->ChatPacket(CHAT_TYPE_COMMAND, "biyolog_update %d %d %d %d %d", ch->GetQuestFlag("bio.durum"), ch->GetQuestFlag("bio.ruhtasi"), ch->GetQuestFlag("bio.verilen"), BiyologSistemi[ch->GetQuestFlag("bio.durum")][1], ch->GetQuestFlag("bio.kalan") - get_global_time());
+						return;
+					}
+
+					if(dwVnum == 3)
+					{
+						ch->AddAffect(AFFECT_BIO_94, aApplyInfo[affectvnum3].bPointType, affectvalue3, 0, unlimited, 0, false);
+						ch->SetQuestFlag("bio.durum",11);
+						ch->SetQuestFlag("bio.94",1);
+						ch->SetQuestFlag("bio.verilen",0);
+						ch->SetQuestFlag("bio.kalan",get_global_time()+0);
+						ch->SetQuestFlag("bio.ruhtasi",1);
+						ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<Biyolog Görevleri> Görev tamamlandy!"));
+						ch->ChatPacket(CHAT_TYPE_COMMAND, "biyolog_update %d %d %d %d %d", ch->GetQuestFlag("bio.durum"), ch->GetQuestFlag("bio.ruhtasi"), ch->GetQuestFlag("bio.verilen"), BiyologSistemi[ch->GetQuestFlag("bio.durum")][1], ch->GetQuestFlag("bio.kalan") - get_global_time());
+						return;
+					}
+				}
+            }
+		}
+	}
+
+	if(strArg1 == "all")
+	{
+		if (quest::CQuestManager::instance().GetEventFlag("biyolog_hizli") == 1)
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "Sistem suan icin devre disi!");
+			return;
+		}
+
+		if (biyologtimer)
+		{
+			event_cancel(&biyologtimer);
+		}
+
+		TMainEventInfo5* info = AllocEventInfo<TMainEventInfo5>();
+
+		info->kim = ch;
+		info->deger = toplam;
+		info->itemim1 = dwVnum;
+		info->itemim2 = dwVnum2;
+		biyologtimer = event_create(biyolog_event, info, PASSES_PER_SEC(1));
+	}
+
+	return;
+}
+#endif
+
+#ifdef __LEADERSHIP__BONUS__
+#include "party.h"
+ACMD(do_leadership_bonus)
+{
+	char arg1[256];
+	one_argument(argument, arg1, sizeof(arg1));
+
+	if (!*arg1)
+		return;
+
+	BYTE bRole = 0;
+	str_to_number(bRole, arg1);
+
+	if (!ch->GetDesc() || !ch->CanWarp() || !ch->IsLoadedAffect())
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "Bu komutu kullanmadan önce 10 saniye beklemelisin.");
+		return;
+	}
+	
+	if (ch->GetParty())
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "Partideyken bunu yapamazs?n.");
+		return;
+	}
+	
+	if (ch->GetLeadershipSkillLevel() == 0)
+		return;
+	
+	if (ch->GetQuestFlag("wait_leadership") > get_global_time())
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "Bu komutu yeniden kullanabilmek için k?sa bir süre beklemen gerekiyor.");
+		return;
+	}
+	
+	ch->SetQuestFlag("wait_leadership", get_global_time() + 2);
+
+	int iBonus = 0;
+	float k = (float) ch->GetSkillPowerByLevel( MIN(SKILL_MAX_LEVEL, ch->GetLeadershipSkillLevel() ) )/ 100.0f;
+	
+	int iPointActived = 0;
+	
+	CAffect* aff = ch->FindAffect(AFF_LEADERSHIP);
+	if (aff)
+	{
+		iPointActived = aff->bApplyOn;
+	}
+
+	ch->PointChange(POINT_PARTY_ATTACKER_BONUS, -ch->GetPoint(POINT_PARTY_ATTACKER_BONUS));
+	ch->PointChange(POINT_PARTY_TANKER_BONUS, -ch->GetPoint(POINT_PARTY_TANKER_BONUS));
+	ch->PointChange(POINT_PARTY_BUFFER_BONUS, -ch->GetPoint(POINT_PARTY_BUFFER_BONUS));
+	ch->PointChange(POINT_PARTY_SKILL_MASTER_BONUS, -ch->GetPoint(POINT_PARTY_SKILL_MASTER_BONUS));
+	ch->PointChange(POINT_PARTY_DEFENDER_BONUS, -ch->GetPoint(POINT_PARTY_DEFENDER_BONUS));
+	ch->PointChange(POINT_PARTY_HASTE_BONUS, -ch->GetPoint(POINT_PARTY_HASTE_BONUS));
+	ch->ComputeBattlePoints();
+
+	ch->SetPoint(POINT_PARTY_ATTACKER_BONUS, 0);
+	ch->SetPoint(POINT_PARTY_TANKER_BONUS, 0);
+	ch->SetPoint(POINT_PARTY_BUFFER_BONUS, 0);
+	ch->SetPoint(POINT_PARTY_SKILL_MASTER_BONUS, 0);
+	ch->SetPoint(POINT_PARTY_DEFENDER_BONUS, 0);
+	ch->SetPoint(POINT_PARTY_HASTE_BONUS, 0);
+
+	ch->RemoveAffect(AFF_LEADERSHIP);
+	ch->ComputePoints();
+	
+	switch(bRole)
+	{
+		case 1:
+			{
+				if (iPointActived == POINT_PARTY_ATTACKER_BONUS)
+					break;
+				
+				iBonus = (int)(10 + 60 * k);
+				ch->AddAffect(AFF_LEADERSHIP, POINT_PARTY_ATTACKER_BONUS, iBonus, AFF_NONE, INFINITE_AFFECT_DURATION, 0, false);
+			}
+			break;
+
+		case 2:
+			{
+				if (iPointActived == POINT_PARTY_TANKER_BONUS)
+					break;
+				
+				iBonus = (int)(50 + 1450 * k);
+
+				ch->AddAffect(AFF_LEADERSHIP, POINT_PARTY_TANKER_BONUS, iBonus, AFF_NONE, INFINITE_AFFECT_DURATION, 0, false);
+			}
+			break;
+		
+		case 3:
+			{
+				if (iPointActived == POINT_PARTY_BUFFER_BONUS)
+					break;
+				
+				iBonus = (int)(5 + 45 * k);
+
+				ch->AddAffect(AFF_LEADERSHIP, POINT_PARTY_BUFFER_BONUS, iBonus, AFF_NONE, INFINITE_AFFECT_DURATION, 0, false);
+			}
+			break;
+			
+		case 4:
+			{
+				if (iPointActived == POINT_PARTY_SKILL_MASTER_BONUS)
+					break;
+				
+				iBonus = (int)(25 + 600 * k);
+
+				ch->AddAffect(AFF_LEADERSHIP, POINT_PARTY_SKILL_MASTER_BONUS, iBonus, AFF_NONE, INFINITE_AFFECT_DURATION, 0, false);
+			}
+			break;
+			
+		case 5:
+			{
+				if (iPointActived == POINT_PARTY_HASTE_BONUS)
+					break;
+				
+				iBonus = (int)(1 + 5 * k);
+
+				ch->AddAffect(AFF_LEADERSHIP, POINT_PARTY_HASTE_BONUS, iBonus, AFF_NONE, INFINITE_AFFECT_DURATION, 0, false);
+			}
+			break;
+			
+		case 6:
+			{
+				if (iPointActived == POINT_PARTY_DEFENDER_BONUS)
+					break;
+				
+				iBonus = (int)(5 + 30 * k);
+
+				ch->AddAffect(AFF_LEADERSHIP, POINT_PARTY_DEFENDER_BONUS, iBonus, AFF_NONE, INFINITE_AFFECT_DURATION, 0, false);
+			}
+			break;
+			
+		default:
+		{
+			break;
+		}
+	}
+	
+	ch->ComputePoints();
+	ch->PointsPacket();
+}
+#endif
+
+#ifdef ENABLE_REMOTE_SHOP_SYSTEM
+ACMD(do_open_range_npc)
+{
+	char arg1[256];
+	one_argument(argument, arg1, sizeof(arg1));
+
+	if (!*arg1)
+		return;
+
+	DWORD vnum = 0;
+	str_to_number(vnum, arg1);
+
+	if (ch->IsDead())
+		return;
+
+	if (ch->IsDead() || ch->GetExchange() || ch->GetMyShop() || ch->IsOpenSafebox() || ch->IsCubeOpen())
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("PLEASE_BEFORE_CLOSE_WINDOW_AND_USE_THIS_FUNCTION"));
+		return;
+	}
+
+#ifdef ENABLE_ACCE_COSTUME_SYSTEM
+	if (ch->IsAcceOpened(true) || ch->IsAcceOpened(false))
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("PLEASE_BEFORE_CLOSE_WINDOW_AND_USE_THIS_FUNCTION"));
+		return;
+	}
+#endif
+
+#ifdef ENABLE_AURA_COSTUME_SYSTEM
+	if (ch->IsAuraRefineWindowOpen())
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("PLEASE_BEFORE_CLOSE_WINDOW_AND_USE_THIS_FUNCTION"));
+		return;
+	}
+#endif
+
+#ifdef ENABLE_CHANGE_LOOK_SYSTEM
+	if (ch->GetTransmutation() != NULL)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("PLEASE_BEFORE_CLOSE_WINDOW_AND_USE_THIS_FUNCTION"));
+		return;
+	}
+#endif
+
+#ifdef ENABLE_ITEM_COMBINATION_SYSTEM
+	if (ch->IsCombOpen() == true)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("PLEASE_BEFORE_CLOSE_WINDOW_AND_USE_THIS_FUNCTION"));
+		return;
+	}
+#endif
+
+	LPSHOP shop = CShopManager::instance().Get(vnum);
+	if (!shop) return;
+
+	ch->SetShopOwner(ch);
+	shop->AddGuest(ch, 0, false);
+}
+#endif
+
+#ifdef __SYSTEM_SEARCH_ITEM_MOB__
+ACMD(search_drop)
+{
+	int iWaitMadafaka = ch->GetQuestFlag("search.sijaja");
+	if (iWaitMadafaka)
+	{
+		if (get_global_time() < iWaitMadafaka + 5) 
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "Arama butonuna basmadan önce birkaç saniye bekleyin..");
+			return;
+		}
+	}
+	char arg1[4096];
+	one_argument(argument, arg1, sizeof(arg1));
+	
+	if (!*arg1)
+		return;
+
+	std::string nume_item(arg1);
+	boost::algorithm::replace_all(nume_item, "_", " ");
+	
+	ITEM_MANAGER::instance().FindItemMonster(ch, nume_item);
+	ch->SetQuestFlag("search.sijaja", get_global_time());
+}
+#endif
+
+#ifdef ENABLE_COLLECT_WINDOW
+ACMD(do_choose_quest)
+{
+	const char *line;
+	char arg1[256], arg2[256];
+	line = two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
+
+	if (!ch || !*arg1 && !*arg2)
+		return;
+
+	// Cooldown kontrolü (1 saniye)
+	time_t cooldown_flag = ch->GetQuestFlag("collector.choose_quest_cooldown");
+	time_t current_time = get_global_time();
+	
+	if (cooldown_flag > current_time)
+	{
+		time_t remaining = cooldown_flag - current_time;
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Remaining time: %d seconds"), remaining);
+		return;
+	}
+
+	// Cooldown'u ayarla (1 saniye)
+	ch->SetQuestFlag("collector.choose_quest_cooldown", current_time + 1);
+
+	BYTE id = 0;
+	BYTE id1 = 0;
+	str_to_number(id, arg1);
+	str_to_number(id1, arg2);
+
+	ch->SetQuestFlag("collector.state", id);
+	// ch->ChatPacket(CHAT_TYPE_INFO, "%d %d %d", ch->GetQuestFlag("collector.state"), id, id1);
+
+	quest::CQuestManager::Instance().QuestButton(ch->GetPlayerID(), id1, 0);
+}
+ACMD(do_open_collect_window)
+{
+	// Cooldown kontrolü (0.7 saniye = 1 saniye rounded)
+	time_t cooldown_flag = ch->GetQuestFlag("collector.window_cooldown");
+	time_t current_time = get_global_time();
+	
+	if (cooldown_flag > current_time)
+	{
+		time_t remaining = cooldown_flag - current_time;
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Remaining time: %d seconds"), remaining);
+		return;
+	}
+
+	// Cooldown'u ayarla (1 saniye)
+	ch->SetQuestFlag("collector.window_cooldown", current_time + 1);
+	ch->ChatPacket(CHAT_TYPE_COMMAND, "OpenCollectWindow");
+	quest::CQuestManager::Instance().QuestButton(ch->GetPlayerID(), 13, 2);
+}
+#endif
+
+#ifdef __ENABLE_COLLECTIONS_SYSTEM__
+ACMD(do_add_collect_item)
+{
+	if (!ch || !ch->IsPC())
+	{
+		return;
+	}
+
+	char arg1[256];
+	char arg2[256];
+	char arg3[256];
+
+	const char* line;
+	line = two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
+	one_argument(line, arg3, sizeof(arg3));
+
+	if (!*arg1 || !*arg2 || !*arg3)
+	{
+		return;
+	}
+
+	if (!ch->CanWarp())
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "Lütfen biraz bekle!");
+		return;
+	}
+
+	BYTE collectID = std::atoi(arg1);
+	BYTE itemID = std::atoi(arg2);
+	BYTE isAll = std::atoi(arg3);
+	CSystemCollections::instance().AddItem(ch, collectID, itemID, (isAll == 1) ? true : false);
+}
+#endif
+
+#ifdef ENABLE_MINIGAME_RUMI_EVENT
+ACMD(do_cards)
+{
+	const char *line;
+
+	char arg1[256], arg2[256];
+
+	line = two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
+	switch (LOWER(arg1[0]))
+	{
+		case 'o':	// open
+			if (isdigit(*arg2))
+			{
+				DWORD safemode;
+				str_to_number(safemode, arg2);
+				ch->Cards_open(safemode);
+			}
+			break;
+		case 'p':	// open
+			ch->Cards_pullout();
+			break;
+		case 'e':	// open
+			ch->CardsEnd();
+			break;
+		case 'd':	// open
+			if (isdigit(*arg2))
+			{
+				DWORD destroy_index;
+				str_to_number(destroy_index, arg2);
+				ch->CardsDestroy(destroy_index);
+			}
+			break;
+		case 'a':	// open
+			if (isdigit(*arg2))
+			{
+				DWORD accpet_index;
+				str_to_number(accpet_index, arg2);
+				ch->CardsAccept(accpet_index);
+			}
+			break;
+		case 'r':	// open
+			if (isdigit(*arg2))
+			{
+				DWORD restore_index;
+				str_to_number(restore_index, arg2);
+				ch->CardsRestore(restore_index);
+			}
+			break;
+		default:
+			return;
+	}
+}
+#endif
+
+#ifdef ENABLE_GAYA_SHOP_SYSTEM
+ACMD(do_gem)
+{
+	char arg1[255];
+	char arg2[255];
+	two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
+
+	if (0 == arg1[0])
+		return;
+
+	const std::string& strArg1 = std::string(arg1);
+
+	if (strArg1 == "craft") {
+
+		if (0 == arg2[0])
+			return;
+
+		int slot = atoi(arg2);
+		ch->CraftGemItems(slot);
+
+	}
+	else if (strArg1 == "market") {
+
+		if (0 == arg2[0])
+			return;
+
+		int slot = atoi(arg2);
+		ch->MarketGemItems(slot);
+
+	}
+	else if (strArg1 == "refresh")
+	{
+		ch->RefreshGemItems();
+	}
+}
+#endif
+
+#ifdef ENABLE_GAYA_TICKET_SYSTEM
+ACMD(do_use_gem_ticket)
+{
+	if(ch->IsDead() || ch->GetMyShop() || ch->GetShopOwner() || ch->IsOpenSafebox() || ch->IsCubeOpen()
+#ifdef ENABLE_RENEWAL_OFFLINESHOP
+		|| ch->GetShopOwner()
+#endif
+		)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("?u anda özel depoyu kullanamazsyn. "));
+		return;
+	}
+
+	char arg1[256], arg2[256];
+	two_arguments(argument, arg1, sizeof(arg1), arg2, sizeof(arg2));
+	
+	if (!*arg1 || !*arg2)
+		return;
+	
+	int itemPos = atoi(arg1);
+	int inputGem = atoi(arg2);
+	
+	if (itemPos < 0 || itemPos >= INVENTORY_MAX_NUM)
+		return;
+	
+	if (inputGem < 0)
+		return;
+	
+	if (inputGem > ch->GetGem())
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("GEM_COUPON_ENOUGH_GEM"));
+		return;
+	}
+	
+	if (inputGem > 999999)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("GEM_COUPON_MAX_GEM"));
+		return;
+	}
+	
+	LPITEM item = ch->GetInventoryItem(itemPos);
+	
+	if (!item)
+		return;
+	
+	if (item->GetSocket(0) != 0)
+		return;
+	
+	if (item->GetVnum() != 50000)
+		return;
+	
+	ch->PointChange(POINT_GEM, -inputGem, false);
+	item->SetSocket(0, inputGem);
+}
+#endif
+
+#ifdef ENABLE_BATTLE_PASS
+ACMD(open_battlepass)
+{
+	if (!ch)
+		return;
+
+	if (quest::CQuestManager::instance().GetEventFlag("battlepas_open") == 1)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Sava? bileti etkinli?i ?uanda aktif de?il."));
+		return;
+	}
+
+	if (ch->v_counts.empty())
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Aktif savas biletin yok."));
+		return;
+	}
+
+	if (ch->missions_bp.empty())
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Aktif gorevin yok."));
+		return;
+	}
+
+	if (ch->IsObserverMode())
+		return;
+
+	if (ch->IsWarping())
+		return;
+
+	if (ch->IsDead() || ch->IsStun() || ch->GetExchange() || ch->GetMyShop() || ch->GetShopOwner() || ch->IsCubeOpen() || ch->GetSafebox() || ch->IsOpenSafebox() || ch->IsHack()
+#ifdef ENABLE_ACCE_COSTUME_SYSTEM
+		|| ch->IsAcceOpened(true) || ch->IsAcceOpened(false)
+#endif
+#ifdef __ENABLE_NEW_OFFLINESHOP__
+		|| ch->GetOfflineShopGuest() || ch->GetSafebox() || ch->GetAuctionGuest()
+#endif
+		)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("?u anda özel depoyu kullanamazsyn. "));
+		return;
+	}
+
+#ifdef ENABLE_BATTLE_PASS_MOUNTH_CLOSE
+	time_t cur_Time = time(NULL);
+	struct tm vKey = *localtime(&cur_Time);
+	int month = vKey.tm_mon;
+	if (month != ch->iMonthBattlePass)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Bu ay sava? bileti etkinli?i bulunamady."));
+		return;
+	}
+#endif
+
+	for (int i = 0; i < ch->missions_bp.size(); ++i)
+	{
+		ch->ChatPacket(CHAT_TYPE_COMMAND, "missions_bp %d %d %d %d %d", i, ch->missions_bp[i].type, ch->missions_bp[i].vnum, ch->missions_bp[i].count, ch->missions_bp[i].ep);
+		ch->ChatPacket(CHAT_TYPE_COMMAND, "info_missions_bp %d %d %d %s", i, ch->v_counts[i].count, ch->v_counts[i].status, ch->rewards_bp[i].name);
+		ch->ChatPacket(CHAT_TYPE_COMMAND, "rewards_missions_bp %d %d %d %d %d %d %d", i, ch->rewards_bp[i].vnum1, ch->rewards_bp[i].vnum2, ch->rewards_bp[i].vnum3, ch->rewards_bp[i].count1, ch->rewards_bp[i].count2, ch->rewards_bp[i].count3);
+		ch->ChatPacket(CHAT_TYPE_COMMAND, "rewards_missions_bonus_bp %d %d %d %d %d %d %d", i, ch->rewards_bonus_bp[i].vnum1, ch->rewards_bonus_bp[i].vnum2, ch->rewards_bonus_bp[i].vnum3, ch->rewards_bonus_bp[i].count1, ch->rewards_bonus_bp[i].count2, ch->rewards_bonus_bp[i].count3);
+	}
+
+	ch->ChatPacket(CHAT_TYPE_COMMAND, "size_missions_bp %d ", ch->missions_bp.size());
+	ch->ChatPacket(CHAT_TYPE_COMMAND, "final_reward %d %d %d %d %d %d", ch->final_rewards[0].f_vnum1, ch->final_rewards[0].f_vnum2, ch->final_rewards[0].f_vnum3, ch->final_rewards[0].f_count1, ch->final_rewards[0].f_count2, ch->final_rewards[0].f_count3);
+	ch->ChatPacket(CHAT_TYPE_COMMAND, "show_battlepass");
+}
+
+ACMD(final_reward_battlepass)
+{
+	if (!ch)
+		return;
+
+	if (quest::CQuestManager::instance().GetEventFlag("battlepas_reward") == 1)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Sava? bileti etkinli?i ?uanda aktif de?il."));
+		return;
+	}
+
+	if (ch->v_counts.empty())
+		return;
+
+	if (ch->missions_bp.empty())
+		return;
+
+	if (ch->v_counts[0].status == 2)
+		return;
+
+#ifdef ENABLE_BATTLE_PASS_MOUNTH_CLOSE
+	time_t cur_Time = time(NULL);
+	struct tm vKey = *localtime(&cur_Time);
+	int month = vKey.tm_mon;
+	if (month != ch->iMonthBattlePass)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Bu ay sava? bileti etkinli?i bulunamady."));
+		return;
+	}
+#endif
+
+	for (int i = 0; i < ch->missions_bp.size(); ++i)
+	{
+		if (ch->missions_bp[i].count != ch->v_counts[i].count)
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Yeterli miktarda görev bulunamady."));
+			return;
+		}
+	}
+
+	ch->FinalRewardBattlePass();
+}
+
+ACMD(battlepass_bitirici)
+{
+	if (!ch)
+		return;
+
+	if (quest::CQuestManager::instance().GetEventFlag("battlepass_bitirici") == 1)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Sava? bileti etkinli?i ?uanda aktif de?il."));
+		return;
+	}
+
+	if (ch->v_counts.empty())
+		return;
+
+	if (ch->missions_bp.empty())
+		return;
+
+	char arg1[256];
+	one_argument(argument, arg1, sizeof(arg1));
+
+	if (!*arg1)
+	{
+		return;
+	}
+
+	int indexid = 0;
+	str_to_number(indexid, arg1);
+
+#ifdef ENABLE_BATTLE_PASS_MOUNTH_CLOSE
+	time_t cur_Time = time(NULL);
+	struct tm vKey = *localtime(&cur_Time);
+	int month = vKey.tm_mon;
+	if (month != ch->iMonthBattlePass)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Bu ay sava? bileti etkinli?i bulunamady."));
+		return;
+	}
+#endif
+
+	ch->SendDoneBattlePass(indexid);
+}
+
+//premium
+ACMD(open_battlepass_premium)
+{
+	if (!ch)
+		return;
+
+	if (quest::CQuestManager::instance().GetEventFlag("battlepas_open_premium") == 1)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Sava? bileti etkinli?i ?uanda aktif de?il."));
+		return;
+	}
+
+	if (ch->v_counts_premium.empty())
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Aktif savas biletin yok."));
+		return;
+	}
+
+	if (ch->missions_bp_premium.empty())
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Aktif gorevin yok."));
+		return;
+	}
+
+	if (ch->IsObserverMode())
+		return;
+
+	if (ch->IsWarping())
+		return;
+
+	if (ch->IsDead() || ch->IsStun() || ch->GetExchange() || ch->GetMyShop() || ch->GetShopOwner() || ch->IsCubeOpen() || ch->GetSafebox() || ch->IsOpenSafebox() || ch->IsHack()
+#ifdef ENABLE_ACCE_COSTUME_SYSTEM
+		|| ch->IsAcceOpened(true) || ch->IsAcceOpened(false)
+#endif
+#ifdef __ENABLE_NEW_OFFLINESHOP__
+		|| ch->GetOfflineShopGuest() || ch->GetSafebox() || ch->GetAuctionGuest()
+#endif
+		)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("?u anda özel depoyu kullanamazsyn. "));
+		return;
+	}
+
+#ifdef ENABLE_BATTLE_PASS_MOUNTH_CLOSE
+	time_t cur_Time = time(NULL);
+	struct tm vKey = *localtime(&cur_Time);
+	int month = vKey.tm_mon;
+	if (month != ch->iMonthBattlePassPremium)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Bu ay sava? bileti etkinli?i bulunamady."));
+		return;
+	}
+#endif
+
+	for (int i = 0; i < ch->missions_bp_premium.size(); ++i)
+	{
+		ch->ChatPacket(CHAT_TYPE_COMMAND, "missions_bp_premium %d %d %d %d %d", i, ch->missions_bp_premium[i].type, ch->missions_bp_premium[i].vnum, ch->missions_bp_premium[i].count, ch->missions_bp_premium[i].ep);
+		ch->ChatPacket(CHAT_TYPE_COMMAND, "info_missions_bp_premium %d %d %d %s", i, ch->v_counts_premium[i].count, ch->v_counts_premium[i].status, ch->rewards_bp_premium[i].name);
+		ch->ChatPacket(CHAT_TYPE_COMMAND, "rewards_missions_bp_premium %d %d %d %d %d %d %d", i, ch->rewards_bp_premium[i].vnum1, ch->rewards_bp_premium[i].vnum2, ch->rewards_bp_premium[i].vnum3, ch->rewards_bp_premium[i].count1, ch->rewards_bp_premium[i].count2, ch->rewards_bp_premium[i].count3);
+		ch->ChatPacket(CHAT_TYPE_COMMAND, "rewards_missions_bonus_bp_premium %d %d %d %d %d %d %d", i, ch->rewards_bonus_bp_premium[i].vnum1, ch->rewards_bonus_bp_premium[i].vnum2, ch->rewards_bonus_bp_premium[i].vnum3, ch->rewards_bonus_bp_premium[i].count1, ch->rewards_bonus_bp_premium[i].count2, ch->rewards_bonus_bp_premium[i].count3);
+	}
+
+	ch->ChatPacket(CHAT_TYPE_COMMAND, "size_missions_bp_premium %d ", ch->missions_bp_premium.size());
+	ch->ChatPacket(CHAT_TYPE_COMMAND, "final_reward_premium %d %d %d %d %d %d", ch->final_rewards_premium[0].f_vnum1, ch->final_rewards_premium[0].f_vnum2, ch->final_rewards_premium[0].f_vnum3, ch->final_rewards_premium[0].f_count1, ch->final_rewards_premium[0].f_count2, ch->final_rewards_premium[0].f_count3);
+	ch->ChatPacket(CHAT_TYPE_COMMAND, "show_battlepass_premium");
+}
+
+ACMD(final_reward_battlepass_premium)
+{
+	if (!ch)
+		return;
+
+	if (quest::CQuestManager::instance().GetEventFlag("battlepas_reward_premium") == 1)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Sava? bileti etkinli?i ?uanda aktif de?il."));
+		return;
+	}
+
+	if (ch->v_counts_premium.empty())
+		return;
+
+	if (ch->missions_bp_premium.empty())
+		return;
+
+	if (ch->v_counts_premium[0].status == 2)
+		return;
+
+#ifdef ENABLE_BATTLE_PASS_MOUNTH_CLOSE
+	time_t cur_Time = time(NULL);
+	struct tm vKey = *localtime(&cur_Time);
+	int month = vKey.tm_mon;
+	if (month != ch->iMonthBattlePassPremium)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Bu ay sava? bileti etkinli?i bulunamady."));
+		return;
+	}
+#endif
+
+	for (int i = 0; i < ch->missions_bp_premium.size(); ++i)
+	{
+		if (ch->missions_bp_premium[i].count != ch->v_counts_premium[i].count)
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Yeterli miktarda görev bulunamady."));
+			return;
+		}
+	}
+
+	ch->FinalRewardBattlePassPremium();
+}
+
+ACMD(battlepass_bitirici_premium)
+{
+	if (!ch)
+		return;
+
+	if (quest::CQuestManager::instance().GetEventFlag("battlepass_bitirici_premium") == 1)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Sava? bileti etkinli?i ?uanda aktif de?il."));
+		return;
+	}
+
+	if (ch->v_counts_premium.empty())
+		return;
+
+	if (ch->missions_bp_premium.empty())
+		return;
+
+	char arg1[256];
+	one_argument(argument, arg1, sizeof(arg1));
+
+	if (!*arg1)
+	{
+		return;
+	}
+
+	int indexid = 0;
+	str_to_number(indexid, arg1);
+
+#ifdef ENABLE_BATTLE_PASS_MOUNTH_CLOSE
+	time_t cur_Time = time(NULL);
+	struct tm vKey = *localtime(&cur_Time);
+	int month = vKey.tm_mon;
+	if (month != ch->iMonthBattlePassPremium)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Bu ay sava? bileti etkinli?i bulunamady."));
+		return;
+	}
+#endif
+
+	ch->SendDoneBattlePassPremium(indexid);
+}
+
+#endif
+
+#ifdef ENABLE_RANKING
+ACMD(do_ranking_subcategory)
+{
+	if (!ch)
+		return;
+
+	if (ch->IsObserverMode())
+		return;
+
+	if (ch->IsDead() || ch->IsStun() || ch->GetExchange() || ch->GetMyShop() || ch->GetShopOwner() || ch->IsCubeOpen() || ch->GetSafebox()
+#ifdef ENABLE_ACCE_COSTUME_SYSTEM
+		|| ch->IsAcceOpened(true) || ch->IsAcceOpened(false)
+#endif
+#ifdef __ENABLE_NEW_OFFLINESHOP__
+		|| ch->GetOfflineShopGuest() || ch->GetSafebox() || ch->GetAuctionGuest()
+#endif
+		)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("?u anda özel depoyu kullanamazsyn."));
+		return;
+	}
+
+	if (ch->GetProtectTime("RANK_OPEN_TIME") > get_global_time())
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Kategoriler arasy gezerken 1 saniye beklemelisin."));
+		return;
+	}
+
+	ch->SetProtectTime("RANK_OPEN_TIME", get_global_time() + 1);
+
+	char arg1[256];
+	one_argument(argument, arg1, sizeof(arg1));
+	if (!*arg1)
+		return;
+
+	ch->RankingSubcategory(atoi(arg1));
+}
+#endif
+
+#ifdef ENABLE_CONQUEROR_LEVEL
+ACMD(do_conqueror_stat)
+{
+	char arg1[256];
+	one_argument(argument, arg1, sizeof(arg1));
+
+	if (!*arg1)
+		return;
+
+	if (ch->IsPolymorphed())
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "[LS;521]");
+		return;
+	}
+
+	if (ch->GetPoint(POINT_CONQUEROR_POINT) <= 0)
+		return;
+
+	BYTE idx = 0;
+
+	if (!strcmp(arg1, "smh_str"))
+		idx = POINT_SUNGMA_STR;
+	else if (!strcmp(arg1, "smh_hp"))
+		idx = POINT_SUNGMA_HP;
+	else if (!strcmp(arg1, "smh_move"))
+		idx = POINT_SUNGMA_MOVE;
+	else if (!strcmp(arg1, "smh_immune"))
+		idx = POINT_SUNGMA_IMMUNE;
+	else
+	{
+		return;
+	}
+
+	if (ch->GetRealPoint(idx) >= MAX_STAT)
+		return;
+
+	ch->SetRealPoint(idx, ch->GetRealPoint(idx) + 1);
+	ch->SetPoint(idx, ch->GetPoint(idx) + 1);
+	ch->ComputePoints();
+	ch->PointChange(idx, 0);
+
+	if (idx == POINT_SUNGMA_HP)
+	{
+		ch->PointChange(POINT_MAX_HP, 0);
+	}
+
+	ch->PointChange(POINT_CONQUEROR_POINT, -1);
+	ch->ComputePoints();
+}
+#endif

@@ -1,8 +1,8 @@
 extern "C"
 {
-	#include <lua.h>
-	#include <lauxlib.h>
-	#include <lualib.h>
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
 }
 
 #include <unistd.h>
@@ -22,10 +22,10 @@ bool ReadStateFile()
 {
     DIR* pdir = opendir("state");
 
-    if ((!pdir)&&(pdir = opendir("./object/state")))
+    if (!pdir)
     {
-		cerr << "cannot find state directory" << endl;
-		return false;
+	cerr << "cannot find state directory" << endl;
+	return false;
     }
 
     dirent * pde;

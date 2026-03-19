@@ -771,3 +771,27 @@
 771	%s a eclozat!
 772	Mergi la Bătrână pentru a te alătura.
 773	%s și %s vă invită la nunta lor!
+774	<System> The skill has reached its maximum level.
+775	<System> You cannot perform this action without learning the skill.
+776	<System> You do not have the skill book for the required skill.
+777	<System> You must wait 1 second before the next reading.
+778	<System> You cannot perform this action without a skill book.
+779	<System> You need an Exorcism Scroll to continue reading the skill book.
+780	<System> You do not have enough spirit beans. Required: %d
+781	<System> Spirit beans have been used to refresh your grade.
+782	<System> The required time to read the soul stone has not yet passed.
+783	<System> Hermit’s Advice has been used.
+784	<System> You cannot perform this action without a soul stone.
+785	<System> The skill has reached its maximum level.
+786	<System> You must wait 1 second before the next reading.
+787	<System> You cannot perform this action without learning the skill.
+788	To perform this action, you must first remove the item you want to deposit.
+789	<System> You must wait 60 seconds to do this!
+790	<Auto-Sell> You have reached the maximum number of auto-sell items!
+791	<Auto-Sell> This item is already in the list!
+792	<Auto-Sell> Item added to auto-sell list.
+793	<Auto-Sell> Item removed from the list.
+794	<Auto-Sell> Item removed from the list.
+795	<Auto-Sell> Your auto-sell list is already empty.
+796	<Auto-Sell> All items have been removed from the auto-sell list.
+797	You performed an invalid action. Your account has been locked. You will be disconnected in 3 seconds.

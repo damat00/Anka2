@@ -86,8 +86,12 @@ class CTerrainImpl
 
 		bool					LoadWaterMap(const char *c_szWaterMapName);
 		bool					LoadWaterMapFile(const char *c_szWaterMapName);
-		
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+		LPDIRECT3DTEXTURE9		GetShadowTexture()						{ return m_lpShadowTexture; }
+#else
 		LPDIRECT3DTEXTURE8		GetShadowTexture()						{ return m_lpShadowTexture; }
+#endif
 
 		DWORD					GetShadowMapColor(float fx, float fy);		
 
@@ -103,7 +107,11 @@ class CTerrainImpl
 		__forceinline WORD		GetHeightMapValue(short sx, short sy);
 
 	protected:
+#ifdef ENABLE_DIRECTX9_UPDATE
+		LPDIRECT3DTEXTURE9		m_lpAlphaTexture[MAXTERRAINTEXTURES];
+#else
 		LPDIRECT3DTEXTURE8		m_lpAlphaTexture[MAXTERRAINTEXTURES];
+#endif
 		WORD					m_awRawHeightMap[HEIGHTMAP_RAW_YSIZE*HEIGHTMAP_RAW_XSIZE];
 					
 		BYTE 					m_abyTileMap[TILEMAP_RAW_YSIZE*TILEMAP_RAW_XSIZE];		
@@ -133,7 +141,11 @@ class CTerrainImpl
 
 		//////////////////////////////////////////////////////////////////////////
 		// Shadow Map
+#ifdef ENABLE_DIRECTX9_UPDATE
+		LPDIRECT3DTEXTURE9		m_lpShadowTexture;
+#else
 		LPDIRECT3DTEXTURE8		m_lpShadowTexture;
+#endif
 		WORD					m_awShadowMap[SHADOWMAP_YSIZE*SHADOWMAP_XSIZE];	// 16bit R5 G6 B5
 		
 	protected:

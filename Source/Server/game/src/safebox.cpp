@@ -1,8 +1,6 @@
 #include "stdafx.h"
-
-#include "../../common/service.h"
 #include "../../library/libgame/include/grid.h"
-
+#include "../../common/service.h"
 #include "constants.h"
 #include "safebox.h"
 #include "packet.h"
@@ -42,6 +40,7 @@ void CSafebox::__Destroy()
 		{
 			m_pkItems[i]->SetSkipSave(true);
 			ITEM_MANAGER::instance().FlushDelayedSave(m_pkItems[i]);
+
 			M2_DESTROY_ITEM(m_pkItems[i]->RemoveFromCharacter());
 			m_pkItems[i] = NULL;
 		}
@@ -95,10 +94,10 @@ bool CSafebox::Add(DWORD dwPos, LPITEM pkItem)
 	TPacketGCItemSet pack;
 
 	pack.header	= m_bWindowMode == SAFEBOX ? HEADER_GC_SAFEBOX_SET : HEADER_GC_MALL_SET;
-	pack.Cell = TItemPos(m_bWindowMode, dwPos);
-	pack.vnum = pkItem->GetVnum();
-	pack.count = pkItem->GetCount();
-	pack.flags = pkItem->GetFlag();
+	pack.Cell	= TItemPos(m_bWindowMode, dwPos);
+	pack.vnum	= pkItem->GetVnum();
+	pack.count	= pkItem->GetCount();
+	pack.flags	= pkItem->GetFlag();
 	pack.anti_flags	= pkItem->GetAntiFlag();
 	thecore_memcpy(pack.alSockets, pkItem->GetSockets(), sizeof(pack.alSockets));
 	thecore_memcpy(pack.aAttr, pkItem->GetAttributes(), sizeof(pack.aAttr));
@@ -229,8 +228,8 @@ bool CSafebox::MoveItem(BYTE bCell, BYTE bDestCell, BYTE count)
 		LPITEM item2;
 
 		if ((item2 = GetItem(bDestCell)) && item != item2 && item2->IsStackable() &&
-				!IS_SET(item2->GetAntiFlag(), ITEM_ANTIFLAG_STACK) &&
-				item2->GetVnum() == item->GetVnum())
+			!IS_SET(item2->GetAntiFlag(), ITEM_ANTIFLAG_STACK) &&
+			item2->GetVnum() == item->GetVnum())
 		{
 			for (int i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
 				if (item2->GetSocket(i) != item->GetSocket(i))

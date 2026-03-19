@@ -29,15 +29,15 @@ if app.ENABLE_MOB_DROP_INFO:
 class TargetBoard(ui.ThinBoard):
 
 	BUTTON_NAME_LIST = [
-		localeInfo.TARGET_BUTTON_WHISPER, 
-		localeInfo.TARGET_BUTTON_EXCHANGE, 
-		localeInfo.TARGET_BUTTON_FIGHT, 
-		localeInfo.TARGET_BUTTON_ACCEPT_FIGHT, 
-		localeInfo.TARGET_BUTTON_AVENGE, 
-		localeInfo.TARGET_BUTTON_FRIEND, 
-		localeInfo.TARGET_BUTTON_INVITE_PARTY, 
-		localeInfo.TARGET_BUTTON_LEAVE_PARTY, 
-		localeInfo.TARGET_BUTTON_EXCLUDE, 
+		localeInfo.TARGET_BUTTON_WHISPER,
+		localeInfo.TARGET_BUTTON_EXCHANGE,
+		localeInfo.TARGET_BUTTON_FIGHT,
+		localeInfo.TARGET_BUTTON_ACCEPT_FIGHT,
+		localeInfo.TARGET_BUTTON_AVENGE,
+		localeInfo.TARGET_BUTTON_FRIEND,
+		localeInfo.TARGET_BUTTON_INVITE_PARTY,
+		localeInfo.TARGET_BUTTON_LEAVE_PARTY,
+		localeInfo.TARGET_BUTTON_EXCLUDE,
 		localeInfo.TARGET_BUTTON_INVITE_GUILD,
 		localeInfo.TARGET_BUTTON_DISMOUNT,
 		localeInfo.TARGET_BUTTON_EXIT_OBSERVER,
@@ -79,6 +79,14 @@ class TargetBoard(ui.ThinBoard):
 		hpGauge.SetParent(self)
 		hpGauge.MakeGauge(130, "red", "yellow")
 		hpGauge.Hide()
+
+		if app.ENABLE_ATTENDANCE_EVENT:
+			hitCount = ui.TextLine()
+			hitCount.SetParent(name)
+			hitCount.SetDefaultFontName()
+			hitCount.SetOutline()
+			hitCount.Show()
+			self.hitCount = hitCount
 
 		if app.ENABLE_VIEW_TARGET_DECIMAL_HP:
 			hpDecimal = ui.TextLine()
@@ -211,6 +219,8 @@ class TargetBoard(ui.ThinBoard):
 			self.hpDecimal = None
 		if app.ENABLE_MOB_DROP_INFO:
 			self.infoButton = None
+		if app.ENABLE_ATTENDANCE_EVENT:
+			self.hitCount = None
 		if app.ENABLE_MONSTER_TARGET_ELEMENT:
 			self.elementImage = None
 		self.__Initialize()
@@ -240,6 +250,10 @@ class TargetBoard(ui.ThinBoard):
 		self.Hide()
 
 	def Open(self, vid, name):
+		if app.ENABLE_ATTENDANCE_EVENT:
+			if self.hitCount:
+				self.hitCount.Hide()
+				
 		if vid:
 			if not constInfo.GET_VIEW_OTHER_EMPIRE_PLAYER_TARGET_BOARD():
 				if not player.IsSameEmpire(vid):
@@ -316,7 +330,11 @@ class TargetBoard(ui.ThinBoard):
 		self.name.SetPosition(0, 13)
 		self.name.SetHorizontalAlignCenter()
 		self.name.SetWindowHorizontalAlignCenter()
-
+		if app.ENABLE_ATTENDANCE_EVENT:
+			if self.hitCount:
+				self.hitCount.SetPosition(0, 30)
+				self.hitCount.SetHorizontalAlignLeft()
+				self.hitCount.SetWindowHorizontalAlignCenter()
 		self.hpGauge.Hide()
 		if app.ENABLE_VIEW_TARGET_DECIMAL_HP:
 			self.hpDecimal.Hide()
@@ -346,12 +364,22 @@ class TargetBoard(ui.ThinBoard):
 
 		nameFront = ""
 		if -1 != level:
-			nameFront += "Lv." + str(level) + " "
+			nameFront += "|cFF98ff33Lv." + str(level) + " |r"
 		if self.GRADE_NAME.has_key(grade):
 			nameFront += "(" + self.GRADE_NAME[grade] + ") "
 
-		self.SetTargetName(nameFront + name)
+		if grade == 5:
+			self.SetTargetName(nameFront + "|cFFffffff"+name+"|r")
+		else:
+			self.SetTargetName(nameFront + "|cFFeb1609"+name+"|r")
 
+		if app.ENABLE_ATTENDANCE_EVENT:
+			countHits = player.GetHitCountByVID(vid)
+			if countHits:
+				self.hitCount.SetText(localeInfo.TARGET_TOOLTIP_ATTACK_COUNT % countHits)
+				self.hitCount.Show()
+			else:
+				self.hitCount.Hide()
 		if app.ENABLE_MOB_DROP_INFO:
 			(textWidth, textHeight) = self.name.GetTextSize()
 
@@ -635,6 +663,15 @@ class TargetBoard(ui.ThinBoard):
 			self.SetSize(max(150, showingButtonCount * 75), 65)
 
 		self.UpdatePosition()
+
+	if app.ENABLE_ATTENDANCE_EVENT:
+		def RefreshHitCount(self, vid):
+			countHits = player.GetHitCountByVID(vid)
+			if countHits:
+				self.hitCount.SetText(localeInfo.TARGET_TOOLTIP_ATTACK_COUNT % countHits)
+				self.hitCount.Show()
+			else:
+				self.hitCount.Hide()
 
 	def OnUpdate(self):
 		if self.isShowButton:

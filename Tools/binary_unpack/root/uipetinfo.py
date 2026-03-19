@@ -23,8 +23,8 @@ import uiAffectShower
 import functools
 import event
 
-SKILL_SLOT_ENABLE = "d:/ymir work/ui/pet/skill_button/skill_enable_button.sub"
-SKILL_SLOT_MAX = 3
+SKILL_SLOT_ENABLE = "d:/ymir work/ui/game/pet/skill_button/skill_enable_button.sub"
+SKILL_SLOT_MAX		= 3
 
 TOTAL_EXP_GAUGE_COUNT = 5
 BATTLE_EXP_GAUGE_MAX = 4
@@ -39,6 +39,12 @@ DEFAULT_DESC_Y = 7
 def unsigned32(n):
 	return n & 0xFFFFFFFFL
 
+"""
+		PetMiniInfomationWindow appears in the bottom left corner.
+		It shows experience bars, skill slots and their cooldowns
+		and icon flash effect which indicates that pet is ready to
+		evolve.
+"""
 class PetMiniInfomationWindow(ui.ScriptWindow):
 	def __init__(self, wndPetInformation):
 		import exception
@@ -53,9 +59,9 @@ class PetMiniInfomationWindow(ui.ScriptWindow):
 		self.isLoaded = 0
 		self.wndPetInformation = wndPetInformation
 		self.petSlot = 0
-		self.petSlotAniImg = None
-		self.expGauge = None
-		self.expGaugeBoard = None
+		self.petSlotAniImg  = None
+		self.expGauge		= None
+		self.expGaugeBoard	= None
 
 		self.__LoadWindow()
 
@@ -78,12 +84,12 @@ class PetMiniInfomationWindow(ui.ScriptWindow):
 	def Destroy(self):
 		self.isLoaded = 0
 		self.wndPetInformation = 0
-		self.lifeTimeGauge = None
+		self.lifeTimeGauge	= None
 		self.petSlot = 0
-		self.petSlotAniImg = None
-		self.expGauge = None
-		self.expGaugeBoard = None
-		self.tooltipEXP = None
+		self.petSlotAniImg  = None
+		self.expGauge		= None
+		self.expGaugeBoard	= None
+		self.tooltipEXP		= None
 
 		if self.skillSlot:
 			del self.skillSlot[:]
@@ -91,6 +97,7 @@ class PetMiniInfomationWindow(ui.ScriptWindow):
 	def __LoadWindow(self):
 		if self.isLoaded == 1:
 			return
+
 		self.isLoaded = 1
 
 		try:
@@ -100,13 +107,20 @@ class PetMiniInfomationWindow(ui.ScriptWindow):
 			exception.Abort("PetMiniInfomationWindow.LoadWindow.LoadObject")
 
 		try:
+			## Pet Icon Slot
 			self.petSlot = self.GetChild("pet_icon_slot")
 			self.petSlot.SetSlotStyle(wndMgr.SLOT_STYLE_NONE)
 			self.petSlot.SAFE_SetButtonEvent("LEFT", "EXIST", self.SelectItemSlot)
 
+			# Pet Icon Slot Animation Image - Flash
 			self.petSlotAniImg = self.GetChild("pet_icon_slot_ani_img")
+			if hasattr(self.petSlotAniImg, "SetAlpha"):
+				self.petSlotAniImg.SetAlpha(0.45)
+			if hasattr(self.petSlotAniImg, "SetRenderingMode") and hasattr(wndMgr, "RENDERING_MODE_MODULATE"):
+				self.petSlotAniImg.SetRenderingMode(wndMgr.RENDERING_MODE_MODULATE)
 			self.petSlotAniImg.Hide()
 
+			# EXP Gauges
 			expGauge = []
 			self.expGaugeBoard = self.GetChild("pet_mini_info_exp_gauge_board")
 			expGauge.append(self.GetChild("pet_mini_EXPGauge_01"))
@@ -118,15 +132,19 @@ class PetMiniInfomationWindow(ui.ScriptWindow):
 			for exp in expGauge:
 				exp.SetSize(0, 0)
 
-			self.expGauge = expGauge
+			self.expGauge	= expGauge
 			self.tooltipEXP = TextToolTip()
 			self.tooltipEXP.Hide()
 
+			# Mini Info Skill Slot Scale
 			for value in range(SKILL_SLOT_MAX):
 				self.skillSlot.append(self.GetChild("mini_skill_slot"+str(value)))
 				self.skillSlot[value].SetCoverButton(0, SKILL_SLOT_ENABLE, SKILL_SLOT_ENABLE, SKILL_SLOT_ENABLE, SKILL_SLOT_ENABLE, FALSE, FALSE)
 				self.skillSlot[value].SetAlwaysRenderCoverButton(0)
 
+			# This client renders the mini pet HP gauge wider than the
+			# official TR client with the stock script values, so keep a
+			# local override here to match the expected compact width.
 			self.lifeTimeGauge = self.GetChild("LifeGauge")
 			self.lifeTimeGauge.SetWindowHorizontalAlignLeft()
 
@@ -148,11 +166,11 @@ class PetMiniInfomationWindow(ui.ScriptWindow):
 
 		return
 
-	def SetItemSlot(self, CurPetItemVNum):
-		self.petSlot.SetItemSlot(0, CurPetItemVNum)
+	def SetItemSlot( self, CurPetItemVNum ):
+		self.petSlot.SetItemSlot( 0, CurPetItemVNum )
 		self.petSlot.RefreshSlot()
 
-	def SetSkillSlot(self, slotNumber, slotIndex, skillVnum):
+	def SetSkillSlot( self, slotNumber, slotIndex, skillVnum ):
 		if 0 > slotNumber or slotNumber >= SKILL_SLOT_MAX:
 			return
 
@@ -195,6 +213,7 @@ class PetMiniInfomationWindow(ui.ScriptWindow):
 		itemExp = max(itemExp, 0)
 		itemExpMax = max(itemExpMax, 0)
 
+		# Battle exp is divided into BATTLE_EXP_GAUGE_MAX parts
 		quarterPoint = maxPoint / BATTLE_EXP_GAUGE_MAX
 		FullCount = 0
 
@@ -214,6 +233,10 @@ class PetMiniInfomationWindow(ui.ScriptWindow):
 				self.expGauge[FullCount].SetRenderingRect(0.0, Percentage, 0.0, 0.0)
 				self.expGauge[FullCount].Show()
 
+		## Calculate the experience obtained with the item.
+		## The last value of self.expGauge is the item exp marble.
+		## If the Top value is 0, a full ball
+		## An empty marble if Top value is -1
 		if 0 != itemExpMax:
 			itemExpGauge = self.expGauge[ITEM_EXP_GAUGE_POS]
 			Percentage = float(itemExp) / float(itemExpMax) - float(1.0)
@@ -223,6 +246,7 @@ class PetMiniInfomationWindow(ui.ScriptWindow):
 		output_cur_exp = curPoint + itemExp
 		output_max_exp = maxPoint + itemExpMax
 
+		## TEXT output is based on hunting experience + item experience.
 		expPercent = 0
 		if output_max_exp:
 			expPercent = float(output_cur_exp) / float(output_max_exp) * 100
@@ -243,6 +267,10 @@ class PetMiniInfomationWindow(ui.ScriptWindow):
 		if self.petSlotAniImg:
 			self.petSlotAniImg.Hide()
 
+"""
+		PetHatchingWindow will appear when hatching an egg.
+		It can be closed manually or after successful egg hatch.
+"""
 class PetHatchingWindow(ui.ScriptWindow):
 	def __init__(self, wndPetInformation):
 		import exception
@@ -308,6 +336,7 @@ class PetHatchingWindow(ui.ScriptWindow):
 	def __LoadWindow(self):
 		if self.isLoaded == 1:
 			return
+
 		self.isLoaded = 1
 
 		try:
@@ -323,12 +352,15 @@ class PetHatchingWindow(ui.ScriptWindow):
 			self.hatchingSlot.SetOverInItemEvent(ui.__mem_func__(self.OverInItem))
 			self.hatchingSlot.SetOverOutItemEvent(ui.__mem_func__(self.OverOutItem))
 
+			# Hatch button
 			self.hatchingButton = self.GetChild("HatchingButton")
 			self.hatchingButton.SetEvent(ui.__mem_func__(self.ClickHatchingButton))
 
+			## Hatching Gold TEXT
 			self.hatchingMoneyText = self.GetChild("HatchingMoney");
-			self.hatchingMoneyText.SetText(localeInfo.PET_HATCHING_MONEY % localeInfo.NumberToMoneyString(0))
+			self.hatchingMoneyText.SetText(localeInfo.PET_HATCHING_MONEY % localeInfo.NumberToMoneyString(0) )
 
+			# Pet name editline
 			self.petNameEdit = self.GetChild("pet_name")
 			self.petNameEdit.SetText("")
 			self.petNameEdit.SetReturnEvent(ui.__mem_func__(self.ClickHatchingButton))
@@ -337,6 +369,7 @@ class PetHatchingWindow(ui.ScriptWindow):
 			self.petNameEdit.SetFocus()
 			self.petNameEdit.Show()
 
+			# Initialize question and popup dialogs
 			self.__MakeQuestionDialog()
 			self.__MakePopupDialog()
 
@@ -381,6 +414,7 @@ class PetHatchingWindow(ui.ScriptWindow):
 		if self.eggItemSlotIndex == -1:
 			return
 
+		# Unlock egg item
 		inven_slot_pos = self.eggItemSlotIndex
 
 		if inven_slot_pos >= player.INVENTORY_PAGE_SIZE:
@@ -389,6 +423,7 @@ class PetHatchingWindow(ui.ScriptWindow):
 
 		self.wndPetInformation.inven.wndItem.SetCanMouseEventSlot(inven_slot_pos)
 
+		# Reset egg item position
 		self.eggItemSlotIndex  = -1
 		self.eggItemSlotWindow = player.INVENTORY
 
@@ -404,30 +439,36 @@ class PetHatchingWindow(ui.ScriptWindow):
 
 		try:
 			inven = self.wndPetInformation.inven
-			invenPage = inven.GetInventoryPageIndex()
+			invenPage = inven.GetInventoryPageIndex() ## 0 or 1
 
-			min_range = invenPage * player.INVENTORY_PAGE_SIZE
-			max_range = (invenPage + 1) * player.INVENTORY_PAGE_SIZE
+			min_range = invenPage * player.INVENTORY_PAGE_SIZE ## 0 or 45
+			max_range = (invenPage + 1) * player.INVENTORY_PAGE_SIZE ## 45 or 90
 
+			# Lock egg item
 			inven_slot_pos = self.eggItemSlotIndex
 
 			if min_range <= inven_slot_pos < max_range:
 				inven_slot_pos = inven_slot_pos - min_range
 				inven.wndItem.SetCantMouseEventSlot(inven_slot_pos)
+
 		except:
 			pass
 
 		return
 
 	def HatchingWindowOpen(self, slotWindow, slotIndex):
+		# Check if player has no other trading windows opened
 		checkMsg = net.CheckUsePetItem()
 
 		if checkMsg == item.PET_EGG_USE_FAILED_BECAUSE_TRADING:
 			chat.AppendChat(chat.CHAT_TYPE_INFO, localeInfo.PET_CAN_NOT_EGG_ITEM_USE)
+
 		elif checkMsg == item.PET_EGG_USE_FAILED_BECAUSE_SHOP_OPEN:
 			chat.AppendChat(chat.CHAT_TYPE_INFO, localeInfo.PET_CAN_NOT_EGG_ITEM_USE)
+
 		elif checkMsg == item.PET_EGG_USE_FAILED_BECAUSE_MALL_OPEN:
 			chat.AppendChat(chat.CHAT_TYPE_INFO, localeInfo.PET_CAN_NOT_EGG_ITEM_USE)
+
 		elif checkMsg == item.PET_EGG_USE_FAILED_BECAUSE_SAFEBOX_OPEN:
 			chat.AppendChat(chat.CHAT_TYPE_INFO, localeInfo.PET_CAN_NOT_EGG_ITEM_USE)
 
@@ -454,7 +495,7 @@ class PetHatchingWindow(ui.ScriptWindow):
 			self.hatchingMoneyText.SetText(localeInfo.PET_HATCHING_MONEY % localeInfo.NumberToMoneyString(hatching_money_value))
 
 		self.Close()
-		self.eggItemSlotIndex  = slotIndex
+		self.eggItemSlotIndex = slotIndex
 		self.eggItemSlotWindow = slotWindow
 		self.hatchingSlot.SetItemSlot(0, growthPetVnum)
 		self.hatchingSlot.RefreshSlot()
@@ -477,6 +518,7 @@ class PetHatchingWindow(ui.ScriptWindow):
 		if not self.questionDialog:
 			self.__MakeQuestionDialog()
 
+		# Reset position if name has no characters inside editline
 		if "" == self.petNameEdit.GetText():
 			self.petNameEdit.SetText(self.petName)
 			self.petNameEdit.SetEndPosition()
@@ -488,6 +530,7 @@ class PetHatchingWindow(ui.ScriptWindow):
 	def __HatchingQuestionDialogAccept(self):
 		self.questionDialog.Close()
 
+		# Check if pet's name is smaller than defined minimal size (item.PET_NAME_MIN_SIZE)
 		if len(self.petNameEdit.GetText()) < item.PET_NAME_MIN_SIZE:
 			self.petNameEdit.SetText("")
 			self.__OpenPopupDialog(localeInfo.PET_NAME_MIN)
@@ -500,6 +543,7 @@ class PetHatchingWindow(ui.ScriptWindow):
 		item.SelectItem(itemVnum)
 		hatching_money = item.GetValue(3)
 
+		# Check if player has enough money to hatch an egg
 		if player.GetMoney() < hatching_money:
 			self.__OpenPopupDialog(localeInfo.PET_MSG_NOT_ENOUGH_MONEY)
 			return
@@ -523,13 +567,24 @@ class PetHatchingWindow(ui.ScriptWindow):
 		self.popupDialog.Open()
 
 	def PetHatchingWindowCommand(self, command):
+		# Egg hatch succeeded, close the window
 		if command == item.EGG_USE_SUCCESS:
 			self.Close()
+
+		# Egg hatch failed, clear the name
 		elif command == item.EGG_USE_FAILED_BECAUSE_NAME:
 			self.petNameEdit.SetText("")
 			self.petNameEdit.SetEndPosition()
+
+		# Egg hatch hit an error, close the window
 		elif command == item.EGG_USE_FAILED_TIMEOVER:
 				self.Close()
+
+"""
+		PetNameChangeWindow will appear when change name item is
+		dragged to upbringing item. It can be closed manually or 
+		after successful name change.
+"""
 
 class PetNameChangeWindow(ui.ScriptWindow):
 	def __init__(self, wndPetInformation):
@@ -587,11 +642,11 @@ class PetNameChangeWindow(ui.ScriptWindow):
 			self.petNameEdit.KillFocus()
 
 	def Destroy(self):
-		self.isLoaded = 0
-		self.wndPetInformation = None
-		self.petItemSlot = None
-		self.nameChangeButton = None
-		self.petName = None
+		self.isLoaded			= 0
+		self.wndPetInformation	= None
+		self.petItemSlot		= None
+		self.nameChangeButton	= None
+		self.petName			= None
 
 		if self.popupDialog:
 			self.popupDialog.Destroy()
@@ -599,6 +654,7 @@ class PetNameChangeWindow(ui.ScriptWindow):
 	def __LoadWindow(self):
 		if self.isLoaded == 1:
 			return
+
 		self.isLoaded = 1
 
 		try:
@@ -612,12 +668,15 @@ class PetNameChangeWindow(ui.ScriptWindow):
 			self.petItemSlot = self.GetChild("PetItemSlot")
 			self.petItemSlot.SetSlotStyle(wndMgr.SLOT_STYLE_NONE)
 
+			# Name change button
 			self.nameChangeButton = self.GetChild("NameChangeButton")
 			self.nameChangeButton.SetEvent(ui.__mem_func__(self.ClickNameChangeButton))
 
+			# Pet change name price
 			MoneyText = self.GetChild("NameChangeMoney");
 			MoneyText.SetText(localeInfo.PET_HATCHING_MONEY % (localeInfo.NumberToMoneyString(item.PET_HATCHING_MONEY)))
 
+			# Pet name editline
 			self.petNameEdit = self.GetChild("pet_name")
 			self.petNameEdit.SetText("")
 			self.petNameEdit.SetReturnEvent(ui.__mem_func__(self.ClickNameChangeButton))
@@ -626,6 +685,7 @@ class PetNameChangeWindow(ui.ScriptWindow):
 			self.petNameEdit.SetFocus()
 			self.petNameEdit.Show()
 
+			# Initialize question and popup dialogs
 			self.__MakeQuestionDialog()
 			self.__MakePopupDialog()
 
@@ -667,20 +727,23 @@ class PetNameChangeWindow(ui.ScriptWindow):
 		if self.petItemSlotIndex == -1:
 			return
 
+		# Unlock name change item
 		if self.nameChangeItemSlotIndex >= player.INVENTORY_PAGE_SIZE:
 			inven_page = self.wndPetInformation.inven.GetInventoryPageIndex()
 			self.nameChangeItemSlotIndex -= (inven_page * player.INVENTORY_PAGE_SIZE)
 
 		self.wndPetInformation.inven.wndItem.SetCanMouseEventSlot(self.nameChangeItemSlotIndex)
 
+		# Unlock pet upbringing item
 		if self.petItemSlotIndex >= player.INVENTORY_PAGE_SIZE:
 			inven_page = self.wndPetInformation.inven.GetInventoryPageIndex()
 			self.petItemSlotIndex -= (inven_page * player.INVENTORY_PAGE_SIZE)
 
 		self.wndPetInformation.inven.wndItem.SetCanMouseEventSlot(self.petItemSlotIndex)
 
-		self.nameChangeItemSlotIndex = -1
-		self.petItemSlotIndex = -1
+		# Reset item positions
+		self.nameChangeItemSlotIndex	= -1
+		self.petItemSlotIndex			= -1
 
 	def OnUpdate(self):
 		if not self.wndPetInformation.inven:
@@ -696,17 +759,19 @@ class PetNameChangeWindow(ui.ScriptWindow):
 			return
 
 		try:
-			inven = self.wndPetInformation.inven
-			invenPage = inven.GetInventoryPageIndex()
+			inven		= self.wndPetInformation.inven
+			invenPage	= inven.GetInventoryPageIndex() ## 0 or 1
 
 			min_range = invenPage * player.INVENTORY_PAGE_SIZE
 			max_range = (invenPage + 1) * player.INVENTORY_PAGE_SIZE
 
+			# Name change
 			inven_slot_pos = self.nameChangeItemSlotIndex
 			if min_range <= inven_slot_pos < max_range:
 				inven_slot_pos = inven_slot_pos - min_range
 				inven.wndItem.SetCantMouseEventSlot(inven_slot_pos)
 
+			# Lock pet upbringing item
 			inven_slot_pos = self.petItemSlotIndex
 			if min_range <= inven_slot_pos < max_range:
 				inven_slot_pos = inven_slot_pos - min_range
@@ -721,10 +786,13 @@ class PetNameChangeWindow(ui.ScriptWindow):
 
 		if checkMsg == item.PET_EGG_USE_FAILED_BECAUSE_TRADING:
 			chat.AppendChat(chat.CHAT_TYPE_INFO, localeInfo.PET_CAN_NOT_EGG_ITEM_USE)
+
 		elif checkMsg == item.PET_EGG_USE_FAILED_BECAUSE_SHOP_OPEN:
 			chat.AppendChat(chat.CHAT_TYPE_INFO, localeInfo.PET_CAN_NOT_EGG_ITEM_USE)
+
 		elif checkMsg == item.PET_EGG_USE_FAILED_BECAUSE_MALL_OPEN:
 			chat.AppendChat(chat.CHAT_TYPE_INFO, localeInfo.PET_CAN_NOT_EGG_ITEM_USE)
+
 		elif checkMsg == item.PET_EGG_USE_FAILED_BECAUSE_SAFEBOX_OPEN:
 			chat.AppendChat(chat.CHAT_TYPE_INFO, localeInfo.PET_CAN_NOT_EGG_ITEM_USE)
 
@@ -770,6 +838,7 @@ class PetNameChangeWindow(ui.ScriptWindow):
 		if not self.questionDialog:
 			self.__MakeQuestionDialog()
 
+		# Reset position if name has no characters inside editline
 		if "" == self.petNameEdit.GetText():
 			self.petNameEdit.SetText(self.petName)
 			self.petNameEdit.SetEndPosition()
@@ -781,11 +850,13 @@ class PetNameChangeWindow(ui.ScriptWindow):
 	def __NameChangeQuestionDialogAccept(self):
 		self.questionDialog.Close()
 
+		# Check if pet's name is smaller than defined minimal size (item.PET_NAME_MIN_SIZE)
 		if len(self.petNameEdit.GetText()) < item.PET_NAME_MIN_SIZE:
 			self.petNameEdit.SetText("")
 			self.__OpenPopupDialog(localeInfo.PET_NAME_MIN)
 			return
 
+		# Check if player has enough money to change the name
 		if player.GetMoney() < item.PET_HATCHING_MONEY:
 			self.__OpenPopupDialog(localeInfo.PET_MSG_NOT_ENOUGH_MONEY)
 			return
@@ -811,9 +882,17 @@ class PetNameChangeWindow(ui.ScriptWindow):
 	def PetNameChangeWindowCommand(self, command):
 		if command == item.NAME_CHANGE_USE_SUCCESS:
 			self.Close()
+
+		# Name change has failed, clear the name
 		elif command == item.NAME_CHANGE_USE_FAILED_BECAUSE_NAME:
 			self.petNameEdit.SetText("")
 			self.petNameEdit.SetEndPosition()
+
+"""
+		PetFeedWindow is opened through main pet interface.
+		It consists of item slot grid on which player can
+		drag items. Used for pet lifetime, evolve & item exp.
+"""
 
 class PetFeedWindow(ui.ScriptWindow):
 	def __init__(self, wndPetInformation):
@@ -856,7 +935,6 @@ class PetFeedWindow(ui.ScriptWindow):
 			self.FeedItemSlot.RefreshSlot()
 
 	def SetOnTopWindowNone(self):
-
 		if not self.wndPetInformation:
 			return
 
@@ -884,10 +962,10 @@ class PetFeedWindow(ui.ScriptWindow):
 		del self.FeedItems[:]
 		del	self.FeedItemsCount[:]
 		del self.FeedItemDummy[:]
-		self.FeedItems = None
-		self.FeedItemsCount = None
-		self.FeedItemSlot = None
-		self.FeedItemDummy = None
+		self.FeedItems		= None
+		self.FeedItemsCount	= None
+		self.FeedItemSlot	= None
+		self.FeedItemDummy  = None
 		self.questionDialog = None
 
 		self.questionDialogEmptyPos = -1
@@ -908,6 +986,7 @@ class PetFeedWindow(ui.ScriptWindow):
 		try:
 			self.GetChild("PetFeed_TitleBar").SetCloseEvent(ui.__mem_func__(self.Close))
 
+			# Item slot grid
 			FeedItemSlot = self.GetChild("FeedItemSlot")
 			FeedItemSlot.SetOverInItemEvent(ui.__mem_func__(self.OverInItem))
 			FeedItemSlot.SetOverOutItemEvent(ui.__mem_func__(self.OverOutItem))
@@ -917,10 +996,11 @@ class PetFeedWindow(ui.ScriptWindow):
 			FeedItemSlot.SetSelectItemSlotEvent(ui.__mem_func__(self.SelectItemSlot))
 			self.FeedItemSlot = FeedItemSlot
 
-			self.FeedItems = []
+			self.FeedItems		= []
 			self.FeedItemsCount = []
 
-			self.FeedItemDummy = []
+			# Used as a sub-container for items to check their positions
+			self.FeedItemDummy	= []
 
 			self.ClearMouseEventFeedItems()
 
@@ -970,6 +1050,7 @@ class PetFeedWindow(ui.ScriptWindow):
 		if mouseModule.mouseController.isAttached():
 			return
 
+		# Unlock item that was inside feed window
 		inven_slot_pos = self.FeedItems[slotIndex]
 		if inven_slot_pos != -1:
 			if inven_slot_pos >= player.INVENTORY_PAGE_SIZE:
@@ -984,9 +1065,13 @@ class PetFeedWindow(ui.ScriptWindow):
 		self.FeedItemSlot.ClearSlot(slotIndex)
 		self.FeedItemSlot.RefreshSlot()
 
+	# Search for empty slot space for item
+	# If not found, return -1
 	def SearchEmptySlot(self, size):
 		for value in range(player.PET_FEED_SLOT_MAX):
-			if 0 == self.FeedItemDummy[value]:
+
+			if 0 == self.FeedItemDummy[value]:	# Check if value inside this slot is empty
+
 				if 1 == size:
 					return value
 
@@ -1008,6 +1093,8 @@ class PetFeedWindow(ui.ScriptWindow):
 
 		return -1
 
+	## When using an inventory item with a right-click
+	## Inventory -> Feed window
 	def ItemMoveFeedWindow(self, slotWindow, slotIndex):
 		if player.INVENTORY == slotWindow:
 			attachSlotType = player.SLOT_TYPE_INVENTORY
@@ -1024,7 +1111,7 @@ class PetFeedWindow(ui.ScriptWindow):
 		mouseModule.mouseController.DeattachObject()
 
 		selectedItemVNum = player.GetItemIndex(slotWindow, slotIndex)
-		count = player.GetItemCount(slotWindow, slotIndex)
+		count			 = player.GetItemCount(slotWindow, slotIndex)
 
 		mouseModule.mouseController.AttachObject(self, attachSlotType, slotIndex, selectedItemVNum, count)
 
@@ -1043,6 +1130,7 @@ class PetFeedWindow(ui.ScriptWindow):
 		itemVnum = player.GetItemIndex(player.INVENTORY, slotIndex)
 		item.SelectItem(itemVnum)
 
+		# If item has one or more attributes, display a question dialog to continue
 		if item.GetItemType() in [item.ITEM_TYPE_WEAPON, item.ITEM_TYPE_ARMOR]:
 			metinSlot = [player.GetItemMetinSocket(player.INVENTORY, slotIndex, i) for i in xrange(player.METIN_SOCKET_MAX_NUM)]
 			attrSlot = [player.GetItemAttribute(player.INVENTORY, slotIndex, i) for i in xrange(player.ATTRIBUTE_SLOT_MAX_NUM)]
@@ -1068,17 +1156,19 @@ class PetFeedWindow(ui.ScriptWindow):
 					mouseModule.mouseController.DeattachObject()
 				return
 
+		# Item did not have any attributes, move it to the feed window
 		self.InsertItemToSlot(emptySlotIndex)
 
 	def __ItemMoveQuestionDialogAccept(self):
 		attachSlotType = player.SLOT_TYPE_INVENTORY
 		selectedItemVNum = player.GetItemIndex(player.INVENTORY, self.questionDialogItemPos)
-		count = player.GetItemCount(player.INVENTORY, self.questionDialogItemPos)
+		count			 = player.GetItemCount(player.INVENTORY, self.questionDialogItemPos)
 
 		mouseModule.mouseController.AttachObject(self, attachSlotType, self.questionDialogItemPos, selectedItemVNum, count)
 
 		self.InsertItemToSlot(self.questionDialogEmptyPos)
 
+		# Clear question dialog data for further use
 		self.__ClearItemMoveQuestionDialog()
 
 	def __ItemMoveQuestionDialogCancel(self):
@@ -1088,6 +1178,7 @@ class PetFeedWindow(ui.ScriptWindow):
 		if self.questionDialog:
 			self.questionDialog.Close()
 
+		# Clear the locked item (it will stay locked if it was put into the feed window)
 		inven_slot_pos = self.questionDialogItemPos
 		if inven_slot_pos != -1:
 			if inven_slot_pos >= player.INVENTORY_PAGE_SIZE:
@@ -1099,6 +1190,7 @@ class PetFeedWindow(ui.ScriptWindow):
 		self.questionDialogEmptyPos = -1
 		self.questionDialogItemPos = -1
 
+	# Inventory -> Feed Window
 	def SelectEmptySlot(self, slotIndex):
 		attachedSlotType = mouseModule.mouseController.GetAttachedType()
 		attachedSlotPos = mouseModule.mouseController.GetAttachedSlotNumber()
@@ -1125,25 +1217,30 @@ class PetFeedWindow(ui.ScriptWindow):
 		attachedItemVNum = player.GetItemIndex(attachedSlotPos)
 		item.SelectItem(attachedItemVNum)
 
-		itemType = item.GetItemType()
+		itemType	= item.GetItemType()
 		itemSubType = item.GetItemSubType()
 
+		# Return if item is beging attached from not inventory window
 		if player.SLOT_TYPE_INVENTORY != attachedSlotType:
 			return FALSE
 
-		if attachedSlotPos >= player.ITEM_SLOT_COUNT: 
+		# Return if item position is bigger than player.ITEM_SLOT_COUNT
+		if attachedSlotPos >= player.ITEM_SLOT_COUNT:
 			return FALSE
 
+		# Return if there is no pet summoned
 		petVNum = player.GetActivePetItemVNum()
 		if 0 == petVNum:
 			return FALSE
 
+		# Return if active pet is being dragged to the window
 		if item.ITEM_TYPE_GROWTH_PET == itemType and itemSubType == item.PET_UPBRINGING:
 			activePetId = player.GetActivePetItemId()
 			petId = player.GetItemMetinSocket(attachedSlotPos, 2)
 			if petId == activePetId:
 				return FALSE
 
+		# Display a msg if item type does not correspond to condtions
 		if self.wndPetInformation.CantFeedItem(attachedSlotPos):
 			chat.AppendChat(chat.CHAT_TYPE_INFO, localeInfo.PET_CAN_NOT_FEED_TYPE)
 			return FALSE
@@ -1171,7 +1268,7 @@ class PetFeedWindow(ui.ScriptWindow):
 		self.FeedItemDummy[slotIndex] = 1
 
 		item.SelectItem(vnum)
-		itemSize = item.GetItemSize(vnum)
+		itemSize = item.GetItemSize(vnum)	# Item size to put
 
 		if 1 == itemSize[1]:
 			return
@@ -1180,6 +1277,7 @@ class PetFeedWindow(ui.ScriptWindow):
 
 		for value in range(itemSize[1] - 1):
 			addSlotIndex = addSlotIndex + FEED_WINDOW_X_SIZE
+
 			if addSlotIndex >= player.PET_FEED_SLOT_MAX:
 				return
 
@@ -1188,7 +1286,7 @@ class PetFeedWindow(ui.ScriptWindow):
 	def DeleteDataDummySlot(self, slotIndex, InvenPos):
 		vnum = player.GetItemIndex(InvenPos)
 		item.SelectItem(vnum)
-		itemSize = item.GetItemSize(vnum)
+		itemSize = item.GetItemSize(vnum)	# Item size to be subtracted
 
 		self.FeedItemDummy[slotIndex] = 0
 
@@ -1199,11 +1297,13 @@ class PetFeedWindow(ui.ScriptWindow):
 
 		for value in range(itemSize[1] - 1):
 			delSlotIndex = delSlotIndex + FEED_WINDOW_X_SIZE
+
 			if delSlotIndex >= player.PET_FEED_SLOT_MAX:
 				return
 
 			self.FeedItemDummy[delSlotIndex] = 0
 
+	# Send feed packet if there are items inside the window
 	def ClickPetFeedButton(self):
 		resultFeedItems = [value for value in self.FeedItems if value != -1]
 		resultFeedItemCounts = [value for value in self.FeedItemsCount if value != 0]
@@ -1213,6 +1313,7 @@ class PetFeedWindow(ui.ScriptWindow):
 				self.feedButtonClickTime = app.GetGlobalTimeStamp()
 
 	def ClearMouseEventFeedItems(self):
+		# Unlock items that are inside the feed window
 		for inven_slot_pos in self.FeedItems:
 			if inven_slot_pos != -1:
 				if inven_slot_pos >= player.INVENTORY_PAGE_SIZE:
@@ -1238,11 +1339,12 @@ class PetFeedWindow(ui.ScriptWindow):
 			return
 
 		inven = self.wndPetInformation.inven
-		invenPage = inven.GetInventoryPageIndex()
+		invenPage = inven.GetInventoryPageIndex() ## 0 or 1
 
-		min_range = invenPage * player.INVENTORY_PAGE_SIZE
-		max_range = (invenPage + 1) * player.INVENTORY_PAGE_SIZE
+		min_range = invenPage * player.INVENTORY_PAGE_SIZE ## 0 or 45
+		max_range = (invenPage + 1) * player.INVENTORY_PAGE_SIZE ## 45 or 90
 
+		# Lock items that are inside the feed window
 		for inven_slot_pos in self.FeedItems:
 			if inven_slot_pos == -1:
 				continue
@@ -1270,22 +1372,28 @@ class PetFeedWindow(ui.ScriptWindow):
 		interface.SetOnTopWindow(player.ON_TOP_WND_PET_FEED)
 		interface.RefreshMarkInventoryBag()
 
-class PetInformationWindow(ui.ScriptWindow):
-	wndPetFeed = None
-	tooltipItem = None
-	inven = None
-	wndPetHatching = None
-	wndPetNameChange = None
-	wndPetMiniInfo = None
-	feedIndex = player.FEED_BUTTON_MAX
-	skillSlot = []
-	feedButton = []
 
-	SkillBookSlotIndex = -1
+"""
+		PetInformationWindow is opened through taskbar or 'P' key.
+		Shows pet statistics and windows for attr change/pet revive.
+"""
+
+class PetInformationWindow(ui.ScriptWindow):
+	wndPetFeed		= None
+	tooltipItem		= None
+	inven			= None
+	wndPetHatching	= None
+	wndPetNameChange= None
+	wndPetMiniInfo	= None
+	feedIndex		= player.FEED_BUTTON_MAX
+	skillSlot		= []
+	feedButton		= []
+
+	SkillBookSlotIndex	= -1
 	SkillBookInvenIndex = -1
 
-	SkillBookDelSlotIndex = -1
-	SkillBookDelInvenIndex = -1
+	SkillBookDelSlotIndex	= -1
+	SkillBookDelInvenIndex	= -1
 
 	typeInfo = {
 		1	:	localeInfo.PET_ATTR_DETERMINE_TYPE1,
@@ -1316,30 +1424,32 @@ class PetInformationWindow(ui.ScriptWindow):
 		ui.ScriptWindow.__init__(self)
 		self.interface = None
 		self.isLoaded = 0
+
+		# Tab - Pages
 		self.state = player.PET_WINDOW_INFO
-		self.tabDict = None
-		self.tabButtonDict = None
-		self.pageDict = None
-		self.AffectShower = None
-		self.popupDialog = None
-		self.questionDialog = None
-		self.skillUpgradeGold = 0
-		self.skillUpgradeSlot = -1
-		self.skillUpgradeIndex = -1
-		self.tooptipPetSkill = None
-		self.attrChangeIndex = [-1, -1, -1]
-		self.petReviveIndex = -1
-		self.petReviveItems = [-1 for i in xrange(player.PET_REVIVE_MATERIAL_SLOT_MAX)]
-		self.petReviveItemsCount = [0 for i in xrange(player.PET_REVIVE_MATERIAL_SLOT_MAX)]
+		self.tabDict		= None
+		self.tabButtonDict	= None
+		self.pageDict		= None
+		self.AffectShower	= None
+		self.popupDialog	= None
+		self.questionDialog	= None
+		self.skillUpgradeGold	= 0
+		self.skillUpgradeSlot	= -1
+		self.skillUpgradeIndex	= -1
+		self.tooptipPetSkill	= None
+		self.attrChangeIndex	= [-1, -1, -1]
+		self.petReviveIndex		= -1
+		self.petReviveItems	= [-1 for i in xrange(player.PET_REVIVE_MATERIAL_SLOT_MAX)]
+		self.petReviveItemsCount	= [0 for i in xrange(player.PET_REVIVE_MATERIAL_SLOT_MAX)]
 		self.isPetReviveResultTooltip = FALSE
 		self.descIndex = 0
 		self.desc_Y = DEFAULT_DESC_Y
 		self.SetWindowName("PetInformationWindow")
 		self.__LoadWindow()
-		self.wndPetHatching = PetHatchingWindow(self)
-		self.wndPetNameChange = PetNameChangeWindow(self)
-		self.wndPetMiniInfo = PetMiniInfomationWindow(self)
-		self.wndPetFeed = PetFeedWindow(self)
+		self.wndPetHatching		= PetHatchingWindow(self)
+		self.wndPetNameChange	= PetNameChangeWindow(self)
+		self.wndPetMiniInfo 	= PetMiniInfomationWindow(self)
+		self.wndPetFeed			= PetFeedWindow(self)
 
 	def __del__(self):
 		ui.ScriptWindow.__del__(self)
@@ -1366,34 +1476,38 @@ class PetInformationWindow(ui.ScriptWindow):
 
 		try:
 			self.__LoadScript("UIScript/petInformationWindow.py")
+
 		except:
 			import exception
 			exception.Abort("petInformationWindow.LoadWindow.__LoadScript")
 
 		try:
-			self.GetChild("CloseButton").SetEvent(ui.__mem_func__(self.Close))
+			# Close Button Event
+			self.GetChild("PetWindowCloseButton").SetEvent(ui.__mem_func__(self.Close))
 
+			# Page Tabs
 			self.tabDict = {
-				player.PET_WINDOW_INFO : self.GetChild("Tab_01"),
-				player.PET_WINDOW_ATTR_CHANGE : self.GetChild("Tab_02"),
-				player.PET_WINDOW_PRIMIUM_FEEDSTUFF : self.GetChild("Tab_03"),
+				player.PET_WINDOW_INFO					: self.GetChild("Tab_01"),
+				player.PET_WINDOW_ATTR_CHANGE			: self.GetChild("Tab_02"),
+				player.PET_WINDOW_PRIMIUM_FEEDSTUFF		: self.GetChild("Tab_03"),
 			}
 
 			self.tabButtonDict = {
-				player.PET_WINDOW_INFO : self.GetChild("Tab_Button_01"),
-				player.PET_WINDOW_ATTR_CHANGE : self.GetChild("Tab_Button_02"),
-				player.PET_WINDOW_PRIMIUM_FEEDSTUFF : self.GetChild("Tab_Button_03"),
+				player.PET_WINDOW_INFO					: self.GetChild("Tab_Button_01"),
+				player.PET_WINDOW_ATTR_CHANGE			: self.GetChild("Tab_Button_02"),
+				player.PET_WINDOW_PRIMIUM_FEEDSTUFF		: self.GetChild("Tab_Button_03"),
 			}
 
 			self.pageDict = {
-				player.PET_WINDOW_INFO : self.GetChild("PetInfo_Page"),
-				player.PET_WINDOW_ATTR_CHANGE : self.GetChild("PetAttrChange_Page"),
-				player.PET_WINDOW_PRIMIUM_FEEDSTUFF : self.GetChild("PetPremiumFeefstuff_Page"),
+				player.PET_WINDOW_INFO					: self.GetChild("PetInfo_Page"),
+				player.PET_WINDOW_ATTR_CHANGE			: self.GetChild("PetAttrChange_Page"),
+				player.PET_WINDOW_PRIMIUM_FEEDSTUFF		: self.GetChild("PetPrimiumFeefstuff_Page"),
 			}
 
 			for (tabKey, tabButton) in self.tabButtonDict.items():
 				tabButton.SetEvent(ui.__mem_func__(self.__OnClickTabButton), tabKey)
 
+			# UpBringing Pet Slot
 			wndUpBringingPetSlot = self.GetChild("UpBringing_Pet_Slot")
 			wndUpBringingPetSlot.SetSlotStyle(wndMgr.SLOT_STYLE_NONE)
 
@@ -1405,12 +1519,14 @@ class PetInformationWindow(ui.ScriptWindow):
 				feedLifeTimeButton.SetToggleUpEvent(ui.__mem_func__(self.ClickFeedLifeTimeButtonUp))
 			self.feedButton.append(feedLifeTimeButton)
 
+			# Feed Evolution Button
 			feedEvolButton = self.GetChild("FeedEvolButton")
 			if feedEvolButton:
 				feedEvolButton.SetToggleDownEvent(ui.__mem_func__(self.ClickFeedEvolButtonDown))
 				feedEvolButton.SetToggleUpEvent(ui.__mem_func__(self.ClickFeedEvolButtonUp))
 			self.feedButton.append(feedEvolButton)
 
+			# Feed EXP Button
 			feedExpButton = self.GetChild("FeedExpButton")
 			if feedExpButton:
 				feedExpButton.SetToggleDownEvent(ui.__mem_func__(self.ClickFeedExpButtonDown))
@@ -1420,10 +1536,12 @@ class PetInformationWindow(ui.ScriptWindow):
 			for value in range(player.FEED_BUTTON_MAX):
 				self.feedButton[value].DisableFlash()
 
+			##		Life Time Gauge
 			self.lifeTimeGauge = self.GetChild("LifeGauge")
-			self.lifeTimeGauge.SetScale(1.61, 1.0)
+			self.lifeTimeGauge.SetScale(1.0, 1.0)
 			self.lifeTimeGauge.SetWindowHorizontalAlignLeft()
 
+			##		EXP GAUGE
 			expGauge = []
 			self.expGaugeBoard = self.GetChild("UpBringing_Pet_EXP_Gauge_Board")
 			expGauge.append(self.GetChild("UpBringing_Pet_EXPGauge_01"))
@@ -1435,7 +1553,7 @@ class PetInformationWindow(ui.ScriptWindow):
 			for exp in expGauge:
 				exp.SetSize(0, 0)
 
-			self.expGauge = expGauge
+			self.expGauge	= expGauge
 			self.tooltipEXP = TextToolTip()
 			self.tooltipEXP.Hide()
 
@@ -1447,18 +1565,22 @@ class PetInformationWindow(ui.ScriptWindow):
 											"d:/ymir work/ui/game/windows/btn_plus_over.sub",\
 											"d:/ymir work/ui/game/windows/btn_plus_down.sub")
 
+			# Skill slot empty event
 			self.skillSlot[0].SetSelectEmptySlotEvent(ui.__mem_func__(self.SelectEmptySkillSlot1))
 			self.skillSlot[1].SetSelectEmptySlotEvent(ui.__mem_func__(self.SelectEmptySkillSlot2))
 			self.skillSlot[2].SetSelectEmptySlotEvent(ui.__mem_func__(self.SelectEmptySkillSlot3))
 
+			# Skill slot select Item event
 			self.skillSlot[0].SetSelectItemSlotEvent(ui.__mem_func__(self.SetSelectItemSlotEvent1))
 			self.skillSlot[1].SetSelectItemSlotEvent(ui.__mem_func__(self.SetSelectItemSlotEvent2))
 			self.skillSlot[2].SetSelectItemSlotEvent(ui.__mem_func__(self.SetSelectItemSlotEvent3))
 
+			# Skill slot over in event
 			self.skillSlot[0].SetOverInItemEvent(ui.__mem_func__(self.OverInSkillSlot1))
 			self.skillSlot[1].SetOverInItemEvent(ui.__mem_func__(self.OverInSkillSlot2))
 			self.skillSlot[2].SetOverInItemEvent(ui.__mem_func__(self.OverInSkillSlot3))
 
+			# Skill slot over out event
 			self.skillSlot[0].SetOverOutItemEvent(ui.__mem_func__(self.OverOutSkillSlot1))
 			self.skillSlot[1].SetOverOutItemEvent(ui.__mem_func__(self.OverOutSkillSlot2))
 			self.skillSlot[2].SetOverOutItemEvent(ui.__mem_func__(self.OverOutSkillSlot3))
@@ -1467,16 +1589,19 @@ class PetInformationWindow(ui.ScriptWindow):
 			self.skillSlot[1].SetPressedSlotButtonEvent(ui.__mem_func__(self.OnPressedSkill2SlotButton))
 			self.skillSlot[2].SetPressedSlotButtonEvent(ui.__mem_func__(self.OnPressedSkill3SlotButton))
 
+			# Initialize skill delete question dialog
 			self.questionSkillDelDlg = uiCommon.QuestionDialog2()
 			self.questionSkillDelDlg.SetAcceptEvent(ui.__mem_func__(self.__SkillDeleteQuestionDialogAccept))
 			self.questionSkillDelDlg.SetCancelEvent(ui.__mem_func__(self.__SkillDeleteQuestionDialogCancel))
 			self.questionSkillDelDlg.Close()
 
+			# Initialize skill learn question dialog
 			self.questionDialog1 = uiCommon.QuestionDialog("thin")
 			self.questionDialog1.SetAcceptEvent(ui.__mem_func__(self.__SkillLearnQuestionDialogAccept))
 			self.questionDialog1.SetCancelEvent(ui.__mem_func__(self.__SkillLearnQuestionDialogCancel))
 			self.questionDialog1.Close()
 
+			# Initialize skill upgrade question dialog
 			self.questionDialog2 = uiCommon.QuestionDialog2()
 			self.questionDialog2.SetText1(localeInfo.PET_SKILL_UPGRADE_QUESTION_DLG_MSG1)
 			self.questionDialog2.SetText2("")
@@ -1484,8 +1609,10 @@ class PetInformationWindow(ui.ScriptWindow):
 			self.questionDialog2.SetCancelEvent(ui.__mem_func__(self.__SkillUpgradeQuestionDialogCancel))
 			self.questionDialog2.Close()
 
+			# Determine Button
 			self.GetChild("DetermineButton").SetEvent(ui.__mem_func__(self.ClickDetermineButton))
 
+			# Attr Change Slot
 			attrChangeSlot = self.GetChild("Change_Pet_Slot")
 			attrChangeSlot.SetSelectEmptySlotEvent(ui.__mem_func__(self.SelectEmptyAttrChangeSlot))
 			attrChangeSlot.SetSelectItemSlotEvent(ui.__mem_func__(self.SelectAttrChangeItemSlot))
@@ -1493,26 +1620,33 @@ class PetInformationWindow(ui.ScriptWindow):
 			attrChangeSlot.SetOverOutItemEvent(ui.__mem_func__(self.OverOutAttrChangeItem))
 			self.attrChangeSlot = attrChangeSlot
 
+			# Attr Change Button
 			self.attrChangeButton = self.GetChild("Pet_Change_Button")
 			self.attrChangeButton.SetEvent(ui.__mem_func__(self.ClickAttrChangeButton))
 			self.attrChangeButton.Hide()
 
+			# Attr Change Close Button
 			self.attrCloseButton = self.GetChild("Pet_OK_Button")
 			self.attrCloseButton.SetEvent(ui.__mem_func__(self.ClickAttrClearButton))
 
+			# Attr Change Type Text
 			self.attrChangeText = self.GetChild("PetDetermineInfoText")
 
+			# Revive description window
 			self.reviveDescWindow = self.GetChild("desc_window")
 
+			# Revive description box
 			self.descriptionBox = self.DescriptionBox()
 			self.descriptionBox.Show()
 			self.descriptionBox.SetParent(self.reviveDescWindow)
 
+			# Revive description prev/next buttons
 			self.petReviveDescPrevButton = self.GetChild("PetReviveDescPrevButton")
 			self.petReviveDescNextButton = self.GetChild("PetReviveDescNextButton")
 			self.petReviveDescPrevButton.SetEvent(ui.__mem_func__(self.PetPremiumFeedStuffPrevDescriptionPage))
 			self.petReviveDescNextButton.SetEvent(ui.__mem_func__(self.PetPremiumFeedStuffNextDescriptionPage))
 
+			# Revive UpBringing Pet Slot
 			petReviveSlot = self.GetChild("PetReviveSlot")
 			petReviveSlot.SetSelectEmptySlotEvent(ui.__mem_func__(self.SelectPetReviveEmptySlot))
 			petReviveSlot.SetSelectItemSlotEvent(ui.__mem_func__(self.SelectPetReviveItemSlot))
@@ -1520,29 +1654,36 @@ class PetInformationWindow(ui.ScriptWindow):
 			petReviveSlot.SetOverOutItemEvent(ui.__mem_func__(self.OverOutPetReviveSlot))
 			self.petReviveSlot = petReviveSlot
 
+			# Revived UpBringing Pet Slot
 			petReviveResultSlot = self.GetChild("PetReviveResultSlot")
 			petReviveResultSlot.SetOverInItemEvent(ui.__mem_func__(self.OverInPetReviveResultSlot))
 			petReviveResultSlot.SetOverOutItemEvent(ui.__mem_func__(self.OverOutPetReviveResultSlot))
 			self.petReviveResultSlot = petReviveResultSlot
 
+			# Revive Material Slot Grid
 			petReviveMaterialSlot = self.GetChild("PetReviveMaterialSlot")
 			petReviveMaterialSlot.SetSelectEmptySlotEvent(ui.__mem_func__(self.SelectPetReviveMaterialEmptySlot))
 			petReviveMaterialSlot.SetSelectItemSlotEvent(ui.__mem_func__(self.SelectPetReviveMaterialItemSlot))
 			self.petReviveMaterialSlot = petReviveMaterialSlot
 
+			# Revive Age/Material Count Texts 
 			self.petReviveAgeText = self.GetChild("PetReviveAgeNumberText")
 			self.petReviveResultAgeText = self.GetChild("PetReviveResultAgeNumerText")
 			self.petReviveItemsCountText = self.GetChild("PetReviveMaterialCountText")
 
+			# Revive Button
 			self.petReviveButton = self.GetChild("PetReviveButton")
 			self.petReviveButton.SetEvent(ui.__mem_func__(self.ClickPetReviveButton))
 
+			# Revive Cancel Button
 			self.petReviveCancelButton = self.GetChild("PetReviveCancelButton")
 			self.petReviveCancelButton.SetEvent(ui.__mem_func__(self.ClickPetReviveCancelButton))
 
+			# Initialize question dialog
 			self.questionDialog = uiCommon.QuestionDialog("thin")
 			self.questionDialog.Close()
 
+			# Initialize info page and revive description
 			self.SetState(player.PET_WINDOW_INFO)
 			self.__DescPetPremiumFeedstuff()
 		except:
@@ -1564,17 +1705,17 @@ class PetInformationWindow(ui.ScriptWindow):
 			self.wndPetFeed.Destroy()
 			self.wndPetFeed = None
 
-		self.interface = None
-		self.inven = None
-		self.tooltipItem = None
+		self.interface		= None
+		self.inven			= None
+		self.tooltipItem	= None
 
 		self.ClearDictionary()
 		self.wndUpBringingPetSlot = None
 
-		self.lifeTimeGauge = None
-		self.expGauge = None
-		self.expGaugeBoard = None
-		self.tooltipEXP = None
+		self.lifeTimeGauge	= None
+		self.expGauge		= None
+		self.expGaugeBoard	= None
+		self.tooltipEXP		= None
 
 		if self.wndPetHatching:
 			self.wndPetHatching.Destroy()
@@ -1594,24 +1735,24 @@ class PetInformationWindow(ui.ScriptWindow):
 		if self.feedButton:
 			del self.feedButton[:]
 
-		self.feedIndex = player.FEED_BUTTON_MAX
-		self.SkillBookSlotIndex = -1
+		self.feedIndex				= player.FEED_BUTTON_MAX
+		self.SkillBookSlotIndex  = -1
 		self.SkillBookInvenIndex = -1
 
-		SkillBookDelSlotIndex = -1
-		SkillBookDelInvenIndex = -1
+		SkillBookDelSlotIndex	= -1
+		SkillBookDelInvenIndex	= -1
 
-		self.skillUpgradeGold = 0
-		self.skillUpgradeSlot = -1
-		self.skillUpgradeIndex = -1
-		self.attrChangeIndex = None
-		self.petReviveIndex = -1
-		self.petReviveItems = None
+		self.skillUpgradeGold	 = 0
+		self.skillUpgradeSlot	 = -1
+		self.skillUpgradeIndex	 = -1
+		self.attrChangeIndex	 = None
+		self.petReviveIndex		 = -1
+		self.petReviveItems	= None
 		self.petReviveItemsCount = None
-		self.isPetReviveResultTooltip = FALSE
+		self.isPetReviveResultTooltip	= FALSE
 
-		self.AffectShower = None
-		self.tooptipPetSkill = None
+		self.AffectShower		= None
+		self.tooptipPetSkill	= None
 
 		if self.questionDialog1:
 			self.questionDialog1.Destroy()
@@ -1628,15 +1769,15 @@ class PetInformationWindow(ui.ScriptWindow):
 		if self.questionDialog:
 			self.questionDialog.Destroy()
 
-		self.questionDialog1 = None
-		self.questionDialog2 = None
-		self.questionSkillDelDlg = None
-		self.popupDialog = None
-		self.questionDialog = None
+		self.questionDialog1		= None
+		self.questionDialog2		= None
+		self.questionSkillDelDlg	= None
+		self.popupDialog			= None
+		self.questionDialog		= None
 
-		self.tabDict = None
-		self.tabButtonDict = None
-		self.pageDict = None
+		self.tabDict		= None
+		self.tabButtonDict	= None
+		self.pageDict		= None
 
 		self.descIndex = 0
 		self.desc_Y = DEFAULT_DESC_Y
@@ -1672,18 +1813,23 @@ class PetInformationWindow(ui.ScriptWindow):
 		if stateKey == self.state:
 			return
 
+		# Update server with current opened window
 		if stateKey == player.PET_WINDOW_INFO:
 			net.SendPetWindowType(player.PET_WINDOW_INFO)
+
 		elif stateKey == player.PET_WINDOW_ATTR_CHANGE:
 			net.SendPetWindowType(player.PET_WINDOW_ATTR_CHANGE)
+	
 		elif stateKey == player.PET_WINDOW_PRIMIUM_FEEDSTUFF:
 			net.SendPetWindowType(player.PET_WINDOW_PRIMIUM_FEEDSTUFF)
 
 	def PetWindowTypeResult(self, result):
 		if result == player.PET_WINDOW_INFO:
 			self.SetState(player.PET_WINDOW_INFO)
+
 		elif result == player.PET_WINDOW_ATTR_CHANGE:
 			self.SetState(player.PET_WINDOW_ATTR_CHANGE)
+
 		elif result == player.PET_WINDOW_PRIMIUM_FEEDSTUFF:
 			self.SetState(player.PET_WINDOW_PRIMIUM_FEEDSTUFF)
 
@@ -1707,12 +1853,14 @@ class PetInformationWindow(ui.ScriptWindow):
 			if stateKey == player.PET_WINDOW_INFO:
 				self.interface.SetOnTopWindow(player.ON_TOP_WND_NONE)
 				self.interface.RefreshMarkInventoryBag()
+
 			elif stateKey == player.PET_WINDOW_ATTR_CHANGE:
 				if self.wndPetFeed.IsShow():
 					self.wndPetFeed.Close()
 
 				self.interface.SetOnTopWindow(player.ON_TOP_WND_PET_ATTR_CHANGE)
 				self.interface.RefreshMarkInventoryBag()
+
 			elif stateKey == player.PET_WINDOW_PRIMIUM_FEEDSTUFF:
 				if self.wndPetFeed.IsShow():
 					self.wndPetFeed.Close()
@@ -1720,6 +1868,7 @@ class PetInformationWindow(ui.ScriptWindow):
 				self.interface.SetOnTopWindow(player.ON_TOP_WND_PET_PRIMIUM_FEEDSTUFF)
 				self.interface.RefreshMarkInventoryBag()
 
+			# Clear attr change/revive windows
 			self.__ClearAttrChangeWindow()
 			self.__ClearPetReviveWindow()
 
@@ -1743,6 +1892,7 @@ class PetInformationWindow(ui.ScriptWindow):
 			self.skillSlot[value].SetCoverButton(0, SKILL_SLOT_ENABLE, SKILL_SLOT_ENABLE, SKILL_SLOT_ENABLE, SKILL_SLOT_ENABLE, FALSE, FALSE)
 			self.skillSlot[value].SetAlwaysRenderCoverButton(0)
 
+	# Skill upgrade button events
 	def OnPressedSkill1SlotButton(self, slotIndex):
 		self.OnPressedSkillSlotButton(0, slotIndex)
 
@@ -1752,6 +1902,7 @@ class PetInformationWindow(ui.ScriptWindow):
 	def OnPressedSkill3SlotButton(self, slotIndex):
 		self.OnPressedSkillSlotButton(2, slotIndex)
 
+	# Open skill upgrade question dialog, triggered from OnPressedSkillXSlotButton
 	def OnPressedSkillSlotButton(self, slotPos, slotIndex):
 		self.OpenPetSkillUpGradeQuestionDialog(slotPos, slotIndex)
 
@@ -1777,25 +1928,28 @@ class PetInformationWindow(ui.ScriptWindow):
 			self.questionDialog2.SetAcceptEvent(ui.__mem_func__(self.__SkillUpgradeQuestionDialogAccept))
 			self.questionDialog2.SetCancelEvent(ui.__mem_func__(self.__SkillUpgradeQuestionDialogCancel))
 
-		self.skillUpgradeGold = 2000000
-		self.skillUpgradeSlot = slot
-		self.skillUpgradeIndex = index
+		self.skillUpgradeGold	= 2000000
+		self.skillUpgradeSlot	= slot
+		self.skillUpgradeIndex	= index
 
 		self.questionDialog2.SetText2(localeInfo.PET_SKILL_UPGRADE_QUESTION_DLG_MSG2 % (localeInfo.NumberToMoneyString(self.skillUpgradeGold)))
 		self.questionDialog2.SetTop()
 		self.questionDialog2.Open()
 
 	def __SkillUpgradeQuestionDialogAccept(self):
-		slot = self.skillUpgradeSlot
-		gold = self.skillUpgradeGold
+
+		slot  = self.skillUpgradeSlot
+		gold  = self.skillUpgradeGold
 		index = self.skillUpgradeIndex
 
 		self.__ClearSkillUpgradeEvent()
 
+		# Check if player has enough money to upgrade skill
 		if player.GetMoney() < gold:
 			self.__OpenPopupDialog(localeInfo.PET_MSG_NOT_ENOUGH_MONEY)
 			return
 
+		# Send skill upgrade request packet
 		net.SendPetSkillUpgradeRequest(slot, index)
 
 	def __SkillUpgradeQuestionDialogCancel(self):
@@ -1805,10 +1959,11 @@ class PetInformationWindow(ui.ScriptWindow):
 		if self.questionDialog2:
 			self.questionDialog2.Close()
 
-		self.skillUpgradeGold = 0
-		self.skillUpgradeSlot = -1
-		self.skillUpgradeIndex = -1
+		self.skillUpgradeGold	= 0
+		self.skillUpgradeSlot	= -1
+		self.skillUpgradeIndex	= -1
 
+	# Skill slot select events
 	def SetSelectItemSlotEvent1(self, slotIndex):
 		self.SetSelectItemSlotEvent(0)
 
@@ -1818,7 +1973,9 @@ class PetInformationWindow(ui.ScriptWindow):
 	def SetSelectItemSlotEvent3(self, slotIndex):
 		self.SetSelectItemSlotEvent(2)
 
+	# Delete skill dialog, triggered from SetSelectItemSlotEventX
 	def SetSelectItemSlotEvent(self, skillSlotIndex):
+		# Return if there is no pet summoned	
 		pet_id = player.GetActivePetItemId()
 		if 0 == pet_id:
 			return
@@ -1826,9 +1983,11 @@ class PetInformationWindow(ui.ScriptWindow):
 		if not mouseModule.mouseController.isAttached():
 			return
 
+		# Return if skill slot index is not between 0~2
 		if skillSlotIndex < 0 or skillSlotIndex >= SKILL_SLOT_MAX:
 			return
 
+		# Skill data
 		(skill_count, pet_skill1, pet_skill_level1, pet_skill_cool1, pet_skill2, pet_skill_level2, pet_skill_cool2, pet_skill3, pet_skill_level3, pet_skill_cool3) = player.GetPetSkill(pet_id)
 
 		if 0 == skill_count:
@@ -1847,24 +2006,28 @@ class PetInformationWindow(ui.ScriptWindow):
 			if not pet_skill3:
 				return
 
-		attachedSlotType = mouseModule.mouseController.GetAttachedType()
-		attachedSlotPos = mouseModule.mouseController.GetAttachedSlotNumber()
-		attachedItemCount = mouseModule.mouseController.GetAttachedItemCount()
-		attachedItemVNum = player.GetItemIndex(attachedSlotPos)
+		attachedSlotType	= mouseModule.mouseController.GetAttachedType()
+		attachedSlotPos		= mouseModule.mouseController.GetAttachedSlotNumber()
+		attachedItemCount	= mouseModule.mouseController.GetAttachedItemCount()
+		attachedItemVNum	= player.GetItemIndex(attachedSlotPos)
 		item.SelectItem(attachedItemVNum)
 
-		itemType = item.GetItemType()
+		itemType	= item.GetItemType()
 		itemSubType = item.GetItemSubType()
 
+		# Return if item is not from inventory
 		if player.SLOT_TYPE_INVENTORY != attachedSlotType:
 			return
 
+		# Return if item position is bigger than player.ITEM_SLOT_COUNT
 		if attachedSlotPos >= player.ITEM_SLOT_COUNT: 
 			return
 
+		# Return if it is not a skill delete item
 		if item.ITEM_TYPE_GROWTH_PET != itemType or item.PET_SKILL_DEL_BOOK != itemSubType:
 			return
 
+		# Initialize skill delete question dialog if it hasn't been yet
 		if not self.questionSkillDelDlg:
 			self.questionSkillDelDlg = uiCommon.QuestionDialog2()
 			self.questionSkillDelDlg.SetAcceptEvent(ui.__mem_func__(self.__SkillDeleteQuestionDialogAccept))
@@ -1894,14 +2057,16 @@ class PetInformationWindow(ui.ScriptWindow):
 		return
 
 	def __ClearSkillDeleteBookEvent(self):
+		# Lock skill delete item
 		self.CanInvenSlot(self.SkillBookDelInvenIndex)
 
-		self.SkillBookDelSlotIndex = -1
+		self.SkillBookDelSlotIndex  = -1
 		self.SkillBookDelInvenIndex = -1
 
 		if self.questionSkillDelDlg:
 			self.questionSkillDelDlg.Close()
 
+	# Skill slot OverIn events
 	def OverInSkillSlot1(self, slotIndex):
 		self.OverInPetSkillSlot(0, slotIndex)
 
@@ -1911,6 +2076,7 @@ class PetInformationWindow(ui.ScriptWindow):
 	def OverInSkillSlot3(self, slotIndex):
 		self.OverInPetSkillSlot(2, slotIndex)
 
+	# Show pet tooltip
 	def OverInPetSkillSlot(self, slot, index):
 		pet_id = player.GetActivePetItemId()
 		if 0 == pet_id:
@@ -1919,6 +2085,7 @@ class PetInformationWindow(ui.ScriptWindow):
 		if self.tooptipPetSkill:
 			self.tooptipPetSkill.SetPetSkill(pet_id, slot, index)
 
+	# Skill slot OverOut events
 	def OverOutSkillSlot1(self):
 		self.tooptipPetSkill.HideToolTip()
 
@@ -1928,6 +2095,7 @@ class PetInformationWindow(ui.ScriptWindow):
 	def OverOutSkillSlot3(self):
 		self.tooptipPetSkill.HideToolTip()
 
+	# Skill empty slot events
 	def SelectEmptySkillSlot1(self, slotIndex):
 		self.SelectEmptySkillSlot(0)
 
@@ -1937,7 +2105,9 @@ class PetInformationWindow(ui.ScriptWindow):
 	def SelectEmptySkillSlot3(self, slotIndex):
 		self.SelectEmptySkillSlot(2)
 
+	# Triggered from SelectEmptySkillSlotX, opens learn skill dialog
 	def SelectEmptySkillSlot(self, skillSlotIndex):
+		# Return if there is no summoned pet		
 		pet_id = player.GetActivePetItemId()
 		if 0 == pet_id:
 			return
@@ -1948,35 +2118,43 @@ class PetInformationWindow(ui.ScriptWindow):
 		if skillSlotIndex < 0 or skillSlotIndex >= SKILL_SLOT_MAX:
 			return
 
+		# Pet data
 		(pet_level, evol_level, birthday, pet_nick, pet_hp, pet_def, pet_sp) = player.GetPetItem(pet_id)
 
+		# Skill data
 		(skill_count, pet_skill1, pet_skill_level1, pet_skill_cool1, pet_skill2, pet_skill_level2, pet_skill_cool2, pet_skill3, pet_skill_level3, pet_skill_cool3) = player.GetPetSkill(pet_id)
 
-		attachedSlotType = mouseModule.mouseController.GetAttachedType()
-		attachedSlotPos = mouseModule.mouseController.GetAttachedSlotNumber()
-		attachedItemCount = mouseModule.mouseController.GetAttachedItemCount()
-		attachedItemVNum = player.GetItemIndex(attachedSlotPos)
+		attachedSlotType	= mouseModule.mouseController.GetAttachedType()
+		attachedSlotPos		= mouseModule.mouseController.GetAttachedSlotNumber()
+		attachedItemCount	= mouseModule.mouseController.GetAttachedItemCount()
+		attachedItemVNum	= player.GetItemIndex(attachedSlotPos)
 		item.SelectItem(attachedItemVNum)
 
-		itemType = item.GetItemType()
+		itemType	= item.GetItemType()
 		itemSubType = item.GetItemSubType()
 
+		# Return if item is not from inventory
 		if player.SLOT_TYPE_INVENTORY != attachedSlotType:
 			return
 
+		# Return if item position is bigger than player.ITEM_SLOT_COUNT
 		if attachedSlotPos >= player.ITEM_SLOT_COUNT: 
 			return
 
+		# Check if item is item.ITEM_TYPE_PET
 		if item.ITEM_TYPE_GROWTH_PET != itemType:
 			return
 
+		# Return if skill delete item is dragged to an empty slot
 		if item.PET_SKILL_DEL_BOOK == itemSubType:
 			self.__OpenPopupDialog(localeInfo.PET_EMPTY_SKILL_SLOT_USE_ITEM)
 			return
 
+		# Return if it is not item.PET_SKILL subtype
 		if item.PET_SKILL != itemSubType:
 			return
 
+		# Pet has no unlocked skills, return
 		if 0 == skill_count:
 			return
 
@@ -1993,6 +2171,7 @@ class PetInformationWindow(ui.ScriptWindow):
 			if pet_skill3:
 				return
 
+		# Return if pet's evolution is not player.PET_GROWTH_SKILL_OPEN_EVOL_LEVEL
 		if evol_level < player.PET_GROWTH_SKILL_OPEN_EVOL_LEVEL:
 			return
 
@@ -2060,6 +2239,7 @@ class PetInformationWindow(ui.ScriptWindow):
 			self.wndPetFeed.Close()
 
 	def IsActivateEvolButton(self, pet_id):
+		# Return if there is no summoned pet
 		if 0 == pet_id:
 			return FALSE
 
@@ -2073,21 +2253,28 @@ class PetInformationWindow(ui.ScriptWindow):
 		if 0 == evol_require:
 			return FALSE
 
+		# Check level and experience limit for the first two evolutions
 		if evol_level < player.PET_GROWTH_SKILL_OPEN_EVOL_LEVEL-1:
+			# Level Check
 			if pet_level < evol_require:
 				chat.AppendChat(chat.CHAT_TYPE_INFO, localeInfo.PET_CAN_NOT_OPEN_EVOL_BUTTON % evol_require)
 				return FALSE
 			else:
+				# EXP Check
 				(curEXP, nextEXP, itemEXP, itemMaxEXP) = player.GetPetExpPoints(pet_id)
 
 				if curEXP != nextEXP or itemEXP != itemMaxEXP:
 					chat.AppendChat(chat.CHAT_TYPE_INFO, localeInfo.PET_CAN_NOT_OPEN_EVOL_BUTTON_EXP_LACK)
 					return FALSE
+
+		# Check level and age limit for the last evolution
 		elif evol_level == player.PET_GROWTH_SKILL_OPEN_EVOL_LEVEL - 1:
+			# Level Check
 			if pet_level < evol_require:
 				chat.AppendChat(chat.CHAT_TYPE_INFO, localeInfo.PET_CAN_NOT_OPEN_EVOL_BUTTON % evol_require)
 				return FALSE
 			else:
+				# Age Check
 				curTime = app.GetGlobalTimeStamp()
 				birthSec = max(0, curTime - birthday)
 
@@ -2122,6 +2309,7 @@ class PetInformationWindow(ui.ScriptWindow):
 	def OnUpdate(self):
 		self.RefreshStatus()
 
+		# Lock used items 
 		self.CantInvenSlot(self.SkillBookInvenIndex)
 		self.CantInvenSlot(self.SkillBookDelInvenIndex)
 		self.CantInvenSlot(self.petReviveIndex)
@@ -2146,6 +2334,7 @@ class PetInformationWindow(ui.ScriptWindow):
 		if self.isLoaded==0:
 			return
 
+		# If there is no summoned pet, close pet mini window and clear the main window
 		pet_id = player.GetActivePetItemId()
 		if 0 == pet_id:
 			self.ClearStatus()
@@ -2159,41 +2348,52 @@ class PetInformationWindow(ui.ScriptWindow):
 		(pet_level, evol_level, birthday, pet_nick, pet_hp, pet_def, pet_sp) = player.GetPetItem(pet_id)
 		curTime = app.GetGlobalTimeStamp()
 
+		# UpBringing Pet Slot Image
 		CurPetItemVNum = player.GetActivePetItemVNum()
 		self.wndUpBringingPetSlot.SetItemSlot(0, CurPetItemVNum)
 		self.wndPetMiniInfo.SetItemSlot(CurPetItemVNum)
 
+		# Pet Name
 		self.GetChild("PetName").SetText(pet_nick);
 
+		# Evolution Name
 		self.GetChild("EvolName").SetText(self.__GetEvolName(evol_level))
 
+		# Level
 		self.GetChild("LevelValue").SetText(str(pet_level))
 
+		# Age
 		birthSec = max(0, curTime - birthday)
 		self.GetChild("AgeValue").SetText(localeInfo.SecondToDay(birthSec))
 
+		# Life Time Text
 		(endTime, maxTime) = player.GetPetLifeTime(pet_id)
 		lifeTime = max(0, endTime - curTime)
-		self.GetChild("LifeTextValue").SetText(localeInfo.SecondToH(lifeTime) + " / " + localeInfo.SecondToH(maxTime) + " " +uiScriptLocale.PET_INFORMATION_LIFE_TIME)
+		self.GetChild("LifeTextValue").SetText( localeInfo.SecondToH(lifeTime) + " / " + localeInfo.SecondToH(maxTime) + " " +uiScriptLocale.PET_INFORMATION_LIFE_TIME)
 
+		# Life Time Gauge
 		self.SetLifeTime(lifeTime, maxTime)
 		self.wndPetMiniInfo.SetLifeTime(lifeTime, maxTime)
 
+		# HP, Def, SP Bonus Text
 		self.GetChild("HpValue").SetText("+" + str("%0.1f" % pet_hp) + "%")
 		self.GetChild("DefValue").SetText("+" + str("%0.1f" % pet_def) + "%")
 		self.GetChild("SpValue").SetText("+" + str("%0.1f" % pet_sp) + "%")
 
+		# EXP
 		(curEXP, nextEXP, itemEXP, itemMaxEXP) = player.GetPetExpPoints(pet_id)
 
-		curEXP = unsigned32(curEXP)
-		nextEXP = unsigned32(nextEXP)
-		itemEXP = unsigned32(itemEXP)
-		itemMaxEXP = unsigned32(itemMaxEXP)
+		curEXP		= unsigned32(curEXP)
+		nextEXP		= unsigned32(nextEXP)
+		itemEXP		= unsigned32(itemEXP)
+		itemMaxEXP	= unsigned32(itemMaxEXP)
 		self.SetExperience(curEXP, nextEXP, itemEXP, itemMaxEXP)
 		self.wndPetMiniInfo.SetExperience(curEXP, nextEXP, itemEXP, itemMaxEXP)
 
+		# Clear skill slots
 		self.__ClearPetSkillSlot()
 
+		# Clear skill slots on mini window
 		self.wndPetMiniInfo.ClearSkillSlot()
 
 		bMiniWindowFlash = FALSE
@@ -2261,6 +2461,7 @@ class PetInformationWindow(ui.ScriptWindow):
 				else:
 					if self.AffectShower:
 						self.AffectShower.SetPetSkillAffect(2, pet_skill2)
+
 			elif skill.PET_SKILL_USE_TYPE_PASSIVE == pet_skill_use_type:
 				if self.AffectShower:
 					self.AffectShower.SetPetSkillAffect(2, pet_skill2)
@@ -2284,6 +2485,7 @@ class PetInformationWindow(ui.ScriptWindow):
 				else:
 					if self.AffectShower:
 						self.AffectShower.SetPetSkillAffect(3, pet_skill3)
+
 			elif skill.PET_SKILL_USE_TYPE_PASSIVE == pet_skill_use_type:
 				if self.AffectShower:
 					self.AffectShower.SetPetSkillAffect(3, pet_skill3)
@@ -2302,7 +2504,7 @@ class PetInformationWindow(ui.ScriptWindow):
 		self.GetChild("HpValue").SetText("")
 		self.SetExperience(0, 0, 0, 0)
 		self.SetLifeTime(100, 100)
-		self.__ClearPetSkillSlot()
+		self.__ClearPetSkillSlot()	##Skill clear
 
 		if self.wndPetFeed:
 			if self.wndPetFeed.IsShow():
@@ -2317,6 +2519,7 @@ class PetInformationWindow(ui.ScriptWindow):
 
 		self.AllOffPetInfoFlashEvent()
 
+	# Lock item at position invenIndex
 	def CantInvenSlot(self, invenIndex):
 		if invenIndex == -1:
 			return
@@ -2333,6 +2536,7 @@ class PetInformationWindow(ui.ScriptWindow):
 			inven_slot_pos = inven_slot_pos - min_range
 			inven.wndItem.SetCantMouseEventSlot(inven_slot_pos)
 
+	# Unlock item at position invenIndex
 	def CanInvenSlot(self, invenIndex):
 		if invenIndex == -1:
 			return
@@ -2362,17 +2566,21 @@ class PetInformationWindow(ui.ScriptWindow):
 		return localeInfo.PET_INFORMATION_STAGE1
 
 	def PetAffectShowerRefresh(self):
+		# Return if affectShower class was not bound
 		if not self.AffectShower:
 			return
 
+		# Clear pet affects
 		self.AffectShower.ClearPetSkillAffect()
 
+		# Return if there is no summoned pet
 		pet_id = player.GetActivePetItemId()
 		if 0 == pet_id:
 			return
 
 		curTime = app.GetGlobalTimeStamp()
 
+		# Skill data
 		(skill_count, pet_skill1, pet_skill_level1, pet_skill_cool1, pet_skill2, pet_skill_level2, pet_skill_cool2, pet_skill3, pet_skill_level3, pet_skill_cool3) = player.GetPetSkill(pet_id)
 
 		if pet_skill1:
@@ -2405,6 +2613,7 @@ class PetInformationWindow(ui.ScriptWindow):
 					pass
 				else:
 					self.AffectShower.SetPetSkillAffect(3, pet_skill3)
+
 			elif skill.PET_SKILL_USE_TYPE_PASSIVE == pet_skill_use_type:
 				self.AffectShower.SetPetSkillAffect(3, pet_skill3)
 
@@ -2457,6 +2666,7 @@ class PetInformationWindow(ui.ScriptWindow):
 		return FALSE
 
 	def AllOffPetInfoFlashEvent(self):
+	
 		if self.wndPetMiniInfo:
 			self.wndPetMiniInfo.OffFlashEvent()
 
@@ -2464,6 +2674,7 @@ class PetInformationWindow(ui.ScriptWindow):
 			self.DisableFlashButtonEvent(i)
 
 	def EnableFlashButtonEvent(self, index):
+
 		if index < 0 or index >= player.FEED_BUTTON_MAX:
 			return
 
@@ -2471,6 +2682,7 @@ class PetInformationWindow(ui.ScriptWindow):
 			self.feedButton[index].EnableFlash()
 
 	def DisableFlashButtonEvent(self, index):
+
 		if index < 0 or index >= player.FEED_BUTTON_MAX:
 			return
 
@@ -2487,6 +2699,7 @@ class PetInformationWindow(ui.ScriptWindow):
 		itemExp = max(itemExp, 0)
 		itemExpMax = max(itemExpMax, 0)
 
+		# Battle exp is divided into BATTLE_EXP_GAUGE_MAX parts
 		quarterPoint = maxPoint / BATTLE_EXP_GAUGE_MAX
 		FullCount = 0
 
@@ -2519,6 +2732,8 @@ class PetInformationWindow(ui.ScriptWindow):
 		if output_max_exp:
 			expPercent = float(output_cur_exp) / float(output_max_exp) * 100
 
+		# If ENABLE_MULTI_TEXTLINE is active, experience points will be
+		# shown seperately based on type.
 		if app.ENABLE_MULTI_TEXTLINE:
 			tooltip_text = str(localeInfo.PET_INFO_EXP) + ': '+ str(curPoint) + '\n' + str(localeInfo.PET_INFO_NEXT_EXP) + ': ' + str(maxPoint - curPoint) + '\n'	\
 						 + str(localeInfo.PET_INFO_ITEM_EXP) + ': '+ str(itemExp) + '\n' + str(localeInfo.PET_INFO_NEXT_ITEM_EXP) + ': ' + str(itemExpMax - itemExp)
@@ -2555,10 +2770,13 @@ class PetInformationWindow(ui.ScriptWindow):
 		return self.wndPetFeed
 
 	def CantFeedItem(self, InvenSlot):
+		
 		if self.feedIndex == player.FEED_LIFE_TIME_EVENT:
 			return self.__CantLifeTimeFeedItem(InvenSlot)
+			
 		elif self.feedIndex == player.FEED_EVOL_EVENT:
 			return self.__CantEvolFeedItem(InvenSlot)
+			
 		elif self.feedIndex == player.FEED_EXP_EVENT:
 			return self.__CantExpFeedItem(InvenSlot)
 
@@ -2648,6 +2866,7 @@ class PetInformationWindow(ui.ScriptWindow):
 		self.tooptipPetSkill = tooltipPetSkill
 
 	def GetEvolInfo(self, evol_level):
+		# Return if evolution level in invalid
 		if evol_level < 1 or evol_level >= player.PET_GROWTH_EVOL_MAX:
 			return 0
 
@@ -2692,6 +2911,7 @@ class PetInformationWindow(ui.ScriptWindow):
 		if mouseModule.mouseController.isAttached():
 			return
 
+		#Unlock item in slotIndex slot
 		self.CanInvenSlot(self.attrChangeIndex[slotIndex])
 		self.attrChangeIndex[slotIndex] = -1
 		self.attrChangeSlot.ClearSlot(slotIndex)
@@ -2712,30 +2932,39 @@ class PetInformationWindow(ui.ScriptWindow):
 		itemType = item.GetItemType()
 		itemSubType = item.GetItemSubType()
 
+		# Return if item is beging attached from not inventory window
 		if player.SLOT_TYPE_INVENTORY != attachedSlotType:
 			return FALSE
 
+		# Return if item position is bigger than player.ITEM_SLOT_COUNT
 		if attachedSlotPos >= player.ITEM_SLOT_COUNT: 
 			return FALSE
 
 		if slotIndex == player.PET_WND_SLOT_ATTR_CHANGE:
+
+			# Return if upbringing item is already in place
 			if -1 != self.attrChangeIndex[player.PET_WND_SLOT_ATTR_CHANGE]:
 				return FALSE
 
 			if item.ITEM_TYPE_GROWTH_PET != itemType or itemSubType != item.PET_UPBRINGING:
 				return FALSE
 
+			# Return if there is an active pet
 			activePetId = player.GetActivePetItemId()
 			if activePetId != 0:
 				return FALSE
 
+			# Select attr change item if it wasn't selected yet
 			if -1 == self.attrChangeIndex[player.PET_WND_SLOT_ATTR_CHANGE_ITEM]:
+
 				attrChangePos = player.GetItemSlotIndex(player.PET_ATTR_CHANGE_ITEM)
 				if attrChangePos != -1:
 					self.attrChangeIndex[player.PET_WND_SLOT_ATTR_CHANGE_ITEM] = attrChangePos
 					self.attrChangeSlot.SetItemSlot(player.PET_WND_SLOT_ATTR_CHANGE_ITEM, player.PET_ATTR_CHANGE_ITEM)
 
 		elif slotIndex == player.PET_WND_SLOT_ATTR_CHANGE_ITEM:
+
+			# Return if attr change item is already in place
 			if -1 != self.attrChangeIndex[player.PET_WND_SLOT_ATTR_CHANGE_ITEM]:
 				return FALSE
 
@@ -2779,6 +3008,7 @@ class PetInformationWindow(ui.ScriptWindow):
 		upBringingPos = self.attrChangeIndex[player.PET_WND_SLOT_ATTR_CHANGE]
 		attrChangePos = self.attrChangeIndex[player.PET_WND_SLOT_ATTR_CHANGE_ITEM]
 
+		# Send packet if positions are valid and close the question dialog
 		if upBringingPos != -1 and attrChangePos != -1:
 			net.SendPetAttrChange(upBringingPos, attrChangePos)
 
@@ -2793,9 +3023,11 @@ class PetInformationWindow(ui.ScriptWindow):
 		text = self.typeInfo[byType]
 		self.attrChangeText.SetText(text)
 
+		# Clear slots 
 		for i in xrange(player.PET_WND_SLOT_ATTR_CHANGE_MAX):
 			self.__ClearAttrChangeSlot(i)
 
+		# Append new upbringing pet item in result slot
 		itemVnum = player.GetItemIndex(slotIndex)
 		self.attrChangeIndex[player.PET_WND_SLOT_ATTR_CHANGE_RESULT] = slotIndex
 		self.attrChangeSlot.SetItemSlot(player.PET_WND_SLOT_ATTR_CHANGE_RESULT, itemVnum)
@@ -2832,6 +3064,8 @@ class PetInformationWindow(ui.ScriptWindow):
 		return FALSE
 
 	def ClickDetermineButton(self):
+		# If there is an active pet and player has player.PET_ATTR_DETERMINE_ITEM 
+		# item, send the packet
 		activePetId = player.GetActivePetItemId()
 		if activePetId != 0:
 			sourcePos = player.GetItemSlotIndex(player.PET_ATTR_DETERMINE_ITEM)
@@ -2839,10 +3073,12 @@ class PetInformationWindow(ui.ScriptWindow):
 				net.SendPetAttrDetermine(sourcePos)
 
 	def PetAttrDetermineResult(self, byType):
+		# Display determine result in a popup dialog
 		text = self.typeInfo[byType]
 		self.__OpenPopupDialog(text)
 
 	def __DescPetPremiumFeedstuff(self):
+		# Initialize pet premium feedstuff description
 		event.ClearEventSet(self.descIndex)
 
 		self.descIndex = event.RegisterEventSet(uiScriptLocale.PET_PRIMIUM_FEEDSTUFF_DESC)
@@ -2885,9 +3121,9 @@ class PetInformationWindow(ui.ScriptWindow):
 		if None != self.tooltipItem:
 			invenPos = self.petReviveIndex
 			if invenPos != -1:
-				if self.isPetReviveResultTooltip:
+				if self.isPetReviveResultTooltip:	# Real pet tooltip after being revived
 					self.tooltipItem.SetInventoryItem(invenPos, player.INVENTORY)
-				else:
+				else:	# To be revived pet dummy tooltip
 					metinSlot = [player.GetItemMetinSocket(invenPos, i) for i in xrange(player.METIN_SOCKET_MAX_NUM)]
 					pet_id = metinSlot[2]
 
@@ -2901,26 +3137,32 @@ class PetInformationWindow(ui.ScriptWindow):
 
 						(pet_level, evol_level, birthday, pet_nick, pet_hp, pet_def, pet_sp) = player.GetPetItem(pet_id)
 
+						# Item Title
 						self.tooltipItem.AppendTextLine(pet_nick, self.tooltipItem.TITLE_COLOR)
 
+						# Item Description
 						itemDesc = item.GetItemDescription()
 						self.tooltipItem.AppendDescription(itemDesc, 26)
 
+						# Pet Level/Age
 						self.tooltipItem.AppendSpace(5)
 						birthSec = max(0, metinSlot[0] - birthday)
 						self.tooltipItem.AppendTextLine(localeInfo.PET_TOOLTIP_LEVEL + " " + str(pet_level) + " (" + localeInfo.SecondToDay(birthSec * 0.8) + ")")
 
+						# Pet Evolution / Skill Count
 						self.tooltipItem.AppendSpace(5)
 						if skill_count:
 							self.tooltipItem.AppendTextLine(self.tooltipItem.GetEvolName(evol_level) + "(" + str(skill_count) + ")")
 						else:
 							self.tooltipItem.AppendTextLine(self.tooltipItem.GetEvolName(evol_level))
 
+						# Pet HP/SP/DEF
 						self.tooltipItem.AppendSpace(5)
 						self.tooltipItem.AppendTextLine(localeInfo.PET_TOOLTIP_HP + " +" + str("%0.1f" % pet_hp) + "%", self.tooltipItem.SPECIAL_POSITIVE_COLOR)
 						self.tooltipItem.AppendTextLine(localeInfo.PET_TOOLTIP_DEF + " +" + str("%0.1f" % pet_def) + "%", self.tooltipItem.SPECIAL_POSITIVE_COLOR)
 						self.tooltipItem.AppendTextLine(localeInfo.PET_TOOLTIP_SP + " +" + str("%0.1f" % pet_sp) + "%", self.tooltipItem.SPECIAL_POSITIVE_COLOR)
 
+						# Pet Skills
 						if pet_skill1:
 							self.tooltipItem.AppendSpace(5)
 							(pet_skill_name, pet_skill_desc, pet_skill_use_type , pet_skill_cool_time) = skill.GetPetSkillInfo(pet_skill1)
@@ -2936,6 +3178,7 @@ class PetInformationWindow(ui.ScriptWindow):
 							(pet_skill_name, pet_skill_desc, pet_skill_use_type , pet_skill_cool_time) = skill.GetPetSkillInfo(pet_skill3)
 							self.tooltipItem.AppendTextLine(localeInfo.PET_TOOLTUP_SKILL % (pet_skill_name, pet_skill_level3) , self.tooltipItem.SPECIAL_POSITIVE_COLOR)
 
+						# Pet Lifetime
 						for i in xrange(item.LIMIT_MAX_NUM):
 							(limitType, limitValue) = item.GetLimit(i)
 							if item.LIMIT_REAL_TIME == limitType:
@@ -3001,15 +3244,18 @@ class PetInformationWindow(ui.ScriptWindow):
 		itemType = item.GetItemType()
 		itemSubType = item.GetItemSubType()
 
+		# Return if item is beging attached from not inventory window
 		if player.SLOT_TYPE_INVENTORY != attachedSlotType:
 			return FALSE
 
+		# Return if item position is bigger than player.ITEM_SLOT_COUNT
 		if attachedSlotPos >= player.ITEM_SLOT_COUNT: 
 			return FALSE
 
 		curTime = app.GetGlobalTimeStamp()
 		metinSlot = [player.GetItemMetinSocket(attachedSlotPos, i) for i in xrange(player.METIN_SOCKET_MAX_NUM)]
 
+		# Return if there is an active pet or target pet is still alive
 		if item.ITEM_TYPE_GROWTH_PET == itemType and itemSubType == item.PET_UPBRINGING:
 			activePetId = player.GetActivePetItemId()
 			if activePetId != 0:
@@ -3020,9 +3266,11 @@ class PetInformationWindow(ui.ScriptWindow):
 		else:
 			return FALSE
 
+		# Return if there is already pet in place
 		if self.petReviveIndex != -1:
 			return FALSE
 
+		# Return if no pet_id in the socket
 		pet_id = metinSlot[2]
 		if 0 == pet_id:
 			return FALSE
@@ -3030,13 +3278,16 @@ class PetInformationWindow(ui.ScriptWindow):
 		(pet_level, evol_level, birthday, pet_nick, pet_hp, pet_def, pet_sp) = player.GetPetItem(pet_id)
 		birthSec = max(0, metinSlot[0] - birthday)
 
+		# Upbringing Slot
 		self.petReviveIndex = attachedSlotPos
 		self.petReviveSlot.SetItemSlot(slotIndex, attachedItemVNum)
 		self.petReviveSlot.RefreshSlot()
 
+		# Revived Upbringing Slot
 		self.petReviveResultSlot.SetItemSlot(slotIndex, attachedItemVNum)
 		self.petReviveResultSlot.RefreshSlot()
 
+		# Age Texts
 		self.petReviveAgeText.SetText("%s" % localeInfo.SecondToDay(birthSec))
 		self.petReviveResultAgeText.SetText("%s" % localeInfo.SecondToDay(birthSec * 0.8))
 		self.__RefreshPetReviveMaterialCount()
@@ -3060,24 +3311,30 @@ class PetInformationWindow(ui.ScriptWindow):
 		itemType = item.GetItemType()
 		itemSubType = item.GetItemSubType()	
 
+		# Return if item is beging attached from not inventory window
 		if player.SLOT_TYPE_INVENTORY != attachedSlotType:
 			return FALSE
 
+		# Return if item position is bigger than player.ITEM_SLOT_COUNT
 		if attachedSlotPos >= player.ITEM_SLOT_COUNT:
 			return FALSE
 
+		# Return if there is no to-be-revived pet in slot
 		if self.petReviveIndex == -1:
 			return FALSE
 
+		# Return if material is not item.PET_PRIMIUM_FEEDSTUFF
 		if itemType != item.ITEM_TYPE_GROWTH_PET or itemSubType != item.PET_PRIMIUM_FEEDSTUFF:
 			return FALSE
 
+		# Return if the slot is already occupied or item is in another slot
 		if self.petReviveItems[slotIndex] != -1:
 			return FALSE
 
 		if attachedSlotPos in self.petReviveItems:
 			return FALSE
 
+		# Return if enough material has been appended
 		if self.HasEnoughPetReviveMaterial():
 			return FALSE
 
@@ -3086,6 +3343,7 @@ class PetInformationWindow(ui.ScriptWindow):
 		self.petReviveMaterialSlot.SetItemSlot(slotIndex, attachedItemVNum, attachedItemCount)
 		self.petReviveMaterialSlot.RefreshSlot()
 
+		# Refresh required material text
 		self.__RefreshPetReviveMaterialCount()
 
 		mouseModule.mouseController.DeattachObject()
@@ -3111,9 +3369,11 @@ class PetInformationWindow(ui.ScriptWindow):
 		metinSlot = [player.GetItemMetinSocket(self.petReviveIndex, i) for i in xrange(player.METIN_SOCKET_MAX_NUM)]
 		pet_id = metinSlot[2]
 
+		# Pet data
 		(pet_level, evol_level, birthday, pet_nick, pet_hp, pet_def, pet_sp) = player.GetPetItem(pet_id)
 		birthSec = max(0, metinSlot[0] - birthday)
 
+		# Material Count
 		petMaxReviveMaterialCount = localeInfo.SecondToDayNumber(birthSec) / 10
 		if petMaxReviveMaterialCount < 1:
 			petMaxReviveMaterialCount = 1
@@ -3123,6 +3383,7 @@ class PetInformationWindow(ui.ScriptWindow):
 			if self.petReviveItems[i] != -1:
 				petReviveMaterialCount += self.petReviveItemsCount[i]
 
+		# Set added mateiral count to required material count if higher
 		if petReviveMaterialCount > petMaxReviveMaterialCount:
 			petReviveMaterialCount = petMaxReviveMaterialCount
 
@@ -3138,6 +3399,7 @@ class PetInformationWindow(ui.ScriptWindow):
 		(pet_level, evol_level, birthday, pet_nick, pet_hp, pet_def, pet_sp) = player.GetPetItem(pet_id)
 		birthSec = max(0, metinSlot[0] - birthday)
 
+		# Material Count
 		petMaxReviveMaterialCount = localeInfo.SecondToDayNumber(birthSec) / 10
 		if petMaxReviveMaterialCount < 1:
 			petMaxReviveMaterialCount = 1
@@ -3153,13 +3415,16 @@ class PetInformationWindow(ui.ScriptWindow):
 		return FALSE
 
 	def ClickPetReviveButton(self):
+		# Return if there is no pet upbringing item in slot
 		if self.petReviveIndex == -1:
 			self.__OpenPopupDialog(localeInfo.PET_REVIVE_FAIL_EMPTY_PET_SLOT)
 			return
 
+		# Return if question dialog is already opened
 		if self.questionDialog.IsShow():
 			return
 
+		# Return if there is not enough material
 		if not self.HasEnoughPetReviveMaterial():
 			self.__OpenPopupDialog(localeInfo.PET_REVIVE_FAIL_NOT_ENOUGHT_MATERIAL)
 			return
@@ -3183,6 +3448,7 @@ class PetInformationWindow(ui.ScriptWindow):
 		resultReviveItems = [value for value in self.petReviveItems if value != -1]
 		resultReviveItemsCount = [value for value in self.petReviveItemsCount if value != 0]
 
+		# Send revive packet if there are items in list and close the question dialog
 		if resultReviveItems:
 			net.SendPetRevive(self.petReviveIndex, resultReviveItems, resultReviveItemsCount)
 
@@ -3195,6 +3461,8 @@ class PetInformationWindow(ui.ScriptWindow):
 		self.__ClearPetReviveWindow()
 
 	def PetReviveResult(self, result):
+		# If succeeded set revived pet to result item slot,
+		# else clear the revive window.
 		if result:
 			self.isPetReviveResultTooltip = TRUE
 			self.petReviveSlot.SetItemSlot(0, 0)
@@ -3233,6 +3501,7 @@ class PetInformationWindow(ui.ScriptWindow):
 			if item.GetItemSubType() == item.PET_UPBRINGING:
 				return self.SelectPetReviveEmptySlot(0)
 			elif item.GetItemSubType() == item.PET_PRIMIUM_FEEDSTUFF:
+				# Return the first available slot
 				for i in xrange(player.PET_REVIVE_MATERIAL_SLOT_MAX):
 					if self.petReviveItems[i] == -1:
 						return self.SelectPetReviveMaterialEmptySlot(i)
@@ -3277,6 +3546,7 @@ class TextToolTip(ui.Window):
 		mouseY = mouseY - 50
 
 		if self.textLine.GetText():
+			# Move upwards if text is a multiline text
 			mouseY = mouseY - (self.textLine.GetTextLineCount() - 1) * 6
 
 		self.textLine.SetPosition(mouseX, mouseY)

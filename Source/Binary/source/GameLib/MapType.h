@@ -1,11 +1,13 @@
 #ifndef __MapType_Header__
 #define __MapType_Header__
 
-#include "../eterLib/SkyBox.h"
-#include "../mileslib/SoundManager.h"
-
 class CProperty;
 
+#include "../eterLib/SkyBox.h"
+#include "../mileslib/SoundManager.h"
+#include "../UserInterface/Locale_inc.h"
+/////////////////////////////////////////////////////////////////
+// Property
 namespace prt
 {
 	enum EPropertyType
@@ -19,7 +21,7 @@ namespace prt
 		PROPERTY_TYPE_MAX_NUM,
 	};
 
-	const char c_szPropertyTypeName[PROPERTY_TYPE_MAX_NUM][32] = 
+	const char c_szPropertyTypeName[PROPERTY_TYPE_MAX_NUM][32] =
 	{
 		"None",
 		"Tree",
@@ -29,7 +31,7 @@ namespace prt
 		"DungeonBlock"
 	};
 
-	const char c_szPropertyExtension[PROPERTY_TYPE_MAX_NUM][16] = 
+	const char c_szPropertyExtension[PROPERTY_TYPE_MAX_NUM][16] =
 	{
 		".pr",
 		".prt",
@@ -39,8 +41,8 @@ namespace prt
 		".prd"
 	};
 
-	DWORD GetPropertyType(const char *c_szTypeName);
-	const char *GetPropertyExtension(DWORD dwType);
+	DWORD GetPropertyType(const char * c_szTypeName);
+	const char * GetPropertyExtension(DWORD dwType);
 
 	struct TPropertyTree
 	{
@@ -109,8 +111,12 @@ namespace prt
 	bool PropertyDungeonBlockDataToString(TPropertyDungeonBlock * pData, CProperty * pProperty);
 	bool PropertyDungeonBlockStringToData(CProperty * pProperty, TPropertyDungeonBlock * pData);
 };
+/////////////////////////////////////////////////////////////////
 
-enum 
+/////////////////////////////////////////////////////////////////
+// Environment
+//
+enum
 {
 	ENV_DIRLIGHT_BACKGROUND,
 	ENV_DIRLIGHT_CHARACTER,
@@ -119,11 +125,22 @@ enum
 
 typedef struct SEnvironmentData
 {
+	// Light
 	BOOL		bDirLightsEnable[ENV_DIRLIGHT_NUM];
-	D3DLIGHT8	DirLights[ENV_DIRLIGHT_NUM];
+#ifdef ENABLE_DIRECTX9_UPDATE
+    D3DLIGHT9   DirLights[ENV_DIRLIGHT_NUM];
+#else
+    D3DLIGHT8   DirLights[ENV_DIRLIGHT_NUM];
+#endif
 
-	D3DMATERIAL8 Material;
+	// Material
+#ifdef ENABLE_DIRECTX9_UPDATE
+    D3DMATERIAL9 Material;
+#else
+    D3DMATERIAL8 Material;
+#endif
 
+	// Fog
 #ifdef ENABLE_FOG_FIX
 	mutable BOOL bFogEnable;
 #else
@@ -136,25 +153,27 @@ typedef struct SEnvironmentData
 
 	float GetFogNearDistance() const;
 	float GetFogFarDistance() const;
-	
+
 	D3DXCOLOR FogColor;
 
+	// Filtering
 	BOOL bFilteringEnable;
 	D3DXCOLOR FilteringColor;
 	BYTE byFilteringAlphaSrc;
 	BYTE byFilteringAlphaDest;
 
+	// Wind
 	float fWindStrength;
 	float fWindRandom;
 
+	// SkyBox
 	D3DXVECTOR3 v3SkyBoxScale;
 	BOOL		bSkyBoxTextureRenderMode;
 
 	BYTE bySkyBoxGradientLevelUpper;
 	BYTE bySkyBoxGradientLevelLower;
 
-	std::string strSkyBoxFaceFileName[6];
-
+	std::string strSkyBoxFaceFileName[6]; //order : front/back/left/right/top/bottom
 
 	D3DXVECTOR2 v2CloudScale;
 	float fCloudHeight;
@@ -165,21 +184,22 @@ typedef struct SEnvironmentData
 
 	std::vector<TGradientColor> SkyBoxGradientColorVector;
 
+	// LensFlare
 	BOOL bLensFlareEnable;
 	D3DXCOLOR LensFlareBrightnessColor;
 	float fLensFlareMaxBrightness;
 
 	BOOL bMainFlareEnable;
-	std::string strMainFlareTextureFileName; 
+	std::string strMainFlareTextureFileName;
 	float fMainFlareSize;
-	
+
 	BOOL bReserve;
 } TEnvironmentData;
 
 typedef std::map<DWORD, TEnvironmentData*> TEnvironmentDataMap;
+/////////////////////////////////////////////////////////////////
 
-typedef struct SScreenPosition
-{
+typedef struct SScreenPosition {
 	int x;
 	int y;
 } TScreenPosition;

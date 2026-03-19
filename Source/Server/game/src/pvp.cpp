@@ -206,6 +206,7 @@ void CPVPManager::Insert(LPCHARACTER pkChr, LPCHARACTER pkVictim)
 	pkVictim->LocaleChatPacket(CHAT_TYPE_INFO, 124, "%s", pkChr->GetName());
 	pkChr->LocaleChatPacket(CHAT_TYPE_INFO, 123, "%s", pkVictim->GetName());
 
+	// NOTIFY_PVP_MESSAGE
 	LPDESC pkVictimDesc = pkVictim->GetDesc();
 	if (pkVictimDesc)
 	{
@@ -238,12 +239,10 @@ void CPVPManager::Connect(LPCHARACTER pkChr)
 
 void CPVPManager::Disconnect(LPCHARACTER pkChr)
 {
-#ifdef ENABLE_END_PVP_WHEN_DISCONNECT
-	ConnectEx(pkChr, true);
-#endif
+	//ConnectEx(pkChr, true);
 }
 
-void CPVPManager::GiveUp(LPCHARACTER pkChr, DWORD dwKillerPID)
+void CPVPManager::GiveUp(LPCHARACTER pkChr, DWORD dwKillerPID) // This method is calling from no where yet.
 {
 	CPVPSetMap::iterator it = m_map_pkPVPSetByID.find(pkChr->GetPlayerID());
 
@@ -332,7 +331,7 @@ bool CPVPManager::CanAttack(LPCHARACTER pkChr, LPCHARACTER pkVictim)
 	switch (pkVictim->GetCharType())
 	{
 		case CHAR_TYPE_NPC:
-#ifdef ENABLE_SHIP_DEFENCE_DUNGEON
+#ifdef ENABLE_DEFENSAWE_SHIP
 			if (pkVictim->IsHydraNPC())
 				return true;
 			else
@@ -351,6 +350,11 @@ bool CPVPManager::CanAttack(LPCHARACTER pkChr, LPCHARACTER pkVictim)
 		case CHAR_TYPE_GROWTH_PET:
 #endif
 			return false;
+	}
+
+	if (pkChr->GetWaitHackCounter() == 1) {	//@fixme503
+		pkChr->ClearWaitHackCounter();
+		return false;
 	}
 
 	if (pkChr == pkVictim)
@@ -381,10 +385,132 @@ bool CPVPManager::CanAttack(LPCHARACTER pkChr, LPCHARACTER pkVictim)
 	}
 #endif
 
+	if (pkVictim->IsNPC() && pkChr->IsNPC() && !pkChr->IsGuardNPC())
+		return false;
+
+	if(pkVictim->IsPC() && pkChr->IsPC() && pkVictim->GetMapIndex() == 24 && pkChr->GetMapIndex() == 24)
+	{
+		return false;
+	}
+
+	if(pkVictim->IsPC() && pkChr->IsPC() && pkVictim->GetMapIndex() == 44 && pkChr->GetMapIndex() == 44)
+	{
+		return false;
+	}
+
+
 	if( true == pkChr->IsHorseRiding() )
 	{
-		if( pkChr->GetHorseLevel() > 0 && 1 == pkChr->GetHorseGrade() ) 
+		if( pkChr->GetHorseLevel() > 0 && 1 == pkChr->GetHorseGrade() )
 			return false;
+	}
+	else
+	{
+		switch( pkChr->GetMountVnum() )
+		{
+			case 0:
+			case 20030:
+			case 20110:
+			case 20111:
+			case 20112:
+			case 20113:
+			case 20114:
+			case 20115:
+			case 20116:
+			case 20117:
+			case 20118:
+				//
+			case 20205:
+			case 20206:
+			case 20207:
+			case 20208:
+			case 20209:
+			case 20210:
+			case 20211:
+			case 20212:
+			case 20119:		// 
+			case 20219:		// 
+			case 20220:		// 
+			case 20221:		// 
+			case 20222:		// 
+			case 20120:
+			case 20121:
+			case 20122:
+			case 20123:
+			case 20124:
+			case 20125:
+			case 20214:		// 
+			case 20215:		//
+			case 20217:		//
+			case 20218:		// 
+			case 20224:		// 
+			case 20225:		// 
+			case 20226:		//	
+			case 20227:
+			case 20228:
+			case 20229:
+			case 20230:
+			case 20231:
+			case 20232:
+			case 20233:
+			case 20234:
+			case 20235:
+			case 20236:
+			case 20237:
+			case 20238:
+			case 20239:
+			case 20240:
+			case 20241:
+			case 20242:
+			case 20243:
+			case 20244:
+			case 20245:
+			case 20246:
+			case 20247:
+			case 20248:
+			case 20249:
+			case 20250:
+			case 20251:
+			case 20252:
+			case 20253:
+			case 20254:
+			case 20255:
+			case 20256:
+			case 20257:
+			case 20258:
+			case 20259:
+			case 20260:
+			case 20261:
+			case 20262:
+			case 20263:
+			case 20264:
+			case 20265:
+			case 20266:
+			case 20267:
+			case 20268:
+			case 20269:
+			case 20270:
+			case 20271:
+			case 20272:
+			case 20273:
+			case 20274:
+			case 20275:
+			case 20276:
+			case 20277:
+			case 20278:
+			case 20279:
+			case 20280:
+			case 20281:
+#ifdef ENABLE_STANDING_MOUNT
+			case 40003:		// Standing Mount: Turbo Sörf Tahtasý
+			case 40004:		// Standing Mount: Wukong'un Fýrtýnasý
+			case 40005:		// Standing Mount: Wukong'un Gürlemesi
+#endif
+				break;
+
+			default:
+				return false;
+		}
 	}
 
 	if (pkVictim->IsNPC() || pkChr->IsNPC())
@@ -398,8 +524,8 @@ bool CPVPManager::CanAttack(LPCHARACTER pkChr, LPCHARACTER pkVictim)
 	{
 		BYTE bMapEmpire = SECTREE_MANAGER::instance().GetEmpireFromMapIndex(pkChr->GetMapIndex());
 
-		if ( pkChr->GetPKMode() == PK_MODE_PROTECT && pkChr->GetEmpire() == bMapEmpire ||
-				pkVictim->GetPKMode() == PK_MODE_PROTECT && pkVictim->GetEmpire() == bMapEmpire )
+		if ( ((pkChr->GetPKMode() == PK_MODE_PROTECT) && (pkChr->GetEmpire() == bMapEmpire)) ||
+				((pkVictim->GetPKMode() == PK_MODE_PROTECT) && (pkVictim->GetEmpire() == bMapEmpire)) )
 		{
 			return false;
 		}
@@ -464,6 +590,7 @@ bool CPVPManager::CanAttack(LPCHARACTER pkChr, LPCHARACTER pkVictim)
 				break;
 
 			case PK_MODE_GUILD:
+				// Same implementation from PK_MODE_FREE except for attacking same guild
 				if (!pkChr->GetGuild() || (pkVictim->GetGuild() != pkChr->GetGuild()))
 				{
 					if (pkVictim->GetAlignment() >= 0)

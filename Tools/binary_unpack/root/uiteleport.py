@@ -22,6 +22,9 @@ buttons_list = {
 		{'btn_name': localeInfo.TELEPORT_WINDOW_CLASS_1},
 		{'btn_name': localeInfo.TELEPORT_WINDOW_CLASS_2},
 		{'btn_name': localeInfo.TELEPORT_WINDOW_CLASS_3},
+		{'btn_name': localeInfo.TELEPORT_WINDOW_CLASS_4},
+		{'btn_name': localeInfo.TELEPORT_WINDOW_CLASS_5},
+		{'btn_name': localeInfo.TELEPORT_WINDOW_CLASS_6},
 	],
 
 	'subBoardsButtons': {
@@ -54,6 +57,23 @@ buttons_list = {
 		   {'btn_name': localeInfo.MAP_NUSLUCK,					'index': 18,	'minLevel': 1,	'maxLevel': 110,	'costReq': 0,		'itemReq': 0},
 		   {'btn_name': localeInfo.MAP_TRENT,					'index': 11,	'minLevel': 1,	'maxLevel': 110,	'costReq': 0,		'itemReq': 0},
 		   {'btn_name': localeInfo.MAP_TRENT02,					'index': 12,	'minLevel': 1,	'maxLevel': 110,	'costReq': 0,		'itemReq': 0},
+		],
+		4: [
+		   {'btn_name': localeInfo.MAP_MAGIC_FOREST,			'index': 24,		'minLevel': 100,	'maxLevel': 110,	'costReq': 0,		'itemReq': 0}
+		],
+		5: [
+		   {'btn_name': localeInfo.MAP_ABANDONED_CASTLE,		'index': 25,		'minLevel': 100,	'maxLevel': 120,	'costReq': 0,		'itemReq': 0},
+		   {'btn_name': localeInfo.MAP_DONGAN_PLAIN,			'index': 26,		'minLevel': 100,	'maxLevel': 120,	'costReq': 0,		'itemReq': 0},
+		   {'btn_name': localeInfo.MAP_SEOGAN_SWAMP,			'index': 27,		'minLevel': 100,	'maxLevel': 120,	'costReq': 0,		'itemReq': 0},
+		   {'btn_name': localeInfo.MAP_NAMGAN_GAP,			    'index': 28,		'minLevel': 100,	'maxLevel': 120,	'costReq': 0,		'itemReq': 0},
+		   {'btn_name': localeInfo.MAP_NORTH_WIND_CACHE,		'index': 29,		'minLevel': 100,	'maxLevel': 120,	'costReq': 0,		'itemReq': 0},
+		   {'btn_name': localeInfo.MAP_NORTH_R_CLIFF,	        'index': 30,		'minLevel': 100,	'maxLevel': 120,	'costReq': 0,		'itemReq': 0},
+		   {'btn_name': localeInfo.MAP_NORTH_WIND_DESCEN,		'index': 31,		'minLevel': 100,	'maxLevel': 120,	'costReq': 0,		'itemReq': 0},
+		   {'btn_name': localeInfo.MAP_MYSTERIOUS_DUNGEON,		'index': 32,		'minLevel': 100,	'maxLevel': 120,	'costReq': 0,		'itemReq': 0},
+		   {'btn_name': localeInfo.MAP_YILAD_PASS,			    'index': 33,		'minLevel': 100,	'maxLevel': 120,	'costReq': 0,		'itemReq': 0},
+		   {'btn_name': localeInfo.MAP_CRYSTAL_CAVE,			'index': 34,		'minLevel': 100,	'maxLevel': 120,	'costReq': 0,		'itemReq': 0}
+		],
+		6: [
 		   {'btn_name': localeInfo.MAP_TRADE,					'index': 23,	'minLevel': 1,	'maxLevel': 110,	'costReq': 0,		'itemReq': 0}
 		],
 	}

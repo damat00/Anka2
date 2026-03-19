@@ -402,7 +402,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "water_breathe02.dds"
+            "D:\Ymir Work\monster2\ch_water_dragon\water_breathe02.dds"
         }
     }
 }

@@ -1,13 +1,17 @@
 #ifndef __INC_YMIR_GAMELIB__
 #define __INC_YMIR_GAMELIB__
 
+//#ifndef WORLD_EDITOR
+//#define WORLD_EDITOR
+//#endif
+
 #ifndef _CRT_SECURE_NO_WARNINGS
 	#define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#pragma warning(disable:4710)
+#pragma warning(disable:4710)	// not inlined
 #pragma warning(disable:4786)
-#pragma warning(disable:4244)
+#pragma warning(disable:4244)	// type conversion possible lose of data
 
 #pragma warning(disable:4018)
 #pragma warning(disable:4245)

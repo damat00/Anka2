@@ -42,7 +42,9 @@ extern void SendShout(const char* szText, BYTE bEmpire
 #include <fstream>
 #include <iostream>
 #include <random>
+#include <set>
 #include <vector>
+#include <map>
 
 // Empire map artýk kullanýlmýyor - bot'lar spawn eden oyuncunun yanýna spawn olur
 // const std::unordered_map<int8_t, std::tuple<int32_t, int32_t, int32_t>> empire_map = {
@@ -61,12 +63,19 @@ EVENTINFO(bot_character_event_info)
 	uint32_t savedMountVnum; // Saldýrý öncesi kullanýlan binek VNUM'u
 	bool wasMounted; // Saldýrý öncesi binekli miydi?
 	DWORD m_dwSkillNextTime; // Skill kullanýmý için timer (Buffi mantýðý)
+	size_t m_lastSkillIndex; // Son kullanilan skill indeksi (6 skill rotasyonu icin)
+	std::map<DWORD, DWORD> m_buffSkillCooldownEnd; // Buff skill soguma: skillVnum -> get_dword_time() bitis
+	DWORD m_dwLastVictimTime;  // Son hedef bulma zamani (idle icin)
+	DWORD m_dwIdleUntil;       // Bu zamana kadar bekle (sag-sol yapmasin)
 	
 	bot_character_event_info() :
 		botCharacter(),
 		savedMountVnum(0),
 		wasMounted(false),
-		m_dwSkillNextTime(0)
+		m_dwSkillNextTime(0),
+		m_lastSkillIndex(0),
+		m_dwLastVictimTime(0),
+		m_dwIdleUntil(0)
 	{
 	}
 };
@@ -89,7 +98,9 @@ public:
 		LPCHARACTER pkChr = (LPCHARACTER)ent;
 		if (!pkChr)
 			return;
-		
+		// Kendini hedefleme
+		if (pkChr == m_pkChr)
+			return;
 		// Ölü hedefleri atla
 		if (pkChr->IsDead())
 			return;
@@ -106,13 +117,16 @@ public:
 			isValidTarget = true;
 			targetPriority = 3;
 		}
-		// 2. Düþman imparatorluk oyuncularý (yüksek öncelik) - GM kontrolü kaldýrýldý
+		// 2. Dusman imparatorluk oyunculari (GM haric) (yuksek oncelik)
 		else if (pkChr->IsPC() && !pkChr->IsBotCharacter() && pkChr->GetEmpire() != m_pkChr->GetEmpire())
 		{
-			isValidTarget = true;
-			targetPriority = 2;
+			if (pkChr->GetGMLevel() == GM_PLAYER)
+			{
+				isValidTarget = true;
+				targetPriority = 2;
+			}
 		}
-		// 3. Düþman imparatorluk botlarý (orta öncelik)
+		// 3. Dusman imparatorluk botlari (orta oncelik)
 		else if (pkChr->IsPC() && pkChr->IsBotCharacter() && pkChr->GetEmpire() != m_pkChr->GetEmpire())
 		{
 			isValidTarget = true;
@@ -161,67 +175,45 @@ private:
 	int m_iCurrentPriority = -1; // Hedef öncelik seviyesi
 };
 
-// Sýnýf bazlý skill tanýmlamalarý (Her sýnýfýn 2 yol seçeneði var)
-// dwVnum'lar skill klavuzuna göre DOÐRU hali
-static const std::vector<DWORD> GetClassSkills(BYTE job, BYTE skillGroup)
+// Sinif bazli skill tanimlamalari - Saldiri + buff skillleri (buff'lar soguma doldugunda kullanilir)
+static std::vector<DWORD> GetClassSkills(BYTE job, BYTE skillGroup)
 {
-	// Savaþçý (Warrior) - Body:1, Mental:2
-	if (job == JOB_WARRIOR)
+	if (skillGroup == 1)
 	{
-		if (skillGroup == 1) // Grup 1 - Body (Bedensel): 1-5
-		{
-			// 1-Üç Yönlü, 2-Kýlýç Çevirme, 3-Öfke, 4-Hava Kýlýcý, 5-HamLe
-			return {SKILL_SAMYEON, SKILL_PALBANG, SKILL_JEONGWI, SKILL_GEOMKYUNG, SKILL_TANHWAN};
-		}
-		else // Grup 2 - Mental (Zihinsel): 16-20
-		{
-			// 16-Ruh Vuruþu, 17-Güçlü Vuruþ, 18-Þiddetli Vuruþ, 19-Güçlü Beden, 20-Kýlýç Darbesi
-			return {SKILL_GIGONGCHAM, SKILL_GYOKSAN, SKILL_DAEJINGAK, SKILL_CHUNKEON, SKILL_GEOMPUNG};
-		}
+		if (job == JOB_WARRIOR)      return {SKILL_SAMYEON, SKILL_PALBANG, SKILL_JEONGWI, SKILL_GEOMKYUNG, SKILL_TANHWAN, 6};
+		if (job == JOB_ASSASSIN)     return {SKILL_AMSEOP, SKILL_GUNGSIN, SKILL_CHARYUN, SKILL_EUNHYUNG, SKILL_SANGONG, 36};
+		if (job == JOB_SURA)         return {SKILL_SWAERYUNG, SKILL_YONGKWON, SKILL_GWIGEOM, SKILL_TERROR, SKILL_JUMAGAP, SKILL_PABEOB};
+		if (job == JOB_SHAMAN)       return {SKILL_BIPABU, SKILL_YONGBI, SKILL_PAERYONG, SKILL_HOSIN, SKILL_REFLECT, SKILL_GICHEON};
 	}
-	// Ninja (Assassin) - Dagger:1, Bow:2
-	else if (job == JOB_ASSASSIN)
+	else if (skillGroup == 2)
 	{
-		if (skillGroup == 1) // Grup 1 - Dagger (Hançer): 31-35
-		{
-			// 31-Suikast, 32-Hýzlý Saldýrý, 33-Býçak Çevirme, 34-Kamuflaj, 35-Zehirli Bulut
-			return {SKILL_AMSEOP, SKILL_GUNGSIN, SKILL_CHARYUN, SKILL_EUNHYUNG, SKILL_SANGONG};
-		}
-		else // Grup 2 - Bow (Yay): 46-50
-		{
-			// 46-Tekrarlanan Atýþ, 47-Ok Yaðmuru, 48-Ateþli Ok, 49-Hafif Adým, 50-Zehirli Ok
-			return {SKILL_YEONSA, SKILL_KWANKYEOK, SKILL_HWAJO, SKILL_GYEONGGONG, SKILL_GIGUNG};
-		}
+		if (job == JOB_WARRIOR)      return {SKILL_GIGONGCHAM, SKILL_GYOKSAN, SKILL_DAEJINGAK, SKILL_CHUNKEON, SKILL_GEOMPUNG, 21};
+		if (job == JOB_ASSASSIN)     return {SKILL_YEONSA, SKILL_KWANKYEOK, SKILL_HWAJO, SKILL_GYEONGGONG, SKILL_GIGUNG, 51};
+		if (job == JOB_SURA)         return {SKILL_MARYUNG, SKILL_HWAYEOMPOK, SKILL_MUYEONG, SKILL_MANASHILED, SKILL_TUSOK, SKILL_MAHWAN};
+		if (job == JOB_SHAMAN)       return {SKILL_NOEJEON, SKILL_BYEURAK, SKILL_CHAIN, SKILL_JEONGEOP, SKILL_KWAESOK, SKILL_JEUNGRYEOK};
 	}
-	// Sura - Weaponary:1, Black Magic:2
-	else if (job == JOB_SURA)
+	return {};
+}
+
+// Saldirida kullanilmayan buff/ozel skilller - hedef olmadan kullanilabilir (STANDING_SKILL)
+// skilldesc.txt'e gore: Ofke, Hava Kilici, Guclu Beden, Kamuflaj, Hafif Adim, vs.
+// Botlar bu skillleri hedef yokken de kullanir (soguma sureleri mevcut: ~92sn, ~100sn)
+static std::vector<DWORD> GetClassBuffSkills(BYTE job, BYTE skillGroup)
+{
+	if (skillGroup == 1)
 	{
-		if (skillGroup == 1) // Grup 1 - Weaponary (Büyülü Silah): 61-66
-		{
-			// 61-Parmak Darbesi, 62-Ejderha Dönüþü, 63-Büyülü Keskinlik, 64-Dehþet, 65-Büyülü Zýrh, 66-Büyü Çözme
-			return {SKILL_SWAERYUNG, SKILL_YONGKWON, SKILL_GWIGEOM, SKILL_TERROR, SKILL_JUMAGAP, SKILL_PABEOB};
-		}
-		else // Grup 2 - Black Magic (Kara Büyü): 76-81
-		{
-			// 76-Karanlýk Vuruþ, 77-Ateþ Vuruþ, 78-Ateþ Hayaleti, 79-Karanlýk Koruma, 80-Hayalet Vuruþ, 81-Karanlýk Küre
-			return {SKILL_MARYUNG, SKILL_HWAYEOMPOK, SKILL_MUYEONG, SKILL_MANASHILED, SKILL_TUSOK, SKILL_MAHWAN};
-		}
+		if (job == JOB_WARRIOR)      return {SKILL_JEONGWI, SKILL_GEOMKYUNG};           // Ofke, Hava Kilici
+		if (job == JOB_ASSASSIN)     return {SKILL_EUNHYUNG};                           // Kamuflaj
+		if (job == JOB_SURA)         return {SKILL_GWIGEOM, SKILL_TERROR, SKILL_JUMAGAP}; // Buyulu Keskinlik, Deset, Buyulu Zirh
+		if (job == JOB_SHAMAN)       return {SKILL_HOSIN, SKILL_REFLECT, SKILL_GICHEON};  // Kutsama, Yansitma, Ejderha Yardimi
 	}
-	// Þaman (Shaman) - Dragon:1, Healing:2
-	else if (job == JOB_SHAMAN)
+	else if (skillGroup == 2)
 	{
-		if (skillGroup == 1) // Grup 1 - Dragon Force (Ejderha): 91-96
-		{
-			// 91-Uçan Týlsýn, 92-Ejderha Atýþý, 93-Kutsama, 94-Ejderha Kükremesi, 95-Yansýtma, 96-Ejderha Yardýmý
-			return {SKILL_BIPABU, SKILL_YONGBI, SKILL_PAERYONG, SKILL_HOSIN, SKILL_REFLECT, SKILL_GICHEON};
-		}
-		else // Grup 2 - Healing (Þifacý): 106-111
-		{
-			// 106-Þimþek Atma, 107-Þimþek Çaðýrma, 108-Þimþek Pençesi, 109-Ýyileþtirme, 110-Hýz, 111-Yüksek Saldýrý
-			return {SKILL_NOEJEON, SKILL_BYEURAK, SKILL_CHAIN, SKILL_JEONGEOP, SKILL_KWAESOK, SKILL_JEUNGRYEOK};
-		}
+		if (job == JOB_WARRIOR)      return {SKILL_CHUNKEON};                            // Guclu Beden
+		if (job == JOB_ASSASSIN)     return {SKILL_GYEONGGONG};                          // Hafif Adim
+		if (job == JOB_SURA)         return {SKILL_MUYEONG, SKILL_MANASHILED};          // Ates Hayaleti, Karanlik Koruma
+		if (job == JOB_SHAMAN)       return {SKILL_JEONGEOP, SKILL_KWAESOK, SKILL_JEUNGRYEOK}; // Iyilestirme, Cabukluk, Yuksek Saldiri
 	}
-	
 	return {};
 }
 
@@ -332,6 +324,52 @@ EVENTFUNC(bot_character_event)
 		}
 	}
 
+	// Buff/destek skillleri - SADECE soguma sresi doldugunda kullan (surekli basma)
+	// Korumali alanda buff da kullanma (tutarlilik icin)
+	if (botCharacter->GetSectree() && botCharacter->GetSectree()->IsAttr(botCharacter->GetX(), botCharacter->GetY(), ATTR_BANPK))
+	{
+		// Korumali alanda hicbir saldiri/buff aksiyonu yapma
+	}
+	else
+	{
+		// Ofke, Hava Kilici, Kamuflaj, Kutsama vb. - skill kapandiginda tekrar bas
+		BYTE job = botCharacter->GetJob();
+		BYTE skillGroup = botCharacter->GetSkillGroup();
+		if (skillGroup == 0) skillGroup = 1;
+		auto buffSkills = GetClassBuffSkills(job, skillGroup);
+		const DWORD now = get_dword_time();
+		
+		for (DWORD skillVnum : buffSkills)
+		{
+			if (botCharacter->GetSkillLevel(skillVnum) == 0)
+				continue;
+			if (botCharacter->GetSP() < 30)
+				break;
+			
+			auto it = info->m_buffSkillCooldownEnd.find(skillVnum);
+			if (it != info->m_buffSkillCooldownEnd.end() && now < it->second)
+				continue;
+			
+			CSkillProto* pkSk = CSkillManager::instance().Get(skillVnum);
+			if (!pkSk)
+				continue;
+			
+			float k = 1.0f * botCharacter->GetSkillPower(skillVnum) * pkSk->bMaxLevel / 100;
+			pkSk->kCooldownPoly.SetVar("k", k);
+			int iCooltimeSec = (int) pkSk->kCooldownPoly.Eval();
+			if (iCooltimeSec <= 0)
+				iCooltimeSec = 90;
+			
+			bool useOk = botCharacter->UseSkill(skillVnum, botCharacter, false);
+			if (useOk)
+			{
+				info->m_buffSkillCooldownEnd[skillVnum] = now + (iCooltimeSec * 1000);
+				sys_log(0, "Bot %s: Buff skill (soguma doldu) - Skill:%u, Soguma:%dsn", 
+				        botCharacter->GetName(), skillVnum, iCooltimeSec);
+				return PASSES_PER_SEC(0.5f);
+			}
+		}
+	}
 
 	FuncFindVictim f(botCharacter, 1000);		//metin alan hesaplama
 	if (botCharacter->GetSectree())
@@ -340,8 +378,48 @@ EVENTFUNC(bot_character_event)
 	}
 
 	auto victim = f.GetVictim();
+	// Sectree dusman bot bulamadiysa, BotCharacterManager uzerinden dene (bot vs bot icin)
+	if (!victim)
+	{
+		victim = CBotCharacterManager::instance().FindNearestEnemyBot(botCharacter, 1000);
+	}
+	// Korumali alan (ATTR_BANPK) - bot burada ise saldiri/skill kullanma
+	if (victim && botCharacter->GetSectree() && botCharacter->GetSectree()->IsAttr(botCharacter->GetX(), botCharacter->GetY(), ATTR_BANPK))
+		victim = nullptr;
 	if (victim)
 	{
+		info->m_dwLastVictimTime = get_dword_time();  // Hedef var, idle sayacini sifirla
+		// Bot SP her zaman full - skill kullanimi icin (botlar icin ST kullanilmiyor)
+		if (botCharacter->GetSP() < botCharacter->GetMaxSP())
+			botCharacter->PointChange(POINT_SP, botCharacter->GetMaxSP() - botCharacter->GetSP());
+
+		// Okcu ninjalar icin ok kontrolu - yoksa veya azsa Gumus Ok ekle (sinirsiz)
+		if (botCharacter->GetJob() == JOB_ASSASSIN)
+		{
+			LPITEM weapon = botCharacter->GetWear(WEAR_WEAPON);
+			if (weapon && weapon->GetSubType() == WEAPON_BOW)
+			{
+				LPITEM arrow = botCharacter->GetWear(WEAR_ARROW);
+				if (!arrow || arrow->GetCount() < 100)
+				{
+					if (arrow)
+						arrow->SetCount(99999);
+					else
+					{
+						LPITEM newArrow = ITEM_MANAGER::instance().CreateItem(8005, 99999);
+						if (newArrow)
+						{
+							int pos = botCharacter->GetEmptyInventory(newArrow->GetSize());
+							if (pos >= 0 && newArrow->AddToCharacter(botCharacter, TItemPos(INVENTORY, pos)))
+								botCharacter->EquipItem(newArrow);
+							else
+								M2_DESTROY_ITEM(newArrow);
+						}
+					}
+				}
+			}
+		}
+		
 		// Hedef mesafesi hesapla
 		int distance = DISTANCE_APPROX(botCharacter->GetX() - victim->GetX(), 
 		                                botCharacter->GetY() - victim->GetY());
@@ -424,20 +502,26 @@ EVENTFUNC(bot_character_event)
 		// Hedefe yaklaþmak için hareket et
 		if (distance > attackRange)
 		{
-			// Hedefe doðru hareket et
-		if (SECTREE_MANAGER::instance().IsMovablePosition(victim->GetMapIndex(), victim->GetX(), victim->GetY()))
-		{
-				float dx = victim->GetX() - botCharacter->GetX();
-				float dy = victim->GetY() - botCharacter->GetY();
+			long destX = victim->GetX(), destY = victim->GetY();
+			// Bot VID ile benzersiz offset: hedef etrafinda 8 yon (gercek oyuncu gibi carpisma)
+			static const int offsetX[] = {50, 35, 0, -35, -50, -35, 0, 35};
+			static const int offsetY[] = {0, 35, 50, 35, 0, -35, -50, -35};
+			int idx = (botCharacter->GetVID() * 7) % 8;
+			destX += offsetX[idx];
+			destY += offsetY[idx];
+			
+			if (SECTREE_MANAGER::instance().IsMovablePosition(victim->GetMapIndex(), destX, destY))
+			{
+				float dx = (float)(destX - botCharacter->GetX());
+				float dy = (float)(destY - botCharacter->GetY());
 				botCharacter->SetRotation(GetDegreeFromPosition(dx, dy));
 				
-				if (botCharacter->Goto(victim->GetX(), victim->GetY()))
+				if (botCharacter->Goto(destX, destY))
 				{
-					// Goto() zaten hareket paketlerini gönderir
 					botCharacter->SendMovePacket(FUNC_WAIT, 0, 0, 0, 0);
 				}
 				
-				return PASSES_PER_SEC(0.3f); // Hedefe yaklaþýrken dengeli bekleme
+				return PASSES_PER_SEC(0.08f); // Hedefe yaklarken dengeli bekleme
 			}
 		}
 
@@ -458,94 +542,78 @@ EVENTFUNC(bot_character_event)
 			
 			if (canUseSkill)
 			{
-				// Timer'ý güncelle (her skill kullanýmýndan sonra 3 saniye bekle)
-				info->m_dwSkillNextTime = now + 3000;
+				// Skill arasi bekleme k?salt?ld? (mant?kl? s?ra için daha s?k deneme)
+				info->m_dwSkillNextTime = now + 1500;
 				
-				// Bot'un sýnýfýna göre skill listesi al
-				BYTE skillGroup = number(1, 2);
-				auto skills = GetClassSkills(job, skillGroup);
+				std::vector<DWORD> skills = GetClassSkills(job, botCharacter->GetSkillGroup());
+				auto buffSkills = GetClassBuffSkills(job, botCharacter->GetSkillGroup());
+				std::set<DWORD> buffSkillSet(buffSkills.begin(), buffSkills.end());
 				
-				sys_log(0, "Bot %s: [SKILL CHECK] Job=%d, SkillGroup=%d, Skills count=%zu", 
-				        botCharacter->GetName(), job, skillGroup, skills.size());
+				// Önce sald?r? skilleri, ard?ndan buff skilleri (mant?ken s?rayla)
+				std::vector<DWORD> reordered;
+				for (DWORD sv : skills)
+				{
+					if (buffSkillSet.find(sv) == buffSkillSet.end())
+						reordered.push_back(sv);
+				}
+				for (DWORD sv : skills)
+				{
+					if (buffSkillSet.find(sv) != buffSkillSet.end())
+						reordered.push_back(sv);
+				}
 				
-				// SP kontrolü
 				int currentSP = botCharacter->GetSP();
 				int maxSP = botCharacter->GetMaxSP();
 				
 				if (currentSP < 30)
 				{
-					sys_log(0, "Bot %s: [SKILL SKIP] SP yetersiz (%d < 30), normal saldýrýya geç", 
+					sys_log(0, "Bot %s: [SKILL SKIP] SP yetersiz (%d < 30), normal saldiriya gec", 
 					        botCharacter->GetName(), currentSP);
 				}
-				else if (skills.empty())
+				else if (reordered.empty())
 				{
 					sys_log(0, "Bot %s: [SKILL SKIP] Skill listesi boþ!", 
 					        botCharacter->GetName());
 				}
 				else
 				{
-					
-					// DitoSystem mantýðý: Skill listesini sýrayla kontrol et, uygun olan ilk skill'i kullan
-					for (DWORD skillVnum : skills)
+					const size_t skillCount = reordered.size();
+					for (size_t i = 0; i < skillCount; ++i)
 					{
-						BYTE skillLevel = botCharacter->GetSkillLevel(skillVnum);
+						size_t idx = (info->m_lastSkillIndex + 1 + i) % skillCount;
+						DWORD skillVnum = reordered[idx];
 						
-						sys_log(0, "Bot %s: [SKILL ITER] Skill %d, Level %d", 
-						        botCharacter->GetName(), skillVnum, skillLevel);
+						if (botCharacter->GetSkillLevel(skillVnum) == 0)
+							botCharacter->SetSkillLevel(skillVnum, SKILL_MAX_LEVEL);
 						
-						// Skill seviyesi kontrolü (DitoSystem gibi)
-						if (skillLevel == 0)
+						bool isBuffSkill = (buffSkillSet.find(skillVnum) != buffSkillSet.end());
+						if (isBuffSkill)
 						{
-							sys_log(0, "Bot %s: [SKILL SKIP] Skill %d seviyesi 0, atlanýyor", 
-							        botCharacter->GetName(), skillVnum);
-							continue;
+							auto it = info->m_buffSkillCooldownEnd.find(skillVnum);
+							if (it != info->m_buffSkillCooldownEnd.end() && now < it->second)
+								continue;
 						}
 						
-						// SP kontrolü - Bot karakterler için yeterli SP olduðundan emin ol
-						// DitoSystem'de SP bypass ediliyor, biz de bot için yeterli SP veriyoruz
-						int currentSP = botCharacter->GetSP();
-						int maxSP = botCharacter->GetMaxSP();
+						LPCHARACTER skillTarget = isBuffSkill ? botCharacter : victim;
+						bool useOk = botCharacter->UseSkill(skillVnum, skillTarget, false);
 						
-						// SP yetersizse doldur (Dito gibi SP sorunu olmamalý)
-						if (currentSP < maxSP * 10 / 100)
+						if (useOk)
 						{
-							botCharacter->PointChange(POINT_SP, maxSP - currentSP);
-							sys_log(0, "Bot %s: [SKILL SP] SP düþük, dolduruluyor (%d -> %d)", 
-								botCharacter->GetName(), currentSP, maxSP);
-						}
-						
-						// Skill kullan - DitoSystem mantýðý: ComputeSkill(skillIdx, target, skillLevel)
-						sys_log(0, "Bot %s: [SKILL USE] Skill kullanýlýyor! Target:%s, Skill:%d, Level:%d, SP:%d/%d", 
-							botCharacter->GetName(), victim->GetName(), skillVnum, skillLevel, 
-							botCharacter->GetSP(), botCharacter->GetMaxSP());
-						
-						// ComputeSkill çaðrýsý - DitoSystem'deki gibi (result kontrolü ile)
-						int result = botCharacter->ComputeSkill(skillVnum, victim, skillLevel);
-						
-						// Skill kullaným sonucunu kontrol et
-						sys_log(0, "Bot %s: [SKILL RESULT] ComputeSkill sonucu: %d", 
-						        botCharacter->GetName(), result);
-						
-						if (result != BATTLE_NONE)
-						{
-							// Skill baþarýyla kullanýldý
-							bool isPvPTarget = victim->IsPC();
-							bool isBoss = (victim->IsMonster() && victim->GetMobRank() >= MOB_RANK_BOSS);
-							sys_log(0, "Bot %s (%s) %s %s karakterine skill ile saldýrdý! (Skill: %d, Level: %d, Result: %d)", 
-								botCharacter->GetName(), 
-								empireArray[botCharacter->GetEmpire() - 1].c_str(),
-								isPvPTarget ? "düþman" : (isBoss ? "boss" : "yaratýk"),
-								victim->GetName(),
-								skillVnum, skillLevel, result);
-							
-							// Skill kullandýktan sonra döngüden çýk (DitoSystem mantýðý)
-							return PASSES_PER_SEC(1.0f);
-						}
-						else
-						{
-							// Skill kullanýlamadý, bir sonraki skill'i dene
-							sys_log(0, "Bot %s: [SKILL FAIL] Skill %d kullanýlamadý (Result: BATTLE_NONE), bir sonraki skill deneniyor", 
-								botCharacter->GetName(), skillVnum);
+							info->m_lastSkillIndex = idx;
+							if (isBuffSkill)
+							{
+								CSkillProto* pkSk = CSkillManager::instance().Get(skillVnum);
+								int iCooltimeSec = 90;
+								if (pkSk)
+								{
+									float k = 1.0f * botCharacter->GetSkillPower(skillVnum) * pkSk->bMaxLevel / 100;
+									pkSk->kCooldownPoly.SetVar("k", k);
+									iCooltimeSec = (int)pkSk->kCooldownPoly.Eval();
+								}
+								if (iCooltimeSec <= 0) iCooltimeSec = 90;
+								info->m_buffSkillCooldownEnd[skillVnum] = now + (iCooltimeSec * 1000);
+							}
+							return PASSES_PER_SEC(0.5f);
 						}
 					}
 				}
@@ -566,14 +634,16 @@ EVENTFUNC(bot_character_event)
 				}
 				else
 				{
-					// Quest flag yoksa, job'a göre silah seç
+					// Quest flag yoksa, job ve skill grubuna gore silah sec
 					BYTE job = botCharacter->GetJob();
+					BYTE skillGroup = botCharacter->GetSkillGroup();
+					if (skillGroup == 0) skillGroup = 1;
 					uint32_t weaponVnum = 0;
 					
 					if (job == JOB_WARRIOR)
 						weaponVnum = number(0, 1) == 0 ? 19 : 3009;
 					else if (job == JOB_ASSASSIN)
-						weaponVnum = number(0, 1) == 0 ? 1009 : 2009;
+						weaponVnum = (skillGroup == 2) ? 2009 : 1009;
 					else if (job == JOB_SURA)
 						weaponVnum = 49;
 					else if (job == JOB_SHAMAN)
@@ -585,6 +655,28 @@ EVENTFUNC(bot_character_event)
 						CBotCharacterManager::instance().SetBotWeaponVnum(botCharacter->GetName(), weaponVnum);
 						sys_log(0, "Bot %s: Silah kaybolmuþ, job'a göre yeniden set edildi (Weapon: %d, Job: %d)", 
 							botCharacter->GetName(), weaponVnum, job);
+						// Yay restore edildiyse Gumus Ok ekle
+						if (job == JOB_ASSASSIN && skillGroup == 2)
+						{
+							LPITEM arrow = botCharacter->GetWear(WEAR_ARROW);
+							if (!arrow || arrow->GetCount() < 100)
+							{
+								if (arrow)
+									arrow->SetCount(99999);
+								else
+								{
+									LPITEM newArrow = ITEM_MANAGER::instance().CreateItem(8005, 99999);
+									if (newArrow)
+									{
+										int apos = botCharacter->GetEmptyInventory(newArrow->GetSize());
+										if (apos >= 0 && newArrow->AddToCharacter(botCharacter, TItemPos(INVENTORY, apos)))
+											botCharacter->EquipItem(newArrow);
+										else
+											M2_DESTROY_ITEM(newArrow);
+									}
+								}
+							}
+						}
 					}
 				}
 			}
@@ -655,33 +747,49 @@ EVENTFUNC(bot_character_event)
 				botCharacter->SetValidComboInterval(interval);
 				botCharacter->SetLastComboTime(dwTime);
 				
-				// Kombo motion gönder - SendMovePacket zaten client'a animasyon paketini gönderir
+				// Kombo motion gönder - SendMovePacket zaten client'a animasyon paketini gnderir
 				botCharacter->SendMovePacket(FUNC_COMBO, MOTION_COMBO_ATTACK_1 + comboIndex, 
 				                           botCharacter->GetX(), botCharacter->GetY(), 0, dwTime);
 				
-				// Saldýrý animasyonu için dengeli bekleme süresi
-				return PASSES_PER_SEC(0.8f); // Dengeli kombo saldýrý hýzý
+				// Saldýrý animasyonu için dengeli bekleme süresi
+				return PASSES_PER_SEC(0.25f); // Hizli kombo saldýrý hýzý
 			}
 		}
 	}
 	else
 	{
-		if (botCharacter->IsHorseRiding() && !victim && std::rand() % 5 == 0)
+		if (botCharacter->IsHorseRiding() && std::rand() % 5 == 0)
 			botCharacter->StopRiding();
 
-		if (number(0, 2) == 1)
+		const DWORD now = get_dword_time();
+		// Idle: hedef yokken belirli sure dur (sag-sol yapmasin)
+		if (info->m_dwLastVictimTime == 0)
+			info->m_dwLastVictimTime = now;
+		if (now < info->m_dwIdleUntil)
 		{
-			int iDist[4] = { 500, 1000, 3000, 5000 };
+			// Idle suresi dolana kadar bekle
+			return PASSES_PER_SEC(2.0f);
+		}
+		if (now - info->m_dwLastVictimTime > 5000 && info->m_dwIdleUntil == 0)
+		{
+			// 5 sn hedef yok, 4 sn idle (bir yerde dur)
+			info->m_dwIdleUntil = now + 4000;
+			return PASSES_PER_SEC(2.0f);
+		}
+		if (info->m_dwIdleUntil > 0 && now > info->m_dwIdleUntil)
+			info->m_dwIdleUntil = 0;  // Idle bitti, sifirla
 
+		// Nadiren hareket (1/10 - aptal gibi sag sol yapmasin), guvenli bolge/NPC yonune
+		if (number(0, 9) == 0)
+		{
+			int iDist[4] = { 200, 400, 600, 800 };
 			for (int iDistIdx = 2; iDistIdx >= 0; --iDistIdx)
 			{
-				for (int iTryCount = 0; iTryCount < 8; ++iTryCount)
+				for (int iTryCount = 0; iTryCount < 6; ++iTryCount)
 				{
 					botCharacter->SetRotation(number(0, 359));
-
 					float fx, fy;
 					float fDist = number(iDist[iDistIdx], iDist[iDistIdx + 1]);
-
 					GetDeltaByDegree(botCharacter->GetRotation(), fDist, &fx, &fy);
 
 					bool isBlock = false;
@@ -693,15 +801,14 @@ EVENTFUNC(bot_character_event)
 							break;
 						}
 					}
-
 					if (isBlock)
 						continue;
 
 					int iDestX = botCharacter->GetX() + (int)fx;
 					int iDestY = botCharacter->GetY() + (int)fy;
-
 					if (botCharacter->Goto(iDestX, iDestY))
 						botCharacter->SendMovePacket(FUNC_WAIT, 0, 0, 0, 0);
+					break;
 				}
 			}
 		}
@@ -1115,10 +1222,10 @@ void CBotCharacterManager::Initialize()
 
 	// Bot isimlerini yükle
 	InitializeBotNames();
-	
+
 	// Chat mesajlarýný yükle
 	InitializeChatMessages();
-	
+
 	// JSON'dan item template'lerini yükle
 	const std::string filename = LocaleService_GetBasePath() + "/bot_player/bot_player.json";
 	std::ifstream ifs(filename);
@@ -1367,8 +1474,12 @@ void CBotCharacterManager::BotSpawn(LPCHARACTER ch, int32_t spawn_count, int8_t 
 			case JOB_SHAMAN: jobName = "Þaman"; break;
 		}
 		
-		sys_log(0, "Bot %s: Otomatik oluþturuldu - Job: %d (%s), Seviye: %d", 
-			botName.c_str(), randomJob, jobName, bot_level);
+		// Otomatik skill grubu: 1. bot=Grup1, 2. bot=Grup2, 3. bot=Grup1, ...
+		uint32_t sameJobCount = CBotCharacterManager::instance().GetBotCountByJob(randomJob);
+		BYTE skillGroup = (sameJobCount % 2) + 1;
+		
+		sys_log(0, "Bot %s: Otomatik oluþturuldu - Job: %d (%s), SkillGroup: %d, Seviye: %d", 
+			botName.c_str(), randomJob, jobName, skillGroup, bot_level);
 		
 		// Job'u cinsiyet bazlý race'e çevir (FakePlayerManager gibi)
 		BYTE byRace = randomJob;
@@ -1396,8 +1507,16 @@ void CBotCharacterManager::BotSpawn(LPCHARACTER ch, int32_t spawn_count, int8_t 
 		sys_log(0, "Bot %s: Race ayarlandý - Job: %d, Race: %d, Sex: %s", 
 			botName.c_str(), randomJob, byRace, bySex == SEX_MALE ? "Erkek" : "Kadýn");
 		
-		// Empire atamasý - Rastgele veya sabit
-		int8_t botEmpire = useRandomEmpire ? number(1, 3) : baseEmpireId;
+		// Empire atamasý - Rastgele modda 1-2-3 rotasyonu (bot vs bot icin karisik imparatorluk garantisi)
+		int8_t botEmpire;
+		if (useRandomEmpire)
+		{
+			botEmpire = (spawnedCount % 3) + 1;  // 1, 2, 3, 1, 2, 3...
+		}
+		else
+		{
+			botEmpire = baseEmpireId;
+		}
 		botCharacter->SetEmpire(botEmpire);
 		
 		sys_log(0, "Bot %s: Empire atandý - %s (Mode: %s)", 
@@ -1405,8 +1524,9 @@ void CBotCharacterManager::BotSpawn(LPCHARACTER ch, int32_t spawn_count, int8_t 
 			empireArray[botEmpire - 1].c_str(),
 			useRandomEmpire ? "Rastgele" : "Sabit");
 		botCharacter->UpdateAlignment(alignment * 10);
-		botCharacter->SetPoint(POINT_MOV_SPEED, 250);  // Hareket hýzý 250
-		botCharacter->SetPoint(POINT_ATT_SPEED, 200);
+		botCharacter->SetPoint(POINT_MOV_SPEED, 200);   // Hareket hizi 250
+		botCharacter->SetPoint(POINT_ATT_SPEED, 180);   // Saldiri hizi 250
+		botCharacter->SetPoint(POINT_CASTING_SPEED, 150); // Buyu hizi cok yuksek
 
 		// Base stats
 		botCharacter->SetRealPoint(POINT_ST, 200);
@@ -1471,10 +1591,11 @@ void CBotCharacterManager::BotSpawn(LPCHARACTER ch, int32_t spawn_count, int8_t 
 		botCharacter->SetPoint(POINT_RESIST_CRITICAL, 100);   // Kritik savunmasý
 		botCharacter->SetPoint(POINT_RESIST_PENETRATE, 100);  // Delici vuruþ savunmasý
 		
-		// Yohara/Þampiyon sistemi kullanýlmýyor
+		// Yohara/Þampiyon sistemi kullanlmyor
 		
 		botCharacter->ComputePoints();
-		
+		botCharacter->SetPoint(POINT_MOV_SPEED, 200);
+		botCharacter->SetPoint(POINT_ATT_SPEED, 180);
 		// ComputePoints() sonrasýnda HP ve savunma deðerlerini tekrar ayarla (bot oyuncular için sabit deðerler)
 		const int botFixedHP = 30000;
 		botCharacter->SetMaxHP(botFixedHP);
@@ -1507,7 +1628,7 @@ void CBotCharacterManager::BotSpawn(LPCHARACTER ch, int32_t spawn_count, int8_t 
 		long showY = ch->GetY() + number(-500, 500);
 		int32_t playerMapIndex = ch->GetMapIndex();
 
-		ch->ChatPacket(CHAT_TYPE_INFO, "Bot spawning at x:%ld y:%ld (Map: %d)", showX, showY, playerMapIndex);
+		ch->ChatPacket(CHAT_TYPE_INFO, "Bot oluþturuluyor: X:%ld Y:%ld (Harita: %d)", showX, showY, playerMapIndex);
 
 		if (!botCharacter->Show(playerMapIndex, showX, showY, 0))
 		{
@@ -1577,12 +1698,12 @@ void CBotCharacterManager::BotSpawn(LPCHARACTER ch, int32_t spawn_count, int8_t 
 				}
 				break;
 				
-			case JOB_ASSASSIN: // Ninja
+			case JOB_ASSASSIN: // Ninja - Skill grubuna gore silah (Grup1=Hancer, Grup2=Yay)
 				{
+					bool useBow = (skillGroup == 2);
 					if (itemTier == 2)
 					{
-						// Yüksek seviye - Býçak veya Yay
-						bool useBow = (number(0, 1) == 1);
+						// Yüksek seviye - Skill grubuna gore Býçak veya Yay
 						if (useBow)
 						{
 							uint32_t highBows[] = {2169, 2179, 2209, 2225, 2245, 2379, 2509};
@@ -1596,11 +1717,11 @@ void CBotCharacterManager::BotSpawn(LPCHARACTER ch, int32_t spawn_count, int8_t 
 					}
 					else if (itemTier == 1)
 					{
-						weaponVnum = number(0, 1) == 0 ? 1009 : 2009;
+						weaponVnum = useBow ? 2009 : 1009;
 					}
 					else
 					{
-						weaponVnum = number(0, 1) == 0 ? 1000 : 2000;
+						weaponVnum = useBow ? 2000 : 1000;
 					}
 					
 					// Ninja zýrhlarý
@@ -1721,6 +1842,22 @@ void CBotCharacterManager::BotSpawn(LPCHARACTER ch, int32_t spawn_count, int8_t 
 					{
 						// Silah VNUM'unu hafif cache'e yaz (garanti amaçlý)
 						CBotCharacterManager::instance().SetBotWeaponVnum(botCharacter->GetName(), weaponVnum);
+						// Yay kullanan Assassin botlara Gumus Ok ekle (skill 46-50 icin zorunlu, sinirsiz)
+						if (randomJob == JOB_ASSASSIN && w->GetSubType() == WEAPON_BOW)
+						{
+							const uint32_t arrowVnum = 8005; // Gumus Ok (en iyi ok)
+							if (LPITEM arrow = ITEM_MANAGER::instance().CreateItem(arrowVnum, 99999))
+							{
+								int apos = botCharacter->GetEmptyInventory(arrow->GetSize());
+								if (apos >= 0 && arrow->AddToCharacter(botCharacter, TItemPos(INVENTORY, apos)))
+								{
+									if (botCharacter->EquipItem(arrow))
+										sys_log(0, "Bot %s: Yay icin Gumus Ok eklendi (VNUM: %u, sinirsiz)", botCharacter->GetName(), arrowVnum);
+								}
+								else
+									M2_DESTROY_ITEM(arrow);
+							}
+						}
 					}
 				}
 			}
@@ -1771,7 +1908,7 @@ void CBotCharacterManager::BotSpawn(LPCHARACTER ch, int32_t spawn_count, int8_t 
 		
 		// Bot karakterlerin ku?ak envanteri sistemi - Potion ve e?ya kullan?m?
 		{
-			// Bot seviyesine göre potion ve e?ya ekleme
+			// Bot seviyesine göre potion ve eþya ekleme
 			int botLevel = botCharacter->GetLevel();
 			
 			// Gerçek HP Potion kodlar? - Bot seviyesine göre
@@ -1813,7 +1950,7 @@ void CBotCharacterManager::BotSpawn(LPCHARACTER ch, int32_t spawn_count, int8_t 
 				}
 			}
 			
-			// Ek e?yalar - Bot seviyesine göre
+			// Ek eþyalar - Bot seviyesine göre
 			if (botLevel >= 60)
 			{
 				// Yüksek seviye botlar için ek e?yalar
@@ -1830,9 +1967,16 @@ void CBotCharacterManager::BotSpawn(LPCHARACTER ch, int32_t spawn_count, int8_t 
 				}
 			}
 			
-			sys_log(0, "Bot %s: Seviye %d için Gerçek Ku?ak envanteri dolduruldu (HP: %d, SP: %d)", 
+			sys_log(0, "Bot %s: Seviye %d için Gerçek Kuþak envanteri dolduruldu (HP: %d, SP: %d)", 
 				botCharacter->GetName(), botLevel, hpPotionVnum, spPotionVnum);
 		}
+		
+		// Skill ve item attribute atamalari (bot skill kullanimi icin zorunlu)
+		// Bot karakterler DB'den yuklenmedigi icin m_pSkillLevels NULL kalir - once allocate et
+		botCharacter->EnsureSkillLevels();
+		botCharacter->SetSkillGroup(skillGroup);
+		botCharacter->DisableCooltime();
+		EquipItemAttributes(botCharacter);
 		
 		// Görünümü güncelle
 		sys_log(0, "Bot %s: UpdatePacket() çaðrýlýyor...", botCharacter->GetName());
@@ -1895,6 +2039,37 @@ void CBotCharacterManager::BotSpawnJinno(LPCHARACTER ch, int32_t spawn_count)
 	BotSpawn(ch, spawn_count, 3); // Jinno (Mavi)
 }
 
+LPCHARACTER CBotCharacterManager::FindNearestEnemyBot(LPCHARACTER botChr, int maxDistance) const
+{
+	if (!botChr || !botChr->IsBotCharacter())
+		return nullptr;
+	const int8_t myEmpire = botChr->GetEmpire();
+	const int32_t myMap = botChr->GetMapIndex();
+	const long myX = botChr->GetX();
+	const long myY = botChr->GetY();
+	LPCHARACTER nearest = nullptr;
+	int minDist = maxDistance + 1;
+	for (const auto& [_, pBot] : m_botCharacters)
+	{
+		if (!pBot)
+			continue;
+		LPCHARACTER other = pBot->GetBotCharacter();
+		if (!other || other == botChr || other->IsDead())
+			continue;
+		if (other->GetMapIndex() != myMap)
+			continue;
+		if (other->GetEmpire() == myEmpire)
+			continue;
+		int d = DISTANCE_APPROX(myX - other->GetX(), myY - other->GetY());
+		if (d <= maxDistance && d < minDist)
+		{
+			minDist = d;
+			nearest = other;
+		}
+	}
+	return nearest;
+}
+
 void CBotCharacterManager::BotFullRemove()
 {
 	for (auto& [_, botCharacter] : m_botCharacters)
@@ -1953,6 +2128,17 @@ bool CBotCharacterManager::IsBotCharacter(const char* c_szName) const
 	return m_botCharacters.find(c_szName) != m_botCharacters.end();
 }
 
+uint32_t CBotCharacterManager::GetBotCountByJob(BYTE job) const
+{
+	uint32_t count = 0;
+	for (const auto& kv : m_botCharacters)
+	{
+		LPCHARACTER pkChr = kv.second ? kv.second->GetBotCharacter() : nullptr;
+		if (pkChr && pkChr->GetJob() == job)
+			++count;
+	}
+	return count;
+}
 
 void CBotCharacterManager::ForwardPMToGMs(LPCHARACTER sender, const char* botName, const char* message)
 {
@@ -2335,21 +2521,17 @@ void CBotCharacterManager::EquipItemAttributes(LPCHARACTER ch)
 	ch->SetSkillLevel(SKILL_LANGUAGE2, 20);
 	ch->SetSkillLevel(SKILL_LANGUAGE3, 20);
 	
-	// Sýnýf bazlý skill'leri ver - her iki grup'tan da skill ver
-	// (Combat'ta rastgele seçilecek)
-	for (BYTE group = 1; group <= 2; group++)
+	// Sinif bazli skill grubuna gore 6 skill ver - Perfect Master seviyesi (SKILL_MAX_LEVEL)
+	BYTE skillGroup = ch->GetSkillGroup();
+	if (skillGroup == 0) skillGroup = 1;
+	auto skills = GetClassSkills(job, skillGroup);
+	for (DWORD skillVnum : skills)
 	{
-		auto skills = GetClassSkills(job, group);
-		for (DWORD skillVnum : skills)
-		{
-			// Her skill'i rastgele 30-40 arasý level yap
-			BYTE skillLevel = number(30, 40);
-			ch->SetSkillLevel(skillVnum, skillLevel);
-		}
+		ch->SetSkillLevel(skillVnum, SKILL_MAX_LEVEL);
 	}
 	
-	sys_log(0, "Bot %s: Job=%d, Skills assigned from both groups", 
-	        ch->GetName(), job);
+	sys_log(0, "Bot %s: Job=%d, SkillGroup=%d, %zu skill atandi", 
+	        ch->GetName(), job, skillGroup, skills.size());
 
 	// DitoSystem mantýðý: SkillLevelPacket çaðýr (skill'lerin client'a gönderilmesi için)
 	ch->SkillLevelPacket();
@@ -2358,7 +2540,8 @@ void CBotCharacterManager::EquipItemAttributes(LPCHARACTER ch)
 	ch->PointChange(POINT_SP, ch->GetMaxSP() - ch->GetSP());
 
 	ch->ComputePoints();
-	
+	ch->SetPoint(POINT_MOV_SPEED, 200);
+	ch->SetPoint(POINT_ATT_SPEED, 180);
 	// ComputePoints() sonrasýnda HP ve savunma deðerlerini tekrar ayarla (bot oyuncular için sabit deðerler)
 	const int botFixedHP = 30000;
 	ch->SetMaxHP(botFixedHP);

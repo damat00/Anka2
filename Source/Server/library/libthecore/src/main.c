@@ -20,7 +20,7 @@ static int pid_init(void)
 	{
 		fprintf(fp, "%d", getpid());
 		fclose(fp);
-		sys_err("\nStart of pid: %d\n", getpid());
+		sys_log(0, "SYSTEM: Start of pid: %d", getpid());
 	}
 	else
 	{
@@ -38,7 +38,7 @@ static void pid_deinit(void)
 	return;
 #else
 	remove("./pid");
-	sys_err("\nEnd of pid\n");
+	sys_log(0, "SYSTEM: End of pid");
 #endif
 }
 

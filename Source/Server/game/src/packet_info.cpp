@@ -163,10 +163,13 @@ CPacketInfoCG::CPacketInfoCG()
 	Set(HEADER_CG_EMPIRE,							sizeof(TPacketCGEmpire),					"Empire");
 	Set(HEADER_CG_SAFEBOX_CHECKOUT,					sizeof(TPacketCGSafeboxCheckout),			"SafeboxCheckout");
 	Set(HEADER_CG_SAFEBOX_CHECKIN,					sizeof(TPacketCGSafeboxCheckin),			"SafeboxCheckin");
-
+#ifdef ENABLE_FISH_EVENT
+	Set(HEADER_CG_FISH_EVENT_SEND, 					sizeof(TPacketCGFishEvent), 				"FishEvent");
+#endif
 	Set(HEADER_CG_SAFEBOX_ITEM_MOVE,				sizeof(TPacketCGItemMove),					"SafeboxItemMove");
 
 	Set(HEADER_CG_GUILD,							sizeof(TPacketCGGuild),						"Guild");
+	Set(HEADER_CG_ANSWER_MAKE_GUILD, 				sizeof(TPacketCGAnswerMakeGuild), 			"AnswerMakeGuild");
 
 	Set(HEADER_CG_FISHING,							sizeof(TPacketCGFishing),					"Fishing");
 	Set(HEADER_CG_ITEM_GIVE,						sizeof(TPacketCGGiveItem),					"ItemGive");
@@ -212,26 +215,12 @@ CPacketInfoCG::CPacketInfoCG()
 	Set(HEADER_CG_ACCE,								sizeof(TPacketAcce),						"Acce");
 #endif
 
-#ifdef ENABLE_BIOLOG_SYSTEM
-	Set(HEADER_CG_BIOLOG_MANAGER,					sizeof(TPacketCGBiologManagerAction),		"BiologManager");
-#endif
-
 #ifdef ENABLE_MOB_DROP_INFO
 	Set(HEADER_CG_TARGET_INFO_LOAD,					sizeof(TPacketCGTargetInfoLoad),			"TargetInfoLoad");
 #endif
 
 #ifdef ENABLE_VIEW_CHEST_DROP
 	Set(HEADER_CG_CHEST_DROP_INFO,					sizeof(TPacketCGChestDropInfo),				"ChestDropInfo");
-#endif
-
-#ifdef ENABLE_EVENT_MANAGER
-	Set(HEADER_CG_REQUEST_EVENT_QUEST,				sizeof(TPacketCGRequestEventQuest),			"RequestEventQuest");
-	Set(HEADER_CG_REQUEST_EVENT_DATA,				sizeof(TPacketCGRequestEventData),			"EventRequest");
-#endif
-
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-	Set(HEADER_CG_EXT_BATTLE_PASS_ACTION,			sizeof(TPacketCGExtBattlePassAction),		"ReciveExtBattlePassActions");
-	Set(HEADER_CG_EXT_SEND_BP_PREMIUM_ITEM,			sizeof(TPacketCGExtBattlePassSendPremiumItem), "ReciveExtBattlePassPremiumItem");
 #endif
 
 #ifdef ENABLE_SKILL_COLOR_SYSTEM
@@ -289,6 +278,26 @@ CPacketInfoCG::CPacketInfoCG()
 #ifdef ENABLE_STYLE_ATTRIBUTE_SYSTEM
 	Set(HEADER_CG_ITEM_USE_NEW_ATTRIBUTE, 			sizeof(TPacketCGItemNewAttribute), 			"UseItemNewAttributes");
 #endif
+
+#ifdef ENABLE_DUNGEON_INFO
+	Set(HEADER_CG_DUNGEON_INFO_SYSTEM, 				sizeof(TPacketCGDungeonInfoSend), 			"DungeonInfoSend");
+#endif
+
+#ifdef ENABLE_RESP_SYSTEM
+	Set(HEADER_CG_RESP, 							sizeof(SPacketCGRespHeader), 				"Resp");
+#endif
+
+#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
+	Set(HEADER_CG_SOUL_ROULETTE, 					sizeof(TPacketCGSoulRoulette), 				"SoulRoulette");
+#endif
+
+#ifdef ENABLE_ATTENDANCE_EVENT
+	Set(HEADER_CG_ATTENDANCE_REWARD, 				sizeof(BYTE), 								"RequestAttendanceReward");
+#endif
+
+#ifdef ENABLE_MINI_GAME_CATCH_KING
+	Set(HEADER_CG_MINI_GAME_CATCH_KING, 			sizeof(TPacketCGMiniGameCatchKing), 		"MiniGameCatchKing");
+#endif
 }
 
 CPacketInfoCG::~CPacketInfoCG()
@@ -329,18 +338,23 @@ CPacketInfoGG::CPacketInfoGG()
 #ifdef ENABLE_RENEWAL_SWITCHBOT
 	Set(HEADER_GG_SWITCHBOT,						sizeof(TPacketGGSwitchbot),					"Switchbot");
 #endif
-#ifdef ENABLE_EVENT_MANAGER
-	Set(HEADER_GG_EVENT_RELOAD,						sizeof(TPacketGGReloadEvent),				"Event");
-	Set(HEADER_GG_EVENT,							sizeof(TPacketGGEvent),						"Event");
-#endif
 #ifdef ENABLE_MULTI_FARM_BLOCK
 	Set(HEADER_GG_MULTI_FARM,						sizeof(TPacketGGMultiFarm),					"MultiFarm");
 #endif
 #ifdef ENABLE_CLIENT_LOCALE_STRING
 	Set(HEADER_GG_LOCALE_CHAT_NOTICE,				sizeof(TPacketGGLocaleChatNotice),			"LocaleChatNotice");
 #endif
-#ifdef ENABLE_RENEWAL_REGEN
+#ifdef ENABLE_ULTIMATE_REGEN
 	Set(HEADER_GG_NEW_REGEN,						sizeof(TGGPacketNewRegen),					"NewRegen");
+#endif
+#ifdef ENABLE_RELOAD_COMMAND_ALL_CORES
+	Set(HEADER_GG_RELOAD_COMMAND, 					sizeof(TPacketGGReloadCommand), 			"ReloadCommand");
+#endif
+#ifdef ENABLE_STONE_EVENT_SYSTEM
+	Set (HEADER_GG_STONE_EVENT, 					sizeof (TPacketGGStoneEvent), 				"StoneEvent");
+#endif
+#ifdef ENABLE_EVENT_SYSTEM
+	Set(HEADER_GG_EVENT_TIME, 						sizeof(TPacketGGEventInfo), "EventTime");
 #endif
 }
 

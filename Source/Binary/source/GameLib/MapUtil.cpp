@@ -67,10 +67,10 @@ void Environment_Init(SEnvironmentData& envData)
 	envData.bReserve = FALSE;
 }
 
-bool Environment_Load(SEnvironmentData& envData, const char *envFileName)
+bool Environment_Load(SEnvironmentData& envData, const char* envFileName)
 {
 	CTextFileLoader textLoader;
-	
+
 	if (!textLoader.Load(envFileName))
 		return false;
 
@@ -130,7 +130,7 @@ bool Environment_Load(SEnvironmentData& envData, const char *envFileName)
 		textLoader.GetTokenByte("alphadest", &envData.byFilteringAlphaDest);
 		textLoader.SetParentNode();
 	}
-	
+
 	if (textLoader.SetChildNode("skybox"))
 	{
 		textLoader.GetTokenBoolean("btexturerendermode", (BOOL *) &envData.bSkyBoxTextureRenderMode);
@@ -144,7 +144,6 @@ bool Environment_Load(SEnvironmentData& envData, const char *envFileName)
 		textLoader.GetTokenString("rightfacefilename", &envData.strSkyBoxFaceFileName[3]);
 		textLoader.GetTokenString("topfacefilename", &envData.strSkyBoxFaceFileName[4]);
 		textLoader.GetTokenString("bottomfacefilename", &envData.strSkyBoxFaceFileName[5]);
-
 
 		textLoader.GetTokenVector2("cloudscale", &envData.v2CloudScale);
 		textLoader.GetTokenFloat("cloudheight", &envData.fCloudHeight);
@@ -255,10 +254,9 @@ void CEaseOutInterpolation::Initialize()
 	m_fLastValue = 0.0f;
 }
 
-
 BOOL CEaseOutInterpolation::Setup(float fStart, float fEnd, float fTime)
 {
-	//for safety 
+	//for safety
 	if( fabs(fTime) < FLT_EPSILON )
 	{
 		fTime = 0.01f;

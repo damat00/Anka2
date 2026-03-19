@@ -1,0 +1,10 @@
+<ScriptFile>
+	<CreateEterPackXml Input="../binary_unpack/patch_dungeon_new" ArchivePath="../../Client/pack/patch_dungeon_new" XmlPath="xml/patch_dungeon_new_create.xml">
+		<Ignore Pattern="*.psd" />
+		<Ignore Pattern="*.uas" />
+		<Ignore Pattern="*.pdn" />
+		<Ignore Pattern="*.ufo" />
+
+		<Patch Search="ymir work/" Replace="d:/ymir work/" />
+	</CreateEterPackXml>
+</ScriptFile>

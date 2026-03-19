@@ -17,10 +17,17 @@ void CGrannyModelInstance::RenderWithOneTexture()
 	if (IsEmpty())
 		return;
 
-	STATEMANAGER.SetVertexShader(ms_pntVS);
+#ifdef ENABLE_DIRECTX9_UPDATE
+    STATEMANAGER.SetVertexDeclaration(ms_pntVS);
 
-	LPDIRECT3DVERTEXBUFFER8 lpd3dDeformPNTVtxBuf = __GetDeformableD3DVertexBufferPtr();
-	LPDIRECT3DVERTEXBUFFER8 lpd3dRigidPNTVtxBuf = m_pModel->GetPNTD3DVertexBuffer();
+    LPDIRECT3DVERTEXBUFFER9 lpd3dDeformPNTVtxBuf = __GetDeformableD3DVertexBufferPtr();
+    LPDIRECT3DVERTEXBUFFER9 lpd3dRigidPNTVtxBuf = m_pModel->GetPNTD3DVertexBuffer();
+#else
+    STATEMANAGER.SetVertexShader(ms_pntVS);
+
+    LPDIRECT3DVERTEXBUFFER8 lpd3dDeformPNTVtxBuf = __GetDeformableD3DVertexBufferPtr();
+    LPDIRECT3DVERTEXBUFFER8 lpd3dRigidPNTVtxBuf = m_pModel->GetPNTD3DVertexBuffer();
+#endif
 
 	if (lpd3dDeformPNTVtxBuf)
 	{
@@ -39,10 +46,17 @@ void CGrannyModelInstance::BlendRenderWithOneTexture()
 	if (IsEmpty())
 		return;
 
-	LPDIRECT3DVERTEXBUFFER8 lpd3dDeformPNTVtxBuf = __GetDeformableD3DVertexBufferPtr();
-	LPDIRECT3DVERTEXBUFFER8 lpd3dRigidPNTVtxBuf = m_pModel->GetPNTD3DVertexBuffer();
+#ifdef ENABLE_DIRECTX9_UPDATE
+    LPDIRECT3DVERTEXBUFFER9 lpd3dDeformPNTVtxBuf = __GetDeformableD3DVertexBufferPtr();
+    LPDIRECT3DVERTEXBUFFER9 lpd3dRigidPNTVtxBuf = m_pModel->GetPNTD3DVertexBuffer();
 
-	STATEMANAGER.SetVertexShader(ms_pntVS);
+    STATEMANAGER.SetVertexDeclaration(ms_pntVS);
+#else
+    LPDIRECT3DVERTEXBUFFER8 lpd3dDeformPNTVtxBuf = __GetDeformableD3DVertexBufferPtr();
+    LPDIRECT3DVERTEXBUFFER8 lpd3dRigidPNTVtxBuf = m_pModel->GetPNTD3DVertexBuffer();
+
+    STATEMANAGER.SetVertexShader(ms_pntVS);
+#endif
 
 	if (lpd3dDeformPNTVtxBuf)
 	{
@@ -57,15 +71,23 @@ void CGrannyModelInstance::BlendRenderWithOneTexture()
 	}
 }
 
+// With Two Texture
 void CGrannyModelInstance::RenderWithTwoTexture()
 {
 	if (IsEmpty())
 		return;
 
-	STATEMANAGER.SetVertexShader(ms_pntVS);
+#ifdef ENABLE_DIRECTX9_UPDATE
+    STATEMANAGER.SetVertexDeclaration(ms_pntVS);
 
-	LPDIRECT3DVERTEXBUFFER8 lpd3dDeformPNTVtxBuf = __GetDeformableD3DVertexBufferPtr();
-	LPDIRECT3DVERTEXBUFFER8 lpd3dRigidPNTVtxBuf = m_pModel->GetPNTD3DVertexBuffer();
+    LPDIRECT3DVERTEXBUFFER9 lpd3dDeformPNTVtxBuf = __GetDeformableD3DVertexBufferPtr();
+    LPDIRECT3DVERTEXBUFFER9 lpd3dRigidPNTVtxBuf = m_pModel->GetPNTD3DVertexBuffer();
+#else
+    STATEMANAGER.SetVertexShader(ms_pntVS);
+
+    LPDIRECT3DVERTEXBUFFER8 lpd3dDeformPNTVtxBuf = __GetDeformableD3DVertexBufferPtr();
+    LPDIRECT3DVERTEXBUFFER8 lpd3dRigidPNTVtxBuf = m_pModel->GetPNTD3DVertexBuffer();
+#endif
 
 	if (lpd3dDeformPNTVtxBuf)
 	{
@@ -84,10 +106,17 @@ void CGrannyModelInstance::BlendRenderWithTwoTexture()
 	if (IsEmpty())
 		return;
 
-	LPDIRECT3DVERTEXBUFFER8 lpd3dDeformPNTVtxBuf = __GetDeformableD3DVertexBufferPtr();
-	LPDIRECT3DVERTEXBUFFER8 lpd3dRigidPNTVtxBuf = m_pModel->GetPNTD3DVertexBuffer();
+#ifdef ENABLE_DIRECTX9_UPDATE
+    LPDIRECT3DVERTEXBUFFER9 lpd3dDeformPNTVtxBuf = __GetDeformableD3DVertexBufferPtr();
+    LPDIRECT3DVERTEXBUFFER9 lpd3dRigidPNTVtxBuf = m_pModel->GetPNTD3DVertexBuffer();
 
-	STATEMANAGER.SetVertexShader(ms_pntVS);
+    STATEMANAGER.SetVertexDeclaration(ms_pntVS);
+#else
+    LPDIRECT3DVERTEXBUFFER8 lpd3dDeformPNTVtxBuf = __GetDeformableD3DVertexBufferPtr();
+    LPDIRECT3DVERTEXBUFFER8 lpd3dRigidPNTVtxBuf = m_pModel->GetPNTD3DVertexBuffer();
+
+    STATEMANAGER.SetVertexShader(ms_pntVS);
+#endif
 
 	if (lpd3dDeformPNTVtxBuf)
 	{
@@ -107,12 +136,21 @@ void CGrannyModelInstance::RenderWithoutTexture()
 	if (IsEmpty())
 		return;
 
-	STATEMANAGER.SetVertexShader(ms_pntVS);
-	STATEMANAGER.SetTexture(0, nullptr);
-	STATEMANAGER.SetTexture(1, nullptr);
+#ifdef ENABLE_DIRECTX9_UPDATE
+    STATEMANAGER.SetVertexDeclaration(ms_pntVS);
+    STATEMANAGER.SetTexture(0, nullptr);
+    STATEMANAGER.SetTexture(1, nullptr);
 
-	LPDIRECT3DVERTEXBUFFER8 lpd3dDeformPNTVtxBuf = __GetDeformableD3DVertexBufferPtr();
-	LPDIRECT3DVERTEXBUFFER8 lpd3dRigidPNTVtxBuf = m_pModel->GetPNTD3DVertexBuffer();
+    LPDIRECT3DVERTEXBUFFER9 lpd3dDeformPNTVtxBuf = __GetDeformableD3DVertexBufferPtr();
+    LPDIRECT3DVERTEXBUFFER9 lpd3dRigidPNTVtxBuf = m_pModel->GetPNTD3DVertexBuffer();
+#else
+    STATEMANAGER.SetVertexShader(ms_pntVS);
+    STATEMANAGER.SetTexture(0, nullptr);
+    STATEMANAGER.SetTexture(1, nullptr);
+
+    LPDIRECT3DVERTEXBUFFER8 lpd3dDeformPNTVtxBuf = __GetDeformableD3DVertexBufferPtr();
+    LPDIRECT3DVERTEXBUFFER8 lpd3dRigidPNTVtxBuf = m_pModel->GetPNTD3DVertexBuffer();
+#endif
 
 	if (lpd3dDeformPNTVtxBuf)
 	{
@@ -133,8 +171,17 @@ void CGrannyModelInstance::RenderMeshNodeListWithOneTexture(CGrannyMesh::EType e
 {
 	assert(m_pModel != nullptr);
 
-	LPDIRECT3DINDEXBUFFER8 lpd3dIdxBuf = m_pModel->GetD3DIndexBuffer();
+#ifdef ENABLE_DIRECTX9_UPDATE
+    LPDIRECT3DINDEXBUFFER9 lpd3dIdxBuf = m_pModel->GetD3DIndexBuffer();
+#else
+    LPDIRECT3DINDEXBUFFER8 lpd3dIdxBuf = m_pModel->GetD3DIndexBuffer();
+#endif
+
 	assert(lpd3dIdxBuf != nullptr);
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+    D3DPERF_BeginEvent(D3DCOLOR_ARGB(255, 50, 50, 0), L"** CGrannyModelInstance::RenderMeshNodeListWithOneTexture **");
+#endif
 
 	const CGrannyModel::TMeshNode * pMeshNode = m_pModel->GetMeshNodeList(eMeshType, eMtrlType);
 
@@ -154,22 +201,50 @@ void CGrannyModelInstance::RenderMeshNodeListWithOneTexture(CGrannyMesh::EType e
 
 			CGrannyMaterial& rkMtrl=m_kMtrlPal.GetMaterialRef(pTriGroupNode->mtrlIndex);
 			rkMtrl.ApplyRenderState();
-			STATEMANAGER.DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, vtxCount, pTriGroupNode->idxPos, pTriGroupNode->triCount);
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+            STATEMANAGER.DrawIndexedPrimitive(D3DPT_TRIANGLELIST
+                                                , vtxMeshBasePos
+                                                , vtxCount
+                                                , pTriGroupNode->idxPos
+                                                , pTriGroupNode->triCount);
+#else
+            STATEMANAGER.DrawIndexedPrimitive(D3DPT_TRIANGLELIST
+                                                , 0
+                                                , vtxCount
+                                                , pTriGroupNode->idxPos
+                                                , pTriGroupNode->triCount);
+#endif
+
 			rkMtrl.RestoreRenderState();
-			
+
 			pTriGroupNode = pTriGroupNode->pNextTriGroupNode;
 		}
 
 		pMeshNode = pMeshNode->pNextMeshNode;
 	}
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+    D3DPERF_EndEvent();
+#endif
 }
 
+// With Two Texture
 void CGrannyModelInstance::RenderMeshNodeListWithTwoTexture(CGrannyMesh::EType eMeshType, CGrannyMaterial::EType eMtrlType)
 {
 	assert(m_pModel != nullptr);
 
-	LPDIRECT3DINDEXBUFFER8 lpd3dIdxBuf = m_pModel->GetD3DIndexBuffer();
+#ifdef ENABLE_DIRECTX9_UPDATE
+    LPDIRECT3DINDEXBUFFER9 lpd3dIdxBuf = m_pModel->GetD3DIndexBuffer();
+#else
+    LPDIRECT3DINDEXBUFFER8 lpd3dIdxBuf = m_pModel->GetD3DIndexBuffer();
+#endif
+
 	assert(lpd3dIdxBuf != nullptr);
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+    D3DPERF_BeginEvent(D3DCOLOR_ARGB(255, 50, 100, 0), L"** CGrannyModelInstance::RenderMeshNodeListWithTwoTexture **");
+#endif
 
 	const CGrannyModel::TMeshNode * pMeshNode = m_pModel->GetMeshNodeList(eMeshType, eMtrlType);
 
@@ -190,20 +265,49 @@ void CGrannyModelInstance::RenderMeshNodeListWithTwoTexture(CGrannyMesh::EType e
 			const CGrannyMaterial& rkMtrl=m_kMtrlPal.GetMaterialRef(pTriGroupNode->mtrlIndex);
 			STATEMANAGER.SetTexture(0, rkMtrl.GetD3DTexture(0));
 			STATEMANAGER.SetTexture(1, rkMtrl.GetD3DTexture(1));
-			STATEMANAGER.DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, vtxCount, pTriGroupNode->idxPos, pTriGroupNode->triCount);
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+            STATEMANAGER.DrawIndexedPrimitive(D3DPT_TRIANGLELIST
+                                                , vtxMeshBasePos
+                                                , vtxCount
+                                                , pTriGroupNode->idxPos
+                                                , pTriGroupNode->triCount);
+#else
+            STATEMANAGER.DrawIndexedPrimitive(D3DPT_TRIANGLELIST
+                                                , 0
+                                                , vtxCount
+                                                , pTriGroupNode->idxPos
+                                                , pTriGroupNode->triCount);
+#endif
+
 			pTriGroupNode = pTriGroupNode->pNextTriGroupNode;
 		}
+		/////
 
 		pMeshNode = pMeshNode->pNextMeshNode;
 	}
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+    D3DPERF_EndEvent();
+#endif
 }
 
+// Without Texture
 void CGrannyModelInstance::RenderMeshNodeListWithoutTexture(CGrannyMesh::EType eMeshType, CGrannyMaterial::EType eMtrlType)
 {
 	assert(m_pModel != nullptr);
 
-	LPDIRECT3DINDEXBUFFER8 lpd3dIdxBuf = m_pModel->GetD3DIndexBuffer();
+#ifdef ENABLE_DIRECTX9_UPDATE
+    LPDIRECT3DINDEXBUFFER9 lpd3dIdxBuf = m_pModel->GetD3DIndexBuffer();
+#else
+    LPDIRECT3DINDEXBUFFER8 lpd3dIdxBuf = m_pModel->GetD3DIndexBuffer();
+#endif
+
 	assert(lpd3dIdxBuf != nullptr);
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+    D3DPERF_BeginEvent(D3DCOLOR_ARGB(255, 140, 140, 0), L"** CGrannyModelInstance::RenderMeshNodeListWithoutTexture **");
+#endif
 
 	const CGrannyModel::TMeshNode * pMeshNode = m_pModel->GetMeshNodeList(eMeshType, eMtrlType);
 
@@ -221,10 +325,28 @@ void CGrannyModelInstance::RenderMeshNodeListWithoutTexture(CGrannyMesh::EType e
 		while (pTriGroupNode)
 		{
 			ms_faceCount += pTriGroupNode->triCount;
-			STATEMANAGER.DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, vtxCount, pTriGroupNode->idxPos, pTriGroupNode->triCount);
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+            STATEMANAGER.DrawIndexedPrimitive(D3DPT_TRIANGLELIST
+                                                , vtxMeshBasePos
+                                                , vtxCount
+                                                , pTriGroupNode->idxPos
+                                                , pTriGroupNode->triCount);
+#else
+            STATEMANAGER.DrawIndexedPrimitive(D3DPT_TRIANGLELIST
+                                                , 0
+                                                , vtxCount
+                                                , pTriGroupNode->idxPos
+                                                , pTriGroupNode->triCount);
+#endif
+
 			pTriGroupNode = pTriGroupNode->pNextTriGroupNode;
 		}
 
 		pMeshNode = pMeshNode->pNextMeshNode;
 	}
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+    D3DPERF_EndEvent();
+#endif
 }

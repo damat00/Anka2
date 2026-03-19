@@ -72,12 +72,20 @@ granny_model* CGrannyModel::GetGrannyModelPointer()
 	return m_pgrnModel;
 }
 
+#ifdef ENABLE_DIRECTX9_UPDATE
+LPDIRECT3DINDEXBUFFER9 CGrannyModel::GetD3DIndexBuffer() const
+#else
 LPDIRECT3DINDEXBUFFER8 CGrannyModel::GetD3DIndexBuffer() const
+#endif
 {
 	return m_idxBuf.GetD3DIndexBuffer();
 }
 
+#ifdef ENABLE_DIRECTX9_UPDATE
+LPDIRECT3DVERTEXBUFFER9 CGrannyModel::GetPNTD3DVertexBuffer() const
+#else
 LPDIRECT3DVERTEXBUFFER8 CGrannyModel::GetPNTD3DVertexBuffer() const
+#endif
 {
 	return m_pntVtxBuf.GetD3DVertexBuffer();
 }
@@ -389,7 +397,7 @@ bool CGrannyModel::__LoadVertices()
 void CGrannyModel::Initialize()
 {
 	memset(m_meshNodeLists, 0, sizeof(m_meshNodeLists));
-	
+
 	m_pgrnModel = nullptr;
 	m_meshs = nullptr;
 	m_meshNodes = nullptr;

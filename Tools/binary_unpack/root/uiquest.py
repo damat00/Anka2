@@ -206,9 +206,9 @@ class BarButton(ui.Button):
 	DOWN=1
 	OVER=2
 
-	def __init__(self, layer = "UI", 
-			aColorUp   = ColorUp, 
-			aColorDown = ColorDown, 
+	def __init__(self, layer = "UI",
+			aColorUp   = ColorUp,
+			aColorDown = ColorDown,
 			aColorOver = ColorOver):
 		ui.Button.__init__(self,layer)
 		self.state = self.UP
@@ -474,7 +474,7 @@ class QuestDialog(ui.ScriptWindow):
 		self.btnNext = b
 	# END_OF_QUEST_CANCEL
 
-	def MakeQuestion(self, n):  # n은 �?든 퀘스트 대화창의 마지막 버튼인 "�?기"를 포함한 전체 퀘스트 버튼 개수. by 김준호
+	def MakeQuestion(self, n):
 		global entire_questbutton_number
 		global entire_questpage_number
 		global cur_questpage_number

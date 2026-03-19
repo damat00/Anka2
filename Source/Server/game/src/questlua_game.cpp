@@ -10,7 +10,8 @@
 #include "item.h"
 #include "cmd.h"
 #include "packet.h"
-
+#include "utils.h"
+#include "db.h"
 #ifdef ENABLE_DICE_SYSTEM
 	#include "party.h"
 #endif
@@ -21,6 +22,14 @@
 
 #ifdef ENABLE_RIDING_EXTENDED
 	#include "mount_up_grade.h"
+#endif
+
+#ifdef ENABLE_EVENT_SYSTEM
+	#include "auto_event_list.h"
+#endif
+
+#ifdef ENABLE_ATTENDANCE_EVENT
+	#include "minigame.h"
 #endif
 
 #undef sys_err
@@ -92,6 +101,39 @@ namespace quest
 		ch->ChatPacket(CHAT_TYPE_COMMAND, "ShowMeSafeboxPassword");
 		return 0;
 	}
+
+#ifdef ENABLE_GAYA_SHOP_SYSTEM
+	int game_open_gem_c(lua_State*)
+	{
+		CQuestManager& q = CQuestManager::instance();
+		LPCHARACTER ch = q.GetCurrentCharacterPtr();
+		ch->ChatPacket(CHAT_TYPE_COMMAND, "OpenGuiGem");
+		return 0;
+	}
+
+	int game_open_gem_m(lua_State*)
+	{
+		CQuestManager& q = CQuestManager::instance();
+		LPCHARACTER ch = q.GetCurrentCharacterPtr();
+
+		if (ch->CheckItemsFull() == false)
+		{
+			//ch->SetGemState("gem_refresh_time", init_gemTime() + (60*60*5));
+			ch->UpdateItemsGemMarker();
+			ch->InfoGemMarker();
+			ch->StartCheckTimeMarket();
+		}
+		else
+		{
+			ch->InfoGemMarker();
+			ch->StartCheckTimeMarket();
+		}
+
+		ch->ChatPacket(CHAT_TYPE_COMMAND, "OpenGuiGemMarket");
+
+		return 0;
+	}
+#endif
 
 	int game_open_mall(lua_State* /*L*/)
 	{
@@ -314,9 +356,77 @@ namespace quest
 		return 0;
 	}
 
+#ifdef ENABLE_ZODIAC_MISSION
+	int game_open_zodiac(lua_State* L)
+	{
+		CQuestManager& q = CQuestManager::instance();
+		LPCHARACTER ch = q.GetCurrentCharacterPtr();
+		if(!ch || ch == NULL)
+			return 0;
+		if (ch->GetProtectTime("Zodiac12Zi") > get_global_time())
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, "Biraz beklemelisin.");
+			return 0;
+		}
+		ch->SetProtectTime("Zodiac12Zi",get_global_time()+1);
+		ch->ChatPacket(CHAT_TYPE_COMMAND, "OpenUI12zi %d %d %d %d", ch->GetQuestFlag("Quest_ZodiacTemple.YellowMark"), ch->GetQuestFlag("Quest_ZodiacTemple.GreenMark"), ch->GetQuestFlag("Quest_ZodiacTemple.YellowReward"), ch->GetQuestFlag("Quest_ZodiacTemple.GreenReward"));
+		return 0;
+	}
+#endif
+
+#ifdef ENABLE_MINI_GAME_CATCH_KING
+	int mini_game_catch_king_get_score(lua_State* L)
+	{
+		DWORD dwArg = (DWORD) lua_tonumber(L, 1);
+		bool isTotal = dwArg ? true : false;
+		
+		CMiniGame::instance().MiniGameCatchKingGetScore(L, isTotal);
+		return 1;
+	}
+#endif
+
+#ifdef ENABLE_EVENT_SYSTEM
+	int game_set_event_time(lua_State* L)
+	{
+		if (lua_isnumber(L, 1) && lua_isnumber(L, 2))
+			CGameEventsManager::instance().SetEventTime((int)lua_tonumber(L, 1), (int)lua_tonumber(L, 2));
+
+		return 0;
+	}
+#endif
+
+	int game_mysql_query(lua_State* L)
+	{
+		//MYSQL_FIELD *field;
+		SQLMsg* run = DBManager::instance().DirectQuery(lua_tostring(L,1));
+		MYSQL_RES* res=run->Get()->pSQLResult;
+		if (!res){
+			lua_pushnumber(L, 0);
+			return 0;
+		}
+		MYSQL_ROW row;
+		lua_newtable(L);			
+		int rowcount = 1;
+		while((row = mysql_fetch_row(res))){
+			lua_newtable(L);
+			lua_pushnumber(L, rowcount);
+			lua_pushvalue(L, -2);
+			lua_settable(L, -4);
+			unsigned int fields = mysql_num_fields(res);
+			for(unsigned int i = 0; i < fields; i++){
+				lua_pushnumber(L, i + 1);
+				lua_pushstring(L, row[i]);
+				lua_settable(L, -3);
+			}
+			lua_pop(L, 1);
+			rowcount++;
+		}
+		return 1;
+	}
+	
 	void RegisterGameFunctionTable()
 	{
-		luaL_reg game_functions[] = 
+		luaL_reg game_functions[] =
 		{
 			{ "get_safebox_level",						game_get_safebox_level						},
 			{ "request_make_guild",						game_request_make_guild						},
@@ -327,6 +437,7 @@ namespace quest
 			{ "set_event_flag",							game_set_event_flag							},
 			{ "drop_item",								game_drop_item								},
 			{ "drop_item_with_ownership",				game_drop_item_with_ownership				},
+			{ "open_web_mall",							game_web_mall								},
 #ifdef ENABLE_DICE_SYSTEM
 			{ "drop_item_with_ownership_and_dice",		game_drop_item_with_ownership_and_dice		},
 #endif
@@ -341,7 +452,20 @@ namespace quest
 #ifdef ENABLE_RIDING_EXTENDED
 			{ "open_mount_up_grade", 					game_open_mount_up_grade					},
 #endif
-			{ "open_web_mall",							game_web_mall								},
+#ifdef ENABLE_ZODIAC_MISSION
+			{ "open_zodiac", 							game_open_zodiac 							},
+#endif
+#ifdef ENABLE_MINI_GAME_CATCH_KING
+			{ "mini_game_catch_king_get_score",	mini_game_catch_king_get_score		},
+#endif
+#ifdef ENABLE_GAYA_SHOP_SYSTEM
+			{ "open_gem",					game_open_gem_c					},
+			{ "open_gem_market",			game_open_gem_m					},
+#endif
+#ifdef ENABLE_EVENT_SYSTEM
+			{ "set_event_time",				game_set_event_time				},
+#endif
+			{ "mysql_query",	game_mysql_query },
 
 			{ NULL,					NULL				}
 		};

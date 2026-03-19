@@ -1,4 +1,3 @@
-
 #ifndef __INC_METIN_II_UTILS_H__
 #define __INC_METIN_II_UTILS_H__
 
@@ -53,7 +52,9 @@ inline int DISTANCE_APPROX(int dx, int dy)
 		max = dx;
 	}
 
-	return ((( max << 8 ) + ( max << 3 ) - ( max << 4 ) - ( max << 1 ) + ( min << 7 ) - ( min << 5 ) + ( min << 3 ) - ( min << 1 )) >> 8 );
+	// coefficients equivalent to ( 123/128 * max ) and ( 51/128 * min )
+	return (((max << 8) + (max << 3) - (max << 4) - (max << 1) +
+		(min << 7) - (min << 5) + (min << 3) - (min << 1)) >> 8);
 }
 
 inline WORD MAKEWORD(BYTE a, BYTE b)
@@ -70,6 +71,10 @@ extern void split_argument_special(const char* argument, std::vector<std::string
 extern bool getInjectText(const char* data);
 #endif
 
+#ifdef ENABLE_GAYA_SHOP_SYSTEM
+extern time_t init_gemTime();
+#endif
+
 extern int dice(int number, int size);
 extern size_t str_lower(const char * src, char * dest, size_t dest_size);
 
@@ -77,7 +82,9 @@ extern void	skip_spaces(char **string);
 
 extern const char *one_argument(const char *argument, char *first_arg, size_t first_size);
 extern const char *two_arguments(const char *argument, char *first_arg, size_t first_size, char *second_arg, size_t second_size);
+extern const char *three_arguments(const char *argument, char *first_arg, size_t first_size, char *second_arg, size_t second_size, char *third_arg, size_t third_size);
 extern const char* four_arguments(const char* argument, char* first_arg, size_t first_size, char* second_arg, size_t second_size, char* third_flag, size_t third_size, char* four_flag, size_t four_size);
+extern const char * six_arguments(const char* argument, char* first_arg, size_t first_size, char* second_arg, size_t second_size, char* third_flag, size_t third_size, char* four_flag, size_t four_size, char* five_flag, size_t five_size, char* six_flag, size_t six_size);
 extern const char *first_cmd(const char *argument, char *first_arg, size_t first_arg_size, size_t *first_arg_len_result);
 
 extern int CalculateDuration(int iSpd, int iDur);
@@ -87,10 +94,6 @@ extern float gauss_random(float avg = 0, float sigma = 1);
 extern int parse_time_str(const char* str);
 
 extern bool WildCaseCmp(const char *w, const char *s);
-
-#ifdef ENABLE_BIOLOG_SYSTEM
-extern std::string GetFullDateFromTime(time_t && end_time_sec, bool bWhiteSpace = true);
-extern std::string GetFullDateFromTime(const time_t & end_time_sec, bool bWhiteSpace = true);
-#endif
+extern bool is_digits(const std::string &str);
 
 #endif

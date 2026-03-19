@@ -593,16 +593,32 @@ PyObject *wndMgrSetWindowVerticalAlign(PyObject *poSelf, PyObject *poArgs)
 	return Py_BuildNone();
 }
 
-PyObject *wndMgrIsIn(PyObject *poSelf, PyObject *poArgs)
+PyObject * wndMgrIsIn(PyObject * poSelf, PyObject * poArgs)
 {
 	UI::CWindow * pWin;
 	if (!PyTuple_GetWindow(poArgs, 0, &pWin))
 		return Py_BuildException();
+#ifdef INSIDE_RENDER
+	bool bCheckChilds;
+	if (!PyTuple_GetBoolean(poArgs, 1, &bCheckChilds))
+		bCheckChilds = false;
 
+	UI::CWindow* pWinPoint = UI::CWindowManager::Instance().GetPointWindow();
+	if (pWin == pWinPoint)
+		return Py_BuildValue("b", true);
+
+	if (bCheckChilds && pWinPoint)
+	{
+		if (pWin->IsChild(pWinPoint, true))
+			return Py_BuildValue("b", true);
+	}
+	return Py_BuildValue("b", false);
+#else
 	return Py_BuildValue("i", pWin == UI::CWindowManager::Instance().GetPointWindow());
+#endif
 }
 
-PyObject *wndMgrGetMouseLocalPosition(PyObject *poSelf, PyObject *poArgs)
+PyObject * wndMgrGetMouseLocalPosition(PyObject * poSelf, PyObject * poArgs)
 {
 	UI::CWindow * pWin;
 	if (!PyTuple_GetWindow(poArgs, 0, &pWin))
@@ -613,7 +629,7 @@ PyObject *wndMgrGetMouseLocalPosition(PyObject *poSelf, PyObject *poArgs)
 	return Py_BuildValue("ii", lx, ly);
 }
 
-PyObject *wndMgrGetHyperlink(PyObject *poSelf, PyObject *poArgs)
+PyObject * wndMgrGetHyperlink(PyObject * poSelf, PyObject * poArgs)
 {
 	char retBuf[1024];
 	int retLen = CGraphicTextInstance::Hyperlink_GetText(retBuf, sizeof(retBuf)-1);
@@ -622,29 +638,29 @@ PyObject *wndMgrGetHyperlink(PyObject *poSelf, PyObject *poArgs)
 	return Py_BuildValue("s#", retBuf, retLen);
 }
 
-PyObject *wndMgrGetScreenWidth(PyObject *poSelf, PyObject *poArgs)
+PyObject * wndMgrGetScreenWidth(PyObject * poSelf, PyObject * poArgs)
 {
 	return Py_BuildValue("i", UI::CWindowManager::Instance().GetScreenWidth());
 }
 
-PyObject *wndMgrGetScreenHeight(PyObject *poSelf, PyObject *poArgs)
+PyObject * wndMgrGetScreenHeight(PyObject * poSelf, PyObject * poArgs)
 {
 	return Py_BuildValue("i", UI::CWindowManager::Instance().GetScreenHeight());
 }
 
-PyObject *wndMgrGetMousePosition(PyObject *poSelf, PyObject *poArgs)
+PyObject * wndMgrGetMousePosition(PyObject * poSelf, PyObject * poArgs)
 {
 	long lx, ly;
 	UI::CWindowManager::Instance().GetMousePosition(lx, ly);
 	return Py_BuildValue("ii", lx, ly);
 }
 
-PyObject *wndMgrIsDragging(PyObject *poSelf, PyObject *poArgs)
+PyObject * wndMgrIsDragging(PyObject * poSelf, PyObject * poArgs)
 {
 	return Py_BuildValue("i", UI::CWindowManager::Instance().IsDragging());
 }
 
-PyObject *wndMgrIsPickedWindow(PyObject *poSelf, PyObject *poArgs)
+PyObject * wndMgrIsPickedWindow(PyObject * poSelf, PyObject * poArgs)
 {
 	UI::CWindow * pWin;
 	if (!PyTuple_GetWindow(poArgs, 0, &pWin))
@@ -654,7 +670,7 @@ PyObject *wndMgrIsPickedWindow(PyObject *poSelf, PyObject *poArgs)
 	return Py_BuildValue("i", pWin == pPickedWin ? 1 : 0);
 }
 
-PyObject *wndMgrGetChildCount(PyObject *poSelf, PyObject *poArgs)
+PyObject * wndMgrGetChildCount(PyObject * poSelf, PyObject * poArgs)
 {
 	UI::CWindow * pWin;
 	if (!PyTuple_GetWindow(poArgs, 0, &pWin))
@@ -663,13 +679,13 @@ PyObject *wndMgrGetChildCount(PyObject *poSelf, PyObject *poArgs)
 	return Py_BuildValue("i", pWin->GetChildCount());
 }
 
-PyObject *wndMgrAddFlag(PyObject *poSelf, PyObject *poArgs)
+PyObject * wndMgrAddFlag(PyObject * poSelf, PyObject * poArgs)
 {
 	UI::CWindow * pWin;
 	if (!PyTuple_GetWindow(poArgs, 0, &pWin))
 		return Py_BuildException();
 
-	char *pszFlag;
+	char * pszFlag;
 	if (!PyTuple_GetString(poArgs, 1, &pszFlag))
 		return Py_BuildException();
 
@@ -1245,65 +1261,6 @@ PyObject *wndMgrSetSlot(PyObject *poSelf, PyObject *poArgs)
 
 	return Py_BuildNone();
 }
-
-#ifdef ENABLE_MINIGAME_OKEY_CARDS_SYSTEM
-PyObject *wndMgrSetCardSlot(PyObject *poSelf, PyObject *poArgs)
-{
-	UI::CWindow * pWin;
-	if (!PyTuple_GetWindow(poArgs, 0, &pWin))
-		return Py_BuildException();
-
-	int iSlotIndex;
-	if (!PyTuple_GetInteger(poArgs, 1, &iSlotIndex))
-		return Py_BuildException();
-
-	int iItemIndex;
-	if (!PyTuple_GetInteger(poArgs, 2, &iItemIndex))
-		return Py_BuildException();
-
-	int iWidth;
-	if (!PyTuple_GetInteger(poArgs, 3, &iWidth))
-		return Py_BuildException();
-
-	int iHeight;
-	if (!PyTuple_GetInteger(poArgs, 4, &iHeight))
-		return Py_BuildException();
-
-	char *c_szFileName;
-	if (!PyTuple_GetString(poArgs, 5, &c_szFileName))
-		return Py_BuildException();
-
-	D3DXCOLOR diffuseColor;
-	PyObject *pTuple;
-	if (!PyTuple_GetObject(poArgs, 6, &pTuple))
-	{
-		diffuseColor = D3DXCOLOR(1.0, 1.0, 1.0, 1.0);
-		//return Py_BuildException();
-	}
-	else
-	// get diffuse color from pTuple
-	{
-		if (PyTuple_Size(pTuple) != 4)
-			return Py_BuildException();
-		if (!PyTuple_GetFloat(pTuple, 0, &diffuseColor.r))
-			return Py_BuildException();
-		if (!PyTuple_GetFloat(pTuple, 1, &diffuseColor.g))
-			return Py_BuildException();
-		if (!PyTuple_GetFloat(pTuple, 2, &diffuseColor.b))
-			return Py_BuildException();
-		if (!PyTuple_GetFloat(pTuple, 3, &diffuseColor.a))
-			return Py_BuildException();
-	}
-
-	if (!pWin->IsType(UI::CSlotWindow::Type()))
-		return Py_BuildException();
-
-	UI::CSlotWindow * pSlotWin = (UI::CSlotWindow *)pWin;
-	pSlotWin->SetCardSlot(iSlotIndex, iItemIndex, iWidth, iHeight, c_szFileName, diffuseColor);
-
-	return Py_BuildNone();
-}
-#endif
 
 PyObject *wndMgrSetSlotCount(PyObject *poSelf, PyObject *poArgs)
 {
@@ -2030,7 +1987,23 @@ PyObject *wndTextGetTextSize(PyObject *poSelf, PyObject *poArgs)
 	return Py_BuildValue("(ii)", nWidth, nHeight);
 }
 
-PyObject *wndTextShowCursor(PyObject *poSelf, PyObject *poArgs)
+#ifdef ENABLE_SUNG_MAHI_TOWER
+PyObject * wndTextGetCharSize(PyObject * poSelf, PyObject * poArgs)
+{
+	UI::CWindow * pWindow;
+	if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
+		return Py_BuildException();
+
+	short sWidth;
+
+	UI::CTextLine* pkTextLine=(UI::CTextLine*)pWindow;
+	pkTextLine->GetCharSize(&sWidth);
+
+	return Py_BuildValue("i", sWidth);
+}
+#endif
+
+PyObject * wndTextShowCursor(PyObject * poSelf, PyObject * poArgs)
 {
 	UI::CWindow * pWindow;
 	if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
@@ -2039,7 +2012,7 @@ PyObject *wndTextShowCursor(PyObject *poSelf, PyObject *poArgs)
 	((UI::CTextLine*)pWindow)->ShowCursor();
 	return Py_BuildNone();
 }
-PyObject *wndTextHideCursor(PyObject *poSelf, PyObject *poArgs)
+PyObject * wndTextHideCursor(PyObject * poSelf, PyObject * poArgs)
 {
 	UI::CWindow * pWindow;
 	if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
@@ -2048,7 +2021,104 @@ PyObject *wndTextHideCursor(PyObject *poSelf, PyObject *poArgs)
 	((UI::CTextLine*)pWindow)->HideCursor();
 	return Py_BuildNone();
 }
-PyObject *wndTextGetCursorPosition(PyObject *poSelf, PyObject *poArgs)
+
+#ifdef INSIDE_RENDER
+PyObject* wndTextIsShowCursor(PyObject*/* poSelf*/, PyObject* poArgs)
+{
+	UI::CWindow* pWindow;
+	if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
+		return Py_BuildException();
+
+	return Py_BuildValue("b", ((UI::CTextLine*)pWindow)->IsShowCursor());
+}
+
+PyObject* wndMgrSetInsideRender(PyObject*/* poSelf*/, PyObject* poArgs)
+{
+	UI::CWindow* pWin;
+	if (!PyTuple_GetWindow(poArgs, 0, &pWin))
+		return Py_BuildException();
+
+	bool val;
+	if (!PyTuple_GetBoolean(poArgs, 1, &val))
+		return Py_BuildException();
+
+	pWin->SetInsideRender(val);
+	return Py_BuildNone();
+}
+
+PyObject* wndSetRenderingRect(PyObject*/* poSelf*/, PyObject* poArgs)
+{
+	UI::CWindow* pWindow;
+	if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
+		return Py_BuildException();
+	float fLeft;
+	if (!PyTuple_GetFloat(poArgs, 1, &fLeft))
+		return Py_BuildException();
+	float fTop;
+	if (!PyTuple_GetFloat(poArgs, 2, &fTop))
+		return Py_BuildException();
+	float fRight;
+	if (!PyTuple_GetFloat(poArgs, 3, &fRight))
+		return Py_BuildException();
+	float fBottom;
+	if (!PyTuple_GetFloat(poArgs, 4, &fBottom))
+		return Py_BuildException();
+
+	pWindow->SetRenderingRect(fLeft, fTop, fRight, fBottom);
+	return Py_BuildNone();
+}
+
+PyObject* wndMgrGetRenderBox(PyObject*/* poSelf*/, PyObject* poArgs)
+{
+	UI::CWindow* pWin;
+	if (!PyTuple_GetWindow(poArgs, 0, &pWin))
+		return Py_BuildException();
+
+	RECT val;
+	pWin->GetRenderBox(&val);
+	return Py_BuildValue("iiii", val.left, val.top, val.right, val.bottom);
+}
+
+PyObject* wndTextSetFixedRenderPos(PyObject*/* poSelf*/, PyObject* poArgs)
+{
+	UI::CWindow* pWindow;
+	if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
+		return Py_BuildException();
+	int startPos, endPos;
+	if (!PyTuple_GetInteger(poArgs, 1, &startPos))
+		return Py_BuildException();
+	if (!PyTuple_GetInteger(poArgs, 2, &endPos))
+		return Py_BuildException();
+
+	((UI::CTextLine*)pWindow)->SetFixedRenderPos(startPos, endPos);
+	return Py_BuildNone();
+}
+
+PyObject* wndTextGetRenderPos(PyObject*/* poSelf*/, PyObject* poArgs)
+{
+	UI::CWindow* pWindow;
+	if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
+		return Py_BuildException();
+	WORD startPos, endPos;
+
+	((UI::CTextLine*)pWindow)->GetRenderPositions(startPos, endPos);
+	return Py_BuildValue("ii", startPos, endPos);
+}
+
+PyObject* wndImageUnloadImage(PyObject*/* poSelf*/, PyObject* poArgs)
+{
+    UI::CWindow* pWindow;
+    if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
+    {
+        return Py_BuildException();
+    }
+
+    dynamic_cast<UI::CImageBox*>(pWindow)->UnloadImage();
+    return Py_BuildNone();
+}
+#endif
+
+PyObject * wndTextGetCursorPosition(PyObject * poSelf, PyObject * poArgs)
 {
 	UI::CWindow * pWindow;
 	if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
@@ -2057,12 +2127,12 @@ PyObject *wndTextGetCursorPosition(PyObject *poSelf, PyObject *poArgs)
 	return Py_BuildValue("i", ((UI::CTextLine*)pWindow)->GetCursorPosition());
 }
 
-PyObject *wndNumberSetNumber(PyObject *poSelf, PyObject *poArgs)
+PyObject * wndNumberSetNumber(PyObject * poSelf, PyObject * poArgs)
 {
 	UI::CWindow * pWindow;
 	if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
 		return Py_BuildException();
-	char *szNumber;
+	char * szNumber;
 	if (!PyTuple_GetString(poArgs, 1, &szNumber))
 		return Py_BuildException();
 
@@ -2071,7 +2141,7 @@ PyObject *wndNumberSetNumber(PyObject *poSelf, PyObject *poArgs)
 	return Py_BuildNone();
 }
 
-PyObject *wndNumberSetNumberHorizontalAlignCenter(PyObject *poSelf, PyObject *poArgs)
+PyObject * wndNumberSetNumberHorizontalAlignCenter(PyObject * poSelf, PyObject * poArgs)
 {
 	UI::CWindow * pWindow;
 	if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
@@ -2311,11 +2381,11 @@ PyObject *wndImageSetRenderingRect(PyObject *poSelf, PyObject *poArgs)
 		((UI::CExpandedImageBox*)pWindow)->SetRenderingRect(fLeft, fTop, fRight, fBottom);
 	else if (pWindow->IsType(UI::CAniImageBox::Type()))
 		((UI::CAniImageBox*)pWindow)->SetRenderingRect(fLeft, fTop, fRight, fBottom);
-#ifdef ENABLE_INGAME_WIKI_SYSTEM
+#ifdef ENABLE_WIKI_SYSTEM
 	else if (pWindow->IsType(UI::CRenderTarget::Type()))
 		((UI::CRenderTarget*)pWindow)->SetRenderingRect(fLeft, fTop, fRight, fBottom);
 #endif
-#ifdef ENABLE_DUNGEON_TRACKING_SYSTEM
+#if defined(ENABLE_TRACK_WINDOW) && defined(ENABLE_ADVANCED_GAME_OPTIONS)
 	else if (pWindow->IsType(UI::CButton::Type()))
 		((UI::CButton*)pWindow)->SetRenderingRect(fLeft, fTop, fRight, fBottom);
 	else if (pWindow->IsType(UI::CRadioButton::Type()))
@@ -2370,10 +2440,67 @@ PyObject *wndImageAppendImage(PyObject *poSelf, PyObject *poArgs)
 	return Py_BuildNone();
 }
 
-#ifdef ENABLE_MINIGAME_OKEY_CARDS_SYSTEM
-PyObject *wndImageResetFrame(PyObject *poSelf, PyObject *poArgs)
+#ifdef ENABLE_MINI_GAME
+PyObject* wndMgrSetCardSlot(PyObject* poSelf, PyObject* poArgs)
 {
-	UI::CWindow * pWindow;
+	UI::CWindow* pWin;
+	if (!PyTuple_GetWindow(poArgs, 0, &pWin))
+		return Py_BuildException();
+
+	int iSlotIndex;
+	if (!PyTuple_GetInteger(poArgs, 1, &iSlotIndex))
+		return Py_BuildException();
+
+	int iItemIndex;
+	if (!PyTuple_GetInteger(poArgs, 2, &iItemIndex))
+		return Py_BuildException();
+
+	int iWidth;
+	if (!PyTuple_GetInteger(poArgs, 3, &iWidth))
+		return Py_BuildException();
+
+	int iHeight;
+	if (!PyTuple_GetInteger(poArgs, 4, &iHeight))
+		return Py_BuildException();
+
+	char* c_szFileName;
+	if (!PyTuple_GetString(poArgs, 5, &c_szFileName))
+		return Py_BuildException();
+
+	D3DXCOLOR diffuseColor;
+	PyObject* pTuple;
+	if (!PyTuple_GetObject(poArgs, 6, &pTuple))
+	{
+		diffuseColor = D3DXCOLOR(1.0, 1.0, 1.0, 1.0);
+		//return Py_BuildException();
+	}
+	else
+		// get diffuse color from pTuple
+	{
+		if (PyTuple_Size(pTuple) != 4)
+			return Py_BuildException();
+		if (!PyTuple_GetFloat(pTuple, 0, &diffuseColor.r))
+			return Py_BuildException();
+		if (!PyTuple_GetFloat(pTuple, 1, &diffuseColor.g))
+			return Py_BuildException();
+		if (!PyTuple_GetFloat(pTuple, 2, &diffuseColor.b))
+			return Py_BuildException();
+		if (!PyTuple_GetFloat(pTuple, 3, &diffuseColor.a))
+			return Py_BuildException();
+	}
+
+	if (!pWin->IsType(UI::CSlotWindow::Type()))
+		return Py_BuildException();
+
+	UI::CSlotWindow* pSlotWin = (UI::CSlotWindow*)pWin;
+	pSlotWin->SetCardSlot(iSlotIndex, iItemIndex, iWidth, iHeight, c_szFileName, diffuseColor);
+
+	return Py_BuildNone();
+}
+
+PyObject* wndImageResetFrame(PyObject* poSelf, PyObject* poArgs)
+{
+	UI::CWindow* pWindow;
 	if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
 		return Py_BuildException();
 
@@ -2561,6 +2688,54 @@ PyObject *wndButtonIsDown(PyObject *poSelf, PyObject *poArgs)
 
 	return Py_BuildValue("i", ((UI::CButton*)pWindow)->IsPressed());
 }
+
+#ifdef ENABLE_FISH_EVENT_SYSTEM
+PyObject * wndMgrSetPickedAreaRender(PyObject * poSelf, PyObject * poArgs)
+{
+	UI::CWindow * pWin;
+	if (!PyTuple_GetWindow(poArgs, 0, &pWin))
+		return Py_BuildException();
+
+	int iFlag;
+	if (!PyTuple_GetInteger(poArgs, 1, &iFlag))
+		return Py_BuildException();
+
+	if (!pWin->IsType(UI::CGridSlotWindow::Type()))
+	{
+		TraceError("wndMgr.SetPickedAreaRender : not a grid window");
+		return Py_BuildException();
+	}
+
+	UI::CGridSlotWindow * pGridSlotWin = (UI::CGridSlotWindow *)pWin;
+	pGridSlotWin->SetPickedAreaRender(iFlag ? true : false);
+
+	return Py_BuildNone();
+}
+PyObject * wndMgrDeleteCoverButton(PyObject * poSelf, PyObject * poArgs)
+{
+	UI::CWindow * pWindow;
+	if (!PyTuple_GetWindow(poArgs, 0, &pWindow))
+		return Py_BuildException();
+
+	int iSlotIndex;
+	if (!PyTuple_GetInteger(poArgs, 1, &iSlotIndex))
+		return Py_BuildException();
+
+	UI::CSlotWindow * pSlotWin = (UI::CSlotWindow *)pWindow;
+	pSlotWin->DeleteCoverButton(iSlotIndex);
+
+	return Py_BuildNone();
+}
+PyObject * wndMgrSetDisableDeattach(PyObject * poSelf, PyObject * poArgs)
+{
+	BOOL bFlag;
+	if (!PyTuple_GetInteger(poArgs, 0, &bFlag))
+		return Py_BuildException();
+
+	UI::CWindowManager::Instance().SetDisableDeattach(bFlag ? true : false);
+	return Py_BuildNone();
+}
+#endif
 
 extern BOOL g_bOutlineBoxEnable;
 extern BOOL g_bShowOverInWindowName;
@@ -3189,9 +3364,6 @@ void initwndMgr()
 		{ "ClearAllSlot",				wndMgrClearAllSlot,					METH_VARARGS },
 		{ "HasSlot",					wndMgrHasSlot,						METH_VARARGS },
 		{ "SetSlot",					wndMgrSetSlot,						METH_VARARGS },
-#ifdef ENABLE_MINIGAME_OKEY_CARDS_SYSTEM
-		{ "SetCardSlot",				wndMgrSetCardSlot,					METH_VARARGS },
-#endif
 		{ "SetSlotCount",				wndMgrSetSlotCount,					METH_VARARGS },
 		{ "SetSlotCountNew",			wndMgrSetSlotCountNew,				METH_VARARGS },
 		{ "SetSlotRealNumber",			wndMgrSetRealSlotNumber,			METH_VARARGS },
@@ -3254,9 +3426,23 @@ void initwndMgr()
 		{ "SetLimitWidth",				wndTextSetLimitWidth,				METH_VARARGS },
 		{ "GetText",					wndTextGetText,						METH_VARARGS },
 		{ "GetTextSize",				wndTextGetTextSize,					METH_VARARGS },
+#ifdef ENABLE_SUNG_MAHI_TOWER
+		{ "GetCharSize",				wndTextGetCharSize,					METH_VARARGS },
+#endif
 		{ "ShowCursor",					wndTextShowCursor,					METH_VARARGS },
 		{ "HideCursor",					wndTextHideCursor,					METH_VARARGS },
 		{ "GetCursorPosition",			wndTextGetCursorPosition,			METH_VARARGS },
+
+#ifdef INSIDE_RENDER
+		{ "SetInsideRender",			wndMgrSetInsideRender,				METH_VARARGS },
+		{ "SetRenderingRect",			wndSetRenderingRect,				METH_VARARGS },
+		{ "GetRenderBox",				wndMgrGetRenderBox,					METH_VARARGS },
+		{ "SetFixedRenderPos",			wndTextSetFixedRenderPos,			METH_VARARGS },
+		{ "GetRenderPos",				wndTextGetRenderPos,				METH_VARARGS },
+		{ "UnloadImage",				wndImageUnloadImage,				METH_VARARGS },
+		{ "IsShowCursor",				wndTextIsShowCursor,				METH_VARARGS },
+#endif
+
 		// NumberLine
 		{ "SetNumber",						wndNumberSetNumber,							METH_VARARGS },
 		{ "SetNumberHorizontalAlignCenter",	wndNumberSetNumberHorizontalAlignCenter,	METH_VARARGS },
@@ -3285,7 +3471,9 @@ void initwndMgr()
 		// AniImageBox
 		{ "SetDelay",					wndImageSetDelay,					METH_VARARGS },
 		{ "AppendImage",				wndImageAppendImage,				METH_VARARGS },
-#ifdef ENABLE_MINIGAME_OKEY_CARDS_SYSTEM
+
+#ifdef ENABLE_MINI_GAME
+		{ "SetCardSlot",				wndMgrSetCardSlot,					METH_VARARGS },
 		{ "ResetFrame",					wndImageResetFrame,					METH_VARARGS },
 #endif
 #ifdef ENABLE_OFFICAL_FEATURES
@@ -3308,6 +3496,11 @@ void initwndMgr()
 		{ "Down",						wndButtonDown,						METH_VARARGS },
 		{ "SetUp",						wndButtonSetUp,						METH_VARARGS },
 		{ "IsDown",						wndButtonIsDown,					METH_VARARGS },
+#ifdef ENABLE_FISH_EVENT_SYSTEM
+		{ "SetPickedAreaRender",		wndMgrSetPickedAreaRender,			METH_VARARGS },
+		{ "DeleteCoverButton",			wndMgrDeleteCoverButton,			METH_VARARGS },
+		{ "SetDisableDeattach",			wndMgrSetDisableDeattach,			METH_VARARGS },
+#endif
 #ifdef ENABLE_OFFICAL_FEATURES
 		{ "LeftRightReverse", 			wndButtonLeftRightReverse, 			METH_VARARGS },
 #endif

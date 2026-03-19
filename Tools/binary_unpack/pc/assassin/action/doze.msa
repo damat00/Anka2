@@ -1,7 +1,7 @@
 ScriptType               MotionData
 
 MotionFileName           "D:/Ymir Work/pc/assassin/action/doze.gr2"
-MotionDuration           4.666667
+MotionDuration           4.700000
 Accumulation           0.00	0.00	0.00
 
 Group MotionEventData

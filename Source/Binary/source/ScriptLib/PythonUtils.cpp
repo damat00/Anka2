@@ -55,7 +55,7 @@ bool PyTuple_GetObject(PyObject *poArgs, int pos, PyObject ** ret)
 
 	if (!poItem)
 		return false;
-	
+
 	*ret = poItem;
 	return true;
 }
@@ -132,10 +132,10 @@ bool PyTuple_GetInteger(PyObject *poArgs, int pos, int* ret)
 		return false;
 
 	PyObject *poItem = PyTuple_GetItem(poArgs, pos);
-	
+
 	if (!poItem)
 		return false;
-	
+
 	*ret = PyLong_AsLong(poItem);
 	return true;
 }
@@ -146,7 +146,7 @@ bool PyTuple_GetUnsignedLong(PyObject *poArgs, int pos, unsigned long *ret)
 		return false;
 
 	PyObject *poItem = PyTuple_GetItem(poArgs, pos);
-	
+
 	if (!poItem)
 		return false;
 	
@@ -176,10 +176,10 @@ bool PyTuple_GetUnsignedInteger(PyObject *poArgs, int pos, unsigned int *ret)
 		return false;
 
 	PyObject *poItem = PyTuple_GetItem(poArgs, pos);
-	
+
 	if (!poItem)
 		return false;
-	
+
 	*ret = PyLong_AsUnsignedLong(poItem);
 	return true;
 }
@@ -194,7 +194,7 @@ bool PyTuple_GetString(PyObject *poArgs, int pos, char ** ret)
 	if (!poItem)
 		return false;
 
-	if (!PyString_Check(poItem)) 
+	if (!PyString_Check(poItem))
 		return false;
 
 	*ret = PyString_AsString(poItem);
@@ -205,7 +205,7 @@ bool PyTuple_GetBoolean(PyObject *poArgs, int pos, bool *ret)
 {
 	if (pos >= PyTuple_Size(poArgs))
 		return false;
-	
+
 	PyObject *poItem = PyTuple_GetItem(poArgs, pos);
 
 	if (!poItem)
@@ -219,7 +219,6 @@ bool PyCallClassMemberFunc(PyObject *poClass, PyObject *poFunc, PyObject *poArgs
 {
 	PyObject *poRet;
 
-	// NOTE : NULL 체크 추가.. - [levites]
 	if (!poClass)
 	{
 		Py_XDECREF(poArgs);
@@ -237,7 +236,6 @@ bool PyCallClassMemberFunc(PyObject *poClass, const char *c_szFunc, PyObject *po
 {
 	PyObject *poRet;
 
-	// NOTE : NULL 체크 추가.. - [levites]
 	if (!poClass)
 	{
 		Py_XDECREF(poArgs);
@@ -255,7 +253,6 @@ bool PyCallClassMemberFunc_ByPyString(PyObject *poClass, PyObject *poFuncName, P
 {
 	PyObject *poRet;
 
-	// NOTE : NULL 체크 추가.. - [levites]
 	if (!poClass)
 	{
 		Py_XDECREF(poArgs);
@@ -264,7 +261,7 @@ bool PyCallClassMemberFunc_ByPyString(PyObject *poClass, PyObject *poFuncName, P
 
 	if (!__PyCallClassMemberFunc_ByPyString(poClass, poFuncName, poArgs, &poRet))
 		return false;
-	
+
 	Py_DECREF(poRet);
 	return true;
 }
@@ -303,14 +300,9 @@ bool PyCallClassMemberFunc(PyObject *poClass, const char *c_szFunc, PyObject *po
 	return false;
 }
 
-/*
- *	이 함수를 직접 호출하지 않도록 한다.
- *	부득이 하게 직접 호출할 경우에는 �?드시 false 가 리턴 됐을 때
- *	Py_DECREF(poArgs); 를 해준다.
- */
 bool __PyCallClassMemberFunc_ByCString(PyObject *poClass, const char *c_szFunc, PyObject *poArgs, PyObject ** ppoRet)
 {
-	if (!poClass) 
+	if (!poClass)
 	{
 		Py_XDECREF(poArgs);
 		return false;
@@ -319,13 +311,13 @@ bool __PyCallClassMemberFunc_ByCString(PyObject *poClass, const char *c_szFunc, 
 	PyObject *poFunc = PyObject_GetAttrString(poClass, (char *)c_szFunc);	// New Reference
 
 	if (!poFunc)
-	{		
+	{
 		PyErr_Clear();
 		Py_XDECREF(poArgs);
 		return false;
 	}
 
-	if (!PyCallable_Check(poFunc)) 
+	if (!PyCallable_Check(poFunc))
 	{
 		Py_DECREF(poFunc);
 		Py_XDECREF(poArgs);
@@ -358,7 +350,7 @@ bool __PyCallClassMemberFunc_ByCString(PyObject *poClass, const char *c_szFunc, 
 
 bool __PyCallClassMemberFunc_ByPyString(PyObject *poClass, PyObject *poFuncName, PyObject *poArgs, PyObject ** ppoRet)
 {
-	if (!poClass) 
+	if (!poClass)
 	{
 		Py_XDECREF(poArgs);
 		return false;
@@ -367,13 +359,13 @@ bool __PyCallClassMemberFunc_ByPyString(PyObject *poClass, PyObject *poFuncName,
 	PyObject *poFunc = PyObject_GetAttr(poClass, poFuncName);	// New Reference
 
 	if (!poFunc)
-	{		
+	{
 		PyErr_Clear();
 		Py_XDECREF(poArgs);
 		return false;
 	}
 
-	if (!PyCallable_Check(poFunc)) 
+	if (!PyCallable_Check(poFunc))
 	{
 		Py_DECREF(poFunc);
 		Py_XDECREF(poArgs);
@@ -406,20 +398,20 @@ bool __PyCallClassMemberFunc_ByPyString(PyObject *poClass, PyObject *poFuncName,
 
 bool __PyCallClassMemberFunc(PyObject *poClass, PyObject *poFunc, PyObject *poArgs, PyObject ** ppoRet)
 {
-	if (!poClass) 
+	if (!poClass)
 	{
 		Py_XDECREF(poArgs);
 		return false;
 	}
 
 	if (!poFunc)
-	{		
+	{
 		PyErr_Clear();
 		Py_XDECREF(poArgs);
 		return false;
 	}
 
-	if (!PyCallable_Check(poFunc)) 
+	if (!PyCallable_Check(poFunc))
 	{
 		Py_DECREF(poFunc);
 		Py_XDECREF(poArgs);

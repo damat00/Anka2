@@ -138,6 +138,7 @@ class CPythonSkill : public CSingleton<CPythonSkill>
 			SKILL_ATTRIBUTE_HORSE_SKILL				= (1 << 21),
 			SKILL_ATTRIBUTE_CIRCLE_RANGE			= (1 << 22),
 			SKILL_ATTRIBUTE_SEARCH_TARGET			= (1 << 23),
+			SKILL_ATTRIBUTE_IGNORE_BLOCK			= (1 << 24),
 		};
 
 		enum
@@ -193,13 +194,14 @@ class CPythonSkill : public CSingleton<CPythonSkill>
 		typedef struct SSkillData
 		{
 			static DWORD MELEE_SKILL_TARGET_RANGE;
-
+			// Functions
 			SSkillData();
 			DWORD GetTargetRange() const;
 			BOOL CanChangeDirection();
 			BOOL IsFanRange();
 			BOOL IsCircleRange();
 			BOOL IsAutoSearchTarget();
+			BOOL IsIgnoreTarget();
 			BOOL IsNeedTarget();
 			BOOL IsNeedCorpse();
 			BOOL IsToggleSkill();
@@ -229,7 +231,7 @@ class CPythonSkill : public CSingleton<CPythonSkill>
 			DWORD GetMotionLoopCount(float fSkillPoint);
 			DWORD GetTargetCount(float fSkillPoint);
 			DWORD GetDuration(float fSkillPoint);
-			DWORD GetSkillMotionIndex(int iGrade=-1);
+			DWORD GetSkillMotionIndex(int iGrade = -1);
 			BYTE GetMaxLevel();
 			BYTE GetLevelUpPoint();
 			bool IsCanUseSkill();
@@ -238,6 +240,7 @@ class CPythonSkill : public CSingleton<CPythonSkill>
 			const std::string GetName() const;
 			BYTE GetType() const;
 
+			// Variable
 			BYTE byType;
 			DWORD dwSkillIndex;
 			BYTE byMaxLevel;

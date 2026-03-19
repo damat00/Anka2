@@ -179,7 +179,7 @@ class CProfiler : public singleton<CProfiler>
 				stLine.assign(p->iDepth * 5, ' ');
 				stLine += p->strName;
 
-				fprintf(fp, "%-30s %10d/%-10d %.2f\n", 
+				fprintf(fp, "%-30s %10d/%-10d %.2f\n",
 						stLine.c_str(),
 						p->iCallingCount, p->iCollapsedTime,
 						p->iCallingCount != 0 ? (float) p->iCollapsedTime / p->iCallingCount : 0.0f);
@@ -228,9 +228,11 @@ class CProfiler : public singleton<CProfiler>
 		}
 
 	protected:
+		// Profile Stack Data
 		int m_ProfileStackDataCount;
 		TProfileStackData m_ProfileStackDatas[STACK_DATA_MAX_NUM];
 
+		// Profile Accum Data
 		TProfileAccumDataMap			m_ProfileAccumDataMap;
 		std::vector<TProfileAccumData *>	m_vec_Accum;
 		int					m_iAccumDepth;

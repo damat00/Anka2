@@ -11,10 +11,14 @@ class CGraphicTexture : public CGraphicBase
 		int GetHeight() const;
 
 		void SetTextureStage(int stage) const;
-		LPDIRECT3DTEXTURE8 GetD3DTexture() const;
+#ifdef ENABLE_DIRECTX9_UPDATE
+        LPDIRECT3DTEXTURE9 GetD3DTexture() const;
+#else
+        LPDIRECT3DTEXTURE8 GetD3DTexture() const;
+#endif
 
 		void DestroyDeviceObjects();
-		
+
 	protected:
 		CGraphicTexture();
 		virtual	~CGraphicTexture();
@@ -28,5 +32,9 @@ class CGraphicTexture : public CGraphicBase
 		int m_width;
 		int m_height;
 
-		LPDIRECT3DTEXTURE8 m_lpd3dTexture;
+#ifdef ENABLE_DIRECTX9_UPDATE
+        LPDIRECT3DTEXTURE9 m_lpd3dTexture;
+#else
+        LPDIRECT3DTEXTURE8 m_lpd3dTexture;
+#endif
 };

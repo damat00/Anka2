@@ -14,6 +14,9 @@ if app.ENABLE_RENEWAL_DEAD_PACKET:
 if app.ENABLE_RESTART_INSTANT:
 	import uiCommon
 
+if app.ENABLE_SUNG_MAHI_TOWER:
+	import wndMgr
+
 class RestartDialog(ui.ScriptWindow):
 
 	def __init__(self):
@@ -49,6 +52,31 @@ class RestartDialog(ui.ScriptWindow):
 		self.restartHereButton.SetEvent(ui.__mem_func__(self.RestartHere))
 		self.restartTownButton.SetEvent(ui.__mem_func__(self.RestartTown))
 
+		if app.ENABLE_SUNG_MAHI_TOWER:
+			self.isSungMahiMap = False
+
+			self.dlgBox = ui.Board()
+			self.dlgBox.SetSize(300, 100)
+			self.dlgBox.SetPosition((wndMgr.GetScreenWidth() / 2) - 150, (wndMgr.GetScreenHeight() / 2) - 100)
+
+			self.dlgBoxText = ui.TextLine()
+			self.dlgBoxText.SetParent(self.dlgBox)
+			self.dlgBoxText.SetPosition(40, 35)
+			self.dlgBoxText.SetText("O infrangere amara! Calatoria ta se termina aici.")
+			self.dlgBoxText.Show()
+
+			self.dlgBoxButton = ui.Button()
+			self.dlgBoxButton.SetParent(self.dlgBox)
+			self.dlgBoxButton.SetUpVisual("d:/ymir work/ui/public/small_button_01.sub")
+			self.dlgBoxButton.SetOverVisual("d:/ymir work/ui/public/small_button_02.sub")
+			self.dlgBoxButton.SetDownVisual("d:/ymir work/ui/public/small_button_03.sub")
+			self.dlgBoxButton.SetPosition(125, 60)
+			self.dlgBoxButton.SetEvent(ui.__mem_func__(self.RestartHere))
+			self.dlgBoxButton.SetText("OK")
+			self.dlgBoxButton.Show()
+
+			self.dlgBox.Hide()
+
 		if app.ENABLE_RESTART_INSTANT:
 			self.restartInstantButton.SetEvent(ui.__mem_func__(self.RestartInstantMessage))
 
@@ -71,8 +99,19 @@ class RestartDialog(ui.ScriptWindow):
 
 		self.ClearDictionary()
 
+	if app.ENABLE_SUNG_MAHI_TOWER:
+		def SetSungMahiRestartDialog(self):
+			self.isSungMahiMap = True
+
 	if app.ENABLE_RENEWAL_DEAD_PACKET:
 		def OpenDialog(self, times):
+			if app.ENABLE_SUNG_MAHI_TOWER:
+				if self.isSungMahiMap:
+					self.dlgBox.Show()
+					return
+			import chat
+			chat.AppendChat(1,"{}".format(times))
+
 			for x in xrange(player.REVIVE_TYPE_MAX):
 				self.reviveTimeStamp[x] = app.GetTime() + times[x]
 				self.reviveTimeTexts[x].Show()
@@ -101,6 +140,11 @@ class RestartDialog(ui.ScriptWindow):
 
 	def Close(self):
 		self.Hide()
+
+		if app.ENABLE_SUNG_MAHI_TOWER:
+			if self.dlgBox.IsShow():
+				self.dlgBox.Hide()
+
 		return TRUE
 
 	def RestartHere(self):

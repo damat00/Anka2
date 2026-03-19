@@ -11,7 +11,7 @@ bool CNetworkPacketHeaderMap::Get(int header, TPacketType * pPacketType)
 
 	if (m_headerMap.end()==f)
 		return false;
-	
+
 	*pPacketType = f->second;
 
 	return true;

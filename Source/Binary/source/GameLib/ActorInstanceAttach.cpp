@@ -26,11 +26,25 @@ bool CActorInstance::__IsLeftHandWeapon(DWORD type)
 		return true;
 	if (CItemData::WEAPON_FAN == type && __IsMountingHorse())
 	{
+		// Standing mount (hoverboard) motionlarÃƒÆ’Ã¢â‚¬ï¿½Ãƒâ€šÃ‚Â±nda fan sol ele takÃƒÆ’Ã¢â‚¬ï¿½Ãƒâ€šÃ‚Â±lmamalÃƒÆ’Ã¢â‚¬ï¿½Ãƒâ€šÃ‚Â±.
+		// (BazÃƒÆ’Ã¢â‚¬ï¿½Ãƒâ€šÃ‚Â± durumlarda horse race beklenenden farklÃƒÆ’Ã¢â‚¬ï¿½Ãƒâ€šÃ‚Â± gelebiliyor; motion mode ile garantile.)
+		const WORD wMotionMode = GetMotionMode();
+		if (wMotionMode == CRaceMotionData::MODE_HORSE_STAND ||
+			wMotionMode == CRaceMotionData::MODE_HORSE_STAND_FAN)
+			return false;
+
 		DWORD dwRace = m_pkHorse->GetRace();
+		if (dwRace >= STANDING_MOUNT_VNUM_1 && dwRace <= STANDING_MOUNT_VNUM_3)
+			return false;
 		if (dwRace != STANDING_MOUNT_VNUM_1 && 
 			dwRace != STANDING_MOUNT_VNUM_2 && 
 			dwRace != STANDING_MOUNT_VNUM_3)
 			return true;
+	}
+	else if (CItemData::WEAPON_FAN == type)
+	{
+		// Yaya iken fan tek elde olmalÃ„Â±.
+		return false;
 	}
 #else
 	if (CItemData::WEAPON_DAGGER == type || (CItemData::WEAPON_FAN == type && __IsMountingHorse()))
@@ -109,19 +123,38 @@ void CActorInstance::AttachWeapon(DWORD dwItemIndex, DWORD dwParentPartIndex, DW
 
 	if (pItemData->GetType() != CItemData::ITEM_TYPE_COSTUME)
 	{
-		if (__IsRightHandWeapon(pItemData->GetWeaponType()))
+		const DWORD weaponType = pItemData->GetWeaponType();
+		const bool bRight = __IsRightHandWeapon(weaponType);
+		const bool bLeft = __IsLeftHandWeapon(weaponType);
+
+		if (!bLeft)
+		{
+			RegisterModelThing(CRaceData::PART_WEAPON_LEFT, nullptr);
+			SetModelInstance(CRaceData::PART_WEAPON_LEFT, CRaceData::PART_WEAPON_LEFT, 0);
+		}
+
+		if (bRight)
 			AttachWeapon(dwParentPartIndex, CRaceData::PART_WEAPON, pItemData);
 		
-		if (__IsLeftHandWeapon(pItemData->GetWeaponType()))
+		if (bLeft)
 			AttachWeapon(dwParentPartIndex, CRaceData::PART_WEAPON_LEFT, pItemData);
 	}
 	else
 	{
 		DWORD typeDec = pItemData->GetValue(3);
-		if (__IsRightHandWeapon(typeDec))
+		const bool bRight = __IsRightHandWeapon(typeDec);
+		const bool bLeft = __IsLeftHandWeapon(typeDec);
+
+		if (!bLeft)
+		{
+			RegisterModelThing(CRaceData::PART_WEAPON_LEFT, nullptr);
+			SetModelInstance(CRaceData::PART_WEAPON_LEFT, CRaceData::PART_WEAPON_LEFT, 0);
+		}
+
+		if (bRight)
 			AttachWeapon(dwParentPartIndex, CRaceData::PART_WEAPON, pItemData);
 		
-		if (__IsLeftHandWeapon(typeDec))
+		if (bLeft)
 			AttachWeapon(dwParentPartIndex, CRaceData::PART_WEAPON_LEFT, pItemData);
 	}
 }
@@ -305,9 +338,13 @@ void CActorInstance::RefreshActorInstance()
 		return;
 	}
 
+	// This is Temporary place before making the weapon detection system
+	// Setup Collison Detection Data
 	m_BodyPointInstanceList.clear();
+	//m_AttackingPointInstanceList.clear();
 	m_DefendingPointInstanceList.clear();
 
+	// Base
 	for (DWORD i = 0; i < m_pkCurRaceData->GetAttachingDataCount(); ++i)
 	{
 		const NRaceData::TAttachingData * c_pAttachingData;
@@ -555,7 +592,9 @@ void CActorInstance::ShowAllAttachingEffect()
 	{
 		CEffectManager::Instance().SelectEffectInstance(it->dwEffectIndex);
 		CEffectManager::Instance().ShowEffect();
+#ifdef __ENABLE_STEALTH_FIX__
 		CEffectManager::Instance().ReleaseAlwaysHidden();
+#endif
 	}
 }
 
@@ -566,7 +605,9 @@ void CActorInstance::HideAllAttachingEffect()
 	{
 		CEffectManager::Instance().SelectEffectInstance(it->dwEffectIndex);
 		CEffectManager::Instance().HideEffect();
+#ifdef __ENABLE_STEALTH_FIX__
 		CEffectManager::Instance().ApplyAlwaysHidden();
+#endif
 	}
 }
 
@@ -617,7 +658,7 @@ void CActorInstance::RenderAllAttachingEffect()
 }
 #endif
 
-#ifdef ENABLE_INGAME_WIKI_SYSTEM
+#if defined(ENABLE_WIKI_SYSTEM) || defined(INSIDE_RENDER)
 void CActorInstance::RenderAllAttachingEffectWiki()
 {
 	for (const auto& it : m_AttachingEffectList)

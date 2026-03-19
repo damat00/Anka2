@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CSpeedGrassWrapper Class
 //
 //	(c) 2003 IDV, Inc.
@@ -32,12 +32,14 @@
 //#include "../Common Source/Random.h"
 //#include "TextureLayers.h"
 
-using namespace std;
+//using namespace std;
+
+namespace { char dummy; }; // solve warning lnk4221
 
 #ifdef USE_SPEEDGRASS
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CSpeedGrassWrapper::CSpeedGrassWrapper
 
 CSpeedGrassWrapper::CSpeedGrassWrapper() : m_pMapOutdoor(nullptr), m_lpD3DTexure8(nullptr)//m_uiTexture(0)
@@ -45,7 +47,7 @@ CSpeedGrassWrapper::CSpeedGrassWrapper() : m_pMapOutdoor(nullptr), m_lpD3DTexure
 }
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CSpeedGrassWrapper::~CSpeedGrassWrapper
 
 CSpeedGrassWrapper::~CSpeedGrassWrapper( )
@@ -53,7 +55,7 @@ CSpeedGrassWrapper::~CSpeedGrassWrapper( )
 }
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CSpeedGrassWrapper::Draw
 
 int CSpeedGrassWrapper::Draw(float fDensity)
@@ -63,13 +65,13 @@ int CSpeedGrassWrapper::Draw(float fDensity)
 	return nTriangleCount;
 }
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CSpeedGrassWrapper::InitFromBsfFile
 
-bool CSpeedGrassWrapper::InitFromBsfFile(const char *pFilename, 
-										 unsigned int nNumBlades, 
-										 unsigned int uiRows, 
-										 unsigned int uiCols, 
+bool CSpeedGrassWrapper::InitFromBsfFile(const char* pFilename,
+										 unsigned int nNumBlades,
+										 unsigned int uiRows,
+										 unsigned int uiCols,
 										 float fCollisionDistance)
 {
 	bool bSuccess = false;
@@ -86,10 +88,10 @@ bool CSpeedGrassWrapper::InitFromBsfFile(const char *pFilename,
 }
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CSpeedGrassWrapper::Color
 
-float CSpeedGrassWrapper::Color(float fX, float fY, const float *pNormal, float *pTopColor, float *pBottomColor) const
+float CSpeedGrassWrapper::Color(float fX, float fY, const float* pNormal, float* pTopColor, float* pBottomColor) const
 {
 	const float c_fColorAdjust = 0.3f;	// controls how much the color of the top vertices of each grass blade can vary
 	const float c_fColorThrow = 1.0f;	// controls how much the r, g, and b components can vary
@@ -128,10 +130,10 @@ float CSpeedGrassWrapper::Color(float fX, float fY, const float *pNormal, float 
 }
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CSpeedGrassWrapper::Height
 
-float CSpeedGrassWrapper::Height(float fX, float fY, float *pNormal) const
+float CSpeedGrassWrapper::Height(float fX, float fY, float* pNormal) const
 {
 	float fHeight = 0.0f;
 	float afPos[3] = { fX, fY, 0.0f };
@@ -145,13 +147,13 @@ float CSpeedGrassWrapper::Height(float fX, float fY, float *pNormal) const
 }
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CSpeedGrassWrapper::InitGraphics
 
 void CSpeedGrassWrapper::InitGraphics(void)
 {
 	// load texture
-//	m_uiTexture = LoadDDS((c_strDataPath + string("brush_2.dds")).c_str( ));
+//	m_uiTexture = LoadDDS((c_strDataPath + std::string("brush_2.dds")).c_str( ));
 	CGraphicImage * pImage = (CGraphicImage *) CResourceManager::Instance().GetResourcePointer("D:/ymir work/special/brush_2.dds");
 	m_GrassImageInstance.SetImagePointer(pImage);
 	m_lpD3DTexure8 = m_GrassImageInstance.GetTexturePointer()->GetD3DTexture();
@@ -167,13 +169,13 @@ void CSpeedGrassWrapper::InitGraphics(void)
 		const int c_nNumCorners = 4;
 		unsigned int uiNumBlades = pRegion->m_vBlades.size( );
 		unsigned int uiBufferSize = uiNumBlades * c_nNumCorners * c_nGrassVertexTotalSize;
-		unsigned char *pBuffer = new unsigned char[uiBufferSize];
+		unsigned char* pBuffer = new unsigned char[uiBufferSize];
 
 		// setup initial pointers for individual attribute copying
-		float *pTexCoords0 = reinterpret_cast<float*>(pBuffer + 0);
-		float *pTexCoords1 = reinterpret_cast<float*>(pTexCoords0 + c_nGrassVertexTexture0Size * uiNumBlades * c_nNumCorners / sizeof(float));
-		unsigned char *pColors = (unsigned char *) pTexCoords1 + c_nGrassVertexTexture1Size * uiNumBlades * c_nNumCorners;
-		float *pPositions = reinterpret_cast<float*>(pColors + c_nGrassVertexColorSize * uiNumBlades * c_nNumCorners);
+		float* pTexCoords0 = reinterpret_cast<float*>(pBuffer + 0);
+		float* pTexCoords1 = reinterpret_cast<float*>(pTexCoords0 + c_nGrassVertexTexture0Size * uiNumBlades * c_nNumCorners / sizeof(float));
+		unsigned char* pColors = (unsigned char*) pTexCoords1 + c_nGrassVertexTexture1Size * uiNumBlades * c_nNumCorners;
+		float* pPositions = reinterpret_cast<float*>(pColors + c_nGrassVertexColorSize * uiNumBlades * c_nNumCorners);
 
 		for (vector<SBlade>::const_iterator iBlade = pRegion->m_vBlades.begin( ); iBlade != pRegion->m_vBlades.end( ); ++iBlade)
 		{
@@ -203,9 +205,9 @@ void CSpeedGrassWrapper::InitGraphics(void)
 					break;
 				default:
 					assert(false);
-				}	
+				}
 				pTexCoords0 += c_nGrassVertexTexture0Size / sizeof(float);
-			
+
 				// texcoord 1
 				switch (nCorner)
 				{
@@ -227,7 +229,7 @@ void CSpeedGrassWrapper::InitGraphics(void)
 					break;
 				default:
 					assert(false);
-				}	
+				}
 				// same for all corners
 				pTexCoords1[1] = iBlade->m_fSize;
 				pTexCoords1[3] = iBlade->m_fNoise;
@@ -254,20 +256,20 @@ void CSpeedGrassWrapper::InitGraphics(void)
 			}
 		}
 
-//		assert((unsigned char *) pTexCoords0 - pBuffer == c_nGrassVertexTexture0Size * uiNumBlades * c_nNumCorners);
+//		assert((unsigned char*) pTexCoords0 - pBuffer == c_nGrassVertexTexture0Size * uiNumBlades * c_nNumCorners);
 //		assert(pTexCoords1 - pTexCoords0 == (c_nGrassVertexTexture1Size * uiNumBlades * c_nNumCorners) / sizeof(float));
-//		assert(pColors - (unsigned char *) pTexCoords1 == c_nGrassVertexColorSize * uiNumBlades * c_nNumCorners);
-//		assert((unsigned char *) pPositions - pColors == c_nGrassVertexPositionSize * uiNumBlades * c_nNumCorners);
+//		assert(pColors - (unsigned char*) pTexCoords1 == c_nGrassVertexColorSize * uiNumBlades * c_nNumCorners);
+//		assert((unsigned char*) pPositions - pColors == c_nGrassVertexPositionSize * uiNumBlades * c_nNumCorners);
 
 //		pRegion->m_pVertexBuffer->SetBuffer(pBuffer, uiBufferSize, true);
 //		pRegion->m_pVertexBuffer->SetStride(CIdvVertexBuffer::VERTEX_TEXCOORD0, 2, GL_FLOAT, 0, 0);
-//		pRegion->m_pVertexBuffer->SetStride(CIdvVertexBuffer::VERTEX_TEXCOORD1, 4, GL_FLOAT, 0, (unsigned char *) pTexCoords0 - pBuffer);
-//		pRegion->m_pVertexBuffer->SetStride(CIdvVertexBuffer::VERTEX_COLOR, 4, GL_UNSIGNED_BYTE, 0, (unsigned char *) pTexCoords1 - pBuffer);
+//		pRegion->m_pVertexBuffer->SetStride(CIdvVertexBuffer::VERTEX_TEXCOORD1, 4, GL_FLOAT, 0, (unsigned char*) pTexCoords0 - pBuffer);
+//		pRegion->m_pVertexBuffer->SetStride(CIdvVertexBuffer::VERTEX_COLOR, 4, GL_UNSIGNED_BYTE, 0, (unsigned char*) pTexCoords1 - pBuffer);
 //		pRegion->m_pVertexBuffer->SetStride(CIdvVertexBuffer::VERTEX_POSITION, 3, GL_FLOAT, 0, pColors - pBuffer);
 
  		DWORD dwFVF = D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1;
 // 		pRegion->m_VertexBuffer.Create();
-		
+
 		delete[] pBuffer;
 	}
 }

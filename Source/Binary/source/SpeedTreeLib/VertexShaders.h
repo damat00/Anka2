@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	SpeedTreeRT DirectX Example
 //
 //	(c) 2003 IDV, Inc.
@@ -26,7 +26,7 @@
 //		Fax:   (803) 931-0320
 //		Web:   http://www.idvinc.com
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	Includes
 
 #pragma once
@@ -34,7 +34,7 @@
 #include <map>
 #include <string>
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	Branch & Frond Vertex Formats
 
 static DWORD D3DFVF_SPEEDTREE_BRANCH_VERTEX =
@@ -49,37 +49,37 @@ static DWORD D3DFVF_SPEEDTREE_BRANCH_VERTEX =
 	#else
 		D3DFVF_TEX1 | D3DFVF_TEXCOORDSIZE2(0)	// always have first texture layer coords
 	#endif
-	#ifdef WRAPPER_USE_GPU_WIND					
+	#ifdef WRAPPER_USE_GPU_WIND
 		| D3DFVF_TEX3 | D3DFVF_TEXCOORDSIZE2(2)	// GPU Only - wind weight and index passed in second texture layer
 	#endif
 		;
 
-/////////////////////////////////////////////////////////////////////// 
+///////////////////////////////////////////////////////////////////////
 // FVF Branch Vertex Structure
 
 struct SFVFBranchVertex
 {
-	D3DXVECTOR3		m_vPosition;			// Always Used							
-#ifdef WRAPPER_USE_DYNAMIC_LIGHTING			
-	D3DXVECTOR3		m_vNormal;				// Dynamic Lighting Only			
-#else										     
-	DWORD			m_dwDiffuseColor;		// Static Lighting Only	
-#endif	
+	D3DXVECTOR3		m_vPosition;			// Always Used
+#ifdef WRAPPER_USE_DYNAMIC_LIGHTING
+	D3DXVECTOR3		m_vNormal;				// Dynamic Lighting Only
+#else
+	DWORD			m_dwDiffuseColor;		// Static Lighting Only
+#endif
 	FLOAT			m_fTexCoords[2];		// Always Used
 #ifdef WRAPPER_RENDER_SELF_SHADOWS
 	FLOAT			m_fShadowCoords[2];		// Texture coordinates for the shadows
 #endif
-#ifdef WRAPPER_USE_GPU_WIND		
+#ifdef WRAPPER_USE_GPU_WIND
 	FLOAT			m_fWindIndex;			// GPU Only
-	FLOAT			m_fWindWeight;			
+	FLOAT			m_fWindWeight;
 #endif
 };
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	Branch/Frond Vertex Program
 
-static const char g_achSimpleVertexProgram[] = 
+static const char g_achSimpleVertexProgram[] =
 {
 		"vs.1.1\n"												// identity shader version
 
@@ -112,10 +112,10 @@ static const char g_achSimpleVertexProgram[] =
 	#else
 		"mov		r1,			c[74]\n"						// can only use one const register per instruction
 		"mul		r5,			c[73],		r1\n"				// diffuse values
-	
+
 		"mov		r1,			c[75]\n"						// can only use one const register per instruction
 		"mul		r4,			c[72],		r1\n"				// ambient values
-			
+
 		"dp3		r2,		v3,			c[71]\n"				// dot light direction with normal
 //		"max		r2.x,		r2.x,		c[70].x\n"			// limit it
 		"mad		oD0,		r2.x,		r5,			r4\n"	// compute the final color
@@ -123,17 +123,41 @@ static const char g_achSimpleVertexProgram[] =
 };
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	LoadBranchShader
 
+#ifdef ENABLE_DIRECTX9_UPDATE
+static LPDIRECT3DVERTEXDECLARATION9 LoadBranchShader(LPDIRECT3DDEVICE9 pDx)
+#else
 static DWORD LoadBranchShader(LPDIRECT3DDEVICE8 pDx)
+#endif
 {
+#ifdef ENABLE_DIRECTX9_UPDATE
+    // branch shader declaration
+    D3DVERTEXELEMENT9 pBranchShaderDecl[] =
+    {
+        { 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 }
+        , { 0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0 }
+        , { 0, 16, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 }
+        , { 0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 1 }
+        , D3DDECL_END()
+    };
+
+    // assemble shader
+    LPDIRECT3DVERTEXDECLARATION9 dwShader = nullptr;
+    if (pDx->CreateVertexDeclaration(pBranchShaderDecl, &dwShader) != D3D_OK)
+    {
+        char szError[1024];
+        sprintf_s(szError, "Failed to create branch vertex shader.");
+        MessageBox(nullptr, szError, "Vertex Shader Error", MB_ICONSTOP);
+    }
+#else
 	#ifndef WRAPPER_USE_GPU_WIND
 		return D3DFVF_SPEEDTREE_BRANCH_VERTEX;
 	#endif
 
 	// branch shader declaration
-    DWORD pBranchShaderDecl[] = 
+    DWORD pBranchShaderDecl[] =
     {
 			D3DVSD_STREAM(0),
 			D3DVSD_REG(D3DVSDE_POSITION,        D3DVSDT_FLOAT3),
@@ -168,17 +192,18 @@ static DWORD LoadBranchShader(LPDIRECT3DDEVICE8 pDx)
 	else
     {
         char szError[1024];
-	    sprintf(szError, "Failed to assemble branch vertex shader.\nThe error reported is [ %s ].\n", pError->GetBufferPointer( ));
+	    sprintf(szError, "Failed to assemble branch vertex shader.\nThe error reported is [ %s ].\n", (char*)pError->GetBufferPointer());
 	    MessageBox(nullptr, szError, "Vertex Shader Error", MB_ICONSTOP);
     }
 
 	if (pCode)
     	pCode->Release();
+#endif
 
-	return dwShader;
+    return dwShader;
 }
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	Leaf Vertex Formats
 
 static DWORD D3DFVF_SPEEDTREE_LEAF_VERTEX =
@@ -189,42 +214,42 @@ static DWORD D3DFVF_SPEEDTREE_LEAF_VERTEX =
 		D3DFVF_DIFFUSE |
 	#endif
 		D3DFVF_TEX1 | D3DFVF_TEXCOORDSIZE2(0)	// always have first texture layer coords
-	#if defined WRAPPER_USE_GPU_WIND || defined WRAPPER_USE_GPU_LEAF_PLACEMENT					
+	#if defined WRAPPER_USE_GPU_WIND || defined WRAPPER_USE_GPU_LEAF_PLACEMENT
 		| D3DFVF_TEX3 | D3DFVF_TEXCOORDSIZE4(2)	// GPU Only - wind weight and index passed in second texture layer
 	#endif
 		;
 
 
-/////////////////////////////////////////////////////////////////////// 
+///////////////////////////////////////////////////////////////////////
 // FVF Leaf Vertex Structure
 
 struct SFVFLeafVertex
 {
-		D3DXVECTOR3		m_vPosition;			// Always Used							
-	#ifdef WRAPPER_USE_DYNAMIC_LIGHTING			
-		D3DXVECTOR3		m_vNormal;				// Dynamic Lighting Only			
-	#else										     
-		DWORD			m_dwDiffuseColor;		// Static Lighting Only	
-	#endif											
+		D3DXVECTOR3		m_vPosition;			// Always Used
+	#ifdef WRAPPER_USE_DYNAMIC_LIGHTING
+		D3DXVECTOR3		m_vNormal;				// Dynamic Lighting Only
+	#else
+		DWORD			m_dwDiffuseColor;		// Static Lighting Only
+	#endif
 		FLOAT			m_fTexCoords[2];		// Always Used
 	#if defined WRAPPER_USE_GPU_WIND || defined WRAPPER_USE_GPU_LEAF_PLACEMENT
 		FLOAT			m_fWindIndex;			// Only used when GPU is involved
-		FLOAT			m_fWindWeight;					
+		FLOAT			m_fWindWeight;
 		FLOAT			m_fLeafPlacementIndex;
 		FLOAT			m_fLeafScalarValue;
 	#endif
 };
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	Leaf Vertex Program
 
-static const char g_achLeafVertexProgram[] = 
+static const char g_achLeafVertexProgram[] =
 {
 		"vs.1.1\n"											// identity shader version
 
 		"mov		oT0.xy,	v7\n"							// always pass texcoord0 through
-		
+
 	#ifdef WRAPPER_USE_GPU_WIND
 		// retrieve and convert wind matrix index
 		"mov		a0.x,	v9.x\n"
@@ -241,7 +266,7 @@ static const char g_achLeafVertexProgram[] =
 	#ifdef WRAPPER_USE_GPU_LEAF_PLACEMENT
 		"mov		a0.x,	v9.z\n"							// place the leaves
 		"mul		r1,		c[a0.x],	v9.w\n"
-		"add		r0,		r1,			r0\n"	
+		"add		r0,		r1,			r0\n"
 	#endif
 
 		"add		r0,		c[52],		r0\n"				// translate to tree's position
@@ -249,7 +274,7 @@ static const char g_achLeafVertexProgram[] =
 
 	#ifdef WRAPPER_USE_FOG
 		"dp4		r1,			r0,			c[2]\n"			// find distance to vertex
-		"sub		r2.x,		c[85].y,	r1.z\n"			// 
+		"sub		r2.x,		c[85].y,	r1.z\n"			//
 		"mul		oFog,		r2.x,		c[85].z\n"
 	#endif
 
@@ -261,7 +286,7 @@ static const char g_achLeafVertexProgram[] =
 
 		"mov		r1,		c[75]\n"						// can only use one const register per instruction
 		"mul		r4,		c[72],		r1\n"				// ambient values
-		
+
 		"dp3		r2.x,   v3,			c[71]\n"			// dot light direction with normal
 		"max		r2.x,	r2.x,		c[70].x\n"			// limit it
 		"mad		oD0,	r2.x,		r5,			r4\n"	// compute the final color
@@ -269,17 +294,42 @@ static const char g_achLeafVertexProgram[] =
 };
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	LoadLeafShader
 
+#ifdef ENABLE_DIRECTX9_UPDATE
+static LPDIRECT3DVERTEXDECLARATION9 LoadLeafShader(LPDIRECT3DDEVICE9 pDx)
+#else
 static DWORD LoadLeafShader(LPDIRECT3DDEVICE8 pDx)
+#endif
 {
+#ifdef ENABLE_DIRECTX9_UPDATE
+    // leaf shader declaration
+    D3DVERTEXELEMENT9 pLeafShaderDecl[] =
+    {
+        { 0, 0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 }
+        , { 0, 12, D3DDECLTYPE_D3DCOLOR, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_COLOR, 0 }
+        , { 0, 16, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 }
+        , { 0, 24, D3DDECLTYPE_FLOAT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 2 }
+        , D3DDECL_END()
+    };
+
+    // assemble shader
+    LPDIRECT3DVERTEXDECLARATION9 dwShader = nullptr;
+
+    if (pDx->CreateVertexDeclaration(pLeafShaderDecl, &dwShader) != D3D_OK)
+    {
+        char szError[1024];
+        sprintf_s(szError, "Failed to create leaf vertex shader.");
+        MessageBox(nullptr, szError, "Vertex Shader Error", MB_ICONSTOP);
+    }
+#else
 	DWORD dwShader = D3DFVF_SPEEDTREE_LEAF_VERTEX;
 
 	#if defined WRAPPER_USE_GPU_LEAF_PLACEMENT || defined WRAPPER_USE_GPU_WIND
 
 		// leaf shader declaration
-		DWORD pLeafShaderDecl[ ] = 
+		DWORD pLeafShaderDecl[ ] =
 		{
 				D3DVSD_STREAM(0),
 				D3DVSD_REG(D3DVSDE_POSITION,        D3DVSDT_FLOAT3),
@@ -326,7 +376,6 @@ static DWORD LoadLeafShader(LPDIRECT3DDEVICE8 pDx)
 		dwShader = D3DFVF_SPEEDTREE_LEAF_VERTEX;
 
 	#endif
-
-	return dwShader;
+#endif
+    return dwShader;
 }
-	

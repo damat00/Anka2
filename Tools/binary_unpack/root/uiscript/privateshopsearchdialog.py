@@ -26,8 +26,8 @@ window = {
 					(
 						{
 							"name" : "category_menu_class", "type" : "image",
-							"x" : 5, "y" : 8,
-							"image" : ROOT + "category_menu.tga",
+							"x" : 6, "y" : 8,
+							"image" : ROOT + "category_input.tga",
 
 							"children" :
 							(
@@ -36,8 +36,8 @@ window = {
 						},
 						{
 							"name" : "category_menu_objects", "type" : "image",
-							"x" : 5, "y" : 75,
-							"image" : ROOT + "category_menu.tga",
+							"x" : 6, "y" : 75,
+							"image" : ROOT + "category_input.tga",
 
 							"children" :
 							(
@@ -46,8 +46,8 @@ window = {
 						},
 						{
 							"name" : "category_menu_minmax", "type" : "image",
-							"x" : 5, "y" : 170,
-							"image" : ROOT + "category_menu.tga",
+							"x" : 6, "y" : 170,
+							"image" : ROOT + "category_input.tga",
 
 							"children" :
 							(
@@ -57,7 +57,7 @@ window = {
 						{
 							"name" : "category_menu_price", "type" : "image",
 							"x" : 5, "y" : 272,
-							"image" : ROOT + "category_menu.tga",
+							"image" : ROOT + "category_input.tga",
 
 							"children" :
 							(
@@ -67,7 +67,7 @@ window = {
 						{
 							"name" : "category_menu_input", "type" : "image",
 							"x" : 5, "y" : 370,
-							"image" : ROOT + "category_menu.tga",
+							"image" : ROOT + "category_input.tga",
 
 							"children" :
 							(
@@ -98,7 +98,7 @@ window = {
 							(
 								{
 									"name" : "minLevelInput", "type" : "image",
-									"x" : 4, "y" : -1,
+									"x" : 1, "y" : 2,
 									"image" : ROOT + "filter_input.tga",
 
 									"children" :
@@ -116,7 +116,7 @@ window = {
 								},
 								{
 									"name" : "maxLevelInput", "type" : "image",
-									"x" : 130, "y" : -1,
+									"x" : 105, "y" : 2,
 									"image" : ROOT + "filter_input.tga",
 
 									"children" :
@@ -134,7 +134,7 @@ window = {
 								},
 								{
 									"name" : "minRefineInput", "type" : "image",
-									"x" : 4, "y" : 35,
+									"x" : 1, "y" : 35,
 									"image" : ROOT + "filter_input.tga",
 
 									"children" :
@@ -152,7 +152,7 @@ window = {
 								},
 								{
 									"name" : "maxRefineInput", "type" : "image",
-									"x" : 130, "y" : 35,
+									"x" : 105, "y" : 35,
 									"image" : ROOT + "filter_input.tga",
 
 									"children" :
@@ -170,7 +170,7 @@ window = {
 								},
 								{
 									"name" : "minYangInput", "type" : "image",
-									"x" : 4, "y" : 101,
+									"x" : 1, "y" : 105,
 									"image" : ROOT + "category_input.tga",
 
 									"children" :
@@ -188,7 +188,7 @@ window = {
 								},
 								{
 									"name" : "maxYangInput", "type" : "image",
-									"x" : 4, "y" : 133,
+									"x" : 1, "y" : 135,
 									"image" : ROOT + "category_input.tga",
 
 									"children" :
@@ -206,14 +206,14 @@ window = {
 								},
 								{
 									"name" : "searchItemNameInput", "type" : "image",
-									"x" : 4, "y" : 200,
+									"x" : 1, "y" : 202,
 									"image" : ROOT + "category_input.tga",
 
 									"children" :
 									(
 										{
 											"name" : "searchItemName", "type" : "editline",
-											"x" : 10, "y" : 7,
+											"x" : 10, "y" : 6,
 											"width" : 194, "height" : 26,
 
 											"input_limit" : 35,
@@ -225,7 +225,7 @@ window = {
 												{
 													"name" : "searchClearBtn",
 													"type" : "button",
-													"x" : 194-25,
+													"x" : 194-35,
 													"y" : 1,
 													"default_image" : ROOT + "clear_button_1.tga",
 													"over_image" : ROOT + "clear_button_2.tga",
@@ -248,8 +248,8 @@ window = {
 								{"name" : "listboxText", "type" : "text", "x" : 0, "y" : 0, "text" : "", "all_align" : 1,},
 							),
 						},
-						{"name" : "searchBtn", "type" : "button", "x" : 212, "y" : 412, "text" : localeInfo.OFFLINESHOP_SEARCH_BUTTON, "default_image" : ROOT + "search_0.tga", "over_image" : ROOT + "search_1.tga", "down_image" : ROOT + "search_2.tga",},
-						{"name" : "buyBtn", "type" : "button", "x" : 665, "y" : 412, "text" : localeInfo.OFFLINESHOP_SEARCH_BUTTON_BUY, "default_image" : ROOT + "search_0.tga", "over_image" : ROOT + "search_1.tga", "down_image" : ROOT + "search_2.tga",},
+						{"name" : "searchBtn", "type" : "button", "x" : 205, "y" : 412, "text" : localeInfo.OFFLINESHOP_SEARCH_BUTTON, "default_image" : ROOT + "category_input.tga", "over_image" : ROOT + "category_input.tga", "down_image" : ROOT + "category_input.tga",},
+						{"name" : "buyBtn", "type" : "button", "x" : 622, "y" : 412, "text" : localeInfo.OFFLINESHOP_SEARCH_BUTTON_BUY, "default_image" : ROOT + "category_input.tga", "over_image" : ROOT + "category_input.tga", "down_image" : ROOT + "category_input.tga",},
 
 						{"name" : "first_prev_button", "type" : "button", "x" : 400, "y" : 422, "default_image" : ROOT + "first_page_0.tga", "over_image" : ROOT + "first_page_1.tga", "down_image" : ROOT + "first_page_1.tga",},
 						{"name" : "prev_button", "type" : "button", "x" : 416, "y" : 422, "default_image" : ROOT + "back_page_0.tga", "over_image" : ROOT + "back_page_1.tga", "down_image" : ROOT + "back_page_2.tga",},

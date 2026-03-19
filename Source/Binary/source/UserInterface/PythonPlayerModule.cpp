@@ -651,6 +651,14 @@ PyObject *playerGetLevel(PyObject *poSelf, PyObject *poArgs)
 	return Py_BuildValue("l", dwLevel);
 }
 
+#ifdef ENABLE_CONQUEROR_LEVEL
+PyObject * playerGetConquerorEXP(PyObject* poSelf, PyObject* poArgs)
+{
+	DWORD dwEXP = CPythonPlayer::Instance().GetStatus(POINT_CONQUEROR_EXP);
+	return Py_BuildValue("l", dwEXP);
+}
+#endif
+
 PyObject *playerGetStatus(PyObject *poSelf, PyObject *poArgs)
 {
 	int iType;
@@ -698,6 +706,13 @@ PyObject *playerGetElk(PyObject *poSelf, PyObject *poArgs)
 PyObject *playerGetCoins(PyObject *poSelf, PyObject *poArgs)
 {
 	return Py_BuildValue("l", CPythonPlayer::Instance().GetStatus(POINT_COINS));
+}
+#endif
+
+#ifdef ENABLE_GAYA_SYSTEM
+PyObject* playerGetGem(PyObject* poSelf, PyObject* poArgs)
+{
+	return Py_BuildValue("i", CPythonPlayer::Instance().GetStatus(POINT_GEM));
 }
 #endif
 
@@ -1236,7 +1251,7 @@ PyObject *playerGetItemLink(PyObject *poSelf, PyObject *poArgs)
 		for (int i = 0; i < ITEM_ATTRIBUTE_SLOT_MAX_NUM; ++i)
 			if (pPlayerItem->aAttr[i].bType != 0)
 			{
-				len += snprintf(itemlink + len, sizeof(itemlink) - len, ":%x:%d", 
+				len += snprintf(itemlink + len, sizeof(itemlink) - len, ":%x:%d",
 						pPlayerItem->aAttr[i].bType, pPlayerItem->aAttr[i].sValue);
 				isAttr = true;
 			}
@@ -1721,6 +1736,7 @@ PyObject *playerCanRefine(PyObject *poSelf, PyObject *poArgs)
 	if (iScrollSubType != CItemData::USE_TUNING)
 		return Py_BuildValue("i", REFINE_CANT);
 
+	// Target Item
 	int iTargetItemIndex = CPythonPlayer::Instance().GetItemIndex(TargetSlotIndex);
 	CItemManager::Instance().SelectItemData(iTargetItemIndex);
 	CItemData * pTargetItemData = CItemManager::Instance().GetSelectedItemDataPointer();
@@ -2414,9 +2430,37 @@ PyObject *playerSendDragonSoulRefine(PyObject *poSelf, PyObject *poArgs)
 
 	CPythonNetworkStream& rns=CPythonNetworkStream::Instance();
 	rns.SendDragonSoulRefinePacket(bSubHeader, RefineItemPoses);
-	
+
 	return Py_BuildNone();
 }
+
+#ifdef ENABLE_ATTENDANCE_EVENT
+PyObject * playerGetHitCountByVID(PyObject* poSelf, PyObject* poArgs)
+{
+	int iVid;
+	if (!PyTuple_GetInteger(poArgs, 0, &iVid))
+		return Py_BuildException();
+
+	return Py_BuildValue("i", CPythonPlayer::Instance().GetHitCountInfo(iVid));
+}
+
+PyObject* playerGetAttendanceRewardList(PyObject* poSelf, PyObject* poArgs)
+{
+	std::vector<TRewardItem> m_rewardItems = CPythonPlayer::Instance().GetRewardVec();
+
+	PyObject* dict = PyDict_New();
+	
+	if(!m_rewardItems.empty())
+	{
+		for (DWORD i = 0; i < m_rewardItems.size(); i++)
+		{
+			PyDict_SetItem(dict, Py_BuildValue("i", m_rewardItems[i].bDay), Py_BuildValue("ii", m_rewardItems[i].dwVnum, m_rewardItems[i].dwCount));
+		}
+	}
+	
+	return dict;
+}
+#endif
 
 PyObject *playerClearAutoAttackTargetActorID(PyObject *poSelf, PyObject *poArgs)
 {
@@ -2454,13 +2498,6 @@ PyObject *playerCanInteract(PyObject *poSelf, PyObject *poArgs)
 {
 	CInstanceBase* pMainInstance = CPythonPlayer::Instance().NEW_GetMainActorPtr();
 	return Py_BuildValue("i", (int)pMainInstance->CanInteract());
-}
-#endif
-
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-PyObject *playerGetPremiumBattlePassID(PyObject *poSelf, PyObject *poArgs)
-{
-	return Py_BuildValue("b", CPythonPlayer::Instance().GetStatus(POINT_BATTLE_PASS_PREMIUM_ID));
 }
 #endif
 
@@ -2908,8 +2945,8 @@ PyObject *playerCanUseGrowthPetQuickSlot(PyObject *poSelf, PyObject *poArgs)
 }
 #endif
 
-#ifdef ENABLE_RENEWAL_REGEN
-PyObject *playerLoadNewRegen(PyObject *poSelf, PyObject *poArgs)
+#ifdef ENABLE_ULTIMATE_REGEN
+PyObject* playerLoadNewRegen(PyObject* poSelf, PyObject* poArgs)
 {
 	CPythonPlayer::Instance().LoadNewRegen();
 	return Py_BuildNone();
@@ -3076,6 +3113,36 @@ PyObject *playerGetChangeChangeLookPrice(PyObject *poSelf, PyObject *poArgs)
 }
 #endif
 
+#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
+PyObject* playerGetRouletteData(PyObject* poSelf, PyObject* poArgs)
+{
+	int iOption;
+	if (!PyTuple_GetInteger(poArgs, 0, &iOption))
+		return Py_BuildException();
+	
+	enum { Speed, Position };
+	PyObject* SList = PyList_New(0);
+
+	if (iOption == Speed) {
+		const std::vector<int> lSpeedList = { 325, 105, 75, 40, 25, 10 };
+		for (auto it = lSpeedList.begin(); it != lSpeedList.end(); ++it)
+			PyList_Append(SList, Py_BuildValue("i", (*it)));
+	}
+	else if (iOption == Position) {
+		const std::vector<std::pair<int, int>> lPositionList = { {25, 46}, {69, 46}, {113, 46}, {157, 46}, {201, 46}, {245, 46}, {245, 90}, {245, 134}, {245, 178}, {245, 222}, {245, 266}, {201, 266}, {157, 266}, {113, 266}, {69, 266}, {25, 266}, {25, 222}, {25, 178}, {25, 134}, {25, 90} };
+		for (auto it = lPositionList.begin(); it != lPositionList.end(); ++it)
+			PyList_Append(SList, Py_BuildValue("[ii]", it->first, it->second));
+	}
+
+	return SList;
+}
+
+PyObject * playerGetSoul(PyObject* poSelf, PyObject* poArgs)
+{
+	return Py_BuildValue("i", CPythonPlayer::Instance().GetStatus(POINT_SOUL));
+}
+#endif
+
 void initPlayer()
 {
 	static PyMethodDef s_methods[] =
@@ -3164,6 +3231,9 @@ void initPlayer()
 		{ "AffectIndexToSkillIndex", playerAffectIndexToSkillIndex, METH_VARARGS },
 
 		{ "GetEXP", playerGetEXP, METH_VARARGS },
+#ifdef ENABLE_CONQUEROR_LEVEL
+		{ "GetConquerorEXP",			playerGetConquerorEXP,				METH_VARARGS },
+#endif
 		{ "GetLevel", playerGetLevel, METH_VARARGS },
 		{ "GetStatus", playerGetStatus, METH_VARARGS },
 		{ "SetStatus", playerSetStatus, METH_VARARGS },
@@ -3171,6 +3241,9 @@ void initPlayer()
 		{ "GetMoney", playerGetElk, METH_VARARGS },
 #ifdef ENABLE_COINS_INVENTORY
 		{ "GetCoins", playerGetCoins, METH_VARARGS },
+#endif
+#ifdef ENABLE_GAYA_SYSTEM
+		{ "GetGem", playerGetGem, METH_VARARGS },
 #endif
 		{ "GetGuildID", playerGetGuildID, METH_VARARGS },
 		{ "GetGuildName", playerGetGuildName, METH_VARARGS },
@@ -3270,10 +3343,6 @@ void initPlayer()
 		{ "CanInteract", playerCanInteract, METH_VARARGS },
 #endif
 
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-		{ "GetPremiumBattlePassID", playerGetPremiumBattlePassID, METH_VARARGS },
-#endif
-
 #ifdef ENABLE_SKILL_COLOR_SYSTEM
 		{ "SetSkillColor", playerSetSkillColor, METH_VARARGS },
 		{ "GetSkillColor", playerGetSkillColor, METH_VARARGS },
@@ -3323,7 +3392,7 @@ void initPlayer()
 		{ "CanUseGrowthPetQuickSlot", playerCanUseGrowthPetQuickSlot, METH_VARARGS },
 #endif
 
-#ifdef ENABLE_RENEWAL_REGEN
+#ifdef ENABLE_ULTIMATE_REGEN
 		{ "LoadNewRegen", playerLoadNewRegen, METH_VARARGS },
 #endif
 
@@ -3346,6 +3415,16 @@ void initPlayer()
 		{ "GetChangeChangeLookPrice", playerGetChangeChangeLookPrice, METH_VARARGS },
 #endif
 
+#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
+		{ "GetRouletteData",			playerGetRouletteData,				METH_VARARGS },
+		{ "GetEventSoul",				playerGetSoul,						METH_VARARGS },
+#endif
+
+#ifdef ENABLE_ATTENDANCE_EVENT
+		{ "GetHitCountByVID",			playerGetHitCountByVID,				METH_VARARGS },
+		{ "GetAttendanceRewardList",	playerGetAttendanceRewardList,		METH_VARARGS },
+#endif
+
 		{ nullptr, nullptr },
 	};
 
@@ -3354,59 +3433,80 @@ void initPlayer()
 #else
 	PyObject *poModule = Py_InitModule("player", s_methods);
 #endif
-
 	PyModule_AddIntConstant(poModule, "LEVEL", POINT_LEVEL);
-	PyModule_AddIntConstant(poModule, "VOICE", POINT_VOICE);
-	PyModule_AddIntConstant(poModule, "EXP", POINT_EXP);
-	PyModule_AddIntConstant(poModule, "NEXT_EXP", POINT_NEXT_EXP);
-	PyModule_AddIntConstant(poModule, "HP", POINT_HP);
-	PyModule_AddIntConstant(poModule, "MAX_HP", POINT_MAX_HP);
-	PyModule_AddIntConstant(poModule, "SP", POINT_SP);
-	PyModule_AddIntConstant(poModule, "MAX_SP", POINT_MAX_SP);
-	PyModule_AddIntConstant(poModule, "STAMINA", POINT_STAMINA);
-	PyModule_AddIntConstant(poModule, "MAX_STAMINA", POINT_MAX_STAMINA);
-	PyModule_AddIntConstant(poModule, "ELK", POINT_GOLD);
-	PyModule_AddIntConstant(poModule, "ST", POINT_ST);
-	PyModule_AddIntConstant(poModule, "HT", POINT_HT);
-	PyModule_AddIntConstant(poModule, "DX", POINT_DX);
-	PyModule_AddIntConstant(poModule, "IQ", POINT_IQ);
-	PyModule_AddIntConstant(poModule, "ATT_POWER", POINT_ATT_POWER);
-	PyModule_AddIntConstant(poModule, "ATT_MIN", POINT_MIN_ATK);
-	PyModule_AddIntConstant(poModule, "ATT_MAX", POINT_MAX_ATK);
-	PyModule_AddIntConstant(poModule, "MIN_MAGIC_WEP", POINT_MIN_MAGIC_WEP);
-	PyModule_AddIntConstant(poModule, "MAX_MAGIC_WEP", POINT_MAX_MAGIC_WEP);
-	PyModule_AddIntConstant(poModule, "ATT_SPEED", POINT_ATT_SPEED);
-	PyModule_AddIntConstant(poModule, "ATT_BONUS", POINT_ATT_GRADE_BONUS);
-	PyModule_AddIntConstant(poModule, "EVADE_RATE", POINT_EVADE_RATE);
-	PyModule_AddIntConstant(poModule, "MOVING_SPEED", POINT_MOV_SPEED);
-	PyModule_AddIntConstant(poModule, "DEF_GRADE", POINT_DEF_GRADE);
-	PyModule_AddIntConstant(poModule, "DEF_BONUS", POINT_DEF_GRADE_BONUS);
-	PyModule_AddIntConstant(poModule, "CASTING_SPEED", POINT_CASTING_SPEED);
-	PyModule_AddIntConstant(poModule, "MAG_ATT", POINT_MAGIC_ATT_GRADE);
-	PyModule_AddIntConstant(poModule, "MAG_DEF", POINT_MAGIC_DEF_GRADE);
-	PyModule_AddIntConstant(poModule, "EMPIRE_POINT", POINT_EMPIRE_POINT);
-	PyModule_AddIntConstant(poModule, "STAT", POINT_STAT);
-	PyModule_AddIntConstant(poModule, "SKILL_PASSIVE", POINT_SUB_SKILL);
-	PyModule_AddIntConstant(poModule, "SKILL_SUPPORT", POINT_SUB_SKILL);
-	PyModule_AddIntConstant(poModule, "SKILL_ACTIVE", POINT_SKILL);
-	PyModule_AddIntConstant(poModule, "SKILL_HORSE", POINT_HORSE_SKILL);
-	PyModule_AddIntConstant(poModule, "PLAYTIME", POINT_PLAYTIME);
-	PyModule_AddIntConstant(poModule, "BOW_DISTANCE", POINT_BOW_DISTANCE);
-	PyModule_AddIntConstant(poModule, "HP_RECOVERY", POINT_HP_RECOVERY);
-	PyModule_AddIntConstant(poModule, "SP_RECOVERY", POINT_SP_RECOVERY);
-	PyModule_AddIntConstant(poModule, "ATTACKER_BONUS", POINT_PARTY_ATT_GRADE);
-	PyModule_AddIntConstant(poModule, "MAX_NUM", POINT_MAX_NUM);
-
+#ifdef ENABLE_CONQUEROR_LEVEL
+	PyModule_AddIntConstant(poModule, "CONQUEROR_LEVEL", POINT_CONQUEROR_LEVEL);
+	PyModule_AddIntConstant(poModule, "CONQUEROR_LEVEL_STEP", POINT_CONQUEROR_LEVEL_STEP);
+	PyModule_AddIntConstant(poModule, "SUNGMA_STR", POINT_SUNGMA_STR);
+	PyModule_AddIntConstant(poModule, "SUNGMA_HP", POINT_SUNGMA_HP);
+	PyModule_AddIntConstant(poModule, "SUNGMA_MOVE", POINT_SUNGMA_MOVE);
+	PyModule_AddIntConstant(poModule, "SUNGMA_IMMUNE", POINT_SUNGMA_IMMUNE);
+	PyModule_AddIntConstant(poModule, "CONQUEROR_POINT", POINT_CONQUEROR_POINT);
+	PyModule_AddIntConstant(poModule, "CONQUEROR_EXP", POINT_CONQUEROR_EXP);
+	PyModule_AddIntConstant(poModule, "CONQUEROR_NEXT_EXP", POINT_CONQUEROR_NEXT_EXP);
+#endif
+#ifdef ENABLE_NEW_BONUS_SYSTEM
+	PyModule_AddIntConstant(poModule, "ATTBONUS_STONE", POINT_ATTBONUS_STONE);
+	PyModule_AddIntConstant(poModule, "ATTBONUS_BOSS", POINT_ATTBONUS_BOSS);
+	PyModule_AddIntConstant(poModule, "ATTBONUS_ELEMENTS", POINT_ATTBONUS_ELEMENTS);
+	PyModule_AddIntConstant(poModule, "ENCHANT_ELEMENTS", POINT_ENCHANT_ELEMENTS);
+	PyModule_AddIntConstant(poModule, "ATTBONUS_CHARACTERS", POINT_ATTBONUS_CHARACTERS);
+	PyModule_AddIntConstant(poModule, "ENCHANT_CHARACTERS", POINT_ENCHANT_CHARACTERS);
+	PyModule_AddIntConstant(poModule, "RESIST_MONSTER", POINT_RESIST_MONSTER);
+#endif
+	PyModule_AddIntConstant(poModule, "VOICE",					POINT_VOICE);
+    PyModule_AddIntConstant(poModule, "EXP",					POINT_EXP);
+    PyModule_AddIntConstant(poModule, "NEXT_EXP",				POINT_NEXT_EXP);
+    PyModule_AddIntConstant(poModule, "HP",						POINT_HP);
+    PyModule_AddIntConstant(poModule, "MAX_HP",					POINT_MAX_HP);
+    PyModule_AddIntConstant(poModule, "SP",						POINT_SP);
+    PyModule_AddIntConstant(poModule, "MAX_SP",					POINT_MAX_SP);
+    PyModule_AddIntConstant(poModule, "STAMINA",				POINT_STAMINA);
+    PyModule_AddIntConstant(poModule, "MAX_STAMINA",			POINT_MAX_STAMINA);
+    PyModule_AddIntConstant(poModule, "ELK",					POINT_GOLD);
+    PyModule_AddIntConstant(poModule, "ST",						POINT_ST);
+    PyModule_AddIntConstant(poModule, "HT",						POINT_HT);
+    PyModule_AddIntConstant(poModule, "DX",						POINT_DX);
+    PyModule_AddIntConstant(poModule, "IQ",						POINT_IQ);
+    PyModule_AddIntConstant(poModule, "ATT_POWER",				POINT_ATT_GRADE);
+	PyModule_AddIntConstant(poModule, "ATT_MIN",				POINT_MIN_ATK);
+	PyModule_AddIntConstant(poModule, "ATT_MAX",				POINT_MAX_ATK);
+	PyModule_AddIntConstant(poModule, "MIN_MAGIC_WEP",			POINT_MIN_MAGIC_WEP);
+	PyModule_AddIntConstant(poModule, "MAX_MAGIC_WEP",			POINT_MAX_MAGIC_WEP);
+    PyModule_AddIntConstant(poModule, "ATT_SPEED",				POINT_ATT_SPEED);
+	PyModule_AddIntConstant(poModule, "ATT_BONUS",				POINT_ATT_GRADE_BONUS);
+    PyModule_AddIntConstant(poModule, "EVADE_RATE",				POINT_EVADE_RATE);
+    PyModule_AddIntConstant(poModule, "MOVING_SPEED",			POINT_MOV_SPEED);
+    PyModule_AddIntConstant(poModule, "DEF_GRADE",				POINT_DEF_GRADE);
+    PyModule_AddIntConstant(poModule, "DEF_BONUS",				POINT_DEF_GRADE_BONUS);
+    PyModule_AddIntConstant(poModule, "CASTING_SPEED",			POINT_CASTING_SPEED);
+    PyModule_AddIntConstant(poModule, "MAG_ATT",				POINT_MAGIC_ATT_GRADE);
+    PyModule_AddIntConstant(poModule, "MAG_DEF",				POINT_MAGIC_DEF_GRADE);
+    PyModule_AddIntConstant(poModule, "EMPIRE_POINT",			POINT_EMPIRE_POINT);
+	PyModule_AddIntConstant(poModule, "STAT",					POINT_STAT);
+	PyModule_AddIntConstant(poModule, "SKILL_PASSIVE",			POINT_SUB_SKILL);
+	PyModule_AddIntConstant(poModule, "SKILL_SUPPORT",			POINT_SUB_SKILL);
+	PyModule_AddIntConstant(poModule, "SKILL_ACTIVE",			POINT_SKILL);
+	PyModule_AddIntConstant(poModule, "SKILL_HORSE",			POINT_HORSE_SKILL);
+	PyModule_AddIntConstant(poModule, "PLAYTIME",				POINT_PLAYTIME);
+	PyModule_AddIntConstant(poModule, "BOW_DISTANCE",			POINT_BOW_DISTANCE);
+	PyModule_AddIntConstant(poModule, "HP_RECOVERY",			POINT_HP_RECOVERY);
+	PyModule_AddIntConstant(poModule, "SP_RECOVERY",			POINT_SP_RECOVERY);
+	PyModule_AddIntConstant(poModule, "ATTACKER_BONUS",			POINT_PARTY_ATT_GRADE);
+    PyModule_AddIntConstant(poModule, "MAX_NUM",				POINT_MAX_NUM);
+#ifdef ENABLE_FISH_EVENT_SYSTEM
+	PyModule_AddIntConstant(poModule, "SLOT_TYPE_FISH_EVENT",	SLOT_TYPE_FISH_EVENT);
+#endif
 	PyModule_AddIntConstant(poModule, "POINT_CRITICAL_PCT", POINT_CRITICAL_PCT);
 	PyModule_AddIntConstant(poModule, "POINT_PENETRATE_PCT", POINT_PENETRATE_PCT);
 	PyModule_AddIntConstant(poModule, "POINT_MALL_ATTBONUS", POINT_MALL_ATTBONUS);
+	PyModule_AddIntConstant(poModule, "POINT_ATT_BONUS", POINT_ATT_BONUS);
 	PyModule_AddIntConstant(poModule, "POINT_MALL_DEFBONUS", POINT_MALL_DEFBONUS);
 	PyModule_AddIntConstant(poModule, "POINT_MALL_EXPBONUS", POINT_MALL_EXPBONUS);
 	PyModule_AddIntConstant(poModule, "POINT_MALL_ITEMBONUS", POINT_MALL_ITEMBONUS);
 	PyModule_AddIntConstant(poModule, "POINT_MALL_GOLDBONUS", POINT_MALL_GOLDBONUS);
 	PyModule_AddIntConstant(poModule, "POINT_MAX_HP_PCT", POINT_MAX_HP_PCT);
 	PyModule_AddIntConstant(poModule, "POINT_MAX_SP_PCT", POINT_MAX_SP_PCT);
-	PyModule_AddIntConstant(poModule, "POINT_ATT_BONUS", POINT_ATT_BONUS);
 
 	PyModule_AddIntConstant(poModule, "POINT_SKILL_DAMAGE_BONUS", POINT_SKILL_DAMAGE_BONUS);
 	PyModule_AddIntConstant(poModule, "POINT_NORMAL_HIT_DAMAGE_BONUS", POINT_NORMAL_HIT_DAMAGE_BONUS);
@@ -3416,32 +3516,50 @@ void initPlayer()
 	PyModule_AddIntConstant(poModule, "RESIST_MAGIC", POINT_RESIST_MAGIC);
 	PyModule_AddIntConstant(poModule, "POINT_ATTBONUS_MONSTER", POINT_ATTBONUS_MONSTER);
 
-	PyModule_AddIntConstant(poModule, "ENERGY", POINT_ENERGY);
-	PyModule_AddIntConstant(poModule, "ENERGY_END_TIME", POINT_ENERGY_END_TIME);
+#ifdef ENABLE_AVG_PVM
+	PyModule_AddIntConstant(poModule, "POINT_ATTBONUS_MEDI_PVM", POINT_ATTBONUS_MEDI_PVM);
+#endif
+	PyModule_AddIntConstant(poModule, "POINT_ATTBONUS_PVM_STR", POINT_ATTBONUS_PVM_STR);
+	PyModule_AddIntConstant(poModule, "POINT_ATTBONUS_PVM_BERSERKER", POINT_ATTBONUS_PVM_BERSERKER);
 
+	PyModule_AddIntConstant(poModule, "POINT_PC_BANG_EXP_BONUS", POINT_PC_BANG_EXP_BONUS);
+	PyModule_AddIntConstant(poModule, "POINT_PC_BANG_DROP_BONUS", POINT_PC_BANG_DROP_BONUS);
+#ifdef ENABLE_GAYA_SYSTEM
+	PyModule_AddIntConstant(poModule, "GEM",							POINT_GEM);
+#endif
 	PyModule_AddIntConstant(poModule, "POINT_COSTUME_ATTR_BONUS", POINT_COSTUME_ATTR_BONUS);
 	PyModule_AddIntConstant(poModule, "POINT_MAGIC_ATT_BONUS_PER", POINT_MAGIC_ATT_BONUS_PER);
 	PyModule_AddIntConstant(poModule, "POINT_MELEE_MAGIC_ATT_BONUS_PER", POINT_MELEE_MAGIC_ATT_BONUS_PER);
 
-	PyModule_AddIntConstant(poModule, "SKILL_GRADE_NORMAL", CPythonPlayer::SKILL_NORMAL);
-	PyModule_AddIntConstant(poModule, "SKILL_GRADE_MASTER", CPythonPlayer::SKILL_MASTER);
-	PyModule_AddIntConstant(poModule, "SKILL_GRADE_GRAND_MASTER", CPythonPlayer::SKILL_GRAND_MASTER);
-	PyModule_AddIntConstant(poModule, "SKILL_GRADE_PERFECT_MASTER", CPythonPlayer::SKILL_PERFECT_MASTER);
+	PyModule_AddIntConstant(poModule, "SKILL_GRADE_NORMAL",			CPythonPlayer::SKILL_NORMAL);
+	PyModule_AddIntConstant(poModule, "SKILL_GRADE_MASTER",			CPythonPlayer::SKILL_MASTER);
+	PyModule_AddIntConstant(poModule, "SKILL_GRADE_GRAND_MASTER",	CPythonPlayer::SKILL_GRAND_MASTER);
+	PyModule_AddIntConstant(poModule, "SKILL_GRADE_PERFECT_MASTER",	CPythonPlayer::SKILL_PERFECT_MASTER);
 
-	PyModule_AddIntConstant(poModule, "CATEGORY_ACTIVE", CPythonPlayer::CATEGORY_ACTIVE);
-	PyModule_AddIntConstant(poModule, "CATEGORY_PASSIVE", CPythonPlayer::CATEGORY_PASSIVE);
+	PyModule_AddIntConstant(poModule, "CATEGORY_ACTIVE",		CPythonPlayer::CATEGORY_ACTIVE);
+	PyModule_AddIntConstant(poModule, "CATEGORY_PASSIVE",		CPythonPlayer::CATEGORY_PASSIVE);
 
-	PyModule_AddIntConstant(poModule, "INVENTORY_PAGE_SIZE", c_Inventory_Page_Size);
-	PyModule_AddIntConstant(poModule, "INVENTORY_PAGE_COUNT", c_Inventory_Page_Count);
-	PyModule_AddIntConstant(poModule, "INVENTORY_SLOT_COUNT", c_Inventory_Count);
-	PyModule_AddIntConstant(poModule, "EQUIPMENT_SLOT_START", c_Equipment_Start);
-	PyModule_AddIntConstant(poModule, "EQUIPMENT_PAGE_COUNT", c_Equipment_Count);
+	PyModule_AddIntConstant(poModule, "INVENTORY_PAGE_SIZE",	c_Inventory_Page_Size);
+	PyModule_AddIntConstant(poModule, "INVENTORY_PAGE_COUNT",	c_Inventory_Page_Count);
+	PyModule_AddIntConstant(poModule, "INVENTORY_SLOT_COUNT",	c_Inventory_Count);
+	PyModule_AddIntConstant(poModule, "EQUIPMENT_SLOT_START",	c_Equipment_Start);
+	PyModule_AddIntConstant(poModule, "EQUIPMENT_PAGE_COUNT",	c_Equipment_Count);
 
 #ifdef ENABLE_NEW_EQUIPMENT_SYSTEM
-	PyModule_AddIntConstant(poModule, "NEW_EQUIPMENT_SLOT_START", c_New_Equipment_Start);
-	PyModule_AddIntConstant(poModule, "NEW_EQUIPMENT_SLOT_COUNT", c_New_Equipment_Count);
+	PyModule_AddIntConstant(poModule, "NEW_EQUIPMENT_SLOT_START",	c_New_Equipment_Start);
+	PyModule_AddIntConstant(poModule, "NEW_EQUIPMENT_SLOT_COUNT",	c_New_Equipment_Count);
 #endif
 
+	PyModule_AddIntConstant(poModule, "MBF_SKILL",	CPythonPlayer::MBF_SKILL);
+	PyModule_AddIntConstant(poModule, "MBF_ATTACK",	CPythonPlayer::MBF_ATTACK);
+	PyModule_AddIntConstant(poModule, "MBF_CAMERA",	CPythonPlayer::MBF_CAMERA);
+	PyModule_AddIntConstant(poModule, "MBF_SMART",	CPythonPlayer::MBF_SMART);
+	PyModule_AddIntConstant(poModule, "MBF_MOVE",	CPythonPlayer::MBF_MOVE);
+	PyModule_AddIntConstant(poModule, "MBF_AUTO",	CPythonPlayer::MBF_AUTO);
+	PyModule_AddIntConstant(poModule, "MBS_PRESS",	CPythonPlayer::MBS_PRESS);
+	PyModule_AddIntConstant(poModule, "MBS_CLICK",	CPythonPlayer::MBS_CLICK);
+	PyModule_AddIntConstant(poModule, "MBT_RIGHT",	CPythonPlayer::MBT_RIGHT);
+	PyModule_AddIntConstant(poModule, "MBT_LEFT",	CPythonPlayer::MBT_LEFT);
 #ifdef ENABLE_SPECIAL_INVENTORY
 	PyModule_AddIntConstant(poModule, "SPECIAL_INVENTORY_PAGE_SIZE", c_Special_Inventory_Page_Size);
 	PyModule_AddIntConstant(poModule, "SPECIAL_INVENTORY_PAGE_COUNT", c_Special_Inventory_Page_Count);
@@ -3452,30 +3570,20 @@ void initPlayer()
 	PyModule_AddIntConstant(poModule, "GIFT_BOX_INVENTORY_SLOT_COUNT", c_GiftBox_Inventory_Slot_Count);
 	PyModule_AddIntConstant(poModule, "CHANGERS_INVENTORY_SLOT_COUNT", c_Changers_Inventory_Slot_Count);
 #endif
-
-	PyModule_AddIntConstant(poModule, "MBF_SKILL", CPythonPlayer::MBF_SKILL);
-	PyModule_AddIntConstant(poModule, "MBF_ATTACK", CPythonPlayer::MBF_ATTACK);
-	PyModule_AddIntConstant(poModule, "MBF_CAMERA", CPythonPlayer::MBF_CAMERA);
-	PyModule_AddIntConstant(poModule, "MBF_SMART", CPythonPlayer::MBF_SMART);
-	PyModule_AddIntConstant(poModule, "MBF_MOVE", CPythonPlayer::MBF_MOVE);
-	PyModule_AddIntConstant(poModule, "MBF_AUTO", CPythonPlayer::MBF_AUTO);
-	PyModule_AddIntConstant(poModule, "MBS_PRESS", CPythonPlayer::MBS_PRESS);
-	PyModule_AddIntConstant(poModule, "MBS_CLICK", CPythonPlayer::MBS_CLICK);
-	PyModule_AddIntConstant(poModule, "MBT_RIGHT", CPythonPlayer::MBT_RIGHT);
-	PyModule_AddIntConstant(poModule, "MBT_LEFT", CPythonPlayer::MBT_LEFT);
-
-	PyModule_AddIntConstant(poModule, "SLOT_TYPE_NONE", SLOT_TYPE_NONE);
-	PyModule_AddIntConstant(poModule, "SLOT_TYPE_INVENTORY", SLOT_TYPE_INVENTORY);
-	PyModule_AddIntConstant(poModule, "SLOT_TYPE_SKILL", SLOT_TYPE_SKILL);
-	PyModule_AddIntConstant(poModule, "SLOT_TYPE_SHOP", SLOT_TYPE_SHOP);
-	PyModule_AddIntConstant(poModule, "SLOT_TYPE_EXCHANGE_OWNER", SLOT_TYPE_EXCHANGE_OWNER);
-	PyModule_AddIntConstant(poModule, "SLOT_TYPE_EXCHANGE_TARGET", SLOT_TYPE_EXCHANGE_TARGET);
-	PyModule_AddIntConstant(poModule, "SLOT_TYPE_QUICK_SLOT", SLOT_TYPE_QUICK_SLOT);
-	PyModule_AddIntConstant(poModule, "SLOT_TYPE_SAFEBOX", SLOT_TYPE_SAFEBOX);
-	PyModule_AddIntConstant(poModule, "SLOT_TYPE_PRIVATE_SHOP", SLOT_TYPE_PRIVATE_SHOP);
-	PyModule_AddIntConstant(poModule, "SLOT_TYPE_MALL", SLOT_TYPE_MALL);
-	PyModule_AddIntConstant(poModule, "SLOT_TYPE_EMOTION", SLOT_TYPE_EMOTION);
-	PyModule_AddIntConstant(poModule, "SLOT_TYPE_DRAGON_SOUL_INVENTORY", SLOT_TYPE_DRAGON_SOUL_INVENTORY);
+	// Public code with server
+	PyModule_AddIntConstant(poModule, "SLOT_TYPE_NONE",						SLOT_TYPE_NONE);
+	PyModule_AddIntConstant(poModule, "SLOT_TYPE_INVENTORY",				SLOT_TYPE_INVENTORY);
+	PyModule_AddIntConstant(poModule, "SLOT_TYPE_SKILL",					SLOT_TYPE_SKILL);
+	// Special indecies for client
+	PyModule_AddIntConstant(poModule, "SLOT_TYPE_SHOP",						SLOT_TYPE_SHOP);
+	PyModule_AddIntConstant(poModule, "SLOT_TYPE_EXCHANGE_OWNER",			SLOT_TYPE_EXCHANGE_OWNER);
+	PyModule_AddIntConstant(poModule, "SLOT_TYPE_EXCHANGE_TARGET",			SLOT_TYPE_EXCHANGE_TARGET);
+	PyModule_AddIntConstant(poModule, "SLOT_TYPE_QUICK_SLOT",				SLOT_TYPE_QUICK_SLOT);
+	PyModule_AddIntConstant(poModule, "SLOT_TYPE_SAFEBOX",					SLOT_TYPE_SAFEBOX);
+	PyModule_AddIntConstant(poModule, "SLOT_TYPE_PRIVATE_SHOP",				SLOT_TYPE_PRIVATE_SHOP);
+	PyModule_AddIntConstant(poModule, "SLOT_TYPE_MALL",						SLOT_TYPE_MALL);
+	PyModule_AddIntConstant(poModule, "SLOT_TYPE_EMOTION",					SLOT_TYPE_EMOTION);
+	PyModule_AddIntConstant(poModule, "SLOT_TYPE_DRAGON_SOUL_INVENTORY",	SLOT_TYPE_DRAGON_SOUL_INVENTORY);
 	PyModule_AddIntConstant(poModule, "SLOT_TYPE_BELT_INVENTORY", SLOT_TYPE_BELT_INVENTORY);
 #ifdef ENABLE_SPECIAL_INVENTORY
 	PyModule_AddIntConstant(poModule, "SLOT_TYPE_SKILL_BOOK_INVENTORY", SLOT_TYPE_SKILL_BOOK_INVENTORY);
@@ -3484,16 +3592,14 @@ void initPlayer()
 	PyModule_AddIntConstant(poModule, "SLOT_TYPE_GIFT_BOX_INVENTORY", SLOT_TYPE_GIFT_BOX_INVENTORY);
 	PyModule_AddIntConstant(poModule, "SLOT_TYPE_CHANGERS_INVENTORY", SLOT_TYPE_CHANGERS_INVENTORY);
 #endif
-
-	PyModule_AddIntConstant(poModule, "RESERVED_WINDOW", RESERVED_WINDOW);
-	PyModule_AddIntConstant(poModule, "INVENTORY", INVENTORY);
-	PyModule_AddIntConstant(poModule, "EQUIPMENT", EQUIPMENT);
-	PyModule_AddIntConstant(poModule, "SAFEBOX", SAFEBOX);
-	PyModule_AddIntConstant(poModule, "MALL", MALL);
-	PyModule_AddIntConstant(poModule, "DRAGON_SOUL_INVENTORY", DRAGON_SOUL_INVENTORY);
+	PyModule_AddIntConstant(poModule, "RESERVED_WINDOW",					RESERVED_WINDOW);
+	PyModule_AddIntConstant(poModule, "INVENTORY",							INVENTORY);
+	PyModule_AddIntConstant(poModule, "EQUIPMENT",							EQUIPMENT);
+	PyModule_AddIntConstant(poModule, "SAFEBOX",							SAFEBOX);
+	PyModule_AddIntConstant(poModule, "MALL",								MALL);
+	PyModule_AddIntConstant(poModule, "DRAGON_SOUL_INVENTORY",				DRAGON_SOUL_INVENTORY);
 	PyModule_AddIntConstant(poModule, "BELT_INVENTORY", BELT_INVENTORY);
-	PyModule_AddIntConstant(poModule, "GROUND", GROUND);
-
+	PyModule_AddIntConstant(poModule, "GROUND",								GROUND);
 #ifdef ENABLE_RENEWAL_SWITCHBOT
 	PyModule_AddIntConstant(poModule, "SWITCHBOT", SWITCHBOT);
 	PyModule_AddIntConstant(poModule, "SLOT_TYPE_SWITCHBOT", SLOT_TYPE_SWITCHBOT);
@@ -3766,15 +3872,11 @@ void initPlayer()
 	PyModule_AddIntConstant(poModule, "QUICK_SLOT_CAN_NOT_USE_PET_ITEM", QUICK_SLOT_CAN_NOT_USE_PET_ITEM);
 #endif
 
-#ifdef ENABLE_RENEWAL_BONUS_BOARD
-	PyModule_AddIntConstant(poModule, "POINT_BLUE_PLAYER_KILLED", POINT_BLUE_PLAYER_KILLED);
-	PyModule_AddIntConstant(poModule, "POINT_YELLOW_PLAYER_KILLED", POINT_YELLOW_PLAYER_KILLED);
-	PyModule_AddIntConstant(poModule, "POINT_RED_PLAYER_KILLED", POINT_RED_PLAYER_KILLED);
-	PyModule_AddIntConstant(poModule, "POINT_ALL_PLAYER_KILLED", POINT_ALL_PLAYER_KILLED);
-	PyModule_AddIntConstant(poModule, "POINT_KILL_DUELWON", POINT_KILL_DUELWON);
-	PyModule_AddIntConstant(poModule, "POINT_KILL_DUELLOST", POINT_KILL_DUELLOST);
-	PyModule_AddIntConstant(poModule, "POINT_MONSTER_KILLED", POINT_MONSTER_KILLED);
-	PyModule_AddIntConstant(poModule, "POINT_STONE_KILLED", POINT_STONE_KILLED);
-	PyModule_AddIntConstant(poModule, "POINT_BOSS_KILLED", POINT_BOSS_KILLED);
+#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
+	PyModule_AddIntConstant(poModule, "ROULETTE_ITEM_MAX", ROULETTE_ITEM_MAX);
+	PyModule_AddIntConstant(poModule, "ROULETTE_PACKET_CLOSE", 0);
+	PyModule_AddIntConstant(poModule, "ROULETTE_PACKET_TURN", 1);
+	PyModule_AddIntConstant(poModule, "ROULETTE_PACKET_GIFT", 2);
+	PyModule_AddIntConstant(poModule, "EVENTSOUL",			POINT_SOUL);
 #endif
 }

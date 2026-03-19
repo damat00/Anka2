@@ -5,7 +5,7 @@ MotionDuration           2.000000
 
 Group MotionEventData
 {
-    MotionEventDataCount     2
+    MotionEventDataCount     3
     Group Event00
     {
         MotionEventType      1
@@ -29,5 +29,27 @@ Group MotionEventData
         FollowingEnable      0
         EffectFileName       "d:/ymir work/effect/monster2/fire_dragon_strike.mse"
         EffectPosition       300.000000 -320.000000 0.000000
+    }
+    Group Event02
+    {
+        MotionEventType      4
+        StartingTime         0.997567
+        DuringTime           0.300000
+        EnableHitProcess     0
+        
+        AttackType           0
+        HittingType          1
+        StiffenTime          0.000000
+        InvisibleTime        0.300000
+        ExternalForce        0.000000
+        HitLimitCount        0
+        CollisionType        4
+        
+        SphereDataCount      1
+        Group SphereData00
+        {
+            Radius           900.000000
+            Position         0.000000 -200.000000 0.000000
+        }
     }
 }

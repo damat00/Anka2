@@ -1,8 +1,7 @@
 #ifndef __INC_TABLES_H__
 #define __INC_TABLES_H__
-
-#include "length.h"
 #include "service.h"
+#include "length.h"
 
 typedef DWORD IDENT;
 
@@ -62,6 +61,7 @@ enum
 	HEADER_GD_SET_EVENT_FLAG						= 55,
 	HEADER_GD_PARTY_SET_MEMBER_LEVEL				= 56,
 	HEADER_GD_GUILD_WAR_BET							= 57,
+
 	HEADER_GD_CREATE_OBJECT							= 60,
 	HEADER_GD_DELETE_OBJECT							= 61,
 	HEADER_GD_UPDATE_LAND							= 62,
@@ -90,40 +90,31 @@ enum
 	HEADER_GD_UPDATE_CHANNELSTATUS					= 139,
 	HEADER_GD_REQUEST_CHANNELSTATUS					= 140,
 
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-	HEADER_GD_SAVE_EXT_BATTLE_PASS					= 142,
-#endif
-
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
-	HEADER_GD_OFFLINESHOP							= 143,
+	HEADER_GD_OFFLINESHOP							= 142,
 #endif
 
 #ifdef ENABLE_OFFLINE_MESSAGE
-	HEADER_GD_REQUEST_OFFLINE_MESSAGES				= 144,
-	HEADER_GD_SEND_OFFLINE_MESSAGE					= 145,
+	HEADER_GD_REQUEST_OFFLINE_MESSAGES				= 143,
+	HEADER_GD_SEND_OFFLINE_MESSAGE					= 144,
 #endif
 
 #ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
-	HEADER_GD_REQUEST_CHANGE_LANGUAGE				= 146,
-#endif
-
-#ifdef ENABLE_EVENT_MANAGER
-	HEADER_GD_UPDATE_EVENT_STATUS					= 147,
-	HEADER_GD_EVENT_NOTIFICATION					= 148,
+	HEADER_GD_REQUEST_CHANGE_LANGUAGE				= 145,
 #endif
 
 #ifdef ENABLE_SKILL_COLOR_SYSTEM
-	HEADER_GD_SKILL_COLOR_SAVE						= 149,
-#endif
-
-#ifdef ENABLE_RENEWAL_INGAME_ITEMSHOP
-	HEADER_GD_ITEMSHOP								= 150,
+	HEADER_GD_SKILL_COLOR_SAVE						= 146,
 #endif
 
 #ifdef ENABLE_GROWTH_PET_SYSTEM
-	HEADER_GD_GROWTH_PET_SAVE						= 151,
-	HEADER_GD_GROWTH_PET_DELETE						= 152,
+	HEADER_GD_GROWTH_PET_SAVE						= 147,
+	HEADER_GD_GROWTH_PET_DELETE						= 148,
 #endif
+
+	// RANKING_SYSTEM
+	HEADER_GD_ADD_RANKING,
+	// END_OF_RANKING_SYSTEM
 
 	HEADER_GD_SETUP									= 0xff,
 
@@ -161,6 +152,11 @@ enum
 	HEADER_DG_PARTY_STATE_CHANGE					= 63,
 	HEADER_DG_PARTY_HEAL_USE						= 64,
 	HEADER_DG_PARTY_SET_MEMBER_LEVEL				= 65,
+
+#ifdef ENABLE_ITEMSHOP
+	HEADER_DG_ITEMSHOP 								= 76,
+	HEADER_GD_ITEMSHOP 								= 76,
+#endif
 	HEADER_DG_TIME									= 90,
 	HEADER_DG_ITEM_ID_RANGE							= 91,
 	HEADER_DG_GUILD_ADD_MEMBER						= 92,
@@ -211,24 +207,14 @@ enum
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
 	HEADER_DG_OFFLINESHOP							= 182,
 #endif
-#ifdef ENABLE_EVENT_MANAGER
-	HEADER_DG_UPDATE_EVENT_STATUS					= 183,
-	HEADER_DG_EVENT_NOTIFICATION					= 184,
-#endif
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-	HEADER_DG_EXT_BATTLE_PASS_LOAD					= 185,
-#endif
 #ifdef ENABLE_SKILL_COLOR_SYSTEM
-	HEADER_DG_SKILL_COLOR_LOAD						= 186,
+	HEADER_DG_SKILL_COLOR_LOAD						= 183,
 #endif
 #ifdef ENABLE_OFFLINE_MESSAGE
-	HEADER_DG_RESPOND_OFFLINE_MESSAGES				= 187,
-#endif
-#ifdef ENABLE_RENEWAL_INGAME_ITEMSHOP
-	HEADER_DG_ITEMSHOP								= 188,
+	HEADER_DG_RESPOND_OFFLINE_MESSAGES				= 184,
 #endif
 #ifdef ENABLE_GROWTH_PET_SYSTEM
-	HEADER_DG_GROWTH_PET_LOAD						= 189,
+	HEADER_DG_GROWTH_PET_LOAD						= 185,
 #endif
 
 	HEADER_DG_MAP_LOCATIONS							= 0xfe,
@@ -259,6 +245,10 @@ typedef struct SSimplePlayer
 	int byLevel;
 #else
 	BYTE byLevel;
+#endif
+#ifdef ENABLE_CONQUEROR_LEVEL
+	BYTE byConquerorLevel;
+	BYTE bySungmaST, bySungmaHP, bySungmaMV, bySungmaINM;
 #endif
 	DWORD dwPlayMinutes;
 	BYTE byST, byHT, byDX, byIQ;
@@ -328,6 +318,14 @@ typedef struct SQuickslot
 	BYTE pos;
 } TQuickslot;
 
+#ifdef ENABLE_FISH_EVENT
+typedef struct SPlayerFishEventSlot
+{
+	bool	bIsMain;
+	BYTE	bShape;
+} TPlayerFishEventSlot;
+#endif
+
 typedef struct SPlayerSkill
 {
 	BYTE bMasterType;
@@ -370,6 +368,12 @@ typedef struct SPlayerTable
 	INT gold;
 #endif
 
+#ifdef ENABLE_HALLOWEEN_EVENT_SYSTEM
+	int halounlv;
+	long long phaloun;
+	int rhaloun;
+#endif
+
 	BYTE dir;
 	INT x, y, z;
 	INT lMapIndex;
@@ -377,7 +381,7 @@ typedef struct SPlayerTable
 	long lExitX, lExitY;
 	long lExitMapIndex;
 
-
+	// @fixme301
 #ifdef ENABLE_WARP_HP_LOSS_FIX
 	int hp;
 	int sp;
@@ -407,7 +411,13 @@ typedef struct SPlayerTable
 
 	BYTE skill_group;
 	long lAlignment;
-
+#ifdef ENABLE_CONQUEROR_LEVEL
+	BYTE	conquerorlevel;
+	BYTE	conqueror_level_step;
+	short	sungma_str, sungma_hp, sungma_move, sungma_immune;
+	DWORD	conqueror_exp;
+	short	conqueror_point;
+#endif
 	short stat_reset_count;
 
 	THorseInfo horse;
@@ -419,22 +429,6 @@ typedef struct SPlayerTable
 
 #ifdef ENABLE_ANTI_EXP
 	bool anti_exp;
-#endif
-
-#ifdef ENABLE_BIOLOG_SYSTEM
-	BYTE m_BiologActualMission;
-	WORD m_BiologCollectedItems;
-
-	BYTE m_BiologCooldownReminder;
-	long m_BiologCooldown;
-#endif
-
-#ifdef ENABLE_TITLE_SYSTEM
-	int iTChoosed;
-#endif
-
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-	int battle_pass_premium_id;
 #endif
 
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
@@ -449,20 +443,46 @@ typedef struct SPlayerTable
 	DWORD inventory_unlock[UNLOCK_INVENTORY_MAX];
 #endif
 
-#ifdef ENABLE_RENEWAL_BONUS_BOARD
-	long long llMonsterKilled, llStoneKilled, llBossKilled, llBluePlayerKilled, llYellowPlayerKilled, llRedPlayerKilled, llAllPlayerKilled, llDuelWon, llDuelLost;
-#endif
-
 #ifdef ENABLE_RIDING_EXTENDED
 	uint32_t mount_up_grade_exp;
 	uint8_t mount_up_grade_fail;
+#endif
+
+#ifdef ENABLE_FISH_EVENT
+	DWORD	fishEventUseCount;
+	TPlayerFishEventSlot fishSlots[FISH_EVENT_SLOTS_NUM];
+#endif
+
+#ifdef ENABLE_GAYA_SYSTEM
+	INT gem;
+#endif
+
+#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
+	INT		soul;
+	INT		soulre;
+#endif
+#ifdef ENABLE_KILL_STATISTICS
+	int		iJinnoKills;
+	int		iShinsooKills;
+	int		iChunjoKills;
+	int		iTotalKills;
+	int		iTotalDeaths;
+	int		iDuelsWon;
+	int		iDuelsLost;
+	int		iBossesKills;
+	int		iStonesKills;
+	int		iMobsKills;
+	int		top_damage;
+#endif
+#ifdef ENABLE_RANKING
+	long long	lRankPoints[RANKING_MAX_CATEGORIES];
 #endif
 } TPlayerTable;
 
 typedef struct SMobSkillLevel
 {
-	DWORD dwVnum;
-	BYTE bLevel;
+	DWORD	dwVnum;
+	BYTE	bLevel;
 } TMobSkillLevel;
 
 typedef struct SEntityTable
@@ -528,6 +548,8 @@ typedef struct SMobTable : public SEntityTable
 	BYTE bGodSpeedPoint;
 	BYTE bDeathBlowPoint;
 	BYTE bRevivePoint;
+
+	float fHitRange;
 } TMobTable;
 
 typedef struct SSkillTable
@@ -700,7 +722,9 @@ typedef struct SItemTable : public SEntityTable
 
 struct TItemAttrTable
 {
-	TItemAttrTable() : dwApplyIndex(0), dwProb(0)
+	TItemAttrTable() :
+		dwApplyIndex(0),
+		dwProb(0)
 	{
 		szApply[0] = 0;
 		memset(&lValues, 0, sizeof(lValues));
@@ -808,7 +832,7 @@ typedef struct SEmpireSelectPacket
 
 typedef struct SPacketGDSetup
 {
-	char szPublicIP[16];
+	char szPublicIP[16]; // Public IP which listen to users
 	BYTE bChannel;
 	WORD wListenPort;
 	WORD wP2PPort;
@@ -876,7 +900,6 @@ typedef struct SPacketGuildChangeMemberData
 #endif
 	BYTE grade;
 } TPacketGuildChangeMemberData;
-
 
 typedef struct SPacketDGLoginAlready
 {
@@ -1108,6 +1131,7 @@ typedef struct SPacketGiveGuildPriv
 	DWORD guild_id;
 	time_t duration_sec;
 } TPacketGiveGuildPriv;
+
 typedef struct SPacketGiveEmpirePriv
 {
 	BYTE type;
@@ -1115,17 +1139,20 @@ typedef struct SPacketGiveEmpirePriv
 	BYTE empire;
 	time_t duration_sec;
 } TPacketGiveEmpirePriv;
+
 typedef struct SPacketGiveCharacterPriv
 {
 	BYTE type;
 	int value;
 	DWORD pid;
 } TPacketGiveCharacterPriv;
+
 typedef struct SPacketRemoveGuildPriv
 {
 	BYTE type;
 	DWORD guild_id;
 } TPacketRemoveGuildPriv;
+
 typedef struct SPacketRemoveEmpirePriv
 {
 	BYTE type;
@@ -1249,6 +1276,7 @@ typedef struct
 	DWORD dwGuild;
 } TPacketGDGuildWarBet;
 
+// Marriage
 typedef struct
 {
 	DWORD dwPID1;
@@ -1317,6 +1345,7 @@ typedef struct SItemPriceListTable
 {
 	DWORD dwOwnerID;
 	BYTE byCount;
+
 	TItemPriceInfo aPriceInfo[SHOP_PRICELIST_MAX_NUM];
 } TItemPriceListTable;
 
@@ -1464,87 +1493,111 @@ struct TSwitchbottAttributeTable
 };
 #endif
 
-#ifdef ENABLE_BIOLOG_SYSTEM
-typedef struct SBiologMissions
+#ifdef ENABLE_DUNGEON_INFO
+typedef struct SFDateInfoPacket
 {
-	BYTE bMission;
-	BYTE bRequiredLevel;
-	DWORD iRequiredItem;
-	WORD wRequiredItemCount;
-	time_t iCooldown;
-	BYTE bChance;
-} TBiologMissionsProto;
+	int 	id_dungeon;
+	char 	name[100];
+	char 	img[100];
+	int 	lv_min;
+	int 	lv_max;
+	int 	party_max;
+	DWORD 	respawn;
+	DWORD 	time_room;
+	int   	time_respawn_dungeon;
+	int 	time_room_dungeon;
+	char 	entrance[100];
+	char 	resistance[100];
+	char 	force[100];
+	int 	vnum_item;
+	int 	count_item;
+	int 	count_finish;
+	int 	time_finish;
+	int 	difficulty;
+	int 	damage_done;
+	int 	damage_received;
+	int 	id_boss;
 
-typedef struct SBiologRewards
-{
-	BYTE bMission;
-	DWORD dRewardItem;
-	WORD wRewardItemCount;
-	DWORD bApplyType[MAX_BONUSES_LENGTH];
-	long lApplyValue[MAX_BONUSES_LENGTH];
-} TBiologRewardsProto;
 
-typedef struct SBiologMonsters
+}TFDateInfoPacket;
+
+typedef struct SFDateMision
 {
-	BYTE bMission;
-	DWORD dwMonsterVnum;
-	BYTE bChance;
-} TBiologMonstersProto;
+	
+	int 	vnum_mob_mision;
+	int 	count_mob_mision;
+	int 	count_mob_a_mision;
+	int 	status_mision;
+}TFDateMision;
+
+typedef struct SFDateInfo
+{
+	int 	id;
+	SFDateInfoPacket dateinfo;
+	int 	index_map;
+	int 	x_dungeon_join;
+	int 	y_dungeon_join;
+	int 	x_map_npc;
+	int 	y_map_npc;
+	SFDateMision	dateinfom;
+}TFDateInfo;
+
+typedef struct  SFDateRanking
+{
+	int vnum_mob_r;
+	int type;
+	char name_r[24];
+	int extra_r;
+
+}TFDateInfoRanking;
+
 #endif
 
-#ifdef ENABLE_EVENT_MANAGER
-typedef struct SEventTable
+#ifdef ENABLE_ITEMSHOP
+enum EItemShopSubheaders : uint8_t
 {
-	DWORD dwID;
-	char szType[64];
-	long startTime;
-	long endTime;
-	DWORD dwVnum;
-	int iPercent;
-	int iDropType;
-	bool bCompleted;
-} TEventTable;
+	ITEMSHOP_LOAD			= 0,
+	ITEMSHOP_LOG			= 1,
+	ITEMSHOP_BUY			= 2,
+	ITEMSHOP_DRAGONCOIN		= 3,
+	ITEMSHOP_RELOAD			= 4,
+	ITEMSHOP_UPDATE_ITEM	= 5,
+};
+
+typedef struct SIShopData
+{
+	DWORD		id;
+	DWORD		itemVnum;
+	long long	itemPrice;
+#ifdef USE_ITEMSHOP_RENEWED
+	long long	itemPriceJD;
 #endif
+	int			topSellingIndex;
+	BYTE		discount;
+	int			offerTime;
+	int			addedTime;
+	long long	sellCount;
+	int			week_limit;
+	int			month_limit;
+	int 		maxSellCount;
+} TIShopData;
 
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-typedef struct SPlayerExtBattlePassMission
+typedef struct SIShopLogData
 {
-	DWORD dwPlayerId;
-	DWORD dwBattlePassType;
-	DWORD dwMissionIndex;
-	DWORD dwMissionType;
-	DWORD dwBattlePassId;
-	DWORD dwExtraInfo;
-	BYTE bCompleted;
-	BYTE bIsUpdated;
-} TPlayerExtBattlePassMission;
-
-typedef struct SExtBattlePassRewardItem
-{
-	DWORD dwVnum;
-#ifdef ENABLE_STACK_LIMIT
-	WORD bCount;
-#else
-	BYTE bCount;
+	DWORD		accountID;
+	char		playerName[CHARACTER_NAME_MAX_LEN+1];
+	char		buyDate[21];
+	int			buyTime;
+	char		ipAdress[16];
+	DWORD		itemID;
+	DWORD		itemVnum;
+	int			itemCount;
+	long long	itemPrice;
+#ifdef USE_ITEMSHOP_RENEWED
+	long long	itemPriceJD;
 #endif
-} TExtBattlePassRewardItem;
-
-typedef struct SExtBattlePassMissionInfo
-{
-	BYTE bMissionIndex;
-	BYTE bMissionType;
-	DWORD dwMissionInfo[3];
-	TExtBattlePassRewardItem aRewardList[3];
-} TExtBattlePassMissionInfo;
-
-typedef struct SExtBattlePassTimeTable
-{
-	BYTE bBattlePassId;
-	DWORD dwStartTime;
-	DWORD dwEndTime;
-} TExtBattlePassTimeTable;
+} TIShopLogData;
 #endif
-
 #ifdef ENABLE_MULTI_FARM_BLOCK
 typedef struct SMultiFarm
 {
@@ -1749,47 +1802,6 @@ typedef struct SPacketGDSendOfflineMessage
 } TPacketGDSendOfflineMessage;
 #endif
 
-#ifdef ENABLE_RENEWAL_INGAME_ITEMSHOP
-enum
-{
-	ITEMSHOP_LOAD,
-	ITEMSHOP_LOG,
-	ITEMSHOP_BUY,
-	ITEMSHOP_DRAGONCOIN,
-	ITEMSHOP_RELOAD,
-	ITEMSHOP_LOG_ADD,
-	ITEMSHOP_UPDATE_ITEM,
-};
-
-typedef struct SIShopData
-{
-	DWORD id;
-	DWORD itemVnum;
-	long long itemPrice;
-	int topSellingIndex;
-	BYTE discount;
-	int offerTime;
-	int addedTime;
-	long long sellCount;
-	int	week_limit;
-	int	month_limit;
-	int maxSellCount;
-} TIShopData;
-
-typedef struct SIShopLogData
-{
-	DWORD accountID;
-	char playerName[CHARACTER_NAME_MAX_LEN+1];
-	char buyDate[21];
-	int buyTime;
-	char ipAdress[16];
-	DWORD itemID;
-	DWORD itemVnum;
-	int itemCount;
-	long long itemPrice;
-} TIShopLogData;
-#endif
-
 #ifdef ENABLE_GROWTH_PET_SYSTEM
 typedef struct SPetSkill
 {
@@ -1861,6 +1873,22 @@ typedef struct SGrowthPetSkillTable
 	char szDurationPoly[100 + 1];
 } TGrowthPetSkillTable;
 #endif
+
+#ifdef __DUNGEON_INFO__
+typedef struct SDungeonRank
+{
+	char name[CHARACTER_NAME_MAX_LEN + 1];
+	BYTE level;
+	int	value;
+}TDungeonRank;
+#endif
+
+typedef struct SPacketGDAddRanking
+{
+	uint32_t		dwPID;
+	uint8_t		bTypeRank;
+	int64_t	lValue;
+} TPacketGDAddRanking;
 
 #pragma pack()
 #endif

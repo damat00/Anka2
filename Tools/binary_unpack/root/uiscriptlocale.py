@@ -58,8 +58,15 @@ EMPIREDESC_A = "%s/empiredesc_a.txt" % (name)
 EMPIREDESC_B = "%s/empiredesc_b.txt" % (name)
 EMPIREDESC_C = "%s/empiredesc_c.txt" % (name)
 
-if app.ENABLE_MINIGAME_OKEY_CARDS_SYSTEM:
-	CARDS_DESC = "%s/mini_game_okey_desc.txt" % (name)
+if app.ENABLE_MINI_GAME_OKEY:
+	MINIGAME_RUMI_DESC = "%s/mini_game_okey_desc.txt" % (name)
+
+if app.ENABLE_MINI_GAME_CATCH_KING:
+	MINIGAME_CATCH_KING_DESC = "%s/catchking_event_desc.txt" % (name)
+	MINIGAME_CATCH_KING_SIMPLE_DESC = "%s/catchking_event_simple_desc.txt" % (name)
+
+if app.ENABLE_FISH_EVENT_SYSTEM:
+	FISH_JIGSAW_DESC = "%s/fish_event_desc.txt" % (name)
 
 if app.ENABLE_GROWTH_PET_SYSTEM:
 	PET_PRIMIUM_FEEDSTUFF_DESC = "%s/pet_primium_feedstuff_desc.txt" % (name)

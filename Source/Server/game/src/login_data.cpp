@@ -2,7 +2,7 @@
 #include "constants.h"
 #include "login_data.h"
 
-extern std::string g_stBlockDate; 
+extern std::string g_stBlockDate;
 
 CLoginData::CLoginData()
 {

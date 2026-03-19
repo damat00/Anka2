@@ -13,12 +13,12 @@ void CInstanceBase::SCRIPT_SetPixelPosition(float fx, float fy)
 
 void CInstanceBase::NEW_SetPixelPosition(const TPixelPosition & c_rPixelPosition)
 {
-	m_GraphicThingInstance.SetCurPixelPosition(c_rPixelPosition);		
+	m_GraphicThingInstance.SetCurPixelPosition(c_rPixelPosition);
 }
 
 void CInstanceBase::NEW_GetPixelPosition(TPixelPosition * pPixelPosition)
 {
-	*pPixelPosition=m_GraphicThingInstance.NEW_GetCurPixelPositionRef();	
+	*pPixelPosition=m_GraphicThingInstance.NEW_GetCurPixelPositionRef();
 }
 
 void CInstanceBase::SetRotation(float fRotation)
@@ -75,7 +75,7 @@ float CInstanceBase::GetDegreeFromDirection(int dir)
 
 	if (dir >= DIR_MAX_NUM)
 		return 0.0f;
-	
+
 	static float s_dirRot[DIR_MAX_NUM]=
 	{
 		+45.0f * 4,

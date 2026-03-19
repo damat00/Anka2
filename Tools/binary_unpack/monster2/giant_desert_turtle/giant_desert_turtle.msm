@@ -15,7 +15,7 @@ Group AttachingData
     {
         AttachingDataType    1
         
-        isAttaching          0
+        isAttaching          1
         AttachingModelIndex  0
         AttachingBoneName    "Bip01"
         
@@ -24,8 +24,8 @@ Group AttachingData
         SphereDataCount      1
         Group SphereData00
         {
-            Radius           239.000000
-            Position         0.000000 -100.000000 100.000000
+            Radius           230.000000
+            Position         0.000000 -100.000000 50.000000
         }
     }
     
@@ -33,7 +33,7 @@ Group AttachingData
     {
         AttachingDataType    1
         
-        isAttaching          0
+        isAttaching          1
         AttachingModelIndex  0
         AttachingBoneName    "Bip01"
         
@@ -42,8 +42,8 @@ Group AttachingData
         SphereDataCount      1
         Group SphereData00
         {
-            Radius           274.000000
-            Position         0.000000 -100.000000 100.000000
+            Radius           250.000000
+            Position         0.000000 -100.000000 50.000000
         }
     }
 }

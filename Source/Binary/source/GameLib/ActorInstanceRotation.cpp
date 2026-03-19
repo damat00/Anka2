@@ -57,12 +57,11 @@ void CActorInstance::RotationProcess()
 		m_fcurRotation = GetInterpolatedRotation(m_rotBegin, m_rotEnd, (GetLocalTime() - m_rotBeginTime) / m_rotBlendTime);
 		SetAdvancingRotation(m_fcurRotation);
 	}
-	else 
+	else
 	{
 		m_fcurRotation = m_rotEnd;
 	}
 
-	// FIXME : "건물일때만 체크"로 바꾼다. - [levites]
 	if (0.0f != m_rotX || 0.0f != m_rotY)
 	{
 		CGraphicObjectInstance::SetRotation(m_rotX, m_rotY, m_fcurRotation);
@@ -85,7 +84,7 @@ void CActorInstance::LookAtFromXY(float x, float y, CActorInstance * pDestInstan
 
 void CActorInstance::LookAt(float fDirRot)
 {
-	BlendRotation(fDirRot, 0.3f);	
+	BlendRotation(fDirRot, 0.3f);
 }
 
 void CActorInstance::LookAt(float fx, float fy)

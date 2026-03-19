@@ -15,7 +15,7 @@ class CWeaponTrace
 		} TSplineValue;
 	*/
 	public:
-		static void DestroySystem();		
+		static void DestroySystem();
 		static void Delete(CWeaponTrace* pkWTDel);
 		static CWeaponTrace* New();
 
@@ -27,12 +27,12 @@ class CWeaponTrace
 
 		void TurnOn();
 		void TurnOff();
-		
+
 		void UseAlpha();
 		void UseTexture();
 
-		void SetTexture(const char *c_szFileName);
-		bool SetWeaponInstance(CGraphicThingInstance * pInstance, DWORD dwModelIndex, const char *c_szBoneName);
+		void SetTexture(const char * c_szFileName);
+		bool SetWeaponInstance(CGraphicThingInstance * pInstance, DWORD dwModelIndex, const char * c_szBoneName);
 		void SetPosition(float fx, float fy, float fz);
 		void SetRotation(float fRotation);
 
@@ -69,7 +69,7 @@ class CWeaponTrace
 		DWORD m_dwModelInstanceIndex;
 
 		CGraphicImageInstance m_ImageInstance;
-		
+
 		float m_fx;
 		float m_fy;
 		float m_fz;

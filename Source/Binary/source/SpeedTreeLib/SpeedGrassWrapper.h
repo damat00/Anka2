@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CSpeedGrassWrapper Class
 //
 //	(c) 2003 IDV, Inc.
@@ -32,7 +32,7 @@
 class CMapOutdoor;
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	class CSpeedGrassWrapper declaration
 
 class CSpeedGrassWrapper : public CSpeedGrassRT
@@ -43,20 +43,24 @@ public:
 
 		void							SetMapOutdoor(CMapOutdoor* pMapOutdoor)	{ m_pMapOutdoor = pMapOutdoor; }
 		int								Draw(float fDensity);
-		bool							InitFromBsfFile(const char *pFilename,
-														unsigned int nNumBlades, 
-														unsigned int uiRows, 
-														unsigned int uiCols, 
+		bool							InitFromBsfFile(const char* pFilename,
+														unsigned int nNumBlades,
+														unsigned int uiRows,
+														unsigned int uiCols,
 														float fCollisionDistance);
 
 private:
-virtual float							Color(float fX, float fY, const float *pNormal, float *pTopColor, float *pBottomColor) const;
-virtual	float							Height(float fX, float fY, float *pNormal) const;
+virtual float							Color(float fX, float fY, const float* pNormal, float* pTopColor, float* pBottomColor) const;
+virtual	float							Height(float fX, float fY, float* pNormal) const;
 		void							InitGraphics(void);
 
 		CMapOutdoor *					m_pMapOutdoor;
 
-		LPDIRECT3DTEXTURE8				m_lpD3DTexure8;
+#ifdef ENABLE_DIRECTX9_UPDATE
+        LPDIRECT3DTEXTURE9 m_lpD3DTexure8;
+#else
+        LPDIRECT3DTEXTURE8 m_lpD3DTexure8;
+#endif
 
 		CGraphicImageInstance			m_GrassImageInstance;
 };

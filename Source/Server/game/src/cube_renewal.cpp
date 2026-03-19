@@ -1,4 +1,3 @@
-
 #define _cube_cpp_
 
 #include "stdafx.h"
@@ -17,6 +16,7 @@
 #include <unordered_map>
 
 #include "../../common/service.h"
+#define CUBE_NO_ITEM
 
 #ifdef ENABLE_RENEWAL_CUBE
 static std::vector<CUBE_RENEWAL_DATA*>	s_cube_proto;
@@ -36,6 +36,9 @@ struct SCubeMaterialInfo
 	long long gold;
 #else
 	DWORD gold;
+#endif
+#ifdef ENABLE_GAYA_SYSTEM
+	DWORD gem;
 #endif
 	int percent;
 	std::string category;
@@ -118,6 +121,9 @@ static int FN_check_cube_item_count_material(const SCubeMaterialInfo& materialIn
 CUBE_RENEWAL_DATA::CUBE_RENEWAL_DATA()
 {
 	this->gold = 0;
+#ifdef ENABLE_GAYA_SYSTEM
+	this->gem = 0;
+#endif
 	this->allowCopyAttr = false;
 	this->category = "OUTROS";
 }
@@ -219,6 +225,12 @@ bool Cube_load (const char *file)
 		{
 			cube_data->gold = value1;
 		}
+#ifdef ENABLE_GAYA_SYSTEM
+		else TOKEN("gem")
+		{
+			cube_data->gem = value1;
+		}
+#endif
 		else TOKEN("allow_copy")
 		{
 			cube_data->allowCopyAttr = (value1 == 1 ? true : false);
@@ -283,6 +295,9 @@ bool Cube_InformationInitialize()
 
 		materialInfo.reward = reward;
 		materialInfo.gold = cubeData->gold;
+#ifdef ENABLE_GAYA_SYSTEM
+		materialInfo.gem = cubeData->gem;
+#endif
 		materialInfo.percent = cubeData->percent;
 		materialInfo.material = cubeData->item;
 		materialInfo.category = cubeData->category;
@@ -376,6 +391,20 @@ void Cube_Make(LPCHARACTER ch, int index, int count_item, int index_item_improve
 	if (NULL == ch) //Fix
 		return;
 
+#ifdef CUBE_NO_ITEM
+	if (count_item <= 0 || count_item > 100)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "Invalid craft count.");
+		return;
+	}
+
+	if (index < 0)
+	{
+		ch->ChatPacket(CHAT_TYPE_INFO, "Geçersiz küp tarif indeksi.");
+		return;
+	}
+#endif
+
 	LPCHARACTER	npc;
 
 	npc = ch->GetQuestNPC();
@@ -412,12 +441,41 @@ void Cube_Make(LPCHARACTER ch, int index, int count_item, int index_item_improve
 		{
 			const SCubeMaterialInfo& materialInfo = *iter;
 
+#ifdef CUBE_NO_ITEM
+			if (materialInfo.material.empty())
+			{
+				ch->ChatPacket(CHAT_TYPE_INFO, "Bu tarifte malzeme bulunmuyor (geçersiz).");
+				return;
+			}
+
+			if (materialInfo.reward.vnum == 0 || materialInfo.reward.count == 0)
+			{
+				ch->ChatPacket(CHAT_TYPE_INFO, "Bu tarif geçersiz ödül içeriyor (istismar engellendi).");
+				return;
+			}
+#endif
+
 			for (int i = 0; i < materialInfo.material.size(); ++i)
 			{
-				if (ch->CountSpecifyItem(materialInfo.material[i].vnum) < (materialInfo.material[i].count*count_item))
+#ifdef CUBE_NO_ITEM
+				long long required = (long long)materialInfo.material[i].count * count_item;
+				if (required > 0x7FFFFFFF)
+				{
+					ch->ChatPacket(CHAT_TYPE_INFO, "Geçersiz malzeme sayýsý (taþma tespit edildi).");
+					return;
+				}
+				if (ch->CountSpecifyItem(materialInfo.material[i].vnum) < required)
 				{
 					material_check = false;
+					break;
 				}
+#else
+				if (ch->CountSpecifyItem(materialInfo.material[i].vnum) < (materialInfo.material[i].count * count_item))
+				{
+					material_check = false;
+					break;
+				}
+#endif
 			}
 
 			if (materialInfo.gold != 0)
@@ -428,7 +486,15 @@ void Cube_Make(LPCHARACTER ch, int index, int count_item, int index_item_improve
 					return;
 				}
 			}
-
+#ifdef ENABLE_GAYA_SYSTEM
+			if (materialInfo.gem != 0){
+				if (ch->GetGem() < (materialInfo.gem*count_item))
+				{
+					ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("He doesn't have the necessary amount of gem."));
+					return;
+				}
+			}
+#endif
 			bool pAntiStack = false;
 			TItemTable* p = ITEM_MANAGER::instance().GetTable(materialInfo.reward.vnum);
 
@@ -576,7 +642,12 @@ void Cube_Make(LPCHARACTER ch, int index, int count_item, int index_item_improve
 					ch->PointChange(POINT_GOLD, -(materialInfo.gold*count_item), false);
 #endif
 				}
+#ifdef ENABLE_GAYA_SYSTEM
+				if (materialInfo.gem != 0){
+					ch->PointChange(POINT_GEM, -static_cast<long long>(materialInfo.gem*count_item), false);
 
+				}
+#endif
 				if(total_items_give <= 0)
 				{
 					ch->LocaleChatPacket(CHAT_TYPE_INFO, 73, "");
@@ -648,6 +719,9 @@ void Cube_Make(LPCHARACTER ch, int index, int count_item, int index_item_improve
 			else
 			{
 				ch->LocaleChatPacket(CHAT_TYPE_INFO, 226, "");
+#ifdef CUBE_NO_ITEM
+				return;
+#endif
 			}
 		}
 
@@ -696,6 +770,9 @@ void SendDateCubeRenewalPackets(LPCHARACTER ch, BYTE subheader, DWORD npcVNUM)
 			pack.date_cube_renewal.count_material_5 = FN_check_cube_item_count_material(materialInfo,5);
 
 			pack.date_cube_renewal.gold = materialInfo.gold;
+#ifdef ENABLE_GAYA_SYSTEM
+			pack.date_cube_renewal.gem = materialInfo.gem;
+#endif
 			pack.date_cube_renewal.percent = materialInfo.percent;
 
 			memcpy (pack.date_cube_renewal.category, materialInfo.category.c_str(), sizeof(pack.date_cube_renewal.category));

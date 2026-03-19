@@ -8,7 +8,7 @@ CNetworkDevice::CNetworkDevice()
 
 CNetworkDevice::~CNetworkDevice()
 {
-	Destroy();	
+	Destroy();
 }
 
 void CNetworkDevice::Initialize()
@@ -36,6 +36,6 @@ bool CNetworkDevice::Create()
 		return false;
 
 	m_isWSA=true;
-	
+
 	return true;
 }

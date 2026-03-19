@@ -57,7 +57,7 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalIncludeDirectories>../../extern/include;../../source/EterBase/Poly;$(VC_IncludePath);$(WindowsSDK_IncludePath);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalOptions>/D _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/D _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS /wd4477 %(AdditionalOptions)</AdditionalOptions>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -82,7 +82,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalModuleDependencies>
       </AdditionalModuleDependencies>
-      <AdditionalOptions>/D _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/D _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS /wd4477 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
@@ -95,6 +95,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\source\EterBase\CPostIt.cpp" />
     <ClCompile Include="..\..\source\EterBase\CRC32.cpp" />
+    <ClCompile Include="..\..\source\EterBase\DDSTextureLoader.cpp" />
     <ClCompile Include="..\..\source\EterBase\Debug.cpp" />
     <ClCompile Include="..\..\source\EterBase\error.cpp" />
     <ClCompile Include="..\..\source\EterBase\FileBase.cpp" />
@@ -115,11 +116,13 @@
     <ClCompile Include="..\..\source\EterBase\tea.cpp" />
     <ClCompile Include="..\..\source\EterBase\TempFile.cpp" />
     <ClCompile Include="..\..\source\EterBase\Timer.cpp" />
+    <ClCompile Include="..\..\source\EterBase\tinyxml2.cpp" />
     <ClCompile Include="..\..\source\EterBase\Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\source\EterBase\CPostIt.h" />
     <ClInclude Include="..\..\source\EterBase\CRC32.h" />
+    <ClInclude Include="..\..\source\EterBase\DDSTextureLoader.h" />
     <ClInclude Include="..\..\source\EterBase\Debug.h" />
     <ClInclude Include="..\..\source\EterBase\error.h" />
     <ClInclude Include="..\..\source\EterBase\FileBase.h" />
@@ -133,14 +136,19 @@
     <ClInclude Include="..\..\source\EterBase\Poly\Symbol.h" />
     <ClInclude Include="..\..\source\EterBase\Poly\SymTable.h" />
     <ClInclude Include="..\..\source\EterBase\Random.h" />
+    <ClInclude Include="..\..\source\EterBase\ServiceDefs.h" />
+    <ClInclude Include="..\..\source\EterBase\SimpleTimer.h" />
     <ClInclude Include="..\..\source\EterBase\Singleton.h" />
     <ClInclude Include="..\..\source\EterBase\StdAfx.h" />
     <ClInclude Include="..\..\source\EterBase\Stl.h" />
     <ClInclude Include="..\..\source\EterBase\tea.h" />
     <ClInclude Include="..\..\source\EterBase\TempFile.h" />
     <ClInclude Include="..\..\source\EterBase\Timer.h" />
+    <ClInclude Include="..\..\source\EterBase\tinyxml2.h" />
     <ClInclude Include="..\..\source\EterBase\Utils.h" />
     <ClInclude Include="..\..\source\EterBase\vk.h" />
+    <ClInclude Include="..\..\source\EterBase\WinVerHelper.h" />
+    <ClInclude Include="..\..\source\EterBase\WorkQueue.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

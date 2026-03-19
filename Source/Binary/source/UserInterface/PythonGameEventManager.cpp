@@ -89,7 +89,7 @@ void InGameEventManager::BuildEventNameMap()
 	m_mapEventName["EVENT_TYPE_OX"] = EVENT_TYPE_OX;
 	m_mapEventName["EVENT_TYPE_TANAKA"] = EVENT_TYPE_TANAKA;
 	m_mapEventName["EVENT_TYPE_YANG"] = EVENT_TYPE_YANG;
-#ifdef ENABLE_MINIGAME_OKEY_CARDS_SYSTEM
+#ifdef ENABLE_MINI_GAME_OKEY
 	m_mapEventName["EVENT_TYPE_OKEY_CARDS"] = EVENT_TYPE_OKEY_CARDS;
 #endif
 }

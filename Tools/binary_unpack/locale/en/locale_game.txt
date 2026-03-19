@@ -3057,22 +3057,24 @@ SWITCHBOT_CLEAR_ATTR	Delete
 SWITCHBOT_LOAD_CONFIGURATION	Load
 SWITCHBOT_CLEAR_CONFIGURATION	Clear
 SYMBOLLIST_TITLE	Register guild flag
-SYSTEM_WHISPER	[Nirvana2]
+SYSTEM_WHISPER	[Anka2]
 TARGET_BUTTON_ACCEPT_FIGHT	Agree
 TARGET_BUTTON_AVENGE	Revenge
 TARGET_BUTTON_BLOCK	Block
+TARGET_BUTTON_BLOCK_REMOVE	Unblock
 TARGET_BUTTON_BUILDING_DESTROY	Destroy
 TARGET_BUTTON_DISMOUNT	Dismount
 TARGET_BUTTON_EMOTION_ALLOW	Emotions
 TARGET_BUTTON_EXCHANGE	Trading
 TARGET_BUTTON_EXCLUDE	Exclude
-TARGET_BUTTON_EXIT_OBSERVER	End observer mode
+TARGET_BUTTON_EXIT_OBSERVER	End Observer Mode
 TARGET_BUTTON_FIGHT	Duel
 TARGET_BUTTON_FRIEND	Friend
-TARGET_BUTTON_INVITE_GUILD	Guild invitation
-TARGET_BUTTON_INVITE_PARTY	Group invitation
-TARGET_BUTTON_LEAVE_PARTY	Leave group
-TARGET_BUTTON_REQUEST_ENTER_PARTY	Join group
+TARGET_BUTTON_INVITE_GUILD	Guild Invitation
+TARGET_BUTTON_INVITE_PARTY	Group Invitation
+TARGET_BUTTON_LEAVE_PARTY	Leave Group
+TARGET_BUTTON_REQUEST_ENTER_PARTY	Join Group
+TARGET_BUTTON_REVIVE	Revive
 TARGET_BUTTON_UNBLOCK	Unblock
 TARGET_BUTTON_VIEW_EQUIPMENT	Equipment
 TARGET_BUTTON_WHISPER	Whispering
@@ -3641,3 +3643,54 @@ MULTI_FARM_PREMIUM_EFFECT	+%d characters to multi-farm	SA
 MULTI_FARM_TEXT_CAN_FARM	Disable multi-farm - |Eemoji/key_lclick|e.
 MULTI_FARM_TEXT_CANT_FARM	Enable multi-farm - |Eemoji/key_lclick|e.
 MULTI_FARM_TITLE	Multi-Farm
+REFINE_ERROR_ADD_PERC_STONES	[Refine] You cannot add an elixir to increase the stone success rate.
+REFINE_ERROR_ITEM_COUNT	[Refine] You can only add 1 item, not more.
+REFINE_ERROR_ITEM_OVERFLOW_PERCENTAGE	[Refine] Total percentage exceeds 100, you cannot do this.
+REFINE_ERROR_ADD_PERC_STONES	[Refine] You cannot increase the success rate of the stones.
+REFINE_POPUP_NO_DOWNGRADE_MESSAGE	An upgraded item cannot be destroyed or downgraded.
+REFINE_INCREASE_PERCENTAGE	[Extra + %d%%]
+REFINE_NEED_ITEMS	[i] Required items
+REFINE_NEXT_ITEM	[i] Improved Item
+REFINE_PERCENTAGE_LOW	+%5
+REFINE_PERCENTAGE_MEDIUM	+%10
+REFINE_PERCENTAGE_EXTRA	+%15
+REFINE_SUCCESS_PROBALITY	|cFFE53931The item may fail.|r
+REFINE_TOOLTIP_ITEM_DESCRIPTION_1	
+REFINE_TOOLTIP_ITEM_DESCRIPTION_2	
+REFINE_TOOLTIP_ITEM_DESCRIPTION_3	
+REFINE_TOOLTIP_ITEM_DESCRIPTION_4
+REVIVE_AUTO_TOWN_MESSAGE	Auto-revive time: {}
+STAT_TOOLTIP_IMG_DEF	Defense
+GUILD_DIAMANT_OVEN	Diamond furnace
+GUILD_FOSSIL_OVEN	Fossil wood furnace
+GUILD_COPPER_OVEN	Copper furnace
+GUILD_SILVER_OVEN	Silver furnace
+GUILD_GOLD_OVEN	Gold furnace
+GUILD_JADE_OVEN	Jade furnace
+GUILD_EBONY_OVEN	Ebony furnace
+GUILD_PEARL_OVEN	Pearl furnace
+GUILD_WHITEGOLD_OVEN	White gold furnace
+GUILD_KRISTALL_OVEN	Crystal furnace
+GUILD_QUARZ_OVEN	Quartz furnace
+GUILD_TEARS_OVEN	Celestial tear furnace
+GUILD_SOULCRISTAL_OVEN	Soul crystal furnace
+GUILD_RUBIN_OVEN	Ruby furnace
+GUILD_GRANAT_OVEN	Garnet furnace
+GUILD_SMARAGD_OVEN	Emerald furnace
+GUILD_SAPHIR_OVEN	Sapphire furnace
+GUILD_TURMALIN_OVEN	Tourmaline furnace
+GUILD_WEAPON_BLACKSMITH	Weapon blacksmith
+GUILD_ARMOR_BLACKSMITH	Armor blacksmith
+GUILD_JUWELER_BLACKSMITH	Jeweler
+NEW_AFFECT_AUTO_HUNT	Auto Hunt	SNA
+OTO_SATIS	|Eemoji/key_ctrl|e + |Eemoji/key_x|e + |Eemoji/key_rclick|e - Auto Sell.
+OTOMATIK_SAT_UYARI	<Auto Sell> You cannot add more than 1 item, separate the items first!
+OTOMATIK_SAT_UYARI_SANDIK	<Auto Sell> You cannot add chests to auto sell!
+POSSIBLE_ORE    Suitable Ore:
+EMOJI_TEXTLINE_VIEW_RENDER	Hold |Eemoji/key_ctrl|e to preview.
+REFINE_INCRESE3	Automatically use every enhancement
+REFINE_INCRESE2	Use only for the current upgrade
+REFINE_INCRESE	[i] Increase upgrade chances
+REFINE_NO_SOULD_OF_GOD_ALERT	You do not have the Seal of God!
+REFINE_INFO_PITTY_DESC1	The Pity System serves as an anti-frustration mechanic for regular players. It helps prevent progression blockage caused by repeated failures during expensive item upgrades.
+REFINE_INFO_PITTY_DESC2	This system guarantees success after a certain number of attempts and is enabled only for high-level equipment, ensuring a smoother progression for players. It is especially effective when using the Magic Stone refinement scroll, as failure count resets if the item level decreases.

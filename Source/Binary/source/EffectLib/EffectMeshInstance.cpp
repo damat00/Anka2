@@ -45,6 +45,17 @@ bool CEffectMeshInstance::OnUpdate(float fElapsedTime)
 	if (!isActive())
 		return false;
 
+#ifdef USE_EFFECTS_LOD
+    if (IsHiddenByLod()
+#ifdef ENABLE_WIKI_SYSTEM
+        && !m_wikiIgnoreFrustum
+#endif
+        && !m_ignoreFrustum)
+    {
+        return false;
+    }
+#endif
+
 	if (m_MeshFrameController.isActive())
 		m_MeshFrameController.Update(fElapsedTime);
 
@@ -62,6 +73,21 @@ void CEffectMeshInstance::OnRender()
 {
 	if (!isActive())
 		return;
+
+#ifdef USE_EFFECTS_LOD
+    if (IsHiddenByLod()
+#ifdef ENABLE_WIKI_SYSTEM
+        && !m_wikiIgnoreFrustum
+#endif
+        && !m_ignoreFrustum)
+    {
+        return;
+    }
+#endif
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+    D3DPERF_BeginEvent(D3DCOLOR_ARGB(255, 50, 50, 0), L"** CEffectMeshInstance::OnRender **");
+#endif
 
 	CEffectMesh * pEffectMesh = m_roMesh.GetPointer();
 
@@ -162,7 +188,7 @@ void CEffectMeshInstance::OnRender()
 		if (m_pMeshScript->GetTimeTableAlphaPointer(i, &TableAlpha) && !TableAlpha->empty())
 			GetTimeEventBlendValue(m_fLocalTime,*TableAlpha, &fAlpha);
 
-		// Render //
+		// Render
 		CEffectMesh::TEffectMeshData * pMeshData = pEffectMesh->GetMeshDataPointer(i);
 
 		assert(m_MeshFrameController.GetCurrentFrame() < pMeshData->EffectFrameDataVector.size());
@@ -177,13 +203,23 @@ void CEffectMeshInstance::OnRender()
 
 		Color.a = fAlpha * rFrameData.fVisibility;
 		STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, DWORD(Color));
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+		STATEMANAGER.SetFVF(D3DFVF_XYZ | D3DFVF_TEX1);
+#else
 		STATEMANAGER.SetVertexShader(D3DFVF_XYZ | D3DFVF_TEX1);
-		STATEMANAGER.DrawPrimitiveUP(D3DPT_TRIANGLELIST,
+#endif
+		if (rFrameData.dwIndexCount) // @fixme027
+			STATEMANAGER.DrawPrimitiveUP(D3DPT_TRIANGLELIST,
 									 rFrameData.dwIndexCount/3,
 									 &rFrameData.PDTVertexVector[0],
 									 sizeof(TPTVertex));
-		// Render //
+		// Render
 	}
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+    D3DPERF_EndEvent();
+#endif
 }
 
 void CEffectMeshInstance::OnSetDataPointer(CEffectElementBase * pElement)

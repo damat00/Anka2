@@ -62,7 +62,7 @@ struct TGuildWaitStartInfo
 
 	bool operator < (const TGuildWaitStartInfo& r) const
 	{
-		return GID[0] < r.GID[0] || GID[0] == r.GID[0] && GID[1] < r.GID[1];
+		return ((GID[0] < r.GID[0]) || ((GID[0] == r.GID[0]) && (GID[1] < r.GID[1])));
 	}
 };
 
@@ -98,12 +98,12 @@ struct TGuildSkillUsed
 
 inline bool operator < (const TGuildSkillUsed& a, const TGuildSkillUsed& b)
 {
-	return a.GID < b.GID || a.GID == b.GID && a.dwSkillVnum < b.dwSkillVnum;
+	return ((a.GID < b.GID) || ((a.GID == b.GID) && (a.dwSkillVnum < b.dwSkillVnum)));
 }
 
 typedef struct SGuild
 {
-	SGuild() : ladder_point(0), win(0), draw(0), loss(0), gold(0), level(0), markpass(0)
+	SGuild() : ladder_point(0), win(0), draw(0), loss(0), gold(0), level(0)
 	{
 		memset(szName, 0, sizeof(szName));
 	}
@@ -115,7 +115,6 @@ typedef struct SGuild
 	int loss;
 	int gold;
 	int level;
-	DWORD markpass;
 } TGuild;
 
 typedef struct SGuildWarInfo

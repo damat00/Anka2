@@ -69,12 +69,11 @@ void CPythonApplication::OnMouseWheel(int nLen)
 	}
 }
 
-
 void CPythonApplication::OnMouseMove(int x, int y)
 {
 	CCameraManager& rkCmrMgr=CCameraManager::Instance();
 	CCamera* pkCmrCur=rkCmrMgr.GetCurrentCamera();
-	
+
 	POINT Point;
 	if (pkCmrCur)
 	{
@@ -83,13 +82,14 @@ void CPythonApplication::OnMouseMove(int x, int y)
 			x = Point.x;
 			y = Point.y;
 			ClientToScreen(m_hWnd, &Point);
+
 			SetCursorPos(Point.x, Point.y);
 		}
 	}
-	
+
 	RECT rcWnd;
 	GetClientRect(&rcWnd);
-	
+
 	UI::CWindowManager& rkWndMgr=UI::CWindowManager::Instance();
 	rkWndMgr.SetResolution(rcWnd.right-rcWnd.left, rcWnd.bottom-rcWnd.top);
 
@@ -203,6 +203,7 @@ void CPythonApplication::OnMouseUpdate()
 #ifdef _DEBUG
 	if (!m_poMouseHandler)
 	{
+		//assert(!" CPythonApplication::OnMouseUpdate - Mouse handler has not set!");
 		return;
 	}
 #endif _DEBUG
@@ -218,6 +219,7 @@ void CPythonApplication::OnMouseRender()
 #ifdef _DEBUG
 	if (!m_poMouseHandler)
 	{
+		//assert(!" CPythonApplication::OnMouseRender - Mouse handler has not set!");
 		return;
 	}
 #endif _DEBUG

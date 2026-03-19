@@ -11,6 +11,16 @@
 #include "resource.h"
 #include "PythonApplication.h"
 #include "PythonCharacterManager.h"
+
+#include <algorithm>
+
+#ifdef max
+#undef max
+#endif
+#ifdef min
+#undef min
+#endif
+
 #include "ProcessScanner.h"
 
 #ifdef ENABLE_RENEWAL_SWITCHBOT
@@ -25,7 +35,85 @@ extern void GrannyCreateSharedDeformBuffer();
 extern void GrannyDestroySharedDeformBuffer();
 
 float MIN_FOG = 2400.0f;
-double g_specularSpd=0.007f;
+
+#ifdef FPS_APPLICATON_DEVICE_LIMITATION
+
+#define GAME_TICK_FPS         60	// don't touch here, not fps.
+#define RENDER_SKIP_BUFFER_MS 1000	// Background render wait time, recommended 1000
+
+#if defined(RENDER_MAX_FPS) && (RENDER_MAX_FPS > 520)
+#error "RENDER MAX FPS value cannot exceed 520!"
+#endif
+
+#if defined(RENDER_SKIP_BUFFER_MS) && (RENDER_SKIP_BUFFER_MS < 10)
+#error "RENDER_SKIP_BUFFER_MS is too low, make it minimum 60!"
+#endif
+
+LARGE_INTEGER g_Frequency;
+
+void InitHighPrecisionTimer()
+{
+	QueryPerformanceFrequency(&g_Frequency);
+}
+
+void SleepUntilNextFrame(double targetFrameTimeMs)
+{
+	static LARGE_INTEGER lastTime = { 0 };
+	LARGE_INTEGER currentTime;
+	QueryPerformanceCounter(&currentTime);
+
+	if (lastTime.QuadPart == 0)
+		lastTime = currentTime;
+
+	double elapsedMs = (double)(currentTime.QuadPart - lastTime.QuadPart) * 1000.0 / (double)g_Frequency.QuadPart;
+
+	if (elapsedMs < targetFrameTimeMs)
+	{
+		double remainingMs = targetFrameTimeMs - elapsedMs;
+
+		if (remainingMs > 2.0)
+			Sleep((DWORD)(remainingMs - 1));
+
+		do {
+			QueryPerformanceCounter(&currentTime);
+			elapsedMs = (double)(currentTime.QuadPart - lastTime.QuadPart) * 1000.0 / (double)g_Frequency.QuadPart;
+		} while (elapsedMs < targetFrameTimeMs);
+	}
+
+	lastTime = currentTime;
+}
+
+inline double CalculateSpecularSpeed(double fps, double boostFactor = 1.0)
+{
+	double baseSpeed;
+
+	if (fps <= 120.0)
+	{
+		baseSpeed = -0.000008333 * fps + 0.0075;
+	}
+	else if (fps <= 360.0)
+	{
+		baseSpeed = -0.000020 * fps + 0.0089;
+	}
+	else if (fps <= 520.0)
+	{
+		baseSpeed = -0.000001875 * fps + 0.002375;
+	}
+	else
+	{
+		baseSpeed = 0.0014;
+	}
+
+	return baseSpeed * boostFactor;
+}
+
+double g_specularSpd = CalculateSpecularSpeed(RENDER_MAX_FPS);
+
+#else
+
+double g_specularSpd = 0.007f;
+
+#endif
 
 CPythonApplication * CPythonApplication::ms_pInstance;
 
@@ -33,27 +121,12 @@ float c_fDefaultCameraRotateSpeed = 1.5f;
 float c_fDefaultCameraPitchSpeed = 1.5f;
 float c_fDefaultCameraZoomSpeed = 0.05f;
 
-CPythonApplication::CPythonApplication() :
-m_bCursorVisible(TRUE),
-m_bLiarCursorOn(false),
-m_iCursorMode(CURSOR_MODE_HARDWARE),
-m_isWindowed(false),
-m_isFrameSkipDisable(false),
-m_poMouseHandler(nullptr),
-m_dwUpdateFPS(0),
-m_dwRenderFPS(0),
-m_fAveRenderTime(0.0f),
-m_dwFaceCount(0),
-m_fGlobalTime(0.0f),
-m_fGlobalElapsedTime(0.0f),
-m_dwLButtonDownTime(0),
-m_dwLastIdleTime(0)
+CPythonApplication::CPythonApplication()
 {
-#ifndef _DEBUG
-	SetEterExceptionHandler();
-#endif
-
 	CTimer::Instance().UseCustomTime();
+#ifdef FPS_APPLICATON_DEVICE_LIMITATION
+	::InitHighPrecisionTimer();
+#endif
 	m_dwWidth = 800;
 	m_dwHeight = 600;
 
@@ -66,7 +139,11 @@ m_dwLastIdleTime(0)
 	m_tLocalStartTime = 0;
 
 	m_iPort = 0;
+#ifdef FPS_APPLICATON_DEVICE_LIMITATION
+	m_iFPS = RENDER_MAX_FPS;
+#else
 	m_iFPS = 60;
+#endif
 
 	m_isActivateWnd = false;
 	m_isMinimizedWnd = true;
@@ -75,13 +152,13 @@ m_dwLastIdleTime(0)
 	m_fPitchSpeed = 0.0f;
 	m_fZoomSpeed = 0.0f;
 
-	m_fFaceSpd=0.0f;
+	m_fFaceSpd = 0.0f;
 
-	m_dwFaceAccCount=0;
-	m_dwFaceAccTime=0;
+	m_dwFaceAccCount = 0;
+	m_dwFaceAccTime = 0;
 
-	m_dwFaceSpdSum=0;
-	m_dwFaceSpdCount=0;
+	m_dwFaceSpdSum = 0;
+	m_dwFaceSpdCount = 0;
 
 	m_FlyingManager.SetMapManagerPtr(&m_pyBackground);
 
@@ -143,7 +220,7 @@ void CPythonApplication::GetInfo(UINT eInfo, std::string* pstInfo)
 		m_kChrMgr.GetInfo(pstInfo);
 		break;
 	case INFO_EFFECT:
-		m_kEftMgr.GetInfo(pstInfo);			
+		m_kEftMgr.GetInfo(pstInfo);
 		break;
 	case INFO_ITEM:
 		m_pyItem.GetInfo(pstInfo);
@@ -210,6 +287,7 @@ void CPythonApplication::RenderGame()
 	CCullingManager::Instance().Process();
 
 	m_kChrMgr.Deform();
+	m_kEftMgr.Update();
 #ifdef ENABLE_RENDER_TARGET
 	m_kRenderTargetManager.DeformModels();
 #endif
@@ -226,12 +304,15 @@ void CPythonApplication::RenderGame()
 	}
 
 	m_pyBackground.RenderSky();
+
 	m_pyBackground.RenderBeforeLensFlare();
+
 	m_pyBackground.RenderCloud();
+
 	m_pyBackground.BeginEnvironment();
 	m_pyBackground.Render();
-	m_pyBackground.SetCharacterDirLight();
 
+	m_pyBackground.SetCharacterDirLight();
 	m_kChrMgr.Render();
 #ifdef ENABLE_RENDER_TARGET
 	m_kRenderTargetManager.RenderModels();
@@ -252,15 +333,17 @@ void CPythonApplication::RenderGame()
 	m_pyBackground.EndEnvironment();
 
 	m_pyBackground.RenderAfterLensFlare();
-	return;
 }
 
 void CPythonApplication::UpdateGame()
 {
+	uint32_t t1 = ELTimer_GetMSec();
 	POINT ptMouse;
 	GetMousePosition(&ptMouse);
 
 	CGraphicTextInstance::Hyperlink_UpdateMousePos(ptMouse.x, ptMouse.y);
+
+	uint32_t t2 = ELTimer_GetMSec();
 
 	{
 		CScreen s;
@@ -280,22 +363,33 @@ void CPythonApplication::UpdateGame()
 	m_kRenderTargetManager.UpdateModels();
 #endif
 
+	uint32_t t3 = ELTimer_GetMSec();
 	TPixelPosition kPPosMainActor;
 	m_pyPlayer.NEW_GetMainActorPosition(&kPPosMainActor);
+
+	uint32_t t4 = ELTimer_GetMSec();
 	m_pyBackground.Update(kPPosMainActor.x, kPPosMainActor.y, kPPosMainActor.z);
 
+	uint32_t t5 = ELTimer_GetMSec();
 	m_GameEventManager.SetCenterPosition(kPPosMainActor.x, kPPosMainActor.y, kPPosMainActor.z);
 	m_GameEventManager.Update();
 
+	uint32_t t6 = ELTimer_GetMSec();
 	m_kChrMgr.Update();
-	m_kEftMgr.Update();
+	uint32_t t7 = ELTimer_GetMSec();
 	m_kEftMgr.UpdateSound();
+
+	uint32_t t8 = ELTimer_GetMSec();
 	m_FlyingManager.Update();
+	uint32_t t9 = ELTimer_GetMSec();
 	m_pyItem.Update(ptMouse);
+	uint32_t t10 = ELTimer_GetMSec();
 	m_pyPlayer.Update();
+	uint32_t t11 = ELTimer_GetMSec();
 
 	m_pyPlayer.NEW_GetMainActorPosition(&kPPosMainActor);
 	SetCenterPosition(kPPosMainActor.x, kPPosMainActor.y, kPPosMainActor.z);
+	uint32_t t12 = ELTimer_GetMSec();
 }
 
 void CPythonApplication::SkipRenderBuffering(DWORD dwSleepMSec)
@@ -310,6 +404,278 @@ bool CPythonApplication::IsMinimizedWnd()
 
 bool CPythonApplication::Process()
 {
+#ifdef FPS_APPLICATON_DEVICE_LIMITATION
+	const double fTargetFrameMsec = 1000.0 / static_cast<double>(RENDER_MAX_FPS);
+
+#if defined(CHECK_LATEST_DATA_FILES)
+	if (CheckLatestFiles_PollEvent())
+		return false;
+#endif
+
+	ELTimer_SetFrameMSec();
+	DWORD dwStart = ELTimer_GetMSec();
+
+	static DWORD s_dwUpdateFrameCount = 0;
+	static DWORD s_dwRenderFrameCount = 0;
+	static DWORD s_dwFaceCount = 0;
+	static UINT s_uiLoad = 0;
+	static DWORD s_dwCheckTime = ELTimer_GetMSec();
+
+	if (ELTimer_GetMSec() - s_dwCheckTime > 1000)
+	{
+		m_dwUpdateFPS = s_dwUpdateFrameCount;
+		m_dwRenderFPS = s_dwRenderFrameCount;
+		m_dwLoad = s_uiLoad;
+		m_dwFaceCount = s_dwFaceCount / std::max(static_cast<DWORD>(1), s_dwRenderFrameCount);
+
+		s_dwCheckTime = ELTimer_GetMSec();
+		s_uiLoad = s_dwFaceCount = s_dwUpdateFrameCount = s_dwRenderFrameCount = 0;
+
+#if defined(EVENT_HANDLER_MASTER)
+		EventHandler::Instance().Proccess();
+#endif
+	}
+
+	static DWORD s_lastLogicTick = ELTimer_GetMSec();
+	static double s_logicAccumMs = 0.0;
+	const double LOGIC_DT_MS = 1000.0 / static_cast<double>(GAME_TICK_FPS);
+
+	DWORD currentTimeMs = ELTimer_GetMSec();
+	DWORD dtMs = currentTimeMs - s_lastLogicTick;
+	s_lastLogicTick = currentTimeMs;
+	s_logicAccumMs += static_cast<double>(dtMs);
+
+	int maxLogicStepsPerFrame = 1;
+	if (m_dwRenderFPS < 80)
+		maxLogicStepsPerFrame = 2;
+	if (m_dwRenderFPS < 50)
+		maxLogicStepsPerFrame = 4;
+	if (m_dwRenderFPS < 30)
+		maxLogicStepsPerFrame = 8;
+
+	int logicSteps = 0;
+	while (s_logicAccumMs >= LOGIC_DT_MS && logicSteps < maxLogicStepsPerFrame)
+	{
+		CTimer& rkTimer = CTimer::Instance();
+		rkTimer.Advance();
+
+		m_fGlobalTime = rkTimer.GetCurrentSecond();
+		m_fGlobalElapsedTime = rkTimer.GetElapsedSecond();
+
+		m_pyNetworkStream.Process();
+		m_kGuildMarkUploader.Process();
+		m_kGuildMarkDownloader.Process();
+		m_kAccountConnector.Process();
+
+		UpdateKeyboard();
+
+		POINT Point;
+		if (GetCursorPos(&Point))
+		{
+			ScreenToClient(m_hWnd, &Point);
+			OnMouseMove(Point.x, Point.y);
+		}
+
+		__UpdateCamera();
+		CRenderTargetManager::Instance().UpdateModels();
+		CResourceManager::Instance().Update();
+		OnCameraUpdate();
+		OnMouseUpdate();
+		OnUIUpdate();
+
+		++s_dwUpdateFrameCount;
+
+		s_logicAccumMs -= LOGIC_DT_MS;
+		++logicSteps;
+	}
+
+	int maxBacklogTicks = 2;
+	if (m_dwRenderFPS < 50)
+		maxBacklogTicks = 4;
+	if (m_dwRenderFPS < 30)
+		maxBacklogTicks = 8;
+
+	if (s_logicAccumMs > LOGIC_DT_MS * maxBacklogTicks)
+		s_logicAccumMs = LOGIC_DT_MS * maxBacklogTicks;
+
+	m_dwCurUpdateTime = ELTimer_GetMSec() - dwStart;
+
+	bool canRender = true;
+	if (m_isMinimizedWnd)
+	{
+		canRender = false;
+		CEffectManager::Instance().Update();
+	}
+	else
+	{
+#ifdef ENABLE_FIX_MOBS_LAG
+		if (DEVICE_STATE_OK != CheckDeviceState())
+		{
+			canRender = false;
+
+			CPythonBackground& rkBG = CPythonBackground::Instance();
+			CRenderTargetManager::Instance().ReleaseRenderTargetTextures();
+
+			if (m_pyGraphic.RestoreDevice())
+			{
+				CRenderTargetManager::Instance().CreateRenderTargetTextures();
+				rkBG.CreateCharacterShadowTexture();
+			}
+			else
+			{
+				canRender = false;
+			}
+		}
+#else
+		if (m_pyGraphic.IsLostDevice())
+		{
+			CPythonBackground& rkBG = CPythonBackground::Instance();
+			rkBG.ReleaseCharacterShadowTexture();
+			CRenderTargetManager::Instance().ReleaseRenderTargetTextures();
+
+			if (m_pyGraphic.RestoreDevice())
+			{
+				CRenderTargetManager::Instance().CreateRenderTargetTextures();
+				rkBG.CreateCharacterShadowTexture();
+			}
+			else
+			{
+				canRender = false;
+			}
+		}
+#endif
+	}
+
+	if (!IsActive())
+		SkipRenderBuffering(RENDER_SKIP_BUFFER_MS);
+
+	if (!canRender)
+	{
+		SkipRenderBuffering(RENDER_SKIP_BUFFER_MS);
+	}
+	else
+	{
+		DWORD dwRenderStartTime = ELTimer_GetMSec();
+		CCullingManager::Instance().Update();
+		if (m_pyGraphic.Begin())
+		{
+			m_pyGraphic.ClearDepthBuffer();
+
+#ifdef _DEBUG
+			m_pyGraphic.SetClearColor(0.3f, 0.3f, 0.3f);
+			m_pyGraphic.Clear();
+#endif
+			CGrannyMaterial::TranslateSpecularMatrix(g_specularSpd, g_specularSpd, 0.0f);
+
+			m_pyGraphic.SetInterfaceRenderState();
+			OnUIRender();
+			OnMouseRender();
+
+			m_pyGraphic.End();
+			m_pyGraphic.Show();
+
+			DWORD dwRenderEndTime = ELTimer_GetMSec();
+
+			static DWORD s_dwRenderCheckTime = dwRenderEndTime;
+			static DWORD s_dwRenderRangeTime = 0;
+			static DWORD s_dwRenderRangeFrame = 0;
+
+			m_dwCurRenderTime = dwRenderEndTime - dwRenderStartTime;
+			s_dwRenderRangeTime += m_dwCurRenderTime;
+			++s_dwRenderRangeFrame;
+
+			if (dwRenderEndTime - s_dwRenderCheckTime > 1000)
+			{
+				m_fAveRenderTime = float(double(s_dwRenderRangeTime) / double(s_dwRenderRangeFrame));
+
+				s_dwRenderCheckTime = ELTimer_GetMSec();
+				s_dwRenderRangeTime = 0;
+				s_dwRenderRangeFrame = 0;
+			}
+
+			DWORD dwCurFaceCount = m_pyGraphic.GetFaceCount();
+			m_pyGraphic.ResetFaceCount();
+			s_dwFaceCount += dwCurFaceCount;
+
+			if (dwCurFaceCount > 5000)
+			{
+				if (dwRenderEndTime > m_dwBufSleepSkipTime)
+				{
+					static float s_fBufRenderTime = 0.0f;
+
+					float fCurRenderTime = m_dwCurRenderTime;
+
+					if (fCurRenderTime > s_fBufRenderTime)
+					{
+						float fRatio = fMAX(0.5f, (fCurRenderTime - s_fBufRenderTime) / 30.0f);
+						s_fBufRenderTime = (s_fBufRenderTime * (100.0f - fRatio) + (fCurRenderTime + 5) * fRatio) / 100.0f;
+					}
+					else
+					{
+						float fRatio = 0.5f;
+						s_fBufRenderTime = (s_fBufRenderTime * (100.0f - fRatio) + fCurRenderTime * fRatio) / 100.0f;
+					}
+
+					if (s_fBufRenderTime > 100.0f)
+						s_fBufRenderTime = 100.0f;
+
+					DWORD dwBufRenderTime = s_fBufRenderTime;
+
+					if (m_isWindowed)
+					{
+						if (dwBufRenderTime > 58)
+							dwBufRenderTime = 64;
+						else if (dwBufRenderTime > 42)
+							dwBufRenderTime = 48;
+						else if (dwBufRenderTime > 26)
+							dwBufRenderTime = 32;
+						else if (dwBufRenderTime > 10)
+							dwBufRenderTime = 16;
+						else
+							dwBufRenderTime = 8;
+					}
+
+					m_fAveRenderTime = s_fBufRenderTime;
+				}
+
+				m_dwFaceAccCount += dwCurFaceCount;
+				m_dwFaceAccTime += m_dwCurRenderTime;
+
+				m_fFaceSpd = (m_dwFaceAccCount / m_dwFaceAccTime);
+
+				if (-1 == m_iForceSightRange)
+				{
+					static float s_fAveRenderTime = 16.0f;
+					float fRatio = 0.3f;
+					s_fAveRenderTime = (s_fAveRenderTime * (100.0f - fRatio) + std::max<float>(16.0f, m_dwCurRenderTime) * fRatio) / 100.0f;
+
+					float fFar = 25600.0f;
+					float fNear = MIN_FOG;
+					double dbAvePow = double(1000.0f / s_fAveRenderTime);
+					double dbMaxPow = 60.0;
+					float fDistance = std::max<float>(fNear + (fFar - fNear) * (dbAvePow) / dbMaxPow, fNear);
+					m_pyBackground.SetViewDistanceSet(0, fDistance);
+				}
+				else
+				{
+					m_pyBackground.SetViewDistanceSet(0, float(m_iForceSightRange));
+				}
+			}
+			else
+			{
+				m_pyBackground.SetViewDistanceSet(0, 25600.0f);
+			}
+
+			++s_dwRenderFrameCount;
+		}
+	}
+
+	s_uiLoad += ELTimer_GetMSec() - dwStart;
+
+	::SleepUntilNextFrame(fTargetFrameMsec);
+
+	return true;
+#else
 	ELTimer_SetFrameMSec();
 
 	DWORD dwStart = ELTimer_GetMSec();
@@ -323,13 +689,13 @@ bool CPythonApplication::Process()
 
 	if (ELTimer_GetMSec() - s_dwCheckTime > 1000)
 	{
-		m_dwUpdateFPS		= s_dwUpdateFrameCount;
-		m_dwRenderFPS		= s_dwRenderFrameCount;
-		m_dwLoad			= s_uiLoad;
+		m_dwUpdateFPS = s_dwUpdateFrameCount;
+		m_dwRenderFPS = s_dwRenderFrameCount;
+		m_dwLoad = s_uiLoad;
 
-		m_dwFaceCount		= s_dwFaceCount / max(1, s_dwRenderFrameCount);
+		m_dwFaceCount = s_dwFaceCount / std::max(static_cast<DWORD>(1), s_dwRenderFrameCount);
 
-		s_dwCheckTime		= ELTimer_GetMSec();
+		s_dwCheckTime = ELTimer_GetMSec();
 
 		s_uiLoad = s_dwFaceCount = s_dwUpdateFrameCount = s_dwRenderFrameCount = 0;
 	}
@@ -338,7 +704,7 @@ bool CPythonApplication::Process()
 	static BOOL s_bFrameSkip = false;
 	static UINT s_uiNextFrameTime = ELTimer_GetMSec();
 
-	CTimer& rkTimer=CTimer::Instance();
+	CTimer & rkTimer = CTimer::Instance();
 	rkTimer.Advance();
 
 	m_fGlobalTime = rkTimer.GetCurrentSecond();
@@ -350,7 +716,6 @@ bool CPythonApplication::Process()
 	DWORD updatestart = ELTimer_GetMSec();
 	// Network I/O
 	m_pyNetworkStream.Process();
-	//m_pyNetworkDatagram.Process();
 
 	m_kGuildMarkUploader.Process();
 
@@ -361,7 +726,6 @@ bool CPythonApplication::Process()
 	// Input Process
 	// Keyboard
 	UpdateKeyboard();
-
 	// Mouse
 	POINT Point;
 	if (GetCursorPos(&Point))
@@ -370,7 +734,6 @@ bool CPythonApplication::Process()
 		OnMouseMove(Point.x, Point.y);
 	}
 	//////////////////////
-	//if (m_isActivateWnd)
 	__UpdateCamera();
 	// Update Game Playing
 	CResourceManager::Instance().Update();
@@ -378,6 +741,7 @@ bool CPythonApplication::Process()
 	OnMouseUpdate();
 	OnUIUpdate();
 
+	//Update
 	m_dwCurUpdateTime = ELTimer_GetMSec() - updatestart;
 
 	DWORD dwCurrentTime = ELTimer_GetMSec();
@@ -388,20 +752,25 @@ bool CPythonApplication::Process()
 	if (dwCurrentTime > s_uiNextFrameTime)
 	{
 		int dt = dwCurrentTime - s_uiNextFrameTime;
-		int nAdjustTime = ((float)dt / (float)uiFrameTime) * uiFrameTime;
+		int nAdjustTime = (static_cast<float>(dt) / static_cast<float>(uiFrameTime)) * uiFrameTime;
 
-		if ( dt >= 500 )
+		if (dt >= 500)
 		{
 			s_uiNextFrameTime += nAdjustTime;
-			printf("FrameSkip Adjusting... %d\n",nAdjustTime);
+			printf("FrameSkip Adjusting... %d\n", nAdjustTime);
 			CTimer::Instance().Adjust(nAdjustTime);
 		}
 
-		s_bFrameSkip = true;
+		if (!m_isFrameSkipDisable)
+			s_bFrameSkip = true;
+
 		bCurrentLateUpdate = TRUE;
 	}
 
-	if (m_isFrameSkipDisable)
+	if (m_isMinimizedWnd)
+		CEffectManager::Instance().Update();
+
+	if (m_isFrameSkipDisable && !m_isMinimizedWnd)
 		s_bFrameSkip = false;
 
 	if (!s_bFrameSkip)
@@ -443,7 +812,7 @@ bool CPythonApplication::Process()
 #else
 			if (m_pyGraphic.IsLostDevice())
 			{
-				CPythonBackground& rkBG = CPythonBackground::Instance();
+				CPythonBackground &rkBG = CPythonBackground::Instance();
 				rkBG.ReleaseCharacterShadowTexture();
 #ifdef ENABLE_RENDER_TARGET
 				CRenderTargetManager::Instance().ReleaseRenderTargetTextures();
@@ -475,10 +844,10 @@ bool CPythonApplication::Process()
 		}
 		else
 		{
+			// RestoreLostDevice
 			CCullingManager::Instance().Update();
 			if (m_pyGraphic.Begin())
 			{
-
 				m_pyGraphic.ClearDepthBuffer();
 
 #ifdef _DEBUG
@@ -496,9 +865,7 @@ bool CPythonApplication::Process()
 
 				m_pyGraphic.End();
 
-				//DWORD t1 = ELTimer_GetMSec();
 				m_pyGraphic.Show();
-				//DWORD t2 = ELTimer_GetMSec();
 
 				DWORD dwRenderEndTime = ELTimer_GetMSec();
 
@@ -506,18 +873,18 @@ bool CPythonApplication::Process()
 				static DWORD s_dwRenderRangeTime = 0;
 				static DWORD s_dwRenderRangeFrame = 0;
 
-				m_dwCurRenderTime = dwRenderEndTime - dwRenderStartTime;			
-				s_dwRenderRangeTime += m_dwCurRenderTime;				
-				++s_dwRenderRangeFrame;			
+				m_dwCurRenderTime = dwRenderEndTime - dwRenderStartTime;
+				s_dwRenderRangeTime += m_dwCurRenderTime;
+				++s_dwRenderRangeFrame;
 
-				if (dwRenderEndTime-s_dwRenderCheckTime>1000)
+				if (dwRenderEndTime - s_dwRenderCheckTime > 1000)
 				{
-					m_fAveRenderTime=float(double(s_dwRenderRangeTime)/double(s_dwRenderRangeFrame));
+					m_fAveRenderTime = float(double(s_dwRenderRangeTime) / double(s_dwRenderRangeFrame));
 
-					s_dwRenderCheckTime=ELTimer_GetMSec();
-					s_dwRenderRangeTime=0;
-					s_dwRenderRangeFrame=0;
-				}										
+					s_dwRenderCheckTime = ELTimer_GetMSec();
+					s_dwRenderRangeTime = 0;
+					s_dwRenderRangeFrame = 0;
+				}
 
 				DWORD dwCurFaceCount=m_pyGraphic.GetFaceCount();
 				m_pyGraphic.ResetFaceCount();
@@ -525,9 +892,8 @@ bool CPythonApplication::Process()
 
 				if (dwCurFaceCount > 5000)
 				{
-					// ÇÁ·¹ÀÓ ¿ÏÃæ Ã³¸®
 					if (dwRenderEndTime > m_dwBufSleepSkipTime)
-					{	
+					{
 						static float s_fBufRenderTime = 0.0f;
 
 						float fCurRenderTime = m_dwCurRenderTime;
@@ -543,52 +909,46 @@ bool CPythonApplication::Process()
 							s_fBufRenderTime = (s_fBufRenderTime * (100.0f - fRatio) + fCurRenderTime * fRatio) / 100.0f;
 						}
 
-						// ÇÑ°èÄ¡¸¦ Á¤ÇÑ´Ù
 						if (s_fBufRenderTime > 100.0f)
 							s_fBufRenderTime = 100.0f;
 
 						DWORD dwBufRenderTime = s_fBufRenderTime;
 
 						if (m_isWindowed)
-						{						
-							if (dwBufRenderTime>58)
-								dwBufRenderTime=64;
-							else if (dwBufRenderTime>42)
-								dwBufRenderTime=48;
-							else if (dwBufRenderTime>26)
-								dwBufRenderTime=32;
-							else if (dwBufRenderTime>10)
-								dwBufRenderTime=16;
+						{
+							if (dwBufRenderTime > 58)
+								dwBufRenderTime = 64;
+							else if (dwBufRenderTime > 42)
+								dwBufRenderTime = 48;
+							else if (dwBufRenderTime > 26)
+								dwBufRenderTime = 32;
+							else if (dwBufRenderTime > 10)
+								dwBufRenderTime = 16;
 							else
-								dwBufRenderTime=8;
+								dwBufRenderTime = 8;
 						}
 
-						// ÀÏÁ¤ ÇÁ·¹ÀÓ ¼Óµµ¿¡ ¸ÂÃß¾îÁÖ´ÂÂÊ¿¡ ´«¿¡ ÆíÇÏ´Ù
-						// ¾Æ·¡¿¡¼­ ÇÑ¹ø ÇÏ¸é ?ç´?
-						//if (m_dwCurRenderTime<dwBufRenderTime)
-						//	Sleep(dwBufRenderTime-m_dwCurRenderTime);			
-
-						m_fAveRenderTime=s_fBufRenderTime;
+						m_fAveRenderTime = s_fBufRenderTime;
 					}
 
 					m_dwFaceAccCount += dwCurFaceCount;
 					m_dwFaceAccTime += m_dwCurRenderTime;
 
-					m_fFaceSpd=(m_dwFaceAccCount/m_dwFaceAccTime);
+					m_fFaceSpd = (m_dwFaceAccCount / m_dwFaceAccTime);
 
-					// °Å¸® ÀÚµ¿ Á¶À?
 					if (-1 == m_iForceSightRange)
 					{
 						static float s_fAveRenderTime = 16.0f;
-						float fRatio=0.3f;
-						s_fAveRenderTime=(s_fAveRenderTime*(100.0f-fRatio)+max(16.0f, m_dwCurRenderTime)*fRatio)/100.0f;
+						float fRatio = 0.3f;
+						s_fAveRenderTime =
+							(s_fAveRenderTime * (100.0f - fRatio) + std::max<float>(16.0f, m_dwCurRenderTime) * fRatio) / 100.0f;
 
 
-						float fFar=25600.0f;
-						float fNear=MIN_FOG;
-						double dbAvePow=double(1000.0f/s_fAveRenderTime);
-						double dbMaxPow=60.0;
-						float fDistance=max(fNear+(fFar-fNear)*(dbAvePow)/dbMaxPow, fNear);
+						float fFar = 25600.0f;
+						float fNear = MIN_FOG;
+						double dbAvePow = double(1000.0f / s_fAveRenderTime);
+						double dbMaxPow = 60.0;
+						float fDistance = std::max<float>(fNear + (fFar - fNear) * (dbAvePow) / dbMaxPow, fNear);
 						m_pyBackground.SetViewDistanceSet(0, fDistance);
 					}
 					// °Å¸® °­Á¦ ¼³Á¤½Ã
@@ -614,13 +974,13 @@ bool CPythonApplication::Process()
 	{
 		s_uiLoad -= rest;	// ½® ½Ã°£Àº ·Îµå¿¡¼­ »«´Ù..
 		Sleep(rest);
-	}	
+	}
 
 	++s_dwUpdateFrameCount;
 
 	s_uiLoad += ELTimer_GetMSec() - dwStart;
-	//m_Profiler.ProfileByScreen();	
 	return true;
+#endif
 }
 
 void CPythonApplication::UpdateClientRect()
@@ -761,12 +1121,6 @@ bool CPythonApplication::CreateDevice(int width, int height, int Windowed, int b
 		TraceError("CreateDevice: Change the screen format");
 		return false;
 
-		/*case CGraphicDevice::CREATE_GET_ADAPTER_DISPLAY_MODE:
-		//PyErr_SetString(PyExc_RuntimeError, "GetAdapterDisplayMode failed");
-		SET_EXCEPTION(CREATE_GET_ADAPTER_DISPLAY_MODE);
-		TraceError("CreateDevice: GetAdapterDisplayMode failed");
-		return false;*/
-
 	case CGraphicDevice::CREATE_GET_DEVICE_CAPS:
 		PyErr_SetString(PyExc_RuntimeError, "GetDevCaps failed");
 		TraceError("CreateDevice: GetDevCaps failed");
@@ -778,6 +1132,7 @@ bool CPythonApplication::CreateDevice(int width, int height, int Windowed, int b
 		return false;
 
 	default:
+		// CREATE_OK bayraðý varsa TNL kontrolü yap
 		if (iRet & CGraphicDevice::CREATE_OK)
 		{
 			if (iRet & CGraphicDevice::CREATE_NO_TNL)
@@ -820,9 +1175,6 @@ bool LoadLocaleData(const char *localePath)
 	CItemManager& rkItemMgr = CItemManager::Instance();
 	CPythonSkill& rkSkillMgr = CPythonSkill::Instance();
 	CPythonNetworkStream& rkNetStream = CPythonNetworkStream::Instance();
-#ifdef ENABLE_EVENT_MANAGER
-	InGameEventManager& rkEventMgr = InGameEventManager::Instance();
-#endif
 
 	char szItemList[256];
 	char szItemProto[256];
@@ -839,9 +1191,6 @@ bool LoadLocaleData(const char *localePath)
 #endif
 #ifdef ENABLE_AURA_COSTUME_SYSTEM
 	char szAuraScale[256];
-#endif
-#ifdef ENABLE_EVENT_MANAGER
-	char szRewardList[256];
 #endif
 #ifdef ENABLE_CLIENT_LOCALE_STRING
 	char szLocaleStringList[256];
@@ -894,14 +1243,6 @@ bool LoadLocaleData(const char *localePath)
 #endif
 #endif
 
-#ifdef ENABLE_EVENT_MANAGER
-#ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
-	snprintf(szRewardList, sizeof(szRewardList), "%s/event_reward_list.txt", localePathCommon);
-#else
-	snprintf(szRewardList, sizeof(szRewardList), "%s/event_reward_list.txt", localePath);
-#endif
-#endif
-
 #ifdef ENABLE_CLIENT_LOCALE_STRING
 	snprintf(szLocaleStringList, sizeof(szLocaleStringList), "%s/locale_string.txt", localePath);
 	snprintf(szLocaleMonsterChat, sizeof(szLocaleMonsterChat), "%s/monster_chat.txt", localePath);
@@ -947,7 +1288,7 @@ bool LoadLocaleData(const char *localePath)
 
 	if (!rkItemMgr.LoadItemDesc(szItemDesc))
 	{
-		Tracenf("LoadLocaleData - LoadItemDesc(%s) Error", szItemDesc);	
+		Tracenf("LoadLocaleData - LoadItemDesc(%s) Error", szItemDesc);
 	}
 
 	if (!rkNPCMgr.LoadNonPlayerData(szMobProto))
@@ -995,14 +1336,6 @@ bool LoadLocaleData(const char *localePath)
 	}
 #endif
 
-#ifdef ENABLE_EVENT_MANAGER
-	if (!rkEventMgr.LoadEventRewardList(szRewardList))
-	{
-		TraceError("LoadLocaleData - LoadEventRewardList(%s) Error", szRewardList);
-		return false;
-	}
-#endif
-
 #ifdef ENABLE_CLIENT_LOCALE_STRING
 	if (!rkNetStream.LoadLocaleStringVnum(szLocaleStringList))
 	{
@@ -1047,7 +1380,7 @@ bool LoadLocaleData(const char *localePath)
 	}
 #endif
 
-#ifdef ENABLE_INGAME_WIKI_SYSTEM
+#ifdef ENABLE_WIKI_SYSTEM
 	CPythonWiki::Instance().ReadData(localePath);
 #endif
 
@@ -1300,7 +1633,7 @@ void CPythonApplication::Clear()
 
 #ifdef ENABLE_BLINK_ALERT
 #include <Windows.h>
-void CPythonApplication::FlashApplication()
+void CPythonApplication::FlashApplication()	//@fixme403
 {
 	HWND hWnd = GetWindowHandle();
 	FLASHWINFO fi;
@@ -1325,6 +1658,7 @@ void CPythonApplication::Destroy()
 {
 	WebBrowser_Destroy();
 
+	// SphereMap
 	CGrannyMaterial::DestroySphereMap();
 
 	m_kWndMgr.Destroy();

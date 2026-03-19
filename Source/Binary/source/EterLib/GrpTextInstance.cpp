@@ -3,7 +3,6 @@
 #include "StateManager.h"
 #include "IME.h"
 #include "TextTag.h"
-
 #include "../EterLocale/StringCodec.h"
 #include "../EterBase/Utils.h"
 #include "../EterLocale/Arabic.h"
@@ -30,17 +29,17 @@ void CGraphicTextInstance::Hyperlink_UpdateMousePos(int x, int y)
 	gs_hyperlinkText = L"";
 }
 
-int CGraphicTextInstance::Hyperlink_GetText(char *buf, int len)
+int CGraphicTextInstance::Hyperlink_GetText(char* buf, int len)
 {
 	if (gs_hyperlinkText.empty())
 		return 0;
 
 	int codePage = GetDefaultCodePage();
 
-	return Ymir_WideCharToMultiByte(codePage, 0, gs_hyperlinkText.c_str(), gs_hyperlinkText.length(), buf, len, nullptr, nullptr);	
+	return Ymir_WideCharToMultiByte(codePage, 0, gs_hyperlinkText.c_str(), gs_hyperlinkText.length(), buf, len, nullptr, nullptr);
 }
 
-int CGraphicTextInstance::__DrawCharacter(CGraphicFontTexture * pFontTexture, WORD codePage, wchar_t text, DWORD dwColor)
+int CGraphicTextInstance::__DrawCharacter(CGraphicFontTexture* pFontTexture, WORD codePage, wchar_t text, DWORD dwColor)
 {
 	CGraphicFontTexture::TCharacterInfomation* pInsCharInfo = pFontTexture->GetCharacterInfomation(codePage, text);
 
@@ -53,11 +52,11 @@ int CGraphicTextInstance::__DrawCharacter(CGraphicFontTexture * pFontTexture, WO
 		m_textHeight = max(pInsCharInfo->height, m_textHeight);
 		return pInsCharInfo->advance;
 	}
-	
+
 	return 0;
 }
 
-void CGraphicTextInstance::__GetTextPos(DWORD index, float *x, float *y)
+void CGraphicTextInstance::__GetTextPos(DWORD index, float* x, float* y)
 {
 	index = min(index, m_pCharInfoVector.size());
 
@@ -65,16 +64,20 @@ void CGraphicTextInstance::__GetTextPos(DWORD index, float *x, float *y)
 	float sy = 0;
 	float fFontMaxHeight = 0;
 
-	for (DWORD i = 0; i<index; ++i)
+#ifdef INSIDE_RENDER
+	for (DWORD i = m_startPos; i < index; ++i)
+#else
+	for (DWORD i = 0; i < index; ++i)
+#endif
 	{
-		if (sx+float(m_pCharInfoVector[i]->width) > m_fLimitWidth)
+		if (sx + float(m_pCharInfoVector[i]->width) > m_fLimitWidth)
 		{
 			sx = 0;
 			sy += fFontMaxHeight;
 		}
 
 #ifdef ENABLE_MULTI_TEXTLINE
-		if(m_isEnterToken && std::find(m_vLineCutPos.begin(), m_vLineCutPos.end(), i) != m_vLineCutPos.end())
+		if (m_isEnterToken && std::find(m_vLineCutPos.begin(), m_vLineCutPos.end(), i) != m_vLineCutPos.end())
 		{
 			sx = 0;
 			sy += i ? m_iLineHeight : 0;
@@ -96,22 +99,22 @@ bool isNumberic(const char chr)
 	return false;
 }
 
-bool IsValidToken(const char *iter)
+bool IsValidToken(const char* iter)
 {
-	return	iter[0]=='@' && 
-		isNumberic(iter[1]) && 
-		isNumberic(iter[2]) && 
-		isNumberic(iter[3]) && 
+	return	iter[0] == '@' &&
+		isNumberic(iter[1]) &&
+		isNumberic(iter[2]) &&
+		isNumberic(iter[3]) &&
 		isNumberic(iter[4]);
 }
 
-const char *FindToken(const char *begin, const char *end)
+const char* FindToken(const char* begin, const char* end)
 {
-	while(begin < end)
+	while (begin < end)
 	{
 		begin = std::find(begin, end, '@');
 
-		if(end-begin>5 && IsValidToken(begin))
+		if (end - begin > 5 && IsValidToken(begin))
 		{
 			return begin;
 		}
@@ -124,9 +127,9 @@ const char *FindToken(const char *begin, const char *end)
 	return end;
 }
 
-int ReadToken(const char *token)
+int ReadToken(const char* token)
 {
-	int nRet = (token[1]-'0')*1000 + (token[2]-'0')*100 + (token[3]-'0')*10 + (token[4]-'0');
+	int nRet = (token[1] - '0') * 1000 + (token[2] - '0') * 100 + (token[3] - '0') * 10 + (token[4] - '0');
 	if (nRet == 9999)
 		return CP_UTF8;
 	return nRet;
@@ -197,28 +200,31 @@ void CGraphicTextInstance::Update()
 	m_textWidth = 0;
 	m_textHeight = spaceHeight;
 
-	const char *begin = m_stText.c_str();
-	const char *end = begin + m_stText.length();
+	/* wstring begin */
+
+	const char* begin = m_stText.c_str();
+	const char* end = begin + m_stText.length();
 
 	int wTextMax = (end - begin) * 2;
-	wchar_t* wText = (wchar_t*)_alloca(sizeof(wchar_t)*wTextMax);
+	wchar_t* wText = (wchar_t*)_alloca(sizeof(wchar_t) * wTextMax);
 
 	DWORD dwColor = m_dwTextColor;
 
+	/* wstring end */
 	while (begin < end)
 	{
-		const char *token = FindToken(begin, end);
+		const char* token = FindToken(begin, end);
 
 		int wTextLen = Ymir_MultiByteToWideChar(dataCodePage, 0, begin, token - begin, wText, wTextMax);
 
 		if (m_isSecret)
 		{
-			for(int i=0; i<wTextLen; ++i)
+			for (int i = 0; i < wTextLen; ++i)
 				__DrawCharacter(pFontTexture, dataCodePage, '*', dwColor);
-		} 
-		else 
+		}
+		else
 		{
-			if (defCodePage == CP_ARABIC)
+			if (defCodePage == CP_ARABIC) // ARABIC
 			{
 
 				wchar_t* wArabicText = (wchar_t*)_alloca(sizeof(wchar_t) * wTextLen);
@@ -238,7 +244,7 @@ void CGraphicTextInstance::Update()
 				{
 					isEnglish = false;
 				}
-				
+
 				int i = 0;
 				for (i = wArabicTextLen - 1 ; i >= 0; --i)
 				{
@@ -320,7 +326,7 @@ void CGraphicTextInstance::Update()
 
 							for (int j = 1; j <= no_hyperlink; j++)
 							{
-								if(m_hyperlinkVector.size() < j)
+								if (m_hyperlinkVector.size() < j)
 									break;
 
 								SHyperlink & tempLink = m_hyperlinkVector[m_hyperlinkVector.size() - j];
@@ -341,7 +347,7 @@ void CGraphicTextInstance::Update()
 
 							for (int j = 1; j <= no_hyperlink; j++)
 							{
-								if(m_hyperlinkVector.size() < j)
+								if (m_hyperlinkVector.size() < j)
 									break;
 
 								SHyperlink & tempLink = m_hyperlinkVector[m_hyperlinkVector.size() - j];
@@ -373,7 +379,7 @@ void CGraphicTextInstance::Update()
 
 								for (int j = 1; j <= no_hyperlink; j++)
 								{
-									if(m_hyperlinkVector.size() < j)
+									if (m_hyperlinkVector.size() < j)
 										break;
 
 									SHyperlink & tempLink = m_hyperlinkVector[m_hyperlinkVector.size() - j];
@@ -491,6 +497,7 @@ void CGraphicTextInstance::Update()
 						emojiBuffer = L"";
 					}
 #endif
+
 #ifdef ENABLE_EMOTICONS_SYSTEM
 					else if (ret == TEXT_TAG_EMOTICON_START)
 					{
@@ -584,6 +591,15 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 	if (!pFontTexture)
 		return;
 
+#ifdef ENABLE_DIRECTX9_UPDATE
+    D3DPERF_BeginEvent(D3DCOLOR_ARGB(255, 50, 50, 0), L"** CGraphicTextInstance::Render **");
+#endif
+
+#ifdef INSIDE_RENDER
+	float textureWidth, textureHeight;
+	pFontTexture->GetTextureSize(textureWidth, textureHeight);
+#endif
+
 	float fStanX = m_v3Position.x;
 	float fStanY = m_v3Position.y + 1.0f;
 
@@ -635,23 +651,31 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 	STATEMANAGER.SetRenderState(D3DRS_FOGENABLE, FALSE);
 	STATEMANAGER.SetRenderState(D3DRS_LIGHTING, FALSE);
 
-	STATEMANAGER.SetVertexShader(D3DFVF_XYZ|D3DFVF_DIFFUSE|D3DFVF_TEX1);
-	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG1,	D3DTA_TEXTURE);
-	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG2,	D3DTA_DIFFUSE);
-	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLOROP,	D3DTOP_MODULATE);
-	STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAARG1,	D3DTA_TEXTURE);
-	STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAARG2,	D3DTA_DIFFUSE);
-	STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAOP,	D3DTOP_MODULATE);
+#ifdef ENABLE_DIRECTX9_UPDATE
+    STATEMANAGER.SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
+#else
+    STATEMANAGER.SetVertexShader(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
+#endif
+
+	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+	STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+	STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
+	STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
 
 #ifdef ENABLE_FIX_MOBS_LAG
 	std::map<CGraphicImageTexture*, std::vector<SPDTVertexRaw>> verticesMap;
 #endif
 
 	{
-		const float fFontHalfWeight=1.0f;
+		const float fFontHalfWeight = 1.0f;
 
 		float fCurX;
 		float fCurY;
+#ifdef INSIDE_RENDER
+		float fCurLocalX;
+#endif
 
 		float fFontSx;
 		float fFontSy;
@@ -678,37 +702,101 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 
 		CGraphicFontTexture::TCharacterInfomation* pCurCharInfo;
 
+#ifdef INSIDE_RENDER
+		m_startPos = max(0, m_startPos);
+		m_endPos = min(m_endPos, WORD(m_pCharInfoVector.size()));
+		if (!m_isFixedRenderPos && (m_startPos >= m_endPos || m_isMultiLine || !m_isCursor || !m_isOutline))
+		{
+			m_startPos = 0;
+			m_endPos = WORD(m_pCharInfoVector.size());
+		}
+#endif
+
 		if (m_isOutline)
 		{
-			fCurX=fStanX;
-			fCurY=fStanY;
-			fFontMaxHeight=0.0f;
+#ifdef INSIDE_RENDER
+			if (m_isCursor && !m_isMultiLine && !m_isFixedRenderPos)
+			{
+				int curPos = min(CIME::GetCurPos(), m_pCharInfoVector.size());
+				if (curPos < m_startPos)
+					m_startPos = max(curPos, 0);
+				else if (curPos > m_endPos)
+				{
+					m_endPos = curPos;
+					m_startPos = min(m_endPos, WORD(m_pCharInfoVector.size()) - 1);
+					fCurX = 0;
+					for (; m_startPos >= 0; --m_startPos)
+					{
+						if (fCurX + float(m_pCharInfoVector[m_startPos]->width) > m_fLimitWidth)
+						{
+							++m_startPos;
+							break;
+						}
+						fCurX += float(m_pCharInfoVector[m_startPos]->advance);
 
-			CGraphicFontTexture::TPCharacterInfomationVector::iterator i;
+						if (m_startPos == 0)
+							break;
+					}
+				}
+			}
+#endif
 
-			for(int i = 0; i < m_pCharInfoVector.size(); ++i)
+			fCurX = fStanX;
+			fCurY = fStanY;
+			fFontMaxHeight = 0.0f;
+
+#ifdef INSIDE_RENDER
+			for (WORD i = m_startPos; i < m_endPos; ++i)
 			{
 				pCurCharInfo = m_pCharInfoVector[i];
 
-				fFontWidth=float(pCurCharInfo->width);
-				fFontHeight=float(pCurCharInfo->height);
-				fFontAdvance=float(pCurCharInfo->advance);
+				fFontWidth = float(pCurCharInfo->width);
+				fFontHeight = float(pCurCharInfo->height);
+				fFontAdvance = float(pCurCharInfo->advance);
 
-				if ((fCurX+fFontWidth)-m_v3Position.x > m_fLimitWidth)
+				float fXRenderLeft = 0.0f;
+				float fXRenderRight = 0.0f;
+
+				if (m_bUseRenderingRect)
+				{
+					if (fCurX - fStanX < m_RenderingRect.left)
+					{
+						if (fCurX - fStanX + fFontWidth <= m_RenderingRect.left)
+						{
+							fCurX += fFontAdvance;
+							continue;
+						}
+
+						fXRenderLeft = -((float)(m_RenderingRect.left - (fCurX - fStanX)) / fFontWidth);
+					}
+					else if ((fCurX - fStanX) + fFontWidth > m_RenderingRect.right)
+					{
+						if ((fCurX - fStanX) >= m_RenderingRect.right)
+						{
+							fCurX += fFontAdvance;
+							continue;
+						}
+
+						fXRenderRight = -((float)((fCurX - fStanX) + fFontWidth - m_RenderingRect.right) / fFontWidth);
+					}
+				}
+
+				if ((fCurX + fFontWidth) - fStanX > m_fLimitWidth)
 				{
 					if (m_isMultiLine)
 					{
-						fCurX=fStanX;
-						fCurY+=fFontMaxHeight;
+						fCurX = fStanX;
+						fCurY += fFontMaxHeight;
 					}
 					else
 					{
+						m_endPos = i;
 						break;
 					}
 				}
 
 #ifdef ENABLE_MULTI_TEXTLINE
-				if(m_isEnterToken && std::find(m_vLineCutPos.begin(), m_vLineCutPos.end(), i) != m_vLineCutPos.end())
+				if (m_isEnterToken && std::find(m_vLineCutPos.begin(), m_vLineCutPos.end(), i) != m_vLineCutPos.end())
 				{
 					switch (m_hAlign)
 					{
@@ -724,7 +812,8 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 							fCurX = fStanX + float(m_textWidth - GetTextWidth(i));
 							break;
 					}
-					fCurY+=m_iLineHeight;
+
+					fCurY += m_iLineHeight;
 				}
 #endif
 
@@ -744,65 +833,328 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 				fFontEx = fFontSx + fFontWidth;
 				fFontEy = fFontSy + fFontHeight;
 
-#ifdef ENABLE_CLIP_MASKING
-				float su = pCurCharInfo->left;
-				float sv = pCurCharInfo->top;
-				float eu = pCurCharInfo->right;
-				float ev = pCurCharInfo->bottom;
+#ifndef ENABLE_CLIP_MASKING
+                pFontTexture->SelectTexture(pCurCharInfo->index);
+                STATEMANAGER.SetTexture(0, pFontTexture->GetD3DTexture());
 
-				if (pClipRect)
+                akVertex[0].u = pCurCharInfo->left;
+                akVertex[0].v = pCurCharInfo->top;
+                akVertex[1].u = pCurCharInfo->left;
+                akVertex[1].v = pCurCharInfo->bottom;
+                akVertex[2].u = pCurCharInfo->right;
+                akVertex[2].v = pCurCharInfo->top;
+                akVertex[3].u = pCurCharInfo->right;
+                akVertex[3].v = pCurCharInfo->bottom;
+#else
+                float su = pCurCharInfo->left;
+                float sv = pCurCharInfo->top;
+                float eu = pCurCharInfo->right;
+                float ev = pCurCharInfo->bottom;
+
+                if (pClipRect)
+                {
+                    const float width = pCurCharInfo->right - pCurCharInfo->left;
+                    const float height = pCurCharInfo->bottom - pCurCharInfo->top;
+
+                    if (fFontEx <= pClipRect->left)
+                    {
+                        fCurX += fFontAdvance;
+                        continue;
+                    }
+
+                    if (fFontSx < pClipRect->left)
+                    {
+                        su += (pClipRect->left - fFontSx) / fFontWidth * width;
+                        fFontSx = pClipRect->left;
+                    }
+
+                    if (fFontEy <= pClipRect->top)
+                    {
+                        fCurX += fFontAdvance;
+                        continue;
+                    }
+
+                    if (fFontSy < pClipRect->top)
+                    {
+                        sv += (pClipRect->top - fFontSy) / fFontHeight * height;
+                        fFontSy = pClipRect->top;
+                    }
+
+                    if (fFontSx >= pClipRect->right)
+                    {
+                        fCurX += fFontAdvance;
+                        continue;
+                    }
+
+                    if (fFontEx > pClipRect->right)
+                    {
+                        eu -= (fFontEx - pClipRect->right) / fFontWidth * width;
+                        fFontEx = pClipRect->right;
+                    }
+
+                    if (fFontSy >= pClipRect->bottom)
+                    {
+                        fCurX += fFontAdvance;
+                        continue;
+                    }
+
+                    if (fFontEy > pClipRect->bottom)
+                    {
+                        ev -= (fFontEy - pClipRect->bottom) / fFontHeight * height;
+                        fFontEy = pClipRect->bottom;
+                    }
+                }
+
+
+#ifdef ENABLE_FIX_MOBS_LAG
+				const auto tex = pFontTexture->GetTexture(pCurCharInfo->index);
+				auto & batchVertices = verticesMap[tex];
+#else
+                pFontTexture->SelectTexture(pCurCharInfo->index);
+                STATEMANAGER.SetTexture(0, pFontTexture->GetD3DTexture());
+#endif
+
+                akVertex[0].u = su;
+                akVertex[0].v = sv;
+                akVertex[1].u = su;
+                akVertex[1].v = ev;
+                akVertex[2].u = eu;
+                akVertex[2].v = sv;
+                akVertex[3].u = eu;
+                akVertex[3].v = ev;
+#endif
+
+#ifdef ENABLE_FIX_MOBS_LAG
+				akVertex[3].diffuse = akVertex[2].diffuse = akVertex[1].diffuse = akVertex[0].diffuse = m_dwOutLineColor;
+#else
+				akVertex[3].color = akVertex[2].color = akVertex[1].color = akVertex[0].color = m_dwOutLineColor;
+#endif
+
+
+				float feather = 0.0f; // m_fFontFeather
+
+#ifdef ENABLE_FIX_MOBS_LAG
+				akVertex[0].py = fFontSy - feather;
+				akVertex[1].py = fFontEy + feather;
+				akVertex[2].py = fFontSy - feather;
+				akVertex[3].py = fFontEy + feather;
+#else
+				akVertex[0].y = fFontSy - feather;
+				akVertex[1].y = fFontEy + feather;
+				akVertex[2].y = fFontSy - feather;
+				akVertex[3].y = fFontEy + feather;
+#endif
+
+				// 왼
+#ifdef ENABLE_FIX_MOBS_LAG
+				akVertex[0].px = fFontSx - fFontHalfWeight - feather;
+				akVertex[1].px = fFontSx - fFontHalfWeight - feather;
+				akVertex[2].px = fFontEx - fFontHalfWeight + feather;
+				akVertex[3].px = fFontEx - fFontHalfWeight + feather;
+#else
+				akVertex[0].x = fFontSx - fFontHalfWeight - feather;
+				akVertex[1].x = fFontSx - fFontHalfWeight - feather;
+				akVertex[2].x = fFontEx - fFontHalfWeight + feather;
+				akVertex[3].x = fFontEx - fFontHalfWeight + feather;
+#endif
+
+#ifdef ENABLE_FIX_MOBS_LAG
+				batchVertices.insert(batchVertices.end(), std::begin(akVertex), std::end(akVertex));
+#else
+				if (CGraphicBase::SetPDTStream((SPDTVertex*)akVertex, 4))
+					STATEMANAGER.DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+#endif
+
+
+				// 오른
+#ifdef ENABLE_FIX_MOBS_LAG
+				akVertex[0].px = fFontSx + fFontHalfWeight - feather;
+				akVertex[1].px = fFontSx + fFontHalfWeight - feather;
+				akVertex[2].px = fFontEx + fFontHalfWeight + feather;
+				akVertex[3].px = fFontEx + fFontHalfWeight + feather;
+				batchVertices.insert(batchVertices.end(), std::begin(akVertex), std::end(akVertex));
+
+				akVertex[0].px = fFontSx - feather;
+				akVertex[1].px = fFontSx - feather;
+				akVertex[2].px = fFontEx + feather;
+				akVertex[3].px = fFontEx + feather;
+
+				akVertex[0].py = fFontSy - fFontHalfWeight - feather;
+				akVertex[1].py = fFontEy - fFontHalfWeight + feather;
+				akVertex[2].py = fFontSy - fFontHalfWeight - feather;
+				akVertex[3].py = fFontEy - fFontHalfWeight + feather;
+				batchVertices.insert(batchVertices.end(), std::begin(akVertex), std::end(akVertex));
+
+				akVertex[0].py = fFontSy + fFontHalfWeight - feather;
+				akVertex[1].py = fFontEy + fFontHalfWeight + feather;
+				akVertex[2].py = fFontSy + fFontHalfWeight - feather;
+				akVertex[3].py = fFontEy + fFontHalfWeight + feather;
+				batchVertices.insert(batchVertices.end(), std::begin(akVertex), std::end(akVertex));
+#else
+				akVertex[0].x = fFontSx + fFontHalfWeight - feather;
+				akVertex[1].x = fFontSx + fFontHalfWeight - feather;
+				akVertex[2].x = fFontEx + fFontHalfWeight + feather;
+				akVertex[3].x = fFontEx + fFontHalfWeight + feather;
+
+				if (CGraphicBase::SetPDTStream((SPDTVertex*)akVertex, 4))
+					STATEMANAGER.DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+
+				akVertex[0].x = fFontSx - feather;
+				akVertex[1].x = fFontSx - feather;
+				akVertex[2].x = fFontEx + feather;
+				akVertex[3].x = fFontEx + feather;
+
+				akVertex[0].y = fFontSy - fFontHalfWeight - feather;
+				akVertex[1].y = fFontEy - fFontHalfWeight + feather;
+				akVertex[2].y = fFontSy - fFontHalfWeight - feather;
+				akVertex[3].y = fFontEy - fFontHalfWeight + feather;
+
+				if (CGraphicBase::SetPDTStream((SPDTVertex*)akVertex, 4))
+					STATEMANAGER.DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+
+				akVertex[0].y = fFontSy + fFontHalfWeight - feather;
+				akVertex[1].y = fFontEy + fFontHalfWeight + feather;
+				akVertex[2].y = fFontSy + fFontHalfWeight - feather;
+				akVertex[3].y = fFontEy + fFontHalfWeight + feather;
+
+				if (CGraphicBase::SetPDTStream((SPDTVertex*)akVertex, 4))
+					STATEMANAGER.DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+#endif
+
+				fCurX += fFontAdvance;
+			}
+#else
+			CGraphicFontTexture::TPCharacterInfomationVector::iterator i;
+			for (int i = 0; i < m_pCharInfoVector.size(); ++i)
+			{
+				pCurCharInfo = m_pCharInfoVector[i];
+
+				fFontWidth = float(pCurCharInfo->width);
+				fFontHeight = float(pCurCharInfo->height);
+				fFontAdvance = float(pCurCharInfo->advance);
+
+				if ((fCurX + fFontWidth) - m_v3Position.x > m_fLimitWidth)
 				{
-					const float width = pCurCharInfo->right - pCurCharInfo->left;
-					const float height = pCurCharInfo->bottom - pCurCharInfo->top;
-
-					if (fFontEx <= pClipRect->left)
+					if (m_isMultiLine)
 					{
-						fCurX += fFontAdvance;
-						continue;
+						fCurX = fStanX;
+						fCurY += fFontMaxHeight;
 					}
-
-					if (fFontSx < pClipRect->left)
+					else
 					{
-						su += (pClipRect->left - fFontSx) / fFontWidth * width;
-						fFontSx = pClipRect->left;
-					}
-
-					if (fFontEy <= pClipRect->top)
-					{
-						fCurX += fFontAdvance;
-						continue;
-					}
-
-					if (fFontSy < pClipRect->top)
-					{
-						sv += (pClipRect->top - fFontSy) / fFontHeight * height;
-						fFontSy = pClipRect->top;
-					}
-
-					if (fFontSx >= pClipRect->right)
-					{
-						fCurX += fFontAdvance;
-						continue;
-					}
-
-					if (fFontEx > pClipRect->right)
-					{
-						eu -= (fFontEx - pClipRect->right) / fFontWidth * width;
-						fFontEx = pClipRect->right;
-					}
-
-					if (fFontSy >= pClipRect->bottom)
-					{
-						fCurX += fFontAdvance;
-						continue;
-					}
-
-					if (fFontEy > pClipRect->bottom)
-					{
-						ev -= (fFontEy - pClipRect->bottom) / fFontHeight * height;
-						fFontEy = pClipRect->bottom;
+						break;
 					}
 				}
+
+#ifdef ENABLE_MULTI_TEXTLINE
+				if (m_isEnterToken && std::find(m_vLineCutPos.begin(), m_vLineCutPos.end(), i) != m_vLineCutPos.end())
+				{
+					switch (m_hAlign)
+					{
+						case HORIZONTAL_ALIGN_LEFT:
+							fCurX = fStanX;
+							break;
+
+						case HORIZONTAL_ALIGN_CENTER:
+							fCurX = fStanX + float(m_textWidth - GetTextWidth(i)) / 2.0f;
+							break;
+
+						case HORIZONTAL_ALIGN_RIGHT:
+							fCurX = fStanX + float(m_textWidth - GetTextWidth(i));
+							break;
+					}
+
+					fCurY += m_iLineHeight;
+				}
+#endif
+
+#ifndef ENABLE_CLIP_MASKING
+                if (pClipRect)
+                {
+                    if (fCurY <= pClipRect->top)
+                    {
+                        fCurX += fFontAdvance;
+                        continue;
+                    }
+                }
+#endif
+
+				fFontSx = fCurX - 0.5f;
+				fFontSy = fCurY - 0.5f;
+				fFontEx = fFontSx + fFontWidth;
+				fFontEy = fFontSy + fFontHeight;
+
+#ifndef ENABLE_CLIP_MASKING
+                pFontTexture->SelectTexture(pCurCharInfo->index);
+                STATEMANAGER.SetTexture(0, pFontTexture->GetD3DTexture());
+
+                akVertex[0].u = pCurCharInfo->left;
+                akVertex[0].v = pCurCharInfo->top;
+                akVertex[1].u = pCurCharInfo->left;
+                akVertex[1].v = pCurCharInfo->bottom;
+                akVertex[2].u = pCurCharInfo->right;
+                akVertex[2].v = pCurCharInfo->top;
+                akVertex[3].u = pCurCharInfo->right;
+                akVertex[3].v = pCurCharInfo->bottom;
+#else
+                float su = pCurCharInfo->left;
+                float sv = pCurCharInfo->top;
+                float eu = pCurCharInfo->right;
+                float ev = pCurCharInfo->bottom;
+
+                if (pClipRect)
+                {
+                    const float width = pCurCharInfo->right - pCurCharInfo->left;
+                    const float height = pCurCharInfo->bottom - pCurCharInfo->top;
+
+                    if (fFontEx <= pClipRect->left)
+                    {
+                        fCurX += fFontAdvance;
+                        continue;
+                    }
+
+                    if (fFontSx < pClipRect->left)
+                    {
+                        su += (pClipRect->left - fFontSx) / fFontWidth * width;
+                        fFontSx = pClipRect->left;
+                    }
+
+                    if (fFontEy <= pClipRect->top)
+                    {
+                        fCurX += fFontAdvance;
+                        continue;
+                    }
+
+                    if (fFontSy < pClipRect->top)
+                    {
+                        sv += (pClipRect->top - fFontSy) / fFontHeight * height;
+                        fFontSy = pClipRect->top;
+                    }
+
+                    if (fFontSx >= pClipRect->right)
+                    {
+                        fCurX += fFontAdvance;
+                        continue;
+                    }
+
+                    if (fFontEx > pClipRect->right)
+                    {
+                        eu -= (fFontEx - pClipRect->right) / fFontWidth * width;
+                        fFontEx = pClipRect->right;
+                    }
+
+                    if (fFontSy >= pClipRect->bottom)
+                    {
+                        fCurX += fFontAdvance;
+                        continue;
+                    }
+
+                    if (fFontEy > pClipRect->bottom)
+                    {
+                        ev -= (fFontEy - pClipRect->bottom) / fFontHeight * height;
+                        fFontEy = pClipRect->bottom;
+                    }
+                }
 
 #ifdef ENABLE_FIX_MOBS_LAG
 				const auto tex = pFontTexture->GetTexture(pCurCharInfo->index);
@@ -942,27 +1294,70 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 #endif
 				fCurX += fFontAdvance;
 			}
+#endif
 		}
 
-		fCurX=fStanX;
-		fCurY=fStanY;
-		fFontMaxHeight=0.0f;
+		fCurX = fStanX;
+		fCurY = fStanY;
+		fFontMaxHeight = 0.0f;
 
-		for (int i = 0; i < m_pCharInfoVector.size(); ++i)
+#ifdef INSIDE_RENDER
+		float fCountX = 0.0f;
+		float fCountY = 0.0f;
+		float addXL, addYT, addXR, addYB;
+		for (WORD i = m_startPos; i < m_endPos; ++i)
 		{
 			pCurCharInfo = m_pCharInfoVector[i];
 
-			fFontWidth=float(pCurCharInfo->width);
-			fFontHeight=float(pCurCharInfo->height);
-			fFontMaxHeight=max(fFontHeight, pCurCharInfo->height);
-			fFontAdvance=float(pCurCharInfo->advance);
+			fCurLocalX = fCurX - fStanX;
 
-			if ((fCurX + fFontWidth) - m_v3Position.x > m_fLimitWidth)
+			fFontWidth = float(pCurCharInfo->width);
+			fFontHeight = float(pCurCharInfo->height);
+			fFontMaxHeight = max(fFontHeight, pCurCharInfo->height);
+			fFontAdvance = float(pCurCharInfo->advance);
+
+			float fXRenderLeft = 0.0f;
+			float fXRenderRight = 0.0f;
+			float fYRenderTop = 0.0f;
+			float fYRenderBottom = 0.0f;
+
+			if (m_bUseRenderingRect)
+			{
+				if (fCurLocalX < m_RenderingRect.left && !m_isMultiLine)
+				{
+					if (fCurLocalX + fFontWidth <= m_RenderingRect.left)
+					{
+						fCurX += fFontAdvance;
+						continue;
+					}
+
+					fXRenderLeft = ((float)(m_RenderingRect.left - fCurLocalX) / fFontWidth);
+				}
+				else if (fCurLocalX + fFontWidth > m_RenderingRect.right && !m_isMultiLine)
+				{
+					if (fCurLocalX >= m_RenderingRect.right)
+					{
+						fCurX += fFontAdvance;
+						continue;
+					}
+
+					fXRenderRight = ((float)(fCurLocalX + fFontWidth - m_RenderingRect.right) / fFontWidth);
+				}
+
+				if (m_RenderingRect.top)
+					fYRenderTop = m_RenderingRect.top / fFontHeight;
+				if (m_RenderingRect.bottom < fFontHeight)
+					fYRenderBottom = 1.0f - (m_RenderingRect.bottom / fFontHeight);
+			}
+
+			if (fCurLocalX + fFontWidth > m_fLimitWidth)
 			{
 				if (m_isMultiLine)
 				{
 					fCurX = fStanX;
+					fCountX = 0.0f;
 					fCurY += fFontMaxHeight;
+					fCountY += fFontMaxHeight;
 				}
 				else
 				{
@@ -971,7 +1366,7 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 			}
 
 #ifdef ENABLE_MULTI_TEXTLINE
-			if(m_isEnterToken && std::find(m_vLineCutPos.begin(), m_vLineCutPos.end(), i) != m_vLineCutPos.end())
+			if (m_isEnterToken && std::find(m_vLineCutPos.begin(), m_vLineCutPos.end(), i) != m_vLineCutPos.end())
 			{
 				switch (m_hAlign)
 				{
@@ -987,7 +1382,8 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 						fCurX = fStanX + float(m_textWidth - GetTextWidth(i));
 						break;
 				}
-				fCurY+=m_iLineHeight;
+
+				fCurY += m_iLineHeight;
 			}
 #endif
 
@@ -1002,70 +1398,310 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 			}
 #endif
 
-			fFontSx = fCurX - 0.5f;
-			fFontSy = fCurY - 0.5f;
-			fFontEx = fFontSx + fFontWidth;
-			fFontEy = fFontSy + fFontHeight;
+			fFontSx = fCurX - 0.5f + fFontWidth * fXRenderLeft;
+			fFontSy = fCurY - 0.5f + fFontHeight * fYRenderTop;
+			fFontEx = fFontSx + fFontWidth * (1.0 - fXRenderRight - fXRenderLeft);
+			fFontEy = fFontSy + fFontHeight * (1.0 - fYRenderBottom - fYRenderTop);
+
+			addXR = addXL = addYT = addYB = 0.0f;
+
+			if (!m_isMultiLine)
+			{
+				if (fCountX + fFontWidth < float(m_renderBox.left))
+				{
+					fCurX += fFontAdvance;
+					fCountX += fFontAdvance;
+					continue;
+				}
+				else if (fCountX < float(m_renderBox.left))
+					addXL = float(m_renderBox.left) - fCountX;
+
+				if (fCountY + fFontHeight < float(m_renderBox.top))
+				{
+					fCurX += fFontAdvance;
+					fCountX += fFontAdvance;
+					continue;
+				}
+				else if (fCountY < float(m_renderBox.top))
+					addYT = float(m_renderBox.top) - fCountY;
+
+				if (fCountX > m_textWidth - float(m_renderBox.right))
+				{
+					fCurX += fFontAdvance;
+					fCountX += fFontAdvance;
+					continue;
+				}
+				else if (fCountX + fFontWidth > m_textWidth - float(m_renderBox.right))
+					addXR = fCountX + fFontWidth - m_textWidth + float(m_renderBox.right);
+
+				if (fCountY > m_textHeight - float(m_renderBox.bottom))
+				{
+					fCurX += fFontAdvance;
+					fCountX += fFontAdvance;
+					continue;
+				}
+				else if (fCountY + fFontHeight > m_textHeight - float(m_renderBox.bottom))
+					addYB = fCountY + fFontHeight - m_textHeight + float(m_renderBox.bottom);
+			}
+
+#ifdef ENABLE_FIX_MOBS_LAG
+			const auto tex = pFontTexture->GetTexture(pCurCharInfo->index);
+			auto& batchVertices = verticesMap[tex];
+#else
+            pFontTexture->SelectTexture(pCurCharInfo->index);
+            STATEMANAGER.SetTexture(0, pFontTexture->GetD3DTexture());
+#endif
+
+            float fTextureRenderLeft = (pCurCharInfo->right - pCurCharInfo->left) * fXRenderLeft;
+            float fTextureRenderTop = (pCurCharInfo->bottom - pCurCharInfo->top) * fYRenderTop;
+            float fTextureRenderRight = (pCurCharInfo->right - pCurCharInfo->left) * fXRenderRight;
+            float fTextureRenderBottom = (pCurCharInfo->bottom - pCurCharInfo->top) * fYRenderBottom;
 
 #ifdef ENABLE_CLIP_MASKING
-			float su = pCurCharInfo->left;
-			float sv = pCurCharInfo->top;
-			float eu = pCurCharInfo->right;
-			float ev = pCurCharInfo->bottom;
+            if (pClipRect)
+            {
+                const float width = pCurCharInfo->right - pCurCharInfo->left;
+                const float height = pCurCharInfo->bottom - pCurCharInfo->top;
 
-			if (pClipRect)
+                if (fFontEx <= pClipRect->left)
+                {
+                    fCurX += fFontAdvance;
+                    continue;
+                }
+
+                if (fFontSx < pClipRect->left)
+                {
+                    fTextureRenderLeft += (pClipRect->left - fFontSx) / fFontWidth * width;
+                    fFontSx = pClipRect->left;
+                }
+
+                if (fFontEy <= pClipRect->top)
+                {
+                    fCurX += fFontAdvance;
+                    continue;
+                }
+
+                if (fFontSy < pClipRect->top)
+                {
+                    fTextureRenderTop += (pClipRect->top - fFontSy) / fFontHeight * height;
+                    fFontSy = pClipRect->top;
+                }
+
+                if (fFontSx >= pClipRect->right)
+                {
+                    fCurX += fFontAdvance;
+                    continue;
+                }
+
+                if (fFontEx > pClipRect->right)
+                {
+                    fTextureRenderRight -= (fFontEx - pClipRect->right) / fFontWidth * width;
+                    fFontEx = pClipRect->right;
+                }
+
+                if (fFontSy >= pClipRect->bottom)
+                {
+                    fCurX += fFontAdvance;
+                    continue;
+                }
+
+                if (fFontEy > pClipRect->bottom)
+                {
+                    fTextureRenderBottom -= (fFontEy - pClipRect->bottom) / fFontHeight * height;
+                    fFontEy = pClipRect->bottom;
+                }
+            }
+#endif
+
+#ifdef ENABLE_FIX_MOBS_LAG
+            akVertex[0].px = fFontSx + addXL;
+            akVertex[0].py = fFontSy + addYT;
+            akVertex[0].u = pCurCharInfo->left + fTextureRenderLeft + addXL / textureWidth;
+            akVertex[0].v = pCurCharInfo->top + fTextureRenderTop + addYT / textureHeight;
+
+            akVertex[1].px = fFontSx + addXL;
+            akVertex[1].py = fFontEy - addYB;
+            akVertex[1].u = pCurCharInfo->left + fTextureRenderLeft + addXL / textureWidth;
+            akVertex[1].v = pCurCharInfo->bottom - fTextureRenderBottom - addYB / textureHeight;
+
+            akVertex[2].px = fFontEx - addXR;
+            akVertex[2].py = fFontSy + addYT;
+            akVertex[2].u = pCurCharInfo->right - fTextureRenderRight - addXR / textureWidth;
+            akVertex[2].v = pCurCharInfo->top + fTextureRenderTop + addYT / textureHeight;
+
+            akVertex[3].px = fFontEx - addXR;
+            akVertex[3].py = fFontEy - addYB;
+            akVertex[3].u = pCurCharInfo->right - fTextureRenderRight - addXR / textureWidth;
+            akVertex[3].v = pCurCharInfo->bottom - fTextureRenderBottom - addYB / textureHeight;
+
+			akVertex[0].diffuse = akVertex[1].diffuse = akVertex[2].diffuse = akVertex[3].diffuse = m_dwColorInfoVector[i];
+
+			batchVertices.insert(batchVertices.end(), std::begin(akVertex), std::end(akVertex));
+#else
+            akVertex[0].x = fFontSx + addXL;
+            akVertex[0].y = fFontSy + addYT;
+            akVertex[0].u = pCurCharInfo->left + fTextureRenderLeft + addXL / textureWidth;
+            akVertex[0].v = pCurCharInfo->top + fTextureRenderTop + addYT / textureHeight;
+
+            akVertex[1].x = fFontSx + addXL;
+            akVertex[1].y = fFontEy - addYB;
+            akVertex[1].u = pCurCharInfo->left + fTextureRenderLeft + addXL / textureWidth;
+            akVertex[1].v = pCurCharInfo->bottom - fTextureRenderBottom - addYB / textureHeight;
+
+            akVertex[2].x = fFontEx - addXR;
+            akVertex[2].y = fFontSy + addYT;
+            akVertex[2].u = pCurCharInfo->right - fTextureRenderRight - addXR / textureWidth;
+            akVertex[2].v = pCurCharInfo->top + fTextureRenderTop + addYT / textureHeight;
+
+            akVertex[3].x = fFontEx - addXR;
+            akVertex[3].y = fFontEy - addYB;
+            akVertex[3].u = pCurCharInfo->right - fTextureRenderRight - addXR / textureWidth;
+            akVertex[3].v = pCurCharInfo->bottom - fTextureRenderBottom - addYB / textureHeight;
+
+			akVertex[0].color = akVertex[1].color = akVertex[2].color = akVertex[3].color = m_dwColorInfoVector[i];
+
+			if (CGraphicBase::SetPDTStream((SPDTVertex*)akVertex, 4))
+				STATEMANAGER.DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+#endif
+
+			fCurX += fFontAdvance;
+			fCountX += fFontAdvance;
+		}
+
+#ifdef ENABLE_FIX_MOBS_LAG
+		for (auto& p : verticesMap)
+		{
+			STATEMANAGER.SetTexture(0, p.first->GetD3DTexture());
+
+			for (auto f = p.second.begin(), l = p.second.end(); f != l; )
 			{
-				const float width = pCurCharInfo->right - pCurCharInfo->left;
-				const float height = pCurCharInfo->bottom - pCurCharInfo->top;
+				const auto batchCount = std::min<std::size_t>(LARGE_PDT_VERTEX_BUFFER_SIZE,
+					l - f);
 
-				if (fFontEx <= pClipRect->left)
+				if (CGraphicBase::SetPDTStream(&*f, batchCount))
+					STATEMANAGER.DrawPrimitive(D3DPT_TRIANGLESTRIP, 0,
+						batchCount - 2);
+				f += batchCount;
+			}
+		}
+#endif
+#else
+		for (int i = 0; i < m_pCharInfoVector.size(); ++i)
+		{
+			pCurCharInfo = m_pCharInfoVector[i];
+
+			fFontWidth = float(pCurCharInfo->width);
+			fFontHeight = float(pCurCharInfo->height);
+			fFontMaxHeight = max(fFontHeight, pCurCharInfo->height);
+			fFontAdvance = float(pCurCharInfo->advance);
+
+			// NOTE : 폰트 출력에 Width 제한을 둡니다. - [levites]
+			if ((fCurX + fFontWidth) - m_v3Position.x > m_fLimitWidth)
+			{
+				if (m_isMultiLine)
 				{
-					fCurX += fFontAdvance;
-					continue;
+					fCurX = fStanX;
+					fCurY += fFontMaxHeight;
 				}
-
-				if (fFontSx < pClipRect->left)
+				else
 				{
-					su += (pClipRect->left - fFontSx) / fFontWidth * width;
-					fFontSx = pClipRect->left;
-				}
-
-				if (fFontEy <= pClipRect->top)
-				{
-					fCurX += fFontAdvance;
-					continue;
-				}
-
-				if (fFontSy < pClipRect->top)
-				{
-					sv += (pClipRect->top - fFontSy) / fFontHeight * height;
-					fFontSy = pClipRect->top;
-				}
-
-				if (fFontSx >= pClipRect->right)
-				{
-					fCurX += fFontAdvance;
-					continue;
-				}
-
-				if (fFontEx > pClipRect->right)
-				{
-					eu -= (fFontEx - pClipRect->right) / fFontWidth * width;
-					fFontEx = pClipRect->right;
-				}
-
-				if (fFontSy >= pClipRect->bottom)
-				{
-					fCurX += fFontAdvance;
-					continue;
-				}
-
-				if (fFontEy > pClipRect->bottom)
-				{
-					ev -= (fFontEy - pClipRect->bottom) / fFontHeight * height;
-					fFontEy = pClipRect->bottom;
+					break;
 				}
 			}
+
+#ifdef ENABLE_MULTI_TEXTLINE
+			if (m_isEnterToken && std::find(m_vLineCutPos.begin(), m_vLineCutPos.end(), i) != m_vLineCutPos.end())
+			{
+				switch (m_hAlign)
+				{
+				case HORIZONTAL_ALIGN_LEFT:
+					fCurX = fStanX;
+					break;
+
+				case HORIZONTAL_ALIGN_CENTER:
+					fCurX = fStanX + float(m_textWidth - GetTextWidth(i)) / 2.0f;
+					break;
+
+				case HORIZONTAL_ALIGN_RIGHT:
+					fCurX = fStanX + float(m_textWidth - GetTextWidth(i));
+					break;
+				}
+
+				//fCurX=fStanX;
+				fCurY += m_iLineHeight;
+			}
+#endif
+
+#ifndef ENABLE_CLIP_MASKING
+            if (pClipRect)
+            {
+                if (fCurY <= pClipRect->top)
+                {
+                    fCurX += fFontAdvance;
+                    continue;
+                }
+            }
+#endif
+
+#ifdef ENABLE_CLIP_MASKING
+            float su = pCurCharInfo->left;
+            float sv = pCurCharInfo->top;
+            float eu = pCurCharInfo->right;
+            float ev = pCurCharInfo->bottom;
+
+            if (pClipRect)
+            {
+                const float width = pCurCharInfo->right - pCurCharInfo->left;
+                const float height = pCurCharInfo->bottom - pCurCharInfo->top;
+
+                if (fFontEx <= pClipRect->left)
+                {
+                    fCurX += fFontAdvance;
+                    continue;
+                }
+
+                if (fFontSx < pClipRect->left)
+                {
+                    su += (pClipRect->left - fFontSx) / fFontWidth * width;
+                    fFontSx = pClipRect->left;
+                }
+
+                if (fFontEy <= pClipRect->top)
+                {
+                    fCurX += fFontAdvance;
+                    continue;
+                }
+
+                if (fFontSy < pClipRect->top)
+                {
+                    sv += (pClipRect->top - fFontSy) / fFontHeight * height;
+                    fFontSy = pClipRect->top;
+                }
+
+                if (fFontSx >= pClipRect->right)
+                {
+                    fCurX += fFontAdvance;
+                    continue;
+                }
+
+                if (fFontEx > pClipRect->right)
+                {
+                    eu -= (fFontEx - pClipRect->right) / fFontWidth * width;
+                    fFontEx = pClipRect->right;
+                }
+
+                if (fFontSy >= pClipRect->bottom)
+                {
+                    fCurX += fFontAdvance;
+                    continue;
+                }
+
+                if (fFontEy > pClipRect->bottom)
+                {
+                    ev -= (fFontEy - pClipRect->bottom) / fFontHeight * height;
+                    fFontEy = pClipRect->bottom;
+                }
+            }
 
 #ifdef ENABLE_FIX_MOBS_LAG
 			const auto tex = pFontTexture->GetTexture(pCurCharInfo->index);
@@ -1149,10 +1785,16 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 
 #ifdef ENABLE_FIX_MOBS_LAG
 			batchVertices.insert(batchVertices.end(), std::begin(akVertex), std::end(akVertex));
+#else
+			if (CGraphicBase::SetPDTStream((SPDTVertex*)akVertex, 4))
+				STATEMANAGER.DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+#endif
+
 			fCurX += fFontAdvance;
 		}
 	}
 
+#ifdef ENABLE_FIX_MOBS_LAG
 	for (auto& p : verticesMap)
 	{
 		STATEMANAGER.SetTexture(0, p.first->GetD3DTexture());
@@ -1163,19 +1805,14 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 				l - f);
 
 			if (CGraphicBase::SetPDTStream(&*f, batchCount))
-			STATEMANAGER.DrawPrimitive(D3DPT_TRIANGLESTRIP, 0,
-				batchCount - 2);
-				f += batchCount;
-		}
-	}
-#else
-			if (CGraphicBase::SetPDTStream((SPDTVertex*)akVertex, 4))
-				STATEMANAGER.DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
-
-			fCurX += fFontAdvance;
+				STATEMANAGER.DrawPrimitive(D3DPT_TRIANGLESTRIP, 0,
+					batchCount - 2);
+			f += batchCount;
 		}
 	}
 #endif
+#endif
+	}
 
 	if (m_isCursor && !(CTimer::instance().GetCurrentSecond() >= m_isBlinking && (ELTimer_GetMSec() / 400) % 2))
 	{
@@ -1189,7 +1826,7 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 		__GetTextPos(curpos, &sx, &sy);
 
 		// If Composition
-		if(curpos<compend)
+		if (curpos < compend)
 		{
 			diffuse = 0x7fffffff;
 			__GetTextPos(compend, &ex, &sy);
@@ -1205,7 +1842,7 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 		{
 			sx += m_v3Position.x - m_textWidth;
 			ex += m_v3Position.x - m_textWidth;
-			sy += m_v3Position.y;			
+			sy += m_v3Position.y;
 			ey = sy + m_textHeight;
 		}
 		else
@@ -1252,6 +1889,8 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 
 		STATEMANAGER.SetTexture(0, nullptr);
 
+
+		// 2004.11.18.myevan.DrawIndexPrimitiveUP -> DynamicVertexBuffer
 		CGraphicBase::SetDefaultIndexBuffer(CGraphicBase::DEFAULT_IB_FILL_RECT);
 		if (CGraphicBase::SetPDTStream(vertices, 4))
 			STATEMANAGER.DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 4, 0, 2);
@@ -1259,10 +1898,10 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 		int ulbegin = CIME::GetULBegin();
 		int ulend = CIME::GetULEnd();
 
-		if(ulbegin < ulend)
+		if (ulbegin < ulend)
 		{
-			__GetTextPos(curpos+ulbegin, &sx, &sy);
-			__GetTextPos(curpos+ulend, &ex, &sy);
+			__GetTextPos(curpos + ulbegin, &sx, &sy);
+			__GetTextPos(curpos + ulend, &ex, &sy);
 
 			sx += m_v3Position.x;
 			sy += m_v3Position.y + m_textHeight;
@@ -1351,6 +1990,10 @@ void CGraphicTextInstance::Render(RECT * pClipRect)
 		}
 	}
 #endif
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+    D3DPERF_EndEvent();
+#endif
 }
 
 void CGraphicTextInstance::CreateSystem(UINT uCapacity)
@@ -1384,6 +2027,13 @@ void CGraphicTextInstance::HideCursor()
 	m_isCursor = false;
 }
 
+#ifdef INSIDE_RENDER
+bool CGraphicTextInstance::IsShowCursor()
+{
+	return m_isCursor;
+}
+#endif
+
 void CGraphicTextInstance::ShowOutLine()
 {
 	m_isOutline = true;
@@ -1399,9 +2049,11 @@ void CGraphicTextInstance::SetColor(DWORD color)
 	if (m_dwTextColor != color)
 	{
 		for (int i = 0; i < m_pCharInfoVector.size(); ++i)
+		{
+			//TraceError("size %d oldcolor %d newcolor %d", m_dwColorInfoVector.size(), m_dwColorInfoVector[i], m_dwTextColor);
 			if (m_dwColorInfoVector[i] == m_dwTextColor)
 				m_dwColorInfoVector[i] = color;
-
+		}
 		m_dwTextColor = color;
 	}
 }
@@ -1413,12 +2065,12 @@ void CGraphicTextInstance::SetColor(float r, float g, float b, float a)
 
 void CGraphicTextInstance::SetOutLineColor(DWORD color)
 {
-	m_dwOutLineColor=color;
+	m_dwOutLineColor = color;
 }
 
 void CGraphicTextInstance::SetOutLineColor(float r, float g, float b, float a)
 {
-	m_dwOutLineColor=D3DXCOLOR(r, g, b, a);
+	m_dwOutLineColor = D3DXCOLOR(r, g, b, a);
 }
 
 void CGraphicTextInstance::SetSecret(bool Value)
@@ -1485,7 +2137,11 @@ void CGraphicTextInstance::SetValueString(const std::string& c_stValue)
 		findN = m_stText.find("\n");
 	}
 
-	if(m_vLineCutPos.size())
+	// Let's hardcode the first line :)
+	// So if the vector is not empty it mean it found \n in it
+	// and if we append first pos in vector it will consider it 
+	// was an \n in the beggining of the std::string
+	if (m_vLineCutPos.size())
 		m_vLineCutPos.push_back(0);
 #endif
 
@@ -1544,14 +2200,14 @@ WORD CGraphicTextInstance::GetTextLineCount()
 
 	float fx = 0.0f;
 	WORD wLineCount = 1;
-	for (itor=m_pCharInfoVector.begin(); itor!=m_pCharInfoVector.end(); ++itor)
+	for (itor = m_pCharInfoVector.begin(); itor != m_pCharInfoVector.end(); ++itor)
 	{
 		pCurCharInfo = *itor;
 
-		float fFontWidth=float(pCurCharInfo->width);
-		float fFontAdvance=float(pCurCharInfo->advance);
+		float fFontWidth = float(pCurCharInfo->width);
+		float fFontAdvance = float(pCurCharInfo->advance);
 
-		if (fx+fFontWidth > m_fLimitWidth)
+		if (fx + fFontWidth > m_fLimitWidth)
 		{
 			fx = 0.0f;
 			++wLineCount;
@@ -1561,7 +2217,7 @@ WORD CGraphicTextInstance::GetTextLineCount()
 	}
 
 #ifdef ENABLE_MULTI_TEXTLINE
-	if(m_isEnterToken && m_vLineCutPos.size())
+	if (m_isEnterToken && m_vLineCutPos.size())
 	{
 		return m_vLineCutPos.size();
 	}
@@ -1580,15 +2236,33 @@ WORD CGraphicTextInstance::GetLineHeight()
 void CGraphicTextInstance::GetTextSize(int* pRetWidth, int* pRetHeight)
 {
 #ifdef ENABLE_MULTI_TEXTLINE
-	if(m_isEnterToken && m_vLineCutPos.size())
+	if (m_isEnterToken && m_vLineCutPos.size())
 	{
 		GetMultiTextSize(pRetWidth, pRetHeight);
 		return;
 	}
 #endif
-	*pRetWidth = m_textWidth;
+
+	* pRetWidth = m_textWidth;
 	*pRetHeight = m_textHeight;
 }
+
+#ifdef ENABLE_SUNG_MAHI_TOWER
+void CGraphicTextInstance::GetCharacterWidth(short* sWidth)
+{
+	CGraphicFontTexture::TCharacterInfomation* pCurCharInfo;
+	CGraphicFontTexture::TPCharacterInfomationVector::iterator itor;
+
+	*sWidth = 0;
+	for (itor = m_pCharInfoVector.begin(); itor != m_pCharInfoVector.end(); ++itor)
+	{
+		pCurCharInfo = *itor;
+		
+		*sWidth = pCurCharInfo->width;
+		break;
+	}
+}
+#endif
 
 int CGraphicTextInstance::PixelPositionToCharacterPosition(int iPixelPosition)
 {
@@ -1610,12 +2284,54 @@ int CGraphicTextInstance::GetHorizontalAlign()
 	return m_hAlign;
 }
 
+#ifdef INSIDE_RENDER
+void CGraphicTextInstance::SetRenderingRect(float fLeft, float fTop, float fRight, float fBottom)
+{
+	if (m_textWidth == 0 || m_textHeight == 0)
+		return;
+
+	m_bUseRenderingRect = true;
+
+	float fWidth = float(m_textWidth);
+	float fHeight = float(m_textHeight);
+
+	m_RenderingRect.left = fWidth * fLeft;
+	m_RenderingRect.top = fHeight * fTop;
+	m_RenderingRect.right = fWidth * fRight;
+	m_RenderingRect.bottom = fHeight * fBottom;
+}
+
+void CGraphicTextInstance::iSetRenderingRect(int iLeft, int iTop, int iRight, int iBottom)
+{
+	if (m_textWidth == 0 || m_textHeight == 0)
+		return;
+
+	m_bUseRenderingRect = true;
+
+	m_RenderingRect.left = iLeft;
+	m_RenderingRect.top = iTop;
+	m_RenderingRect.right = iRight;
+	m_RenderingRect.bottom = iBottom;
+}
+
+void CGraphicTextInstance::SetRenderBox(RECT& renderBox)
+{
+	memcpy(&m_renderBox, &renderBox, sizeof(m_renderBox));
+}
+#endif
+
 void CGraphicTextInstance::__Initialize()
 {
 	m_roText = nullptr;
 
 	m_hAlign = HORIZONTAL_ALIGN_LEFT;
 	m_vAlign = VERTICAL_ALIGN_TOP;
+
+#ifdef ENABLE_MULTI_TEXTLINE
+	m_isEnterToken = true;
+	m_iLineHeight = 12; // default line height
+	m_vLineCutPos.clear();
+#endif
 
 	m_iMax = 0;
 	m_fLimitWidth = 1600.0f;
@@ -1637,17 +2353,93 @@ void CGraphicTextInstance::__Initialize()
 	m_v3Position.x = m_v3Position.y = m_v3Position.z = 0.0f;
 
 	m_dwOutLineColor = 0xff000000;
+#ifdef INSIDE_RENDER
+	memset(&m_RenderingRect, 0, sizeof(RECT));
+	m_bUseRenderingRect = false;
 
-#ifdef ENABLE_MULTI_TEXTLINE
-	m_isEnterToken = true;
-	m_iLineHeight = 12;
-	m_vLineCutPos.clear();
+	memset(&m_renderBox, 0, sizeof(m_renderBox));
+	m_startPos = m_endPos = 0;
+	m_isFixedRenderPos = false;
 #endif
 }
 
+#ifdef ENABLE_MULTI_TEXTLINE
+void CGraphicTextInstance::DisableEnterToken()
+{
+	m_isEnterToken = false;
+}
+
+void CGraphicTextInstance::SetLineHeight(int iHeight)
+{
+	m_iLineHeight = iHeight;
+}
+
+void CGraphicTextInstance::GetMultiTextSize(int* pRetWidth, int* pRetHeight)
+{
+	int iMaxWidth = 0;
+	int iMaxHeigh = 0;
+	int iWidth = 0;
+
+	for (int i = 0; i < (int)m_pCharInfoVector.size(); ++i)
+	{
+		CGraphicFontTexture::TCharacterInfomation* pCurCharInfo = m_pCharInfoVector[i];
+		float fFontWidth = float(pCurCharInfo->width);
+		float fFontAdvance = float(pCurCharInfo->advance);
+
+		if (std::find(m_vLineCutPos.begin(), m_vLineCutPos.end(), i) != m_vLineCutPos.end())
+		{
+			if (iMaxWidth < iWidth)
+				iMaxWidth = iWidth;
+
+			iWidth = 0;
+			iMaxHeigh += i ? m_iLineHeight : 0;
+		}
+		else if (i == (int)m_pCharInfoVector.size() - 1)
+		{
+			if (iMaxWidth < iWidth + fFontAdvance)
+				iMaxWidth = iWidth + fFontAdvance;
+
+			iWidth = 0;
+			iMaxHeigh += i ? m_iLineHeight : 0;
+		}
+
+		iWidth += fFontAdvance;
+	}
+
+	m_textWidth = iMaxWidth;
+	m_textHeight = iMaxHeigh;
+
+	*pRetWidth = iMaxWidth;
+	*pRetHeight = iMaxHeigh;
+}
+
+// This function return the width from iStart position until it find \n again or the end of the std::string
+float CGraphicTextInstance::GetTextWidth(int iStart)
+{
+	float iMaxWidth = 0;
+	float iWidth = 0;
+
+	for (int i = iStart; i < (int)m_pCharInfoVector.size(); ++i)
+	{
+		CGraphicFontTexture::TCharacterInfomation* pCurCharInfo = m_pCharInfoVector[i];
+		float fFontWidth = float(pCurCharInfo->width);
+		float fFontAdvance = float(pCurCharInfo->advance);
+
+		if (i != iStart && (std::find(m_vLineCutPos.begin(), m_vLineCutPos.end(), i) != m_vLineCutPos.end()))
+			return iWidth;
+		else if (i == (int)m_pCharInfoVector.size() - 1)
+			return iWidth + fFontAdvance;
+
+		iWidth += fFontAdvance;
+	}
+
+	return iWidth;
+}
+#endif
+
 void CGraphicTextInstance::Destroy()
 {
-	m_stText="";
+	m_stText = "";
 	m_pCharInfoVector.clear();
 	m_dwColorInfoVector.clear();
 	m_hyperlinkVector.clear();
@@ -1696,76 +2488,3 @@ CGraphicTextInstance::~CGraphicTextInstance()
 {
 	Destroy();
 }
-
-#ifdef ENABLE_MULTI_TEXTLINE
-void CGraphicTextInstance::DisableEnterToken()
-{
-	m_isEnterToken = false;
-}
-
-void CGraphicTextInstance::SetLineHeight(int iHeight)
-{
-	m_iLineHeight = iHeight;
-}
-
-void CGraphicTextInstance::GetMultiTextSize(int* pRetWidth, int* pRetHeight)
-{
-	int iMaxWidth = 0;
-	int iMaxHeigh = 0;
-	int iWidth = 0;
-
-	for (int i = 0; i < (int)m_pCharInfoVector.size(); ++i)
-	{
-		CGraphicFontTexture::TCharacterInfomation* pCurCharInfo = m_pCharInfoVector[i];
-		float fFontWidth = float(pCurCharInfo->width);
-		float fFontAdvance = float(pCurCharInfo->advance);
-
-		if(std::find(m_vLineCutPos.begin(), m_vLineCutPos.end(), i) != m_vLineCutPos.end())
-		{
-			if(iMaxWidth < iWidth)
-				iMaxWidth = iWidth;
-			
-			iWidth = 0;
-			iMaxHeigh += i ? m_iLineHeight : 0;
-		}
-		else if(i == (int)m_pCharInfoVector.size() - 1)
-		{
-			if(iMaxWidth < iWidth + fFontAdvance)
-				iMaxWidth = iWidth + fFontAdvance;
-			
-			iWidth = 0;
-			iMaxHeigh += i ? m_iLineHeight : 0;
-		}
-
-		iWidth += fFontAdvance;
-	}
-
-	m_textWidth = iMaxWidth;
-	m_textHeight = iMaxHeigh;
-
-	*pRetWidth = iMaxWidth;
-	*pRetHeight = iMaxHeigh;
-}
-
-float CGraphicTextInstance::GetTextWidth(int iStart)
-{
-	float iMaxWidth = 0;
-	float iWidth = 0;
-	
-	for (int i = iStart; i < (int)m_pCharInfoVector.size(); ++i)
-	{
-		CGraphicFontTexture::TCharacterInfomation* pCurCharInfo = m_pCharInfoVector[i];
-		float fFontWidth = float(pCurCharInfo->width);
-		float fFontAdvance = float(pCurCharInfo->advance);
-
-		if(i != iStart && (std::find(m_vLineCutPos.begin(), m_vLineCutPos.end(), i) != m_vLineCutPos.end()))
-			return iWidth;
-		else if(i == (int)m_pCharInfoVector.size() - 1)
-			return iWidth + fFontAdvance;
-		
-		iWidth += fFontAdvance;
-	}
-	
-	return iWidth;
-}
-#endif

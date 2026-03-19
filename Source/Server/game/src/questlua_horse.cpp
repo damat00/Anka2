@@ -25,8 +25,6 @@ namespace quest
 	//
 	// "horse" Lua functions
 	//
-#ifdef HORSE_FIX
-#else
 	int horse_is_riding(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
@@ -293,13 +291,11 @@ namespace quest
 
 		return 1;
 	}
-#endif
+
 	void RegisterHorseFunctionTable()
 	{
 		luaL_reg horse_functions[] =
 		{
-#ifdef HORSE_FIX
-#else
 			{ "is_mine",		horse_is_mine			},
 			{ "is_riding",		horse_is_riding			},
 			{ "is_summon",		horse_is_summon			},
@@ -320,7 +316,7 @@ namespace quest
 			{ "feed",			horse_feed				},
 			{ "set_name",		horse_set_name			},
 			{ "get_name",		horse_get_name			},
-#endif
+
 			{ NULL,				NULL					}
 		};
 

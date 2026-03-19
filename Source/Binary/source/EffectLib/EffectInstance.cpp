@@ -6,13 +6,16 @@
 #include "../eterBase/Stl.h"
 #include "../eterLib/StateManager.h"
 #include "../MilesLib/SoundManager.h"
+#ifdef USE_EFFECTS_LOD
+#include "../EterLib/Camera.h"
+#endif
 
 CDynamicPool<CEffectInstance>	CEffectInstance::ms_kPool;
 int CEffectInstance::ms_iRenderingEffectCount = 0;
 
 bool CEffectInstance::LessRenderOrder(CEffectInstance* pkEftInst)
 {
-	return (m_pkEftData<pkEftInst->m_pkEftData);	
+	return (m_pkEftData<pkEftInst->m_pkEftData);
 }
 
 void CEffectInstance::ResetRenderingEffectCount()
@@ -52,7 +55,6 @@ void CEffectInstance::UpdateSound()
 	{
 		CSoundManager& rkSndMgr=CSoundManager::Instance();
 		rkSndMgr.UpdateSoundInstance(m_matGlobal._41, m_matGlobal._42, m_matGlobal._43, m_dwFrame, m_pSoundInstanceVector);
-		// NOTE : 매트릭스에서 위치를 직접 얻어온다 - [levites]
 	}
 	++m_dwFrame;
 }
@@ -72,29 +74,145 @@ struct FEffectUpdator
 	}
 };
 
+#ifdef USE_EFFECTS_LOD
+void CEffectInstance::SetHiddenByLod()
+{
+    for (auto &particle : m_ParticleInstanceVector)
+    {
+        particle->SetHiddenByLod();
+    }
+
+    for (auto &mesh : m_MeshInstanceVector)
+    {
+        mesh->SetHiddenByLod();
+    }
+
+    for (auto &light : m_LightInstanceVector)
+    {
+        light->SetHiddenByLod();
+    }
+}
+
+void CEffectInstance::SetLodShow()
+{
+    for (auto &particle : m_ParticleInstanceVector)
+    {
+        particle->SetShownByLod();
+    }
+
+    for (auto &mesh : m_MeshInstanceVector)
+    {
+        mesh->SetShownByLod();
+    }
+
+    for (auto &light : m_LightInstanceVector)
+    {
+        light->SetShownByLod();
+    }
+}
+
+bool CEffectInstance::IsHiddenByLod()
+{
+    bool anyActive = false;
+
+    for (auto &particle : m_ParticleInstanceVector)
+    {
+        anyActive = particle->IsHiddenByLod();
+    }
+
+    for (auto &mesh : m_MeshInstanceVector)
+    {
+        anyActive = mesh->IsHiddenByLod();
+    }
+
+    for (auto &light : m_LightInstanceVector)
+    {
+        anyActive = light->IsHiddenByLod();
+    }
+
+    return anyActive;
+}
+
+void CEffectInstance::UpdateLODLevel()
+{
+    auto cameraInst = CCameraManager::Instance().GetCurrentCamera();
+    if (!cameraInst)
+    {
+        TraceError("CEffectInstance::UpdateLODLevel - GetCurrentCamera() == NULL");
+        return;
+    }
+
+    const D3DXVECTOR3& c_rv3Eye = cameraInst->GetEye();
+    const D3DXVECTOR3& c_rv3Pos = D3DXVECTOR3(m_matGlobal._41, m_matGlobal._42, m_matGlobal._43);
+
+    auto dist = (c_rv3Eye - c_rv3Pos);
+    float fdist = D3DXVec3Length(&dist);
+    auto lod = std::abs((1.0f * fdist * tan (0.5f * GetFOV())) / (0.5f * (float)ms_iHeight));
+
+    if (lod < 20.0f)
+    {
+        SetLodShow();
+    }
+    else
+    {
+        SetHiddenByLod();
+    }
+}
+#endif
+
 void CEffectInstance::OnUpdate()
 {
 	Transform();
 
-	FEffectUpdator f(CTimer::Instance().GetCurrentSecond()-m_fLastTime);
-	f = std::for_each(m_ParticleInstanceVector.begin(), m_ParticleInstanceVector.end(),f);
-	f = std::for_each(m_MeshInstanceVector.begin(), m_MeshInstanceVector.end(),f);
-	f = std::for_each(m_LightInstanceVector.begin(), m_LightInstanceVector.end(),f);
-	m_isAlive = f.isAlive;
+#ifdef USE_EFFECTS_LOD
+    UpdateLODLevel();
+#endif
 
-	m_fLastTime = CTimer::Instance().GetCurrentSecond();
+#ifdef WORLD_EDITOR
+    FEffectUpdator f(CTimer::Instance().GetElapsedSecond());
+#else
+    FEffectUpdator f(CTimer::Instance().GetCurrentSecond()-m_fLastTime);
+#endif
+
+    f = std::for_each(m_ParticleInstanceVector.begin(), m_ParticleInstanceVector.end(),f);
+    f = std::for_each(m_MeshInstanceVector.begin(), m_MeshInstanceVector.end(),f);
+    f = std::for_each(m_LightInstanceVector.begin(), m_LightInstanceVector.end(),f);
+    m_isAlive = f.isAlive;
+
+    if (m_pSoundInstanceVector)
+    {
+        auto& sndMgr = CSoundManager::Instance();
+        sndMgr.UpdateSoundInstance(m_matGlobal._41
+                                    , m_matGlobal._42
+                                    , m_matGlobal._43
+                                    , m_dwFrame
+                                    , m_pSoundInstanceVector);
+    }
+
+    m_fLastTime = CTimer::Instance().GetCurrentSecond();
+    ++m_dwFrame;
 }
 
 void CEffectInstance::OnRender()
 {
+#ifdef ENABLE_DIRECTX9_UPDATE
+	STATEMANAGER.SaveSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_NONE);
+	STATEMANAGER.SaveSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_NONE);
+#else
 	STATEMANAGER.SaveTextureStageState(0, D3DTSS_MINFILTER, D3DTEXF_NONE);
 	STATEMANAGER.SaveTextureStageState(0, D3DTSS_MAGFILTER, D3DTEXF_NONE);
+#endif
+
 	STATEMANAGER.SaveRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 	STATEMANAGER.SaveRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	STATEMANAGER.SaveRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 	STATEMANAGER.SaveRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 	STATEMANAGER.SaveRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+//#ifdef ENABLE_DIRECTX9_UPDATE
+//    STATEMANAGER.SetDepthEnable(true, false);
+//#else
 	STATEMANAGER.SaveRenderState(D3DRS_ZWRITEENABLE, FALSE);
+//#endif
 	/////
 
     STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TFACTOR);
@@ -103,19 +221,35 @@ void CEffectInstance::OnRender()
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TFACTOR);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_TEXTURE);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAOP,   D3DTOP_MODULATE);
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+	STATEMANAGER.SetFVF(D3DFVF_XYZ|D3DFVF_TEX1);
+#else
 	STATEMANAGER.SetVertexShader(D3DFVF_XYZ|D3DFVF_TEX1);
+#endif
 	std::for_each(m_ParticleInstanceVector.begin(),m_ParticleInstanceVector.end(),std::mem_fn(&CEffectElementBaseInstance::Render));
 	std::for_each(m_MeshInstanceVector.begin(),m_MeshInstanceVector.end(),std::mem_fn(&CEffectElementBaseInstance::Render));
 
 	/////
+#ifdef ENABLE_DIRECTX9_UPDATE
+	STATEMANAGER.RestoreSamplerState(0, D3DSAMP_MINFILTER);
+	STATEMANAGER.RestoreSamplerState(0, D3DSAMP_MAGFILTER);
+#else
 	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_MINFILTER);
 	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_MAGFILTER);
+#endif
+
 	STATEMANAGER.RestoreRenderState(D3DRS_ALPHABLENDENABLE);
 	STATEMANAGER.RestoreRenderState(D3DRS_SRCBLEND);
 	STATEMANAGER.RestoreRenderState(D3DRS_DESTBLEND);
 	STATEMANAGER.RestoreRenderState(D3DRS_ALPHATESTENABLE);
 	STATEMANAGER.RestoreRenderState(D3DRS_CULLMODE);
+
+//#ifdef ENABLE_DIRECTX9_UPDATE
+//    STATEMANAGER.SetDepthEnable(true, false);
+//#else
 	STATEMANAGER.RestoreRenderState(D3DRS_ZWRITEENABLE);
+//#endif
 
 	++ms_iRenderingEffectCount;
 }
@@ -305,30 +439,30 @@ void CEffectInstance::__Initialize()
 {
 	m_isAlive = FALSE;
 	m_dwFrame = 0;
-
+#ifdef ENABLE_WIKI_SYSTEM
+	m_wikiIgnoreFrustum = false;
+#endif
 #ifdef ENABLE_RENDER_TARGET
 	m_ignoreFrustum = false;
 #endif
-
-#ifdef ENABLE_INGAME_WIKI_SYSTEM
-	m_wikiIgnoreFrustum = false;
-#endif
-
 	m_pSoundInstanceVector = nullptr;
 	m_fBoundingSphereRadius = 0.0f;
 	m_v3BoundingSpherePosition.x = m_v3BoundingSpherePosition.y = m_v3BoundingSpherePosition.z = 0.0f;
+
+	m_pkEftData = nullptr;
+#ifdef __ENABLE_STEALTH_FIX__
+	m_isAlwaysHidden = false;
+#endif
 
 #ifdef ENABLE_AURA_COSTUME_SYSTEM
 	m_fParticleScale = 1.0f;
 	m_v3MeshScale.x = m_v3MeshScale.y = m_v3MeshScale.z = 1.0f;
 #endif
 
-	m_pkEftData = nullptr;
-
 	D3DXMatrixIdentity(&m_matGlobal);
 }
 
-CEffectInstance::CEffectInstance() 
+CEffectInstance::CEffectInstance()
 {
 	__Initialize();
 }

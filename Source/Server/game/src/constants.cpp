@@ -4,6 +4,7 @@
 #include "../../common/service.h"
 #include "../../common/length.h"
 
+
 TJobInitialPoints JobInitialPoints[JOB_MAX_NUM] =
 /*
 {
@@ -71,6 +72,43 @@ TBattleTypeStat BattleTypeStats[BATTLE_TYPE_MAX_NUM] =
 };
 
 const DWORD * exp_table = NULL;
+
+#ifdef ENABLE_CONQUEROR_LEVEL
+const DWORD exp_coqueror_table[PLAYER_MAX_CONQUEROR_LEVEL_CONST + 1] =
+{
+	0,	//	0
+	433400,
+	1300204,
+	2600413,
+	4334029,
+	6501054,
+	9101490,
+	12135339,
+	15602603,
+	19503284,
+	23837384,	//	10
+	28604905,
+	33805849,
+	39440218,
+	45508014,
+	52009239,
+	58943895,
+	66311984,
+	74113508,
+	82348469,
+	91016869,	//	20
+	100118710,
+	109653994,
+	119622723,
+	130024899,
+	140860524,
+	152129600,
+	163832129,
+	175968113,
+	188537554,
+	188537554,	//	30	
+};
+#endif
 
 const DWORD exp_table_common[PLAYER_EXP_TABLE_MAX + 1] =
 {
@@ -614,140 +652,205 @@ TItemAttrMap g_map_itemAttr;
 TItemAttrMap g_map_itemRare;
 
 const TApplyInfo aApplyInfo[MAX_APPLY_NUM] =
-/*
-{
-	DWORD dwPointType;
-}
-*/
+/* { DWORD dwPointType; }  */
 {
 	// Point Type
-	{ POINT_NONE,							}, // APPLY_NONE, // 0
-	{ POINT_MAX_HP,							},
-	{ POINT_MAX_SP,							},
-	{ POINT_HT,								},
-	{ POINT_IQ,								},
-	{ POINT_ST,								},
-	{ POINT_DX,								},
-	{ POINT_ATT_SPEED,						},
-	{ POINT_MOV_SPEED,						},
-	{ POINT_CASTING_SPEED,					},
-	{ POINT_HP_REGEN,						}, // APPLY_HP_REGEN, // 10
-	{ POINT_SP_REGEN,						},
-	{ POINT_POISON_PCT,						},
-	{ POINT_STUN_PCT,						},
-	{ POINT_SLOW_PCT,						},
-	{ POINT_CRITICAL_PCT,					},
-	{ POINT_PENETRATE_PCT,					},
-	{ POINT_ATTBONUS_HUMAN,					},
-	{ POINT_ATTBONUS_ANIMAL,				},
-	{ POINT_ATTBONUS_ORC,					},
-	{ POINT_ATTBONUS_MILGYO,				}, // APPLY_ATTBONUS_MILGYO, // 20
-	{ POINT_ATTBONUS_UNDEAD,				},
-	{ POINT_ATTBONUS_DEVIL,					},
-	{ POINT_STEAL_HP,						},
-	{ POINT_STEAL_SP,						},
-	{ POINT_MANA_BURN_PCT,					},
-	{ POINT_DAMAGE_SP_RECOVER,				},
-	{ POINT_BLOCK,							},
-	{ POINT_DODGE,							},
-	{ POINT_RESIST_SWORD,					},
-	{ POINT_RESIST_TWOHAND,					}, // APPLY_RESIST_TWOHAND, // 30
-	{ POINT_RESIST_DAGGER,					},
-	{ POINT_RESIST_BELL,					},
-	{ POINT_RESIST_FAN,						},
-	{ POINT_RESIST_BOW,						},
-	{ POINT_RESIST_FIRE,					},
-	{ POINT_RESIST_ELEC,					},
-	{ POINT_RESIST_MAGIC,					},
-	{ POINT_RESIST_WIND,					},
-	{ POINT_REFLECT_MELEE,					},
-	{ POINT_REFLECT_CURSE,					}, // APPLY_REFLECT_CURSE, // 40
-	{ POINT_POISON_REDUCE,					},
-	{ POINT_KILL_SP_RECOVER,				},
-	{ POINT_EXP_DOUBLE_BONUS,				},
-	{ POINT_GOLD_DOUBLE_BONUS,				},
-	{ POINT_ITEM_DROP_BONUS,				},
-	{ POINT_POTION_BONUS,					},
-	{ POINT_KILL_HP_RECOVERY,				},
-	{ POINT_IMMUNE_STUN,					},
-	{ POINT_IMMUNE_SLOW,					},
-	{ POINT_IMMUNE_FALL,					}, // APPLY_IMMUNE_FALL, // 50
-	{ APPLY_SKILL,							},
-	{ POINT_BOW_DISTANCE,					},
-	{ POINT_ATT_GRADE_BONUS,				},
-	{ POINT_DEF_GRADE_BONUS,				},
-	{ POINT_MAGIC_ATT_GRADE_BONUS,			},
-	{ POINT_MAGIC_DEF_GRADE_BONUS,			},
-	{ POINT_CURSE_PCT,						},
-	{ POINT_MAX_STAMINA,					},
-	{ POINT_ATTBONUS_WARRIOR,				},
-	{ POINT_ATTBONUS_ASSASSIN,				}, // APPLY_ATTBONUS_ASSASSIN, // 60
-	{ POINT_ATTBONUS_SURA,					}, // APPLY_ATTBONUS_SURA, // 61
-	{ POINT_ATTBONUS_SHAMAN,				}, // APPLY_ATTBONUS_SHAMAN, // 62
-	{ POINT_ATTBONUS_MONSTER				}, // APPLY_ATTBONUS_MONSTER, // 63
-	{ POINT_ATT_BONUS						}, // APPLY_MALL_ATTBONUS, // 64
-	{ POINT_MALL_DEFBONUS,					}, // APPLY_MALL_DEFBONUS, // 65
-	{ POINT_MALL_EXPBONUS,					}, // APPLY_MALL_EXPBONUS, // 66
-	{ POINT_MALL_ITEMBONUS,					}, // APPLY_MALL_ITEMBONUS, // 67
-	{ POINT_MALL_GOLDBONUS,					}, // APPLY_MALL_GOLDBONUS, // 68
-	{ POINT_MAX_HP_PCT,						}, // APPLY_MAX_HP_PCT, // 69
-	{ POINT_MAX_SP_PCT,						}, // APPLY_MAX_SP_PCT, // 70
-	{ POINT_SKILL_DAMAGE_BONUS,				}, // APPLY_SKILL_DAMAGE_BONUS, // 71
-	{ POINT_NORMAL_HIT_DAMAGE_BONUS,		}, // APPLY_NORMAL_HIT_DAMAGE_BONUS, // 72
-	{ POINT_SKILL_DEFEND_BONUS,				},
-	{ POINT_NORMAL_HIT_DEFEND_BONUS,		},
-	{ APPLY_EXTRACT_HP_PCT,					},
-	{ POINT_RESIST_WARRIOR,					},
-	{ POINT_RESIST_ASSASSIN,				},
-	{ POINT_RESIST_SURA,					},
-	{ POINT_RESIST_SHAMAN,					},
-	{ POINT_ENERGY,							},
-	{ POINT_DEF_GRADE,						},
-	{ POINT_COSTUME_ATTR_BONUS,				},
-	{ POINT_MAGIC_ATT_BONUS_PER,			},
-	{ POINT_MELEE_MAGIC_ATT_BONUS_PER,		},
-	{ POINT_RESIST_ICE,						},
-	{ POINT_RESIST_EARTH,					},
-	{ POINT_RESIST_DARK,					},
-	{ POINT_RESIST_CRITICAL,				},
-	{ POINT_RESIST_PENETRATE,				},
+	{ POINT_NONE,			},   // APPLY_NONE,		0
+	{ POINT_MAX_HP,		        },   // APPLY_MAX_HP,		1
+	{ POINT_MAX_SP,		        },   // APPLY_MAX_SP,		2
+	{ POINT_HT,			        },   // APPLY_CON,		3
+	{ POINT_IQ,			        },   // APPLY_INT,		4
+	{ POINT_ST,			        },   // APPLY_STR,		5
+	{ POINT_DX,			        },   // APPLY_DEX,		6
+	{ POINT_ATT_SPEED,		        },   // APPLY_ATT_SPEED,	7
+	{ POINT_MOV_SPEED,		        },   // APPLY_MOV_SPEED,	8
+	{ POINT_CASTING_SPEED,	        },   // APPLY_CAST_SPEED,	9
+	{ POINT_HP_REGEN,			},   // APPLY_HP_REGEN,		10
+	{ POINT_SP_REGEN,			},   // APPLY_SP_REGEN,		11
+	{ POINT_POISON_PCT,		        },   // APPLY_POISON_PCT,	12
+	{ POINT_STUN_PCT,		        },   // APPLY_STUN_PCT,		13
+	{ POINT_SLOW_PCT,		        },   // APPLY_SLOW_PCT,		14
+	{ POINT_CRITICAL_PCT,		},   // APPLY_CRITICAL_PCT,	15
+	{ POINT_PENETRATE_PCT,	        },   // APPLY_PENETRATE_PCT,	16
+	{ POINT_ATTBONUS_HUMAN,	        },   // APPLY_ATTBONUS_HUMAN,	17
+	{ POINT_ATTBONUS_ANIMAL,	        },   // APPLY_ATTBONUS_ANIMAL,	18
+	{ POINT_ATTBONUS_ORC,		},   // APPLY_ATTBONUS_ORC,	19
+	{ POINT_ATTBONUS_MILGYO,	        },   // APPLY_ATTBONUS_MILGYO,	20
+	{ POINT_ATTBONUS_UNDEAD,	        },   // APPLY_ATTBONUS_UNDEAD,	21
+	{ POINT_ATTBONUS_DEVIL,	        },   // APPLY_ATTBONUS_DEVIL,	22
+	{ POINT_STEAL_HP,		        },   // APPLY_STEAL_HP,		23
+	{ POINT_STEAL_SP,		        },   // APPLY_STEAL_SP,		24
+	{ POINT_MANA_BURN_PCT,	        },   // APPLY_MANA_BURN_PCT,	25
+	{ POINT_DAMAGE_SP_RECOVER,	        },   // APPLY_DAMAGE_SP_RECOVER,26
+	{ POINT_BLOCK,		        },   // APPLY_BLOCK,		27
+	{ POINT_DODGE,		        },   // APPLY_DODGE,		28
+	{ POINT_RESIST_SWORD,		},   // APPLY_RESIST_SWORD,	29
+	{ POINT_RESIST_TWOHAND,	        },   // APPLY_RESIST_TWOHAND,	30
+	{ POINT_RESIST_DAGGER,	        },   // APPLY_RESIST_DAGGER,	31
+	{ POINT_RESIST_BELL,		},   // APPLY_RESIST_BELL,	32
+	{ POINT_RESIST_FAN,		        },   // APPLY_RESIST_FAN,	33
+	{ POINT_RESIST_BOW,		        },   // APPLY_RESIST_BOW,	34
+	{ POINT_RESIST_FIRE,		},   // APPLY_RESIST_FIRE,	35
+	{ POINT_RESIST_ELEC,		},   // APPLY_RESIST_ELEC,	36
+	{ POINT_RESIST_MAGIC,		},   // APPLY_RESIST_MAGIC,	37
+	{ POINT_RESIST_WIND,		},   // APPLY_RESIST_WIND,	38
+	{ POINT_REFLECT_MELEE,	        },   // APPLY_REFLECT_MELEE,	39
+	{ POINT_REFLECT_CURSE,	        },   // APPLY_REFLECT_CURSE,	40
+	{ POINT_POISON_REDUCE,	        },   // APPLY_POISON_REDUCE,	41
+	{ POINT_KILL_SP_RECOVER,	        },   // APPLY_KILL_SP_RECOVER,	42
+	{ POINT_EXP_DOUBLE_BONUS,	        },   // APPLY_EXP_DOUBLE_BONUS,	43
+	{ POINT_GOLD_DOUBLE_BONUS,	        },   // APPLY_GOLD_DOUBLE_BONUS,44
+	{ POINT_ITEM_DROP_BONUS,	        },   // APPLY_ITEM_DROP_BONUS,	45
+	{ POINT_POTION_BONUS,		},   // APPLY_POTION_BONUS,	46
+	{ POINT_KILL_HP_RECOVERY,	        },   // APPLY_KILL_HP_RECOVER,	47
+	{ POINT_IMMUNE_STUN,		},   // APPLY_IMMUNE_STUN,	48
+	{ POINT_IMMUNE_SLOW,		},   // APPLY_IMMUNE_SLOW,	49
+	{ POINT_IMMUNE_FALL,		},   // APPLY_IMMUNE_FALL,	50
+	{ POINT_NONE,			},   // APPLY_SKILL,		51
+	{ POINT_BOW_DISTANCE,		},   // APPLY_BOW_DISTANCE,	52
+	{ POINT_ATT_GRADE_BONUS,	        },   // APPLY_ATT_GRADE,	53
+	{ POINT_DEF_GRADE_BONUS,	        },   // APPLY_DEF_GRADE,	54
+	{ POINT_MAGIC_ATT_GRADE_BONUS,      },   // APPLY_MAGIC_ATT_GRADE,	55
+	{ POINT_MAGIC_DEF_GRADE_BONUS,      },   // APPLY_MAGIC_DEF_GRADE,	56
+	{ POINT_CURSE_PCT,			},   // APPLY_CURSE_PCT,	57
+	{ POINT_MAX_STAMINA			},   // APPLY_MAX_STAMINA	58
+	{ POINT_ATTBONUS_WARRIOR		},   // APPLY_ATTBONUS_WARRIOR  59
+	{ POINT_ATTBONUS_ASSASSIN		},   // APPLY_ATTBONUS_ASSASSIN 60
+	{ POINT_ATTBONUS_SURA		},   // APPLY_ATTBONUS_SURA     61
+	{ POINT_ATTBONUS_SHAMAN		},   // APPLY_ATTBONUS_SHAMAN   62
+	{ POINT_ATTBONUS_MONSTER		},   //	APPLY_ATTBONUS_MONSTER  63
+	{ POINT_ATT_BONUS		},   // 64 // APPLY_MALL_ATTBONUS
+	{ POINT_MALL_DEFBONUS		},   // 65
+	{ POINT_MALL_EXPBONUS		},   // 66 APPLY_MALL_EXPBONUS
+	{ POINT_MALL_ITEMBONUS		},   // 67
+	{ POINT_MALL_GOLDBONUS		},   // 68
+	{ POINT_MAX_HP_PCT			},		// 69
+	{ POINT_MAX_SP_PCT			},		// 70
+	{ POINT_SKILL_DAMAGE_BONUS		},	// 71
+	{ POINT_NORMAL_HIT_DAMAGE_BONUS	},	// 72
 
-#ifdef ENABLE_PENDANT_SYSTEM
-	{ POINT_ATTBONUS_ELEC,					},
-	{ POINT_ATTBONUS_FIRE,					},
-	{ POINT_ATTBONUS_ICE,					},
-	{ POINT_ATTBONUS_WIND,					},
-	{ POINT_ATTBONUS_EARTH,					},
-	{ POINT_ATTBONUS_DARK,					},
+	// DEFEND_BONUS_ATTRIBUTES
+	{ POINT_SKILL_DEFEND_BONUS		},	// 73
+	{ POINT_NORMAL_HIT_DEFEND_BONUS	},	// 74
+	// END_OF_DEFEND_BONUS_ATTRIBUTES
+
+	{ POINT_PC_BANG_EXP_BONUS	},		// 75
+	{ POINT_PC_BANG_DROP_BONUS	},		// 76
+
+	{ POINT_NONE,		},
+
+	{ POINT_RESIST_WARRIOR,		},
+	{ POINT_RESIST_ASSASSIN,	},
+	{ POINT_RESIST_SURA,		},
+	{ POINT_RESIST_SHAMAN,		},
+	{ POINT_ENERGY				},
+	{ POINT_DEF_GRADE			},
+	{ POINT_COSTUME_ATTR_BONUS	},
+	{ POINT_MAGIC_ATT_BONUS_PER },
+	{ POINT_MELEE_MAGIC_ATT_BONUS_PER		},			// 86 APPLY_MELEE_MAGIC_ATTBONUS_PER
+	{ POINT_RESIST_ICE,			},   // APPLY_RESIST_ICE,	87
+	{ POINT_RESIST_EARTH,		},   // APPLY_RESIST_EARTH,	88
+	{ POINT_RESIST_DARK,		},   // APPLY_RESIST_DARK,	89
+	{ POINT_RESIST_CRITICAL,		},   // APPLY_ANTI_CRITICAL_PCT,	90
+	{ POINT_RESIST_PENETRATE,		},   // APPLY_ANTI_PENETRATE_PCT,	91
+
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	{ POINT_BLEEDING_REDUCE,		},	// APPLY_BLEEDING_REDUCE, 		92
+	{ POINT_BLEEDING_PCT,			},	// APPLY_BLEEDING_PCT, 			93
+	{ POINT_ATTBONUS_WOLFMAN,		},
+	{ POINT_RESIST_WOLFMAN,			},
+	{ POINT_RESIST_CLAW,			},
+#else
+	{ POINT_NONE,					},	// APPLY_BLEEDING_REDUCE, 		92
+	{ POINT_NONE,					},	// APPLY_BLEEDING_PCT, 			93
+	{ POINT_NONE,					},
+	{ POINT_NONE,					},
+	{ POINT_NONE,					},
 #endif
 
 #ifdef ENABLE_ACCE_COSTUME_SYSTEM
-	{ POINT_ACCEDRAIN_RATE,					},
+	{ POINT_ACCEDRAIN_RATE,			},	// APPLY_ACCEDRAIN_RATE,		97
+#else
+	{ POINT_NONE,					},	// APPLY_ACCEDRAIN_RATE,		97
 #endif
 
-#ifdef ENABLE_ATTBONUS_METIN
-	{ POINT_ATTBONUS_METIN,					},
+#ifdef ENABLE_MAGIC_REDUCTION_SYSTEM
+	{ POINT_RESIST_MAGIC_REDUCTION,	},	// APPLY_RESIST_MAGIC_REDUCTION,98
+#else
+	{ POINT_NONE,					},	// APPLY_RESIST_MAGIC_REDUCTION,98
 #endif
 
-#ifdef ENABLE_ATTBONUS_BOSS
-	{ POINT_ATTBONUS_BOSS,					},
+	{ POINT_ENCHANT_ELECT,			},	// APPLY_ENCHANT_ELECT,99
+	{ POINT_ENCHANT_FIRE,			},	// APPLY_ENCHANT_FIRE,100
+	{ POINT_ENCHANT_ICE,			},	// APPLY_ENCHANT_ICE,101
+	{ POINT_ENCHANT_WIND,			},	// APPLY_ENCHANT_WIND,102
+	{ POINT_ENCHANT_EARTH,			},	// APPLY_ENCHANT_EARTH,103
+	{ POINT_ENCHANT_DARK,			},	// APPLY_ENCHANT_DARK,104
+
+	{ POINT_ATTBONUS_CZ,			},	// APPLY_ATTBONUS_CZ,105
+	{ POINT_ATTBONUS_INSECT,		},	// APPLY_ATTBONUS_INSECT,106
+	{ POINT_ATTBONUS_DESERT,		},	// APPLY_ATTBONUS_DESERT,107
+	{ POINT_ATTBONUS_SWORD,			},	// APPLY_ATTBONUS_SWORD,108
+	{ POINT_ATTBONUS_TWOHAND,		},	// APPLY_ATTBONUS_TWOHAND,109
+	{ POINT_ATTBONUS_DAGGER,		},	// APPLY_ATTBONUS_DAGGER,110
+	{ POINT_ATTBONUS_BELL,			},	// APPLY_ATTBONUS_BELL,111
+	{ POINT_ATTBONUS_FAN,			},	// APPLY_ATTBONUS_FAN,112
+	{ POINT_ATTBONUS_BOW,			},	// APPLY_ATTBONUS_BOW,113
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	{ POINT_ATTBONUS_CLAW,			},	// APPLY_ATTBONUS_CLAW,114
+#else
+	{ POINT_NONE,					},	// APPLY_ATTBONUS_CLAW,114
 #endif
+	{ POINT_RESIST_HUMAN,			},	// APPLY_RESIST_HUMAN,115
+	{ POINT_RESIST_MOUNT_FALL,		},	// APPLY_RESIST_MOUNT_FALL,116
+	{ POINT_NONE,					},	// APPLY_UNK117 (unimplemented)
+#ifdef ENABLE_MOUNT_COSTUME_EX_SYSTEM
+	{ POINT_MOUNT,					},	// APPLY_MOUNT,118
+#else
+	{ POINT_NONE,					},	// APPLY_MOUNT,118
+#endif
+#ifdef ENABLE_NEW_BONUS_SYSTEM
+	{ POINT_ATTBONUS_STONE, },
+	{ POINT_ATTBONUS_BOSS, },
+	{ POINT_ATTBONUS_ELEMENTS, },
+	{ POINT_ENCHANT_ELEMENTS, },
+	{ POINT_ATTBONUS_CHARACTERS, },
+	{ POINT_ENCHANT_CHARACTERS, },
+	{ POINT_RESIST_MONSTER, },
+#endif
+#ifdef ENABLE_AVG_PVM
+	{ POINT_ATTBONUS_MEDI_PVM },	// APPLY_ATTBONUS_MEDI_PVM,
+#else
+	{ POINT_NONE, },
+#endif
+#ifdef ENABLE_CONQUEROR_LEVEL
+	{ POINT_SUNGMA_STR, },
+	{ POINT_SUNGMA_HP, },
+	{ POINT_SUNGMA_MOVE, },
+	{ POINT_SUNGMA_IMMUNE, },
+#endif
+	{ POINT_ATTBONUS_PVM_STR, },
+	{ POINT_ATTBONUS_PVM_BERSERKER, },
 };
 
 const int aiItemMagicAttributePercentHigh[ITEM_ATTRIBUTE_MAX_LEVEL] =
 {
+	//25, 25, 40, 8, 2,
 	30, 40, 20, 8, 2
 };
 
 const int aiItemMagicAttributePercentLow[ITEM_ATTRIBUTE_MAX_LEVEL] =
 {
+	//45, 25, 20, 10, 0,
 	50, 40, 10, 0, 0
 };
 
+// ADD_ITEM_ATTRIBUTE
 const int aiItemAttributeAddPercent[ITEM_ATTRIBUTE_MAX_NUM] =
 {
-	100, 80, 60, 50, 30, 0, 0, 
+	100, 80, 60, 50, 30, 0, 0,
 };
+// END_OF_ADD_ITEM_ATTRIBUTE
 
 const int aiExpLossPercents[PLAYER_EXP_TABLE_MAX + 1] =
 {
@@ -882,19 +985,19 @@ const SStoneDropInfo aStoneDrop[STONE_INFO_MAX_NUM] =
 
 const char * c_apszEmpireNames[EMPIRE_MAX_NUM] =
 {
-	"All kingdoms",
-	"Shinsoo Kingdom",
-	"Chunjo Kingdom",
-	"Jinno Kingdom"
+	"Tüm krallýklar",
+	"Shinsoo Krallýðý",
+	"Chunjo Krallýðý",
+	"Jinno Krallýðý"
 };
 
 const char * c_apszPrivNames[MAX_PRIV_NUM] =
 {
 	"",
-	"Item drop rate in percent",
-	"Yang drop rate in percent",
-	"Yang rain drop rate",
-	"Experience percentage",
+	"Eþya düþme oraný yüzde olarak",
+	"Yang düþme oraný yüzde olarak",
+	"Yang yaðmuru düþme oraný",
+	"Tecrübe yüzdesi",
 };
 
 #ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
@@ -933,46 +1036,47 @@ std::string m_horseText[LOCALE_MAX_NUM] =
 
 const int aiPolymorphPowerByLevel[SKILL_MAX_LEVEL + 1] =
 {
-	10, // 1
-	11, // 2
-	11, // 3
-	12, // 4
-	13, // 5
-	13, // 6
-	14, // 7
-	15, // 8
-	16, // 9
-	17, // 10
-	18, // 11
-	19, // 12
-	20, // 13
-	22, // 14
-	23, // 15
-	24, // 16
-	26, // 17
-	27, // 18
-	29, // 19
-	31, // 20
-	33, // 21
-	35, // 22
-	37, // 23
-	39, // 24
-	41, // 25
-	44, // 26
-	46, // 27
-	49, // 28
-	52, // 29
-	55, // 30
-	59, // 31
-	62, // 32
-	66, // 33
-	70, // 34
-	74, // 35
-	79, // 36
-	84, // 37
-	89, // 38
-	94, // 39
-	100, // 40
+	0,    // fix saga2
+	10,   // 1
+	11,   // 2
+	11,   // 3
+	12,   // 4
+	13,   // 5
+	13,   // 6
+	14,   // 7
+	15,   // 8
+	16,   // 9
+	17,   // 10
+	18,   // 11
+	19,   // 12
+	20,   // 13
+	22,   // 14
+	23,   // 15
+	24,   // 16
+	26,   // 17
+	27,   // 18
+	29,   // 19
+	31,   // 20
+	33,   // 21
+	35,   // 22
+	37,   // 23
+	39,   // 24
+	41,   // 25
+	44,   // 26
+	46,   // 27
+	49,   // 28
+	52,   // 29
+	55,   // 30
+	59,   // 31
+	62,   // 32
+	66,   // 33
+	70,   // 34
+	74,   // 35
+	79,   // 36
+	84,   // 37
+	89,   // 38
+	94,   // 39
+	100,  // 40
 };
 
 TGuildWarInfo KOR_aGuildWarInfo[GUILD_WAR_TYPE_MAX_NUM] =
@@ -1118,35 +1222,35 @@ const DWORD THuntingMissions[HUNTING_MISSION_COUNT+1][2][2] =
 	{{0, 0}, {0, 0}}, // None
 	{{171, 5}, {172, 3}},		// Lv1
 	{{171, 10}, {172, 5}},		// Lv2
-	{{171, 20}, {172, 10}},	// Lv3
+	{{171, 20}, {172, 10}},		// Lv3
 	{{172, 15}, {173, 5}},		// Lv4
-	{{173, 10}, {174, 10}},	// Lv5
-	{{174, 20}, {178, 10}},	// Lv6
+	{{173, 10}, {174, 10}},		// Lv5
+	{{174, 20}, {178, 10}},		// Lv6
 	{{178, 10}, {175, 5}},		// Lv7
-	{{178, 20}, {175, 10}},	// Lv8
+	{{178, 20}, {175, 10}},		// Lv8
 	{{175, 15}, {179, 5}},		// Lv9
-	{{175, 20}, {179, 10}},	// Lv10
+	{{175, 20}, {179, 10}},		// Lv10
 	
 	{{179, 10}, {180, 5}},		// Lv11
-	{{180, 15}, {176, 10}},	// Lv12
+	{{180, 15}, {176, 10}},		// Lv12
 	{{176, 20}, {181, 5}},		// Lv13
 	{{181, 15}, {177, 5}},		// Lv14
-	{{181, 20}, {177, 10}},	// Lv15
+	{{181, 20}, {177, 10}},		// Lv15
 	{{177, 15}, {184, 5}},		// Lv16
-	{{177, 20}, {184, 10}},	// Lv17
-	{{184, 10}, {182, 10}},	// Lv18
-	{{182, 20}, {183, 10}},	// Lv19
-	{{183, 20}, {352, 15}},	// Lv20
+	{{177, 20}, {184, 10}},		// Lv17
+	{{184, 10}, {182, 10}},		// Lv18
+	{{182, 20}, {183, 10}},		// Lv19
+	{{183, 20}, {352, 15}},		// Lv20
 	
-	{{352, 10}, {185, 10}},	// Lv21
-	{{185, 25}, {354, 10}},	// Lv22
-	{{354, 20}, {451, 40}},	// Lv23
-	{{451, 60}, {402, 80}},	// Lv24
-	{{551, 80}, {454, 20}},	// Lv25
-	{{552, 80}, {456, 20}},	// Lv26
-	{{456, 30}, {554, 20}},	// Lv27
-	{{651, 35}, {554, 30}},	// Lv28
-	{{651, 40}, {652, 30}},	// Lv29
+	{{352, 10}, {185, 10}},		// Lv21
+	{{185, 25}, {354, 10}},		// Lv22
+	{{354, 20}, {451, 40}},		// Lv23
+	{{451, 60}, {402, 80}},		// Lv24
+	{{551, 80}, {454, 20}},		// Lv25
+	{{552, 80}, {456, 20}},		// Lv26
+	{{456, 30}, {554, 20}},		// Lv27
+	{{651, 35}, {554, 30}},		// Lv28
+	{{651, 40}, {652, 30}},		// Lv29
 	{{652, 40}, {2102, 30}},	// Lv30
 	
 	{{652, 50}, {2102, 45}},	// Lv31
@@ -1223,105 +1327,105 @@ const DWORD THuntingRewardItem[HUNTING_MISSION_COUNT+1][2][4][2] =
 	{ mission_type 2 = { warrior {vnum, count} | assassine {vnum, count} | sura {vnum, count} | shaman {vnum, count} } }
 	*/
 	
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},										// None
-	{{{13, 1}, {13, 1}, {13, 1}, {7003, 1}}, {{3003, 1}, {1003, 1}, {13, 1}, {5003, 1}}},									// Lv1 - Waffen
-	{{{11203, 1}, {11403, 1}, {11603, 1}, {11803, 1}}, {{11205, 1}, {11405, 1}, {11605, 1}, {11805, 1}}},			// Lv2 - Rustungen
-	{{{13003, 1}, {13003, 1}, {13003, 1}, {13003, 1}}, {{13005, 1}, {13005, 1}, {13005, 1}, {13005, 1}}},			// Lv3 - Schild
-	{{{12203, 1}, {12343, 1}, {12483, 1}, {12623, 1}}, {{12205, 1}, {12345, 1}, {12485, 1}, {12625, 1}}},			// Lv4 - Helm
-	{{{14005, 1}, {14005, 1}, {14005, 1}, {14005, 1}}, {{14025, 1}, {14025, 1}, {14025, 1}, {14025, 1}}},			// Lv5 - Armband
-	{{{16005, 1}, {16005, 1}, {16005, 1}, {16005, 1}}, {{16025, 1}, {16025, 1}, {16025, 1}, {16025, 1}}},			// Lv6 - Halskette
-	{{{17005, 1}, {17005, 1}, {17005, 1}, {17005, 1}}, {{17025, 1}, {17025, 1}, {17025, 1}, {17025, 1}}},			// Lv7 - Ohrringe
-	{{{15005, 1}, {15005, 1}, {15005, 1}, {15005, 1}}, {{15025, 1}, {15025, 1}, {15025, 1}, {15025, 1}}},			// Lv8 - Schuhe
-	{{{11213, 1}, {11413, 1}, {11613, 1}, {11813, 1}}, {{11215, 1}, {11415, 1}, {11615, 1}, {11815, 1}}},			// Lv2 - Rustungen Lv9er
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv10
-	
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv11
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv12
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv13
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv14
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv15
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv16
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv17
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv18
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv19
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv20
-	
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv21
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv22
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv23
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv24
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv25
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv26
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv27
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv28
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv29
-	{{{296, 1}, {296, 1}, {296, 1}, {7166, 1}}, {{3216, 1}, {1176, 1}, {296, 1}, {5116, 1}}},							// Lv30 - 30er Waffen
-	
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv31
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv32
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv33
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv34
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv35
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv36
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv37
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv38
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv39
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv40
-	
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv41
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv42
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv43
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv44
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv45
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv46
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv47
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv48
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv49
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv50
-	
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv51
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv52
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv53
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv54
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv55
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv56
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv57
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv58
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv59
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv60
-	
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv61
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv62
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv63
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv64
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv65
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv66
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv67
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv68
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv69
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv70
-	
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv71
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv72
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv73
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv74
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv75
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv76
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv77
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv78
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv79
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv80
-	
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv81
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv82
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv83
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv84
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv85
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv86
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv87
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv88
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv89
-	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},															// Lv90
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Yok
+	{{{13, 1}, {13, 1}, {13, 1}, {7003, 1}}, {{3003, 1}, {1003, 1}, {13, 1}, {5003, 1}}},					// Seviye 1 - Silahlar
+	{{{11203, 1}, {11403, 1}, {11603, 1}, {11803, 1}}, {{11205, 1}, {11405, 1}, {11605, 1}, {11805, 1}}},	// Seviye 2 - Zýrhlar
+	{{{13003, 1}, {13003, 1}, {13003, 1}, {13003, 1}}, {{13005, 1}, {13005, 1}, {13005, 1}, {13005, 1}}},	// Seviye 3 - Kalkan
+	{{{12203, 1}, {12343, 1}, {12483, 1}, {12623, 1}}, {{12205, 1}, {12345, 1}, {12485, 1}, {12625, 1}}},	// Seviye 4 - Miðfer
+	{{{14005, 1}, {14005, 1}, {14005, 1}, {14005, 1}}, {{14025, 1}, {14025, 1}, {14025, 1}, {14025, 1}}},	// Seviye 5 - Bilezik
+	{{{16005, 1}, {16005, 1}, {16005, 1}, {16005, 1}}, {{16025, 1}, {16025, 1}, {16025, 1}, {16025, 1}}},	// Seviye 6 - Kolye
+	{{{17005, 1}, {17005, 1}, {17005, 1}, {17005, 1}}, {{17025, 1}, {17025, 1}, {17025, 1}, {17025, 1}}},	// Seviye 7 - Küpe
+	{{{15005, 1}, {15005, 1}, {15005, 1}, {15005, 1}}, {{15025, 1}, {15025, 1}, {15025, 1}, {15025, 1}}},	// Seviye 8 - Ayakkabý
+	{{{11213, 1}, {11413, 1}, {11613, 1}, {11813, 1}}, {{11215, 1}, {11415, 1}, {11615, 1}, {11815, 1}}},	// Seviye 9 - Zýrhlar (Seviye 9 Serisi)
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 10 - Yok
+
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 11
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 12
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 13
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 14
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 15
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 16
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 17
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 18
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 19
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 20
+
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 21
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 22
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 23
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 24
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 25
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 26
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 27
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 28
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 29
+	{{{296, 1}, {296, 1}, {296, 1}, {7166, 1}}, {{3216, 1}, {1176, 1}, {296, 1}, {5116, 1}}},				// Seviye 30 - 30 Seviye silahlar
+
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 31
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 32
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 33
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 34
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 35
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 36
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 37
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 38
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 39
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 40
+
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 41
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 42
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 43
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 44
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 45
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 46
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 47
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 48
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 49
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 50
+
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 51
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 52
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 53
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 54
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 55
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 56
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 57
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 58
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 59
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 60
+
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 61
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 62
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 63
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 64
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 65
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 66
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 67
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 68
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 69
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 70
+
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 71
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 72
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 73
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 74
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 75
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 76
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 77
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 78
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 79
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 80
+
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 81
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 82
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 83
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 84
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 85
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 86
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 87
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 88
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 89
+	{{{0, 0}, {0, 0}, {0, 0}, {0, 0}}, {{0, 0}, {0, 0}, {0, 0}, {0, 0}}},									// Seviye 90
 };
 
 const SHuntingRewardMoney THuntingRewardMoney[HUNTING_MONEY_TABLE_SIZE] =
@@ -1331,111 +1435,128 @@ const SHuntingRewardMoney THuntingRewardMoney[HUNTING_MONEY_TABLE_SIZE] =
 	from_level, to_level {amount, chance} | {amount, chance} | {amount, chance} | {amount, chance} | {amount, chance}
 	*/
 
-	{ 1, 10,	{10000, 20000, 30000, 40000, 50000}},						// Lv1-10
-	{11, 20,	{20000, 30000, 50000, 70000, 100000}},						// Lv11-20
-	{21, 30,	{20000, 40000, 60000, 90000, 120000}},						// Lv21-30
-	{31, 40,	{50000, 80000, 120000, 150000, 200000}},					// Lv31-40
-	{41, 50,	{100000, 150000, 200000, 300000, 400000}},				// Lv41-50
-	{51, 60,	{200000, 300000, 400000, 500000, 750000}},				// Lv51-60
-	{61, 70,	{500000, 750000, 1000000, 1250000, 1500000}},			// Lv61-70
-	{71, 80,	{1000000, 1500000, 2000000, 2500000, 3500000}},		// Lv71-80
-	{81, 90,	{3000000, 4000000, 5000000, 7500000, 10000000}}, 	// Lv81-90
+	{ 1, 10,	{10000, 20000, 30000, 40000, 50000}},				// Seviye 1-10
+	{11, 20,	{20000, 30000, 50000, 70000, 100000}},				// Seviye 11-20
+	{21, 30,	{20000, 40000, 60000, 90000, 120000}},				// Seviye 21-30
+	{31, 40,	{50000, 80000, 120000, 150000, 200000}},			// Seviye 31-40
+	{41, 50,	{100000, 150000, 200000, 300000, 400000}},			// Seviye 41-50
+	{51, 60,	{200000, 300000, 400000, 500000, 750000}},			// Seviye 51-60
+	{61, 70,	{500000, 750000, 1000000, 1250000, 1500000}},		// Seviye 61-70
+	{71, 80,	{1000000, 1500000, 2000000, 2500000, 3500000}},		// Seviye 71-80
+	{81, 90,	{3000000, 4000000, 5000000, 7500000, 10000000}}, 	// Seviye 81-90
 };
 
 const SHuntingRewardEXP THuntingRewardEXP[HUNTING_EXP_TABLE_SIZE] =
 {
 	/*
-	Note: percent exp from each level
+	Not: Her seviye aralýðý için yüzde EXP oraný
 	from_level, to_level {percent_min, percent_max}
 	*/
 
-	{ 1, 10, {10, 25}}, 	// Lv1-10
-	{11, 20, {10, 20}},	// Lv11-20
-	{21, 30, {10, 15}},	// Lv21-30
-	{31, 40, {5, 15}},	// Lv31-40
-	{41, 50, {5, 12}},	// Lv41-50
-	{51, 60, {3, 10}},	// Lv51-60
-	{61, 70, {3, 8}},		// Lv61-70
-	{71, 80, {3, 5}}, 	// Lv71-80
-	{81, 90, {2, 5}}, 	// Lv81-90
+	{ 1, 10, {10, 25}}, // Seviye 1-10
+	{11, 20, {10, 20}}, // Seviye 11-20
+	{21, 30, {10, 15}}, // Seviye 21-30
+	{31, 40, {5, 15}},  // Seviye 31-40
+	{41, 50, {5, 12}},  // Seviye 41-50
+	{51, 60, {3, 10}},  // Seviye 51-60
+	{61, 70, {3, 8}},   // Seviye 61-70
+	{71, 80, {3, 5}},   // Seviye 71-80
+	{81, 90, {2, 5}},   // Seviye 81-90
 };
 
 const DWORD THuntingRandomItem_01_20[6][2] =
 {
-	{27102, 3},	// Gruener Trank G
-	{27105, 3},	// Violetter Trank G
-	{71151, 5},	// Gruener Zauber
-	{71152, 2},	// Gruene Staerke
-	{70038, 25},	// Tapferkeitsumhang
-	{25040, 2},	// Segensschriftrolle
+	{27102, 3},		// Yeþil Ýksir G
+	{27105, 3},		// Mor Ýksir G
+	{71151, 5},		// Yeþil Büyü
+	{71152, 2},		// Yeþil Güç
+	{70038, 25},	// Cesaret Pelerini
+	{25040, 2},		// Kutsama Kaðýdý
 };
 
 const DWORD THuntingRandomItem_21_40[13][2] =
 {
-	{25040, 3},	// Segensschriftrolle
-	{25041, 1},	// Magisches Metall
-	{55401, 1},	// Affen-Ei
-	{55402, 1},	// Spinnen-Ei
-	{50300, 3},	// Fertigkeitsbuch
-	{70048, 1},	// Fluchtlingsumhang
-	{70049, 1},	// Lucys Ring
-	{70050, 1},	// Symbol d. weisen Kaisers
-	{70051, 1},	// Handschuh weiser Kaiser
-	{71027, 1},	// Drachengott-Leben
-	{71028, 1},	// Drachengott-Angriff
-	{71029, 1},	// Drachengott-Intelligenz
-	{71030, 1},	// Drachengott-Verteidigung
+	{25040, 3},	// Kutsama Kaðýdý
+	{25041, 1},	// Sihirli Metal
+	{55401, 1},	// Maymun Yumurtasý
+	{55402, 1},	// Örümcek Yumurtasý
+	{50300, 3},	// Beceri Kitabý
+	{70048, 1},	// Kaçýþ Pelerini
+	{70049, 1},	// Lucy'nin Yüzüðü
+	{70050, 1},	// Bilge Ýmparatorun Simgesi
+	{70051, 1},	// Bilge Ýmparatorun Eldiveni
+	{71027, 1},	// Ejderha Tanrýsý – Can
+	{71028, 1},	// Ejderha Tanrýsý – Saldýrý
+	{71029, 1},	// Ejderha Tanrýsý – Zeka
+	{71030, 1},	// Ejderha Tanrýsý – Savunma
 };
 
 const DWORD THuntingRandomItem_41_60[13][2] =
 {
-	{25040, 3},	// Segensschriftrolle
-	{25041, 1},	// Magisches Metall
-	{55401, 1},	// Affen-Ei
-	{55402, 1},	// Spinnen-Ei
-	{50300, 3},	// Fertigkeitsbuch
-	{70048, 1},	// Fluchtlingsumhang
-	{70049, 1},	// Lucys Ring
-	{70050, 1},	// Symbol d. weisen Kaisers
-	{70051, 1},	// Handschuh weiser Kaiser
-	{71027, 1},	// Drachengott-Leben
-	{71028, 1},	// Drachengott-Angriff
-	{71029, 1},	// Drachengott-Intelligenz
-	{71030, 1},	// Drachengott-Verteidigung
+	{25040, 3},	// Kutsama Kaðýdý
+	{25041, 1},	// Sihirli Metal
+	{55401, 1},	// Maymun Yumurtasý
+	{55402, 1},	// Örümcek Yumurtasý
+	{50300, 3},	// Beceri Kitabý
+	{70048, 1},	// Kaçýþ Pelerini
+	{70049, 1},	// Lucy'nin Yüzüðü
+	{70050, 1},	// Bilge Ýmparatorun Simgesi
+	{70051, 1},	// Bilge Ýmparatorun Eldiveni
+	{71027, 1},	// Ejderha Tanrýsý – Can
+	{71028, 1},	// Ejderha Tanrýsý – Saldýrý
+	{71029, 1},	// Ejderha Tanrýsý – Zeka
+	{71030, 1},	// Ejderha Tanrýsý – Savunma
 };
 
 const DWORD THuntingRandomItem_61_80[13][2] =
 {
-	{25040, 3},	// Segensschriftrolle
-	{25041, 1},	// Magisches Metall
-	{55401, 1},	// Affen-Ei
-	{55402, 1},	// Spinnen-Ei
-	{50300, 3},	// Fertigkeitsbuch
-	{70048, 1},	// Fluchtlingsumhang
-	{70049, 1},	// Lucys Ring
-	{70050, 1},	// Symbol d. weisen Kaisers
-	{70051, 1},	// Handschuh weiser Kaiser
-	{71027, 1},	// Drachengott-Leben
-	{71028, 1},	// Drachengott-Angriff
-	{71029, 1},	// Drachengott-Intelligenz
-	{71030, 1},	// Drachengott-Verteidigung
+	{25040, 3},	// Kutsama Kaðýdý
+	{25041, 1},	// Sihirli Metal
+	{55401, 1},	// Maymun Yumurtasý
+	{55402, 1},	// Örümcek Yumurtasý
+	{50300, 3},	// Beceri Kitabý
+	{70048, 1},	// Kaçýþ Pelerini
+	{70049, 1},	// Lucy'nin Yüzüðü
+	{70050, 1},	// Bilge Ýmparatorun Simgesi
+	{70051, 1},	// Bilge Ýmparatorun Eldiveni
+	{71027, 1},	// Ejderha Tanrýsý – Can
+	{71028, 1},	// Ejderha Tanrýsý – Saldýrý
+	{71029, 1},	// Ejderha Tanrýsý – Zeka
+	{71030, 1},	// Ejderha Tanrýsý – Savunma
 };
 
 const DWORD THuntingRandomItem_81_90[13][2] =
 {
-	{25040, 3},	// Segensschriftrolle
-	{25041, 1},	// Magisches Metall
-	{55401, 1},	// Affen-Ei
-	{55402, 1},	// Spinnen-Ei
-	{50300, 3},	// Fertigkeitsbuch
-	{70048, 1},	// Fluchtlingsumhang
-	{70049, 1},	// Lucys Ring
-	{70050, 1},	// Symbol d. weisen Kaisers
-	{70051, 1},	// Handschuh weiser Kaiser
-	{71027, 1},	// Drachengott-Leben
-	{71028, 1},	// Drachengott-Angriff
-	{71029, 1},	// Drachengott-Intelligenz
-	{71030, 1},	// Drachengott-Verteidigung
+	{25040, 3},	// Kutsama Kaðýdý
+	{25041, 1},	// Sihirli Metal
+	{55401, 1},	// Maymun Yumurtasý
+	{55402, 1},	// Örümcek Yumurtasý
+	{50300, 3},	// Beceri Kitabý
+	{70048, 1},	// Kaçýþ Pelerini
+	{70049, 1},	// Lucy'nin Yüzüðü
+	{70050, 1},	// Bilge Ýmparatorun Simgesi
+	{70051, 1},	// Bilge Ýmparatorun Eldiveni
+	{71027, 1},	// Ejderha Tanrýsý – Can
+	{71028, 1},	// Ejderha Tanrýsý – Saldýrý
+	{71029, 1},	// Ejderha Tanrýsý – Zeka
+	{71030, 1},	// Ejderha Tanrýsý – Savunma
+};
+#endif
+
+#ifdef ENABLE_BIOLOGIST_SYSTEM
+const DWORD BiyologSistemi[11][14] =
+{
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	{ 30006, 10, 0, 100, 30220, 50109, 8, 10, 0, 0, 0, 0, 0, 0 },
+	{ 30047, 15, 0, 100, 30221, 50110, 7, 5, 0, 0, 0, 0, 0, 0 },
+	{ 30015, 15, 0, 100, 30222, 50111, 54, 60, 0, 0, 0, 0, 0, 0 },
+	{ 30050, 20, 0, 100, 30223, 50112, 53, 50, 0, 0, 0, 0, 0, 0 },
+	{ 30165, 25, 0, 100, 30224, 50113, 8, 11, 7, 10, 0, 0, 0, 0 },
+	{ 30166, 30, 0, 100, 30225, 50114, 7, 6, 64, 10, 0, 0, 0, 0 },
+	{ 30167, 40, 0, 100, 30226, 50115, APPLY_RESIST_WARRIOR, 10, APPLY_RESIST_ASSASSIN, 10, APPLY_RESIST_SURA, 10, APPLY_RESIST_SHAMAN, 10 },
+	{ 30168, 50, 30, 50, 30227, 50114, 59, 8, 60, 8, 61, 8, 62, 8 },
+	{ 30251, 10, 60, 40, 0, 0, 1, 1000, 54, 120, 53, 50, 0, 0 },
+	{ 30252, 20, 60, 60, 30228, 0, 1, 1100, 54, 140, 53, 60, 0, 0 }
 };
 #endif
 
@@ -1447,123 +1568,177 @@ typedef struct SValueName
 
 TValueName c_aApplyTypeNames[] =
 {
-	{ "STR",							APPLY_STR						},
-	{ "DEX",							APPLY_DEX						},
-	{ "CON",							APPLY_CON						},
-	{ "INT",							APPLY_INT						},
-	{ "MAX_HP",							APPLY_MAX_HP					},
-	{ "MAX_SP",							APPLY_MAX_SP					},
-	{ "MAX_STAMINA",					APPLY_MAX_STAMINA				},
-	{ "POISON_REDUCE",					APPLY_POISON_REDUCE				},
-	{ "EXP_DOUBLE_BONUS",				APPLY_EXP_DOUBLE_BONUS			},
-	{ "GOLD_DOUBLE_BONUS",				APPLY_GOLD_DOUBLE_BONUS			},
-	{ "ITEM_DROP_BONUS",				APPLY_ITEM_DROP_BONUS			},
-	{ "HP_REGEN",						APPLY_HP_REGEN					},
-	{ "SP_REGEN",						APPLY_SP_REGEN					},
-	{ "ATTACK_SPEED",					APPLY_ATT_SPEED					},
-	{ "MOVE_SPEED",						APPLY_MOV_SPEED					},
-	{ "CAST_SPEED",						APPLY_CAST_SPEED				},
-	{ "ATT_BONUS",						APPLY_ATT_GRADE_BONUS			},
-	{ "DEF_BONUS",						APPLY_DEF_GRADE_BONUS			},
-	{ "MAGIC_ATT_GRADE",				APPLY_MAGIC_ATT_GRADE			},
-	{ "MAGIC_DEF_GRADE",				APPLY_MAGIC_DEF_GRADE			},
-	{ "SKILL",							APPLY_SKILL						},
-	{ "ATTBONUS_ANIMAL",				APPLY_ATTBONUS_ANIMAL			},
-	{ "ATTBONUS_UNDEAD",				APPLY_ATTBONUS_UNDEAD			},
-	{ "ATTBONUS_DEVIL",					APPLY_ATTBONUS_DEVIL			},
-	{ "ATTBONUS_HUMAN",					APPLY_ATTBONUS_HUMAN			},
-	{ "ADD_BOW_DISTANCE",				APPLY_BOW_DISTANCE				},
-	{ "DODGE",							APPLY_DODGE						},
-	{ "BLOCK",							APPLY_BLOCK						},
-	{ "RESIST_SWORD",					APPLY_RESIST_SWORD				},
-	{ "RESIST_TWOHAND",					APPLY_RESIST_TWOHAND			},
-	{ "RESIST_DAGGER",					APPLY_RESIST_DAGGER				},
-	{ "RESIST_BELL",					APPLY_RESIST_BELL				},
-	{ "RESIST_FAN",						APPLY_RESIST_FAN				},
-	{ "RESIST_BOW",						APPLY_RESIST_BOW				},
-	{ "RESIST_FIRE",					APPLY_RESIST_FIRE				},
-	{ "RESIST_ELEC",					APPLY_RESIST_ELEC				},
-	{ "RESIST_MAGIC",					APPLY_RESIST_MAGIC				},
-	{ "RESIST_WIND",					APPLY_RESIST_WIND				},
-	{ "REFLECT_MELEE",					APPLY_REFLECT_MELEE				},
-	{ "REFLECT_CURSE",					APPLY_REFLECT_CURSE				},
-	{ "RESIST_ICE",						APPLY_RESIST_ICE				},
-	{ "RESIST_EARTH",					APPLY_RESIST_EARTH				},
-	{ "RESIST_DARK",					APPLY_RESIST_DARK				},
-	{ "RESIST_CRITICAL",				APPLY_ANTI_CRITICAL_PCT			},
-	{ "RESIST_PENETRATE",				APPLY_ANTI_PENETRATE_PCT		},
-	{ "POISON",							APPLY_POISON_PCT				},
-	{ "SLOW",							APPLY_SLOW_PCT					},
-	{ "STUN",							APPLY_STUN_PCT					},
-	{ "STEAL_HP",						APPLY_STEAL_HP					},
-	{ "STEAL_SP",						APPLY_STEAL_SP					},
-	{ "MANA_BURN_PCT",					APPLY_MANA_BURN_PCT				},
-	{ "CRITICAL",						APPLY_CRITICAL_PCT				},
-	{ "PENETRATE",						APPLY_PENETRATE_PCT				},
-	{ "KILL_SP_RECOVER",				APPLY_KILL_SP_RECOVER			},
-	{ "KILL_HP_RECOVER",				APPLY_KILL_HP_RECOVER			},
-	{ "PENETRATE_PCT",					APPLY_PENETRATE_PCT				},
-	{ "CRITICAL_PCT",					APPLY_CRITICAL_PCT				},
-	{ "POISON_PCT",						APPLY_POISON_PCT				},
-	{ "STUN_PCT",						APPLY_STUN_PCT					},
-	{ "ATT_BONUS_TO_WARRIOR",			APPLY_ATTBONUS_WARRIOR			},
-	{ "ATT_BONUS_TO_ASSASSIN",			APPLY_ATTBONUS_ASSASSIN 		},
-	{ "ATT_BONUS_TO_SURA",				APPLY_ATTBONUS_SURA	    		},
-	{ "ATT_BONUS_TO_SHAMAN",			APPLY_ATTBONUS_SHAMAN   		},
-	{ "ATT_BONUS_TO_MONSTER",			APPLY_ATTBONUS_MONSTER  		},
-	{ "ATT_BONUS_TO_MOB",				APPLY_ATTBONUS_MONSTER  		},
-	{ "MALL_ATTBONUS",					APPLY_MALL_ATTBONUS				},
-	{ "MALL_EXPBONUS",					APPLY_MALL_EXPBONUS				},
-	{ "MALL_DEFBONUS",					APPLY_MALL_DEFBONUS				},
-	{ "MALL_ITEMBONUS",					APPLY_MALL_ITEMBONUS			},
-	{ "MALL_GOLDBONUS",					APPLY_MALL_GOLDBONUS			},
-	{ "MAX_HP_PCT",						APPLY_MAX_HP_PCT				},
-	{ "MAX_SP_PCT",						APPLY_MAX_SP_PCT				},
-	{ "SKILL_DAMAGE_BONUS",				APPLY_SKILL_DAMAGE_BONUS		},
-	{ "NORMAL_HIT_DAMAGE_BONUS",		APPLY_NORMAL_HIT_DAMAGE_BONUS	},
-	{ "SKILL_DEFEND_BONUS",				APPLY_SKILL_DEFEND_BONUS		},
-	{ "NORMAL_HIT_DEFEND_BONUS",		APPLY_NORMAL_HIT_DEFEND_BONUS	},
-	{ "RESIST_WARRIOR",					APPLY_RESIST_WARRIOR			},
-	{ "RESIST_ASSASSIN",				APPLY_RESIST_ASSASSIN			},
-	{ "RESIST_SURA",					APPLY_RESIST_SURA				},
-	{ "RESIST_SHAMAN",					APPLY_RESIST_SHAMAN				},
-	{ "INFINITE_AFFECT_DURATION",		0X1FFFFFFF						},
-	{ "ENERGY",							APPLY_ENERGY					},
-	{ "COSTUME_ATTR_BONUS",				APPLY_COSTUME_ATTR_BONUS		},
-	{ "MAGIC_ATTBONUS_PER",				APPLY_MAGIC_ATTBONUS_PER		},
-	{ "MELEE_MAGIC_ATTBONUS_PER",		APPLY_MELEE_MAGIC_ATTBONUS_PER	},
+	{ "STR",		APPLY_STR		},
+	{ "DEX",		APPLY_DEX		},
+	{ "CON",		APPLY_CON		},
+	{ "INT",		APPLY_INT		},
+	{ "MAX_HP",		APPLY_MAX_HP		},
+	{ "MAX_SP",		APPLY_MAX_SP		},
+	{ "MAX_STAMINA",	APPLY_MAX_STAMINA	},
+	{ "POISON_REDUCE",	APPLY_POISON_REDUCE	},
+	{ "EXP_DOUBLE_BONUS", APPLY_EXP_DOUBLE_BONUS },
+	{ "GOLD_DOUBLE_BONUS", APPLY_GOLD_DOUBLE_BONUS },
+	{ "ITEM_DROP_BONUS", APPLY_ITEM_DROP_BONUS	},
+	{ "HP_REGEN",	APPLY_HP_REGEN		},
+	{ "SP_REGEN",	APPLY_SP_REGEN		},
+	{ "ATT_SPEED",	APPLY_ATT_SPEED		},
+	{ "MOV_SPEED",	APPLY_MOV_SPEED		},
+	{ "CAST_SPEED",	APPLY_CAST_SPEED	},
+	{ "ATT_BONUS",	APPLY_ATT_GRADE_BONUS	},
+	{ "DEF_BONUS",	APPLY_DEF_GRADE_BONUS	},
+	{ "MAGIC_ATT_GRADE",APPLY_MAGIC_ATT_GRADE	},
+	{ "MAGIC_DEF_GRADE",APPLY_MAGIC_DEF_GRADE	},
+	{ "SKILL",		APPLY_SKILL		},
+	{ "ATTBONUS_ANIMAL",APPLY_ATTBONUS_ANIMAL	},
+	{ "ATTBONUS_UNDEAD",APPLY_ATTBONUS_UNDEAD	},
+	{ "ATTBONUS_DEVIL", APPLY_ATTBONUS_DEVIL	},
+	{ "ATTBONUS_HUMAN", APPLY_ATTBONUS_HUMAN	},
+	{ "ADD_BOW_DISTANCE",APPLY_BOW_DISTANCE	},
+	{ "DODGE",		APPLY_DODGE		},
+	{ "BLOCK",		APPLY_BLOCK		},
+	{ "RESIST_SWORD",	APPLY_RESIST_SWORD	},
+	{ "RESIST_TWOHAND",	APPLY_RESIST_TWOHAND	},
+	{ "RESIST_DAGGER",	APPLY_RESIST_DAGGER    },
+	{ "RESIST_BELL",	APPLY_RESIST_BELL	},
+	{ "RESIST_FAN",	APPLY_RESIST_FAN	},
+	{ "RESIST_BOW",	APPLY_RESIST_BOW	},
+	{ "RESIST_FIRE",	APPLY_RESIST_FIRE	},
+	{ "RESIST_ELEC",	APPLY_RESIST_ELEC	},
+	{ "RESIST_MAGIC",	APPLY_RESIST_MAGIC	},
+	{ "RESIST_WIND",	APPLY_RESIST_WIND	},
+	{ "REFLECT_MELEE",	APPLY_REFLECT_MELEE },
+	{ "REFLECT_CURSE",	APPLY_REFLECT_CURSE },
+	{ "RESIST_ICE",		APPLY_RESIST_ICE	},
+	{ "RESIST_EARTH",	APPLY_RESIST_EARTH	},
+	{ "RESIST_DARK",	APPLY_RESIST_DARK	},
+	{ "RESIST_CRITICAL",	APPLY_ANTI_CRITICAL_PCT	},
+	{ "RESIST_PENETRATE",	APPLY_ANTI_PENETRATE_PCT	},
+	{ "POISON",		APPLY_POISON_PCT	},
+	{ "SLOW",		APPLY_SLOW_PCT		},
+	{ "STUN",		APPLY_STUN_PCT		},
+	{ "STEAL_HP",	APPLY_STEAL_HP		},
+	{ "STEAL_SP",	APPLY_STEAL_SP		},
+	{ "MANA_BURN_PCT",	APPLY_MANA_BURN_PCT	},
+	{ "CRITICAL",	APPLY_CRITICAL_PCT	},
+	{ "PENETRATE",	APPLY_PENETRATE_PCT	},
+	{ "KILL_SP_RECOVER",APPLY_KILL_SP_RECOVER	},
+	{ "KILL_HP_RECOVER",APPLY_KILL_HP_RECOVER	},
+	{ "PENETRATE_PCT",	APPLY_PENETRATE_PCT	},
+	{ "CRITICAL_PCT",	APPLY_CRITICAL_PCT	},
+	{ "POISON_PCT",	APPLY_POISON_PCT	},
+	{ "STUN_PCT",	APPLY_STUN_PCT		},
+	{ "ATT_BONUS_TO_WARRIOR",	APPLY_ATTBONUS_WARRIOR  },
+	{ "ATT_BONUS_TO_ASSASSIN",	APPLY_ATTBONUS_ASSASSIN },
+	{ "ATT_BONUS_TO_SURA",	APPLY_ATTBONUS_SURA	    },
+	{ "ATT_BONUS_TO_SHAMAN",	APPLY_ATTBONUS_SHAMAN   },
+	{ "ATT_BONUS_TO_MONSTER",	APPLY_ATTBONUS_MONSTER  },
+	{ "ATT_BONUS_TO_MOB",	APPLY_ATTBONUS_MONSTER  },
+	{ "MALL_ATTBONUS",	APPLY_MALL_ATTBONUS	},
+	{ "MALL_EXPBONUS",	APPLY_MALL_EXPBONUS	},
+	{ "MALL_DEFBONUS",	APPLY_MALL_DEFBONUS	},
+	{ "MALL_ITEMBONUS",	APPLY_MALL_ITEMBONUS	},
+	{ "MALL_GOLDBONUS", APPLY_MALL_GOLDBONUS	},
+	{ "MAX_HP_PCT",	APPLY_MAX_HP_PCT	},
+	{ "MAX_SP_PCT",	APPLY_MAX_SP_PCT	},
+	{ "SKILL_DAMAGE_BONUS",	APPLY_SKILL_DAMAGE_BONUS	},
+	{ "NORMAL_HIT_DAMAGE_BONUS",APPLY_NORMAL_HIT_DAMAGE_BONUS	},
+	{ "SKILL_DEFEND_BONUS",	APPLY_SKILL_DEFEND_BONUS	},
+	{ "NORMAL_HIT_DEFEND_BONUS",APPLY_NORMAL_HIT_DEFEND_BONUS	},
 
-#ifdef ENABLE_PENDANT_SYSTEM
-	{ "ATTBONUS_ELEC",					APPLY_ATTBONUS_ELEC				},
-	{ "ATTBONUS_FIRE",					APPLY_ATTBONUS_FIRE				},
-	{ "ATTBONUS_ICE",					APPLY_ATTBONUS_ICE				},
-	{ "ATTBONUS_WIND",					APPLY_ATTBONUS_WIND				},
-	{ "ATTBONUS_EARTH",					APPLY_ATTBONUS_EARTH			},
-	{ "ATTBONUS_DARK",					APPLY_ATTBONUS_DARK				},
+	{ "PCBANG_EXP_BONUS", APPLY_PC_BANG_EXP_BONUS	},
+	{ "PCBANG_DROP_BONUS", APPLY_PC_BANG_DROP_BONUS	},
+
+	{ "RESIST_WARRIOR",	APPLY_RESIST_WARRIOR},
+	{ "RESIST_ASSASSIN",	APPLY_RESIST_ASSASSIN},
+	{ "RESIST_SURA",		APPLY_RESIST_SURA},
+	{ "RESIST_SHAMAN",	APPLY_RESIST_SHAMAN},
+	{ "INFINITE_AFFECT_DURATION", 0x1FFFFFFF	},
+	{ "ENERGY", APPLY_ENERGY },
+	{ "COSTUME_ATTR_BONUS", APPLY_COSTUME_ATTR_BONUS },
+	{ "MAGIC_ATTBONUS_PER",	APPLY_MAGIC_ATTBONUS_PER	},
+	{ "MELEE_MAGIC_ATTBONUS_PER",	APPLY_MELEE_MAGIC_ATTBONUS_PER	},
+
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	{ "BLEEDING_REDUCE",APPLY_BLEEDING_REDUCE },
+	{ "BLEEDING_PCT",APPLY_BLEEDING_PCT },
+	{ "ATT_BONUS_TO_WOLFMAN",APPLY_ATTBONUS_WOLFMAN },
+	{ "RESIST_WOLFMAN",APPLY_RESIST_WOLFMAN },
+	{ "RESIST_CLAW",APPLY_RESIST_CLAW },
 #endif
 
 #ifdef ENABLE_ACCE_COSTUME_SYSTEM
-	{ "ACCEDRAIN_RATE",					APPLY_ACCEDRAIN_RATE			},
+	{ "ACCEDRAIN_RATE",APPLY_ACCEDRAIN_RATE },
+#endif
+#ifdef ENABLE_MAGIC_REDUCTION_SYSTEM
+	{ "RESIST_MAGIC_REDUCTION",APPLY_RESIST_MAGIC_REDUCTION },
 #endif
 
-#ifdef ENABLE_ATTBONUS_METIN
-	{ "ATTBONUS_METIN",					APPLY_ATTBONUS_METIN			},
-#endif
+	{ "ENCHANT_ELECT", APPLY_ENCHANT_ELECT },
+	{ "ENCHANT_FIRE", APPLY_ENCHANT_FIRE },
+	{ "ENCHANT_ICE", APPLY_ENCHANT_ICE },
+	{ "ENCHANT_WIND", APPLY_ENCHANT_WIND },
+	{ "ENCHANT_EARTH", APPLY_ENCHANT_EARTH },
+	{ "ENCHANT_DARK", APPLY_ENCHANT_DARK },
 
-#ifdef ENABLE_ATTBONUS_BOSS
-	{ "ATTBONUS_BOSS",					APPLY_ATTBONUS_BOSS			},
+#ifdef ENABLE_NEW_BONUS_SYSTEM
+	{ "ATTBONUS_STONE", APPLY_ATTBONUS_STONE },
+	{ "ATTBONUS_BOSS", APPLY_ATTBONUS_BOSS },
+	{ "ATTBONUS_ELEMENTS", APPLY_ATTBONUS_ELEMENTS },
+	{ "ENCHANT_ELEMENTS", APPLY_ENCHANT_ELEMENTS },
+	{ "ATTBONUS_CHARACTERS",APPLY_ATTBONUS_CHARACTERS },
+	{ "ENCHANT_CHARACTERS", APPLY_ENCHANT_CHARACTERS },
+	{ "RESIST_MONSTER", APPLY_RESIST_MONSTER },
 #endif
-
-	{ NULL,								0								},
+#ifdef ENABLE_AVG_PVM
+	{ "ATTBONUS_MEDI_PVM", APPLY_ATTBONUS_MEDI_PVM },
+#endif
+#ifdef ENABLE_CONQUEROR_LEVEL
+	{ "SUNGMA_STR", APPLY_SUNGMA_STR },
+	{ "SUNGMA_HP", APPLY_SUNGMA_HP },
+	{ "SUNGMA_MOVE", APPLY_SUNGMA_MOVE },
+	{ "SUNGMA_IMMUNE", APPLY_SUNGMA_IMMUNE },
+#endif
+	{ "ATTBONUS_PVM_STR",	APPLY_ATTBONUS_PVM_STR },
+	{ "ATTBONUS_PVM_BERSERKER",	APPLY_ATTBONUS_PVM_BERSERKER },
+	{ NULL,		0			}
 };
 
-long FN_get_apply_type(const char *apply_type_string)
+// from import_item_proto.c
+long FN_get_apply_type(const char* apply_type_string)
 {
-	TValueName	*value_name;
+	TValueName* value_name;
 	for (value_name = c_aApplyTypeNames; value_name->c_pszName; ++value_name)
 	{
-		if (0==strcasecmp(value_name->c_pszName, apply_type_string))
+		if (0 == strcasecmp(value_name->c_pszName, apply_type_string))
 			return value_name->lValue;
 	}
 	return 0;
 }
+
+#ifdef __DUNGEON_INFO__
+const std::map<DWORD, std::pair<std::pair<BYTE, BYTE>, std::string>> m_mapDungeonList = {
+	//bossIdx, {{minLvl, maxLvl}, questName},
+	{1093, {{40, 95}, "deviltower_zone"}},
+	{5127, {{50, 90}, "monkeydungeon_zone"}},
+	{2092, {{70, 90}, "spiderdungeon3_zone"}},
+	{2493, {{70, 105}, "dragonlair_zone"}},
+	{2598, {{80, 105}, "devilcatacomb_zone"}},
+	{6091, {{90, 120}, "flamedungeon_zone"}},
+	{6191, {{90, 120}, "snowdungeon_zone"}},
+	{6192, {{105, 120}, "erebus_zone"}},
+	{9018, {{105, 120}, "ShipDefense"}},
+	{20442, {{110, 120}, "MeleyDungeon"}},
+	{4042, {{55, 80}, "nightMare_zone"}},
+	{4031, {{115, 120}, "duratusDungeon_zone"}},
+	{9838, {{105, 120}, "zodiactemple_zone"}},
+	{6500, {{110, 120}, "akzadurlair_zone"}},
+	{6756, {{120, 120}, "serpent_zone"}},
+	{6790, {{120, 120}, "rxdragonlair_zone"}},
+};
+#endif
+
+#ifdef ENABLE_RESP_SYSTEM
+std::set<uint32_t> g_setRespAllowedMap = {
+	1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 20, 22, 23
+};
+#endif

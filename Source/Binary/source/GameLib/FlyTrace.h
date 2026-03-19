@@ -5,7 +5,7 @@ class CFlyTrace : public CScreen
 	public:
 		CFlyTrace();
 		virtual ~CFlyTrace();
-		
+
 		void Destroy();
 
 		void Create(const CFlyingData::TFlyingAttachData & rFlyingAttachData);
@@ -13,7 +13,7 @@ class CFlyTrace : public CScreen
 		void UpdateNewPosition(const D3DXVECTOR3 & v3Position);
 
 		void Update();
-		void Render();		
+		void Render();
 
 	protected:
 		void __Initialize();
@@ -38,5 +38,5 @@ class CFlyTrace : public CScreen
 		static CFlyTrace* New();
 		static void Delete(CFlyTrace* pkInst);
 
-		static CDynamicPool<CFlyTrace>		ms_kPool;		
+		static CDynamicPool<CFlyTrace>		ms_kPool;
 };
