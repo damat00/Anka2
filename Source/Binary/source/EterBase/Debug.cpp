@@ -43,8 +43,8 @@ class CLogFile : public CSingleton<CLogFile>
 			time_t ct = time(0);
 			struct tm ctm = *localtime(&ct);
 
-			fprintf(m_fp, "%02d%02d %02d:%02d:%05d :: %s", 
-				ctm.tm_mon + 1, 
+			fprintf(m_fp, "%02d%02d %02d:%02d:%05d :: %s",
+				ctm.tm_mon + 1,
 				ctm.tm_mday,
 				ctm.tm_hour,
 				ctm.tm_min,

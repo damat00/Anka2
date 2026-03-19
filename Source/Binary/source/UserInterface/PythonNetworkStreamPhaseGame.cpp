@@ -16,15 +16,15 @@
 #include "PythonEventManager.h"
 #include "PythonMessenger.h"
 #include "PythonApplication.h"
-
 #include "../EterPack/EterPackManager.h"
 #include "../gamelib/ItemManager.h"
-
 #include "AbstractApplication.h"
 #include "AbstractCharacterManager.h"
 #include "InstanceBase.h"
-
 #include "ProcessCRC.h"
+#ifdef ENABLE_DUNGEON_INFO
+	#include "PythonDungeonInfo.h"
+#endif
 
 #ifdef ENABLE_RENEWAL_CUBE
 	#include "PythonCubeRenewal.h"
@@ -43,6 +43,10 @@
 
 #ifdef ENABLE_RIDING_EXTENDED
 	#include "PythonMountUpGrade.h"
+#endif
+
+#ifdef ENABLE_EVENT_SYSTEM
+	#include "PythonGameEvents.h"
 #endif
 
 BOOL gs_bEmpireLanuageEnable = TRUE;
@@ -174,13 +178,6 @@ void CPythonNetworkStream::__SetGuildID(DWORD id)
 	}
 }
 
-#ifdef ENABLE_GUILD_TOKEN_AUTH
-void CPythonNetworkStream::__SetGuildToken(uint64_t token)
-{
-	m_dwGuildToken = token;
-}
-#endif
-
 struct PERF_PacketInfo
 {
 	DWORD dwCount;
@@ -262,6 +259,7 @@ void CPythonNetworkStream::GamePhase()
 				break;
 
 			case HEADER_GC_CHARACTER_UPDATE:
+			case HEADER_GC_PARTS:
 				ret = RecvCharacterUpdatePacket();
 				break;
 
@@ -308,9 +306,20 @@ void CPythonNetworkStream::GamePhase()
 				break;
 
 			case HEADER_GC_PLAYER_POINT_CHANGE:
+			case 170: /* point change (alternate header from server) */
 				ret = RecvPointChange();
 				break;
 
+			case 144: /* unknown from server; skip 1 byte */
+			case 195: /* unknown from server; skip 1 byte */
+			case 33: /* unknown from server; skip 1 byte */
+			{
+				TPacketGCBlank skip;
+				ret = Recv(sizeof(skip), &skip);
+			}
+				break;
+
+			// item packet.
 			case HEADER_GC_ITEM_SET:
 				ret = RecvItemSetPacket();
 				break;
@@ -397,10 +406,6 @@ void CPythonNetworkStream::GamePhase()
 				ret = RecvQuestConfirmPacket();
 				break;
 
-			case HEADER_GC_GUILDMARK_PASS:
-				ret = RecvMarkPass();
-				break;
-
 			case HEADER_GC_TARGET:
 				ret = RecvTargetPacket();
 				break;
@@ -436,6 +441,38 @@ void CPythonNetworkStream::GamePhase()
 			case HEADER_GC_SKILL_LEVEL:
 				ret = RecvSkillLevel();
 				break;
+
+#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
+			case HEADER_GC_SOUL_ROULETTE:
+				ret = RecvSoulRoulette();
+				break;
+#endif
+
+#ifdef ENABLE_MINI_GAME_CATCH_KING
+			case HEADER_GC_MINI_GAME_CATCH_KING:
+				ret = RecvMiniGameCatchKingPacket();
+				break;
+#endif
+
+#ifdef ENABLE_STONE_EVENT
+			case HEADER_GC_STONE_EVENT:
+				ret = RecvStoneEvent();
+				break;
+#endif
+
+#ifdef ENABLE_ATTENDANCE_EVENT
+			case HEADER_GC_HIT_COUNT_INFO:
+				ret = RecvHitCountInfo();
+				break;
+				
+			case HEADER_GC_ATTENDANCE_EVENT:
+				ret = RecvAttendanceEvent();
+				break;
+				
+			case HEADER_GC_ATTENDANCE_EVENT_INFO:
+				ret = RecvAttendanceEventInfo();
+				break;
+#endif
 
 			case HEADER_GC_SKILL_LEVEL_NEW:
 				ret = RecvSkillLevelNew();
@@ -577,6 +614,12 @@ void CPythonNetworkStream::GamePhase()
 				ret = RecvMallItemDelPacket();
 				break;
 
+#ifdef ENABLE_CONQUEROR_LEVEL
+			case HEADER_GC_SUNGMA_ATTR_UPDATE:
+				ret = RecvSungmaAttrUpdatePacket();
+				break;
+#endif
+
 			case HEADER_GC_LOVER_INFO:
 				ret = RecvLoverInfoPacket();
 				break;
@@ -599,6 +642,14 @@ void CPythonNetworkStream::GamePhase()
 				return;
 				break;
 
+#ifdef ENABLE_ITEMSHOP
+			case HEADER_GC_ITEMSHOP:
+			{
+				ret = RecvItemShop();
+				break;
+			}
+#endif
+
 			case HEADER_GC_SPECIFIC_EFFECT:
 				ret = RecvSpecificEffect();
 				break;
@@ -606,6 +657,12 @@ void CPythonNetworkStream::GamePhase()
 			case HEADER_GC_DRAGON_SOUL_REFINE:
 				ret = RecvDragonSoulRefine();
 				break;
+
+#ifdef ENABLE_FISH_EVENT_SYSTEM
+			case HEADER_GC_FISH_EVENT_INFO:
+				ret = RecvFishEventInfo();
+				break;
+#endif
 
 #ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
 			case HEADER_GC_REQUEST_CHANGE_LANGUAGE:
@@ -616,6 +673,12 @@ void CPythonNetworkStream::GamePhase()
 #ifdef ENABLE_EXTENDED_WHISPER_DETAILS
 			case HEADER_GC_WHISPER_DETAILS:
 				ret = RecvWhisperDetails();
+				break;
+#endif
+
+#ifdef ENABLE_RESP_SYSTEM
+			case HEADER_GC_RESP:
+				ret = RecvRespPacket();
 				break;
 #endif
 
@@ -637,53 +700,21 @@ void CPythonNetworkStream::GamePhase()
 				break;
 #endif
 
-#ifdef ENABLE_BIOLOG_SYSTEM
-			case HEADER_GC_BIOLOG_MANAGER:
-				ret = RecvBiologManager();
-				break;
-#endif
-
 #ifdef ENABLE_MOB_DROP_INFO
 			case HEADER_GC_TARGET_INFO:
 				ret = RecvTargetInfoPacket();
 				break;
 #endif
 
+#ifdef ENABLE_COLLECT_WINDOW
+			case HEADER_GC_COLLECT:
+				ret = RecvCollectPacket();
+				break;
+#endif
+
 #ifdef ENABLE_VIEW_CHEST_DROP
 			case HEADER_GC_CHEST_DROP_INFO:
 				ret = RecvChestDropInfo();
-				break;
-#endif
-
-#ifdef ENABLE_EVENT_MANAGER
-			case HEADER_GC_EVENT_INFO:
-				ret = RecvEventInformation();
-				break;
-
-			case HEADER_GC_EVENT_RELOAD:
-				ret = RecvEventReload();
-				break;
-#endif
-
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-			case HEADER_GC_EXT_BATTLE_PASS_OPEN:
-				ret = RecvExtBattlePassOpenPacket();
-				break;
-
-			case HEADER_GC_EXT_BATTLE_PASS_GENERAL_INFO:
-				ret = RecvExtBattlePassGeneralInfoPacket();
-				break;
-
-			case HEADER_GC_EXT_BATTLE_PASS_MISSION_INFO:
-				ret = RecvExtBattlePassMissionInfoPacket();
-				break;
-
-			case HEADER_GC_EXT_BATTLE_PASS_MISSION_UPDATE:
-				ret = RecvExtBattlePassMissionUpdatePacket();
-				break;
-
-			case HEADER_GC_EXT_BATTLE_PASS_SEND_RANKING:
-				ret = RecvExtBattlePassRankingPacket();
 				break;
 #endif
 
@@ -697,7 +728,7 @@ void CPythonNetworkStream::GamePhase()
 			case HEADER_GC_OFFLINE_SHOP:
 				ret = RecvOfflineShopPacket();
 				break;
-	
+
 			case HEADER_GC_OFFLINE_SHOP_SIGN:
 				ret = RecvOfflineShopSignPacket();
 				break;
@@ -716,12 +747,6 @@ void CPythonNetworkStream::GamePhase()
 
 			case HEADER_GC_LOCALE_WHISPER:
 				ret = RecvLocaleWhishperPacket();
-				break;
-#endif
-
-#ifdef ENABLE_RENEWAL_INGAME_ITEMSHOP
-			case HEADER_GC_ITEMSHOP:
-				ret = RecvItemShop();
 				break;
 #endif
 
@@ -777,12 +802,6 @@ void CPythonNetworkStream::GamePhase()
 				break;
 #endif
 
-#ifdef ENABLE_GUILD_TOKEN_AUTH
-			case HEADER_GC_GUILD_TOKEN:
-				ret = RecvGuildTokenPacket();
-				break;
-#endif
-
 #ifdef ENABLE_CHANGE_LOOK_SYSTEM
 			case HEADER_GC_CHANGE_LOOK_SET:
 				ret = RecvChangeLookItemSetPacket();
@@ -830,6 +849,30 @@ void CPythonNetworkStream::GamePhase()
 
 			case HEADER_GC_MOUNT_UP_GRADE_CHAT:
 				ret = RecvMountUpGradeChat();
+				break;
+#endif
+
+#ifdef ENABLE_DUNGEON_INFO
+			case HEADER_GC_DUNGEON_INFO_SYSTEM:
+				ret = RecvDungeonInfoPacket();
+				break;
+#endif
+
+#ifdef ENABLE_EVENT_SYSTEM
+			case HEADER_GC_EVENT_INFO:
+				ret = RecvEventInfo();
+				break;
+#endif
+
+#ifdef ENABLE_RANKING
+			case HEADER_GC_RANKING_SEND:
+				ret = RecvRankingTable();
+				break;
+#endif
+
+#ifdef ENABLE_KILL_STATISTICS
+			case HEADER_GC_KILL_STATISTICS:
+				ret = RecvKillStatistics();
 				break;
 #endif
 
@@ -1047,14 +1090,14 @@ void CPythonNetworkStream::SetGamePhase()
 	rkPlayer.SetMainCharacterIndex(GetMainActorVID());
 
 #ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
-	// Game phase'e geçildiðinde dil bilgisini server'a gönder
+	// Game phase'e geçildi?inde dil bilgisini server'a gönder
 	if (m_bLanguageSet == FALSE && m_bLanguage != 0)
 	{
 		SendChangeLanguagePacket(m_bLanguage);
 	}
 #endif
 
-#ifdef ENABLE_DUNGEON_TRACKING_SYSTEM
+#ifdef ENABLE_TRACK_WINDOW
 	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "TrackWindowUpdate", Py_BuildValue("()"));
 #endif
 
@@ -1914,33 +1957,39 @@ bool CPythonNetworkStream::RecvWhisperPacket()
 	}
 	else if (CPythonChat::WHISPER_TYPE_SYSTEM == whisperPacket.bType || CPythonChat::WHISPER_TYPE_ERROR == whisperPacket.bType)
 	{
-		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "OnRecvWhisperSystemMessage", Py_BuildValue("(iss)", (int) whisperPacket.bType, whisperPacket.szNameFrom, buf));
+		PyCallClassMemberFunc (m_apoPhaseWnd[PHASE_WINDOW_GAME], "OnRecvWhisperSystemMessage", Py_BuildValue ("(iss)", (int) whisperPacket.bType, whisperPacket.szNameFrom, buf));
 	}
 	else
 	{
-		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "OnRecvWhisperError", Py_BuildValue("(iss)", (int) whisperPacket.bType, whisperPacket.szNameFrom, buf));
+		PyCallClassMemberFunc (m_apoPhaseWnd[PHASE_WINDOW_GAME], "OnRecvWhisperError", Py_BuildValue ("(iss)", (int) whisperPacket.bType, whisperPacket.szNameFrom, buf));
 	}
 
 	return true;
 }
 
-bool CPythonNetworkStream::SendWhisperPacket(const char *name, const char *c_szChat)
+bool CPythonNetworkStream::SendWhisperPacket (const char* name, const char* c_szChat)
 {
-	if (strlen(c_szChat) >= 255)
+	if (strlen (c_szChat) >= 255)
+	{
 		return true;
+	}
 
-	int iTextLen = strlen(c_szChat) + 1;
+	int iTextLen = strlen (c_szChat) + 1;
 	TPacketCGWhisper WhisperPacket;
 	WhisperPacket.bHeader = HEADER_CG_WHISPER;
-	WhisperPacket.wSize = sizeof(WhisperPacket) + iTextLen;
+	WhisperPacket.wSize = sizeof (WhisperPacket) + iTextLen;
 
-	strncpy(WhisperPacket.szNameTo, name, sizeof(WhisperPacket.szNameTo) - 1);
+	strncpy (WhisperPacket.szNameTo, name, sizeof (WhisperPacket.szNameTo) - 1);
 
-	if (!Send(sizeof(WhisperPacket), &WhisperPacket))
+	if (!Send (sizeof (WhisperPacket), &WhisperPacket))
+	{
 		return false;
+	}
 
-	if (!Send(iTextLen, c_szChat))
+	if (!Send (iTextLen, c_szChat))
+	{
 		return false;
+	}
 
 	return SendSequence();
 }
@@ -1949,18 +1998,17 @@ bool CPythonNetworkStream::RecvPointChange()
 {
 	TPacketGCPointChange PointChange;
 
-	if (!Recv(sizeof(TPacketGCPointChange), &PointChange))
+	if (!Recv (sizeof (TPacketGCPointChange), &PointChange))
 	{
-		Tracen("Recv Point Change Packet Error");
+		Tracen ("Recv Point Change Packet Error");
 		return false;
 	}
 
 	CPythonCharacterManager& rkChrMgr = CPythonCharacterManager::Instance();
-	rkChrMgr.ShowPointEffect(PointChange.Type, PointChange.dwVID);
+	rkChrMgr.ShowPointEffect (PointChange.Type, PointChange.dwVID);
 
-	CInstanceBase * pInstance = CPythonCharacterManager::Instance().GetMainInstancePtr();
+	CInstanceBase* pInstance = CPythonCharacterManager::Instance().GetMainInstancePtr();
 
-	// ÀÚ½ÅÀÇ Point°¡ º¯°æµÇ¾úÀ» °æ¿ì..
 	if (pInstance)
 	if (PointChange.dwVID == pInstance->GetVirtualID())
 	{
@@ -1996,6 +2044,13 @@ bool CPythonNetworkStream::RecvPointChange()
 				__RefreshSkillWindow();
 				break;
 			case POINT_IQ:
+#ifdef ENABLE_CONQUEROR_LEVEL
+			case POINT_CONQUEROR_LEVEL:
+			case POINT_SUNGMA_STR:
+			case POINT_SUNGMA_HP:
+			case POINT_SUNGMA_MOVE:
+			case POINT_SUNGMA_IMMUNE:
+#endif
 				m_akSimplePlayerInfo[m_dwSelectedCharacterIndex].byIQ = PointChange.value;
 				__RefreshStatus();
 				__RefreshSkillWindow();
@@ -2030,6 +2085,15 @@ bool CPythonNetworkStream::RecvPointChange()
 #endif
 			}
 		}
+#ifdef ENABLE_GAYA_SYSTEM
+		else if (POINT_GEM == PointChange.Type)
+		{
+			if (PointChange.amount > 0)
+			{
+				PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "OnPickGem", Py_BuildValue("(i)", PointChange.amount));
+			}
+		}
+#endif
 	}
 	else if (POINT_LEVEL == PointChange.Type) // Fix
 	{
@@ -2061,23 +2125,27 @@ bool CPythonNetworkStream::RecvStunPacket()
 {
 	TPacketGCStun StunPacket;
 
-	if (!Recv(sizeof(StunPacket), &StunPacket))
+	if (!Recv (sizeof (StunPacket), &StunPacket))
 	{
-		Tracen("CPythonNetworkStream::RecvStunPacket Error");
+		Tracen ("CPythonNetworkStream::RecvStunPacket Error");
 		return false;
 	}
 
 	//Tracef("RecvStunPacket %d\n", StunPacket.vid);
 
 	CPythonCharacterManager& rkChrMgr=CPythonCharacterManager::Instance();
-	CInstanceBase * pkInstSel = rkChrMgr.GetInstancePtr(StunPacket.vid);
+	CInstanceBase* pkInstSel = rkChrMgr.GetInstancePtr (StunPacket.vid);
 
 	if (pkInstSel)
 	{
 		if (CPythonCharacterManager::Instance().GetMainInstancePtr()==pkInstSel)
+		{
 			pkInstSel->Die();
+		}
 		else
+		{
 			pkInstSel->Stun();
+		}
 	}
 
 	return true;
@@ -2086,20 +2154,20 @@ bool CPythonNetworkStream::RecvStunPacket()
 bool CPythonNetworkStream::RecvDeadPacket()
 {
 	TPacketGCDead DeadPacket;
-	if (!Recv(sizeof(DeadPacket), &DeadPacket))
+	if (!Recv (sizeof (DeadPacket), &DeadPacket))
 	{
-		Tracen("CPythonNetworkStream::RecvDeadPacket Error");
+		Tracen ("CPythonNetworkStream::RecvDeadPacket Error");
 		return false;
 	}
 
 	CPythonCharacterManager& rkChrMgr=CPythonCharacterManager::Instance();
-	CInstanceBase * pkChrInstSel = rkChrMgr.GetInstancePtr(DeadPacket.vid);
+	CInstanceBase* pkChrInstSel = rkChrMgr.GetInstancePtr (DeadPacket.vid);
 	if (pkChrInstSel)
 	{
 		CInstanceBase* pkInstMain=rkChrMgr.GetMainInstancePtr();
 		if (pkInstMain==pkChrInstSel)
 		{
-			Tracenf("ÁÖÀÎ°ø »ç¸Á");
+			Tracenf ("ÁÖÀÎ°ø »ç¸Á");
 			if (false == pkInstMain->GetDuelMode())
 			{
 #ifndef ENABLE_RENEWAL_DEAD_PACKET
@@ -2121,31 +2189,31 @@ bool CPythonNetworkStream::RecvDeadPacket()
 	return true;
 }
 
-bool CPythonNetworkStream::SendCharacterPositionPacket(BYTE iPosition)
+bool CPythonNetworkStream::SendCharacterPositionPacket (BYTE iPosition)
 {
 	TPacketCGPosition PositionPacket;
 
 	PositionPacket.header = HEADER_CG_CHARACTER_POSITION;
 	PositionPacket.position = iPosition;
 
-	if (!Send(sizeof(TPacketCGPosition), &PositionPacket))
+	if (!Send (sizeof (TPacketCGPosition), &PositionPacket))
 	{
-		Tracen("Send Character Position Packet Error");
+		Tracen ("Send Character Position Packet Error");
 		return false;
 	}
 
 	return SendSequence();
 }
 
-bool CPythonNetworkStream::SendOnClickPacket(DWORD vid)
+bool CPythonNetworkStream::SendOnClickPacket (DWORD vid)
 {
 	TPacketCGOnClick OnClickPacket;
-	OnClickPacket.header = HEADER_CG_ON_CLICK;
-	OnClickPacket.vid = vid;
+	OnClickPacket.header	= HEADER_CG_ON_CLICK;
+	OnClickPacket.vid		= vid;
 
-	if (!Send(sizeof(OnClickPacket), &OnClickPacket))
+	if (!Send (sizeof (OnClickPacket), &OnClickPacket))
 	{
-		Tracen("Send On_Click Packet Error");
+		Tracen ("Send On_Click Packet Error");
 		return false;
 	}
 
@@ -2157,13 +2225,17 @@ bool CPythonNetworkStream::RecvCharacterPositionPacket()
 {
 	TPacketGCPosition PositionPacket;
 
-	if (!Recv(sizeof(TPacketGCPosition), &PositionPacket))
+	if (!Recv (sizeof (TPacketGCPosition), &PositionPacket))
+	{
 		return false;
+	}
 
-	CInstanceBase * pChrInstance = CPythonCharacterManager::Instance().GetInstancePtr(PositionPacket.vid);
+	CInstanceBase* pChrInstance = CPythonCharacterManager::Instance().GetInstancePtr (PositionPacket.vid);
 
 	if (!pChrInstance)
+	{
 		return true;
+	}
 
 	//pChrInstance->UpdatePosition(PositionPacket.position);
 
@@ -2174,17 +2246,24 @@ bool CPythonNetworkStream::RecvMotionPacket()
 {
 	TPacketGCMotion MotionPacket;
 
-	if (!Recv(sizeof(TPacketGCMotion), &MotionPacket))
+	if (!Recv (sizeof (TPacketGCMotion), &MotionPacket))
+	{
 		return false;
+	}
 
-	CInstanceBase * pMainInstance = CPythonCharacterManager::Instance().GetInstancePtr(MotionPacket.vid);
-	CInstanceBase * pVictimInstance = nullptr;
+	CInstanceBase* pMainInstance = CPythonCharacterManager::Instance().GetInstancePtr (MotionPacket.vid);
+	CInstanceBase* pVictimInstance = nullptr;
 
 	if (0 != MotionPacket.victim_vid)
-		pVictimInstance = CPythonCharacterManager::Instance().GetInstancePtr(MotionPacket.victim_vid);
+	{
+		pVictimInstance = CPythonCharacterManager::Instance().GetInstancePtr (MotionPacket.victim_vid);
+	}
 
+	/* Kanalda henüz spawn olmam?? vid için motion gelirse hata verme, yoksay (syserr spam önleme) */
 	if (!pMainInstance)
+	{
 		return false;
+	}
 
 	return true;
 }
@@ -2194,16 +2273,20 @@ bool CPythonNetworkStream::RecvShopPacket()
 	std::vector<char> vecBuffer;
 	vecBuffer.clear();
 
-    TPacketGCShop  packet_shop;
-	if (!Recv(sizeof(packet_shop), &packet_shop))
+	TPacketGCShop  packet_shop;
+	if (!Recv (sizeof (packet_shop), &packet_shop))
+	{
 		return false;
+	}
 
-	int iSize = packet_shop.size - sizeof(packet_shop);
+	int iSize = packet_shop.size - sizeof (packet_shop);
 	if (iSize > 0)
 	{
-		vecBuffer.resize(iSize);
-		if (!Recv(iSize, &vecBuffer[0]))
+		vecBuffer.resize (iSize);
+		if (!Recv (iSize, &vecBuffer[0]))
+		{
 			return false;
+		}
 	}
 
 	switch (packet_shop.subheader)
@@ -2519,14 +2602,14 @@ bool CPythonNetworkStream::RecvQuestInfoPacket()
 		if (!Recv(sizeof(szTitle), &szTitle))
 			return false;
 
-		szTitle[30]='\0';
+		szTitle[30] = '\0';
 	}
 	if (0 != (c_rFlag & QUEST_SEND_CLOCK_NAME))
 	{
 		if (!Recv(sizeof(szClockName), &szClockName))
 			return false;
 
-		szClockName[16]='\0';
+		szClockName[16] = '\0';
 	}
 	if (0 != (c_rFlag & QUEST_SEND_CLOCK_VALUE))
 	{
@@ -2538,7 +2621,7 @@ bool CPythonNetworkStream::RecvQuestInfoPacket()
 		if (!Recv(sizeof(szCounterName), &szCounterName))
 			return false;
 
-		szCounterName[16]='\0';
+		szCounterName[16] = '\0';
 	}
 	if (0 != (c_rFlag & QUEST_SEND_COUNTER_VALUE))
 	{
@@ -2550,11 +2633,11 @@ bool CPythonNetworkStream::RecvQuestInfoPacket()
 		if (!Recv(sizeof(szIconFileName), &szIconFileName))
 			return false;
 
-		szIconFileName[24]='\0';
+		szIconFileName[24] = '\0';
 	}
 	// Recv Data End
 
-	CPythonQuest& rkQuest=CPythonQuest::Instance();
+	CPythonQuest& rkQuest = CPythonQuest::Instance();
 
 	// Process Start
 	if (QUEST_PACKET_TYPE_END == byQuestPacketType)
@@ -2615,19 +2698,6 @@ bool CPythonNetworkStream::RecvQuestConfirmPacket()
 
 	PyObject *poArg = Py_BuildValue("(sii)", kQuestConfirmPacket.msg, kQuestConfirmPacket.timeout, kQuestConfirmPacket.requestPID);
  	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_OnQuestConfirm", poArg);
-	return true;
-}
-
-bool CPythonNetworkStream::RecvMarkPass()
-{
-	TPacketMarkPass pack;
-	if (!Recv(sizeof(pack), &pack))
-	{
-		Tracen("RecvMarkPass Error");
-		return false;
-	}
-
-	m_dwGuildMarkPass = pack.markpass;
 	return true;
 }
 
@@ -2692,6 +2762,51 @@ bool CPythonNetworkStream::RecvGuildRanking()
 	}
 
 	return true;
+}
+#endif
+
+#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
+bool CPythonNetworkStream::RecvSoulRoulette()
+{
+	TPacketGCSoulRoulette Packet;
+	if (!Recv(sizeof(Packet), &Packet)) {
+		Tracen("RecvSoulRoulette Error");
+		return false;
+	}
+
+	enum { OPEN, CLOSE, TURN };
+	switch (Packet.option) {
+	case OPEN:
+		for (int i = 0; i < ROULETTE_ITEM_MAX; i++)
+			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_ROULETTE_ICON", Py_BuildValue("(iii)", i, Packet.ItemInfo[i].vnum, Packet.ItemInfo[i].count));
+		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_ROULETTE_OPEN", Py_BuildValue("(ii)", Packet.yang, Packet.soul));
+		break;
+	case CLOSE:
+		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_ROULETTE_CLOSE", Py_BuildValue("()"));
+		break;
+	case TURN:
+		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_ROULETTE_TURN", Py_BuildValue("(ii)", Packet.ItemInfo[0].vnum, Packet.ItemInfo[0].count));
+		break;
+	}
+
+	return true;
+}
+
+bool CPythonNetworkStream::SoulRoulette(const BYTE option)
+{
+	if (!__CanActMainInstance())
+		return true;
+
+	TPacketCGSoulRoulette p;
+	p.header = HEADER_CG_SOUL_ROULETTE;
+	p.option = option;
+
+	if (!Send(sizeof(p), &p)) {
+		Tracen("Error SoulRoulette");
+		return false;
+	}
+
+	return SendSequence();
 }
 #endif
 
@@ -2819,7 +2934,89 @@ bool CPythonNetworkStream::SendExchangeExitPacket()
 	return SendSequence();
 }
 
-// PointReset °³ÀÓ½Ã
+#ifdef ENABLE_DUNGEON_INFO
+
+bool CPythonNetworkStream::SendDungeonInfoOpen()
+{
+	if (!__CanActMainInstance())
+		return true;
+
+	TPacketCGDungeonInfoSend	packet;
+
+	packet.header = HEADER_CG_DUNGEON_INFO_SYSTEM;
+	packet.subheader = DUNGEON_INFO_SUB_HEADER_OPEN;
+
+	if (!Send(sizeof(TPacketCGDungeonInfoSend), &packet))
+	{
+		Tracef("SendDungeonInfoOpen Error\n");
+		return false;
+	}
+
+	return SendSequence();
+}
+
+bool CPythonNetworkStream::SendDungeonInfoTeleport(int index_teleport)
+{
+	if (!__CanActMainInstance())
+		return true;
+
+	TPacketCGDungeonInfoSend	packet;
+
+	packet.header = HEADER_CG_DUNGEON_INFO_SYSTEM;
+	packet.subheader = DUNGEON_INFO_SUB_HEADER_TELEPORT;
+	packet.index = index_teleport;
+
+	if (!Send(sizeof(TPacketCGDungeonInfoSend), &packet))
+	{
+		Tracef("SendDungeonInfoTeleport Error\n");
+		return false;
+	}
+
+	return SendSequence();
+}
+
+bool CPythonNetworkStream::SendDungeonInfoMision(int index)
+{
+	if (!__CanActMainInstance())
+		return true;
+
+	TPacketCGDungeonInfoSend	packet;
+
+	packet.header = HEADER_CG_DUNGEON_INFO_SYSTEM;
+	packet.subheader = DUNGEON_INFO_SUB_HEADER_MISION;
+	packet.index = index;
+
+	if (!Send(sizeof(TPacketCGDungeonInfoSend), &packet))
+	{
+		Tracef("SendDungeonInfoMision Error\n");
+		return false;
+	}
+
+	return SendSequence();
+}
+
+
+bool CPythonNetworkStream::SendDungeonInfoRanking(int index_dungeon)
+{
+	if (!__CanActMainInstance())
+		return true;
+
+	TPacketCGDungeonInfoSend	packet;
+
+	packet.header = HEADER_CG_DUNGEON_INFO_SYSTEM;
+	packet.subheader = DUNGEON_INFO_SUB_HEADER_RANKING;
+	packet.index = index_dungeon;
+
+	if (!Send(sizeof(TPacketCGDungeonInfoSend), &packet))
+	{
+		Tracef("SendDungeonInfoRanking Error\n");
+		return false;
+	}
+
+	return SendSequence();
+}
+#endif
+
 bool CPythonNetworkStream::SendPointResetPacket()
 {
 	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "StartPointReset", Py_BuildValue("()"));
@@ -2828,8 +3025,8 @@ bool CPythonNetworkStream::SendPointResetPacket()
 
 bool CPythonNetworkStream::__IsPlayerAttacking()
 {
-	CPythonCharacterManager& rkChrMgr=CPythonCharacterManager::Instance();
-	CInstanceBase* pkInstMain=rkChrMgr.GetMainInstancePtr();
+	CPythonCharacterManager& rkChrMgr = CPythonCharacterManager::Instance();
+	CInstanceBase* pkInstMain = rkChrMgr.GetMainInstancePtr();
 	if (!pkInstMain)
 		return false;
 
@@ -2856,16 +3053,16 @@ bool CPythonNetworkStream::RecvScriptPacket()
 	}
 
 	ScriptPacket.size -= sizeof(TPacketGCScript);
-	
+
 	static std::string str;
 	str = "";
-	str.resize(ScriptPacket.size+1);
+	str.resize(ScriptPacket.size + 1);
 
 	if (!Recv(ScriptPacket.size, &str[0]))
 		return false;
 
-	str[str.size()-1] = '\0';
-	
+	str[str.size() - 1] = '\0';
+
 	int iIndex = CPythonEventManager::Instance().RegisterEventSetFromString(str);
 
 	if (-1 != iIndex)
@@ -2892,18 +3089,43 @@ bool CPythonNetworkStream::SendScriptAnswerPacket(int iAnswer)
 	return SendSequence();
 }
 
+#ifdef ENABLE_COLLECT_WINDOW
+bool CPythonNetworkStream::SendScriptButtonPacket(unsigned int iIndex, BYTE bButtonIndex)
+#else
 bool CPythonNetworkStream::SendScriptButtonPacket(unsigned int iIndex)
+#endif
 {
 	TPacketCGScriptButton ScriptButton;
 
 	ScriptButton.header = HEADER_CG_SCRIPT_BUTTON;
 	ScriptButton.idx = iIndex;
+#ifdef ENABLE_COLLECT_WINDOW
+	ScriptButton.button = bButtonIndex;
+#endif
 	if (!Send(sizeof(TPacketCGScriptButton), &ScriptButton))
 	{
 		Tracen("Send Script Button Packet Error");
 		return false;
 	}
 
+	return SendSequence();
+}
+
+bool CPythonNetworkStream::SendAnswerMakeGuildPacket(const char* c_szName)
+{
+	TPacketCGAnswerMakeGuild Packet;
+
+	Packet.header = HEADER_CG_ANSWER_MAKE_GUILD;
+	strncpy(Packet.guild_name, c_szName, GUILD_NAME_MAX_LEN);
+	Packet.guild_name[GUILD_NAME_MAX_LEN] = '\0';
+
+	if (!Send(sizeof(Packet), &Packet))
+	{
+		Tracen("SendAnswerMakeGuild Packet Error");
+		return false;
+	}
+
+	// 	Tracef(" SendAnswerMakeGuildPacket : %s", c_szName);
 	return SendSequence();
 }
 
@@ -4123,9 +4345,6 @@ bool CPythonNetworkStream::RecvGuild()
 				PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "DeleteGuild", Py_BuildValue("()"));
 				CPythonMessenger::Instance().RemoveAllGuildMember();
 				__SetGuildID(0);
-#ifdef ENABLE_GUILD_TOKEN_AUTH
-				__SetGuildToken(0);
-#endif
 				__RefreshMessengerWindow();
 				__RefreshTargetBoard();
 				__RefreshCharacterWindow();
@@ -4502,7 +4721,7 @@ bool CPythonNetworkStream::RecvGuild()
 				return false;
 
 			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME],
-				"BINARY_GuildWar_OnRecvPoint", 
+				"BINARY_GuildWar_OnRecvPoint",
 				Py_BuildValue("(iii)", GuildWarPoint.dwGainGuildID, GuildWarPoint.dwOpponentGuildID, GuildWarPoint.lPoint)
 			);
 			break;
@@ -4773,12 +4992,19 @@ void CPythonNetworkStream::__TEST_SetSkillGroupFake(int iIndex)
 	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "RefreshCharacter", Py_BuildValue("()"));
 }
 
-bool CPythonNetworkStream::SendRefinePacket(BYTE byPos, BYTE byType)
+bool CPythonNetworkStream::SendRefinePacket(BYTE byPos, BYTE byType
+#ifdef ENABLE_PITTY_REFINE
+, bool bUseSealOfGod
+#endif
+)
 {
 	TPacketCGRefine kRefinePacket;
 	kRefinePacket.header = HEADER_CG_REFINE;
 	kRefinePacket.pos = byPos;
 	kRefinePacket.type = byType;
+#ifdef ENABLE_PITTY_REFINE
+	kRefinePacket.seal_of_god = bUseSealOfGod;
+#endif
 
 	if (!Send(sizeof(kRefinePacket), &kRefinePacket))
 		return false;
@@ -4805,12 +5031,12 @@ bool CPythonNetworkStream::RecvRefineInformationPacket()
 		return false;
 
 	TRefineTable & rkRefineTable = kRefineInfoPacket.refine_table;
-	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], 
-		"OpenRefineDialog", 
-		Py_BuildValue("(iiii)", 
-			kRefineInfoPacket.pos, 
-			kRefineInfoPacket.refine_table.result_vnum, 
-			rkRefineTable.cost, 
+	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME],
+		"OpenRefineDialog",
+		Py_BuildValue("(iiii)",
+			kRefineInfoPacket.pos,
+			kRefineInfoPacket.refine_table.result_vnum,
+			rkRefineTable.cost,
 			rkRefineTable.prob));
 
 	for (int i = 0; i < rkRefineTable.material_count; ++i)
@@ -4836,13 +5062,13 @@ bool CPythonNetworkStream::RecvRefineInformationPacketNew()
 		return false;
 
 	TRefineTable & rkRefineTable = kRefineInfoPacket.refine_table;
-	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], 
-		"OpenRefineDialog", 
-		Py_BuildValue("(iiiii)", 
-			kRefineInfoPacket.pos, 
-			kRefineInfoPacket.refine_table.result_vnum, 
-			rkRefineTable.cost, 
-			rkRefineTable.prob, 
+	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME],
+		"OpenRefineDialog",
+		Py_BuildValue("(iiiii)",
+			kRefineInfoPacket.pos,
+			kRefineInfoPacket.refine_table.result_vnum,
+			rkRefineTable.cost,
+			rkRefineTable.prob,
 			kRefineInfoPacket.type)
 		);
 
@@ -4879,7 +5105,7 @@ bool CPythonNetworkStream::RecvNPCList()
 		if (!Recv(sizeof(TNPCPosition), &NPCPosition))
 			return false;
 
-#ifdef ENABLE_RENEWAL_REGEN
+#ifdef ENABLE_ULTIMATE_REGEN
 		const char* c_szName;
 		CPythonNonPlayer& rkNonPlayer = CPythonNonPlayer::Instance();
 		rkNonPlayer.GetName(NPCPosition.mobVnum, &c_szName);
@@ -5082,78 +5308,176 @@ bool CPythonNetworkStream::RecvTargetDeletePacket()
 	return true;
 }
 
+#ifdef ENABLE_CONQUEROR_LEVEL
+bool CPythonNetworkStream::RecvSungmaAttrUpdatePacket()
+{
+	TPacketGCSungmaAttrUpdate kSungmaAttrUpdate;
+	if (!Recv(sizeof(kSungmaAttrUpdate), &kSungmaAttrUpdate))
+		return false;
+
+	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_SungMaAttr", Py_BuildValue("(iiii)", kSungmaAttrUpdate.bSTR, kSungmaAttrUpdate.bHP, kSungmaAttrUpdate.bMOVE, kSungmaAttrUpdate.bIMMUNE));
+#ifdef _DEBUG
+	Tracef("RECV SUNGMA ATTR UPDATE : %d\n", kSungmaAttrUpdate.bSTR, kSungmaAttrUpdate.bHP, kSungmaAttrUpdate.bMOVE, kSungmaAttrUpdate.bIMMUNE);
+#endif
+	return true;
+}
+#endif
+
 bool CPythonNetworkStream::RecvLoverInfoPacket()
 {
 	TPacketGCLoverInfo kLoverInfo;
-	if (!Recv(sizeof(kLoverInfo), &kLoverInfo))
+	if (!Recv (sizeof (kLoverInfo), &kLoverInfo))
+	{
 		return false;
+	}
 
-	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_LoverInfo", Py_BuildValue("(si)", kLoverInfo.szName, kLoverInfo.byLovePoint));
-#ifdef _DEBUG
-	Tracef("RECV LOVER INFO : %s, %d\n", kLoverInfo.szName, kLoverInfo.byLovePoint);
-#endif
+	PyCallClassMemberFunc (m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_LoverInfo", Py_BuildValue ("(si)", kLoverInfo.szName, kLoverInfo.byLovePoint));
+	#ifdef _DEBUG
+	Tracef ("RECV LOVER INFO : %s, %d\n", kLoverInfo.szName, kLoverInfo.byLovePoint);
+	#endif
 	return true;
 }
 
 bool CPythonNetworkStream::RecvLovePointUpdatePacket()
 {
 	TPacketGCLovePointUpdate kLovePointUpdate;
-	if (!Recv(sizeof(kLovePointUpdate), &kLovePointUpdate))
+	if (!Recv (sizeof (kLovePointUpdate), &kLovePointUpdate))
+	{
 		return false;
+	}
 
-	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_UpdateLovePoint", Py_BuildValue("(i)", kLovePointUpdate.byLovePoint));
-#ifdef _DEBUG
-	Tracef("RECV LOVE POINT UPDATE : %d\n", kLovePointUpdate.byLovePoint);
-#endif
+	PyCallClassMemberFunc (m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_UpdateLovePoint", Py_BuildValue ("(i)", kLovePointUpdate.byLovePoint));
+	#ifdef _DEBUG
+	Tracef ("RECV LOVE POINT UPDATE : %d\n", kLovePointUpdate.byLovePoint);
+	#endif
 	return true;
 }
 
 bool CPythonNetworkStream::RecvDigMotionPacket()
 {
 	TPacketGCDigMotion kDigMotion;
-	if (!Recv(sizeof(kDigMotion), &kDigMotion))
+	if (!Recv (sizeof (kDigMotion), &kDigMotion))
+	{
 		return false;
+	}
 
-#ifdef _DEBUG
-	Tracef(" Dig Motion [%d/%d]\n", kDigMotion.vid, kDigMotion.count);
-#endif
+	#ifdef _DEBUG
+	Tracef (" Dig Motion [%d/%d]\n", kDigMotion.vid, kDigMotion.count);
+	#endif
 
 	IAbstractCharacterManager& rkChrMgr=IAbstractCharacterManager::GetSingleton();
-	CInstanceBase * pkInstMain = rkChrMgr.GetInstancePtr(kDigMotion.vid);
-	CInstanceBase * pkInstTarget = rkChrMgr.GetInstancePtr(kDigMotion.target_vid);
+	CInstanceBase* pkInstMain = rkChrMgr.GetInstancePtr (kDigMotion.vid);
+	CInstanceBase* pkInstTarget = rkChrMgr.GetInstancePtr (kDigMotion.target_vid);
 	if (NULL == pkInstMain)
+	{
 		return true;
+	}
 
 	if (pkInstTarget)
-		pkInstMain->NEW_LookAtDestInstance(*pkInstTarget);
+	{
+		pkInstMain->NEW_LookAtDestInstance (*pkInstTarget);
+	}
 
 	for (int i = 0; i < kDigMotion.count; ++i)
-		pkInstMain->PushOnceMotion(CRaceMotionData::NAME_DIG);
+	{
+		pkInstMain->PushOnceMotion (CRaceMotionData::NAME_DIG);
+	}
 
 	return true;
 }
 
-bool CPythonNetworkStream::SendDragonSoulRefinePacket(BYTE bRefineType, TItemPos* pos)
+bool CPythonNetworkStream::SendDragonSoulRefinePacket (BYTE bRefineType, TItemPos* pos)
 {
 	TPacketCGDragonSoulRefine pk;
 	pk.header = HEADER_CG_DRAGON_SOUL_REFINE;
 	pk.bSubType = bRefineType;
 	memcpy (pk.ItemGrid, pos, sizeof (TItemPos) * DS_REFINE_WINDOW_MAX_NUM);
-	if (!Send(sizeof (pk), &pk))
+	if (!Send (sizeof (pk), &pk))
 	{
 		return false;
 	}
 	return true;
 }
 
+#ifdef ENABLE_DUNGEON_INFO
+bool CPythonNetworkStream::RecvDungeonInfoPacket()
+{
+
+	TPacketGCDungeonInfoReceive KDungeonInfo;
+
+	if (!Recv(sizeof(KDungeonInfo), &KDungeonInfo))
+		return false;
+
+	switch (KDungeonInfo.bSubType)
+	{
+
+	case DUNGEON_INFO_SUB_HEADER_OPEN_SEND:
+	{
+		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_TABLE_DUNGEON_INFO_OPEN", Py_BuildValue("()"));
+	}
+	break;
+
+	case DUNGEON_INFO_SUB_HEADER_DATES_CLEAR:
+	{
+		CPythonDungeonInfo::Instance().Clear();
+	}
+	break;
+
+	case DUNGEON_INFO_SUB_HEADER_DATES_MISION_CLEAR:
+	{
+		CPythonDungeonInfo::Instance().ClearMision();
+
+	}
+	break;
+
+	case DUNGEON_INFO_SUB_HEADER_DATES_SEND:
+	{
+
+		CPythonDungeonInfo::Instance().DateInfoList(KDungeonInfo.dateinfo);
+	}
+	break;
+
+	case DUNGEON_INFO_SUB_HEADER_DATES_MISION_SEND:
+	{
+		CPythonDungeonInfo::Instance().DateInfoMisionList(KDungeonInfo.dateinfom);
+	}
+
+	case DUNGEON_INFO_SUB_HEADER_DATES_RANKING_CLEAR:
+	{
+		CPythonDungeonInfo::Instance().ClearRanking();
+	}
+	break;
+
+	case DUNGEON_INFO_SUB_HEADER_DATES_RANKING_SEND:
+	{
+
+		CPythonDungeonInfo::Instance().DateInfoRankingList(KDungeonInfo.dateinfo_ranking);
+	}
+	break;
+	case DUNGEON_INFO_SUB_HEADER_DATES_RANKING_LOAD:
+	{
+		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_TABLE_DUNGEON_RANKING_LOAD", Py_BuildValue("()"));
+	}
+	break;
+	case DUNGEON_INFO_SUB_HEADER_DATES_MISION_LOAD:
+	{
+		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_TABLE_DUNGEON_MISION_LOAD", Py_BuildValue("()"));
+	}
+	break;
+	}
+
+	return true;
+}
+#endif
+
 #ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
 bool CPythonNetworkStream::SendChangeLanguagePacket(BYTE bLanguage)
 {
-	// Eðer dil bilgisi zaten gönderildiyse tekrar gönderme
+	// E?er dil bilgisi zaten gönderildiyse tekrar gönderme
 	if (m_bLanguageSet != FALSE)
 		return true;
 
-	// Game phase'e geçilmediyse gönderme (login sýrasýnda gönderilecek)
+	// Game phase'e geçilmediyse gönderme (login s?ras?nda gönderilecek)
 	if (m_strPhase != "Game")
 		return true;
 
@@ -5343,6 +5667,181 @@ bool CPythonNetworkStream::SendSwitchbotStopPacket(BYTE slot)
 }
 #endif
 
+#ifdef ENABLE_RESP_SYSTEM
+bool CPythonNetworkStream::SendRespFetchDropPacket(uint32_t mobVnum)
+{
+	if (!__CanActMainInstance())
+		return false;
+
+	TPacketCGRespHeader header{};
+	header.header = HEADER_CG_RESP;
+	header.subheader = RESP_CG_SUBHEADER_FETCH_DROP;
+
+	if (!Send(sizeof(TPacketCGRespHeader), &header) ||
+		!Send(sizeof(uint32_t), &mobVnum))
+		return false;
+
+	return SendSequence();
+}
+
+bool CPythonNetworkStream::SendRespFetchRespPacket(uint32_t mobVnum)
+{
+	if (!__CanActMainInstance())
+		return false;
+
+	TPacketCGRespHeader header{};
+	header.header = HEADER_CG_RESP;
+	header.subheader = RESP_CG_SUBHEADER_FETCH_RESP;
+
+	if (!Send(sizeof(TPacketCGRespHeader), &header) ||
+		!Send(sizeof(uint32_t), &mobVnum))
+		return false;
+
+	return SendSequence();
+}
+
+bool CPythonNetworkStream::SendRespTeleportPacket(size_t id)
+{
+	if (!__CanActMainInstance())
+		return false;
+
+	TPacketCGRespHeader header{};
+	header.header = HEADER_CG_RESP;
+	header.subheader = RESP_CG_SUBHEADER_TELEPORT;
+
+	if (!Send(sizeof(TPacketCGRespHeader), &header) ||
+		!Send(sizeof(size_t), &id))
+		return false;
+
+	return SendSequence();
+}
+
+bool CPythonNetworkStream::RecvRespPacket()
+{
+	TPacketGCRespHeader header{};
+	if (!Recv(sizeof(TPacketGCRespHeader), &header))
+		return false;
+
+	switch (header.subheader)
+	{
+		case RESP_GC_SUBHEADER_DATA_RESP:
+		case RESP_GC_SUBHEADER_DATA_DROP:
+		{
+			uint16_t itemCount = 0;
+			if (!Recv(sizeof(uint16_t), &itemCount))
+				return false;
+
+			uint32_t mobVnum = 0;
+			if (!Recv(sizeof(uint32_t), &mobVnum))
+				return false;
+
+			switch (header.subheader)
+			{
+				case RESP_GC_SUBHEADER_DATA_RESP:
+				{
+					PyObject* respDataList = PyList_New(itemCount);
+
+					for (int i=0; i < itemCount; i++)
+					{
+						TPacketGCRespData pack{};
+						if (!Recv(sizeof(TPacketGCRespData), &pack))
+							return false;
+
+						PyObject* positionTuple = PyTuple_New(2);
+						PyTuple_SetItem(positionTuple, 0, Py_BuildValue("i", pack.x));
+						PyTuple_SetItem(positionTuple, 1, Py_BuildValue("i", pack.y));
+
+						PyObject* respDict = PyDict_New();
+
+						PyDict_SetItem(respDict, Py_BuildValue("s", "resp"), Py_BuildValue("i", pack.nextRespTime));
+						PyDict_SetItem(respDict, Py_BuildValue("s", "cord"), Py_BuildValue("O", positionTuple));
+						PyDict_SetItem(respDict, Py_BuildValue("s", "time"), Py_BuildValue("i", pack.time));
+						PyDict_SetItem(respDict, Py_BuildValue("s", "id"), Py_BuildValue("k", pack.id));
+
+						PyList_SetItem(respDataList, i, respDict);
+					}
+
+					PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_SetMobRespData", Py_BuildValue("(lO)", mobVnum, respDataList));
+
+					break;
+				}
+
+				case RESP_GC_SUBHEADER_DATA_DROP:
+				{
+					TPacketGCRespGold gold{};
+					if (!Recv(sizeof(TPacketGCRespGold), &gold))
+						return false;
+
+					PyObject* dropDataList = PyList_New(itemCount + 1);
+
+					PyObject* goldDropDict = PyDict_New();
+
+					PyDict_SetItem(goldDropDict, Py_BuildValue("s", "vnum"), Py_BuildValue("i", 1));
+					PyDict_SetItem(goldDropDict, Py_BuildValue("s", "count"), Py_BuildValue("i", gold.minGold));
+
+					PyList_SetItem(dropDataList, 0, goldDropDict);
+
+					for (int i = 0; i < itemCount; i++)
+					{
+						TPacketGCRespItem data{};
+						if (!Recv(sizeof(TPacketGCRespItem), &data))
+							return false;
+
+						PyObject* dropDict = PyDict_New();
+
+						PyDict_SetItem(dropDict, Py_BuildValue("s", "vnum"), Py_BuildValue("i", data.vnum));
+						PyDict_SetItem(dropDict, Py_BuildValue("s", "count"), Py_BuildValue("i", data.minCount));
+
+						PyList_SetItem(dropDataList, i + 1, dropDict);
+					}
+
+					PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_SetMobDropData", Py_BuildValue("(lO)", mobVnum, dropDataList));
+
+					break;
+				}
+			}
+			break;
+		}
+		case RESP_GC_SUBHEADER_DATA_MOB:
+		{
+			TPacketGCMapData pack{};
+			if (!Recv(sizeof(TPacketGCMapData), &pack))
+				return false;
+
+			PyObject* mobDataList = PyList_New(pack.mobCount);
+
+			for (int i = 0; i < pack.mobCount; i++)
+			{
+				uint32_t mobVnum = 0;
+				if (!Recv(sizeof(uint32_t), &mobVnum))
+					return false;
+
+				PyList_SetItem(mobDataList, i, Py_BuildValue("l", mobVnum));
+			}
+
+			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_SetMapData", Py_BuildValue("(Oiiii)", 
+				mobDataList, pack.currentBossCount, pack.maxBossCount, pack.currentMetinCount, pack.maxMetinCount));
+			break;
+		}
+		case RESP_GC_SUBHEADER_REFRESH_RESP:
+		{
+			TPacketGCRespRefresh pack{};
+			if (!Recv(sizeof(TPacketGCRespRefresh), &pack))
+				return false;
+
+			PyObject* positionTuple = PyTuple_New(2);
+			PyTuple_SetItem(positionTuple, 0, Py_BuildValue("i", pack.x));
+			PyTuple_SetItem(positionTuple, 1, Py_BuildValue("i", pack.y));
+
+PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_RefreshResp", Py_BuildValue("(kllO)", pack.id, pack.vnum, pack.nextRespTime, positionTuple));
+			break;
+		}
+	}
+
+	return true;
+}
+#endif
+
 #ifdef ENABLE_RENEWAL_CUBE
 bool CPythonNetworkStream::CubeRenewalMakeItem(int index_item, int count_item, int index_item_improve)
 {
@@ -5465,6 +5964,380 @@ void CPythonNetworkStream::Discord_Update(const bool bInGame)
 void CPythonNetworkStream::Discord_Close()
 {
 	Discord_Shutdown();
+}
+#endif
+
+#ifdef ENABLE_ITEMSHOP
+bool CPythonNetworkStream::RecvItemShop()
+{
+	TPacketGCItemShop p;
+	if (!Recv(sizeof(p), &p))
+	{
+#ifdef _DEBUG
+		Tracenf("RecvItemShop -> cannot recv: TPacketGCItemShop.");
+#endif
+		return false;
+	}
+
+	BYTE subHeader;
+	if (!Recv(sizeof(subHeader), &subHeader))
+	{
+#ifdef _DEBUG
+		Tracenf("RecvItemShop -> cannot recv: subHeader.");
+#endif
+		return false;
+	}
+
+	switch (subHeader)
+	{
+		case ITEMSHOP_DRAGONCOIN:
+		{
+			long long act_lldCoins;
+			if (!Recv(sizeof(act_lldCoins), &act_lldCoins))
+			{
+#ifdef _DEBUG
+				Tracenf("RecvItemShop -> cannot recv: act_lldCoins (subHeader: %u).", subHeader);
+#endif
+				return false;
+			}
+
+#ifdef USE_ITEMSHOP_RENEWED
+			long long act_lldJCoins;
+			if (!Recv(sizeof(act_lldJCoins), &act_lldJCoins))
+			{
+#ifdef _DEBUG
+				Tracenf("RecvItemShop -> cannot recv: act_lldJCoins (subHeader: %u).", subHeader);
+#endif
+				return false;
+			}
+#endif
+
+			bool isLogOpen;
+			if (!Recv(sizeof(isLogOpen), &isLogOpen))
+			{
+#ifdef _DEBUG
+				Tracenf("RecvItemShop -> cannot recv: isLogOpen (subHeader: %u).", subHeader);
+#endif
+				return false;
+			}
+
+			if (isLogOpen)
+			{
+				TIShopLogData logData;
+				if (!Recv(sizeof(logData), &logData))
+				{
+#ifdef _DEBUG
+					Tracenf("RecvItemShop -> cannot recv: logData (subHeader: %u).", subHeader);
+#endif
+					return false;
+				}
+
+#ifdef USE_ITEMSHOP_RENEWED
+				PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopAppendLog",
+										Py_BuildValue("(sissiiLL)",
+										logData.buyDate,
+										logData.buyTime,
+										logData.playerName,
+										logData.ipAdress,
+										logData.itemVnum,
+										logData.itemCount,
+										logData.itemPrice,
+										logData.itemPriceJD));
+#else
+				PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopAppendLog",
+										Py_BuildValue("(sissiiL)",
+										logData.buyDate,
+										logData.buyTime,
+										logData.playerName,
+										logData.ipAdress,
+										logData.itemVnum,
+										logData.itemCount,
+										logData.itemPrice));
+#endif
+			}
+
+#ifdef USE_ITEMSHOP_RENEWED
+			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopSetDragonCoin",
+									Py_BuildValue("(LL)",
+									act_lldCoins,
+									act_lldJCoins));
+#else
+			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopSetDragonCoin",
+									Py_BuildValue("(L)",
+									act_lldCoins));
+#endif
+
+			return true;
+		}
+		case ITEMSHOP_LOG:
+		{
+			int logCount;
+			if (!Recv(sizeof(int), &logCount))
+			{
+#ifdef _DEBUG
+				Tracenf("RecvItemShop -> cannot recv: logCount (subHeader: %u).", subHeader);
+#endif
+				return false;
+			}
+
+			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopHideLoading",
+									Py_BuildValue("()"));
+
+			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopLogClear",
+									Py_BuildValue("()"));
+
+			if (logCount > 0)
+			{
+				std::vector<TIShopLogData> m_vec;
+				m_vec.resize(logCount);
+
+				if (!Recv(sizeof(TIShopLogData) * logCount, &m_vec[0]))
+				{
+#ifdef _DEBUG
+					Tracenf("RecvItemShop -> cannot recv: m_vec (subHeader: %u).", subHeader);
+#endif
+					return false;
+				}
+
+				for (auto j = 0; j < m_vec.size(); ++j)
+				{
+#ifdef USE_ITEMSHOP_RENEWED
+					PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopAppendLog",
+											Py_BuildValue("(sissiiLL)",
+											m_vec[j].buyDate,
+											m_vec[j].buyTime,
+											m_vec[j].playerName,
+											m_vec[j].ipAdress,
+											m_vec[j].itemVnum,
+											m_vec[j].itemCount,
+											m_vec[j].itemPrice,
+											m_vec[j].itemPriceJD));
+#else
+					PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopAppendLog",
+											Py_BuildValue("(sissiiL)",
+											m_vec[j].buyDate,
+											m_vec[j].buyTime,
+											m_vec[j].playerName,
+											m_vec[j].ipAdress,
+											m_vec[j].itemVnum,
+											m_vec[j].itemCount,
+											m_vec[j].itemPrice));
+#endif
+				}
+			}
+
+			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopPurchasesWindow",
+									Py_BuildValue("()"));
+
+			return true;
+		}
+		case ITEMSHOP_UPDATE_ITEM:
+		{
+			TIShopData updateItem;
+			if (!Recv(sizeof(updateItem), &updateItem))
+			{
+#ifdef _DEBUG
+				Tracenf("RecvItemShop -> cannot recv: updateItem (subHeader: %u).", subHeader);
+#endif
+				return false;
+			}
+
+#ifdef USE_ITEMSHOP_RENEWED
+			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopUpdateItem",
+									Py_BuildValue("(iiLiiiiLiL)",
+									updateItem.id,
+									updateItem.itemVnum,
+									updateItem.itemPrice,
+									updateItem.discount,
+									updateItem.offerTime,
+									updateItem.topSellingIndex,
+									updateItem.addedTime,
+									updateItem.sellCount,
+									updateItem.maxSellCount,
+									updateItem.itemPriceJD));
+#else
+			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopUpdateItem",
+									Py_BuildValue("(iiLiiiiLi)",
+									updateItem.id,
+									updateItem.itemVnum,
+									updateItem.itemPrice,
+									updateItem.discount,
+									updateItem.offerTime,
+									updateItem.topSellingIndex,
+									updateItem.addedTime,
+									updateItem.sellCount,
+									updateItem.maxSellCount));
+#endif
+
+			return true;
+		}
+		case ITEMSHOP_LOAD:
+		{
+			long long act_lldCoins;
+			if (!Recv(sizeof(act_lldCoins), &act_lldCoins))
+			{
+#ifdef _DEBUG
+				Tracenf("RecvItemShop -> cannot recv: act_lldCoins (subHeader: %u).", subHeader);
+#endif
+				return false;
+			}
+
+#ifdef USE_ITEMSHOP_RENEWED
+			long long act_lldJCoins;
+			if (!Recv(sizeof(act_lldJCoins), &act_lldJCoins))
+			{
+#ifdef _DEBUG
+				Tracenf("RecvItemShop -> cannot recv: act_lldJCoins (subHeader: %u).", subHeader);
+#endif
+				return false;
+			}
+#endif
+
+			int updateTime;
+			if (!Recv(sizeof(updateTime), &updateTime))
+			{
+#ifdef _DEBUG
+				Tracenf("RecvItemShop -> cannot recv: updateTime (subHeader: %u).", subHeader);
+#endif
+				return false;
+			}
+
+#ifdef USE_ITEMSHOP_RENEWED
+			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopSetDragonCoin",
+									Py_BuildValue("(LL)",
+									act_lldCoins,
+									act_lldJCoins));
+#else
+			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopSetDragonCoin",
+									Py_BuildValue("(L)",
+									act_lldCoins));
+#endif
+
+			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopHideLoading",
+									Py_BuildValue("()"));
+
+			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopClear",
+									Py_BuildValue("(i)", updateTime));
+
+			int categoryTotalSize;
+			if (!Recv(sizeof(categoryTotalSize), &categoryTotalSize))
+			{
+#ifdef _DEBUG
+				Tracenf("RecvItemShop -> cannot recv: categoryTotalSize (subHeader: %u).", subHeader);
+#endif
+				return false;
+			}
+
+			if (categoryTotalSize == 9999)
+			{
+				PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopOpenMainPage",
+										Py_BuildValue("()"));
+
+				return true;
+			}
+
+
+			for (auto j = 0; j < categoryTotalSize; ++j)
+			{
+				BYTE categoryIndex;
+				if (!Recv(sizeof(categoryIndex), &categoryIndex))
+				{
+#ifdef _DEBUG
+					Tracenf("RecvItemShop -> cannot recv: categoryIndex (subHeader: %u).", subHeader);
+#endif
+					return false;
+				}
+
+				BYTE categorySize;
+				if (!Recv(sizeof(categorySize), &categorySize))
+				{
+#ifdef _DEBUG
+					Tracenf("RecvItemShop -> cannot recv: categorySize (subHeader: %u).", subHeader);
+#endif
+					return false;
+				}
+
+				for (auto x = 0; x < categorySize; ++x)
+				{
+					BYTE categorySubHeader;
+					if (!Recv(sizeof(categorySubHeader), &categorySubHeader))
+					{
+#ifdef _DEBUG
+						Tracenf("RecvItemShop -> cannot recv: categorySubHeader (subHeader: %u).", subHeader);
+#endif
+						return false;
+					}
+
+					BYTE categorySubSize;
+					if (!Recv(sizeof(categorySubSize), &categorySubSize))
+					{
+#ifdef _DEBUG
+						Tracenf("RecvItemShop -> cannot recv: categorySubSize (subHeader: %u).", subHeader);
+#endif
+						return false;
+					}
+
+					if (categorySubSize > 0)
+					{
+						for (auto k = 0; k < categorySubSize; ++k)
+						{
+							TIShopData shopData;
+							if (!Recv(sizeof(shopData), &shopData))
+							{
+#ifdef _DEBUG
+								Tracenf("RecvItemShop -> cannot recv: shopData (subHeader: %u).", subHeader);
+#endif
+								return false;
+							}
+
+#ifdef USE_ITEMSHOP_RENEWED
+							PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopAppendItem",
+													Py_BuildValue("(iiiiLiiiiLiL)",
+													categoryIndex,
+													categorySubHeader,
+													shopData.id,
+													shopData.itemVnum,
+													shopData.itemPrice,
+													shopData.discount,
+													shopData.offerTime,
+													shopData.topSellingIndex,
+													shopData.addedTime,
+													shopData.sellCount,
+													shopData.maxSellCount,
+													shopData.itemPriceJD));
+#else
+							PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopAppendItem",
+													Py_BuildValue("(iiiiLiiiiLi)",
+													categoryIndex,
+													categorySubHeader,
+													shopData.id,
+													shopData.itemVnum,
+													shopData.itemPrice,
+													shopData.discount,
+													shopData.offerTime,
+													shopData.topSellingIndex,
+													shopData.addedTime,
+													shopData.sellCount,
+													shopData.maxSellCount));
+#endif
+						}
+					}
+				}
+
+				PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopOpenMainPage",
+										Py_BuildValue("()"));
+			}
+
+			return true;
+		}
+		default:
+		{
+#ifdef _DEBUG
+			TraceError("RecvItemShop -> invalid subHeader: %u.", subHeader);
+#endif
+			return false;
+		}
+	}
 }
 #endif
 
@@ -5624,73 +6497,6 @@ bool CPythonNetworkStream::SendAcceRefinePacket()
 }
 #endif
 
-#ifdef ENABLE_BIOLOG_SYSTEM
-bool CPythonNetworkStream::SendBiologManagerAction(BYTE bSubHeader)
-{
-	if (!__CanActMainInstance())
-	{
-		return true;
-	}
-
-	TPacketCGBiologManagerAction packet;
-	packet.bHeader = HEADER_CG_BIOLOG_MANAGER;
-	packet.bSubHeader = bSubHeader;
-
-	if (!Send(sizeof(TPacketCGBiologManagerAction), &packet))
-	{
-		Tracef("SendBiologManagerAction Send Packet Error\n");
-		return false;
-	}
-
-	return true;
-}
-
-bool CPythonNetworkStream::RecvBiologManager()
-{
-	TPacketGCBiologManager packet;
-	if (!Recv(sizeof(packet), &packet)) {
-		TraceError("RecvBiologManager Error");
-		return false;
-	}
-
-	switch (packet.bSubHeader)
-	{
-		case GC_BIOLOG_MANAGER_OPEN:
-		{
-			TPacketGCBiologManagerInfo kInfo;
-			if (!Recv(sizeof(kInfo), &kInfo))
-			{
-				return false;
-			}
-
-			CPythonBiologManager::Instance()._LoadBiologInformation(&kInfo);
-			if (kInfo.bUpdate)
-			{
-				PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_BiologManagerUpdate", Py_BuildValue("()"));
-			}
-			else
-			{
-				PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_BiologManagerOpen", Py_BuildValue("()"));
-			}
-		}
-		break;
-
-		case GC_BIOLOG_MANAGER_ALERT:
-		{
-			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_BiologManagerAlert", Py_BuildValue("()"));
-		}
-		break;
-
-		case GC_BIOLOG_MANAGER_CLOSE:
-		{
-			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_BiologManagerClose", Py_BuildValue("()"));
-		}
-		break;
-	}
-	return true;
-}
-#endif
-
 #ifdef ENABLE_VIEW_CHEST_DROP
 bool CPythonNetworkStream::SendChestDropInfo(WORD wInventoryCell)
 {
@@ -5723,227 +6529,6 @@ bool CPythonNetworkStream::RecvChestDropInfo()
 	}
 
 	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_RefreshChestDropInfo", Py_BuildValue("(i)", packet.dwChestVnum));
-
-	return true;
-}
-#endif
-
-#ifdef ENABLE_EVENT_MANAGER
-bool CPythonNetworkStream::SendRequestEventData(int iMonth)
-{
-	if (InGameEventManager::Instance().GetRequestEventData())
-		return false;
-
-	SPacketCGRequestEventData p;
-	p.bHeader = HEADER_CG_REQUEST_EVENT_DATA;
-	p.bMonth = BYTE(iMonth);
-
-	if (!Send(sizeof(p), &p))
-	{
-		Tracen("Send SendRequestEventData Packet Error");
-		return false;
-	}
-
-	Tracef("SendRequestEventData\n");
-	return SendSequence();
-}
-
-bool CPythonNetworkStream::RecvEventInformation()
-{
-	TPacketGCEventInfo p;
-
-	if (!Recv(sizeof(TPacketGCEventInfo), &p))
-	{
-		TraceError("CPythonNetworkStream::RecvEventInformation TPacketGCEventInfo Error");
-		return false;
-	}
-
-	// Fix
-	const time_t serverTimeStamp = CPythonApplication::Instance().GetServerTimeStamp();
-	const time_t clientTimeStamp = time(0);
-	const time_t deltaTime = clientTimeStamp - serverTimeStamp;
-
-	std::vector<InGameEventManager::TEventTable> eventVec;
-
-	int iPacketSize = (p.wSize - sizeof(TPacketGCEventInfo));
-	for (; iPacketSize > 0; iPacketSize -= sizeof(TPacketEventData))
-	{
-		TPacketEventData kElement;
-		if (!Recv(sizeof(TPacketEventData), &kElement))
-		{
-			TraceError("CPythonNetworkStream::RecvEventInformation TPacketEventData Error");
-			return false;
-		}
-
-		InGameEventManager::TEventTable table;
-		table.dwID = kElement.dwID;
-		table.bType = kElement.bType;
-		table.startTime = kElement.startTime + deltaTime;
-		table.endTime = kElement.endTime + deltaTime;
-		table.dwVnum = kElement.dwVnum;
-		table.iPercent = kElement.iPercent;
-		table.iDropType = kElement.iDropType;
-		table.bCompleted = kElement.bCompleted;
-
-		eventVec.emplace_back(table);
-	}
-
-	InGameEventManager::Instance().SetRequestEventData(true);
-	InGameEventManager::Instance().AddEventData(eventVec);
-
-	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_OpenInGameEvent", Py_BuildValue("()"));
-
-	return true;
-}
-
-bool CPythonNetworkStream::RecvEventReload()
-{
-	TPacketGCEventReload p;
-
-	if (!Recv(sizeof(TPacketGCEventReload), &p))
-	{
-		TraceError("CPythonNetworkStream::RecvEventReload TPacketGCEventReload Error");
-		return false;
-	}
-
-	InGameEventManager::Instance().SetRequestEventData(false);
-	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_CloseInGameEvent", Py_BuildValue("()"));
-	return true;
-}
-
-bool CPythonNetworkStream::SendRequestEventQuest(const char *c_szString)
-{
-	TPacketCGRequestEventQuest Packet;
-	Packet.bHeader = HEADER_CG_REQUEST_EVENT_QUEST;
-	strncpy(Packet.szName, c_szString, QUEST_NAME_MAX_NUM);
-
-	if (!Send(sizeof(Packet), &Packet))
-	{
-		Tracen("SendRequestEventQuest Error");
-		return false;
-	}
-
-	return SendSequence();
-}
-#endif
-
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-bool CPythonNetworkStream::SendExtBattlePassAction(BYTE bAction)
-{
-	if (!__CanActMainInstance())
-		return true;
-
-	TPacketCGExtBattlePassAction packet;
-	packet.bHeader = HEADER_CG_EXT_BATTLE_PASS_ACTION;
-	packet.bAction = bAction;
-
-	if (!Send(sizeof(TPacketCGExtBattlePassAction), &packet))
-	{
-		Tracef("SendExtBattlePassAction Send Packet Error\n");
-		return false;
-	}
-
-	return SendSequence();
-}
-
-bool CPythonNetworkStream::SendExtBattlePassPremiumItem(int slotindex)
-{
-	if (!__CanActMainInstance())
-		return true;
-
-	TPacketCGExtBattlePassSendPremiumItem packet;
-	packet.bHeader = HEADER_CG_EXT_SEND_BP_PREMIUM_ITEM;
-	packet.iSlotIndex = slotindex;
-
-	if (!Send(sizeof(TPacketCGExtBattlePassSendPremiumItem), &packet))
-	{
-		Tracef("SendExtBattlePassPremiumItem Send Packet Error\n");
-		return false;
-	}
-
-	return SendSequence();
-}
-
-bool CPythonNetworkStream::RecvExtBattlePassOpenPacket()
-{
-	SPacketGCExtBattlePassOpen packet;
-	if (!Recv(sizeof(packet), &packet))
-		return false;
-
-	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_ExtOpenBattlePass", Py_BuildValue("()"));
-
-	return true;
-}
-
-bool CPythonNetworkStream::RecvExtBattlePassGeneralInfoPacket()
-{
-	TPacketGCExtBattlePassGeneralInfo packet;
-	if (!Recv(sizeof(packet), &packet))
-		return false;
-
-	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_ExtBattlePassAddGeneralInfo", Py_BuildValue("(isiii)", packet.bBattlePassType, packet.szSeasonName, packet.dwBattlePassID, packet.dwBattlePassStartTime, packet.dwBattlePassEndTime));
-
-	return true;
-}
-
-bool CPythonNetworkStream::RecvExtBattlePassMissionInfoPacket()
-{
-	TPacketGCExtBattlePassMissionInfo packet;
-	if (!Recv(sizeof(packet), &packet))
-		return false;
-
-	packet.wSize -= sizeof(packet);
-
-	while (packet.wSize > 0)
-	{
-		TExtBattlePassMissionInfo missionInfo;
-		if (!Recv(sizeof(missionInfo), &missionInfo))
-			return false;
-
-		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_ExtBattlePassAddMission", Py_BuildValue("(iiiiiii)",
-			packet.bBattlePassType, packet.dwBattlePassID, missionInfo.bMissionIndex, missionInfo.bMissionType, missionInfo.dwMissionInfo[0], missionInfo.dwMissionInfo[1], missionInfo.dwMissionInfo[2]));
-
-		for (int i = 0; i < 3; ++i)
-			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_ExtBattlePassAddMissionReward", Py_BuildValue("(iiiiii)",
-				packet.bBattlePassType, packet.dwBattlePassID, missionInfo.bMissionIndex, missionInfo.bMissionType, missionInfo.aRewardList[i].dwVnum, missionInfo.aRewardList[i].bCount));
-
-		packet.wSize -= sizeof(missionInfo);
-	}
-
-	while (packet.wRewardSize > 0)
-	{
-		TExtBattlePassRewardItem rewardInfo;
-		if (!Recv(sizeof(rewardInfo), &rewardInfo))
-			return false;
-
-		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_ExtBattlePassAddReward", Py_BuildValue("(iiii)", packet.bBattlePassType, packet.dwBattlePassID, rewardInfo.dwVnum, rewardInfo.bCount));
-
-		packet.wRewardSize -= sizeof(rewardInfo);
-	}
-	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_ExtOpenBattlePass", Py_BuildValue("()"));
-
-	return true;
-}
-
-bool CPythonNetworkStream::RecvExtBattlePassMissionUpdatePacket()
-{
-	TPacketGCExtBattlePassMissionUpdate packet;
-	if (!Recv(sizeof(packet), &packet))
-		return false;
-
-	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_ExtBattlePassUpdate", Py_BuildValue("(iiii)", packet.bBattlePassType, packet.bMissionIndex, packet.bMissionType, packet.dwNewProgress));
-
-	return true;
-}
-
-bool CPythonNetworkStream::RecvExtBattlePassRankingPacket()
-{
-	TPacketGCExtBattlePassRanking packet;
-	if (!Recv(sizeof(packet), &packet))
-		return false;
-
-	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_ExtBattlePassAddRanklistEntry", Py_BuildValue("(siiii)",
-		packet.szPlayerName, packet.bBattlePassType, packet.bBattlePassID, packet.dwStartTime, packet.dwEndTime));
 
 	return true;
 }
@@ -6384,128 +6969,15 @@ bool CPythonNetworkStream::SendQuestInputStringLongPacket(const char *c_szString
 }
 #endif
 
-#ifdef ENABLE_RENEWAL_INGAME_ITEMSHOP
-bool CPythonNetworkStream::RecvItemShop()
+#ifdef ENABLE_COLLECT_WINDOW
+bool CPythonNetworkStream::RecvCollectPacket()
 {
-	TPacketGCItemShop p;
-	if (!Recv(sizeof(TPacketGCItemShop), &p))
+	TPacketGCCollectWindow kCollectWindow;
+
+	if (!Recv(sizeof(kCollectWindow), &kCollectWindow))
 		return false;
 
-	BYTE subIndex;
-	if (!Recv(sizeof(BYTE), &subIndex))
-		return false;
-
-	switch (subIndex)
-	{
-		case ITEMSHOP_DRAGONCOIN:
-		{
-			long long dragonCoin;
-			if (!Recv(sizeof(long long), &dragonCoin))
-				return false;
-			bool isLogOpen;
-			if (!Recv(sizeof(bool), &isLogOpen))
-				return false;
-
-			if (isLogOpen)
-			{
-				TIShopLogData logData;
-				if (!Recv(sizeof(TIShopLogData), &logData))
-					return false;
-				PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopAppendLog", Py_BuildValue("(sissiiL)", logData.buyDate, logData.buyTime, logData.playerName, logData.ipAdress, logData.itemVnum, logData.itemCount, logData.itemPrice));
-			}
-
-			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopSetDragonCoin", Py_BuildValue("(L)", dragonCoin));
-		}
-		break;
-
-		case ITEMSHOP_LOG:
-		{
-			int logCount;
-			if (!Recv(sizeof(int), &logCount))
-				return false;
-			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopHideLoading", Py_BuildValue("()"));
-			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopLogClear", Py_BuildValue("()"));
-			if (logCount)
-			{
-				std::vector<TIShopLogData> m_vec;
-				m_vec.resize(logCount);
-				if (!Recv(sizeof(TIShopLogData)*logCount, &m_vec[0]))
-					return false;
-				for (DWORD j = 0; j < m_vec.size(); ++j)
-					PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopAppendLog", Py_BuildValue("(sissiiL)", m_vec[j].buyDate, m_vec[j].buyTime, m_vec[j].playerName, m_vec[j].ipAdress, m_vec[j].itemVnum, m_vec[j].itemCount, m_vec[j].itemPrice));
-			}
-			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopPurchasesWindow", Py_BuildValue("()"));
-		}
-		break;
-
-		case ITEMSHOP_UPDATE_ITEM:
-		{
-			TIShopData updateItem;
-			if (!Recv(sizeof(TIShopData), &updateItem))
-				return false;
-			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopUpdateItem", Py_BuildValue("(iiLiiiiLi)",
-				updateItem.id, updateItem.itemVnum, updateItem.itemPrice, updateItem.discount, updateItem.offerTime, updateItem.topSellingIndex, updateItem.addedTime,
-				updateItem.sellCount, updateItem.maxSellCount));
-		}
-		break;
-
-		case ITEMSHOP_LOAD:
-		{
-			long long dragonCoin;
-			if (!Recv(sizeof(long long), &dragonCoin))
-				return false;
-			int updateTime;
-			if (!Recv(sizeof(int), &updateTime))
-				return false;
-
-			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopSetDragonCoin", Py_BuildValue("(L)", dragonCoin));
-
-			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopHideLoading", Py_BuildValue("()"));
-			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopClear", Py_BuildValue("(i)", updateTime));
-
-			int categoryTotalSize;
-			if (!Recv(sizeof(int), &categoryTotalSize))
-				return false;
-
-			if (categoryTotalSize == 9999)
-			{
-				PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopOpenMainPage", Py_BuildValue("()"));
-				return true;
-			}
-
-			for (DWORD j = 0; j < categoryTotalSize; ++j)
-			{
-				BYTE categoryIndex, categorySize;
-				if (!Recv(sizeof(BYTE), &categoryIndex))
-					return false;
-				if (!Recv(sizeof(BYTE), &categorySize))
-					return false;
-				for (DWORD x = 0; x < categorySize; ++x)
-				{
-					BYTE categorySubIndex, categorySubSize = 0;
-					if (!Recv(sizeof(BYTE), &categorySubIndex))
-						return false;
-					if (!Recv(sizeof(BYTE), &categorySubSize))
-						return false;
-
-					if (categorySubSize)
-					{
-						for (DWORD k = 0; k < categorySubSize; ++k)
-						{
-							TIShopData shopData;
-							if (!Recv(sizeof(TIShopData),&shopData))
-								return false;
-							PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopAppendItem", Py_BuildValue("(iiiiLiiiiLi)",
-								categoryIndex, categorySubIndex,  shopData.id, shopData.itemVnum, shopData.itemPrice, shopData.discount, shopData.offerTime, shopData.topSellingIndex, shopData.addedTime,
-								shopData.sellCount, shopData.maxSellCount));
-						}
-					}
-				}
-				PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ItemShopOpenMainPage", Py_BuildValue("()"));
-			}
-		}
-		break;
-	}
+	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_UpdateCollectWindow", Py_BuildValue("(iiiiiiiii)", kCollectWindow.bWindowType, kCollectWindow.dwTime, kCollectWindow.bCount, kCollectWindow.dwItemVnum, kCollectWindow.bCountTotal, kCollectWindow.bChance, kCollectWindow.bRenderTargetID, kCollectWindow.bQuestIndex, kCollectWindow.RequiredLevel));
 
 	return true;
 }
@@ -7147,18 +7619,6 @@ bool CPythonNetworkStream::RecvPetAttrChangeResult()
 }
 #endif
 
-#ifdef ENABLE_GUILD_TOKEN_AUTH
-bool CPythonNetworkStream::RecvGuildTokenPacket()
-{
-	TPacketGCGuildToken packet;
-	if (!Recv(sizeof(packet), &packet))
-		return false;
-
-	__SetGuildToken(packet.token);
-	return true;
-}
-#endif
-
 #ifdef ENABLE_CHANGE_LOOK_SYSTEM
 #define TransmutationPacket(x) TPacketCGTransmutation p(static_cast<std::underlying_type_t<ECG_TRANSMUTATION_SHEADER>>(ECG_TRANSMUTATION_SHEADER::x))
 
@@ -7444,6 +7904,225 @@ bool CPythonNetworkStream::RecvMountUpGradeChat()
 
 	CPythonMountUpGrade::Instance().Chat(p.type, p.value);
 
+	return true;
+}
+#endif
+
+#ifdef ENABLE_ATTENDANCE_EVENT
+bool CPythonNetworkStream::RecvHitCountInfo()
+{
+	TPacketGCHitCountInfo hitCountPacket;
+	if (!Recv(sizeof(hitCountPacket), &hitCountPacket))
+		return false;
+
+	CPythonPlayer::Instance().SetHitCountInfo(hitCountPacket.dwVid, hitCountPacket.dwCount);
+	
+	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "RefreshHitCount", Py_BuildValue("(i)", hitCountPacket.dwVid));
+
+	return true;
+}
+
+bool CPythonNetworkStream::SendAttendanceGetReward()
+{
+	BYTE header = HEADER_CG_ATTENDANCE_REWARD;
+	if (!Send(sizeof(BYTE), &header))
+		return false;
+
+	return SendSequence();
+}
+
+bool CPythonNetworkStream::RecvAttendanceEvent()
+{
+	TPacketGCAttendanceEvent packet;
+	if (!Recv(sizeof(packet), &packet))
+		return false;
+
+	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "MiniGameAttendanceSetData", Py_BuildValue("(ii)", packet.bType, packet.bValue));
+
+	return true;
+}
+
+bool CPythonNetworkStream::RecvAttendanceEventInfo()
+{
+	TPacketGCAttendanceEventInfo packet;
+	if (!Recv(sizeof(packet), &packet))
+		return false;
+
+	packet.wSize -= sizeof(packet);
+	while (packet.wSize > 0)
+	{
+		TRewardItem kReward;
+		if (!Recv(sizeof(kReward), &kReward))
+			return false;
+
+		CPythonPlayer::Instance().SetRewardItem(kReward.bDay, kReward.dwVnum, kReward.dwCount);
+
+		packet.wSize -= sizeof(kReward);
+	}
+
+	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "MiniGameAttendanceEvent", Py_BuildValue("(i)", packet.bIsEnable));
+	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "MiniGameAttendanceSetData", Py_BuildValue("(ii)", 1, packet.bDay));
+	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "MiniGameAttendanceSetData", Py_BuildValue("(ii)", 2, packet.bClear));
+	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "MiniGameAttendanceSetData", Py_BuildValue("(ii)", 3, packet.bReward));
+
+	return true;
+}
+#endif
+
+#ifdef ENABLE_EVENT_SYSTEM
+bool CPythonNetworkStream::RecvEventInfo()
+{
+	TPacketGCEventInfo	infoPacket;
+	if (!Recv(sizeof(infoPacket), &infoPacket))
+		return false;
+	CPythonGameEvents::instance().SetActivateEvent(infoPacket.isActivate, infoPacket.event_id);
+	CPythonGameEvents::instance().SetEventTime(infoPacket.event_id, infoPacket.event_time);
+	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "OnRecvEventInformation", Py_BuildValue("()"));
+	return true;
+}
+#endif
+
+#ifdef ENABLE_MINI_GAME_CATCH_KING
+bool CPythonNetworkStream::SendMiniGameCatchKing(BYTE bSubHeader, BYTE bSubArgument)
+{
+	if (!__CanActMainInstance())
+		return true;
+	
+	TPacketCGMiniGameCatchKing packet;
+	packet.bHeader = HEADER_CG_MINI_GAME_CATCH_KING;
+	packet.bSubheader = bSubHeader;
+	packet.bSubArgument = bSubArgument;
+
+	if (!Send(sizeof(TPacketCGMiniGameCatchKing), &packet))
+	{
+		Tracef("SendMiniGameCatchKing Send Packet Error\n");
+		return false;
+	}
+
+	return SendSequence();
+}
+
+bool CPythonNetworkStream::RecvMiniGameCatchKingPacket()
+{
+	std::vector<char> vecBuffer;
+	vecBuffer.clear();
+
+	TPacketGCMiniGameCatchKing packet;
+	if (!Recv(sizeof(packet), &packet))
+		return false;
+
+	int iSize = packet.wSize - sizeof(packet);
+	if (iSize > 0)
+	{
+		vecBuffer.resize(iSize);
+		if (!Recv(iSize, &vecBuffer[0]))
+			return false;
+	}
+
+	switch (packet.bSubheader)
+	{
+		case SUBHEADER_GC_CATCH_KING_EVENT_INFO:
+			{
+				bool bIsEnable = *(bool *)&vecBuffer[0];
+				PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "MiniGameCatchKingEvent", Py_BuildValue("(b)", bIsEnable));
+			}
+			break;
+			
+		case SUBHEADER_GC_CATCH_KING_START:
+			{
+				DWORD dwBigScore = *(DWORD *)&vecBuffer[0];
+				PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "MiniGameCatchKingEventStart", Py_BuildValue("(i)", dwBigScore));
+			}
+			break;
+			
+		case SUBHEADER_GC_CATCH_KING_SET_CARD:
+			{
+				BYTE bCardNumber = *(BYTE *)&vecBuffer[0];
+				PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "MiniGameCatchKingSetHandCard", Py_BuildValue("(i)", bCardNumber));
+			}
+			break;
+			
+		case SUBHEADER_GC_CATCH_KING_RESULT_FIELD:
+			{
+				TPacketGCMiniGameCatchKingResult * packSecond = (TPacketGCMiniGameCatchKingResult *)&vecBuffer[0];
+				
+				PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "MiniGameCatchKingResultField", Py_BuildValue("(iiiibbbb)", 
+					packSecond->dwPoints, packSecond->bRowType, packSecond->bCardPos, packSecond->bCardValue, 
+					packSecond->bKeepFieldCard, packSecond->bDestroyHandCard, packSecond->bGetReward, packSecond->bIsFiveNearBy));
+			}
+			break;
+			
+		case SUBHEADER_GC_CATCH_KING_SET_END_CARD:
+			{
+				TPacketGCMiniGameCatchKingSetEndCard * packSecond = (TPacketGCMiniGameCatchKingSetEndCard *)&vecBuffer[0];
+				PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "MiniGameCatchKingSetEndCard", Py_BuildValue("(ii)", packSecond->bCardPos, packSecond->bCardValue));
+			}
+			break;
+			
+		case SUBHEADER_GC_CATCH_KING_REWARD:
+			{
+				BYTE bReturnCode = *(BYTE *)&vecBuffer[0];
+				PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "MiniGameCatchKingReward", Py_BuildValue("(i)", bReturnCode));
+			}
+			break;
+			
+		default:
+			TraceError("CPythonNetworkStream::RecvMiniGameCatchKingPacket: Unknown subheader\n");
+			break;
+	}
+
+	return true;
+}
+#endif
+
+#ifdef ENABLE_STONE_EVENT
+bool CPythonNetworkStream::RecvStoneEvent()
+{
+	TPacketGCStoneEvent p;
+	if (!Recv(sizeof(TPacketGCStoneEvent), &p))
+	{
+		Tracenf("Recv Stone Event Packet Error");
+		return false;
+	}
+
+	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_STONE_EVENT", Py_BuildValue("(i)", p.stone_point));
+	return true;
+}
+#endif
+
+#ifdef ENABLE_RANKING
+bool CPythonNetworkStream::RecvRankingTable()
+{
+	TPacketGCRankingTable p;
+	if (!Recv(sizeof(p), &p))
+		return false;
+
+	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "RankingClearData", Py_BuildValue("()"));
+	for (int i = 0; i < MAX_RANKING_LIST; i++)
+	{
+		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "RankingAddRank", Py_BuildValue("(iiLsi)", p.list[i].iPosition, p.list[i].iLevel, p.list[i].iPoints, p.list[i].szName, p.list[i].iRealPosition));
+	}
+
+	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "RankingRefresh", Py_BuildValue("()"));
+	return true;
+}
+#endif
+
+#ifdef ENABLE_KILL_STATISTICS
+bool CPythonNetworkStream::RecvKillStatistics()
+{
+	TPacketGCKillStatistics KStatisticsGC;
+
+	if (!Recv(sizeof(TPacketGCKillStatistics), &KStatisticsGC))
+	{
+		Tracen("Recv KStatisticsGC Packet Error");
+		return false;
+	}
+
+	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ReceiveKillStatisticsPacket", Py_BuildValue("(iiiiiiiiiii)",
+		KStatisticsGC.iJinnoKills, KStatisticsGC.iShinsooKills, KStatisticsGC.iChunjoKills, KStatisticsGC.iTotalKills, KStatisticsGC.iTotalDeaths,
+		KStatisticsGC.iDuelsWon, KStatisticsGC.iDuelsLost, KStatisticsGC.iBossesKills, KStatisticsGC.iStonesKills, KStatisticsGC.iMobsKills
+		, KStatisticsGC.top_damage));
 	return true;
 }
 #endif

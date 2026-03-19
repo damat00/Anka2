@@ -18,14 +18,14 @@ bool CSoundManager3D::Initialize()
 		return true;
 
 	ms_ProviderVector.resize(MAX_PROVIDERS);
-	
+
 	HPROENUM enum3D = HPROENUM_FIRST;
 	int i = 0;
 
 	while (AIL_enumerate_3D_providers(&enum3D,
 									  &ms_ProviderVector[i].hProvider,
 									  &ms_ProviderVector[i].name) && (i < MAX_PROVIDERS))
-	{  
+	{
 		TProvider * provider = &ms_ProviderVector[i];
 
 		//if (strcmp(provider->name, "DirectSound3D Software Emulation") == 0)
@@ -40,7 +40,7 @@ bool CSoundManager3D::Initialize()
 
 		++i;
 	}
-	
+
 	if (!ms_pProviderDefault)
 	{
 		CSoundBase::Destroy();
@@ -55,7 +55,7 @@ bool CSoundManager3D::Initialize()
 //		char buf[64];
 //		sprintf(buf, "Error AIL_open_3D_provider: %s\n", AIL_last_error());
 //		OutputDebugString(buf);
-		
+
 		CSoundBase::Destroy();
 		return false;
 	}
@@ -76,10 +76,10 @@ bool CSoundManager3D::Initialize()
 
 
 void CSoundManager3D::Destroy()
-{		
+{
 	if (!m_bInit)
 		return;
-	
+
 	for (int i = 0; i < INSTANCE_MAX_COUNT; ++i)
 		m_Instances[i].Destroy();
 
@@ -122,7 +122,7 @@ void CSoundManager3D::SetListenerVelocity(float fDistanceX, float fDistanceY, fl
 	AIL_set_3D_velocity(m_pListener, fDistanceX, fDistanceY, -fDistanceZ, fNagnitude);
 }
 
-int CSoundManager3D::SetInstance(const char *c_pszFileName)
+int CSoundManager3D::SetInstance(const char * c_pszFileName)
 {
 	DWORD dwFileCRC = GetFileCRC(c_pszFileName);
 	TSoundDataMap::iterator itor = ms_dataMap.find(dwFileCRC);
@@ -150,7 +150,6 @@ int CSoundManager3D::SetInstance(const char *c_pszFileName)
 			if (!pkInst->SetSound(pkSoundData))
 			{
 				TraceError("CSoundManager3D::GetInstance (filename: %s)", c_pszFileName);
-				// NOTE : 사운드가 없을 경우 Failed to set. return NULL. - [levites]
 				return -1;
 			}
 
@@ -159,7 +158,6 @@ int CSoundManager3D::SetInstance(const char *c_pszFileName)
 
 		++start;
 
-		// 설마 DWORD 한계값을 넘어갈리야 없겠지만.. 그래도.. 혹시나.. - [levites]
 		if (start > 50000)
 		{
 			start = 0;

@@ -18,10 +18,14 @@ namespace marriage
 
 	EVENTINFO(wedding_map_info)
 	{
-		WeddingMap * pWeddingMap;
+		WeddingMap* pWeddingMap;
 		int iStep;
 
-		wedding_map_info() : pWeddingMap( 0 ) , iStep( 0 ) {}
+		wedding_map_info()
+			: pWeddingMap(0)
+			, iStep(0)
+		{
+		}
 	};
 
 	EVENTFUNC(wedding_end_event)
@@ -39,14 +43,24 @@ namespace marriage
 		if (info->iStep == 0)
 		{
 			++info->iStep;
-			pMap->WarpAll(); 
+			pMap->WarpAll();
 			return PASSES_PER_SEC(15);
 		}
 		WeddingManager::instance().DestroyWeddingMap(pMap);
 		return 0;
 	}
 
-	WeddingMap::WeddingMap(DWORD dwMapIndex, DWORD dwPID1, DWORD dwPID2) : m_dwMapIndex(dwMapIndex), m_pEndEvent(NULL), m_isDark(false), m_isSnow(false), m_isMusic(false), dwPID1(dwPID1), dwPID2(dwPID2) {}
+	// Map instance
+	WeddingMap::WeddingMap(DWORD dwMapIndex, DWORD dwPID1, DWORD dwPID2) :
+		m_dwMapIndex(dwMapIndex),
+		m_pEndEvent(NULL),
+		m_isDark(false),
+		m_isSnow(false),
+		m_isMusic(false),
+		dwPID1(dwPID1),
+		dwPID2(dwPID2)
+	{
+	}
 
 	WeddingMap::~WeddingMap()
 	{
@@ -142,7 +156,7 @@ namespace marriage
 	void WeddingMap::DestroyAll()
 	{
 		sys_log(0, "WeddingMap::DestroyAll: m_set_pkChr size %zu", m_set_pkChr.size());
-		
+
 		FDestroyEveryone f;
 
 		for (charset_t::iterator it = m_set_pkChr.begin(); it != m_set_pkChr.end(); it = m_set_pkChr.begin())
@@ -154,6 +168,7 @@ namespace marriage
 		if (IsMember(ch) == true)
 			return;
 
+		//sys_log(0, "WeddingMap: IncMember %s", ch->GetName());
 		m_set_pkChr.insert(ch);
 
 		SendLocalEvent(ch);
@@ -169,6 +184,7 @@ namespace marriage
 		if (IsMember(ch) == false)
 			return;
 
+		//sys_log(0, "WeddingMap: DecMember %s", ch->GetName());
 		m_set_pkChr.erase(ch);
 
 		if (ch->GetLevel() < 10)
@@ -210,7 +226,7 @@ namespace marriage
 			{
 				ShoutInMap(CHAT_TYPE_COMMAND, __BuildCommandPlayMusic(szCommand, sizeof(szCommand), 0, "default"));
 			}
-		} 
+		}
 	}
 
 	void WeddingMap::SetDark(bool bSet)
@@ -253,7 +269,7 @@ namespace marriage
 		if (m_isSnow)
 			ch->ChatPacket(CHAT_TYPE_COMMAND, "xmas_snow 1");
 		if (m_isMusic)
-			ch->ChatPacket(CHAT_TYPE_COMMAND, __BuildCommandPlayMusic(szCommand, sizeof(szCommand), 1, m_stMusicFileName.c_str()));	
+			ch->ChatPacket(CHAT_TYPE_COMMAND, __BuildCommandPlayMusic(szCommand, sizeof(szCommand), 1, m_stMusicFileName.c_str()));
 	}
 
 	const char* WeddingMap::__BuildCommandPlayMusic(char* szCommand, size_t nCmdLen, BYTE bSet, const char* c_szMusicFileName)
@@ -267,6 +283,7 @@ namespace marriage
 		snprintf(szCommand, nCmdLen, "PlayMusic %d %s", bSet, c_szMusicFileName);
 		return szCommand;
 	}
+	// Manager
 
 	WeddingManager::WeddingManager() {}
 
@@ -301,6 +318,7 @@ namespace marriage
 
 		m_mapWedding.insert(make_pair(dwMapIndex, M2_NEW WeddingMap(dwMapIndex, dwPID1, dwPID2)));
 
+		// LOCALE_SERVICE
 		LPSECTREE_MAP pkSectreeMap = rkSecTreeMgr.GetMap(dwMapIndex);
 		if (pkSectreeMap == NULL)
 		{
@@ -320,6 +338,7 @@ namespace marriage
 		{
 			sys_log(0, "CreateWeddingMap(pid1=%d, pid2=%d) / regen_do(fileName=%s, mapIndex=%d, basePos=(%d, %d)) ok", dwPID1, dwPID2, st_weddingMapRegenFileName.c_str(), dwMapIndex, pkSectreeMap->m_setting.iBaseX, pkSectreeMap->m_setting.iBaseY);
 		}
+		// END_OF_LOCALE_SERVICE
 
 		return dwMapIndex;
 	}
@@ -364,5 +383,4 @@ namespace marriage
 			db_clientdesc->DBPacket(HEADER_GD_WEDDING_READY, 0, &p, sizeof(p));
 		}
 	}
-
 }

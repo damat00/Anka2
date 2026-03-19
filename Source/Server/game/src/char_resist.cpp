@@ -5,8 +5,11 @@
 #include "char_manager.h"
 #include "affect.h"
 #include "locale_service.h"
+#ifdef ENABLE_SUNG_MAHI_TOWER
+#include "dungeon.h"
+#endif
 
-const int poison_damage_rate[MOB_RANK_MAX_NUM] = 
+const int poison_damage_rate[MOB_RANK_MAX_NUM] =
 {
 	80, 50, 40, 30, 25, 1
 };
@@ -16,9 +19,7 @@ int GetPoisonDamageRate(LPCHARACTER ch)
 	int iRate;
 
 	if (ch->IsPC())
-	{
 		iRate = 50;
-	}
 	else
 		iRate = poison_damage_rate[ch->GetMobRank()];
 
@@ -29,16 +30,21 @@ int GetPoisonDamageRate(LPCHARACTER ch)
 EVENTINFO(TPoisonEventInfo)
 {
 	DynamicCharacterPtr ch;
-	int count;
-	DWORD attacker_pid;
+	int		count;
+	DWORD	attacker_pid;
 
-	TPoisonEventInfo() : ch(), count(0), attacker_pid(0) {}
+	TPoisonEventInfo()
+		: ch()
+		, count(0)
+		, attacker_pid(0)
+	{
+	}
 };
 
 EVENTFUNC(poison_event)
 {
 	TPoisonEventInfo * info = dynamic_cast<TPoisonEventInfo *>( event->info );
-	
+
 	if ( info == NULL )
 	{
 		sys_err( "poison_event> <Factor> Null pointer" );
@@ -51,10 +57,25 @@ EVENTFUNC(poison_event)
 	{
 		return 0;
 	}
+
+#ifdef ENABLE_BOSS_METIN_POISON_DISABLE
+	if (ch->IsBoss() || ch->IsStone())
+		return 0;
+#else
+	if (ch->IsStone())
+		return 0;
+#endif
+
 	LPCHARACTER pkAttacker = CHARACTER_MANAGER::instance().FindByPID(info->attacker_pid);
 
 	int dam = ch->GetMaxHP() * GetPoisonDamageRate(ch) / 1000;
 	if (test_server) ch->ChatPacket(CHAT_TYPE_NOTICE, "Poison Damage %d", dam);
+
+	if (!pkAttacker)
+	{
+		ch->m_pkPoisonEvent = NULL;
+		return 0;
+	}
 
 	if (ch->Damage(pkAttacker, dam, DAMAGE_TYPE_POISON))
 	{
@@ -81,21 +102,21 @@ EVENTINFO(TFireEventInfo)
 	DWORD	attacker_pid;
 
 	TFireEventInfo()
-	: ch()
-	, count(0)
-	, amount(0)
-	, attacker_pid(0)
+		: ch()
+		, count(0)
+		, amount(0)
+		, attacker_pid(0)
 	{
 	}
 };
 
 EVENTFUNC(fire_event)
 {
-	TFireEventInfo * info = dynamic_cast<TFireEventInfo *>( event->info );
+	TFireEventInfo* info = dynamic_cast<TFireEventInfo*>(event->info);
 
-	if ( info == NULL )
+	if (info == NULL)
 	{
-		sys_err( "fire_event> <Factor> Null pointer" );
+		sys_err("fire_event> <Factor> Null pointer");
 		return 0;
 	}
 
@@ -104,9 +125,14 @@ EVENTFUNC(fire_event)
 	{
 		return 0;
 	}
+
 	LPCHARACTER pkAttacker = CHARACTER_MANAGER::instance().FindByPID(info->attacker_pid);
 
+	if (!pkAttacker)
+		return 0;
+
 	int dam = info->amount;
+
 	if (test_server) ch->ChatPacket(CHAT_TYPE_NOTICE, "Fire Damage %d", dam);
 
 	if (ch->Damage(pkAttacker, dam, DAMAGE_TYPE_FIRE))
@@ -126,30 +152,6 @@ EVENTFUNC(fire_event)
 	}
 }
 
-/*
-
-   LEVEL¿¡ ÀÇÇÑ..
-
-   +8   0%
-   +7   5%
-   +6  10%
-   +5  30%
-   +4  50%
-   +3  70%
-   +2  80%
-   +1  90%
-   +0 100%
-   -1 100%
-   -2 100%
-   -3 100%
-   -4 100%
-   -5 100%
-   -6 100%
-   -7 100%
-   -8 100%
-
- */
-
 static int poison_level_adjust[9] =
 {
 	100, 90, 80, 70, 50, 30, 10, 5, 0
@@ -160,7 +162,12 @@ void CHARACTER::AttackedByFire(LPCHARACTER pkAttacker, int amount, int count)
 	if (m_pkFireEvent)
 		return;
 
-	AddAffect(AFFECT_FIRE, POINT_NONE, 0, AFF_FIRE, count*3+1, 0, true);
+#ifdef ENABLE_ATTENDANCE_EVENT
+	if(GetRaceNum() >= 6500 && GetRaceNum() <= 6504)
+		return;
+#endif
+
+	AddAffect(AFFECT_FIRE, POINT_NONE, 0, AFF_FIRE, count * 3 + 1, 0, true);
 
 	TFireEventInfo* info = AllocEventInfo<TFireEventInfo>();
 
@@ -177,6 +184,11 @@ void CHARACTER::AttackedByPoison(LPCHARACTER pkAttacker)
 	if (m_pkPoisonEvent)
 		return;
 
+#ifdef ENABLE_BOSS_METIN_POISON_DISABLE
+	if (IsBoss())
+		return;
+#endif
+
 	if (m_bHasPoisoned && !IsPC())
 		return;
 
@@ -184,12 +196,22 @@ void CHARACTER::AttackedByPoison(LPCHARACTER pkAttacker)
 	{
 		int delta = GetLevel() - pkAttacker->GetLevel();
 
-		if (delta > 8)
+		if (delta > 8)//zehirlemelevel
 			delta = 8;
 
 		if (number(1, 100) > poison_level_adjust[delta])
 			return;
 	}
+
+	/*if (IsImmune(IMMUNE_POISON))
+		return;*/
+
+#ifdef ENABLE_SUNG_MAHI_TOWER
+	LPDUNGEON dungeonInstance = GetDungeon();
+	if (dungeonInstance)
+		if (dungeonInstance->GetFlag("sungMahiCurseType") == 1)
+			return;
+#endif
 
 	m_bHasPoisoned = true;
 
@@ -240,6 +262,8 @@ void CHARACTER::ApplyMobAttribute(const TMobTable* table)
 
 bool CHARACTER::IsImmune(DWORD dwImmuneFlag)
 {
+	// 1 stun, 2 slow, 4 fall = 7 all == X
+	// ChatPacket(CHAT_TYPE_PARTY, "<IMMUNE_IS> (%u == %u)", m_pointsInstant.dwImmuneFlag, dwImmuneFlag);
 	if (IS_SET(m_pointsInstant.dwImmuneFlag, dwImmuneFlag))
 	{
 #ifdef ENABLE_BERSERKER_MODE_FIX
@@ -249,10 +273,10 @@ bool CHARACTER::IsImmune(DWORD dwImmuneFlag)
 #endif
 		int	percent = number(1, 100);
 
-		if (percent <= immune_pct)
+		if (percent <= immune_pct)	// 90% Immune
 		{
 			if (test_server && IsPC())
-				ChatPacket(CHAT_TYPE_PARTY, "<IMMUNE_SUCCESS> (%s)", GetName()); 
+				ChatPacket(CHAT_TYPE_PARTY, "<IMMUNE_SUCCESS> (%s)", GetName());
 
 			return true;
 		}
@@ -270,4 +294,3 @@ bool CHARACTER::IsImmune(DWORD dwImmuneFlag)
 
 	return false;
 }
-

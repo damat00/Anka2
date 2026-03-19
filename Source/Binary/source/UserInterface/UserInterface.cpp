@@ -126,6 +126,7 @@ bool PackInitialize(const char *c_pszFolder)
 
 	CSoundData::SetPackMode();
 
+	CEterPackManager::Instance().RegisterPack("pack/best_system", "*");
 	CEterPackManager::Instance().RegisterPack("pack/bgm", "*");
 	CEterPackManager::Instance().RegisterPack("pack/effect", "*");
 	CEterPackManager::Instance().RegisterPack("pack/guild", "*");
@@ -138,12 +139,14 @@ bool PackInitialize(const char *c_pszFolder)
 	CEterPackManager::Instance().RegisterPack("pack/npc_mount", "*");
 	CEterPackManager::Instance().RegisterPack("pack/npc_pet", "*");
 	CEterPackManager::Instance().RegisterPack("pack/npc2", "*");
-	CEterPackManager::Instance().RegisterPack("pack/others", "*");
-	CEterPackManager::Instance().RegisterPack("pack/outdoor", "*");
+	CEterPackManager::Instance().RegisterPack("pack/etc", "*");
+	CEterPackManager::Instance().RegisterPack("pack/maps", "*");
+	CEterPackManager::Instance().RegisterPack("pack/patch_dungeon_new", "*");
 	CEterPackManager::Instance().RegisterPack("pack/pc", "*");
 	CEterPackManager::Instance().RegisterPack("pack/pc2", "*");
 	CEterPackManager::Instance().RegisterPack("pack/property", "*");
 	CEterPackManager::Instance().RegisterPack("pack/sound", "*");
+	CEterPackManager::Instance().RegisterPack("pack/season", "*");
 	CEterPackManager::Instance().RegisterPack("pack/terrainmaps", "*");
 	CEterPackManager::Instance().RegisterPack("pack/textureset", "*");
 	CEterPackManager::Instance().RegisterPack("pack/tree", "*");
@@ -170,94 +173,94 @@ bool PackInitialize(const char *c_pszFolder)
 		{ "d:/ymir work/monster2/", "monster" },
 		{ "d:/ymir work/npc/", "npc" },
 		{ "d:/ymir work/npc2/", "npc" },
-		{ "d:/ymir work/environment/", "others" },
-		{ "d:/ymir work/special/", "others" },
-		{ "d:/ymir work/ui/", "others" },
-		{ "gm_guild_build/", "outdoor" },
-		{ "maimetin2_map_empirewar_a01/", "outdoor" },
-		{ "map_a2/", "outdoor" },
-		{ "map_b_fielddungeon/", "outdoor" },
-		{ "map_n_snowm_01/", "outdoor" },
-		{ "map_n_snowm_02/", "outdoor" },
-		{ "metin2_guild_village/", "outdoor" },
-		{ "metin2_guild_village_01/", "outdoor" },
-		{ "metin2_guild_village_02/", "outdoor" },
-		{ "metin2_guild_village_03/", "outdoor" },
-		{ "metin2_map/", "outdoor" },
-		{ "metin2_map_a1/", "outdoor" },
-		{ "metin2_map_a2_1/", "outdoor" },
-		{ "metin2_map_a3/", "outdoor" },
-		{ "metin2_map_b1/", "outdoor" },
-		{ "metin2_map_b3/", "outdoor" },
-		{ "metin2_map_bayblacksand/", "outdoor" },
-		{ "metin2_map_c1/", "outdoor" },
-		{ "metin2_map_c3/", "outdoor" },
-		{ "metin2_map_capedragonhead/", "outdoor" },
-		{ "metin2_map_dawnmistwood/", "outdoor" },
-		{ "metin2_map_devilscatacomb/", "outdoor" },
-		{ "metin2_map_deviltower1/", "outdoor" },
-		{ "metin2_map_duel/", "outdoor" },
-		{ "metin2_map_empirewar_a01/", "outdoor" },
-		{ "metin2_map_empirewar01/", "outdoor" },
-		{ "metin2_map_empirewar02/", "outdoor" },
-		{ "metin2_map_empirewar03/", "outdoor" },
-		{ "metin2_map_ew02/", "outdoor" },
-		{ "metin2_map_guild_01/", "outdoor" },
-		{ "metin2_map_guild_02/", "outdoor" },
-		{ "metin2_map_guild_03/", "outdoor" },
-		{ "metin2_map_guild_inside01/", "outdoor" },
-		{ "metin2_map_milgyo/", "outdoor" },
-		{ "metin2_map_milgyo_a/", "outdoor" },
-		{ "metin2_map_monkeydungeon/", "outdoor" },
-		{ "metin2_map_monkeydungeon_02/", "outdoor" },
-		{ "metin2_map_monkeydungeon_03/", "outdoor" },
-		{ "metin2_map_mt_thunder/", "outdoor" },
-		{ "metin2_map_n_desert_01/", "outdoor" },
-		{ "metin2_map_n_desert_02/", "outdoor" },
-		{ "metin2_map_n_flame_01/", "outdoor" },
-		{ "metin2_map_n_flame_02/", "outdoor" },
-		{ "metin2_map_n_flame_dungeon_01/", "outdoor" },
-		{ "metin2_map_n_snow_dungeon_01/", "outdoor" },
-		{ "metin2_map_nusluck01/", "outdoor" },
-		{ "metin2_map_oxevent/", "outdoor" },
-		{ "metin2_map_shinsutest_01/", "outdoor" },
-		{ "metin2_map_siege_01/", "outdoor" },
-		{ "metin2_map_siege_02/", "outdoor" },
-		{ "metin2_map_siege_03/", "outdoor" },
-		{ "metin2_map_skipia_bossdungeon/", "outdoor" },
-		{ "metin2_map_skipia_dungeon_01/", "outdoor" },
-		{ "metin2_map_skipia_dungeon_02/", "outdoor" },
-		{ "metin2_map_skipia_dungeon_boss/", "outdoor" },
-		{ "metin2_map_spider_bossdungeon/", "outdoor" },
-		{ "metin2_map_spiderdungeon/", "outdoor" },
-		{ "metin2_map_spiderdungeon_02/", "outdoor" },
-		{ "metin2_map_spiderdungeon_03/", "outdoor" },
-		{ "metin2_map_sungzi/", "outdoor" },
-		{ "metin2_map_sungzi_desert_01/", "outdoor" },
-		{ "metin2_map_sungzi_desert_hill_01/", "outdoor" },
-		{ "metin2_map_sungzi_desert_hill_02/", "outdoor" },
-		{ "metin2_map_sungzi_desert_hill_03/", "outdoor" },
-		{ "metin2_map_sungzi_flame_hill_01/", "outdoor" },
-		{ "metin2_map_sungzi_flame_hill_02/", "outdoor" },
-		{ "metin2_map_sungzi_flame_hill_03/", "outdoor" },
-		{ "metin2_map_sungzi_milgyo/", "outdoor" },
-		{ "metin2_map_sungzi_milgyo_pass_01/", "outdoor" },
-		{ "metin2_map_sungzi_milgyo_pass_02/", "outdoor" },
-		{ "metin2_map_sungzi_milgyo_pass_03/", "outdoor" },
-		{ "metin2_map_sungzi_snow/", "outdoor" },
-		{ "metin2_map_sungzi_snow_pass01/", "outdoor" },
-		{ "metin2_map_sungzi_snow_pass02/", "outdoor" },
-		{ "metin2_map_sungzi_snow_pass03/", "outdoor" },
-		{ "metin2_map_t1/", "outdoor" },
-		{ "metin2_map_t2/", "outdoor" },
-		{ "metin2_map_t3/", "outdoor" },
-		{ "metin2_map_t4/", "outdoor" },
-		{ "metin2_map_trent/", "outdoor" },
-		{ "metin2_map_trent_a/", "outdoor" },
-		{ "metin2_map_trent02/", "outdoor" },
-		{ "metin2_map_trent02_a/", "outdoor" },
-		{ "metin2_map_wedding_01/", "outdoor" },
-		{ "metin2_map_wl_01/", "outdoor" },
+		{ "d:/ymir work/environment/", "etc" },
+		{ "d:/ymir work/special/", "etc" },
+		{ "d:/ymir work/ui/", "etc" },
+		{ "gm_guild_build/", "maps" },
+		{ "maimetin2_map_empirewar_a01/", "maps" },
+		{ "map_a2/", "maps" },
+		{ "map_b_fielddungeon/", "maps" },
+		{ "map_n_snowm_01/", "maps" },
+		{ "map_n_snowm_02/", "maps" },
+		{ "metin2_guild_village/", "maps" },
+		{ "metin2_guild_village_01/", "maps" },
+		{ "metin2_guild_village_02/", "maps" },
+		{ "metin2_guild_village_03/", "maps" },
+		{ "metin2_map/", "maps" },
+		{ "metin2_map_a1/", "maps" },
+		{ "metin2_map_a2_1/", "maps" },
+		{ "metin2_map_a3/", "maps" },
+		{ "metin2_map_b1/", "maps" },
+		{ "metin2_map_b3/", "maps" },
+		{ "metin2_map_bayblacksand/", "maps" },
+		{ "metin2_map_c1/", "maps" },
+		{ "metin2_map_c3/", "maps" },
+		{ "metin2_map_capedragonhead/", "maps" },
+		{ "metin2_map_dawnmistwood/", "maps" },
+		{ "metin2_map_devilscatacomb/", "maps" },
+		{ "metin2_map_deviltower1/", "maps" },
+		{ "metin2_map_duel/", "maps" },
+		{ "metin2_map_empirewar_a01/", "maps" },
+		{ "metin2_map_empirewar01/", "maps" },
+		{ "metin2_map_empirewar02/", "maps" },
+		{ "metin2_map_empirewar03/", "maps" },
+		{ "metin2_map_ew02/", "maps" },
+		{ "metin2_map_guild_01/", "maps" },
+		{ "metin2_map_guild_02/", "maps" },
+		{ "metin2_map_guild_03/", "maps" },
+		{ "metin2_map_guild_inside01/", "maps" },
+		{ "metin2_map_milgyo/", "maps" },
+		{ "metin2_map_milgyo_a/", "maps" },
+		{ "metin2_map_monkeydungeon/", "maps" },
+		{ "metin2_map_monkeydungeon_02/", "maps" },
+		{ "metin2_map_monkeydungeon_03/", "maps" },
+		{ "metin2_map_mt_thunder/", "maps" },
+		{ "metin2_map_n_desert_01/", "maps" },
+		{ "metin2_map_n_desert_02/", "maps" },
+		{ "metin2_map_n_flame_01/", "maps" },
+		{ "metin2_map_n_flame_02/", "maps" },
+		{ "metin2_map_n_flame_dungeon_01/", "maps" },
+		{ "metin2_map_n_snow_dungeon_01/", "maps" },
+		{ "metin2_map_nusluck01/", "maps" },
+		{ "metin2_map_oxevent/", "maps" },
+		{ "metin2_map_shinsutest_01/", "maps" },
+		{ "metin2_map_siege_01/", "maps" },
+		{ "metin2_map_siege_02/", "maps" },
+		{ "metin2_map_siege_03/", "maps" },
+		{ "metin2_map_skipia_bossdungeon/", "maps" },
+		{ "metin2_map_skipia_dungeon_01/", "maps" },
+		{ "metin2_map_skipia_dungeon_02/", "maps" },
+		{ "metin2_map_skipia_dungeon_boss/", "maps" },
+		{ "metin2_map_spider_bossdungeon/", "maps" },
+		{ "metin2_map_spiderdungeon/", "maps" },
+		{ "metin2_map_spiderdungeon_02/", "maps" },
+		{ "metin2_map_spiderdungeon_03/", "maps" },
+		{ "metin2_map_sungzi/", "maps" },
+		{ "metin2_map_sungzi_desert_01/", "maps" },
+		{ "metin2_map_sungzi_desert_hill_01/", "maps" },
+		{ "metin2_map_sungzi_desert_hill_02/", "maps" },
+		{ "metin2_map_sungzi_desert_hill_03/", "maps" },
+		{ "metin2_map_sungzi_flame_hill_01/", "maps" },
+		{ "metin2_map_sungzi_flame_hill_02/", "maps" },
+		{ "metin2_map_sungzi_flame_hill_03/", "maps" },
+		{ "metin2_map_sungzi_milgyo/", "maps" },
+		{ "metin2_map_sungzi_milgyo_pass_01/", "maps" },
+		{ "metin2_map_sungzi_milgyo_pass_02/", "maps" },
+		{ "metin2_map_sungzi_milgyo_pass_03/", "maps" },
+		{ "metin2_map_sungzi_snow/", "maps" },
+		{ "metin2_map_sungzi_snow_pass01/", "maps" },
+		{ "metin2_map_sungzi_snow_pass02/", "maps" },
+		{ "metin2_map_sungzi_snow_pass03/", "maps" },
+		{ "metin2_map_t1/", "maps" },
+		{ "metin2_map_t2/", "maps" },
+		{ "metin2_map_t3/", "maps" },
+		{ "metin2_map_t4/", "maps" },
+		{ "metin2_map_trent/", "maps" },
+		{ "metin2_map_trent_a/", "maps" },
+		{ "metin2_map_trent02/", "maps" },
+		{ "metin2_map_trent02_a/", "maps" },
+		{ "metin2_map_wedding_01/", "maps" },
+		{ "metin2_map_wl_01/", "maps" },
 		{ "property/", "property" },
 		{ "uiscript/", "root" },
 		{ "sound/ambience/", "sound" },
@@ -431,13 +434,10 @@ bool RunMainScript(CPythonLauncher& pyLauncher, const char *lpCmdLine)
 #ifdef ENABLE_ACCE_COSTUME_SYSTEM
 	initAcce();
 #endif
-#ifdef ENABLE_BIOLOG_SYSTEM
-	initBiologManager();
-#endif
 #ifdef ENABLE_RENDER_TARGET
 	initRenderTarget();
 #endif
-#ifdef ENABLE_INGAME_WIKI_SYSTEM
+#ifdef ENABLE_WIKI_SYSTEM
 	initWiki();
 #endif
 #ifdef ENABLE_OFFLINESHOP_SEARCH_SYSTEM
@@ -445,6 +445,12 @@ bool RunMainScript(CPythonLauncher& pyLauncher, const char *lpCmdLine)
 #endif
 #ifdef ENABLE_RIDING_EXTENDED
 	initmountupgrade();
+#endif
+#ifdef ENABLE_DUNGEON_INFO
+	intdungeoninfo();
+#endif
+#ifdef ENABLE_EVENT_SYSTEM
+	initGameEvents();
 #endif
 
 	NANOBEGIN
@@ -578,7 +584,7 @@ bool Main(HINSTANCE hInstance, LPSTR lpCmdLine)
 
 	app->Destroy();
 	delete app;
-	
+
 	return ret;
 }
 
@@ -670,7 +676,7 @@ int Setup(LPSTR lpCmdLine)
 		return 0;
 
 	wTimerRes = MINMAX(tc.wPeriodMin, 1, tc.wPeriodMax);
-	timeBeginPeriod(wTimerRes); 
+	timeBeginPeriod(wTimerRes);
 
 	granny_log_callback Callback;
 	Callback.Function = nullptr;

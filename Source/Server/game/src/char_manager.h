@@ -11,6 +11,9 @@
 class CDungeon;
 class CHARACTER;
 class CharacterVectorInteractor;
+#ifdef ENABLE_EVENT_BANNER_FLAG
+typedef std::map<DWORD, std::string> BannerMapType;
+#endif
 
 class CHARACTER_MANAGER : public singleton<CHARACTER_MANAGER>
 {
@@ -43,6 +46,10 @@ class CHARACTER_MANAGER : public singleton<CHARACTER_MANAGER>
 		bool SpawnGroupGroup(DWORD dwVnum, long lMapIndex, int sx, int sy, int ex, int ey, LPREGEN pkRegen = NULL, bool bAggressive_ = false, LPDUNGEON pDungeon = NULL);
 		bool SpawnMoveGroup(DWORD dwVnum, long lMapIndex, int sx, int sy, int ex, int ey, int tx, int ty, LPREGEN pkRegen = NULL, bool bAggressive_ = false);
 		LPCHARACTER SpawnMobRandomPosition(DWORD dwVnum, long lMapIndex);
+#ifdef STONE_REGEN_FIX
+		LPCHARACTER		SpawnMobStone(DWORD dwType, DWORD dwVnum, long lMapIndex, long x, long y, long z, bool bSpawnMotion = false, int iRot = -1, bool bShow = true, bool bAggressive = false);
+		LPCHARACTER		SpawnMobRangeStone(DWORD dwVnum, long lMapIndex, int sx, int sy, int ex, int ey, bool bIsException = false, bool bSpawnMotion = false, bool bAggressive = false);
+#endif
 
 		void SelectStone(LPCHARACTER pkChrStone);
 
@@ -99,6 +106,11 @@ class CHARACTER_MANAGER : public singleton<CHARACTER_MANAGER>
 
 		bool BeginPendingDestroy();
 		void FlushPendingDestroy();
+#ifdef ENABLE_REAL_TIME_REGEN
+		void			EraseRealTimeRegenCharacter(WORD wNum);
+		LPCHARACTER		FindRealTimeRegenMonster(WORD wNum);
+		void			RefreshAllMonsters();
+#endif
 
 	private:
 		int m_iMobItemRate;
@@ -159,21 +171,44 @@ class CHARACTER_MANAGER : public singleton<CHARACTER_MANAGER>
 	protected:
 		std::map<std::string, std::vector<TMultiFarm>> m_mapmultiFarm;
 #endif
-
-#ifdef ENABLE_RENEWAL_INGAME_ITEMSHOP
+#ifdef __DUNGEON_INFO__
 	public:
-		void LoadItemShopData(const char* c_pData);
-		void LoadItemShopData(LPCHARACTER ch, bool isAll = true);
-		void LoadItemShopLog(LPCHARACTER ch);
-		void LoadItemShopLogReal(LPCHARACTER ch, const char* c_pData);
-		void LoadItemShopBuy(LPCHARACTER ch, int itemID, int itemCount);
-		void LoadItemShopBuyReal(LPCHARACTER ch, const char* c_pData);
-		int GetItemShopUpdateTime() { return itemshopUpdateTime; }
-		void UpdateItemShopItem(const char* c_pData);
+		void	SendDungeonRank(LPCHARACTER ch, DWORD mobIdx, BYTE rankIdx);
 
 	protected:
-		int itemshopUpdateTime;
+		std::map<DWORD, std::map<BYTE, std::pair<std::vector<TDungeonRank>, int>>> m_mapDungeonRank;
+#endif
+
+#ifdef ENABLE_ITEMSHOP
+	public:
+		void	LoadItemShopData(const char* c_pData);
+		void	LoadItemShopData(LPCHARACTER ch, bool isAll = true);
+		void	LoadItemShopLog(LPCHARACTER ch);
+		void	LoadItemShopLogReal(LPCHARACTER ch, const char* c_pData);
+		void	LoadItemShopBuy(LPCHARACTER ch, int itemID, int itemCount);
+		void	LoadItemShopBuyReal(LPCHARACTER ch, const char* c_pData);
+		int		GetItemShopUpdateTime() { return itemshopUpdateTime; }
+		void	UpdateItemShopItem(const char* c_pData);
+
+	protected:
+		int		itemshopUpdateTime;
 		std::map<BYTE, std::map<BYTE, std::vector<TIShopData>>> m_IShopManager;
+#endif
+
+#ifdef ENABLE_EVENT_BANNER_FLAG
+	public:
+		enum EBannerMapIndex
+		{
+			EMPIRE_A = 1,
+			EMPIRE_B = 21,
+			EMPIRE_C = 41,
+		};
+		bool InitializeBanners();
+		bool SpawnBanners(int iEnable, const char* c_szBannerName = NULL);
+
+	private:
+		BannerMapType BannerMap;
+		bool m_bIsLoadedBanners;
 #endif
 };
 

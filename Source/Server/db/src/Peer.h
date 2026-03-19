@@ -2,6 +2,7 @@
 #define __INC_PEER_H__
 
 #include "PeerBase.h"
+#include "../../common/service.h"
 
 class CPeer : public CPeerBase
 {
@@ -68,6 +69,7 @@ class CPeer : public CPeerBase
 		DWORD	m_dwUserCount;
 		WORD	m_wListenPort;
 		WORD	m_wP2PPort;
+
 		long	m_alMaps[64];
 
 		TItemIDRangeTable m_itemRange;

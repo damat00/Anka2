@@ -20,7 +20,7 @@ template<typename T> class CRef
 		CRef() : m_pObject(nullptr)
 		{
 		}
-		
+
 		CRef(CReferenceObject* pObject)
 		{
 			m_pObject = nullptr;
@@ -30,14 +30,14 @@ template<typename T> class CRef
 		CRef(const CRef& c_rRef)
 		{
 			m_pObject = nullptr;
-			Initialize(c_rRef.m_pObject);			
+			Initialize(c_rRef.m_pObject);
 		}
 
 		~CRef()
 		{
 			Clear();
 		}
-		
+
 		void operator = (CReferenceObject* pObject)
 		{
 			SetPointer(pObject);
@@ -45,7 +45,7 @@ template<typename T> class CRef
 
 		void operator = (const CRef& c_rRef)
 		{
-			SetPointer(c_rRef.m_pObject);			
+			SetPointer(c_rRef.m_pObject);
 		}
 
 		void Clear()
@@ -85,7 +85,7 @@ template<typename T> class CRef
 			assert(m_pObject != nullptr);
 			return static_cast<T*>(m_pObject);
 		}
-				
+
 	private:
 		void Initialize(CReferenceObject* pObject)
 		{

@@ -142,15 +142,19 @@ void __GetRaceResourcePathes(unsigned race, std::vector <std::string>& vec_stPat
 	}
 	else
 	{
-		vec_stPathes.emplace_back ("d:/ymir work/monster/");
-		vec_stPathes.emplace_back ("d:/ymir work/monster2/");
-		vec_stPathes.emplace_back ("d:/ymir work/npc/");
-		vec_stPathes.emplace_back ("d:/ymir work/npc2/");
-		vec_stPathes.emplace_back ("d:/ymir work/npc_pet/");
-		vec_stPathes.emplace_back ("d:/ymir work/npc_mount/");
-		vec_stPathes.emplace_back ("d:/ymir work/guild/");
+		vec_stPathes.emplace_back("d:/ymir work/monster/");
+		vec_stPathes.emplace_back("d:/ymir work/monster2/");
+		vec_stPathes.emplace_back("d:/ymir work/npc/");
+		vec_stPathes.emplace_back("d:/ymir work/npc2/");
+		vec_stPathes.emplace_back("d:/ymir work/npc_pet/");
+		vec_stPathes.emplace_back("d:/ymir work/npc_mount/");
+		vec_stPathes.emplace_back("d:/ymir work/guild/");
 	}
-	return;
+	// @fixme021 add season folders
+	vec_stPathes.emplace_back("#season1/npc/");
+	vec_stPathes.emplace_back("#season2/npc/");
+	vec_stPathes.emplace_back("#season1/monster/");
+	vec_stPathes.emplace_back("#season2/monster/");
 }
 
 CRaceData* CRaceManager::__LoadRaceData(DWORD dwRaceIndex)
@@ -181,7 +185,7 @@ CRaceData* CRaceManager::__LoadRaceData(DWORD dwRaceIndex)
 			return NULL;
 		}
 
-		__LoadRaceMotionList(*pRaceData, pathName, motionListFileName);		
+		__LoadRaceMotionList(*pRaceData, pathName, motionListFileName);
 
 		return pRaceData;
 	}
@@ -216,7 +220,7 @@ CRaceData* CRaceManager::__LoadRaceData(DWORD dwRaceIndex)
 				TraceError("CRaceManager::RegisterRacePath : RACE[%u] LOAD MSMFILE[%s] ERROR. Will Find Another Path.", dwRaceIndex, stMSMFileName.c_str());
 				continue;
 			}
-			
+
 			TraceError("CRaceManager::RegisterRacePath : RACE[%u] LOAD MSMFILE[%s] ERROR", dwRaceIndex, stMSMFileName.c_str());
 			CRaceData::Delete(pRaceData);
 			return NULL;
@@ -225,7 +229,7 @@ CRaceData* CRaceManager::__LoadRaceData(DWORD dwRaceIndex)
 		std::string stMotionListFileName=stFullPathName;
 		stMotionListFileName+=pRaceData->GetMotionListFileName();
 
-		__LoadRaceMotionList(*pRaceData, stFullPathName.c_str(), stMotionListFileName.c_str());		
+		__LoadRaceMotionList(*pRaceData, stFullPathName.c_str(), stMotionListFileName.c_str());
 
 		return pRaceData;
 	}
@@ -456,7 +460,7 @@ void CRaceManager::SetPathName(const char *c_szPathName)
 const char *CRaceManager::GetFullPathFileName(const char *c_szFileName)
 {
 	static std::string s_stFileName;
-	
+
 	if (c_szFileName[0] != '.')
 	{
 		s_stFileName = m_strPathName;
@@ -499,7 +503,7 @@ void CRaceManager::Destroy()
 
 CRaceManager::CRaceManager()
 {
-	__Initialize();	
+	__Initialize();
 }
 
 CRaceManager::~CRaceManager()

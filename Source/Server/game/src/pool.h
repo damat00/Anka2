@@ -1,6 +1,10 @@
 #ifndef __INC_METIN_II_GAME_POOL_H__
 #define __INC_METIN_II_GAME_POOL_H__
 
+// Neither error-checking nor watermarking here.
+// Definitely not thread-safe.
+// In order to debug the heap memory usage, activate DebugAllocator by defining
+// DEBUG_ALLOC.
 #ifdef M2_USE_POOL
 
 template<typename T>

@@ -21,12 +21,13 @@ class CPythonSafeBox : public CSingleton<CPythonSafeBox>
 
 		void SetMoney(DWORD dwMoney);
 		DWORD GetMoney();
-		
+
 		BOOL GetSlotItemID(DWORD dwSlotIndex, DWORD* pdwItemID);
 
 		int GetCurrentSafeBoxSize();
 		BOOL GetItemDataPtr(DWORD dwSlotIndex, TItemData ** ppInstance);
 
+		// MALL
 		void OpenMall(int iSize);
 		void SetMallItemData(DWORD dwSlotIndex, const TItemData & rItemData);
 		void DelMallItemData(DWORD dwSlotIndex);

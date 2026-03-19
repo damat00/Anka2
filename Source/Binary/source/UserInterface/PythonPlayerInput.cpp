@@ -2,7 +2,6 @@
 #include "PythonPlayer.h"
 #include "PythonPlayerEventHandler.h"
 #include "PythonApplication.h"
-
 #include "../eterlib/Camera.h"
 #include "../eterbase/Timer.h"
 
@@ -165,7 +164,6 @@ void CPythonPlayer::SetTarget(DWORD dwVID, BOOL bForceChange)
 	if (!pkInstMain)
 		return;
 
-	// 2004. 07. 07. [levites] - ½ºÅ³ »ç¿ëÁß Å¸°ÙÀÌ ¹Ù²î´Â ¹®Á¦ ÇØ°áÀ» À§ÇÑ ÄÚµå
 	if (!pkInstMain->CanChangeTarget())
 	{
 		return;
@@ -178,7 +176,7 @@ void CPythonPlayer::SetTarget(DWORD dwVID, BOOL bForceChange)
 		if (dwVID==pkInstMain->GetVirtualID())
 		{
 			__SetTargetVID(0);
-			
+
 			pkInstMain->OnUntargeted();
 			pkInstMain->ClearFlyTargetInstance();
 			CPythonNetworkStream::Instance().SendTargetPacket(0);
@@ -208,7 +206,7 @@ void CPythonPlayer::SetTarget(DWORD dwVID, BOOL bForceChange)
 		if (pTargetedInstance)
 			pTargetedInstance->OnUntargeted();
 	}
-	
+
 
 	CInstanceBase * pkInstTarget = CPythonCharacterManager::Instance().GetInstancePtr(dwVID);
 	if (pkInstTarget)
@@ -220,7 +218,7 @@ void CPythonPlayer::SetTarget(DWORD dwVID, BOOL bForceChange)
 #endif
 		{
 			__SetTargetVID(dwVID);
-			
+
 			pkInstTarget->OnTargeted();
 			pkInstMain->SetFlyTargetInstance(*pkInstTarget);
 			pkInstMain->GetGraphicThingInstanceRef().SetFlyEventHandler(CPythonPlayerEventHandler::GetSingleton().GetNormalBowAttackFlyEventHandler(pkInstMain, pkInstTarget));
@@ -231,10 +229,10 @@ void CPythonPlayer::SetTarget(DWORD dwVID, BOOL bForceChange)
 	}
 
 	__SetTargetVID(0);
-	
+
 	pkInstMain->ClearFlyTargetInstance();
 	CPythonNetworkStream::Instance().SendTargetPacket(0);
-	
+
 }
 
 bool CPythonPlayer::__ChangeTargetToPickedInstance()
@@ -313,15 +311,12 @@ void CPythonPlayer::__OnClickItem(CInstanceBase& rkInstMain, DWORD dwItemID)
 
 void CPythonPlayer::__OnClickActor(CInstanceBase& rkInstMain, DWORD dwPickedActorID, bool isAuto)
 {
-	// ¸¸¾à ½ºÅ³À» ½á¼­ Á¢±ÙÁßÀÌ¶ó¸é..
 	if (MODE_USE_SKILL == m_eReservedMode)
 	{
-		// °°Àº Ä³¸¯ÅÍ¸¦ Å¬¸¯ ÇßÀ¸¸é ¸®ÅÏ
 		if (__GetTargetVID() == dwPickedActorID)
 			return;
 
 		// 2005.03.25.levites
-		// ÅºÈ¯°?À» ¾²°í ´?·Á°¡´ÂÁß °ø°?ÇÒ ¼ö ÀÖ´Â ´Ù¸¥ Å¸°ÙÀ» Å¬¸¯ÇÏ¸é
 		if (__CheckDashAffect(rkInstMain))
 		{
 			m_dwVIDReserved = dwPickedActorID;
@@ -333,7 +328,6 @@ void CPythonPlayer::__OnClickActor(CInstanceBase& rkInstMain, DWORD dwPickedActo
 
 	CInstanceBase* pkInstVictim=NEW_FindActorPtr(dwPickedActorID);
 	CInstanceBase& rkInstVictim=*pkInstVictim;
-
 	if (!pkInstVictim)
 		return;
 
@@ -358,15 +352,12 @@ void CPythonPlayer::__OnClickActor(CInstanceBase& rkInstMain, DWORD dwPickedActo
 
 void CPythonPlayer::__OnPressActor(CInstanceBase& rkInstMain, DWORD dwPickedActorID, bool isAuto)
 {
-	// ¸¸¾à ½ºÅ³À» ½á¼­ Á¢±ÙÁßÀÌ¶ó¸é..
 	if (MODE_USE_SKILL == m_eReservedMode)
 	{
-		// °°Àº Ä³¸¯ÅÍ¸¦ Å¬¸¯ ÇßÀ¸¸é ¸®ÅÏ
 		if (__GetTargetVID() == dwPickedActorID)
 			return;
 
 		// 2005.03.25.levites
-		// ÅºÈ¯°?À» ¾²°í ´?·Á°¡´ÂÁß °ø°?ÇÒ ¼ö ÀÖ´Â ´Ù¸¥ Å¸°ÙÀ» Å¬¸¯ÇÏ¸é
 		if (__CheckDashAffect(rkInstMain))
 		{
 			m_dwVIDReserved = dwPickedActorID;
@@ -473,8 +464,8 @@ void CPythonPlayer::SetMovableGroundDistance(float fDistance)
 }
 
 bool CPythonPlayer::__IsMovableGroundDistance(CInstanceBase& rkInstMain, const TPixelPosition& c_rkPPosPickedGround)
-{	
-	float fDistance=rkInstMain.NEW_GetDistanceFromDestPixelPosition(c_rkPPosPickedGround);	
+{
+	float fDistance=rkInstMain.NEW_GetDistanceFromDestPixelPosition(c_rkPPosPickedGround);
 
 	if (fDistance<MOVABLE_GROUND_DISTANCE)
 		return false;
@@ -530,7 +521,6 @@ bool CPythonPlayer::NEW_MoveToDirection(float fDirRot)
 	{
 		float fCmrCurRot=CameraRotationToCharacterRotation(pkCmrCur->GetRoll());
 
-		// ÇöÀç 
 		if (m_isCmrRot)
 		{
 			float fSigDirRot=fDirRot;
@@ -622,7 +612,7 @@ void CPythonPlayer::NEW_Attack()
 		return;
 
 	if (!__CanAttack())
-		return; 
+		return;
 
 	CInstanceBase* pkInstMain = NEW_GetMainActorPtr();
 	if (!pkInstMain)
@@ -679,7 +669,6 @@ void CPythonPlayer::NEW_Attack()
 	}
 	else
 	{
-		//!@# ¸»¿¡ Åº »óÅÂ¿¡¼­ ¸Ç¼Õ °ø°?Àº Áö¿øµÇÁö ¾Ê´Â´Ù - [levites]
 		if (pkInstMain->IsMountingHorse())
 		{
 			if (pkInstMain->IsHandMode())
@@ -740,7 +729,7 @@ bool CPythonPlayer::__CanShot(CInstanceBase& rkInstMain, CInstanceBase& rkInstTa
 	{
 		PyCallClassMemberFunc(m_ppyGameWindow, "OnCannotShot", Py_BuildValue("(is)", GetMainCharacterIndex(), "DEST_IN_SAFE"));
 		return false;
-	}	
+	}
 
 	return true;
 }
@@ -748,7 +737,7 @@ bool CPythonPlayer::__CanShot(CInstanceBase& rkInstMain, CInstanceBase& rkInstTa
 bool CPythonPlayer::__CanChangeTarget()
 {
 	CInstanceBase* pkInstMain=NEW_GetMainActorPtr();
-	if (!pkInstMain) 
+	if (!pkInstMain)
 		return false;
 
 	return pkInstMain->CanChangeTarget();
@@ -762,7 +751,7 @@ bool CPythonPlayer::__CanMove()
 	}
 
 	CInstanceBase* pkInstMain=NEW_GetMainActorPtr();
-	if (!pkInstMain) 
+	if (!pkInstMain)
 		return false;
 
 	if (!pkInstMain->CanMove())
@@ -787,13 +776,20 @@ bool CPythonPlayer::__CanAttack()
 	if (IsObserverMode())
 		return false;
 
-	CInstanceBase* pkInstMain=NEW_GetMainActorPtr();
+	CInstanceBase* pkInstMain = NEW_GetMainActorPtr();
 
 	if (!pkInstMain)
 		return false;
 
-	if (pkInstMain->IsMountingHorse() && pkInstMain->IsNewMount() && (GetSkillGrade(GetHorseSkillSlotIndex()) < 1 && GetSkillLevel(GetHorseSkillSlotIndex()) < 11))
+	// Fix me
+#ifdef ENABLE_CONQUEROR_LEVEL
+	if (pkInstMain->IsMountingHorse() && pkInstMain->IsNewMount() && (GetSkillGrade(107) < 1 && GetSkillLevel(107) < 11))
+#else
+	if (pkInstMain->IsMountingHorse() && (GetSkillGrade(109) < 1 && GetSkillLevel(109) < 20))
+#endif
+	{
 		return false;
+	}
 
 	return pkInstMain->CanAttack();
 }
@@ -814,7 +810,7 @@ void CPythonPlayer::NEW_GetMultiKeyDirRotation(bool isLeft, bool isRight, bool i
 		fScrY=0.0f;
 	else if (isDown)
 		fScrY=1.0f;
-	else 
+	else
 		fScrY=0.5f;
 
 	NEW_GetMouseDirRotation(fScrX, fScrY, pfDirRot);
@@ -881,7 +877,7 @@ bool CPythonPlayer::__IsReservedUseSkill(DWORD dwSkillSlotIndex)
 
 	if (m_dwSkillSlotIndexReserved!=dwSkillSlotIndex)
 		return false;
-	
+
 	return true;
 }
 
@@ -892,7 +888,6 @@ void CPythonPlayer::__ReserveUseSkill(DWORD dwActorID, DWORD dwSkillSlotIndex, D
 	m_dwSkillSlotIndexReserved=dwSkillSlotIndex;
 	m_dwSkillRangeReserved=dwRange;
 
-	// NOTE : ¾Æ½½¾Æ½½ÇÏ°Ô °Å¸®°¡ ²¿ÀÌ´Â ¹®Á¦°¡ ÀÖ¾î¼­ ¾à°£ ´À½¼ÇÏ°Ô..
 	if (m_dwSkillRangeReserved > 100)
 		m_dwSkillRangeReserved -= 10;
 }
@@ -958,13 +953,10 @@ void CPythonPlayer::__ReserveProcess_ClickActor()
 		return;
 	}
 
-	// ÅºÈ¯°? ¾²°í ´?·Á°¡´Â µµÁß¿¡´Â °ø°?ÇÏÁö ¾Ê´Â´Ù.
 	if (__CheckDashAffect(*pkInstMain))
 	{
 		return;
 	}
-
-	/////
 
 	if (pkInstMain->IsBowMode())
 	{

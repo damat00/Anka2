@@ -13,7 +13,7 @@ class CFlyTrace;
 class IFlyEventHandler;
 class CActorInstance;
 
-class CFlyingInstance 
+class CFlyingInstance
 {
 	public:
 		void Clear();

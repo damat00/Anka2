@@ -43,7 +43,7 @@ void CGuildMarkImage::Create()
 	ilGenImages(1, &m_uImg);
 }
 
-bool CGuildMarkImage::Save(const char* c_szFileName) 
+bool CGuildMarkImage::Save(const char* c_szFileName)
 {
 	ilEnable(IL_FILE_OVERWRITE);
 	ilBindImage(m_uImg);
@@ -84,10 +84,10 @@ bool CGuildMarkImage::Build(const char * c_szFileName)
 	return true;
 }
 
-bool CGuildMarkImage::Load(const char * c_szFileName) 
+bool CGuildMarkImage::Load(const char * c_szFileName)
 {
 	Destroy();
-	Create();	
+	Create();
 
 	ilBindImage(m_uImg);
 	ilEnable(IL_ORIGIN_SET);
@@ -99,7 +99,7 @@ bool CGuildMarkImage::Load(const char * c_szFileName)
 		return false;
 	}
 
-	if (ilGetInteger(IL_IMAGE_WIDTH) != WIDTH)	
+	if (ilGetInteger(IL_IMAGE_WIDTH) != WIDTH)
 	{
 		sys_err("GuildMarkImage: %s width must be %u", c_szFileName, WIDTH);
 		return false;
@@ -126,9 +126,10 @@ void CGuildMarkImage::PutData(UINT x, UINT y, UINT width, UINT height, void * da
 void CGuildMarkImage::GetData(UINT x, UINT y, UINT width, UINT height, void * data)
 {
 	ilBindImage(m_uImg);
-	ilCopyPixels(x, y, 0, width, height, 1, IL_BGRA, IL_UNSIGNED_BYTE, data);	
+	ilCopyPixels(x, y, 0, width, height, 1, IL_BGRA, IL_UNSIGNED_BYTE, data);
 }
 
+// SERVER
 bool CGuildMarkImage::SaveMark(DWORD posMark, BYTE * pbImage)
 {
 	if (posMark >= MARK_TOTAL_COUNT)
@@ -159,6 +160,7 @@ bool CGuildMarkImage::DeleteMark(DWORD posMark)
 	return SaveMark(posMark, (BYTE *) &image);
 }
 
+// CLIENT
 bool CGuildMarkImage::SaveBlockFromCompressedData(DWORD posBlock, const BYTE * pbComp, DWORD dwCompSize)
 {
 	if (posBlock >= BLOCK_TOTAL_COUNT)
@@ -245,7 +247,7 @@ void CGuildMarkImage::GetBlockCRCList(DWORD * crcList)
 void SGuildMark::Clear()
 {
 	for (DWORD iPixel = 0; iPixel < SIZE; ++iPixel)
-		m_apxBuf[iPixel] = 0xff000000;	
+		m_apxBuf[iPixel] = 0xff000000;
 }
 
 bool SGuildMark::IsEmpty()

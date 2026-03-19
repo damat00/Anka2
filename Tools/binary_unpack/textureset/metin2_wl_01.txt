@@ -1,8 +1,8 @@
 TextureSet
 
-TextureCount 17
+TextureCount 19
 Start Texture001
-    "d:\ymir work\terrainmaps\A\stone\stone01.DDS"
+    "d:\ymir work\terrainmaps\studio\grass\green02.dds"
     5.000000
     5.000000
     0.000000
@@ -12,9 +12,9 @@ Start Texture001
     0
 End Texture001
 Start Texture002
-    "d:\ymir work\terrainmaps\A\stone\stone04.DDS"
-    6.000000
-    6.000000
+    "d:\ymir work\terrainmaps\guildzone\field10.dds"
+    5.000000
+    5.000000
     0.000000
     0.000000
     0
@@ -22,9 +22,9 @@ Start Texture002
     0
 End Texture002
 Start Texture003
-    "d:\ymir work\terrainmaps\B\stone\stone01.DDS"
-    5.000000
-    5.000000
+    "d:\ymir work\terrainmaps\wom\wom_cliff01.dds"
+    4.000000
+    4.000000
     0.000000
     0.000000
     0
@@ -32,9 +32,9 @@ Start Texture003
     0
 End Texture003
 Start Texture004
-    "d:\ymir work\terrainmaps\B\stone\stone03_02.DDS"
-    6.000000
-    6.000000
+    "d:\ymir work\terrainmaps\wom\wom_cliff02.DDS"
+    4.000000
+    4.000000
     0.000000
     0.000000
     0
@@ -42,9 +42,9 @@ Start Texture004
     0
 End Texture004
 Start Texture005
-    "d:\ymir work\terrainmaps\A\tile\tile02.DDS"
-    9.000000
-    9.000000
+    "d:\ymir work\terrainmaps\guildzone\grass4.dds"
+    4.000000
+    4.000000
     0.000000
     0.000000
     0
@@ -52,9 +52,9 @@ Start Texture005
     0
 End Texture005
 Start Texture006
-    "d:\ymir work\terrainmaps\A\grass\grass 02.DDS"
-    8.000000
-    8.000000
+    "d:\ymir work\terrainmaps\studio\grass\groundplants01.dds"   
+    6.000000
+    6.000000
     0.000000
     0.000000
     0
@@ -62,9 +62,9 @@ Start Texture006
     0
 End Texture006
 Start Texture007
-    "d:\ymir work\terrainmaps\A\grass\grass 03.DDS"
-    9.000000
-    9.000000
+    "d:\ymir work\terrainmaps\wom\wom_grass_worn.dds"
+    5.000000
+    5.000000
     0.000000
     0.000000
     0
@@ -82,7 +82,7 @@ Start Texture008
     0
 End Texture008
 Start Texture009
-    "d:\ymir work\terrainmaps\B\grass\grass 02_01.dds"
+    "d:\ymir work\terrainmaps\wom\wom_grass_01.dds"
     4.000000
     4.000000
     0.000000
@@ -102,9 +102,9 @@ Start Texture010
     0
 End Texture010
 Start Texture011
-    "d:\ymir work\terrainmaps\A\field\field 05.dds"
-    5.000000
-    5.000000
+    "d:\ymir work\terrainmaps\guildzone\field8.dds"
+    4.000000
+    4.000000
     0.000000
     0.000000
     0
@@ -113,8 +113,8 @@ Start Texture011
 End Texture011
 Start Texture012
     "d:\ymir work\terrainmaps\C\stone\C_stone04_bb.DDS"
-    5.000000
-    5.000000
+    6.000000
+    6.000000
     0.000000
     0.000000
     0
@@ -122,7 +122,7 @@ Start Texture012
     0
 End Texture012
 Start Texture013
-    "d:\ymir work\terrainmaps\G\field\field 06.DDS"
+    "d:\ymir work\terrainmaps\guildzone\field3.dds"
     5.000000
     5.000000
     0.000000
@@ -133,8 +133,8 @@ Start Texture013
 End Texture013
 Start Texture014
     "d:\ymir work\terrainmaps\N\desert\sand\sand02.dds"
-    5.000000
-    5.000000
+    3.000000
+    3.000000
     0.000000
     0.000000
     0
@@ -142,9 +142,9 @@ Start Texture014
     0
 End Texture014
 Start Texture015
-    "d:\ymir work\terrainmaps\N\desert\sand\sand03.dds"
-    5.000000
-    5.000000
+    "d:\ymir work\terrainmaps\N\desert\field\field 01.dds"
+    2.000000
+    2.000000
     0.000000
     0.000000
     0
@@ -171,17 +171,23 @@ Start Texture017
     0
     0
 End Texture017
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Start Texture018
+    "d:\ymir work\terrainmaps\wom\wom_cracked_surface.dds"
+    4.000000
+    4.000000
+    0.000000
+    0.000000
+    0
+    0
+    0
+End Texture018
+Start Texture019
+    "d:\ymir work\terrainmaps\guildzone\field7.dds"
+    4.000000
+    4.000000
+    0.000000
+    0.000000
+    0
+    0
+    0
+End Texture019

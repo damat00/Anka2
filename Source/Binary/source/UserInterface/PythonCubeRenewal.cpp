@@ -54,6 +54,32 @@ PyObject *GetCubeRenewalDates(PyObject *poSelf, PyObject *poArgs)
 	if (!PyTuple_GetInteger(poArgs, 0, &index))
 		return Py_BuildException();
 
+#ifdef ENABLE_GAYA_SYSTEM
+	const CPythonCubeRenewal::TInfoStrucCubeRenewal & CRItemVector = CPythonCubeRenewal::Instance().GetList();
+	if (DWORD(index) >= CRItemVector.size())
+		return Py_BuildValue("iibiiiiiiiiiiiiiis",0,0,false,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"None");
+
+	const TInfoDateCubeRenewal & CRenewalItemVector = CRItemVector[index];
+	return Py_BuildValue("iibiiiiiiiiiiiiiis",
+		CRenewalItemVector.vnum_reward,
+		CRenewalItemVector.count_reward,
+		CRenewalItemVector.item_reward_stackable,
+		CRenewalItemVector.vnum_material_1,
+		CRenewalItemVector.count_material_1,
+		CRenewalItemVector.vnum_material_2,
+		CRenewalItemVector.count_material_2,
+		CRenewalItemVector.vnum_material_3,
+		CRenewalItemVector.count_material_3,
+		CRenewalItemVector.vnum_material_4,
+		CRenewalItemVector.count_material_4,
+		CRenewalItemVector.vnum_material_5,
+		CRenewalItemVector.count_material_5,
+		CRenewalItemVector.gold,
+		CRenewalItemVector.gem,
+		CRenewalItemVector.percent,
+		CRenewalItemVector.category
+		);
+#else
 	const CPythonCubeRenewal::TInfoStrucCubeRenewal & CRItemVector = CPythonCubeRenewal::Instance().GetList();
 	if (DWORD(index) >= CRItemVector.size())
 		return Py_BuildValue("iibiiiiiiiiiiiiis",0,0,false,0,0,0,0,0,0,0,0,0,0,0,0,false,"None");
@@ -79,6 +105,7 @@ PyObject *GetCubeRenewalDates(PyObject *poSelf, PyObject *poArgs)
 		CRenewalItemVector.allowCopyAttr,
 		CRenewalItemVector.category
 		);
+#endif
 }
 
 PyObject *SetCubeRenewalHandler(PyObject *poSelf, PyObject *poArgs)

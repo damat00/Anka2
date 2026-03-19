@@ -31,11 +31,11 @@ void Traceback()
 		str.append(g_stTraceBuffer[i]);
 		str.append("\n");
 	}
-	
-	PyObject *exc;
-	PyObject *v;
-	PyObject *tb;
-	const char *errStr;
+
+	PyObject * exc;
+	PyObject * v;
+	PyObject * tb;
+	const char * errStr;
 
 	PyErr_Fetch(&exc, &v, &tb);
 
@@ -53,9 +53,9 @@ void Traceback()
 	LogBoxf("Traceback:\n\n%s\n", str.c_str());
 }
 
-int TraceFunc(PyObject *obj, PyFrameObject * f, int what, PyObject *arg)
+int TraceFunc(PyObject * obj, PyFrameObject * f, int what, PyObject *arg)
 {
-	const char *funcname;
+	const char * funcname;
 	char szTraceBuffer[128];
 
 	switch (what)
@@ -69,12 +69,12 @@ int TraceFunc(PyObject *obj, PyFrameObject * f, int what, PyObject *arg)
 
 			funcname = PyString_AsString(f->f_code->co_name);
 
-			_snprintf(szTraceBuffer, sizeof(szTraceBuffer), "Call: File \"%s\", line %d, in %s", 
-					  PyString_AsString(f->f_code->co_filename), 
+			_snprintf(szTraceBuffer, sizeof(szTraceBuffer), "Call: File \"%s\", line %d, in %s",
+					  PyString_AsString(f->f_code->co_filename),
 					  f->f_lineno,
 					  funcname);
 
-			g_stTraceBuffer[g_nCurTraceN++]=szTraceBuffer;			
+			g_stTraceBuffer[g_nCurTraceN++]=szTraceBuffer;
 			break;
 
 		case PyTrace_RETURN:
@@ -85,30 +85,30 @@ int TraceFunc(PyObject *obj, PyFrameObject * f, int what, PyObject *arg)
 		case PyTrace_EXCEPTION:
 			if (g_nCurTraceN >= 512)
 				return 0;
-			
-			PyObject *exc_type, * exc_value, * exc_traceback;
+
+			PyObject * exc_type, * exc_value, * exc_traceback;
 
 			PyTuple_GetObject(arg, 0, &exc_type);
 			PyTuple_GetObject(arg, 1, &exc_value);
 			PyTuple_GetObject(arg, 2, &exc_traceback);
 
 			int len;
-			const char *exc_str;
+			const char * exc_str;
 			PyObject_AsCharBuffer(exc_type, &exc_str, &len);
-			
-			_snprintf(szTraceBuffer, sizeof(szTraceBuffer), "Exception: File \"%s\", line %d, in %s", 
-					  PyString_AS_STRING(f->f_code->co_filename), 
+
+			_snprintf(szTraceBuffer, sizeof(szTraceBuffer), "Exception: File \"%s\", line %d, in %s",
+					  PyString_AS_STRING(f->f_code->co_filename),
 					  f->f_lineno,
 					  PyString_AS_STRING(f->f_code->co_name));
 
 			g_stTraceBuffer[g_nCurTraceN++]=szTraceBuffer;
-			
+
 			break;
 	}
 	return 0;
 }
 
-void CPythonLauncher::SetTraceFunc(int (*pFunc)(PyObject *obj, PyFrameObject * f, int what, PyObject *arg))
+void CPythonLauncher::SetTraceFunc(int (*pFunc)(PyObject * obj, PyFrameObject * f, int what, PyObject *arg))
 {
 	PyEval_SetTrace(pFunc, nullptr);
 }
@@ -200,7 +200,7 @@ bool CPythonLauncher::Create(const char *c_szProgramName)
 	return true;
 }
 
-bool CPythonLauncher::RunCompiledFile(const char *c_szFileName)
+bool CPythonLauncher::RunCompiledFile(const char* c_szFileName)
 {
 	NANOBEGIN
 	FILE * fp = fopen(c_szFileName, "rb");
@@ -246,7 +246,7 @@ bool CPythonLauncher::RunCompiledFile(const char *c_szFileName)
 	}
 
 	Py_DECREF(v);
-	if (Py_FlushLine()) 
+	if (Py_FlushLine())
 		PyErr_Clear();
 
 	NANOEND
@@ -254,7 +254,7 @@ bool CPythonLauncher::RunCompiledFile(const char *c_szFileName)
 }
 
 
-bool CPythonLauncher::RunMemoryTextFile(const char *c_szFileName, UINT uFileSize, const VOID* c_pvFileData)
+bool CPythonLauncher::RunMemoryTextFile(const char* c_szFileName, UINT uFileSize, const VOID* c_pvFileData)
 {
 	NANOBEGIN
 	const CHAR* c_pcFileData=(const CHAR*)c_pvFileData;
@@ -310,13 +310,14 @@ bool CPythonLauncher::RunFile(const char *c_szFileName)
 	return ret;
 }
 
-bool CPythonLauncher::RunLine(const char *c_szSrc)
+bool CPythonLauncher::RunLine(const char* c_szSrc)
 {
-	PyObject *v = PyRun_String((char *) c_szSrc, Py_file_input, m_poDic, m_poDic);
+	PyObject * v = PyRun_String((char *) c_szSrc, Py_file_input, m_poDic, m_poDic);
 
 	if (!v)
 	{
-		Traceback();
+		//Traceback();
+		PyErr_Print();
 		return false;
 	}
 
@@ -324,16 +325,16 @@ bool CPythonLauncher::RunLine(const char *c_szSrc)
 	return true;
 }
 
-const char *CPythonLauncher::GetError()
+const char* CPythonLauncher::GetError()
 {
-	PyObject *exc;
-	PyObject *v;
-	PyObject *tb;
+	PyObject* exc;
+	PyObject* v;
+	PyObject* tb;
 
-	PyErr_Fetch(&exc, &v, &tb);        
+	PyErr_Fetch(&exc, &v, &tb);
 
 	if (PyString_Check(v))
 		return PyString_AS_STRING(v);
-	
+
 	return "";
 }

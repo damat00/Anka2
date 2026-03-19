@@ -20,22 +20,34 @@ void CVertexShader::Initialize()
 
 void CVertexShader::Destroy()
 {
-	if (m_handle)
-	{
-		if (ms_lpd3dDevice)
-			ms_lpd3dDevice->DeleteVertexShader(m_handle);
+#ifdef ENABLE_DIRECTX9_UPDATE
+    if (m_handle)
+    {
+        m_handle = 0;
+    }
+#else
+    if (m_handle)
+    {
+        if (ms_lpd3dDevice)
+        {
+            ms_lpd3dDevice->DeleteVertexShader(m_handle);
+        }
 
-		m_handle = 0;
-	}
+        m_handle = 0;
+    }
+#endif
 }
 
-bool CVertexShader::CreateFromDiskFile(const char *c_szFileName, const DWORD* c_pdwVertexDecl)
+bool CVertexShader::CreateFromDiskFile(const char* c_szFileName, const DWORD* c_pdwVertexDecl)
 {
-	Destroy();
+    Destroy();
 
+#ifdef ENABLE_DIRECTX9_UPDATE
+    return false;
+#else
 	LPD3DXBUFFER lpd3dxShaderBuffer;
 	LPD3DXBUFFER lpd3dxErrorBuffer;
-	
+
 	if (FAILED(
 		D3DXAssembleShaderFromFile(c_szFileName, 0, nullptr, &lpd3dxShaderBuffer, &lpd3dxErrorBuffer)
 	)) return false;
@@ -49,9 +61,12 @@ bool CVertexShader::CreateFromDiskFile(const char *c_szFileName, const DWORD* c_
 		return false;
 
 	return true;
+#endif
 }
 
 void CVertexShader::Set()
 {
-	STATEMANAGER.SetVertexShader(m_handle);
+#ifndef ENABLE_DIRECTX9_UPDATE
+    STATEMANAGER.SetVertexShader(m_handle);
+#endif
 }

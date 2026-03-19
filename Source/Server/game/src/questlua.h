@@ -31,7 +31,21 @@ namespace quest
 	extern void RegisterDanceEventFunctionTable();
 	extern void RegisterDragonLairFunctionTable();
 	extern void RegisterDragonSoulFunctionTable();
-
+#ifdef ENABLE_ZODIAC_MISSION
+	extern void RegisterZodiacFunctionTable();
+#endif
+#ifdef ENABLE_DUNGEON_INFO
+	extern void RegisterDungeonInfoFunctionTable();
+#endif
+#ifdef ENABLE_OCHAO_TEMPLE_SYSTEM
+	extern void RegisterTempleOchaoFunctionTable();
+#endif
+#ifdef ENABLE_WHITE_DRAGON
+	extern void RegisterWhiteLairFunctionTable();
+#endif
+#ifdef ENABLE_QUEEN_NETHIS
+	extern void RegisterSnakeLairFunctionTable();
+#endif
 	extern void combine_lua_string(lua_State* L, std::ostringstream &s);
 
 	struct FSetWarpLocation
@@ -40,7 +54,9 @@ namespace quest
 		long x;
 		long y;
 
-		FSetWarpLocation (long _map_index, long _x, long _y) : map_index (_map_index), x (_x), y (_y) {}
+		FSetWarpLocation (long _map_index, long _x, long _y) :
+			map_index (_map_index), x (_x), y (_y)
+		{}
 		void operator () (LPCHARACTER ch);
 	};
 
@@ -107,7 +123,7 @@ namespace quest
 		long 	m_x;
 		long	m_y;
 
-		warp_all_to_map_my_empire_event_info() 
+		warp_all_to_map_my_empire_event_info()
 		: m_bEmpire( 0 )
 		, m_lMapIndexFrom( 0 )
 		, m_lMapIndexTo( 0 )
@@ -127,15 +143,6 @@ namespace quest
 		FBuildLuaGuildWarList(lua_State * L);
 		void operator() (DWORD g1, DWORD g2);
 	};
-
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-	struct FDungeonUpdateAllBattlepassProcess
-	{
-		int dungeon_index;
-
-		void operator () (LPCHARACTER ch);
-	};
-#endif
 }
 #endif /*__HEADER_QUEST_LUA__*/
 

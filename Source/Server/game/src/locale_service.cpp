@@ -7,6 +7,7 @@
 #include "empire_text_convert.h"
 #include "config.h"
 #include "skill_power.h"
+#include "../../common/service.h"
 
 using namespace std;
 
@@ -1056,7 +1057,7 @@ static void __LocaleService_Init_Taiwan()
 	PK_PROTECT_LEVEL = 15;
 }
 
-//#ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
+#ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
 static void __LocaleService_Init_Europe()
 {
 	g_stLocale = "utf8mb4";
@@ -1072,7 +1073,7 @@ static void __LocaleService_Init_Europe()
 
 	PK_PROTECT_LEVEL = 15;
 }
-//#endif
+#endif
 
 static void __CheckPlayerSlot(const std::string& service_name)
 {
@@ -1227,12 +1228,12 @@ bool LocaleService_Init(const std::string& c_rstServiceName)
 	{
 		__LocaleService_Init_Taiwan();
 	}
-//#ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
+#ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
 	else if ("europe" == g_stServiceName)
 	{
 		__LocaleService_Init_Europe();
 	}
-//#endif
+#endif
 	else
 	{
 		__LocaleService_Init_DEFAULT();
@@ -1357,10 +1358,10 @@ bool LC_InitLocalization( const std::string& szLocal )
 		g_eLocalType = LC_WE_KOREA;
 	else if ( !g_stLocal.compare("taiwan") )
 		g_eLocalType = LC_TAIWAN;
-//#ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
+#ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
 	else if (!g_stLocal.compare("europe"))
 		g_eLocalType = LC_EUROPE;
-//#endif
+#endif
 	else
 		return false;
 
@@ -1428,9 +1429,9 @@ bool LC_IsEurope()
 		case LC_JAPAN:
 		case LC_NEWCIBN:
 		case LC_CANADA:
-//#ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
+#ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
 		case LC_EUROPE:
-//#endif
+#endif
 			return true;
 	}
 

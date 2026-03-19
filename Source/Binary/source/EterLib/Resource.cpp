@@ -28,7 +28,7 @@ void CResource::OnConstruct()
 }
 
 void CResource::OnSelfDestruct()
-{	
+{
 	if (ms_bDeleteImmediately)
 		Clear();
 	else
@@ -143,8 +143,6 @@ int CResource::ConvertPathName(const char *c_szPathName, char *pszRetPathName, i
 
 void CResource::SetFileName(const char *c_szFileName)
 {
-	// 2004. 2. 1. myevan. 쓰레드가 사용되는 상황에서 static 변수는 사용하지 않는것이 좋다.
-	// 2004. 2. 1. myevan. 파일 이름 처리를 std::string 사용
 	m_stFileName=c_szFileName;
 }
 
@@ -169,7 +167,7 @@ bool CResource::OnIsType(TType type)
 {
 	if (CResource::Type() == type)
 		return true;
-	
+
 	return false;
 }
 

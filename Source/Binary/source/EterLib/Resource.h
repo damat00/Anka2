@@ -11,7 +11,7 @@ class CResource : public CReferenceObject
 		enum EState
 		{
 			STATE_EMPTY,
-			STATE_ERROR,			
+			STATE_ERROR,
 			STATE_EXIST,
 			STATE_LOAD,
 			STATE_FREE

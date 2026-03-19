@@ -73,7 +73,7 @@ void CClientManager::SendEventFlagsOnSetup(CPeer* peer)
 	}
 }
 
-#ifdef ENABLE_RENEWAL_INGAME_ITEMSHOP
+#ifdef ENABLE_ITEMSHOP
 void CClientManager::SetEventFlag(const char* flag, int value)
 {
 	TPacketSetEventFlag p;
@@ -86,8 +86,6 @@ void CClientManager::SetEventFlag(const char* flag, int value)
 int CClientManager::GetEventFlag(const char* flag)
 {
 	auto it = m_map_lEventFlag.find(flag);
-	if(it!=m_map_lEventFlag.end())
-		return it->second;
-	return 0;
+	return (it != m_map_lEventFlag.end()) ? it->second : 0;
 }
 #endif

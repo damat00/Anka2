@@ -101,7 +101,7 @@ namespace xmas
 	{
 		long lMapIndex;
 
-		spawn_santa_info() 
+		spawn_santa_info()
 		: lMapIndex( 0 )
 		{
 		}

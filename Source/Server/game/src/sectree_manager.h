@@ -3,39 +3,48 @@
 
 #include "sectree.h"
 
-
 typedef struct SMapRegion
 {
-	int index;
-	int sx, sy, ex, ey;
-	PIXEL_POSITION posSpawn;
+	int			index;
+	int			sx, sy, ex, ey;
+	PIXEL_POSITION	posSpawn;
 
-	bool bEmpireSpawnDifferent;
-	PIXEL_POSITION posEmpire[3];
+	bool		bEmpireSpawnDifferent;
+	PIXEL_POSITION	posEmpire[3];
 
-	std::string strMapName;
+	std::string		strMapName;
 } TMapRegion;
+
+#ifdef ENABLE_CONQUEROR_LEVEL
+typedef struct SSungmaAffectMap{
+	long lMapIndex;
+	int iAffecType;
+	int iValue;
+}TSungmaAffectMap;
+#endif
 
 struct TAreaInfo
 {
 	int sx, sy, ex, ey, dir;
-	TAreaInfo(int sx, int sy, int ex, int ey, int dir) : sx(sx), sy(sy), ex(ex), ey(ey), dir(dir) {}
+	TAreaInfo(int sx, int sy, int ex, int ey, int dir)
+		: sx(sx), sy(sy), ex(ex), ey(ey), dir(dir)
+		{}
 };
 
 struct npc_info
 {
 	BYTE bType;
-#ifdef ENABLE_RENEWAL_REGEN
+#ifdef ENABLE_ULTIMATE_REGEN
 	DWORD mobVnum;
 #else
 	const char* name;
 #endif
 	long x, y;
-#ifdef ENABLE_RENEWAL_REGEN
+#ifdef ENABLE_ULTIMATE_REGEN
 	int regenTime;
 #endif
 
-#ifdef ENABLE_RENEWAL_REGEN
+#ifdef ENABLE_ULTIMATE_REGEN
 	npc_info(BYTE bType, DWORD vnum, long x, long y, int iTime) : bType(bType), mobVnum(vnum), x(x), y(y), regenTime(iTime) {}
 #else
 	npc_info(BYTE bType, const char* name, long x, long y) : bType(bType), name(name), x(x), y(y) {}
@@ -46,14 +55,14 @@ typedef std::map<std::string, TAreaInfo> TAreaMap;
 
 typedef struct SSetting
 {
-	int iIndex;
-	int iCellScale;
-	int iBaseX;
-	int iBaseY;
-	int iWidth;
-	int iHeight;
+	int			iIndex;
+	int			iCellScale;
+	int			iBaseX;
+	int			iBaseY;
+	int			iWidth;
+	int			iHeight;
 
-	PIXEL_POSITION posSpawn;
+	PIXEL_POSITION	posSpawn;
 } TMapSetting;
 
 class SECTREE_MAP
@@ -70,18 +79,42 @@ class SECTREE_MAP
 			return map_.insert(MapType::value_type(key, sectree)).second;
 		}
 
-		LPSECTREE Find(DWORD dwPackage);
-		LPSECTREE Find(DWORD x, DWORD y);
-		void Build();
-
+		LPSECTREE	Find(DWORD dwPackage);
+		LPSECTREE	Find(DWORD x, DWORD y);
+		void		Build();
+#ifdef ENABLE_DRAGON_LAIR
+		void SetFlag(std::string flagname, int value)
+		{
+			itertype(m_entity_Flag) it =  m_entity_Flag.find(flagname);
+			if (it != m_entity_Flag.end())
+			{
+				it->second = value;
+			}
+			else
+			{
+				m_entity_Flag.insert(make_pair(flagname, value));
+			}
+		}
+		int GetFlag(std::string flagname)
+		{
+			itertype(m_entity_Flag) it =  m_entity_Flag.find(flagname);
+			if (it != m_entity_Flag.end())
+			{
+				return it->second;
+			}
+			return 0;
+		}
+		std::map<std::string, int>  m_entity_Flag;
+#endif
 		TMapSetting	m_setting;
 
-		template<typename Func>
-		void for_each(Func & rfunc)
+		template< typename Func >
+		void for_each( Func & rfunc )
 		{
+			// <Factor> Using snapshot copy to avoid side-effects
 			FCollectEntity collector;
 			std::map<DWORD, LPSECTREE>::iterator it = map_.begin();
-			for (;it != map_.end(); ++it)
+			for ( ; it != map_.end(); ++it)
 			{
 				LPSECTREE sectree = it->second;
 				sectree->for_each_entity(collector);
@@ -128,6 +161,10 @@ class SECTREE_MANAGER : public singleton<SECTREE_MANAGER>
 				pSecMap->for_each(rfunc);
 			}
 		}
+#ifdef ENABLE_CONQUEROR_LEVEL
+		void		LoadSungmaAttr(const char * c_pszFileName, long lMapIndex);
+		int		GetSungmaValueAffectByRegion(long lMapIndex, int iAffecType);
+#endif
 
 		int LoadSettingFile(long lIndex, const char * c_pszSettingFileName, TMapSetting & r_setting);
 		bool LoadMapRegion(const char * c_pszFileName, TMapSetting & r_Setting, const char * c_pszMapName);
@@ -157,7 +194,7 @@ class SECTREE_MANAGER : public singleton<SECTREE_MANAGER>
 		TAreaMap& GetDungeonArea(long lMapIndex);
 		void SendNPCPosition(LPCHARACTER ch);
 
-#ifdef ENABLE_RENEWAL_REGEN
+#ifdef ENABLE_ULTIMATE_REGEN
 		void InsertNPCPosition(long lMapIndex, BYTE bType, DWORD mobVnum, long x, long y, int regenTime);
 #else
 		void InsertNPCPosition(long lMapIndex, BYTE bType, const char* szName, long x, long y);
@@ -169,12 +206,33 @@ class SECTREE_MANAGER : public singleton<SECTREE_MANAGER>
 		void PurgeStonesInMap(long lMapIndex);
 		void PurgeNPCsInMap(long lMapIndex);
 		size_t GetMonsterCountInMap(long lMapIndex);
+#ifdef __SYSTEM_SEARCH_ITEM_MOB__
+		size_t GetMonsterCountSpawned(DWORD dwVnum);
+#endif
 		size_t GetMonsterCountInMap(long lMpaIndex, DWORD dwVnum);
 
 		bool ForAttrRegion(long lMapIndex, long lStartX, long lStartY, long lEndX, long lEndY, long lRotate, DWORD dwAttr, EAttrRegionMode mode);
 
+#ifdef ENABLE_NPC_LOCATION_TRACE
+		bool GetNpcLocationByVnum(long lMapIndex, DWORD npcVnum, std::vector<std::pair<long, long>>& positions);
+#endif
+#ifdef ENABLE_OCHAO_TEMPLE_SYSTEM
+		void GetRestartCityPos(int iMapIndex, int iEmpire, int &iTargetX, int &iTargetY, int &iTargetZ);
+		void AddRestartCityPos(int iMapIndex = 0, int iEmpire = 0, int iX = 0, int iY = 0, int iZ = 0);
+#endif
 		bool SaveAttributeToImage(int lMapIndex, const char * c_pszFileName, LPSECTREE_MAP pMapSrc = NULL);
 
+		/// Executes specific processing for Sectree's Attribute for the area.
+		/**
+		* @param [in] lMapIndex Map index to apply
+		* @param [in] lStartX The leftmost coordinate of the rectangular area.
+		* @param [in] lStartY The top coordinate of the rectangle area.
+		* @param [in] lEndX Rightmost coordinate of the rectangular area
+		* @param [in] lEndY The coordinates of the bottom of the rectangle
+		* @param [in] lRotate The angle to rotate about the region.
+		* @param [in] dwAttr Attribute to apply
+		* @param [in] Type to be processed for mode Attribute
+		*/
 	private:
 		bool ForAttrRegionRightAngle( long lMapIndex, long lCX, long lCY, long lCW, long lCH, long lRotate, DWORD dwAttr, EAttrRegionMode mode );
 		bool ForAttrRegionFreeAngle( long lMapIndex, long lCX, long lCY, long lCW, long lCH, long lRotate, DWORD dwAttr, EAttrRegionMode mode );
@@ -184,8 +242,12 @@ class SECTREE_MANAGER : public singleton<SECTREE_MANAGER>
 		std::map<DWORD, LPSECTREE_MAP> m_map_pkSectree;
 		std::map<int, TAreaMap> m_map_pkArea;
 		std::vector<TMapRegion> m_vec_mapRegion;
+#ifdef ENABLE_CONQUEROR_LEVEL
+		std::vector<TSungmaAffectMap>		m_vec_mapSungmaAffect;
+#endif
 		std::map<DWORD, std::vector<npc_info> > m_mapNPCPosition;
 
+	// <Factor> Circular private map indexing
 		typedef std::unordered_map<long, int> PrivateIndexMapType;
 		PrivateIndexMapType next_private_index_map_;
 };

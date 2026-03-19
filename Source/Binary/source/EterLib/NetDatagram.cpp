@@ -17,7 +17,7 @@ void CNetworkDatagram::Destroy()
 		return;
 
 	closesocket(m_sock);
-	
+
 	__Initialize();
 }
 
@@ -60,7 +60,7 @@ void CNetworkDatagram::Update()
 
 	delay.tv_sec = 0;
 	delay.tv_usec = 0;
-	
+
 	if (select(0, &m_fdsRecv, &m_fdsSend, nullptr, &delay) == SOCKET_ERROR)
 		return;
 }
@@ -74,7 +74,7 @@ bool CNetworkDatagram::CanRecv()
 	return false;
 }
 
-		
+
 int CNetworkDatagram::PeekRecvFrom(UINT uBufLen, void* pvBuf, SOCKADDR_IN* pkSockAddrIn)
 {
 	int nSockAddrInLen=sizeof(SOCKADDR_IN);

@@ -8,10 +8,6 @@
 #include "../../common/service.h"
 #include "../../common/tables.h"
 
-#ifdef ENABLE_BIOLOG_SYSTEM
-	#define DIRECT_QUERY(query) CDBManager::instance().DirectQuery((query))
-#endif
-
 using namespace std;
 extern std::string g_stLocaleNameColumn;
 
@@ -91,34 +87,6 @@ bool CClientManager::InitializeTables()
 		return false;
 	}
 
-#ifdef ENABLE_BIOLOG_SYSTEM
-	if (!InitializeBiologMissions())
-	{
-		sys_err("InitializeBiologMissions FAILED");
-		return false;
-	}
-
-	if (!InitializeBiologRewards())
-	{
-		sys_err("InitializeBiologRewards FAILED");
-		return false;
-	}
-
-	if (!InitializeBiologMonsters())
-	{
-		sys_err("InitializeBiologMonsters FAILED");
-		return false;
-	}
-#endif
-
-#ifdef ENABLE_EVENT_MANAGER
-	if (!InitializeEventTable())
-	{
-		sys_err("InitializeEventTable FAILED");
-		return false;
-	}
-#endif
-
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
 	if (!InitializeOfflineShop())
 	{
@@ -127,7 +95,7 @@ bool CClientManager::InitializeTables()
 	}
 #endif
 
-#ifdef ENABLE_RENEWAL_INGAME_ITEMSHOP
+#ifdef ENABLE_ITEMSHOP
 	if (!InitializeItemShop())
 	{
 		sys_err("InitializeItemShop FAILED");
@@ -725,6 +693,11 @@ bool CClientManager::InitializeItemTable()
 		m_map_itemTableByVnum.insert(std::map<DWORD, TItemTable *>::value_type(item_table->dwVnum, item_table));
 		++item_table;
 	}
+	//_______________________________________________________________________//
+
+	// QUEST_ITEM_PROTO_DISABLE
+	// InitializeQuestItemTable();
+	// END_OF_QUEST_ITEM_PROTO_DISABLE
 
 	m_map_itemTableByVnum.clear();
 
@@ -734,7 +707,7 @@ bool CClientManager::InitializeItemTable()
 	{
 		TItemTable * item_table = &(*(it++));
 
-		sys_log(1, "ITEM: #%-5lu %-24s %-24s VAL: %ld %ld %ld %ld %ld %ld WEAR %lu ANTI %lu IMMUNE %lu REFINE %lu REFINE_SET %u MAGIC_PCT %u", 
+		sys_log(0, "ITEM: #%-5lu %-24s %-24s VAL: %ld %ld %ld %ld %ld %ld WEAR %lu ANTI %lu IMMUNE %lu REFINE %lu REFINE_SET %u MAGIC_PCT %u",
 				item_table->dwVnum,
 				item_table->szName,
 				item_table->szLocaleName,
@@ -880,19 +853,17 @@ bool CClientManager::InitializeItemAttrTable()
 {
 	char query[4096];
 	snprintf(query, sizeof(query),
-	"SELECT apply, apply+0, prob, lv1, lv2, lv3, lv4, lv5, "
-	"weapon, body, wrist, foots, neck, head, shield, ear "
+		"SELECT apply, apply+0, prob, lv1, lv2, lv3, lv4, lv5, "
+		"weapon, body, wrist, foots, neck, head, shield, ear "
 #ifdef ENABLE_PENDANT_SYSTEM
-	",pendant "
+		",pendant "
 #endif
 #ifdef ENABLE_BONUS_COSTUME_SYSTEM
-	", costume_body, costume_hair "
-#ifdef ENABLE_WEAPON_COSTUME_SYSTEM
-	", costume_weapon "
+		", costume_body, costume_hair, costume_weapon"
 #endif
-#endif
-	"FROM item_attr%s ORDER BY apply"
-	, GetTablePostfix());
+		" FROM item_attr%s ORDER BY apply",
+		GetTablePostfix());
+
 	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
 	SQLResult * pRes = pkMsg->Get();
 
@@ -942,10 +913,35 @@ bool CClientManager::InitializeItemAttrTable()
 #ifdef ENABLE_BONUS_COSTUME_SYSTEM
 		str_to_number(t.bMaxLevelBySet[ATTRIBUTE_SET_COSTUME_BODY], data[col++]);
 		str_to_number(t.bMaxLevelBySet[ATTRIBUTE_SET_COSTUME_HEAD], data[col++]);
-#ifdef ENABLE_WEAPON_COSTUME_SYSTEM
 		str_to_number(t.bMaxLevelBySet[ATTRIBUTE_SET_COSTUME_WEAPON], data[col++]);
 #endif
+
+		sys_log(0, "ITEM_ATTR: %-20s %4lu { %3d %3d %3d %3d %3d } { %d %d %d %d %d %d %d %d }",
+				t.szApply,
+				t.dwProb,
+				t.lValues[0],
+				t.lValues[1],
+				t.lValues[2],
+				t.lValues[3],
+				t.lValues[4],
+				t.bMaxLevelBySet[ATTRIBUTE_SET_WEAPON],
+				t.bMaxLevelBySet[ATTRIBUTE_SET_BODY],
+				t.bMaxLevelBySet[ATTRIBUTE_SET_WRIST],
+				t.bMaxLevelBySet[ATTRIBUTE_SET_FOOTS],
+				t.bMaxLevelBySet[ATTRIBUTE_SET_NECK],
+				t.bMaxLevelBySet[ATTRIBUTE_SET_HEAD],
+				t.bMaxLevelBySet[ATTRIBUTE_SET_SHIELD],
+				t.bMaxLevelBySet[ATTRIBUTE_SET_EAR]
+#ifdef ENABLE_PENDANT_SYSTEM
+				,t.bMaxLevelBySet[ATTRIBUTE_SET_PENDANT]
 #endif
+#ifdef ENABLE_BONUS_COSTUME_SYSTEM
+				,t.bMaxLevelBySet[ATTRIBUTE_SET_COSTUME_BODY],
+				t.bMaxLevelBySet[ATTRIBUTE_SET_COSTUME_HEAD],
+				t.bMaxLevelBySet[ATTRIBUTE_SET_COSTUME_WEAPON]
+#endif
+
+				);
 		m_vec_itemAttrTable.push_back(t);
 	}
 
@@ -961,8 +957,9 @@ bool CClientManager::InitializeItemRareTable()
 #ifdef ENABLE_PENDANT_SYSTEM
 	",pendant "
 #endif
-	"FROM item_attr_rare%s ORDER BY apply"
-	, GetTablePostfix());
+		" FROM item_attr_rare%s ORDER BY apply",
+		GetTablePostfix());
+
 	std::unique_ptr<SQLMsg> pkMsg(CDBManager::instance().DirectQuery(query));
 	SQLResult * pRes = pkMsg->Get();
 
@@ -1009,6 +1006,25 @@ bool CClientManager::InitializeItemRareTable()
 #ifdef ENABLE_PENDANT_SYSTEM
 		str_to_number(t.bMaxLevelBySet[ATTRIBUTE_SET_PENDANT], data[col++]);
 #endif
+		sys_log(0, "ITEM_RARE: %-20s %4lu { %3d %3d %3d %3d %3d } { %d %d %d %d %d %d %d }",
+				t.szApply,
+				t.dwProb,
+				t.lValues[0],
+				t.lValues[1],
+				t.lValues[2],
+				t.lValues[3],
+				t.lValues[4],
+				t.bMaxLevelBySet[ATTRIBUTE_SET_WEAPON],
+				t.bMaxLevelBySet[ATTRIBUTE_SET_BODY],
+				t.bMaxLevelBySet[ATTRIBUTE_SET_WRIST],
+				t.bMaxLevelBySet[ATTRIBUTE_SET_FOOTS],
+				t.bMaxLevelBySet[ATTRIBUTE_SET_NECK],
+				t.bMaxLevelBySet[ATTRIBUTE_SET_HEAD],
+				t.bMaxLevelBySet[ATTRIBUTE_SET_SHIELD],
+				t.bMaxLevelBySet[ATTRIBUTE_SET_EAR]
+
+				);
+
 		m_vec_itemRareTable.push_back(t);
 	}
 
@@ -1086,6 +1102,7 @@ bool CClientManager::InitializeLandTable()
 
 void parse_pair_number_string(const char * c_pszString, std::vector<std::pair<int, int> > & vec)
 {
+	// format: 10,1/20,3/300,50
 	const char * t = c_pszString;
 	const char * p = strchr(t, '/');
 	std::pair<int, int> k;
@@ -1190,12 +1207,14 @@ bool CClientManager::InitializeObjectProto()
 			str_to_number(t.lRegion[2], data[col++]);
 			str_to_number(t.lRegion[3], data[col++]);
 
+			// ADD_BUILDING_NPC
 			str_to_number(t.dwNPCVnum, data[col++]);
 			str_to_number(t.dwGroupVnum, data[col++]);
 			str_to_number(t.dwDependOnGroupVnum, data[col++]);
 
 			t.lNPCX = 0;
 			t.lNPCY = MAX(t.lRegion[1], t.lRegion[3])+300;
+			// END_OF_ADD_BUILDING_NPC
 
 			sys_log(0, "OBJ_PROTO: vnum %lu price %lu mat %lu %lu",
 					t.dwVnum, t.dwPrice, t.kMaterials[0].dwItemVnum, t.kMaterials[0].dwCount);
@@ -1244,7 +1263,7 @@ bool CClientManager::InitializeObjectTable()
 			str_to_number(k->zRot, data[col++]);
 			str_to_number(k->lLife, data[col++]);
 
-			sys_log(0, "OBJ: %lu vnum %lu map %-4ld %7ldx%-7ld life %ld", 
+			sys_log(0, "OBJ: %lu vnum %lu map %-4ld %7ldx%-7ld life %ld",
 					k->dwID, k->dwVnum, k->lMapIndex, k->x, k->y, k->lLife);
 
 			m_map_pkObjectTable.insert(std::make_pair(k->dwID, k));
@@ -1252,190 +1271,6 @@ bool CClientManager::InitializeObjectTable()
 
 	return true;
 }
-
-#ifdef ENABLE_BIOLOG_SYSTEM
-bool CClientManager::InitializeBiologMissions()
-{
-	MYSQL_ROW data;
-	const char szQuery[] = "SELECT `mission`, `required_lvl`, `required_item`, `required_item_count`, `cooldown`, `chance` FROM `player`.biolog_missions ORDER BY mission;";
-	std::unique_ptr<SQLMsg> pMsg(DIRECT_QUERY(szQuery));
-
-	if (pMsg->uiSQLErrno != 0)
-	{
-		sys_err("CANNOT LOAD biolog_missions TABLE , errorcode %d ", pMsg->uiSQLErrno);
-		return false;
-	}
-
-	if (!m_vec_BiologMissions.empty())
-	{
-		sys_log(0, "RELOAD: biolog_missions upgrade");
-		m_vec_BiologMissions.clear();
-	}
-
-	if (pMsg->Get())
-	{
-		sys_log(0, "BIOLOG_MISSIONS: Table size is %u", pMsg->Get()->uiNumRows);
-
-		while ((data = mysql_fetch_row(pMsg->Get()->pSQLResult)))
-		{
-			TBiologMissionsProto b;
-			memset(&b, 0, sizeof(TBiologMissionsProto));
-
-			int col = 0;
-
-			str_to_number(b.bMission, data[col++]);
-			str_to_number(b.bRequiredLevel, data[col++]);
-			str_to_number(b.iRequiredItem, data[col++]);
-			str_to_number(b.wRequiredItemCount, data[col++]);
-			str_to_number(b.iCooldown, data[col++]);
-			str_to_number(b.bChance, data[col++]);
-
-			sys_log(0, "BIOLOG_MISSIONS: Added to vector: mission %u required_level: %u required_item: %u required_count: %u chance: %u",
-				b.bMission, b.bRequiredLevel, b.iRequiredItem, b.wRequiredItemCount, b.bChance);
-
-			m_vec_BiologMissions.push_back(b);
-		}
-	}
-	return true;
-}
-
-bool CClientManager::InitializeBiologRewards()
-{
-	MYSQL_ROW data;
-	const char szQuery[] = "SELECT mission, reward_item, reward_item_count, apply_type0+0, apply_value0, apply_type1+0, apply_value1, apply_type2+0, apply_value2 FROM `player`.biolog_rewards ORDER by mission;";
-	std::unique_ptr<SQLMsg> pMsg(DIRECT_QUERY(szQuery));
-
-	if (pMsg->uiSQLErrno != 0)
-	{
-		sys_err("CANNOT LOAD biolog_rewards TABLE , errorcode %d ", pMsg->uiSQLErrno);
-		return false;
-	}
-
-	if (!m_vec_BiologRewards.empty())
-	{
-		sys_log(0, "RELOAD: biolog_missions upgrade");
-		m_vec_BiologRewards.clear();
-	}
-
-	if (pMsg->Get())
-	{
-		sys_log(0, "BIOLOG_REWARDS: Table size is %u", pMsg->Get()->uiNumRows);
-
-		while ((data = mysql_fetch_row(pMsg->Get()->pSQLResult)))
-		{
-			TBiologRewardsProto b;
-			memset(&b, 0, sizeof(TBiologRewardsProto));
-
-			int col = 0;
-
-			str_to_number(b.bMission, data[col++]);
-			str_to_number(b.dRewardItem, data[col++]);
-			str_to_number(b.wRewardItemCount, data[col++]);
-
-			for (size_t i = 0; i < MAX_BONUSES_LENGTH; i++)
-			{
-				str_to_number(b.bApplyType[i], data[col++]);
-				str_to_number(b.lApplyValue[i], data[col++]);
-			}
-
-			sys_log(0, "BIOLOG_REWARDS: Added to vector: mission %u apply_type0: %u aply_value0: %u, apply_type1: %u aply_value1: %u, apply_type2: %u aply_value2: %u",
-				b.bMission, b.bApplyType[0], b.lApplyValue[0], b.bApplyType[1], b.lApplyValue[1], b.bApplyType[2], b.lApplyValue[2]);
-
-			m_vec_BiologRewards.push_back(b);
-		}
-	}
-	return true;
-}
-
-bool CClientManager::InitializeBiologMonsters()
-{
-	MYSQL_ROW data;
-	const char szQuery[] = "SELECT `mission`, `mob_vnum`, `chance` FROM `player`.biolog_monsters ORDER by mission;";
-	std::unique_ptr<SQLMsg> pMsg(DIRECT_QUERY(szQuery));
-
-	if (pMsg->uiSQLErrno != 0)
-	{
-		sys_err("CANNOT LOAD biolog_monsters TABLE , errorcode %d ", pMsg->uiSQLErrno);
-		return false;
-	}
-
-	if (!m_vec_BiologMonsters.empty())
-	{
-		sys_log(0, "RELOAD: biolog_monsters upgrade");
-		m_vec_BiologMonsters.clear();
-	}
-
-	if (pMsg->Get())
-	{
-		sys_log(0, "BIOLOG_MONSTERS: Table size is %u", pMsg->Get()->uiNumRows);
-
-		while ((data = mysql_fetch_row(pMsg->Get()->pSQLResult)))
-		{
-			TBiologMonstersProto b;
-			memset(&b, 0, sizeof(TBiologMonstersProto));
-
-			int col = 0;
-
-			str_to_number(b.bMission, data[col++]);
-			str_to_number(b.dwMonsterVnum, data[col++]);
-			str_to_number(b.bChance, data[col++]);
-
-			sys_log(0, "BIOLOG_MONSTERS: Added to vector: mission: %u monster_vnum: %u chance: %u ",
-				b.bMission, b.dwMonsterVnum, b.bChance);
-
-			m_vec_BiologMonsters.push_back(b);
-		}
-	}
-	return true;
-}
-#endif
-
-#ifdef ENABLE_EVENT_MANAGER
-bool CClientManager::InitializeEventTable()
-{
-	char query[4096]= { '\0' };
-	snprintf(query, sizeof(query), "SELECT id, type, UNIX_TIMESTAMP(start), UNIX_TIMESTAMP(end), vnum, percent, drop_type+0, completed FROM event%s ORDER BY start", GetTablePostfix());
-
-	auto pkMsg(CDBManager::instance().DirectQuery(&query[0]));
-	SQLResult* pRes = pkMsg->Get();
-
-	if (!m_vec_eventTable.empty())
-	{
-		sys_log(0, "RELOAD: event");
-		m_vec_eventTable.clear();
-	}
-
-	m_vec_eventTable.reserve(pRes->uiNumRows);
-
-	MYSQL_ROW data;
-
-	if (pRes->uiNumRows > 0)
-	{
-		while ((data = mysql_fetch_row(pRes->pSQLResult)))
-		{
-			TEventTable t;
-			memset(&t, 0, sizeof(t));
-
-			int col = 0;
-
-			str_to_number(t.dwID, data[col++]);
-			strlcpy(t.szType, data[col++], sizeof(t.szType));
-			str_to_number(t.startTime, data[col++]);
-			str_to_number(t.endTime, data[col++]);
-			str_to_number(t.dwVnum, data[col++]);
-			str_to_number(t.iPercent, data[col++]);
-			str_to_number(t.iDropType, data[col++]);
-			str_to_number(t.bCompleted, data[col++]);
-
-			sys_log(0, "EVENT: %s start %lu end %lu", t.szType, t.startTime, t.endTime);
-
-			m_vec_eventTable.emplace_back(t);
-		}
-	}
-
-	return true;
-}
-#endif
 
 #ifdef ENABLE_GROWTH_PET_SYSTEM
 bool CClientManager::InitializeGrowthPetSkillTable()

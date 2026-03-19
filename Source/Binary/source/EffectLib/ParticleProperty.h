@@ -34,8 +34,8 @@ class CParticleProperty
 
 		void Clear();
 
-		void InsertTexture(const char *c_szFileName);
-		bool SetTexture(const char *c_szFileName);
+		void InsertTexture(const char * c_szFileName);
+		bool SetTexture(const char * c_szFileName);
 
 		__forceinline BYTE GetTextureAnimationType()
 		{
@@ -74,7 +74,16 @@ class CParticleProperty
 
 		TTimeEventTableFloat m_TimeEventScaleX;
 		TTimeEventTableFloat m_TimeEventScaleY;
+#ifdef WORLD_EDITOR
+		TTimeEventTableFloat m_TimeEventColorRed;
+		TTimeEventTableFloat m_TimeEventColorGreen;
+		TTimeEventTableFloat m_TimeEventColorBlue;
+		TTimeEventTableFloat m_TimeEventAlpha;
+
+		std::vector<std::string> m_TextureNameVector;
+#else
 		TTimeEventTableColor m_TimeEventColor;
+#endif
 		TTimeEventTableFloat m_TimeEventRotation;
 
 		std::vector<CGraphicImage*> m_ImageVector;

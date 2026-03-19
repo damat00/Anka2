@@ -12,6 +12,8 @@
 #include "ParticleSystemInstance.h"
 #include "SimpleLightInstance.h"
 
+#include "../UserInterface/Locale_inc.h"
+
 class CEffectInstance : public CGraphicObjectInstance
 {
 	public:
@@ -55,6 +57,14 @@ class CEffectInstance : public CGraphicObjectInstance
 		void SetDeactive();
 		void SetGlobalMatrix(const D3DXMATRIX & c_rmatGlobal);
 		void UpdateSound();
+
+#ifdef USE_EFFECTS_LOD
+        bool IsHiddenByLod();
+        void SetLodShow();
+        void SetHiddenByLod();
+        void UpdateLODLevel();
+#endif
+
 		void OnUpdate();
 		void OnRender();
 		void OnBlendRender() {} // Not used
@@ -63,28 +73,28 @@ class CEffectInstance : public CGraphicObjectInstance
 		void OnRenderPCBlocker() {} // Not used
 
 	protected:
-		void __Initialize();
+		void					__Initialize();
 
-		void __SetParticleData(CParticleSystemData * pData);
-		void __SetMeshData(CEffectMeshScript * pMesh);
-		void __SetLightData(CLightData * pData);
+		void					__SetParticleData(CParticleSystemData * pData);
+		void					__SetMeshData(CEffectMeshScript * pMesh);
+		void					__SetLightData(CLightData * pData);
 
-		virtual void OnUpdateCollisionData(const CStaticCollisionDataVector * pscdVector) {} // Not used
-		virtual void OnUpdateHeighInstance(CAttributeInstance * pAttributeInstance) {}
-		virtual bool OnGetObjectHeight(float fX, float fY, float * pfHeight) { return false; }
+		virtual void			OnUpdateCollisionData(const CStaticCollisionDataVector * pscdVector) {} // Not used
+		virtual void			OnUpdateHeighInstance(CAttributeInstance * pAttributeInstance) {}
+		virtual bool			OnGetObjectHeight(float fX, float fY, float * pfHeight) { return false; }
 
 	protected:
-		BOOL m_isAlive;
-		DWORD m_dwFrame;
-		D3DXMATRIX m_matGlobal;
+		BOOL					m_isAlive;
+		DWORD					m_dwFrame;
+		D3DXMATRIX				m_matGlobal;
 
 		CEffectData * m_pkEftData;
 
- 		std::vector<CParticleSystemInstance*> m_ParticleInstanceVector;
-		std::vector<CEffectMeshInstance*> m_MeshInstanceVector;
-		std::vector<CLightInstance*> m_LightInstanceVector;
+ 		std::vector<CParticleSystemInstance*>	m_ParticleInstanceVector;
+		std::vector<CEffectMeshInstance*>		m_MeshInstanceVector;
+		std::vector<CLightInstance*>			m_LightInstanceVector;
 
-		NSound::TSoundInstanceVector *m_pSoundInstanceVector;
+		NSound::TSoundInstanceVector *	m_pSoundInstanceVector;
 
 		float m_fBoundingSphereRadius;
 		D3DXVECTOR3 m_v3BoundingSpherePosition;
@@ -120,8 +130,7 @@ class CEffectInstance : public CGraphicObjectInstance
 			std::for_each(m_LightInstanceVector.begin(), m_LightInstanceVector.end(), f2);
 		}
 #endif
-
-#ifdef ENABLE_INGAME_WIKI_SYSTEM
+#ifdef ENABLE_WIKI_SYSTEM
 	public:
 		void SetWikiIgnoreFrustum(bool flag)
 		{

@@ -176,8 +176,9 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 
 		void SendNotice(const char * c_pszFormat, ...);
 
-		char* GetCommand(char* str);
-		void ItemAward(CPeer * peer, char* login);
+	// @fixme203 directly GetCommand instead of strcpy
+		char* GetCommand(char* str, char* command); //Function to get command from German gift function
+		void ItemAward(CPeer * peer, char* login); //German gift function
 
 	protected:
 		void Destroy();
@@ -199,20 +200,13 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 		bool InitializeLandTable();
 		bool InitializeObjectProto();
 		bool InitializeObjectTable();
-
-#ifdef ENABLE_BIOLOG_SYSTEM
-		bool InitializeBiologMissions();
-		bool InitializeBiologRewards();
-		bool InitializeBiologMonsters();
-#endif
-
-#ifdef ENABLE_EVENT_MANAGER
-		bool InitializeEventTable();
-#endif
-
 #ifdef ENABLE_GROWTH_PET_SYSTEM
 		bool InitializeGrowthPetSkillTable();
 #endif
+
+		// Reflect mob_proto and item_proto read from mob_proto.txt and item_proto.txt to real db.
+		// Even if item_proto and mob_proto are not reflected in the db, there is no problem with the game running,
+		// A problem occurs because the operation tool reads and writes item_proto and mob_proto of db.
 
 		void AddPeer(socket_t fd);
 		void RemovePeer(CPeer * pPeer);
@@ -268,12 +262,8 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 		void RESULT_PLAYER_LOAD(CPeer * peer, MYSQL_RES * pRes, ClientHandleInfo * pkInfo);
 		void RESULT_ITEM_LOAD(CPeer * peer, MYSQL_RES * pRes, DWORD dwHandle, DWORD dwPID);
 		void RESULT_QUEST_LOAD(CPeer * pkPeer, MYSQL_RES * pRes, DWORD dwHandle, DWORD dwPID);
-		void RESULT_AFFECT_LOAD(CPeer * pkPeer, MYSQL_RES * pRes, DWORD dwHandle);
-
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-		void RESULT_EXT_BATTLE_PASS_LOAD(CPeer* peer, MYSQL_RES* pRes, DWORD dwHandle, DWORD dwRealPID);
-		void QUERY_SAVE_EXT_BATTLE_PASS(CPeer* peer, DWORD dwHandle, TPlayerExtBattlePassMission* battlePass);
-#endif
+	// @fixme402 (RESULT_AFFECT_LOAD +dwRealPID)
+		void RESULT_AFFECT_LOAD(CPeer * pkPeer, MYSQL_RES * pRes, DWORD dwHandle, DWORD dwRealPID);
 
 #ifdef ENABLE_SKILL_COLOR_SYSTEM
 		void QUERY_SKILL_COLOR_LOAD(CPeer* peer, DWORD dwHandle, TPlayerLoadPacket* packet);
@@ -431,18 +421,8 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 		std::vector<building::TObjectProto> m_vec_kObjectProto;
 		std::map<DWORD, building::TObject*> m_map_pkObjectTable;
 
-#ifdef ENABLE_EVENT_MANAGER
-		std::vector<TEventTable> m_vec_eventTable;
-#endif
-
 #ifdef ENABLE_GROWTH_PET_SYSTEM
 		std::vector<TGrowthPetSkillTable> m_vec_growthPetSkillTable;
-#endif
-
-#ifdef ENABLE_BIOLOG_SYSTEM
-		std::vector<TBiologMissionsProto> m_vec_BiologMissions;
-		std::vector<TBiologRewardsProto> m_vec_BiologRewards;
-		std::vector<TBiologMonstersProto> m_vec_BiologMonsters;
 #endif
 
 		bool m_bShutdowned;
@@ -552,10 +532,7 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 		void UpdateChannelStatus(TChannelStatus* pData);
 		void RequestChannelStatus(CPeer* peer, DWORD dwHandle);
 
-#ifdef ENABLE_EVENT_MANAGER
-		void UpdateEventStatus(DWORD dwID);
-		void EventNotification(TPacketSetEventFlag* p);
-#endif
+		void QUERY_ADD_RANKING(CPeer * peer, TPacketGDAddRanking * p, DWORD dwLen);
 
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
 		std::map<DWORD, TOfflineShop*> m_Offlineshop;
@@ -577,21 +554,28 @@ class CClientManager : public CNetBase, public singleton<CClientManager>
 		bool InitializeOfflineShop();
 #endif
 
-#ifdef ENABLE_RENEWAL_INGAME_ITEMSHOP
-	public:
-		bool InitializeItemShop();
-		void SendItemShopData(CPeer* pkPeer = NULL, bool isPacket = false);
-		void RecvItemShop(CPeer* pkPeer, DWORD dwHandle, const char* data);
-		long long GetDragonCoin(DWORD id);
-		void SetDragonCoin(DWORD id, long long amount);
-		void ItemShopIncreaseSellCount(DWORD itemID, int itemCount);
-		void SetEventFlag(const char* flag, int value);
-		int GetEventFlag(const char* flag);
-
+#ifdef ENABLE_ITEMSHOP
 	protected:
 		int itemShopUpdateTime;
 		std::map<BYTE, std::map<BYTE, std::vector<TIShopData>>> m_IShopManager;
 		std::map<DWORD, std::vector<TIShopLogData>> m_IShopLogManager;
+	
+	public:
+		bool InitializeItemShop();
+		void SendItemShopData(CPeer* pkPeer = NULL, bool isPacket = false);
+		void RecvItemShop(CPeer* pkPeer, DWORD dwHandle, const char* data);
+	
+#ifdef USE_ITEMSHOP_RENEWED
+		void GetAccountMoney(DWORD id, long long& coins, long long& jcoins);
+		void SetAccountMoney(DWORD id, long long coins, long long jcoins);
+#else
+		long long GetDragonCoin(DWORD id);
+		void SetDragonCoin(DWORD id, long long amount);
+#endif
+	
+		void ItemShopIncreaseSellCount(DWORD itemID, int itemCount);
+		void SetEventFlag(const char* flag, int value);
+		int GetEventFlag(const char* flag);
 #endif
 };
 

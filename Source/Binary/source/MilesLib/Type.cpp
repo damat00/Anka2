@@ -4,17 +4,17 @@
 
 std::string NSound::strResult;
 
-const char *NSound::GetResultString()
+const char * NSound::GetResultString()
 {
 	return strResult.c_str();
 }
 
-void NSound::SetResultString(const char *c_pszStr)
+void NSound::SetResultString(const char * c_pszStr)
 {
 	strResult.assign(c_pszStr);
 }
 
-bool NSound::LoadSoundInformationPiece(const char *c_szFileName, NSound::TSoundDataVector & rSoundDataVector, const char *c_szPathHeader)
+bool NSound::LoadSoundInformationPiece(const char * c_szFileName, NSound::TSoundDataVector & rSoundDataVector, const char * c_szPathHeader)
 {
 	std::string strResult;
 	strResult = c_szFileName;
@@ -75,13 +75,13 @@ bool NSound::LoadSoundInformationPiece(const char *c_szFileName, NSound::TSoundD
 	return true;
 }
 
-bool NSound::SaveSoundInformationPiece(const char *c_szFileName, NSound::TSoundDataVector & rSoundDataVector)
+bool NSound::SaveSoundInformationPiece(const char * c_szFileName, NSound::TSoundDataVector & rSoundDataVector)
 {
-	if (rSoundDataVector.empty())	// 데이터가 없으면 성공으로 간주
+	if (rSoundDataVector.empty())
 	{
-		if (IsFile(c_szFileName))	// 데이터는 비어있는데 파일이 있다면
+		if (IsFile(c_szFileName))
 		{
-			_unlink(c_szFileName);		// 지운다.
+			_unlink(c_szFileName);
 		}
 		return true;
 	}

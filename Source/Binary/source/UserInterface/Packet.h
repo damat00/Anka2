@@ -4,6 +4,7 @@
 
 #include "../gamelib/RaceData.h"
 #include "../gamelib/ItemData.h"
+#include "GameType.h"
 
 typedef BYTE TPacketHeader;
 
@@ -37,9 +38,8 @@ enum PacketHeaderCG
 	HEADER_CG_ITEM_DESTROY						= 23,
 #endif
 	//HEADER_CG_EMPTY							= 24,
-#ifdef ENABLE_BIOLOG_SYSTEM
-	HEADER_CG_BIOLOG_MANAGER					= 25,
-#endif
+	//HEADER_CG_EMPTY							= 25,
+
 	HEADER_CG_ON_CLICK							= 26,
 	HEADER_CG_EXCHANGE							= 27,
 	HEADER_CG_CHARACTER_POSITION				= 28,
@@ -50,11 +50,21 @@ enum PacketHeaderCG
 #ifdef ENABLE_RENEWAL_OX_EVENT
 	HEADER_CG_QUEST_INPUT_LONG_STRING			= 33,
 #endif
-	//HEADER_CG_EMPTY							= 34,
-	//HEADER_CG_EMPTY							= 35,
-	//HEADER_CG_EMPTY							= 36,
-	//HEADER_CG_EMPTY							= 37,
-	//HEADER_CG_EMPTY							= 38,
+#ifdef ENABLE_RESP_SYSTEM
+	HEADER_CG_RESP 								= 34,
+#endif
+#ifdef ENABLE_ATTENDANCE_EVENT
+	HEADER_CG_ATTENDANCE_REWARD 				= 35,
+#endif
+#ifdef ENABLE_FISH_EVENT_SYSTEM
+	HEADER_CG_FISH_EVENT_SEND 					= 36,
+#endif
+#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
+	HEADER_CG_SOUL_ROULETTE						= 37,
+#endif
+#ifdef ENABLE_MINI_GAME_CATCH_KING
+	HEADER_CG_MINI_GAME_CATCH_KING 				= 38,
+#endif
 	//HEADER_CG_EMPTY							= 39,
 	//HEADER_CG_EMPTY							= 40,
 	HEADER_CG_PVP								= 41,
@@ -105,7 +115,7 @@ enum PacketHeaderCG
 	HEADER_CG_PARTY_PARAMETER					= 78,
 	//HEADER_CG_EMPTY							= 79,
 	HEADER_CG_GUILD								= 80,
-	//HEADER_CG_EMPTY							= 81,
+	HEADER_CG_ANSWER_MAKE_GUILD					= 81,
 	HEADER_CG_FISHING							= 82,
 	HEADER_CG_GIVE_ITEM							= 83,
 	//HEADER_CG_EMPTY							= 84,
@@ -144,14 +154,12 @@ enum PacketHeaderCG
 #ifdef ENABLE_STYLE_ATTRIBUTE_SYSTEM
 	HEADER_CG_ITEM_USE_NEW_ATTRIBUTE 			= 115,
 #endif
-#ifdef ENABLE_EVENT_MANAGER
-	HEADER_CG_REQUEST_EVENT_QUEST				= 116,
-	HEADER_CG_REQUEST_EVENT_DATA				= 117,
-#endif
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-	HEADER_CG_EXT_BATTLE_PASS_ACTION			= 118,
-	HEADER_CG_EXT_SEND_BP_PREMIUM_ITEM			= 119,
-#endif
+
+	//HEADER_CG_EMPTY							= 116,
+	//HEADER_CG_EMPTY							= 117,
+	//HEADER_CG_EMPTY							= 118,
+	//HEADER_CG_EMPTY							= 119,
+
 #ifdef ENABLE_EXTENDED_WHISPER_DETAILS
 	HEADER_CG_WHISPER_DETAILS					= 120,
 #endif
@@ -251,12 +259,15 @@ enum PacketHeaderCG
 	//HEADER_CG_EMPTY							= 203,
 	//HEADER_CG_EMPTY							= 204,
 	HEADER_CG_DRAGON_SOUL_REFINE				= 205,
+	//KULLANILIYOR								= 206,
 	//HEADER_CG_EMPTY							= 207,
 	//HEADER_CG_EMPTY							= 208,
 	//HEADER_CG_EMPTY							= 209,
 	//HEADER_CG_EMPTY							= 210,
 	//HEADER_CG_EMPTY							= 212,
-	//HEADER_CG_EMPTY							= 213,
+#ifdef ENABLE_DUNGEON_INFO
+	HEADER_CG_DUNGEON_INFO_SYSTEM 				= 213,
+#endif
 	//HEADER_CG_EMPTY							= 214,
 	//HEADER_CG_EMPTY							= 215,
 	//HEADER_CG_EMPTY							= 216,
@@ -347,7 +358,7 @@ enum PacketHeaderGC
 	HEADER_GC_WHISPER							= 34,
 	//HEADER_GC_EMPTY							= 35,
 	HEADER_GC_MOTION							= 36,
-	//HEADER_GC_EMPTY							= 37,
+	HEADER_GC_PARTS								= 37,	/* server sends appearance update; match server enum */
 	HEADER_GC_SHOP								= 38,
 	HEADER_GC_SHOP_SIGN							= 39,
 	HEADER_GC_DUEL_START						= 40,
@@ -357,13 +368,16 @@ enum PacketHeaderGC
 	HEADER_GC_PING								= 44,
 	HEADER_GC_SCRIPT							= 45,
 	HEADER_GC_QUEST_CONFIRM						= 46,
-#ifdef ENABLE_BIOLOG_SYSTEM
-	HEADER_GC_BIOLOG_MANAGER					= 47,
-#endif
+
+	//HEADER_CG_EMPTY							= 47,
+
 	HEADER_GC_GUILDMARK_PASS					= 48,
-#ifdef ENABLE_EVENT_MANAGER
-	HEADER_GC_EVENT_INFO						= 49,
-	HEADER_GC_EVENT_RELOAD						= 50,
+
+#ifdef ENABLE_RESP_SYSTEM
+	HEADER_GC_RESP 								= 49,
+#endif
+#ifdef ENABLE_FISH_EVENT_SYSTEM
+	HEADER_GC_FISH_EVENT_INFO 					= 50,
 #endif
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
 	HEADER_GC_OFFLINE_SHOP						= 51,
@@ -372,23 +386,33 @@ enum PacketHeaderGC
 #ifdef ENABLE_OFFLINESHOP_SEARCH_SYSTEM
 	HEADER_GC_SHOPSEARCH_SET					= 53,
 #endif
-	//HEADER_GC_EMPTY							= 54,
-	//HEADER_GC_EMPTY							= 55,
-	//HEADER_GC_EMPTY							= 56,
-	//HEADER_GC_EMPTY							= 57,
+#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
+	HEADER_GC_SOUL_ROULETTE						= 54,
+#endif
+#ifdef ENABLE_ATTENDANCE_EVENT
+	HEADER_GC_HIT_COUNT_INFO 					= 55,
+	HEADER_GC_ATTENDANCE_EVENT 					= 56,
+	HEADER_GC_ATTENDANCE_EVENT_INFO 			= 57,
+#endif
 #ifdef ENABLE_MOB_DROP_INFO
 	HEADER_GC_TARGET_INFO						= 58,
 #endif
 #ifdef ENABLE_RENEWAL_SPECIAL_CHAT
 	HEADER_GC_PICKUP_ITEM_SC					= 59,
 #endif
-	//HEADER_GC_EMPTY							= 60,
+#ifdef ENABLE_MINI_GAME_CATCH_KING
+	HEADER_GC_MINI_GAME_CATCH_KING 				= 60,
+#endif
 	HEADER_GC_MOUNT								= 61,
 	HEADER_GC_OWNERSHIP							= 62,
 	HEADER_GC_TARGET							= 63,
-	//HEADER_GC_EMPTY							= 64,
+#ifdef ENABLE_STONE_EVENT
+	HEADER_GC_STONE_EVENT 						= 64,
+#endif
 	HEADER_GC_WARP								= 65,
-	//HEADER_GC_EMPTY							= 66,
+#ifdef ENABLE_KILL_STATISTICS
+	HEADER_GC_KILL_STATISTICS 					= 66,
+#endif
 	//HEADER_GC_EMPTY							= 67,
 	//HEADER_GC_EMPTY							= 68,
 	HEADER_GC_ADD_FLY_TARGETING					= 69,
@@ -415,7 +439,9 @@ enum PacketHeaderGC
 	HEADER_GC_EMPIRE							= 90,
 	HEADER_GC_PARTY_LINK						= 91,
 	HEADER_GC_PARTY_UNLINK						= 92,
-	//HEADER_GC_EMPTY							= 93,
+#ifdef ENABLE_ITEMSHOP
+	HEADER_GC_ITEMSHOP 							= 93,
+#endif
 	//HEADER_GC_EMPTY							= 94,
 	HEADER_GC_REFINE_INFORMATION				= 95,
 	HEADER_GC_OBSERVER_ADD						= 96,
@@ -433,7 +459,7 @@ enum PacketHeaderGC
 	//HEADER_GC_EMPTY							= 108,
 	//HEADER_GC_EMPTY							= 109,
 	HEADER_GC_DUNGEON							= 110,
-	HEADER_GC_WALK_MODE							= 111, 
+	HEADER_GC_WALK_MODE							= 111,
 	HEADER_GC_CHANGE_SKILL_GROUP				= 112,
 	HEADER_GC_MAIN_CHARACTER2_EMPIRE			= 113,
 	HEADER_GC_SEPCIAL_EFFECT					= 114,
@@ -485,15 +511,15 @@ enum PacketHeaderGC
 	HEADER_GC_MOUNT_UP_GRADE 					= 155,
 	HEADER_GC_MOUNT_UP_GRADE_CHAT 				= 156,
 #endif
-	//HEADER_GC_EMPTY							= 157,
+#ifdef ENABLE_COLLECT_WINDOW
+	HEADER_GC_COLLECT 							= 157,
+#endif
 	//HEADER_GC_EMPTY							= 158,
 	//HEADER_GC_EMPTY							= 159,
 #ifdef ENABLE_EXTENDED_WHISPER_DETAILS
 	HEADER_GC_WHISPER_DETAILS					= 160,
 #endif
-#ifdef ENABLE_GUILD_TOKEN_AUTH
-	HEADER_GC_GUILD_TOKEN						= 162,
-#endif
+	//HEADER_GC_EMPTY							= 162,
 	//HEADER_GC_EMPTY							= 163,
 	//HEADER_GC_EMPTY							= 164,
 	//HEADER_GC_EMPTY							= 165,
@@ -505,9 +531,7 @@ enum PacketHeaderGC
 #ifdef ENABLE_RENEWAL_SWITCHBOT
 	HEADER_GC_SWITCHBOT							= 171,
 #endif
-#ifdef ENABLE_RENEWAL_INGAME_ITEMSHOP
-	HEADER_GC_ITEMSHOP							= 172,
-#endif
+	//HEADER_GC_EMPTY							= 172,
 #ifdef ENABLE_GROWTH_PET_SYSTEM
 	HEADER_GC_PET								= 173,
 	HEADER_GC_PET_SET							= 174,
@@ -522,7 +546,9 @@ enum PacketHeaderGC
 	HEADER_GC_PET_SKILL_UPDATE					= 183,
 	HEADER_GC_PET_SKILL_COOLTIME				= 184,
 #endif
-	//HEADER_GC_EMPTY							= 185,
+#ifdef ENABLE_CONQUEROR_LEVEL
+	HEADER_GC_SUNGMA_ATTR_UPDATE 				= 185,
+#endif
 	//HEADER_GC_EMPTY							= 186,
 	//HEADER_GC_EMPTY							= 187,
 	//HEADER_GC_EMPTY							= 188,
@@ -549,7 +575,9 @@ enum PacketHeaderGC
 	HEADER_GC_DRAGON_SOUL_REFINE				= 209,
 	HEADER_GC_RESPOND_CHANNELSTATUS				= 210,
 	//HEADER_GC_EMPTY							= 212,
-	//HEADER_GC_EMPTY							= 213,
+#ifdef ENABLE_EVENT_SYSTEM
+	HEADER_GC_EVENT_INFO 						= 213,
+#endif
 	//HEADER_GC_EMPTY							= 214,
 #ifdef ENABLE_PARTY_POSITION
 	HEADER_GC_PARTY_POSITION_INFO				= 215,
@@ -557,22 +585,27 @@ enum PacketHeaderGC
 #ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
 	HEADER_GC_REQUEST_CHANGE_LANGUAGE			= 216,
 #endif
+	//KULLANILIYOR 								= 217,
 #ifdef ENABLE_RENEWAL_CUBE
 	HEADER_GC_CUBE_RENEWAL						= 218,
 #endif
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-	HEADER_GC_EXT_BATTLE_PASS_OPEN				= 219,
-	HEADER_GC_EXT_BATTLE_PASS_GENERAL_INFO		= 220,
-	HEADER_GC_EXT_BATTLE_PASS_MISSION_INFO		= 221,
-	HEADER_GC_EXT_BATTLE_PASS_MISSION_UPDATE	= 222,
-	HEADER_GC_EXT_BATTLE_PASS_SEND_RANKING		= 223,
-#endif
+
+	//HEADER_CG_EMPTY							= 219,
+	//HEADER_CG_EMPTY							= 220,
+	//HEADER_CG_EMPTY							= 221,
+	//HEADER_CG_EMPTY							= 222,
+	//HEADER_CG_EMPTY							= 223,
+
 #ifdef ENABLE_AURA_COSTUME_SYSTEM
 	HEADER_GC_AURA								= 224,
 #endif
-	//HEADER_GC_EMPTY							= 225,
+#ifdef ENABLE_DUNGEON_INFO
+	HEADER_GC_DUNGEON_INFO_SYSTEM 				= 225,
+#endif
 	//HEADER_GC_EMPTY							= 226,
-	//HEADER_GC_EMPTY							= 227,
+#ifdef ENABLE_RANKING
+	HEADER_GC_RANKING_SEND 						= 227,
+#endif
 #ifdef ENABLE_CHANGE_LOOK_SYSTEM
 	HEADER_GC_CHANGE_LOOK_SET					= 228,
 	HEADER_GC_CHANGE_LOOK_DEL					= 229,
@@ -642,17 +675,13 @@ enum
 	GUILD_GRADE_COUNT = 15,
 	GULID_COMMENT_MAX_LEN = 50,
 
-	MARK_CRC_NUM = 8*8,
-	MARK_DATA_SIZE = 16*12,
-	SYMBOL_DATA_SIZE = 128*256,
+	MARK_CRC_NUM = 8 * 8,
+	MARK_DATA_SIZE = 16 * 12,
+	SYMBOL_DATA_SIZE = 128 * 256,
 	QUEST_INPUT_STRING_MAX_NUM = 64,
 
 #ifdef ENABLE_RENEWAL_OX_EVENT
 	QUEST_INPUT_LONG_STRING_MAX_NUM = 128,
-#endif
-
-#ifdef ENABLE_EVENT_MANAGER
-	QUEST_NAME_MAX_NUM = 64,
 #endif
 
 	PRIVATE_CODE_LENGTH = 8,
@@ -675,73 +704,59 @@ enum
 
 typedef struct command_mark_login
 {
-	BYTE header;
-	DWORD handle;
-	DWORD random_key;
+	BYTE    header;
+	DWORD   handle;
+	DWORD   random_key;
 } TPacketCGMarkLogin;
 
 typedef struct command_mark_upload
 {
-	BYTE header;
-	DWORD gid;
-	DWORD markpass;
-	BYTE image[16*12*4];
-#ifdef ENABLE_GUILD_TOKEN_AUTH
-	uint64_t token;
-#endif
+	BYTE    header;
+	DWORD   gid;
+	BYTE    image[16 * 12 * 4];
 } TPacketCGMarkUpload;
 
 typedef struct command_mark_idxlist
 {
-	BYTE header;
+	BYTE    header;
 } TPacketCGMarkIDXList;
 
 typedef struct command_mark_crclist
 {
-	BYTE header;
-	BYTE imgIdx;
-	DWORD crclist[80];
+	BYTE    header;
+	BYTE    imgIdx;
+	DWORD   crclist[80];
 } TPacketCGMarkCRCList;
 
 typedef struct packet_mark_idxlist
 {
-	BYTE header;
-	DWORD bufSize;
-	WORD count;
+	BYTE    header;
+	DWORD	bufSize;
+	WORD    count;
 } TPacketGCMarkIDXList;
 
 typedef struct packet_mark_block
 {
-	BYTE header;
-	DWORD bufSize;
-	BYTE imgIdx;
-	DWORD count;
+	BYTE    header;
+	DWORD   bufSize;
+	BYTE	imgIdx;
+	DWORD   count;
 } TPacketGCMarkBlock;
 
 typedef struct command_symbol_upload
 {
-	BYTE header;
-	WORD size;
-	DWORD handle;
-	DWORD markpass;
-#ifdef ENABLE_GUILD_TOKEN_AUTH
-	uint64_t token;
-#endif
+	BYTE	header;
+	WORD	size;
+	DWORD	handle;
 } TPacketCGSymbolUpload;
 
 typedef struct command_symbol_crc
 {
-	BYTE header;
-	DWORD dwGuildID;
-	DWORD dwCRC;
-	DWORD dwSize;
+	BYTE	header;
+	DWORD	dwGuildID;
+	DWORD	dwCRC;
+	DWORD	dwSize;
 } TPacketCGSymbolCRC;
-
-typedef struct packet_markpass
-{
-	BYTE header;
-	DWORD markpass;
-} TPacketMarkPass;
 
 typedef struct packet_symbol_data
 {
@@ -752,31 +767,31 @@ typedef struct packet_symbol_data
 
 typedef struct packet_observer_add
 {
-	BYTE header;
-	DWORD vid;
-	WORD x;
-	WORD y;
+	BYTE	header;
+	DWORD	vid;
+	WORD	x;
+	WORD	y;
 } TPacketGCObserverAdd;
 
 typedef struct packet_observer_move
 {
-	BYTE header;
-	DWORD vid;
-	WORD x;
-	WORD y;
+	BYTE	header;
+	DWORD	vid;
+	WORD	x;
+	WORD	y;
 } TPacketGCObserverMove;
 
 typedef struct packet_observer_remove
 {
-	BYTE header;
-	DWORD vid;
+	BYTE	header;
+	DWORD	vid;
 } TPacketGCObserverRemove;
 
 typedef struct command_checkin
 {
 	BYTE header;
-	char name[ID_MAX_NUM+1];
-	char pwd[PASS_MAX_NUM+1];
+	char name[ID_MAX_NUM + 1];
+	char pwd[PASS_MAX_NUM + 1];
 } TPacketCGCheckin;
 
 typedef struct command_login
@@ -788,61 +803,61 @@ typedef struct command_login
 
 typedef struct command_login2
 {
-	BYTE header;
-	char name[ID_MAX_NUM + 1];
-	DWORD login_key;
-	DWORD adwClientKey[4];
+	BYTE	header;
+	char	name[ID_MAX_NUM + 1];
+	DWORD	login_key;
+	DWORD	adwClientKey[4];
 } TPacketCGLogin2;
 
 typedef struct command_login3
 {
-	BYTE header;
-	char name[ID_MAX_NUM + 1];
-	char pwd[PASS_MAX_NUM + 1];
-	DWORD adwClientKey[4];
+	BYTE	header;
+	char	name[ID_MAX_NUM + 1];
+	char	pwd[PASS_MAX_NUM + 1];
+	DWORD	adwClientKey[4];
 #ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
-	BYTE bLanguage;
+	BYTE	bLanguage;
 #endif
 #ifdef ENABLE_RENEWAL_CLIENT_VERSION
-	char ClientVersion[10];
+	char	ClientVersion[10];
 #endif
 } TPacketCGLogin3;
 
 typedef struct command_direct_enter
 {
-	BYTE bHeader;
-	char login[ID_MAX_NUM + 1];
-	char passwd[PASS_MAX_NUM + 1];
-	BYTE index;
+	BYTE	bHeader;
+	char	login[ID_MAX_NUM + 1];
+	char	passwd[PASS_MAX_NUM + 1];
+	BYTE	index;
 } TPacketCGDirectEnter;
 
 typedef struct command_player_select
 {
-	BYTE header;
-	BYTE player_index;
+	BYTE	header;
+	BYTE	player_index;
 } TPacketCGSelectCharacter;
 
 typedef struct command_attack
 {
-	BYTE header;
-	BYTE bType;
-	DWORD dwVictimVID;
-	BYTE bCRCMagicCubeProcPiece;
-	BYTE bCRCMagicCubeFilePiece;
+	BYTE	header;
+	BYTE	bType;
+	DWORD	dwVictimVID;
+	BYTE	bCRCMagicCubeProcPiece;
+	BYTE	bCRCMagicCubeFilePiece;
 } TPacketCGAttack;
 
 typedef struct command_chat
 {
-	BYTE header;
-	WORD length;
-	BYTE type;
+	BYTE	header;
+	WORD	length;
+	BYTE	type;
 } TPacketCGChat;
 
 typedef struct command_whisper
 {
-	BYTE bHeader;
-	WORD wSize;
-	char szNameTo[CHARACTER_NAME_MAX_LEN + 1];
+	BYTE	bHeader;
+	WORD	wSize;
+	char	szNameTo[CHARACTER_NAME_MAX_LEN + 1];
 } TPacketCGWhisper;
 
 enum EBattleMode
@@ -1040,6 +1055,9 @@ typedef struct command_script_button
 {
 	BYTE header;
 	unsigned int idx;
+#ifdef ENABLE_COLLECT_WINDOW
+	BYTE button;
+#endif
 } TPacketCGScriptButton;
 
 typedef struct command_target
@@ -1344,6 +1362,12 @@ typedef struct command_guild
 	BYTE bySubHeader;
 } TPacketCGGuild;
 
+typedef struct command_guild_answer_make_guild
+{
+	BYTE header;
+	char guild_name[GUILD_NAME_MAX_LEN+1];
+} TPacketCGAnswerMakeGuild;
+
 typedef struct command_give_item
 {
 	BYTE byHeader;
@@ -1416,6 +1440,9 @@ typedef struct SPacketCGRefine
 	BYTE header;
 	BYTE pos;
 	BYTE type;
+#ifdef ENABLE_PITTY_REFINE
+	bool seal_of_god;
+#endif
 } TPacketCGRefine;
 
 typedef struct SPacketCGChangeName
@@ -1543,6 +1570,10 @@ typedef struct SSimplePlayerInformation
 	int byLevel;
 #else
 	BYTE byLevel;
+#endif
+#ifdef ENABLE_CONQUEROR_LEVEL
+	BYTE byConquerorLevel;
+	BYTE bySungmaST, bySungmaHP, bySungmaMV, bySungmaINM;
 #endif
 	DWORD dwPlayMinutes;
 	BYTE byST, byHT, byDX, byIQ;
@@ -1685,8 +1716,8 @@ typedef struct packet_char_additional_info
 	DWORD dwGuildID;
 	DWORD dwLevel;
 	short sAlignment;
-#ifdef ENABLE_TITLE_SYSTEM
-	int iTitleID;
+#ifdef ENABLE_CONQUEROR_LEVEL
+	DWORD dwConquerorLevel;
 #endif
 	BYTE bPKMode;
 	DWORD dwMountVnum;
@@ -1775,8 +1806,8 @@ typedef struct packet_update_char
 
 	DWORD dwGuildID;
 	short sAlignment;
-#ifdef ENABLE_TITLE_SYSTEM
-	int iTitleID;
+#ifdef ENABLE_CONQUEROR_LEVEL
+	DWORD dwConquerorLevel;
 #endif
 	BYTE bPKMode;
 	DWORD dwMountVnum;
@@ -1806,9 +1837,6 @@ typedef struct packet_update_char2
 
 	DWORD dwGuildID;
 	short sAlignment;
-#ifdef ENABLE_TITLE_SYSTEM
-	int iTitleID;
-#endif
 	BYTE bPKMode;
 	DWORD dwMountVnum;
 #ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
@@ -1998,211 +2026,215 @@ typedef struct packet_main_character4_bgm_vol
 
 enum EPointTypes
 {
-	POINT_NONE,							// 0
-	POINT_LEVEL,						// 1
-	POINT_VOICE,						// 2
-	POINT_EXP,							// 3
-	POINT_NEXT_EXP,						// 4
-	POINT_HP,							// 5
-	POINT_MAX_HP,						// 6
-	POINT_SP,							// 7
-	POINT_MAX_SP,						// 8
-	POINT_STAMINA,						// 9
-	POINT_MAX_STAMINA,					// 10
-	POINT_GOLD,							// 11
-	POINT_ST,							// 12
-	POINT_HT,							// 13
-	POINT_DX,							// 14
-	POINT_IQ,							// 15
-	POINT_ATT_POWER,					// 16
-	POINT_ATT_SPEED,					// 17
-	POINT_EVADE_RATE,					// 18
-	POINT_MOV_SPEED,					// 19
-	POINT_DEF_GRADE,					// 20
-	POINT_CASTING_SPEED,				// 21
-	POINT_MAGIC_ATT_GRADE,				// 22
-	POINT_MAGIC_DEF_GRADE,				// 23
-	POINT_EMPIRE_POINT,					// 24
-	POINT_LEVEL_STEP,					// 25
-	POINT_STAT,							// 26
-	POINT_SUB_SKILL,					// 27
-	POINT_SKILL,						// 28
-	POINT_MIN_ATK,						// 29
-	POINT_MAX_ATK,						// 30
-	POINT_PLAYTIME,						// 31
-	POINT_HP_REGEN,						// 32
-	POINT_SP_REGEN,						// 33
-	POINT_BOW_DISTANCE,					// 34
-	POINT_HP_RECOVERY,					// 35
-	POINT_SP_RECOVERY,					// 36
-	POINT_POISON_PCT,					// 37
-	POINT_STUN_PCT,						// 38
-	POINT_SLOW_PCT,						// 39
-	POINT_CRITICAL_PCT,					// 40
-	POINT_PENETRATE_PCT,				// 41
-	POINT_CURSE_PCT,					// 42
-	POINT_ATTBONUS_HUMAN,				// 43
-	POINT_ATTBONUS_ANIMAL,				// 44
-	POINT_ATTBONUS_ORC,					// 45
-	POINT_ATTBONUS_MILGYO,				// 46
-	POINT_ATTBONUS_UNDEAD,				// 47
-	POINT_ATTBONUS_DEVIL,				// 48
-	POINT_ATTBONUS_INSECT,				// 49
-	POINT_ATTBONUS_FIRE,				// 50
-	POINT_ATTBONUS_ICE,					// 51
-	POINT_ATTBONUS_DESERT,				// 52
-	POINT_ATTBONUS_MONSTER,				// 53
-	POINT_ATTBONUS_WARRIOR,				// 54
-	POINT_ATTBONUS_ASSASSIN,			// 55
-	POINT_ATTBONUS_SURA,				// 56
-	POINT_ATTBONUS_SHAMAN,				// 57
-	POINT_ATTBONUS_TREE,				// 58
-	POINT_RESIST_WARRIOR,				// 59
-	POINT_RESIST_ASSASSIN,				// 60
-	POINT_RESIST_SURA,					// 61
-	POINT_RESIST_SHAMAN,				// 62
-	POINT_STEAL_HP,						// 63
-	POINT_STEAL_SP,						// 64
-	POINT_MANA_BURN_PCT,				// 65
-	POINT_DAMAGE_SP_RECOVER,			// 66
-	POINT_BLOCK,						// 67
-	POINT_DODGE,						// 68
-	POINT_RESIST_SWORD,					// 69
-	POINT_RESIST_TWOHAND,				// 70
-	POINT_RESIST_DAGGER,				// 71
-	POINT_RESIST_BELL,					// 72
-	POINT_RESIST_FAN,					// 73
-	POINT_RESIST_BOW,					// 74
-	POINT_RESIST_FIRE,					// 75
-	POINT_RESIST_ELEC,					// 76
-	POINT_RESIST_MAGIC,					// 77
-	POINT_RESIST_WIND,					// 78
-	POINT_REFLECT_MELEE,				// 79
-	POINT_REFLECT_CURSE,				// 80
-	POINT_POISON_REDUCE,				// 81
-	POINT_KILL_SP_RECOVER,				// 82
-	POINT_EXP_DOUBLE_BONUS,				// 83
-	POINT_GOLD_DOUBLE_BONUS,			// 84
-	POINT_ITEM_DROP_BONUS,				// 85
-	POINT_POTION_BONUS,					// 86
-	POINT_KILL_HP_RECOVER,				// 87
-	POINT_IMMUNE_STUN,					// 88
-	POINT_IMMUNE_SLOW,					// 89
-	POINT_IMMUNE_FALL,					// 90
-	POINT_PARTY_ATT_GRADE,				// 91
-	POINT_PARTY_DEF_GRADE,				// 92
-	POINT_ATT_BONUS,					// 93
-	POINT_DEF_BONUS,					// 94
-	POINT_ATT_GRADE_BONUS,				// 95
-	POINT_DEF_GRADE_BONUS,				// 96
-	POINT_MAGIC_ATT_GRADE_BONUS,		// 97
-	POINT_MAGIC_DEF_GRADE_BONUS,		// 98
-	POINT_RESIST_NORMAL_DAMAGE,			// 99
-	POINT_HIT_HP_RECOVERY,				// 100
-	POINT_HIT_SP_RECOVERY,				// 101
-	POINT_MANASHIELD,					// 102
-	POINT_PARTY_BUFFER_BONUS,			// 103
-	POINT_PARTY_SKILL_MASTER_BONUS,		// 104
-	POINT_HP_RECOVER_CONTINUE,			// 105
-	POINT_SP_RECOVER_CONTINUE,			// 106
-	POINT_STEAL_GOLD,					// 107
-	POINT_POLYMORPH,					// 108 
-	POINT_MOUNT,						// 109
-	POINT_PARTY_HASTE_BONUS,			// 110
-	POINT_PARTY_DEFENDER_BONUS,			// 111
-	POINT_STAT_RESET_COUNT,				// 112
-	POINT_HORSE_SKILL,					// 113
-	POINT_MALL_ATTBONUS,				// 114
-	POINT_MALL_DEFBONUS,				// 115
-	POINT_MALL_EXPBONUS,				// 116
-	POINT_MALL_ITEMBONUS,				// 117
-	POINT_MALL_GOLDBONUS,				// 118
-	POINT_MAX_HP_PCT,					// 119
-	POINT_MAX_SP_PCT,					// 120
-	POINT_SKILL_DAMAGE_BONUS,			// 121
-	POINT_NORMAL_HIT_DAMAGE_BONUS,		// 122
-	POINT_SKILL_DEFEND_BONUS,			// 123
-	POINT_NORMAL_HIT_DEFEND_BONUS,		// 124
-	POINT_RAMADAN_CANDY_BONUS_EXP,		// 125
-	POINT_ENERGY,						// 126
-	POINT_ENERGY_END_TIME,				// 127
-	POINT_COSTUME_ATTR_BONUS,			// 128
-	POINT_MAGIC_ATT_BONUS_PER,			// 129
-	POINT_MELEE_MAGIC_ATT_BONUS_PER,	// 130
-	POINT_RESIST_ICE,					// 131
-	POINT_RESIST_EARTH,					// 132
-	POINT_RESIST_DARK,					// 133
-	POINT_RESIST_CRITICAL,				// 134
-	POINT_RESIST_PENETRATE,				// 135
-
-#ifdef ENABLE_PENDANT_SYSTEM
-	POINT_ATTBONUS_ELEC,				// 136
-	POINT_ATTBONUS_WIND,				// 137
-	POINT_ATTBONUS_EARTH,				// 138
-	POINT_ATTBONUS_DARK,				// 139
-#endif
+	POINT_NONE,                 	// 0
+	POINT_LEVEL,                	// 1
+	POINT_VOICE,                	// 2
+	POINT_EXP,                  	// 3
+	POINT_NEXT_EXP,             	// 4
+	POINT_HP,                   	// 5
+	POINT_MAX_HP,               	// 6
+	POINT_SP,                   	// 7
+	POINT_MAX_SP,               	// 8
+	POINT_STAMINA,              	// 9
+	POINT_MAX_STAMINA,          	// 10
+	POINT_GOLD,                 	// 11
+	POINT_ST,                   	// 12
+	POINT_HT,                   	// 13
+	POINT_DX,                   	// 14
+	POINT_IQ,                   	// 15
+	// Must match server's EPointTypes numeric values (char.h)
+	POINT_DEF_GRADE,				// 16
+	POINT_ATT_SPEED,            	// 17
+	POINT_ATT_GRADE,				// 18
+	POINT_MOV_SPEED,            	// 19
+	POINT_CLIENT_DEF_GRADE,			// 20
+	POINT_CASTING_SPEED,        	// 21
+	POINT_MAGIC_ATT_GRADE,      	// 22
+	POINT_MAGIC_DEF_GRADE,      	// 23
+	POINT_EMPIRE_POINT,         	// 24
+	POINT_LEVEL_STEP,           	// 25
+	POINT_STAT,                 	// 26
+	POINT_SUB_SKILL,				// 27
+	POINT_SKILL,					// 28
+	POINT_MIN_ATK,					// 29
+	POINT_MAX_ATK,					// 30
+	POINT_PLAYTIME,             	// 31
+	POINT_HP_REGEN,             	// 32
+	POINT_SP_REGEN,             	// 33
+	POINT_BOW_DISTANCE,         	// 34
+	POINT_HP_RECOVERY,          	// 35
+	POINT_SP_RECOVERY,          	// 36
+	POINT_POISON_PCT,           	// 37
+	POINT_STUN_PCT,             	// 38
+	POINT_SLOW_PCT,             	// 39
+	POINT_CRITICAL_PCT,         	// 40
+	POINT_PENETRATE_PCT,        	// 41
+	POINT_CURSE_PCT,            	// 42
+	POINT_ATTBONUS_HUMAN,       	// 43
+	POINT_ATTBONUS_ANIMAL,      	// 44
+	POINT_ATTBONUS_ORC,         	// 45
+	POINT_ATTBONUS_MILGYO,      	// 46
+	POINT_ATTBONUS_UNDEAD,      	// 47
+	POINT_ATTBONUS_DEVIL,       	// 48
+	POINT_ATTBONUS_INSECT,      	// 49
+	POINT_ATTBONUS_FIRE,        	// 50
+	POINT_ATTBONUS_ICE,         	// 51
+	POINT_ATTBONUS_DESERT,      	// 52
+	POINT_ATTBONUS_MONSTER,			// 53
+	POINT_ATTBONUS_WARRIOR,			// 54
+	POINT_ATTBONUS_ASSASSIN,		// 55
+	POINT_ATTBONUS_SURA,			// 56
+	POINT_ATTBONUS_SHAMAN,			// 57
+	POINT_ATTBONUS_TREE,			// 58
+	POINT_RESIST_WARRIOR,			// 59
+	POINT_RESIST_ASSASSIN,			// 60
+	POINT_RESIST_SURA,				// 61
+	POINT_RESIST_SHAMAN,			// 62
+	POINT_STEAL_HP,             	// 63
+	POINT_STEAL_SP,             	// 64
+	POINT_MANA_BURN_PCT,        	// 65
+	POINT_DAMAGE_SP_RECOVER,    	// 66
+	POINT_BLOCK,                	// 67
+	POINT_DODGE,                	// 68
+	POINT_RESIST_SWORD,         	// 69
+	POINT_RESIST_TWOHAND,       	// 70
+	POINT_RESIST_DAGGER,        	// 71
+	POINT_RESIST_BELL,          	// 72
+	POINT_RESIST_FAN,           	// 73
+	POINT_RESIST_BOW,           	// 74
+	POINT_RESIST_FIRE,          	// 75
+	POINT_RESIST_ELEC,          	// 76
+	POINT_RESIST_MAGIC,         	// 77
+	POINT_RESIST_WIND,          	// 78
+	POINT_REFLECT_MELEE,        	// 79
+	POINT_REFLECT_CURSE,			// 80
+	POINT_POISON_REDUCE,			// 81
+	POINT_KILL_SP_RECOVER,			// 82
+	POINT_EXP_DOUBLE_BONUS,			// 83
+	POINT_GOLD_DOUBLE_BONUS,		// 84
+	POINT_ITEM_DROP_BONUS,			// 85
+	POINT_POTION_BONUS,		 		// 86
+	POINT_KILL_HP_RECOVER,			// 87
+	POINT_IMMUNE_STUN,				// 88
+	POINT_IMMUNE_SLOW,				// 89
+	POINT_IMMUNE_FALL,				// 90
+	POINT_PARTY_ATT_GRADE,			// 91
+	POINT_PARTY_DEF_GRADE,			// 92
+	POINT_ATT_BONUS,				// 93
+	POINT_DEF_BONUS,				// 94
+	POINT_ATT_GRADE_BONUS,			// 95
+	POINT_DEF_GRADE_BONUS,			// 96
+	POINT_MAGIC_ATT_GRADE_BONUS,	// 97
+	POINT_MAGIC_DEF_GRADE_BONUS,	// 98
+	POINT_RESIST_NORMAL_DAMAGE,		// 99
+	POINT_STAT_RESET_COUNT 			= 112,
+	POINT_HORSE_SKILL 				= 113,
+	POINT_MALL_ATTBONUS,
+	POINT_MALL_DEFBONUS,
+	POINT_MALL_EXPBONUS,
+	POINT_MALL_ITEMBONUS,
+	POINT_MALL_GOLDBONUS,
+	POINT_MAX_HP_PCT,
+	POINT_MAX_SP_PCT,
+	POINT_SKILL_DAMAGE_BONUS,
+	POINT_NORMAL_HIT_DAMAGE_BONUS,
+	POINT_SKILL_DEFEND_BONUS,
+	POINT_NORMAL_HIT_DEFEND_BONUS,
+	POINT_PC_BANG_EXP_BONUS,		// 125
+	POINT_PC_BANG_DROP_BONUS,		// 126
+	POINT_RAMADAN_CANDY_BONUS_EXP,	// 127
+	POINT_ENERGY 					= 128,
+	POINT_ENERGY_END_TIME 			= 129,
+	POINT_COSTUME_ATTR_BONUS 		= 130,
+	POINT_MAGIC_ATT_BONUS_PER 		= 131,
+	POINT_MELEE_MAGIC_ATT_BONUS_PER = 132,
+	POINT_RESIST_ICE 				= 133,
+	POINT_RESIST_EARTH 				= 134,
+	POINT_RESIST_DARK 				= 135,
+	POINT_RESIST_CRITICAL 			= 136,
+	POINT_RESIST_PENETRATE 			= 137,
 
 #ifdef ENABLE_ACCE_COSTUME_SYSTEM
-	POINT_ACCEDRAIN_RATE,				// 140
+	POINT_ACCEDRAIN_RATE 			= 138,
 #endif
 
-#ifdef ENABLE_ATTBONUS_METIN
-	POINT_ATTBONUS_METIN,				// 141
+#ifdef ENABLE_MAGIC_REDUCTION_SYSTEM
+	POINT_RESIST_MAGIC_REDUCTION 	= 139,
 #endif
+
+	POINT_RESIST_MOUNT_FALL 		= 140, //unk
+	POINT_RESIST_HUMAN 				= 141,
+
+	POINT_ENCHANT_ELECT 			= 142,
+	POINT_ENCHANT_FIRE 				= 143,
+	POINT_ENCHANT_ICE 				= 144,
+	POINT_ENCHANT_WIND 				= 145,
+	POINT_ENCHANT_EARTH 			= 146,
+	POINT_ENCHANT_DARK 				= 147,
+
+	POINT_ATTBONUS_CZ 				= 148,
+	POINT_ATTBONUS_SWORD 			= 149,
+	POINT_ATTBONUS_TWOHAND 			= 150,
+	POINT_ATTBONUS_DAGGER 			= 151,
+	POINT_ATTBONUS_BELL 			= 152,
+	POINT_ATTBONUS_FAN 				= 153,
+	POINT_ATTBONUS_BOW 				= 154,
+
+#ifdef ENABLE_NEW_BONUS_SYSTEM
+	POINT_ATTBONUS_STONE 			= 155,
+	POINT_ATTBONUS_BOSS 			= 156,
+	POINT_ATTBONUS_ELEMENTS			= 157,
+	POINT_ENCHANT_ELEMENTS 			= 158,
+	POINT_ATTBONUS_CHARACTERS 		= 159,
+	POINT_ENCHANT_CHARACTERS 		= 160,
+	POINT_RESIST_MONSTER 			= 161,
+#endif
+
+#ifdef ENABLE_AVG_PVM
+	POINT_ATTBONUS_MEDI_PVM 		= 162,
+#endif
+
+#ifdef ENABLE_CONQUEROR_LEVEL
+	POINT_CONQUEROR_LEVEL 			= 163,
+	POINT_CONQUEROR_LEVEL_STEP 		= 164,
+	POINT_SUNGMA_STR 				= 165,
+	POINT_SUNGMA_HP					= 166,
+	POINT_SUNGMA_MOVE 				= 167,
+	POINT_SUNGMA_IMMUNE 			= 168,
+	POINT_CONQUEROR_POINT 			= 169,
+	POINT_CONQUEROR_EXP 			= 170,
+	POINT_CONQUEROR_NEXT_EXP 		= 171,
+#endif
+
+	POINT_ATTBONUS_PVM_STR 			= 172,
+	POINT_ATTBONUS_PVM_BERSERKER	= 173,
 
 #ifdef ENABLE_COINS_INVENTORY
-	POINT_COINS,						// 142
+	POINT_COINS 					= 174,
 #endif
 
-#ifdef ENABLE_TITLE_SYSTEM
-	POINT_TITLE,						// 143
-	POINT_TITLE_1,						// 144
-	POINT_TITLE_2,						// 145
-	POINT_TITLE_3,						// 146
-	POINT_TITLE_4,						// 147
-	POINT_TITLE_5,						// 148
-	POINT_TITLE_6,						// 149
-	POINT_TITLE_7,						// 150
-	POINT_TITLE_8,						// 151
-	POINT_TITLE_9,						// 152
-	POINT_TITLE_10,						// 153
-	POINT_TITLE_11,						// 154
-	POINT_TITLE_12,						// 155
-	POINT_TITLE_13,						// 156
-	POINT_TITLE_14,						// 157
-	POINT_TITLE_15,						// 158
-	POINT_TITLE_16,						// 159
-	POINT_TITLE_17,						// 160
-	POINT_TITLE_18,						// 161
-	POINT_TITLE_19,						// 162
-	POINT_TITLE_20,						// 163
+#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
+	POINT_SOUL 						= 175,
+	POINT_SOUL_RE 					= 176,
 #endif
 
-#ifdef ENABLE_ATTBONUS_BOSS
-	POINT_ATTBONUS_BOSS,				// 164
+#ifdef ENABLE_HALLOWEEN_EVENT_SYSTEM
+	POINT_HALOUNLV 					= 177,
+	POINT_HALOUN 					= 178,
+	POINT_RHALOUN 					= 179,
 #endif
 
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-	POINT_BATTLE_PASS_PREMIUM_ID,		// 165
+#ifdef ENABLE_GAYA_SYSTEM
+	POINT_GEM 						= 180,
 #endif
 
-#ifdef ENABLE_RENEWAL_BONUS_BOARD
-	POINT_BLUE_PLAYER_KILLED,			// 166
-	POINT_YELLOW_PLAYER_KILLED,			// 167
-	POINT_RED_PLAYER_KILLED,			// 168
-	POINT_ALL_PLAYER_KILLED,			// 169
-	POINT_KILL_DUELWON,					// 170
-	POINT_KILL_DUELLOST,				// 171
-	POINT_MONSTER_KILLED,				// 172
-	POINT_STONE_KILLED,					// 173
-	POINT_BOSS_KILLED,					// 174
-#endif
+	POINT_MIN_WEP = 200,
+	POINT_MAX_WEP,
+	POINT_MIN_MAGIC_WEP,
+	POINT_MAX_MAGIC_WEP,
+	POINT_HIT_RATE,
+	POINT_EVADE_RATE,
 
-	POINT_MIN_WEP						= 200,
-	POINT_MAX_WEP,						// 201
-	POINT_MIN_MAGIC_WEP,				// 202
-	POINT_MAX_MAGIC_WEP,				// 203
-	POINT_HIT_RATE,						// 204
 };
 
 typedef struct packet_points
@@ -2419,6 +2451,9 @@ enum EPacketShopSubHeaders
 	SHOP_SUBHEADER_GC_REALWATCHER_COUNT,
 	SHOP_SUBHEADER_GC_REFRESH_COUNT,
 	SHOP_SUBHEADER_GC_CHANGE_TITLE,
+#endif
+#ifdef ENABLE_ZODIAC_MISSION
+	SHOP_SUBHEADER_GC_NOT_ENOUGH_LUCKY,
 #endif
 };
 
@@ -3100,14 +3135,34 @@ enum SPECIAL_EFFECT
 	SE_EFFECT_ACCE_SUCCEDED,
 	SE_EFFECT_ACCE_EQUIP,
 #endif
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-	SE_EFFECT_BP_NORMAL_MISSION_COMPLETED,
-	SE_EFFECT_BP_PREMIUM_MISSION_COMPLETED,
-	SE_EFFECT_BP_NORMAL_BATTLEPASS_COMPLETED,
-	SE_EFFECT_BP_PREMIUM_BATTLEPASS_COMPLETED,
-#endif
 #ifdef ENABLE_GROWTH_PET_SYSTEM
 	SE_GYEONGGONG_BOOM,
+#endif
+#ifdef ENABLE_OCHAO_TEMPLE_SYSTEM
+	SE_EFFECT_HEALER,
+#endif
+#ifdef ENABLE_ZODIAC_MISSION
+	EFFECT_SKILL_DAMAGE_ZONE,
+	EFFECT_SKILL_DAMAGE_ZONE_BUYUK,
+	EFFECT_SKILL_DAMAGE_ZONE_ORTA,
+	EFFECT_SKILL_DAMAGE_ZONE_KUCUK,
+	EFFECT_SKILL_SAFE_ZONE,
+	EFFECT_SKILL_SAFE_ZONE_BUYUK,
+	EFFECT_SKILL_SAFE_ZONE_ORTA,
+	EFFECT_SKILL_SAFE_ZONE_KUCUK,
+	EFFECT_METEOR,
+	EFFECT_BEAD_RAIN,
+	EFFECT_FALL_ROCK,
+	EFFECT_ARROW_RAIN,
+	EFFECT_HORSE_DROP,
+	EFFECT_EGG_DROP,
+	EFFECT_DEAPO_BOOM,
+#endif
+#ifdef ENABLE_QUEEN_NETHIS
+	SE_EFFECT_SNAKE_REGEN,
+#endif
+#ifdef ENABLE_PASSIVE_SYSTEM
+	SE_PASSIVE_EFFECT,
 #endif
 };
 
@@ -3128,14 +3183,14 @@ typedef struct SPacketGCNPCPosition
 struct TNPCPosition
 {
 	BYTE bType;
-#ifdef ENABLE_RENEWAL_REGEN
+#ifdef ENABLE_ULTIMATE_REGEN
 	DWORD mobVnum;
 #else
 	char name[CHARACTER_NAME_MAX_LEN+1];
 #endif
 	long x;
 	long y;
-#ifdef ENABLE_RENEWAL_REGEN
+#ifdef ENABLE_ULTIMATE_REGEN
 	int regenTime;
 #endif
 };
@@ -3283,6 +3338,17 @@ typedef struct packet_mall_open
 	BYTE bSize;
 } TPacketGCMallOpen;
 
+#ifdef ENABLE_CONQUEROR_LEVEL
+typedef struct packet_sungma_attr_update
+{
+	BYTE bHeader;
+	BYTE bSTR;
+	BYTE bHP;
+	BYTE bMOVE;
+	BYTE bIMMUNE;
+} TPacketGCSungmaAttrUpdate;
+#endif
+
 typedef struct packet_lover_info
 {
 	BYTE bHeader;
@@ -3315,6 +3381,35 @@ typedef struct SPacketGCResetOnTime
 	BYTE header;
 } TPacketGCResetOnTime;
 
+#ifdef ENABLE_FISH_EVENT_SYSTEM
+typedef struct SPacketGCHybridSDB
+{
+private:
+	SPacketGCHybridSDB() : m_pStream(NULL) {}
+
+public:
+	SPacketGCHybridSDB(int iStreamSize) : iSDBStreamLen(iStreamSize)
+	{
+		m_pStream = new BYTE[iStreamSize];
+	}
+	~SPacketGCHybridSDB()
+	{
+		delete[] m_pStream;
+		m_pStream = NULL;
+	}
+	static int GetFixedHeaderSize()
+	{
+		return sizeof(BYTE)+sizeof(WORD)+sizeof(int);
+	}
+
+	BYTE	bHeader;
+	WORD    wDynamicPacketSize;
+	int		iSDBStreamLen;
+	BYTE*	m_pStream;
+
+} TPacketGCHybridSDB;
+#endif
+
 typedef struct packet_state
 {
 	BYTE bHeader;
@@ -3340,6 +3435,34 @@ typedef struct SPacketGCSpecificEffect
 	DWORD vid;
 	char effect_file[128];
 } TPacketGCSpecificEffect;
+
+#ifdef ENABLE_FISH_EVENT_SYSTEM
+enum
+{
+	//HEADER_CG_FISH_EVENT_SEND = 36,
+	//HEADER_GC_FISH_EVENT_INFO = 50,
+};
+
+enum
+{
+	FISH_EVENT_SUBHEADER_BOX_USE,
+	FISH_EVENT_SUBHEADER_SHAPE_ADD,
+	FISH_EVENT_SUBHEADER_GC_REWARD,
+	FISH_EVENT_SUBHEADER_GC_ENABLE,
+};
+
+typedef struct SPacketGCFishEvent {
+	BYTE	bHeader;
+	BYTE	bSubheader;
+} TPacketCGFishEvent;
+
+typedef struct SPacketGCFishEventInfo {
+	BYTE	bHeader;
+	BYTE	bSubheader;
+	DWORD	dwFirstArg;
+	DWORD	dwSecondArg;
+} TPacketGCFishEventInfo;
+#endif
 
 enum EDragonSoulRefineWindowRefineType
 {
@@ -3500,6 +3623,9 @@ typedef struct dates_cube_renewal
 	int count_material_5;
 
 	int gold;
+#ifdef ENABLE_GAYA_SYSTEM
+	int gem;
+#endif
 	int percent;
 
 	bool allowCopyAttr;
@@ -3574,52 +3700,6 @@ typedef struct SAcceResult
 } TAcceResult;
 #endif
 
-#ifdef ENABLE_BIOLOG_SYSTEM
-enum ECGBiologSubHeaders
-{
-	CG_BIOLOG_MANAGER_OPEN,
-	CG_BIOLOG_MANAGER_SEND,
-	CG_BIOLOG_MANAGER_TIMER,
-};
-
-enum EGCBiologSubHeaders
-{
-	GC_BIOLOG_MANAGER_OPEN,
-	GC_BIOLOG_MANAGER_ALERT,
-	GC_BIOLOG_MANAGER_CLOSE,
-};
-
-typedef struct SPacketCGBiologManagerAction
-{
-	BYTE bHeader;
-	BYTE bSubHeader;
-} TPacketCGBiologManagerAction;
-
-typedef struct SPacketGCBiologManager
-{
-	BYTE bHeader;
-	WORD wSize;
-	BYTE bSubHeader;
-} TPacketGCBiologManager;
-
-typedef struct SPacketGCBiologManagerInfo
-{
-	bool bUpdate;
-	BYTE bRequiredLevel;
-	DWORD iRequiredItem;
-	WORD wGivenItems;
-	WORD wRequiredItemCount;
-	time_t iGlobalCooldown;
-	time_t iCooldown;
-	bool iCooldownReminder;
-	BYTE bChance;
-	DWORD bApplyType[MAX_BONUSES_LENGTH];
-	long lApplyValue[MAX_BONUSES_LENGTH];
-	DWORD dRewardItem;
-	WORD wRewardItemCount;
-} TPacketGCBiologManagerInfo;
-#endif
-
 #ifdef ENABLE_MOB_DROP_INFO
 typedef struct packet_target_info
 {
@@ -3678,100 +3758,6 @@ typedef struct SPacketGCChestDropInfo
 } TPacketGCChestDropInfo;
 #endif
 
-#ifdef ENABLE_EVENT_MANAGER
-typedef struct command_request_event_quest
-{
-	BYTE bHeader;
-	char szName[QUEST_NAME_MAX_NUM + 1];
-} TPacketCGRequestEventQuest;
-
-typedef struct SPacketCGRequestEventData
-{
-	BYTE bHeader;
-	BYTE bMonth;
-} TPacketCGRequestEventData;
-
-typedef struct SPacketGCEventInfo
-{
-	BYTE bHeader;
-	WORD wSize; // Fix
-} TPacketGCEventInfo;
-
-typedef struct SPacketGCEventReload
-{
-	BYTE bHeader;
-} TPacketGCEventReload;
-
-typedef struct SPacketEventData
-{
-	DWORD dwID;
-	BYTE bType;
-	long startTime;
-	long endTime;
-	DWORD dwVnum;
-	int iPercent;
-	int iDropType;
-	bool bCompleted;
-} TPacketEventData;
-#endif
-
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-typedef struct SPacketCGExtBattlePassAction
-{
-	BYTE bHeader;
-	BYTE bAction;
-} TPacketCGExtBattlePassAction;
-
-typedef struct SPacketCGExtBattlePassSendPremiumItem
-{
-	BYTE bHeader;
-	int iSlotIndex;
-} TPacketCGExtBattlePassSendPremiumItem;
-
-typedef struct SPacketGCExtBattlePassOpen
-{
-	BYTE bHeader;
-} TPacketGCExtBattlePassOpen;
-
-typedef struct SPacketGCExtBattlePassGeneralInfo
-{
-	BYTE bHeader;
-	BYTE bBattlePassType;
-	char szSeasonName[64+1];
-	DWORD dwBattlePassID;
-	DWORD dwBattlePassStartTime;
-	DWORD dwBattlePassEndTime;
-} TPacketGCExtBattlePassGeneralInfo;
-
-typedef struct SPacketGCExtBattlePassMissionInfo
-{
-	BYTE bHeader;
-	WORD wSize;
-	WORD wRewardSize;
-	BYTE bBattlePassType;
-	DWORD dwBattlePassID;
-} TPacketGCExtBattlePassMissionInfo;
-
-typedef struct SPacketGCExtBattlePassMissionUpdate
-{
-	BYTE bHeader;
-	BYTE bBattlePassType;
-	BYTE bMissionIndex;
-	BYTE bMissionType;
-	DWORD dwNewProgress;
-} TPacketGCExtBattlePassMissionUpdate;
-
-typedef struct SPacketGCExtBattlePassRanking
-{
-	BYTE bHeader;
-	char szPlayerName[CHARACTER_NAME_MAX_LEN + 1];
-	BYTE bBattlePassType;
-	BYTE bBattlePassID;
-	DWORD dwStartTime;
-	DWORD dwEndTime;
-} TPacketGCExtBattlePassRanking;
-#endif
-
 #ifdef ENABLE_RENEWAL_SPECIAL_CHAT
 typedef struct pickup_item_packet
 {
@@ -3810,53 +3796,6 @@ typedef struct packet_locale_whisper
 	DWORD id;
 	char namefrom[CHARACTER_NAME_MAX_LEN + 1];
 } TPacketGCLocaleWhisper;
-#endif
-
-#ifdef ENABLE_RENEWAL_INGAME_ITEMSHOP
-enum
-{
-	ITEMSHOP_LOAD,
-	ITEMSHOP_LOG,
-	ITEMSHOP_BUY,
-	ITEMSHOP_DRAGONCOIN,
-	ITEMSHOP_RELOAD,
-	ITEMSHOP_LOG_ADD,
-	ITEMSHOP_UPDATE_ITEM,
-};
-
-typedef struct SIShopData
-{
-	DWORD id;
-	DWORD itemVnum;
-	long long itemPrice;
-	int topSellingIndex;
-	BYTE discount;
-	int offerTime;
-	int addedTime;
-	long long sellCount;
-	int week_limit;
-	int month_limit;
-	int maxSellCount;
-} TIShopData;
-
-typedef struct SIShopLogData
-{
-	DWORD accountID;
-	char playerName[CHARACTER_NAME_MAX_LEN + 1];
-	char buyDate[21];
-	int buyTime;
-	char ipAdress[16];
-	DWORD itemID;
-	DWORD itemVnum;
-	int itemCount;
-	long long itemPrice;
-} TIShopLogData;
-
-typedef struct SPacketGCItemShop
-{
-	BYTE header;
-	DWORD size;
-} TPacketGCItemShop;
 #endif
 
 #ifdef ENABLE_AURA_COSTUME_SYSTEM
@@ -4154,7 +4093,7 @@ typedef struct SPacketCGPetNameChange
 } TPacketCGPetNameChange;
 #endif
 
-#ifdef ENABLE_RENEWAL_REGEN
+#ifdef ENABLE_ULTIMATE_REGEN
 typedef struct SNewRegen
 {
 	long x, y;
@@ -4165,14 +4104,6 @@ typedef struct SNewRegen
 	BYTE minute_range;
 	int leftTime;
 } TNewRegen;
-#endif
-
-#ifdef ENABLE_GUILD_TOKEN_AUTH
-struct TPacketGCGuildToken
-{
-	uint8_t header;
-	uint64_t token;
-};
 #endif
 
 #ifdef ENABLE_CHANGE_LOOK_SYSTEM
@@ -4328,5 +4259,409 @@ typedef struct command_item_new_attribute
 	BYTE bValues[4 + 1];
 } TPacketCGItemNewAttribute;
 #endif
+
+#ifdef ENABLE_ITEMSHOP
+enum EItemShopSubheaders : uint8_t
+{
+	ITEMSHOP_LOAD			= 0,
+	ITEMSHOP_LOG			= 1,
+	ITEMSHOP_BUY			= 2,
+	ITEMSHOP_DRAGONCOIN		= 3,
+	ITEMSHOP_RELOAD			= 4,
+	ITEMSHOP_UPDATE_ITEM	= 5,
+};
+
+typedef struct SIShopData
+{
+	DWORD		id;
+	DWORD		itemVnum;
+	long long	itemPrice;
+#ifdef USE_ITEMSHOP_RENEWED
+	long long	itemPriceJD;
+#endif
+	int			topSellingIndex;
+	BYTE		discount;
+	int			offerTime;
+	int			addedTime;
+	long long	sellCount;
+	int			week_limit;
+	int			month_limit;
+	int 		maxSellCount;
+} TIShopData;
+
+typedef struct SIShopLogData
+{
+	DWORD		accountID;
+	char		playerName[CHARACTER_NAME_MAX_LEN + 1];
+	char		buyDate[21];
+	int			buyTime;
+	char		ipAdress[16];
+	DWORD		itemID;
+	DWORD		itemVnum;
+	int			itemCount;
+	long long	itemPrice;
+#ifdef USE_ITEMSHOP_RENEWED
+	long long	itemPriceJD;
+#endif
+} TIShopLogData;
+
+typedef struct SPacketGCItemShop
+{
+	BYTE	header;
+#ifdef ENABLE_LARGE_DYNAMIC_PACKETS
+	int		size;
+#else
+	WORD	size;
+#endif
+} TPacketGCItemShop;
+#endif
+
+#ifdef ENABLE_DUNGEON_INFO
+enum 
+{
+	DUNGEON_INFO_SUB_HEADER_OPEN,
+	DUNGEON_INFO_SUB_HEADER_TELEPORT,
+	DUNGEON_INFO_SUB_HEADER_MISION,
+	DUNGEON_INFO_SUB_HEADER_OPEN_SEND,
+	DUNGEON_INFO_SUB_HEADER_DATES_SEND,
+	DUNGEON_INFO_SUB_HEADER_DATES_CLEAR,
+	DUNGEON_INFO_SUB_HEADER_DATES_RANKING_CLEAR,
+	DUNGEON_INFO_SUB_HEADER_DATES_RANKING_SEND,
+	DUNGEON_INFO_SUB_HEADER_DATES_RANKING_LOAD,
+	DUNGEON_INFO_SUB_HEADER_RANKING,
+
+	DUNGEON_INFO_SUB_HEADER_DATES_MISION_CLEAR,
+	DUNGEON_INFO_SUB_HEADER_DATES_MISION_SEND,
+	DUNGEON_INFO_SUB_HEADER_DATES_MISION_LOAD,
+};
+
+typedef struct packet_send_dungeon_info_system
+{
+	BYTE header;
+	BYTE subheader;
+	int  index;
+
+} TPacketCGDungeonInfoSend;
+
+typedef struct SFDateInfoPacket
+{
+	int 	id_dungeon;
+	char 	name[100];
+	char 	img[100];
+	int 	lv_min;
+	int 	lv_max;
+	int 	party_max;
+	DWORD 	respawn;
+	DWORD 	time_room;
+	int   	time_respawn_dungeon;
+	int 	time_room_dungeon;
+	char 	entrance[100];
+	char 	resistance[100];
+	char 	force[100];
+	int 	vnum_item;
+	int 	count_item;
+	int 	count_finish;
+	int 	time_finish;
+	int 	difficulty;
+	int 	damage_done;
+	int 	damage_received;
+	int 	id_boss;
+
+}TFDateInfoPacket;
+
+typedef struct  SFDateRanking
+{
+	int 	vnum_mob_r;
+	int 	type;
+	char 	name_r[24];
+	int 	extra_r;
+
+}TFDateInfoRanking;
+
+typedef struct SFDateMision
+{
+	
+	int 	vnum_mob_mision;
+	int 	count_mob_mision;
+	int 	count_mob_a_mision;
+	int 	status_mision;
+}TFDateMision;
+
+typedef struct SPacketGCDungeonInfoReceive
+{
+	SPacketGCDungeonInfoReceive() : header(HEADER_GC_DUNGEON_INFO_SYSTEM)
+	{}
+	BYTE header;
+	BYTE bSubType;
+
+	SFDateInfoPacket dateinfo;
+	SFDateRanking dateinfo_ranking;
+	SFDateMision		dateinfom;
+
+} TPacketGCDungeonInfoReceive;
+#endif
+
+#ifdef ENABLE_RESP_SYSTEM
+enum ERespConfig
+{
+	RESP_CG_SUBHEADER_FETCH_RESP = 0,
+	RESP_CG_SUBHEADER_FETCH_DROP,
+	RESP_CG_SUBHEADER_TELEPORT,
+
+	RESP_GC_SUBHEADER_DATA_RESP = 0,
+	RESP_GC_SUBHEADER_DATA_DROP,
+	RESP_GC_SUBHEADER_DATA_MOB,
+	RESP_GC_SUBHEADER_REFRESH_RESP,
+};
+
+typedef struct SPacketGCRespHeader
+{
+	uint8_t	header;
+	uint16_t	size;
+	uint8_t	subheader;
+} TPacketGCRespHeader;
+
+typedef struct SPacketCGRespHeader
+{
+	uint8_t	header;
+	uint8_t	subheader;
+} TPacketCGRespHeader;
+
+typedef struct SPacketGCRespData
+{
+	size_t id;
+	uint32_t x;
+	uint32_t y;
+	uint32_t time;
+	time_t nextRespTime;
+} TPacketGCRespData;
+
+typedef struct SPacketGCRespGold
+{
+	uint32_t	minGold;
+	uint32_t	maxGold;
+} TPacketGCRespGold;
+
+typedef struct SPacketGCRespItem
+{
+	uint32_t	vnum;
+	uint8_t	minCount;
+	uint8_t	maxCount;
+} TPacketGCRespItem;
+
+typedef struct SPacketGCMapData
+{
+	uint8_t	mobCount;
+	uint32_t	currentMetinCount;
+	uint32_t	maxMetinCount;
+	uint32_t	currentBossCount;
+	uint32_t	maxBossCount;
+} TPacketGCMapData;
+
+typedef struct SPacketGCRespRefresh
+{
+	size_t	id;
+	uint32_t	vnum;
+	time_t	nextRespTime;
+	uint32_t	x;
+	uint32_t	y;
+} TPacketGCRespRefresh;
+#endif
+
+#ifdef ENABLE_COLLECT_WINDOW
+typedef struct SPacketGCCollectWindow
+{
+	BYTE	bHeader;
+	BYTE	bWindowType;
+	DWORD	dwTime;
+	DWORD	bCount;
+	DWORD	dwItemVnum;
+	DWORD	bCountTotal;
+	BYTE	bChance;
+	DWORD	bRenderTargetID;
+	DWORD	bQuestIndex;
+	DWORD	RequiredLevel;
+} TPacketGCCollectWindow;
+#endif
+
+#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
+typedef struct command_cgroulette
+{
+	BYTE	header;
+	BYTE 	option;
+} TPacketCGSoulRoulette;
+typedef struct command_gcroulette
+{
+	BYTE	header;
+	BYTE 	option;
+	int		yang;
+	int		soul;
+	struct {
+		DWORD vnum;
+		BYTE count;
+	} ItemInfo[ROULETTE_ITEM_MAX];
+} TPacketGCSoulRoulette;
+#endif
+
+#ifdef ENABLE_EVENT_SYSTEM
+typedef struct packet_event_info
+{
+	BYTE		bHeader;
+	BYTE		event_id;
+	bool		isActivate;
+	DWORD		event_time;
+} TPacketGCEventInfo;
+#endif
+
+#ifdef ENABLE_ATTENDANCE_EVENT
+enum
+{
+	//HEADER_CG_ATTENDANCE_REWARD = = 35,
+	
+	//HEADER_GC_HIT_COUNT_INFO = = 55,
+	//HEADER_GC_ATTENDANCE_EVENT = = 55,
+	//HEADER_GC_ATTENDANCE_EVENT_INFO = = 55,
+};
+
+typedef struct SHitCountInfo
+{
+	SHitCountInfo(){ dwVid = dwCount = 0;}
+	SHitCountInfo(DWORD vid, DWORD count)
+	{
+		dwVid = vid;
+		dwCount = count;
+	}
+	DWORD	dwVid;
+	DWORD	dwCount;
+} THitCountInfo;
+
+typedef struct SRewardItem
+{
+	BYTE bDay;
+	DWORD dwVnum;
+	DWORD dwCount;
+} TRewardItem;
+
+typedef struct SPacketGCHitCountInfo {
+	BYTE	bHeader;
+	DWORD	dwVid;
+	DWORD	dwCount;
+} TPacketGCHitCountInfo;
+
+typedef struct SPacketGCAttendanceEventInfo {
+	BYTE	bHeader;
+	WORD	wSize;
+	bool	bIsEnable;
+	BYTE	bDay;
+	BYTE	bClear;
+	BYTE	bReward;
+} TPacketGCAttendanceEventInfo;
+
+typedef struct SPacketGCAttendanceEvent {
+	BYTE	bHeader;
+	BYTE	bType;
+	BYTE	bValue;
+} TPacketGCAttendanceEvent;
+#endif
+
+#ifdef ENABLE_MINI_GAME_CATCH_KING
+enum
+{
+	//HEADER_CG_MINI_GAME_CATCH_KING = 37,
+	//HEADER_GC_MINI_GAME_CATCH_KING = 60,
+};
+
+enum
+{
+	SUBHEADER_GC_CATCH_KING_EVENT_INFO,
+	SUBHEADER_GC_CATCH_KING_START,
+	SUBHEADER_GC_CATCH_KING_SET_CARD,
+	SUBHEADER_GC_CATCH_KING_RESULT_FIELD,
+	SUBHEADER_GC_CATCH_KING_SET_END_CARD,
+	SUBHEADER_GC_CATCH_KING_REWARD
+};
+
+typedef struct SPacketCGMiniGameCatchKing {
+	BYTE	bHeader;
+	BYTE	bSubheader;
+	BYTE	bSubArgument;
+} TPacketCGMiniGameCatchKing;
+
+typedef struct SPacketGCMiniGameCatchKing {
+	BYTE	bHeader;
+	WORD	wSize;
+	BYTE	bSubheader;
+} TPacketGCMiniGameCatchKing;
+
+typedef struct SPacketGCCatchKingEventInfo {
+	BYTE	bHeader;
+	bool	bIsEnable;
+} TPacketGCCatchKingEventInfo;
+
+typedef struct SPacketGCMiniGameCatchKingResult {
+	DWORD	dwPoints;
+	BYTE	bRowType;
+	BYTE	bCardPos;
+	BYTE	bCardValue;
+	bool	bKeepFieldCard;
+	bool	bDestroyHandCard;
+	bool	bGetReward;
+	bool 	bIsFiveNearBy;
+} TPacketGCMiniGameCatchKingResult;
+
+typedef struct SPacketGCMiniGameCatchKingSetEndCard {
+	BYTE	bCardPos;
+	BYTE	bCardValue;
+} TPacketGCMiniGameCatchKingSetEndCard;
+#endif
+
+#ifdef ENABLE_STONE_EVENT
+typedef struct packet_stone_event
+{
+	BYTE	header;
+	int		stone_point;
+} TPacketGCStoneEvent;
+#endif
+
+#ifdef ENABLE_KILL_STATISTICS
+typedef struct command_kill_statistics_packet
+{
+	BYTE bHeader;
+	int  iJinnoKills;
+	int	iShinsooKills;
+	int	iChunjoKills;
+	int iTotalKills;
+	int iTotalDeaths;
+	int iDuelsWon;
+	int iDuelsLost;
+	int	iBossesKills;
+	int	iStonesKills;
+	int	iMobsKills;
+	int	top_damage;
+} TPacketGCKillStatistics;
+#endif
+
+#ifdef ENABLE_RANKING
+enum
+{
+	MAX_RANKING_LIST = 51,
+};
+
+typedef struct SPacketGCList
+{
+	int		iPosition, iRealPosition, iLevel;
+	long long	iPoints;
+	char	szName[CHARACTER_NAME_MAX_LEN + 1];
+} TPacketGCList;
+
+typedef struct SPacketGCRankingTable
+{
+	SPacketGCRankingTable() : bHeader(HEADER_GC_RANKING_SEND)
+	{}
+	BYTE 			bHeader;
+	TPacketGCList	list[MAX_RANKING_LIST];
+} TPacketGCRankingTable;
+#endif
+
 
 #pragma pack(pop)

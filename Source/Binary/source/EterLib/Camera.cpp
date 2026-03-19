@@ -1,10 +1,14 @@
+// Camera.cpp: implementation of the CCamera class.
+//
+//////////////////////////////////////////////////////////////////////
+
 #include "StdAfx.h"
 #include "../eterBase/Utils.h"
 #include "Camera.h"
 
 const float c_fDefaultResistance = 0.3f;
 
-CCameraManager aCameraManager;
+CCameraManager aCameraManager;	// CCameraManager Instance
 
 void CCamera::SetCameraMaxDistance(float fMax)
 {
@@ -20,6 +24,10 @@ void CCamera::SetTargetHeight(float fTarget)
 {
 	m_fTarget_=fTarget;
 }
+
+//////////////////////////////////////////////////////////////////////////
+// CCamera
+//////////////////////////////////////////////////////////////////////////
 
 CCamera::CCamera() :
 m_fEyeGroundHeightRatio(0.3f),
@@ -256,8 +264,8 @@ void CCamera::SetViewMatrix()
     D3DXVec3Cross(&m_v3Up, &m_v3View, &m_v3Cross);
 	D3DXVec3Normalize(&m_v3Up, &m_v3Up);
 
-	const auto vv = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
-	m_fPitch = D3DXVec3Dot(&m_v3Up, &vv);// / D3DXVec2Length(&v2ViewYZ);
+	auto val = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
+	m_fPitch = D3DXVec3Dot(&m_v3Up, &val);
 	if (m_fPitch >= 1)
 		m_fPitch = 1;
 	else if (m_fPitch <= -1)
@@ -269,13 +277,17 @@ void CCamera::SetViewMatrix()
 
 	D3DXMatrixLookAtRH(&m_matView, &m_v3Eye, &m_v3Target, &m_v3Up);
 
-	float fDeterminantD3DMatView = D3DXMatrixfDeterminant(&m_matView);
-    D3DXMatrixInverse(&m_matInverseView, &fDeterminantD3DMatView, &m_matView);
+#ifdef ENABLE_DIRECTX9_UPDATE
+    float fDeterminantD3DMatView = D3DXMatrixDeterminant(&m_matView);
+#else
+    float fDeterminantD3DMatView = D3DXMatrixfDeterminant(&m_matView);
+#endif
+	D3DXMatrixInverse(&m_matInverseView, &fDeterminantD3DMatView, &m_matView);
 
 	m_matBillboard = m_matInverseView;
-    m_matBillboard._41 = 0.0f;
-    m_matBillboard._42 = 0.0f;
-    m_matBillboard._43 = 0.0f;
+	m_matBillboard._41 = 0.0f;
+	m_matBillboard._42 = 0.0f;
+	m_matBillboard._43 = 0.0f;
 
 	m_ViewRay.SetStartPoint(m_v3Target);
 	m_ViewRay.SetDirection(v3CenterRay, m_fDistance);
@@ -292,21 +304,27 @@ void CCamera::SetViewMatrix()
 	m_kCameraBackToTerrainRay.SetDirection(-m_v3View, m_fTerrainCollisionRadius);
 	m_kCameraLeftToTerrainRay.SetDirection(-m_v3Cross, 3.0f * m_fTerrainCollisionRadius);
 	m_kCameraRightToTerrainRay.SetDirection(m_v3Cross, 3.0f * m_fTerrainCollisionRadius);
-	const auto vv2 = (v3CenterRay - m_fTerrainCollisionRadius * m_v3Up);
-	m_kTargetToCameraBottomRay.SetDirection(v3CenterRay - m_fTerrainCollisionRadius * m_v3Up, D3DXVec3Length(&vv2));
+	auto val5 = (v3CenterRay - m_fTerrainCollisionRadius * m_v3Up);
+	m_kTargetToCameraBottomRay.SetDirection(v3CenterRay - m_fTerrainCollisionRadius * m_v3Up,
+		D3DXVec3Length(&val5));
 
 	m_kLeftObjectCollisionRay.SetStartPoint(m_v3Target);
 	m_kTopObjectCollisionRay.SetStartPoint(m_v3Target);
 	m_kRightObjectCollisionRay.SetStartPoint(m_v3Target);
 	m_kBottomObjectCollisionRay.SetStartPoint(m_v3Target);
-	const auto vv3 = (v3CenterRay + m_fObjectCollisionRadius * m_v3Cross);
-	const auto vv4 = (v3CenterRay - m_fObjectCollisionRadius * m_v3Cross);
-	const auto vv5 = (v3CenterRay + m_fObjectCollisionRadius * m_v3Up);
-	const auto vv6 = (v3CenterRay + m_fObjectCollisionRadius * m_v3Up);
-	m_kLeftObjectCollisionRay.SetDirection(v3CenterRay + m_fObjectCollisionRadius * m_v3Cross, D3DXVec3Length(&vv3));
-	m_kRightObjectCollisionRay.SetDirection(v3CenterRay - m_fObjectCollisionRadius * m_v3Cross, D3DXVec3Length(&vv4));
-	m_kTopObjectCollisionRay.SetDirection(v3CenterRay + m_fObjectCollisionRadius * m_v3Up, D3DXVec3Length(&vv5));
-	m_kBottomObjectCollisionRay.SetDirection(v3CenterRay - m_fObjectCollisionRadius * m_v3Up, D3DXVec3Length(&vv6));
+
+	auto val1 = (v3CenterRay + m_fObjectCollisionRadius * m_v3Cross);
+	m_kLeftObjectCollisionRay.SetDirection(v3CenterRay + m_fObjectCollisionRadius * m_v3Cross,
+		D3DXVec3Length(&val1));
+	auto val2 = (v3CenterRay - m_fObjectCollisionRadius * m_v3Cross);
+	m_kRightObjectCollisionRay.SetDirection(v3CenterRay - m_fObjectCollisionRadius * m_v3Cross,
+		D3DXVec3Length(&val2));
+	auto val3 = (v3CenterRay + m_fObjectCollisionRadius * m_v3Up);
+	m_kTopObjectCollisionRay.SetDirection(v3CenterRay + m_fObjectCollisionRadius * m_v3Up,
+		D3DXVec3Length(&val3));
+	auto val4 = (v3CenterRay + m_fObjectCollisionRadius * m_v3Up);
+	m_kBottomObjectCollisionRay.SetDirection(v3CenterRay - m_fObjectCollisionRadius * m_v3Up,
+		D3DXVec3Length(&val4));
 }
 
 void CCamera::Move(const D3DXVECTOR3 & v3Displacement)
@@ -429,7 +447,6 @@ void CCamera::RotateEyeAroundTarget(float fPitchDegree, float fRollDegree)
 
 	D3DXMATRIX matRot, matRotPitch, matRotRoll;
 
-	// 머리위로 넘어가기 막기...
 	if (m_fPitch + fPitchDegree > 80.0f)
 	{
 		fPitchDegree = 80.0f - m_fPitch;
@@ -474,8 +491,8 @@ void CCamera::RotateEyeAroundPoint(const D3DXVECTOR3& v3Point, float fPitchDegre
 	D3DXVec3TransformCoord(&m_v3Eye, &v3Temp, &matRot);
 	m_v3Eye += v3Point;
 
-	const auto vv2 = (v3Temp + m_v3Up);
-	D3DXVec3TransformCoord(&m_v3Up, &vv2, &matRot);
+	auto val = (v3Temp + m_v3Up);
+	D3DXVec3TransformCoord(&m_v3Up, &val, &matRot);
 	m_v3Up -= (m_v3Eye - v3Point);
 
 	v3Temp = m_v3Target - v3Point;
@@ -515,22 +532,22 @@ void CCamera::CalculateRoll()
 	v2ViewXY.x = m_v3View.x;
 	v2ViewXY.y = m_v3View.y;
  	D3DXVec2Normalize(&v2ViewXY, &v2ViewXY);
-	const auto vv = D3DXVECTOR2(0.0f, 1.0f);
-	float fDot = D3DXVec2Dot(&v2ViewXY, &vv);
+	auto val2 = D3DXVECTOR2(0.0f, 1.0f);
+	float fDot = D3DXVec2Dot(&v2ViewXY, &val2);
 	if (fDot >= 1)
 		fDot = 1;
 	else if (fDot <= -1)
 		fDot = -1;
 	fDot = acosf(fDot);
 	fDot *= (180.0f / D3DX_PI);
-	float fCross = D3DXVec2CCW (&v2ViewXY, &vv);
+	auto val = D3DXVECTOR2(0.0f, 1.0f);
+	float fCross = D3DXVec2CCW (&v2ViewXY, &val);
 	if ( 0 > fCross)
 	{
 		fDot = -fDot;
 	}
 
 	m_fRoll = fDot;
-
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -546,7 +563,6 @@ m_pPreviousCamera(nullptr)
 #ifdef ENABLE_RENDER_TARGET
 	AddCamera(SHOPDECO_CAMERA);
 #endif
-
 	SetCurrentCamera(DEFAULT_PERSPECTIVE_CAMERA);
 }
 

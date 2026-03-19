@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CLensFlare Class
 //
 //	(c) 2003 IDV, Inc.
@@ -22,7 +22,7 @@
 //
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	Preprocessor
 #include "StdAfx.h"
 #include "LensFlare.h"
@@ -32,7 +32,7 @@
 
 #include <math.h>
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	Variables
 
 static std::string g_strFiles[] =
@@ -83,7 +83,7 @@ static float g_afColors[ ][4] =
 };
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CLensFlare::CLensFlare
 
 CLensFlare::CLensFlare() :
@@ -103,7 +103,7 @@ CLensFlare::CLensFlare() :
 }
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CLensFlare::~CLensFlare
 
 CLensFlare::~CLensFlare()
@@ -112,7 +112,7 @@ CLensFlare::~CLensFlare()
     delete[] m_pTestPixels;
 }
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CLensFlare::Interpolate
 
 float CLensFlare::Interpolate(float fStart, float fEnd, float fPercent)
@@ -120,7 +120,7 @@ float CLensFlare::Interpolate(float fStart, float fEnd, float fPercent)
 	return fStart + (fEnd - fStart) * fPercent;
 }
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CLensFlare::DrawBeforeFlare
 
 void CLensFlare::Compute(const D3DXVECTOR3 & c_rv3LightDirection)
@@ -128,17 +128,17 @@ void CLensFlare::Compute(const D3DXVECTOR3 & c_rv3LightDirection)
 	float afSunPos[3];
 
 	D3DXVECTOR3 v3Target = CCameraManager::Instance().GetCurrentCamera()->GetTarget();
-	
+
 	afSunPos[0]	= v3Target.x - c_rv3LightDirection.x * 99999999.0f;
 	afSunPos[1]	= v3Target.y - c_rv3LightDirection.y * 99999999.0f;
 	afSunPos[2]	= v3Target.z - c_rv3LightDirection.z * 99999999.0f;
-	
+
 	float fX, fY;
 	ProjectPosition(afSunPos[0], afSunPos[1], afSunPos[2], &fX, &fY);
-	
+
 	// set flare location
 	SetFlareLocation(fX, fY);
-	
+
 	// determine visibility
 	float fSunVectorMagnitude = sqrtf(afSunPos[0] * afSunPos[0] +
 		afSunPos[1] * afSunPos[1] +
@@ -147,44 +147,47 @@ void CLensFlare::Compute(const D3DXVECTOR3 & c_rv3LightDirection)
 	afSunVector[0] = -afSunPos[0] / fSunVectorMagnitude;
 	afSunVector[1] = -afSunPos[1] / fSunVectorMagnitude;
 	afSunVector[2] = -afSunPos[2] / fSunVectorMagnitude;
-	
+
 	float afCameraDirection[3];
 	afCameraDirection[0] = ms_matView._13;
 	afCameraDirection[1] = ms_matView._23;
 	afCameraDirection[2] = ms_matView._33;
-	
 
-	float fDotProduct = 
+	float fDotProduct =
 		(afSunVector[0] * afCameraDirection[0]) +
 		(afSunVector[1] * afCameraDirection[1]) +
 		(afSunVector[2] * afCameraDirection[2]);
-	
+
 	if (acosf(fDotProduct) < 0.5f * D3DX_PI)
 		SetVisible(true);
 	else
 		SetVisible(false);
-	
+
 	// set flare brightness
 	fX /= ms_Viewport.Width;
 	fY /= ms_Viewport.Height;
-	
+
 	float fDistance = sqrtf(((0.5f - fX) * (0.5f - fX)) + ((0.5f - fY) * (0.5f - fY)));
 	float fBeforeBright = Interpolate(0.0f, c_fHalfMaxBright, 1.0f - (fDistance * c_fDistanceScale));
 	float fAfterBright = Interpolate(0.0f, 1.0f, 1.0f - (fDistance * c_fDistanceScale));
-	
+
 	SetBrightnesses(fBeforeBright, fAfterBright);
 }
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CLensFlare::DrawBeforeFlare
 
 void CLensFlare::DrawBeforeFlare()
 {
-	if (!m_bFlareVisible || !m_bEnabled || !m_bShowMainFlare)
-		return;
+    if (!m_bFlareVisible || !m_bEnabled || !m_bShowMainFlare)
+        return;
 
 	if (m_SunFlareImageInstance.IsEmpty())
 		return;
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+    D3DPERF_BeginEvent(D3DCOLOR_ARGB(255, 50, 50, 0), L"** CLensFlare::DrawBeforeFlare **");
+#endif
 
 	D3DXMATRIX matProj;
 	D3DXMatrixOrthoOffCenterRH(&matProj, 0.0f, 1.0f, 1.0f, 0.0f, -1.0f, 1.0f);
@@ -246,7 +249,12 @@ void CLensFlare::DrawBeforeFlare()
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
 
-	STATEMANAGER.SetVertexShader(D3DFVF_XYZ|D3DFVF_DIFFUSE|D3DFVF_TEX1);
+#ifdef ENABLE_DIRECTX9_UPDATE
+    STATEMANAGER.SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
+#else
+    STATEMANAGER.SetVertexShader(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
+#endif
+
 	STATEMANAGER.DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, vertices, sizeof(SVertex));
 
 	STATEMANAGER.RestoreRenderState(D3DRS_LIGHTING);
@@ -261,10 +269,14 @@ void CLensFlare::DrawBeforeFlare()
 
 	STATEMANAGER.RestoreTransform(D3DTS_VIEW);
 	STATEMANAGER.RestoreTransform(D3DTS_PROJECTION);
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+    D3DPERF_EndEvent();
+#endif
 }
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CLensFlare::DrawAfterFlare
 
 void CLensFlare::DrawAfterFlare()
@@ -281,7 +293,7 @@ void CLensFlare::DrawAfterFlare()
 }
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CLensFlare::SetMainFlare
 
 void CLensFlare::SetMainFlare(std::string strSunFile, float fSunSize)
@@ -289,17 +301,17 @@ void CLensFlare::SetMainFlare(std::string strSunFile, float fSunSize)
 	if (m_bEnabled && m_bShowMainFlare)
 	{
 		m_fSunSize = fSunSize;
-		CResource * pResource = CResourceManager::Instance().GetResourcePointer(strSunFile.c_str()); 
+		CResource * pResource = CResourceManager::Instance().GetResourcePointer(strSunFile.c_str());
 
 		if (!pResource->IsType(CGraphicImage::Type()))
 			assert(false);
-		
+
 		m_SunFlareImageInstance.SetImagePointer(static_cast<CGraphicImage *> (pResource));
 	}
 }
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CLensFlare::DrawFlare
 
 void CLensFlare::DrawFlare()
@@ -345,7 +357,7 @@ void CLensFlare::DrawFlare()
 	}
 }
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CLensFlare::CharacterizeFlare
 void CLensFlare::CharacterizeFlare(bool bEnabled, bool bShowMainFlare, float fMaxBrightness, const D3DXCOLOR & c_rColor)
 {
@@ -359,7 +371,7 @@ void CLensFlare::CharacterizeFlare(bool bEnabled, bool bShowMainFlare, float fMa
 }
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CLensFlare::Initialize
 void CLensFlare::Initialize(std::string strPath)
 {
@@ -368,7 +380,7 @@ void CLensFlare::Initialize(std::string strPath)
 }
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CLensFlare::SetFlareLocation
 void CLensFlare::SetFlareLocation(double dX, double dY)
 {
@@ -383,7 +395,7 @@ void CLensFlare::SetFlareLocation(double dX, double dY)
 }
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CLensFlare::SetBrightnesses
 
 void CLensFlare::SetBrightnesses(float fBeforeBright, float fAfterBright)
@@ -398,7 +410,7 @@ void CLensFlare::SetBrightnesses(float fBeforeBright, float fAfterBright)
 }
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CLensFlare::ReadControlPixels
 
 void CLensFlare::ReadControlPixels()
@@ -408,7 +420,7 @@ void CLensFlare::ReadControlPixels()
 }
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CLensFlare::AdjustBrightness
 
 void CLensFlare::AdjustBrightness()
@@ -430,7 +442,7 @@ void CLensFlare::AdjustBrightness()
 }
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CLensFlare::ReadDepthPixels
 
 void CLensFlare::ReadDepthPixels(float * /*pPixels*/)
@@ -521,7 +533,7 @@ void CFlare::Init(std::string strPath)
 }
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CFlare::Draw
 void CFlare::Draw(float fBrightScale, int nWidth, int nHeight, int nX, int nY)
 {
@@ -531,7 +543,12 @@ void CFlare::Draw(float fBrightScale, int nWidth, int nHeight, int nX, int nY)
 	float fDY = float(nY) - float(nHeight) / 2.0f;
 
 	STATEMANAGER.SetTexture(1, nullptr);
-	STATEMANAGER.SetVertexShader(D3DFVF_XYZ|D3DFVF_DIFFUSE|D3DFVF_TEX1);
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+    STATEMANAGER.SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
+#else
+    STATEMANAGER.SetVertexShader(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
+#endif
 
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG1,	D3DTA_TEXTURE);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG2,	D3DTA_DIFFUSE);

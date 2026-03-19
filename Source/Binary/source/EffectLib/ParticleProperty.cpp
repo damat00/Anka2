@@ -7,9 +7,12 @@ void CParticleProperty::InsertTexture(const char * c_szFileName)
 	CGraphicImage * pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer(c_szFileName);
 
 	m_ImageVector.push_back(pImage);
+#ifdef WORLD_EDITOR
+	m_TextureNameVector.push_back(c_szFileName);
+#endif
 }
 
-bool CParticleProperty::SetTexture(const char *c_szFileName)
+bool CParticleProperty::SetTexture(const char * c_szFileName)
 {
 	if (m_ImageVector.size() > 1)
 	{
@@ -17,7 +20,9 @@ bool CParticleProperty::SetTexture(const char *c_szFileName)
 		return false;
 	}
 	m_ImageVector.clear();
-
+#ifdef WORLD_EDITOR
+	m_TextureNameVector.clear();
+#endif
 	InsertTexture(c_szFileName);
 	return true;
 }
@@ -47,7 +52,15 @@ void CParticleProperty::Clear()
 
 	m_TimeEventScaleX.clear();
 	m_TimeEventScaleY.clear();
+#ifdef WORLD_EDITOR
+	m_TimeEventColorRed.clear();
+	m_TimeEventColorGreen.clear();
+	m_TimeEventColorBlue.clear();
+	m_TimeEventAlpha.clear();
+	m_TextureNameVector.clear();
+#else
 	m_TimeEventColor.clear();
+#endif
 	m_TimeEventRotation.clear();
 
 	m_ImageVector.clear();
@@ -86,7 +99,16 @@ CParticleProperty & CParticleProperty::operator = ( const CParticleProperty& c_P
 	m_TimeEventScaleX = c_ParticleProperty.m_TimeEventScaleX;
 	m_TimeEventScaleY = c_ParticleProperty.m_TimeEventScaleY;
 
+#ifdef WORLD_EDITOR
+	m_TimeEventColorRed = c_ParticleProperty.m_TimeEventColorRed;
+	m_TimeEventColorGreen = c_ParticleProperty.m_TimeEventColorGreen;
+	m_TimeEventColorBlue = c_ParticleProperty.m_TimeEventColorBlue;
+	m_TimeEventAlpha = c_ParticleProperty.m_TimeEventAlpha;
+
+	m_TextureNameVector = c_ParticleProperty.m_TextureNameVector;
+#else
 	m_TimeEventColor = c_ParticleProperty.m_TimeEventColor;
+#endif
 	m_TimeEventRotation = c_ParticleProperty.m_TimeEventRotation;
 
 	m_ImageVector = c_ParticleProperty.m_ImageVector;

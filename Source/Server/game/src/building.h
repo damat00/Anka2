@@ -35,12 +35,14 @@ namespace building
 
 			void	RegenNPC();
 
+			// BUILDING_NPC
 			void	ApplySpecialEffect();
 			void	RemoveSpecialEffect();
 
 			void	Reconstruct(DWORD dwVnum);
 
 			LPCHARACTER GetNPC() { return m_chNPC; }
+			// END_OF_BUILDING_NPC
 
 		protected:
 			TObjectProto *	m_pProto;
@@ -80,13 +82,17 @@ namespace building
 
 			void	RequestUpdate(DWORD dwGuild);
 
+			// LAND_CLEAR
 			void	ClearLand();
+			// END_LAND_CLEAR
 
+			// BUILD_WALL
 			bool RequestCreateWall(long nMapIndex, float rot);
 			void RequestDeleteWall();
 
 			bool RequestCreateWallBlocks(DWORD dwVnum, long nMapIndex, char wallSize, bool doorEast, bool doorWest, bool doorSouth, bool doorNorth);
 			void RequestDeleteWallBlocks(DWORD dwVnum);
+			// END_BUILD_WALL
 
 			DWORD GetMapIndex() { return m_data.lMapIndex; }
 
@@ -95,8 +101,10 @@ namespace building
 			std::map<DWORD, LPOBJECT>	m_map_pkObject;
 			std::map<DWORD, LPOBJECT>	m_map_pkObjectByVID;
 
+			// BUILD_WALL
 		private :
 			void DrawWall(DWORD dwVnum, long nMapIndex, long& centerX, long& centerY, char length, float zRot);
+			// END_BUILD_WALL
 	};
 
 	class CManager : public singleton<CManager>
@@ -126,8 +134,10 @@ namespace building
 
 			void	SendLandList(LPDESC d, long lMapIndex);
 
+			// LAND_CLEAR
 			void	ClearLand(DWORD dwLandID);
 			void	ClearLandByGuildID(DWORD dwGuildID);
+			// END_LAND_CLEAR
 
 		protected:
 			std::vector<TObjectProto>		m_vec_kObjectProto;

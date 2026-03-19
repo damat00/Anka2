@@ -33,7 +33,7 @@ Group AttachingData
         Group SphereData00
         {
             Radius           69.000000
-            Position         0.000000 -56.000000 -10.000000
+            Position         0.000000 0.000000 -10.000000
         }
     }
     
@@ -51,7 +51,7 @@ Group AttachingData
         Group SphereData00
         {
             Radius           80.000000
-            Position         0.000000 -56.000000 -10.000000
+            Position         0.000000 0.000000 -10.000000
         }
     }
 }

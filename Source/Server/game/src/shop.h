@@ -1,8 +1,6 @@
 #ifndef __INC_METIN_II_GAME_SHOP_H__
 #define __INC_METIN_II_GAME_SHOP_H__
 
-#include "../../common/service.h"
-
 enum
 {
 	SHOP_MAX_DISTANCE = 1000
@@ -90,4 +88,4 @@ class CShop
 		LPCHARACTER m_pkPC;
 };
 
-#endif 
+#endif

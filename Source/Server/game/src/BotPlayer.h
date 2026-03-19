@@ -77,6 +77,7 @@ public:
 	void BotCharacterRemove(const char* c_szName);
 
 	uint32_t BotCharacterCount() const { return static_cast<uint32_t>(m_botCharacters.size()); }
+	uint32_t GetBotCountByJob(BYTE job) const;
 
 	void TalkingMessage(LPCHARACTER ch, const char* c_szMessage);
 
@@ -92,6 +93,9 @@ public:
 
 	bool IsBotCharacter(const char* c_szName) const;
 	LPCHARACTER GetBotCharacter(const char* c_szName) const;
+
+	// Dusman imparatorluk botlarini bulmak icin (sectree fallback)
+	LPCHARACTER FindNearestEnemyBot(LPCHARACTER botChr, int maxDistance) const;
 	
 	const std::vector<std::string>& GetChatMessages() const { return m_chatMessages; }
 

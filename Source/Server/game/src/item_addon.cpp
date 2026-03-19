@@ -28,7 +28,15 @@ void CItemAddonManager::ApplyAddonTo(int iAddonType, LPITEM pItem)
 		iNormalHitBonus = -2 * iSkillBonus + number(1, 5);
 
 	pItem->RemoveAttributeType(APPLY_SKILL_DAMAGE_BONUS);
+#ifdef ENABLE_AVG_PVM_DISABLE
+	pItem->RemoveAttributeType(APPLY_ATTBONUS_MEDI_PVM);
+#else
 	pItem->RemoveAttributeType(APPLY_NORMAL_HIT_DAMAGE_BONUS);
+#endif
+#ifdef ENABLE_AVG_PVM_DISABLE
+	pItem->AddAttribute(APPLY_ATTBONUS_MEDI_PVM, iNormalHitBonus);
+#else
 	pItem->AddAttribute(APPLY_NORMAL_HIT_DAMAGE_BONUS, iNormalHitBonus);
+#endif
 	pItem->AddAttribute(APPLY_SKILL_DAMAGE_BONUS, iSkillBonus);
 }

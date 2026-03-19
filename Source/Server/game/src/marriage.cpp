@@ -82,7 +82,7 @@ namespace marriage
 		int max_limit = 30;
 		if (IsOnline())
 		{
-			if (ch1->GetPremiumRemainSeconds(PREMIUM_MARRIAGE_FAST) > 0 || 
+			if (ch1->GetPremiumRemainSeconds(PREMIUM_MARRIAGE_FAST) > 0 ||
 					ch2->GetPremiumRemainSeconds(PREMIUM_MARRIAGE_FAST) > 0)
 			{
 				point_per_day = MARRIAGE_POINT_PER_DAY_FAST;
@@ -369,10 +369,10 @@ namespace marriage
 	}
 
 	void TMarriage::SetMarried()
-	{ 
-		is_married = 1; 
-		bSave = true; 
-		Save(); 
+	{
+		is_married = 1;
+		bSave = true;
+		Save();
 
 		if (IsOnline())
 		{
@@ -392,9 +392,9 @@ namespace marriage
 		if (point > 0 && is_married)
 		{
 			bSave = true;
-			love_point += point;
-
-			love_point = MIN( love_point, 2000000000 );
+			// @fixme126
+			uint64_t llActualPoints = static_cast<uint64_t>(love_point) + point;
+			love_point = MIN( llActualPoints, 2000000000 );
 
 			if (test_server)
 			{
@@ -453,8 +453,8 @@ namespace marriage
 		return false;
 	}
 
-	bool CManager::IsMarried(DWORD dwPlayerID) 
-	{ 
+	bool CManager::IsMarried(DWORD dwPlayerID)
+	{
 		TMarriage* pkMarriageFinded=Get(dwPlayerID);
 		if (pkMarriageFinded && pkMarriageFinded->is_married)
 			return true;
@@ -462,8 +462,8 @@ namespace marriage
 		return false;
 	}
 
-	bool CManager::IsEngaged(DWORD dwPlayerID) 
-	{ 
+	bool CManager::IsEngaged(DWORD dwPlayerID)
+	{
 		TMarriage* pkMarriageFinded=Get(dwPlayerID);
 		if (pkMarriageFinded && !pkMarriageFinded->is_married)
 			return true;
@@ -471,9 +471,9 @@ namespace marriage
 		return false;
 	}
 
-	bool CManager::IsEngagedOrMarried(DWORD dwPlayerID) 
-	{ 
-		return Get(dwPlayerID) != NULL; 
+	bool CManager::IsEngagedOrMarried(DWORD dwPlayerID)
+	{
+		return Get(dwPlayerID) != NULL;
 	}
 
 	bool CManager::Initialize()

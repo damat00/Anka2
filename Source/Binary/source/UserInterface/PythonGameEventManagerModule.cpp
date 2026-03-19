@@ -119,7 +119,7 @@ void initeventmgr()
 	PyModule_AddIntConstant(poModule, "EVENT_TYPE_OX",				InGameEventManager::EVENT_TYPE_OX);
 	PyModule_AddIntConstant(poModule, "EVENT_TYPE_TANAKA",			InGameEventManager::EVENT_TYPE_TANAKA);
 	PyModule_AddIntConstant(poModule, "EVENT_TYPE_YANG",			InGameEventManager::EVENT_TYPE_YANG);
-#ifdef ENABLE_MINIGAME_OKEY_CARDS_SYSTEM
+#ifdef ENABLE_MINI_GAME_OKEY
 	PyModule_AddIntConstant(poModule, "EVENT_TYPE_OKEY_CARDS",		InGameEventManager::EVENT_TYPE_OKEY_CARDS);
 #endif
 	PyModule_AddIntConstant(poModule, "EVENT_MAX_NUM",				InGameEventManager::EVENT_MAX_NUM);

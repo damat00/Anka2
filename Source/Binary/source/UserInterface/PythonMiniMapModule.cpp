@@ -151,11 +151,11 @@ PyObject *miniMapRenderAtlas(PyObject *poSelf, PyObject *poArgs)
 	float fScrrenX;
 	if (!PyTuple_GetFloat(poArgs, 0, &fScrrenX))
 		return Py_BuildException();
-	
+
 	float fScrrenY;
 	if (!PyTuple_GetFloat(poArgs, 1, &fScrrenY))
 		return Py_BuildException();
-	
+
 	CPythonMiniMap::Instance().RenderAtlas(fScrrenX, fScrrenY);
 	return Py_BuildNone();
 }
@@ -199,7 +199,7 @@ PyObject *miniMapGetAtlasInfo(PyObject *poSelf, PyObject *poArgs)
 	DWORD dwTextColor = 0;
 	DWORD dwGuildID = 0;
 
-#ifdef ENABLE_RENEWAL_REGEN
+#ifdef ENABLE_ULTIMATE_REGEN
 	int diRegenTime = 0;
 	bool bFind = CPythonMiniMap::Instance().GetAtlasInfo(fScrrenX, fScrrenY, aString, &fPosX, &fPosY, &dwTextColor, &dwGuildID, &diRegenTime);
 #else
@@ -212,7 +212,7 @@ PyObject *miniMapGetAtlasInfo(PyObject *poSelf, PyObject *poArgs)
 	iPosX /= 100;
 	iPosY /= 100;
 
-#ifdef ENABLE_RENEWAL_REGEN
+#ifdef ENABLE_ULTIMATE_REGEN
 	return Py_BuildValue("isiilii", (int)bFind, aString.c_str(), iPosX, iPosY, (signed) dwTextColor, dwGuildID, diRegenTime);
 #else
 	return Py_BuildValue("isiili", (int)bFind, aString.c_str(), iPosX, iPosY, (signed) dwTextColor, dwGuildID);
@@ -330,7 +330,7 @@ PyObject* miniMapSetAutoHuntRange(PyObject* poSelf, PyObject* poArgs)
 
 void initMiniMap()
 {
-	static PyMethodDef s_methods[] = 
+	static PyMethodDef s_methods[] =
 	{
 		{ "SetScale",						miniMapSetScale,								METH_VARARGS },
 		{ "ScaleUp",						miniMapScaleUp,									METH_VARARGS },

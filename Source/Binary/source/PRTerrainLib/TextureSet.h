@@ -21,7 +21,11 @@ typedef struct STerrainTexture
 	}
 
 	std::string					stFilename;
+#ifdef ENABLE_DIRECTX9_UPDATE
+	LPDIRECT3DTEXTURE9			pd3dTexture;
+#else
 	LPDIRECT3DTEXTURE8			pd3dTexture;
+#endif
 	CGraphicImageInstance 		ImageInstance;
 	float						UScale;
 	float						VScale;

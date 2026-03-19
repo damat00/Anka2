@@ -328,7 +328,6 @@ bool SetDefaultCodePage(DWORD codePage)
 	return true;
 }
 
-
 int __base64_get( const int c )
 {
 	if( 'A' <= c && c <= 'Z' )
@@ -346,7 +345,7 @@ int __base64_get( const int c )
 	return -2;	// non value;
 }
 
-void __strcat1(char *str,int i)
+void __strcat1(char * str,int i)
 {
 	char result[2];
 	result[0] = i;
@@ -354,7 +353,7 @@ void __strcat1(char *str,int i)
 	strcat(str,result);
 }
 
-void base64_decode(const char *str,char *resultStr)
+void base64_decode(const char * str,char * resultStr)
 {
 	int nCount=0, i=0, r, result;
 	int length = strlen(str);
@@ -365,59 +364,59 @@ void base64_decode(const char *str,char *resultStr)
 	{
 		i=0;
 		strcpy(szDest, "");
-		while(nCount<length && i<4)	// 4°³ÀÇ ¹ÙÀÌÆ®¸¦ ¾ò´Â´Ù.
-		{			
+		while(nCount<length && i<4)
+		{
 			r = str[nCount++];
 			result = __base64_get(r);
 			if(result!=-2)
 			{
 				if(result!=-1)
 					szDest[i++] = result;
-				else szDest[i++] = '@';	// It's end  (64¹øÀº µ?ÄÚµù½Ã »ç¿ëµÇÁö ¾Ê±â ¶§¹®)
+				else szDest[i++] = '@';
 			}
 		}
 
-		if(i==4)	// 4°³ÀÇ ¼Ò½º¸¦ ¸?µÎ ¾ò¾î³Â´Ù. µ?ÄÚµå ½ÃÀÛ
-		{	
-			if( nCount+3 >= length )	// µ¥ÀÌÅÍÀÇ ³¡¿¡ µµ´?Çß´Ù.
+		if(i==4)
+		{
+			if( nCount+3 >= length )
 			{
 				if( szDest[1] == '@' )
 				{
-					__strcat1(resultStr,(szDest[0]<<2));		
+					__strcat1(resultStr,(szDest[0]<<2));
 					break;
 				}// exit while loop
-				else 
+				else
 					__strcat1(resultStr,(szDest[0]<<2 | szDest[1]>>4));	// 1 Byte
 				if( szDest[2] == '@' )
 				{
 					__strcat1(resultStr,(szDest[1]<<4));
 					break;
 				}
-				else 
-					__strcat1(resultStr,(szDest[1]<<4 | szDest[2]>>2));	// 2 Byte				
+				else
+					__strcat1(resultStr,(szDest[1]<<4 | szDest[2]>>2));	// 2 Byte
 				if( szDest[3] == '@' )
 				{
 					__strcat1(resultStr,(szDest[2]<<6));
 					break;
 				}
-				else 
-					__strcat1(resultStr,(szDest[2]<<6 | szDest[3]));	// 3 Byte				
+				else
+					__strcat1(resultStr,(szDest[2]<<6 | szDest[3]));	// 3 Byte
 			}
 			else
 			{
 				__strcat1(resultStr,(szDest[0]<<2 | szDest[1]>>4));	// 1 Byte
-				__strcat1(resultStr,(szDest[1]<<4 | szDest[2]>>2));	// 2 Byte				
+				__strcat1(resultStr,(szDest[1]<<4 | szDest[2]>>2));	// 2 Byte
 				__strcat1(resultStr,(szDest[2]<<6 | szDest[3]));	// 3 Byte
 			}
 		}
-		
+
 	}// end of while
 
-	for (i = 0; i < strlen(resultStr); i++) 
+	for (i = 0; i < strlen(resultStr); i++)
 	{
 		char c = resultStr[i];
 		int xx = i + 5;
 		resultStr[i] = char(c ^ xx);
-	}	
+	}
 	// E
 }

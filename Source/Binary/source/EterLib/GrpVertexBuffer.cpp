@@ -22,7 +22,7 @@ int CGraphicVertexBuffer::GetVertexCount() const
 void CGraphicVertexBuffer::SetStream(int stride, int layer) const
 {
 	assert(ms_lpd3dDevice != nullptr);
-	STATEMANAGER.SetStreamSource(layer, m_lpd3dVB, stride);	
+	STATEMANAGER.SetStreamSource(layer, m_lpd3dVB, stride);
 }
 
 bool CGraphicVertexBuffer::LockRange(unsigned count, void** pretVertices) const
@@ -31,8 +31,21 @@ bool CGraphicVertexBuffer::LockRange(unsigned count, void** pretVertices) const
 		return false;
 
 	DWORD dwLockSize=GetVertexStride() * count;
-	if (FAILED(m_lpd3dVB->Lock(0, dwLockSize, (BYTE **) pretVertices, m_dwLockFlag)))
-		return false;
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+    if (FAILED(m_lpd3dVB->Lock(0
+                                , dwLockSize
+                                , pretVertices
+                                , m_dwLockFlag)))
+#else
+    if (FAILED(m_lpd3dVB->Lock(0
+                                , dwLockSize
+                                , (BYTE**)pretVertices
+                                , m_dwLockFlag)))
+#endif
+    {
+        return false;
+    }
 
 	return true;
 }
@@ -43,8 +56,21 @@ bool CGraphicVertexBuffer::Lock(void ** pretVertices) const
 		return false;
 
 	DWORD dwLockSize=GetVertexStride()*GetVertexCount();
-	if (FAILED(m_lpd3dVB->Lock(0, dwLockSize, (BYTE **) pretVertices, m_dwLockFlag)))
-		return false;
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+    if (FAILED(m_lpd3dVB->Lock(0
+                                , dwLockSize
+                                , pretVertices
+                                , m_dwLockFlag)))
+#else
+    if (FAILED(m_lpd3dVB->Lock(0
+                                , dwLockSize
+                                , (BYTE**)pretVertices
+                                , m_dwLockFlag)))
+#endif
+    {
+        return false;
+    }
 
 	return true;
 }
@@ -72,8 +98,20 @@ bool CGraphicVertexBuffer::LockDynamic(void** pretVertices)
 	if (!m_lpd3dVB)
 		return false;
 
-	if (FAILED(m_lpd3dVB->Lock(0, 0, (BYTE**)pretVertices, 0)))
-		return false;
+#ifdef ENABLE_DIRECTX9_UPDATE
+    if (FAILED(m_lpd3dVB->Lock(0
+                                , 0
+                                , pretVertices
+                                , 0)))
+#else
+    if (FAILED(m_lpd3dVB->Lock(0
+                                , 0
+                                , (BYTE**)pretVertices
+                                , 0)))
+#endif
+    {
+        return false;
+    }
 
 	return true;
 }
@@ -83,8 +121,20 @@ bool CGraphicVertexBuffer::Lock(void ** pretVertices)
 	if (!m_lpd3dVB)
 		return false;
 
-	if (FAILED(m_lpd3dVB->Lock(0, 0, (BYTE**)pretVertices, m_dwLockFlag)))
-		return false;
+#ifdef ENABLE_DIRECTX9_UPDATE
+    if (FAILED(m_lpd3dVB->Lock(0
+                                , 0
+                                , pretVertices
+                                , m_dwLockFlag)))
+#else
+    if (FAILED(m_lpd3dVB->Lock(0
+                                , 0
+                                , (BYTE**)pretVertices
+                                , m_dwLockFlag)))
+#endif
+    {
+        return false;
+    }
 
 	return true;
 }
@@ -107,7 +157,7 @@ bool CGraphicVertexBuffer::Copy(int bufSize, const void* srcVertices)
 		return false;
 
 	memcpy(dstVertices, srcVertices, bufSize);
-	
+
 	Unlock();
 	return true;
 }
@@ -117,15 +167,23 @@ bool CGraphicVertexBuffer::CreateDeviceObjects()
 	assert(ms_lpd3dDevice != nullptr);
 	assert(m_lpd3dVB == nullptr);
 
-	if (FAILED(
-		ms_lpd3dDevice->CreateVertexBuffer(
-		m_dwBufferSize, 
-		m_dwUsage, 
-		m_dwFVF, 
-		m_d3dPool, 
-		&m_lpd3dVB)
-		))
-		return false;
+#ifdef ENABLE_DIRECTX9_UPDATE
+    if (FAILED(ms_lpd3dDevice->CreateVertexBuffer(m_dwBufferSize
+                                                    , m_dwUsage
+                                                    , m_dwFVF
+                                                    , m_d3dPool
+                                                    , &m_lpd3dVB
+                                                    , nullptr)))
+#else
+    if (FAILED(ms_lpd3dDevice->CreateVertexBuffer(m_dwBufferSize
+                                                    , m_dwUsage
+                                                    , m_dwFVF
+                                                    , m_d3dPool
+                                                    , &m_lpd3dVB)))
+#endif
+    {
+        return false;
+    }
 
 	return true;
 }

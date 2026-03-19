@@ -212,7 +212,7 @@ bool CPythonNetworkStream::LoadConvertTable(DWORD dwEmpireID, const char *c_szFi
 
 	char *pcData=(char *)pvData;
 
-	STextConvertTable& rkTextConvTable=m_aTextConvTable[dwEmpireID-1];		
+	STextConvertTable& rkTextConvTable=m_aTextConvTable[dwEmpireID-1];
 	memcpy(rkTextConvTable.acUpper, pcData, dwEngCount);pcData+=dwEngCount;
 	memcpy(rkTextConvTable.acLower, pcData, dwEngCount);pcData+=dwEngCount;
 	memcpy(rkTextConvTable.aacHan, pcData, dwHanSize);
@@ -225,64 +225,91 @@ void CPythonNetworkStream::LoadingPhase()
 {
 	TPacketHeader header;
 
-	if (!CheckPacket(&header))
+	if (!CheckPacket (&header))
+	{
 		return;
+	}
 
 	switch (header)
 	{
 		case HEADER_GC_PHASE:
 			if (RecvPhasePacket())
+			{
 				return;
+			}
 			break;
 
 		case HEADER_GC_MAIN_CHARACTER:
 			if (RecvMainCharacter())
+			{
 				return;
+			}
 			break;
 
+		// SUPPORT_BGM
 		case HEADER_GC_MAIN_CHARACTER2_EMPIRE:
 			if (RecvMainCharacter2_EMPIRE())
+			{
 				return;
+			}
 			break;
 
 		case HEADER_GC_MAIN_CHARACTER3_BGM:
 			if (RecvMainCharacter3_BGM())
+			{
 				return;
+			}
 			break;
 
 		case HEADER_GC_MAIN_CHARACTER4_BGM_VOL:
 			if (RecvMainCharacter4_BGM_VOL())
+			{
 				return;
+			}
 			break;
+
+		// END_OF_SUPPORT_BGM
 
 		case HEADER_GC_CHARACTER_UPDATE:
 			if (RecvCharacterUpdatePacket())
+			{
 				return;
+			}
 			break;
 
 		case HEADER_GC_PLAYER_POINTS:
 			if (__RecvPlayerPoints())
+			{
 				return;
+			}
 			break;
 
 		case HEADER_GC_PLAYER_POINT_CHANGE:
 			if (RecvPointChange())
+			{
 				return;
+			}
 			break;
 
 		case HEADER_GC_ITEM_SET:
 			if (RecvItemSetPacket())
+			{
 				return;
+			}
 			break;
 
 		case HEADER_GC_PING:
 			if (RecvPingPacket())
+			{
 				return;
+			}
 			break;
 
 		case HEADER_GC_QUICKSLOT_ADD:
 			if (RecvQuickSlotAddPacket())
+			{
 				return;
+			}
 			break;
 
 #ifdef ENABLE_GROWTH_PET_SYSTEM
@@ -298,23 +325,25 @@ void CPythonNetworkStream::LoadingPhase()
 			break;
 	}
 
-	RecvErrorPacket(header);
+	RecvErrorPacket (header);
 }
 
 void CPythonNetworkStream::SetLoadingPhase()
 {
-	if ("Loading" != m_strPhase)
+	if ("Loading"!=m_strPhase)
+	{
 		m_phaseLeaveFunc.Run();
+	}
 
-	Tracen("");
-	Tracen("## Network - Loading Phase ##");
-	Tracen("");
+	Tracen ("");
+	Tracen ("## Network - Loading Phase ##");
+	Tracen ("");
 
 	m_strPhase = "Loading";
 
 	m_dwChangingPhaseTime = ELTimer_GetMSec();
-	m_phaseProcessFunc.Set(this, &CPythonNetworkStream::LoadingPhase);
-	m_phaseLeaveFunc.Set(this, &CPythonNetworkStream::__LeaveLoadingPhase);
+	m_phaseProcessFunc.Set (this, &CPythonNetworkStream::LoadingPhase);
+	m_phaseLeaveFunc.Set (this, &CPythonNetworkStream::__LeaveLoadingPhase);
 
 	CPythonPlayer& rkPlayer=CPythonPlayer::Instance();
 	rkPlayer.Clear();

@@ -42,6 +42,25 @@ bool CEffectManager::IsAliveEffect(DWORD dwInstanceIndex)
 	return f->second->isAlive() ? true : false;
 }
 
+#ifdef __ENABLE_STEALTH_FIX__
+void CEffectManager::ApplyAlwaysHidden()
+{
+	if (!m_pSelectedEffectInstance)
+		return;
+
+	m_pSelectedEffectInstance->ApplyAlwaysHidden();
+}
+
+
+void CEffectManager::ReleaseAlwaysHidden()
+{
+	if (!m_pSelectedEffectInstance)
+		return;
+
+	m_pSelectedEffectInstance->ReleaseAlwaysHidden();
+}
+#endif
+
 void CEffectManager::Update()
 {
 	for (TEffectInstanceMap::iterator itor = m_kEftInstMap.begin(); itor != m_kEftInstMap.end();)
@@ -80,11 +99,14 @@ struct CEffectManager_FEffectInstanceRender
 
 void CEffectManager::Render()
 {
+#ifdef ENABLE_DIRECTX9_UPDATE
+    D3DPERF_BeginEvent(D3DCOLOR_ARGB(251, 50, 50, 0), L"** CEffectManager::Render **");
+#endif
 	STATEMANAGER.SetTexture(0, nullptr);
 	STATEMANAGER.SetTexture(1, nullptr);
 
 	if (m_isDisableSortRendering)
-	{	
+	{
 		for (TEffectInstanceMap::iterator itor = m_kEftInstMap.begin(); itor != m_kEftInstMap.end();)
 		{
 			CEffectInstance * pEffectInstance = itor->second;
@@ -105,6 +127,9 @@ void CEffectManager::Render()
 		std::sort(s_kVct_pkEftInstSort.begin(), s_kVct_pkEftInstSort.end(), CEffectManager_LessEffectInstancePtrRenderOrder());
 		std::for_each(s_kVct_pkEftInstSort.begin(), s_kVct_pkEftInstSort.end(), CEffectManager_FEffectInstanceRender());
 	}
+#ifdef ENABLE_DIRECTX9_UPDATE
+    D3DPERF_EndEvent();
+#endif
 }
 
 #ifdef ENABLE_RENDER_TARGET
@@ -118,25 +143,6 @@ void CEffectManager::RenderOne(DWORD id)
 	if (pEffectInstance != m_kEftInstMap.end())
 	{
 		pEffectInstance->second->SetIgnoreFrustum(true);
-		pEffectInstance->second->Show();
-		pEffectInstance->second->Render();
-	}
-	else
-		TraceError("!RenderOne, not found");
-}
-#endif
-
-#ifdef ENABLE_INGAME_WIKI_SYSTEM
-void CEffectManager::RenderOneWiki(DWORD id)
-{
-	STATEMANAGER.SetTexture(0, nullptr);
-	STATEMANAGER.SetTexture(1, nullptr);
-
-	const auto& pEffectInstance = m_kEftInstMap.find(id);
-
-	if (pEffectInstance != m_kEftInstMap.end())
-	{
-		pEffectInstance->second->SetWikiIgnoreFrustum(true);
 		pEffectInstance->second->Show();
 		pEffectInstance->second->Render();
 	}
@@ -364,7 +370,7 @@ void CEffectManager::SetEffectTextures(DWORD dwID, std::vector<std::string> text
 	CEffectData * pEffectData;
 	if (!GetEffectData(dwID, &pEffectData))
 	{
-		Tracef("CEffectManager::CreateEffectInstance - NO DATA :%d\n", dwID); 
+		Tracef("CEffectManager::CreateEffectInstance - NO DATA :%d\n", dwID);
 		return;
 	}
 
@@ -417,23 +423,6 @@ void CEffectManager::HideEffect()
 		return;
 
 	m_pSelectedEffectInstance->Hide();
-}
-
-void CEffectManager::ApplyAlwaysHidden()
-{
-	if (!m_pSelectedEffectInstance)
-		return;
-
-	m_pSelectedEffectInstance->ApplyAlwaysHidden();
-}
-
-
-void CEffectManager::ReleaseAlwaysHidden()
-{
-	if (!m_pSelectedEffectInstance)
-		return;
-
-	m_pSelectedEffectInstance->ReleaseAlwaysHidden();
 }
 
 bool CEffectManager::GetEffectData(DWORD dwID, CEffectData ** ppEffect)
@@ -546,6 +535,23 @@ CEffectManager::~CEffectManager()
 {
 	Destroy();
 }
+
+// just for map effect
+
+#ifdef ENABLE_WIKI_SYSTEM
+void CEffectManager::RenderOneWiki(DWORD id)
+{
+	STATEMANAGER.SetTexture(0, NULL);
+	STATEMANAGER.SetTexture(1, NULL);
+	const auto& pEffectInstance = m_kEftInstMap.find(id);
+	if (pEffectInstance != m_kEftInstMap.end())
+	{
+		pEffectInstance->second->SetWikiIgnoreFrustum(true);
+		pEffectInstance->second->Show();
+		pEffectInstance->second->Render();
+	}
+}
+#endif
 
 void CEffectManager::RenderEffect()
 {

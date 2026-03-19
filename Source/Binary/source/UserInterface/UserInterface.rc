@@ -114,8 +114,8 @@ IDC_CURSOR_FISH         CURSOR                  "Cursors\\cursor_fish.cur"
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
-IDI_METIN2              ICON                    "metin2.ico"
-BLOCK_METIN2              ICON                    "metin2_block.ico"
+IDI_METIN2              ICON                    "anka2.ico"
+BLOCK_METIN2              ICON                    "anka2_block.ico"
 
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO

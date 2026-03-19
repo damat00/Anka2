@@ -16,7 +16,7 @@ bool CMapOutdoor::Load(float x, float y, float z)
 		static std::string s_strOldPathName="";
 
 		std::string c_rstrNewPathName=GetName()+"\\cache";
-		
+
 		s_strOldPathName=c_rstrNewPathName;
 	}
 
@@ -24,6 +24,11 @@ bool CMapOutdoor::Load(float x, float y, float z)
 
 	if (!LoadSetting(strFileName.c_str()))
 		TraceError("CMapOutdoor::Load : LoadSetting(%s) Failed", strFileName.c_str());
+
+#ifdef WORLD_EDITOR // @fixme015
+	if (!LoadMonsterAreaInfo())
+		TraceError("CMapOutdoor::Load - LoadMonsterAreaInfo ERROR");
+#endif
 
 	CreateTerrainPatchProxyList();
 	BuildQuadTree();
@@ -55,7 +60,7 @@ bool CMapOutdoor::Load(float x, float y, float z)
 			m_envDataName = c_rstrEnvironmentRoot + strAppendName + ".msenv";
 		}
 	}
-
+	// LOCAL_ENVIRONMENT_DATA_END
 	return true;
 }
 
@@ -64,6 +69,7 @@ std::string& CMapOutdoor::GetEnvironmentDataName()
 	return m_envDataName;
 }
 
+
 bool CMapOutdoor::isTerrainLoaded(WORD wX, WORD wY)
 {
 	for (DWORD i = 0; i < m_TerrainVector.size(); ++i)
@@ -71,7 +77,7 @@ bool CMapOutdoor::isTerrainLoaded(WORD wX, WORD wY)
 		CTerrain * pTerrain = m_TerrainVector[i];
 		WORD usCoordX, usCoordY;
 		pTerrain->GetCoordinate(&usCoordX, &usCoordY);
-		
+
 		if (usCoordX == wX && usCoordY == wY)
 			return true;
 	}
@@ -85,7 +91,7 @@ bool CMapOutdoor::isAreaLoaded(WORD wX, WORD wY)
 		CArea * pArea = m_AreaVector[i];
 		WORD usCoordX, usCoordY;
 		pArea->GetCoordinate(&usCoordX, &usCoordY);
-		
+
 		if (usCoordX == wX && usCoordY == wY)
 			return true;
 	}
@@ -167,6 +173,7 @@ bool CMapOutdoor::LoadArea(WORD wAreaCoordX, WORD wAreaCoordY, WORD wCellCoordX,
 	pArea->SetCoordinate(wAreaCoordX, wAreaCoordY);
 	if ( !pArea->Load(szAreaPathName) )
 		TraceError(" CMapOutdoor::LoadArea(%d, %d) LoadShadowMap ERROR", wAreaCoordX, wAreaCoordY);
+
 #ifdef _DEBUG
 	Tracef("CMapOutdoor::LoadArea2 %d\n", ELTimer_GetMSec() - dwStartTime);
 	dwStartTime = ELTimer_GetMSec();
@@ -452,6 +459,7 @@ bool CMapOutdoor::LoadMonsterAreaInfo()
 
 		stl_lowers(stTokenVector[0]);
 
+		// Start or End
 		if (0 == stTokenVector[0].compare("m") || 0 == stTokenVector[0].compare("g"))
 		{
 			if (stTokenVector.size() < 11)
@@ -475,32 +483,35 @@ bool CMapOutdoor::LoadMonsterAreaInfo()
 				continue;
 			}
 
-			const std::string & c_rstrOriginX = stTokenVector[1].c_str();
-			const std::string & c_rstrOriginY = stTokenVector[2].c_str();
-			const std::string & c_rstrSizeX = stTokenVector[3].c_str();
-			const std::string & c_rstrSizeY = stTokenVector[4].c_str();
-			const std::string & c_rstrZ = stTokenVector[5].c_str();
-			const std::string & c_rstrDir = stTokenVector[6].c_str();
-			const std::string & c_rstrTime = stTokenVector[7].c_str();
-			const std::string & c_rstrPercent = stTokenVector[8].c_str();
-			const std::string & c_rstrCount = stTokenVector[9].c_str();
-			const std::string & c_rstrVID = stTokenVector[10].c_str();
+			const std::string & c_rstrOriginX	= stTokenVector[1].c_str();
+			const std::string & c_rstrOriginY	= stTokenVector[2].c_str();
+			const std::string & c_rstrSizeX		= stTokenVector[3].c_str();
+			const std::string & c_rstrSizeY		= stTokenVector[4].c_str();
+			const std::string & c_rstrZ			= stTokenVector[5].c_str();
+			const std::string & c_rstrDir		= stTokenVector[6].c_str();
+			const std::string & c_rstrTime		= stTokenVector[7].c_str();
+			const std::string & c_rstrPercent	= stTokenVector[8].c_str();
+			const std::string & c_rstrCount		= stTokenVector[9].c_str();
+			const std::string & c_rstrVID		= stTokenVector[10].c_str();
 
 			long lOriginX, lOriginY, lSizeX, lSizeY, lZ, lTime, lPercent;
 			CMonsterAreaInfo::EMonsterDir eMonsterDir;
 			DWORD dwMonsterCount;
 			DWORD dwMonsterVID;
 
-			lOriginX = atol(c_rstrOriginX.c_str());
-			lOriginY = atol(c_rstrOriginY.c_str());
-			lSizeX = atol(c_rstrSizeX.c_str());
-			lSizeY = atol(c_rstrSizeY.c_str());
-			lZ = atol(c_rstrZ.c_str());
-			eMonsterDir = (CMonsterAreaInfo::EMonsterDir) atoi(c_rstrDir.c_str());
-			lTime = atol(c_rstrTime.c_str());
-			lPercent = atol(c_rstrPercent.c_str());
-			dwMonsterCount = (DWORD) atoi(c_rstrCount.c_str());
-			dwMonsterVID = (DWORD) atoi(c_rstrVID.c_str());
+			lOriginX		= atol(c_rstrOriginX.c_str());
+			lOriginY		= atol(c_rstrOriginY.c_str());
+			lSizeX			= atol(c_rstrSizeX.c_str());
+			lSizeY			= atol(c_rstrSizeY.c_str());
+			lZ				= atol(c_rstrZ.c_str());
+			eMonsterDir		= (CMonsterAreaInfo::EMonsterDir) atoi(c_rstrDir.c_str());
+			lTime			= atol(c_rstrTime.c_str());
+			lPercent		= atol(c_rstrPercent.c_str());
+			dwMonsterCount	= (DWORD) atoi(c_rstrCount.c_str());
+			dwMonsterVID	= (DWORD) atoi(c_rstrVID.c_str());
+
+//			lOriginX -= m_dwBaseX / 100;
+//			lOriginY -= m_dwBaseY / 100;
 
 			CMonsterAreaInfo * pMonsterAreaInfo = AddMonsterAreaInfo(lOriginX, lOriginY, lSizeX, lSizeY);
 			pMonsterAreaInfo->SetMonsterAreaInfoType(eMonsterAreaInfoType);

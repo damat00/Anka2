@@ -11,7 +11,7 @@ DWORD g_adwDecryptKey[4];
 	#include "PythonDynamicModuleNames.h"
 #endif
 
-inline const BYTE* GetKey_20050304Myevan() 
+inline const BYTE* GetKey_20050304Myevan()
 {
 	volatile static DWORD s_adwKey[1938];
 

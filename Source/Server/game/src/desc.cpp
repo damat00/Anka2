@@ -31,7 +31,10 @@ DESC::DESC()
 	Initialize();
 }
 
-DESC::~DESC() {}
+DESC::~DESC()
+{
+	Destroy();
+}
 
 void DESC::Initialize()
 {
@@ -89,7 +92,6 @@ void DESC::Initialize()
 	m_bCRCMagicCubeIdx = 0;
 	m_dwProcCRC = 0;
 	m_dwFileCRC = 0;
-	m_bHackCRCQuery = 0;
 
 	m_outtime = 0;
 	m_playtime = 0;
@@ -100,11 +102,9 @@ void DESC::Initialize()
 
 void DESC::Destroy()
 {
-	if (m_bDestroyed)
-	{
+	if (m_bDestroyed) {
 		return;
 	}
-
 	m_bDestroyed = true;
 
 	if (m_pkLoginKey)
@@ -219,12 +219,12 @@ BYTE DESC::GetLanguage()
 
 bool DESC::Setup(LPFDWATCH _fdw, socket_t _fd, const struct sockaddr_in & c_rSockAddr, DWORD _handle, DWORD _handshake)
 {
-	m_lpFdw = _fdw;
-	m_sock = _fd;
+	m_lpFdw		= _fdw;
+	m_sock		= _fd;
 
-	m_stHost = inet_ntoa(c_rSockAddr.sin_addr);
-	m_wPort = c_rSockAddr.sin_port;
-	m_dwHandle = _handle;
+	m_stHost		= inet_ntoa(c_rSockAddr.sin_addr);
+	m_wPort			= c_rSockAddr.sin_port;
+	m_dwHandle		= _handle;
 
 #ifdef ENABLE_LARGE_DYNAMIC_PACKET
 	m_lpOutputBuffer = buffer_new(DEFAULT_PACKET_BUFFER_SIZE * 16);
@@ -239,6 +239,7 @@ bool DESC::Setup(LPFDWATCH _fdw, socket_t _fd, const struct sockaddr_in & c_rSoc
 
 	fdwatch_add_fd(m_lpFdw, m_sock, this, FDW_READ, false);
 
+	// Ping Event
 	desc_event_info* info = AllocEventInfo<desc_event_info>();
 
 	info->desc = this;
@@ -246,17 +247,19 @@ bool DESC::Setup(LPFDWATCH _fdw, socket_t _fd, const struct sockaddr_in & c_rSoc
 
 	m_pkPingEvent = event_create(ping_event, info, ping_event_second_cycle);
 
-	thecore_memcpy(m_adwEncryptionKey, "1234abcd5678efgh", sizeof(DWORD) * 4);
-	thecore_memcpy(m_adwDecryptionKey, "1234abcd5678efgh", sizeof(DWORD) * 4);
+	std::memcpy(m_adwEncryptionKey, "1234abcd5678efgh", sizeof(DWORD) * 4);
+	std::memcpy(m_adwDecryptionKey, "1234abcd5678efgh", sizeof(DWORD) * 4);
 
 #ifdef ENABLE_IMPROVED_HANDSHAKE_PROCESS
 	DESC_MANAGER::instance().AcceptHandshake(m_stHost.c_str(), thecore_pulse() + PASSES_PER_SEC(INTRUSIVE_HANDSHAKE_PULSE));
 #endif
 
+	// Set Phase to handshake
 	SetPhase(PHASE_HANDSHAKE);
 	StartHandshake(_handshake);
 
-	sys_log(0, "SYSTEM: new connection from [%s] fd: %d handshake %u output input_len %d, ptr %p", m_stHost.c_str(), m_sock, m_dwHandshake, buffer_size(m_lpInputBuffer), this);
+	sys_log(0, "SYSTEM: new connection from [%s] fd: %d handshake %u output input_len %d, ptr %p",
+			m_stHost.c_str(), m_sock, m_dwHandshake, buffer_size(m_lpInputBuffer), this);
 
 	Log("SYSTEM: new connection from [%s] fd: %d handshake %u ptr %p", m_stHost.c_str(), m_sock, m_dwHandshake, this);
 	return true;
@@ -264,7 +267,7 @@ bool DESC::Setup(LPFDWATCH _fdw, socket_t _fd, const struct sockaddr_in & c_rSoc
 
 int DESC::ProcessInput()
 {
-	ssize_t bytes_read;
+	std::size_t bytes_read;
 
 	if (!m_lpInputBuffer)
 	{
@@ -313,7 +316,10 @@ int DESC::ProcessInput()
 			buffer_adjust_size(lpBufferDecrypt, iSizeBuffer);
 #endif
 
-			int iSizeAfter = TEA_Decrypt((DWORD *) buffer_write_peek(lpBufferDecrypt), (DWORD *) buffer_read_peek(m_lpInputBuffer), GetDecryptionKey(), iSizeBuffer);
+			int iSizeAfter = TEA_Decrypt((uint32_t *) buffer_write_peek(lpBufferDecrypt),
+					(uint32_t *) buffer_read_peek(m_lpInputBuffer),
+					(uint32_t*)GetDecryptionKey(),
+					iSizeBuffer);
 
 			buffer_write_proceed(lpBufferDecrypt, iSizeAfter);
 
@@ -335,7 +341,7 @@ int DESC::ProcessInput()
 				buffer_read_proceed(lpBufferDecrypt, iBytesProceed);
 				iBytesProceed = 0;
 			}
-
+			buffer_delete(lpBufferDecrypt);
 			buffer_read_proceed(m_lpInputBuffer, iBytesProceed);
 		}
 	}
@@ -362,6 +368,8 @@ int DESC::ProcessOutput()
 
 	if (result == 0)
 	{
+		//sys_log(0, "%d bytes written to %s first %u", bytes_to_write, GetHostName(), *(BYTE *) buffer_read_peek(m_lpOutputBuffer));
+		//Log("%d bytes written", bytes_to_write);
 		max_bytes_written = MAX(bytes_to_write, max_bytes_written);
 
 		total_bytes_written += bytes_to_write;
@@ -461,11 +469,12 @@ void DESC::Packet(const void * c_pvData, int iSize)
 #endif
 			else
 			{
+				/* buffer_adjust_size(m_lpOutputBuffer, iSize + 8); */
 				DWORD * pdwWritePoint = (DWORD *) buffer_write_peek(m_lpOutputBuffer);
 
 				if (packet_encode(m_lpOutputBuffer, c_pvData, iSize))
 				{
-					int iSize2 = TEA_Encrypt(pdwWritePoint, pdwWritePoint, GetEncryptionKey(), iSize);
+					int iSize2 = TEA_Encrypt((uint32_t*)pdwWritePoint, (uint32_t*)pdwWritePoint, (uint32_t*)GetEncryptionKey(), iSize);
 
 					if (iSize2 > iSize)
 						buffer_write_proceed(m_lpOutputBuffer, iSize2 - iSize);
@@ -500,6 +509,7 @@ void DESC::SetPhase(int _phase)
 	switch (m_iPhase)
 	{
 		case PHASE_CLOSE:
+			//MessengerManager::instance().Logout(GetAccountTable().login);
 			m_pInputProcessor = &m_inputClose;
 			break;
 
@@ -508,6 +518,7 @@ void DESC::SetPhase(int _phase)
 			break;
 
 		case PHASE_SELECT:
+			//MessengerManager::instance().Logout(GetAccountTable().login);
 		case PHASE_LOGIN:
 		case PHASE_LOADING:
 			m_bEncrypted = true;
@@ -531,7 +542,7 @@ void DESC::SetPhase(int _phase)
 void DESC::BindAccountTable(TAccountTable * pAccountTable)
 {
 	assert(pAccountTable != NULL);
-	thecore_memcpy(&m_accountTable, pAccountTable, sizeof(TAccountTable));
+	std::memcpy(&m_accountTable, pAccountTable, sizeof(TAccountTable));
 	DESC_MANAGER::instance().ConnectAccount(m_accountTable.login, this);
 }
 
@@ -577,6 +588,7 @@ void DESC::Log(const char * format, ...)
 
 void DESC::StartHandshake(DWORD _handshake)
 {
+	// Handshake
 	m_dwHandshake = _handshake;
 
 	SendHandshake(get_dword_time(), 0);
@@ -626,7 +638,7 @@ bool DESC::HandshakeProcess(DWORD dwTime, long lDelta, bool bInfiniteRetry)
 
 		m_dwClientTime = dwCurTime;
 		m_bHandshaking = false;
-		return true; 
+		return true;
 	}
 
 	long lNewDelta = (long) (dwCurTime - dwTime) / 2;
@@ -642,7 +654,7 @@ bool DESC::HandshakeProcess(DWORD dwTime, long lDelta, bool bInfiniteRetry)
 	if (!bInfiniteRetry)
 		if (++m_iHandshakeRetry > HANDSHAKE_RETRY_LIMIT)
 		{
-			sys_err("handshake retry limit reached! (limit %d character %s)", 
+			sys_err("handshake retry limit reached! (limit %d character %s)",
 					HANDSHAKE_RETRY_LIMIT, GetCharacter() ? GetCharacter()->GetName() : "!NO CHARACTER!");
 			SetPhase(PHASE_CLOSE);
 			return false;
@@ -816,11 +828,11 @@ void DESC::SendLoginSuccessPacket()
 
 	TPacketGCLoginSuccess p;
 
-	p.bHeader = HEADER_GC_LOGIN_SUCCESS_NEWSLOT;
+	p.bHeader    = HEADER_GC_LOGIN_SUCCESS_NEWSLOT;
 
-	p.handle = GetHandle();
-	p.random_key = DESC_MANAGER::instance().MakeRandomKey(GetHandle());
-	thecore_memcpy(p.players, rTable.players, sizeof(rTable.players));
+	p.handle     = GetHandle();
+	p.random_key = DESC_MANAGER::instance().MakeRandomKey(GetHandle()); // FOR MARK
+	std::memcpy(p.players, rTable.players, sizeof(rTable.players));
 
 	for (int i = 0; i < PLAYER_PER_ACCOUNT; ++i)
 	{
@@ -867,14 +879,14 @@ DWORD DESC::GetLoginKey()
 }
 
 const BYTE* GetKey_20050304Myevan()
-{   
+{
 	static bool bGenerated = false;
-	static DWORD s_adwKey[1938]; 
+	static DWORD s_adwKey[1938];
 
-	if (!bGenerated) 
+	if (!bGenerated)
 	{
 		bGenerated = true;
-		DWORD seed = 1491971513; 
+		DWORD seed = 1491971513;
 
 		for (UINT i = 0; i < BYTE(seed); ++i)
 		{
@@ -891,12 +903,13 @@ const BYTE* GetKey_20050304Myevan()
 void DESC::SetSecurityKey(const DWORD * c_pdwKey)
 {
 	const BYTE * c_pszKey = (const BYTE *) "JyTxtHljHJlVJHorRM301vf@4fvj10-v";
+
 	c_pszKey = GetKey_20050304Myevan() + 37;
 
-	thecore_memcpy(&m_adwDecryptionKey, c_pdwKey, 16);
-	TEA_Encrypt(&m_adwEncryptionKey[0], &m_adwDecryptionKey[0], (const DWORD *) c_pszKey, 16);
+	std::memcpy(&m_adwDecryptionKey, c_pdwKey, 16);
+	TEA_Encrypt((uint32_t*)&m_adwEncryptionKey[0], (uint32_t*)&m_adwDecryptionKey[0], (const uint32_t *) c_pszKey, 16);
 
-	sys_log(0, "SetSecurityKey decrypt %u %u %u %u encrypt %u %u %u %u", 
+	sys_log(0, "SetSecurityKey decrypt %u %u %u %u encrypt %u %u %u %u",
 			m_adwDecryptionKey[0], m_adwDecryptionKey[1], m_adwDecryptionKey[2], m_adwDecryptionKey[3],
 			m_adwEncryptionKey[0], m_adwEncryptionKey[1], m_adwEncryptionKey[2], m_adwEncryptionKey[3]);
 }
@@ -943,11 +956,11 @@ void DESC::ChatPacket(BYTE type, const char * format, ...)
 
 	struct packet_chat pack_chat;
 
-	pack_chat.header = HEADER_GC_CHAT;
-	pack_chat.size = sizeof(struct packet_chat) + len;
-	pack_chat.type = type;
-	pack_chat.id = 0;
-	pack_chat.bEmpire = GetEmpire();
+	pack_chat.header    = HEADER_GC_CHAT;
+	pack_chat.size      = sizeof(struct packet_chat) + len;
+	pack_chat.type      = type;
+	pack_chat.id        = 0;
+	pack_chat.bEmpire   = GetEmpire();
 
 	TEMP_BUFFER buf;
 	buf.write(&pack_chat, sizeof(struct packet_chat));

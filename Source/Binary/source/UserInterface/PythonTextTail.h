@@ -22,9 +22,6 @@ class CPythonTextTail : public CSingleton<CPythonTextTail>
 			CGraphicImageInstance* pLanguageInstance;
 			CGraphicImageInstance* pLanguageInstance2;
 #endif
-#ifdef ENABLE_TITLE_SYSTEM
-			CGraphicTextInstance* pTitleSystemTextInstance;
-#endif
 #ifdef ENABLE_SHOW_MOB_INFO
 			CGraphicTextInstance* pAIFlagTextInstance;
 #endif
@@ -98,15 +95,14 @@ class CPythonTextTail : public CSingleton<CPythonTextTail>
 
 		void EnablePKTitle(BOOL bFlag);
 
-#ifdef ENABLE_TITLE_SYSTEM
-		void AttachTitleSystem(DWORD dwVID, const char *c_szName, const D3DXCOLOR& c_rColor);
-		void DetachTitleSystem(DWORD dwVID);
-#endif
 		void AttachTitle(DWORD dwVID, const char *c_szName, const D3DXCOLOR& c_rColor);
 		void DetachTitle(DWORD dwVID);
 
 		void AttachLevel(DWORD dwVID, const char *c_szText, const D3DXCOLOR& c_rColor);
 		void DetachLevel(DWORD dwVID);
+#ifdef ENABLE_CONQUEROR_LEVEL
+		void AttachConquerorLevel(DWORD dwVID, const char* c_szText);
+#endif
 
 	protected:
 		TTextTail* RegisterTextTail(DWORD dwVirtualID, const char *c_szText, CGraphicObjectInstance* pOwner, float fHeight, const D3DXCOLOR & c_rColor

@@ -67,7 +67,7 @@ void CPythonPlayer::NEW_SetSingleDirKeyState(int eDirKey, bool isPress)
 void CPythonPlayer::NEW_SetMultiDirKeyState(bool isLeft, bool isRight, bool isUp, bool isDown)
 {
 	if (!__CanMove())
-		return;	
+		return;
 
 	bool isAny=(isLeft || isRight || isUp || isDown);
 

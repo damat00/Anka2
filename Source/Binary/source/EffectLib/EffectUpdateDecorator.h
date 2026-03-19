@@ -278,5 +278,4 @@ namespace NEffectUpdateDecorator
 		virtual void __Excute(const CDecoratorData& d);
 		virtual CBaseDecorator* __Clone(CParticleInstance* pfi, CParticleInstance* pi) ;
 	};
-
 }

@@ -1,11 +1,19 @@
 ScriptType            RaceDataScript
 
-BaseModelFileName     "D:\Ymir Work\npc\fire_tiger\fire_tiger_gold.GR2"
+BaseModelFileName     "D:\Ymir Work\npc\fire_tiger\fire_tiger.GR2"
 
 Group ShapeData
 {
     PathName 		 ""
-    ShapeDataCount 		 0
+    ShapeDataCount 		 1
+	Group ShapeData00
+	{
+		ShapeIndex			0
+
+		Model				"D:\Ymir Work\npc\fire_tiger\fire_tiger.GR2"
+		SourceSkin			"D:\Ymir Work\npc\fire_tiger\fire_tiger.dds"
+		TargetSkin			"D:\Ymir Work\npc\fire_tiger\fire_tiger_gold.dds"
+	}
 }
 Group AttachingData
 {

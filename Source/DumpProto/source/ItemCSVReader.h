@@ -15,7 +15,6 @@ int get_Item_Immune_Value(std::string inputString);
 int get_Item_LimitType_Value(std::string inputString);
 int get_Item_ApplyType_Value(std::string inputString);
 
-
 //몬스터 프로토도 읽을 수 있다.
 int get_Mob_Rank_Value(std::string inputString);
 int get_Mob_Type_Value(std::string inputString);

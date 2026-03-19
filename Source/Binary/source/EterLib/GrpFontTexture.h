@@ -32,7 +32,7 @@ public:
 	virtual ~CGraphicFontTexture();
 
 	void Destroy();
-	bool Create(const char *c_szFontName, int fontSize, bool bItalic);
+	bool Create(const char* c_szFontName, int fontSize, bool bItalic);
 
 	bool CreateDeviceObjects();
 	void DestroyDeviceObjects();
@@ -45,6 +45,14 @@ public:
 #endif
 
 	bool UpdateTexture();
+
+#ifdef INSIDE_RENDER
+	void GetTextureSize(float& width, float& height)
+	{
+		width = float(m_dib.GetWidth());
+		height = float(m_dib.GetHeight());
+	}
+#endif
 
 	TCharacterInfomation* GetCharacterInfomation(WORD codePage, wchar_t keyValue);
 	TCharacterInfomation* UpdateCharacterInfomation(TCharacterKey code);

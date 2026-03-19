@@ -72,7 +72,6 @@ int CMemoryTextFileLoader::SplitLine2(DWORD dwLine, CTokenVector* pstTokenVector
 
 		pstTokenVector->push_back(c_rstLine.substr(beginPos, endPos - beginPos));
 
-		// 추가 코드. 맨뒤에 탭이 있는 경우를 체크한다. - [levites]
 		if (int(c_rstLine.find_first_not_of(c_szDelimeter, basePos)) < 0)
 			break;
 	} while (basePos < c_rstLine.length());
@@ -105,7 +104,7 @@ bool CMemoryTextFileLoader::SplitLine(DWORD dwLine, CTokenVector* pstTokenVector
 
 			if (endPos < 0)
 				return false;
-			
+
 			basePos = endPos + 1;
 		}
 		else
@@ -116,7 +115,6 @@ bool CMemoryTextFileLoader::SplitLine(DWORD dwLine, CTokenVector* pstTokenVector
 
 		pstTokenVector->push_back(c_rstLine.substr(beginPos, endPos - beginPos));
 
-		// 추가 코드. 맨뒤에 탭이 있는 경우를 체크한다. - [levites]
 		if (int(c_rstLine.find_first_not_of(c_szDelimeter, basePos)) < 0)
 			break;
 	} while (basePos < c_rstLine.length());

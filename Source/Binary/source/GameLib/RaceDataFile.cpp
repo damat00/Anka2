@@ -73,7 +73,6 @@ BOOL CRaceData::LoadRaceData(const char *c_szFileName)
 				}
 
 				/////////////////////////
-				// Temporary - 이벤트를 위한 임시 기능
 				TextFileLoader.GetTokenString("specialpath", &strPathName);
 				/////////////////////////
 
@@ -84,21 +83,19 @@ BOOL CRaceData::LoadRaceData(const char *c_szFileName)
 				}
 
 				// LOCAL_PATH_SUPPORT
-				std::string strModel;				
+				std::string strModel;
 				if (TextFileLoader.GetTokenString("model", &strModel))
 				{
 					SetShapeModel(dwShapeIndex, (strPathName + strModel).c_str());
 				}
 				else
-				{					
-					if (!TextFileLoader.GetTokenString("local_model", &strModel))					
+				{
+					if (!TextFileLoader.GetTokenString("local_model", &strModel))
 						continue;
 
 					SetShapeModel(dwShapeIndex, strModel.c_str());
 				}
 				// END_OF_LOCAL_PATH_SUPPORT
-
-				
 
 				std::string strSourceSkin;
 				std::string strTargetSkin;
@@ -137,7 +134,6 @@ BOOL CRaceData::LoadRaceData(const char *c_szFileName)
 		if (TextFileLoader.GetTokenString("pathname", &strPathName) &&
 			TextFileLoader.GetTokenDoubleWord("hairdatacount", &dwHairDataCount))
 		{
-
 			for (DWORD i = 0; i < dwHairDataCount; ++i)
 			{
 				if (!TextFileLoader.SetChildNode("hairdata", i))
@@ -146,7 +142,6 @@ BOOL CRaceData::LoadRaceData(const char *c_szFileName)
 				}
 
 				/////////////////////////
-				// Temporary - 이벤트를 위한 임시 기능
 				TextFileLoader.GetTokenString("specialpath", &strPathName);
 				/////////////////////////
 
@@ -155,7 +150,7 @@ BOOL CRaceData::LoadRaceData(const char *c_szFileName)
 				{
 					continue;
 				}
-				
+
 				std::string strModel;
 				std::string strSourceSkin;
 				std::string strTargetSkin;
@@ -172,7 +167,6 @@ BOOL CRaceData::LoadRaceData(const char *c_szFileName)
 
 		TextFileLoader.SetParentNode();
 	}
-
 
 	if (TextFileLoader.SetChildNode("attachingdata"))
 	{

@@ -3,6 +3,9 @@
 #include "../eterLib/StdAfx.h"
 #include "../eterGrnLib/StdAfx.h"
 
+
+#pragma warning(disable:5033) // supress 'register' storage class
+
 #ifdef _DEBUG
 	#undef _DEBUG
 	#include <Python-2.7/python.h>

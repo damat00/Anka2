@@ -6,6 +6,7 @@ pack = __import__(pyapi.GetModuleName("pack"))
 
 import sys
 import dbg
+import os
 
 sys.path.append("lib")
 
@@ -37,7 +38,9 @@ class LogBoxFile:
 
 sys.stdout = TraceFile()
 sys.stderr = TraceErrorFile()
-
+#
+# pack file support (must move to system.py, systemrelease.pyc)
+#
 import marshal
 import imp
 
@@ -54,7 +57,6 @@ class pack_file_iterator(object):
 _chr = __builtins__.chr
 
 class pack_file(object):
-
 	def __init__(self, filename, mode = 'rb'):
 		assert mode in ('r', 'rb')
 		if not pack.Exist(filename):
@@ -90,25 +92,35 @@ _ModuleType = type(sys)
 
 old_import = __import__
 def _process_result(code, fqname):
+	# did get_code() return an actual module? (rather than a code object)
 	is_module = isinstance(code, _ModuleType)
 
+	# use the returned module, or create a new one to exec code into
 	if is_module:
 		module = code
 	else:
 		module = imp.new_module(fqname)
 
+	# insert additional values into the module (before executing the code)
+	#module.__dict__.update(values)
+
+	# the module is almost ready... make it visible
 	sys.modules[fqname] = module
 
+	# execute the code within the module's namespace
 	if not is_module:
 		exec code in module.__dict__
 
+	# fetch from sys.modules instead of returning module directly.
+	# also make module's __name__ agree with fqname, in case
+	# the "exec code in module.__dict__" played games on us.
 	module = sys.modules[fqname]
 	module.__name__ = fqname
 	return module
 
 module_do = lambda x:None
 
-def __pack_import(name,globals=None,locals=None,fromlist=None, arg5 = None):
+def __pack_import(name,globals=None,locals=None,fromlist=None, level=-1):
 	if name in sys.modules:
 		return sys.modules[name]
 
@@ -121,6 +133,7 @@ def __pack_import(name,globals=None,locals=None,fromlist=None, arg5 = None):
 
 		module_do(newmodule)
 		return newmodule
+		#return imp.load_module(name, pack_file(filename,'r'),filename,('.py','r',imp.PY_SOURCE))
 	else:
 		dbg.Trace('importing from lib %s\\n' % name)
 		if __USE_DYNAMIC_MODULE__ and name in ["player", "net", "pack", "chr", "chrmgr", "app"]:
@@ -190,6 +203,46 @@ def exec_add_module_do(mod):
 import __builtin__
 __builtin__.__import__ = __pack_import
 module_do = exec_add_module_do
+
+"""
+#
+# PSYCO installation (must move to system.py, systemrelease.pyc)
+#
+try:
+	import psyco
+	#from psyco.classes import *
+
+	def bind_me(bindable_list):
+		try:
+			for x in bindable_list:
+				try:
+					psyco.bind(x)
+				except:
+					pass
+		except:
+			pass		
+
+	_prev_psyco_old_module_do = module_do
+	def module_bind(module):
+		_prev_psyco_old_module_do(module)
+		#print 'start binding' + str(module)
+		try:
+			psyco.bind(module)
+		except:
+			pass
+		for x in module.__dict__.itervalues():
+			try:
+				psyco.bind(x)
+			except:
+				pass		
+		#print 'end binding'
+
+	dbg.Trace("PSYCO installed\\n")
+
+except Exception, msg:
+	bind_me = lambda x:None
+	dbg.Trace("No PSYCO support : %s\\n" % msg)
+"""
 
 def GetExceptionString(excTitle):
 	(excType, excMsg, excTraceBack)=sys.exc_info()

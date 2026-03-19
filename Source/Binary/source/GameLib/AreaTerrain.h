@@ -28,13 +28,13 @@ class CTerrain : public CTerrainImpl, public CGraphicBase
 		virtual ~CTerrain();
 
 		virtual void	Clear();
-		
+
 		void			SetMapOutDoor(CMapOutdoor * pOwnerOutdoorMap);
 
 		//////////////////////////////////////////////////////////////////////////
 		// Loading
 		bool			RAW_LoadTileMap(const char *c_pszFileName, bool bBGLoading = false);
-		
+
 		bool			LoadHeightMap(const char *c_pszFileName);
 
 		void			CalculateTerrainPatch();
@@ -46,7 +46,7 @@ class CTerrain : public CTerrainImpl, public CGraphicBase
 
 		bool			IsReady()						{ return m_bReady; }
 		void			SetReady(bool bReady = true)	{ m_bReady = bReady; }
-		
+
 		// Height Map
 		WORD *			GetHeightMap()			{ return m_awRawHeightMap; }
 		float			GetHeight(int x, int y);
@@ -78,7 +78,12 @@ class CTerrain : public CTerrainImpl, public CGraphicBase
 
 		// MiniMap
 		void						LoadMiniMapTexture(const char *c_pszFileName);
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+		inline LPDIRECT3DTEXTURE9	GetMiniMapTexture() { return m_lpMiniMapTexture; }
+#else
 		inline LPDIRECT3DTEXTURE8	GetMiniMapTexture() { return m_lpMiniMapTexture; }
+#endif
 
 		// Marked Area
 		BOOL						IsMarked() { return m_bMarked; }
@@ -107,7 +112,11 @@ class CTerrain : public CTerrainImpl, public CGraphicBase
 		void	RAW_DeallocateSplats(bool bBGLoading = false);
 		virtual void RAW_CountTiles();
 
+#ifdef ENABLE_DIRECTX9_UPDATE
+		LPDIRECT3DTEXTURE9 AddTexture32(BYTE byImageNum, BYTE * pbyImage, long lTextureWidth, long lTextureHeight);
+#else
 		LPDIRECT3DTEXTURE8 AddTexture32(BYTE byImageNum, BYTE * pbyImage, long lTextureWidth, long lTextureHeight);
+#endif
 		void PutImage32(BYTE * pbySrc, BYTE * pbyDst, long src_pitch, long dst_pitch, long lTextureWidth, long lTextureHeight, bool bResize = false);
 		void PutImage16(BYTE * pbySrc, BYTE * pbyDst, long src_pitch, long dst_pitch, long lTextureWidth, long lTextureHeight, bool bResize = false);
 
@@ -126,7 +135,11 @@ class CTerrain : public CTerrainImpl, public CGraphicBase
 
 		//MiniMap
 		CGraphicImageInstance	m_MiniMapGraphicImageInstance;
+#ifdef ENABLE_DIRECTX9_UPDATE
+		LPDIRECT3DTEXTURE9		m_lpMiniMapTexture;
+#else
 		LPDIRECT3DTEXTURE8		m_lpMiniMapTexture;
+#endif
 
 
 		// Owner COutdoorMap poineter
@@ -142,7 +155,11 @@ class CTerrain : public CTerrainImpl, public CGraphicBase
 
 		BOOL					m_bMarked;
 		TTerrainSplatPatch		m_MarkedSplatPatch;
+#ifdef ENABLE_DIRECTX9_UPDATE
+		LPDIRECT3DTEXTURE9		m_lpMarkedTexture;
+#else
 		LPDIRECT3DTEXTURE8		m_lpMarkedTexture;
+#endif
 
 	public:
 		CTerrainPatch *	GetTerrainPatchPtr(BYTE byPatchNumX, BYTE byPatchNumY);

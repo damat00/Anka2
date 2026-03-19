@@ -58,18 +58,6 @@
 	#include "switchbot_manager.h"
 #endif
 
-#ifdef ENABLE_BIOLOG_SYSTEM
-	#include "event_function_handler.h"
-#endif
-
-#ifdef ENABLE_EVENT_MANAGER
-	#include "event_manager.h"
-#endif
-
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-	#include "battlepass_manager.h"
-#endif
-
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
 	#include "offlineshop_manager.h"
 #endif
@@ -78,37 +66,84 @@
 	#include "growth_pet.h"
 #endif
 
-#ifdef ENABLE_RENEWAL_REGEN
-	#include "mob_timer_manager.h"
+#ifdef ENABLE_REAL_TIME_REGEN
+	#include "RealTimeRegen.hpp"
+#endif
+
+#ifdef ENABLE_ULTIMATE_REGEN
+	#include "new_mob_timer.h"
 #endif
 
 #ifdef ENABLE_BOT_PLAYER
-#include "BotPlayer.h"
+	#include "BotPlayer.h"
+#endif
+
+#ifdef ENABLE_DUNGEON_INFO
+	#include "dungeon_info.h"
+#endif
+
+#ifdef ENABLE_WHITE_DRAGON
+	#include "WhiteDragon.h"
+#endif
+
+#ifdef ENABLE_QUEEN_NETHIS
+	#include "SnakeLair.h"
+#endif
+
+#ifdef ENABLE_OCHAO_TEMPLE_SYSTEM
+	#include "TempleOchao.h"
+#endif
+
+#ifdef ENABLE_RESP_SYSTEM
+	#include "resp_manager.h"
+#endif
+
+#ifdef __ENABLE_COLLECTIONS_SYSTEM__
+	#include "CollectionsSystem.hpp"
+#endif
+
+#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
+	#include "soulroulette.h"
+#endif
+
+#ifdef ENABLE_ATTENDANCE_EVENT
+	#include "minigame.h"
+#endif
+
+#ifdef ENABLE_STONE_EVENT_SYSTEM
+	#include "stone_event.h"
+#endif
+
+#ifdef ENABLE_AUTO_EVENTS
+	#include "auto_event_manager.h"
+#endif
+#ifdef ENABLE_EVENT_SYSTEM
+	#include "auto_event_list.h"
 #endif
 
 extern void WriteVersion();
 
 static const DWORD TRAFFIC_PROFILE_FLUSH_CYCLE = 3600;
 
-volatile int num_events_called = 0;
-int max_bytes_written = 0;
-int current_bytes_written = 0;
-int total_bytes_written = 0;
-BYTE g_bLogLevel = 0;
+volatile int	num_events_called = 0;
+int             max_bytes_written = 0;
+int             current_bytes_written = 0;
+int             total_bytes_written = 0;
+BYTE		g_bLogLevel = 0;
 
-socket_t tcp_socket = 0;
-socket_t udp_socket = 0;
-socket_t p2p_socket = 0;
+socket_t	tcp_socket = 0;
+socket_t	udp_socket = 0;
+socket_t	p2p_socket = 0;
 
-LPFDWATCH main_fdw = NULL;
+LPFDWATCH	main_fdw = NULL;
 
-int io_loop(LPFDWATCH fdw);
+int		io_loop(LPFDWATCH fdw);
 
-int start(int argc, char **argv);
-int idle();
-void destroy();
+int		start(int argc, char **argv);
+int		idle();
+void	destroy();
 
-void test();
+void 	test();
 
 enum EProfile
 {
@@ -171,6 +206,10 @@ namespace
 	{
 		void operator () (LPDESC d)
 		{
+#ifdef ENABLE_ANALYZE_CLOSE_FIX
+			if (!d)
+				return;
+#endif
 			if (d->GetType() == DESC_TYPE_CONNECTOR)
 				return;
 
@@ -182,12 +221,12 @@ namespace
 	};
 }
 
-extern std::map<DWORD, CLoginSim *> g_sim;
+extern std::map<DWORD, CLoginSim *> g_sim; // first: AID
 extern std::map<DWORD, CLoginSim *> g_simByPID;
 extern std::vector<TPlayerTable> g_vec_save;
 unsigned int save_idx = 0;
 
-void heartbeat(LPHEART ht, int pulse) 
+void heartbeat(LPHEART ht, int pulse)
 {
 	DWORD t;
 
@@ -197,6 +236,7 @@ void heartbeat(LPHEART ht, int pulse)
 
 	t = get_dword_time();
 
+	// 1
 	if (!(pulse % ht->passes_per_sec))
 	{
 		if (!g_bAuthServer)
@@ -242,19 +282,25 @@ void heartbeat(LPHEART ht, int pulse)
 		}
 	}
 
+	//
+	// 25 PPS(Pulse per second)
+	//
+
+	// 1.16
 	if (!(pulse % (passes_per_sec + 4)))
 		CHARACTER_MANAGER::instance().ProcessDelayedSave();
 
+	// 5.08
 	if (!(pulse % (passes_per_sec * 5 + 2)))
 	{
 		ITEM_MANAGER::instance().Update();
 		DESC_MANAGER::instance().UpdateLocalUserCount();
 	}
 
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-	if (!(pulse % (passes_per_sec * 1)))
+#ifdef ENABLE_MINI_GAME_CATCH_KING
+	if (!(pulse % (passes_per_sec)))
 	{
-		CBattlePassManager::instance().CheckBattlePassTimes();
+		CMiniGame::instance().MiniGameCatchKingCheckEnd();
 	}
 #endif
 
@@ -284,8 +330,7 @@ void heartbeat(LPHEART ht, int pulse)
 	}
 }
 
-static void CleanUpForEarlyExit()
-{
+static void CleanUpForEarlyExit() {
 	CancelReloadSpamEvent();
 }
 
@@ -332,24 +377,17 @@ int main(int argc, char **argv)
 	CBattleArena ba;
 	SpamManager spam_mgr;
 	CDragonLairManager dl_manager;
+
+#ifdef ENABLE_DUNGEON_INFO
+	CDungeonInfoExtern dungeon_info;
+#endif
 	DSManager dsManager;
 #ifdef ENABLE_BOT_PLAYER
 	CBotCharacterManager botCharacter;
 #endif
+
 #ifdef ENABLE_RENEWAL_SWITCHBOT
 	CSwitchbotManager switchbot;
-#endif
-
-#ifdef ENABLE_BIOLOG_SYSTEM
-	CBiologSystemManager biologManager;
-#endif
-
-#ifdef ENABLE_EVENT_MANAGER
-	CEventManager event_manager;
-#endif
-
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-	CBattlePassManager battlepass_manager;
 #endif
 
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
@@ -360,8 +398,28 @@ int main(int argc, char **argv)
 	CGrowthPetManager growth_pet_manager;
 #endif
 
-#ifdef ENABLE_RENEWAL_REGEN
-	CMobTimerManager mobTimer;
+#ifdef ENABLE_ULTIMATE_REGEN
+    CNewMobTimer mobTimer;
+#endif
+
+#ifdef ENABLE_OCHAO_TEMPLE_SYSTEM
+	TempleOchao::CMgr	TempleOchao_manager;
+#endif
+
+#ifdef ENABLE_WHITE_DRAGON
+	WhiteDragon::CWhDr WhiteDragon_manager;
+#endif
+
+#ifdef ENABLE_QUEEN_NETHIS
+	SnakeLair::CSnk SnakeLair_manager;
+#endif
+
+#ifdef ENABLE_RESP_SYSTEM
+	CRespManager resp_manager;
+#endif
+
+#ifdef ENABLE_EVENT_SYSTEM
+	CGameEventsManager	gameEventsManager;
 #endif
 
 	if (!start(argc, argv))
@@ -370,8 +428,8 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
-#ifdef ENABLE_RENEWAL_REGEN
-	mobTimer.Initialize();
+#ifdef ENABLE_ULTIMATE_REGEN
+	 mobTimer.Initialize();
 #endif
 
 	quest::CQuestManager quest_manager;
@@ -398,16 +456,57 @@ int main(int argc, char **argv)
 	Blend_Item_init();
 	ani_init();
 
+#ifdef ENABLE_AUTO_EVENTS
+	CEventsManager	EventManager;
+#endif
+
+#ifdef __ENABLE_COLLECTIONS_SYSTEM__
+	CSystemCollections collectonsSystem;
+#endif
+
+#ifdef ENABLE_WHITE_DRAGON
+	WhiteDragon_manager.Initialize();
+#endif
+
+#ifdef ENABLE_QUEEN_NETHIS
+	SnakeLair_manager.Initialize();
+#endif
+
+#ifdef ENABLE_OCHAO_TEMPLE_SYSTEM
+	TempleOchao_manager.Initialize();
+#endif
+
+#ifdef ENABLE_REAL_TIME_REGEN
+	CRealTimeRegen RealTimeRegen;
+#endif
+
+#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
+	CSoulRoulette::ReadRouletteData();
+	CSoulRoulette::StateError(CSoulRoulette::Error::LOAD, NULL);
+#endif
+
+#ifdef ENABLE_AUTO_EVENTS
+	EventManager.Initialize();
+#endif
+
+#ifdef ENABLE_ATTENDANCE_EVENT
+	CMiniGame		mini_game;
+#endif
+
+#ifdef ENABLE_STONE_EVENT_SYSTEM
+	CStoneEvent	CStoneEventManager;
+#endif
+
 	if ( g_bTrafficProfileOn )
 		TrafficProfiler::instance().Initialize( TRAFFIC_PROFILE_FLUSH_CYCLE, "ProfileLog" );
-
-#ifdef ENABLE_BIOLOG_SYSTEM
-	CEventFunctionHandler EventFunctionHandler;
-#endif
 
 	while (idle());
 
 	sys_log(0, "<shutdown> Starting...");
+#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
+	CSoulRoulette::ReadRouletteData(true);
+	CSoulRoulette::StateError(CSoulRoulette::Error::SHUTDOWN, NULL);
+#endif
 	g_bShutdown = true;
 	g_bNoMoreClient = true;
 
@@ -436,6 +535,10 @@ int main(int argc, char **argv)
 	arena_manager.Destroy();
 	sys_log(0, "<shutdown> Destroying COXEventManager...");
 	OXEvent_manager.Destroy();
+#ifdef ENABLE_ATTENDANCE_EVENT
+	sys_log(0, "<shutdown> Destroying mini_game...");
+	mini_game.Destroy();
+#endif
 
 	sys_log(0, "<shutdown> Disabling signal timer...");
 	signal_timer_disable();
@@ -462,17 +565,32 @@ int main(int argc, char **argv)
 	quest_manager.Destroy();
 	sys_log(0, "<shutdown> Destroying building::CManager...");
 	building_manager.Destroy();
+#ifdef ENABLE_AUTO_EVENTS
+	sys_log(0, "<shutdown> Destroying EventManager::CEventManager...");
+	EventManager.Destroy();
+#endif
+#ifdef ENABLE_WHITE_DRAGON
+	sys_log(0, "<shutdown> Destroying WhiteDragon_manager.");
+	WhiteDragon_manager.Destroy();
+#endif
+#ifdef ENABLE_QUEEN_NETHIS
+	sys_log(0, "<shutdown> Destroying SnakeLair_manager.");
+	SnakeLair_manager.Destroy();
+#endif
+#ifdef ENABLE_OCHAO_TEMPLE_SYSTEM
+	sys_log(0, "<shutdown> Destroying TempleOchao_manager.");
+	TempleOchao_manager.Destroy();
+#endif
 	sys_log(0, "<shutdown> Flushing TrafficProfiler...");
 	trafficProfiler.Flush();
-
-#ifdef ENABLE_BIOLOG_SYSTEM
-	sys_log(0, "<shutdown> Destroying CEventFunctionHandler...");
-	CEventFunctionHandler::instance().Destroy();
-#endif
 
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
 	sys_log(0, "<shutdown> Destroying COfflineShopManager...");
 	offlineshop_manager.Initialize();
+#endif
+#ifdef ENABLE_REAL_TIME_REGEN
+	sys_log(0, "<shutdown> Destroying CRealTimeRegen...");
+	CRealTimeRegen::Instance().Destroy(); 
 #endif
 
 	destroy();
@@ -502,7 +620,7 @@ int start(int argc, char **argv)
 
 		switch (ch)
 		{
-			case 'I':
+			case 'I': // IP
 				strlcpy(g_szPublicIP, argv[optind], sizeof(g_szPublicIP));
 
 				printf("IP %s\n", g_szPublicIP);
@@ -511,7 +629,7 @@ int start(int argc, char **argv)
 				optreset = 1;
 				break;
 
-			case 'p':
+			case 'p': // port
 				mother_port = strtol(argv[optind], &ep, 10);
 
 				if (mother_port <= 1024)
@@ -537,7 +655,8 @@ int start(int argc, char **argv)
 				}
 				break;
 
-			case 'n': 
+				// LOCALE_SERVICE
+			case 'n':
 				{
 					if (optind < argc)
 					{
@@ -546,8 +665,9 @@ int start(int argc, char **argv)
 					}
 				}
 				break;
+				// END_OF_LOCALE_SERVICE
 
-			case 'v':
+			case 'v': // verbose
 				bVerbose = true;
 				break;
 
@@ -555,9 +675,11 @@ int start(int argc, char **argv)
 				g_bNoRegen = true;
 				break;
 
+				// TRAFFIC_PROFILER
 			case 't':
 				g_bTrafficProfileOn = true;
 				break;
+				// END_OF_TRAFFIC_PROFILER
 		}
 	}
 
@@ -594,6 +716,8 @@ int start(int argc, char **argv)
 	}
 #endif
 
+	// if internal ip exists, p2p socket uses internal ip, if not use public ip
+	//if ((p2p_socket = socket_tcp_bind(*g_szInternalIP ? g_szInternalIP : g_szPublicIP, p2p_port)) == INVALID_SOCKET)
 	if ((p2p_socket = socket_tcp_bind(g_szPublicIP, p2p_port)) == INVALID_SOCKET)
 	{
 		perror("socket_tcp_bind: p2p_socket");
@@ -616,7 +740,7 @@ int start(int argc, char **argv)
 		if (g_stAuthMasterIP.length() != 0)
 		{
 			fprintf(stderr, "SlaveAuth");
-			g_pkAuthMasterDesc = DESC_MANAGER::instance().CreateConnectionDesc(main_fdw, g_stAuthMasterIP.c_str(), g_wAuthMasterPort, PHASE_P2P, true); 
+			g_pkAuthMasterDesc = DESC_MANAGER::instance().CreateConnectionDesc(main_fdw, g_stAuthMasterIP.c_str(), g_wAuthMasterPort, PHASE_P2P, true);
 			P2P_MANAGER::instance().RegisterConnector(g_pkAuthMasterDesc);
 			g_pkAuthMasterDesc->SetP2P(g_stAuthMasterIP.c_str(), g_wAuthMasterPort, g_bChannel);
 
@@ -669,9 +793,9 @@ void destroy()
 
 int idle()
 {
-	static struct timeval pta = { 0, 0 };
-	static int process_time_count = 0;
-	struct timeval now;
+	static struct timeval	pta = { 0, 0 };
+	static int			process_time_count = 0;
+	struct timeval		now;
 
 	if (pta.tv_sec == 0)
 		gettimeofday(&pta, (struct timezone *) 0);
@@ -685,9 +809,10 @@ int idle()
 
 	DWORD t;
 
-	while (passed_pulses--)
-	{
+	while (passed_pulses--) {
 		heartbeat(thecore_heart, ++thecore_heart->pulse);
+
+		// To reduce the possibility of abort() in checkpointing
 		thecore_tick();
 	}
 
@@ -722,24 +847,23 @@ int idle()
 		num_events_called = 0;
 		current_bytes_written = 0;
 
-		process_time_count = 0; 
+		process_time_count = 0;
 		gettimeofday(&pta, (struct timezone *) 0);
 
 		memset(&thecore_profiler[0], 0, sizeof(thecore_profiler));
 		memset(&s_dwProfiler[0], 0, sizeof(s_dwProfiler));
 	}
 
-#ifdef ENABLE_BIOLOG_SYSTEM
-	CEventFunctionHandler::instance().Process();
+#ifdef ENABLE_REAL_TIME_REGEN
+	CRealTimeRegen::Instance().Process(); 
 #endif
-
 	return 1;
 }
 
 int io_loop(LPFDWATCH fdw)
 {
-	LPDESC d;
-	int num_events, event_idx;
+	LPDESC	d;
+	int		num_events, event_idx;
 
 	DESC_MANAGER::instance().DestroyClosed();
 	DESC_MANAGER::instance().TryConnect();
@@ -785,7 +909,7 @@ int io_loop(LPFDWATCH fdw)
 				fdwatch_clear_event(fdw, udp_socket, event_idx);
 			}
 			*/
-			continue; 
+			continue;
 		}
 
 		int iRet = fdwatch_check_event(fdw, d->GetSocket(), event_idx);

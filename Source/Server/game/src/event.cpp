@@ -78,6 +78,7 @@ void event_reset_time(LPEVENT event, long when)
 	}
 }
 
+#ifdef ENABLE_EVENT_PROCESS
 int event_process(int pulse)
 {
 	long new_time;
@@ -96,6 +97,74 @@ int event_process(int pulse)
 		new_time = pElem->iKey;
 
 		LPEVENT the_event = pElem->pvData;
+#ifdef __YMIR_REGEN_FIX__
+		if (the_event->skip_event)
+			continue;
+#endif
+		if(!the_event)
+			return 0;
+		int processing_time = 0;//event_processing_time(the_event);
+		try
+		{
+			processing_time = event_processing_time(the_event);
+		}
+		catch(...)
+		{
+			processing_time = 1;
+		}
+		cxx_q.Delete(pElem);
+
+		the_event->is_processing = TRUE;
+
+		if (!the_event->info)
+		{
+			the_event->q_el = NULL;
+			ContinueOnFatalError();
+		}
+		else
+		{
+			//sys_log(0, "EVENT: %s %d event %p info %p", the_event->file, the_event->line, the_event, the_event->info);
+			new_time = (the_event->func) (get_pointer(the_event), processing_time);
+			
+			if (new_time <= 0 || the_event->is_force_to_end)
+			{
+				the_event->q_el = NULL;
+			}
+			else
+			{
+				the_event->q_el = cxx_q.Enqueue(the_event, new_time, pulse);
+				the_event->is_processing = FALSE;
+			}
+		}
+
+		++num_events;
+	}
+
+	return num_events;
+}
+#else
+int event_process(int pulse)
+{
+	long	new_time;
+	int		num_events = 0;
+
+	while (pulse >= cxx_q.GetTopKey())
+	{
+		TQueueElement * pElem = cxx_q.Dequeue();
+
+		if (pElem->bCancel)
+		{
+			cxx_q.Delete(pElem);
+			continue;
+		}
+
+		new_time = pElem->iKey;
+
+		LPEVENT the_event = pElem->pvData;
+#ifdef __YMIR_REGEN_FIX__
+		if (the_event->skip_event)
+			continue;
+#endif
 		long processing_time = event_processing_time(the_event);
 		cxx_q.Delete(pElem);
 
@@ -126,6 +195,7 @@ int event_process(int pulse)
 
 	return num_events;
 }
+#endif
 
 /* 이벤트가 수행시간을 pulse 단위로 리턴해 준다 */
 long event_processing_time(LPEVENT event)

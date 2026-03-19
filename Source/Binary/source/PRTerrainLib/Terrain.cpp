@@ -42,17 +42,17 @@ void CTerrainImpl::Initialize()
 	memset(&m_HeightMapHeader, 0, sizeof(TGA_HEADER));
 	memset(&m_awShadowMap, 0xFFFF, sizeof(m_awShadowMap));
 	memset(&m_lpAlphaTexture, NULL, sizeof(m_lpAlphaTexture));
-	
+
 	m_lViewRadius = 0;
 
 	m_wTileMapVersion = 8976;
 
 	m_fHeightScale = 0.0f;
-	
+
 	m_lpShadowTexture = nullptr;
 
 	m_lSplatTilesX = 0;
-	m_lSplatTilesY = 0;	
+	m_lSplatTilesY = 0;
 }
 
 void CTerrainImpl::Clear()
@@ -65,26 +65,26 @@ void CTerrainImpl::Clear()
 			m_lpAlphaTexture[i] = nullptr;
 		}
 	}
-	
+
 	Initialize();
 }
 
-bool CTerrainImpl::LoadHeightMap(const char *c_szFileName)
+bool CTerrainImpl::LoadHeightMap(const char*c_szFileName)
 {
 	Tracef("LoadRawHeightMapFile %s ", c_szFileName);
-	
+
 	CMappedFile	kMappedFile;
 	LPCVOID		lpcvFileData;
-	
+
 	if (!CEterPackManager::Instance().Get(kMappedFile, c_szFileName, &lpcvFileData))
 	{
 		Tracen("Error");
 		TraceError("CTerrainImpl::LoadHeightMap - %s OPEN ERROR", c_szFileName);
 		return false;
 	}
-	
+
 	memcpy(m_awRawHeightMap, lpcvFileData, sizeof(WORD)*HEIGHTMAP_RAW_XSIZE*HEIGHTMAP_RAW_YSIZE);
-	
+
 	return true;
 }
 
@@ -116,7 +116,7 @@ bool CTerrainImpl::LoadAttrMap(const char *c_szFileName)
 			WORD m_wHeight;
 		};
 #pragma pack(pop)
-		
+
 		if (dwFileSize < sizeof(SAttrMapHeader))
 		{
 			TraceError(" CTerrainImpl::LoadAttrMap - %s FILE SIZE ERROR", c_szFileName);
@@ -154,35 +154,35 @@ bool CTerrainImpl::LoadAttrMap(const char *c_szFileName)
 		}
 
 		BYTE* abSrcAttrData= abFileData+sizeof(kAttrMapHeader);
-		memcpy(m_abyAttrMap, abSrcAttrData, sizeof(m_abyAttrMap));		
+		memcpy(m_abyAttrMap, abSrcAttrData, sizeof(m_abyAttrMap));
 	}
 
 	Tracef("%d\n", ELTimer_GetMSec() - dwStart);
 	return true;
 }
 
-bool CTerrainImpl::RAW_LoadTileMap(const char *c_szFileName)
+bool CTerrainImpl::RAW_LoadTileMap(const char * c_szFileName)
 {
 	Tracef("LoadSplatFile %s ", c_szFileName);
-	
+
 	CMappedFile	kMappedFile;
 	LPCVOID		lpcvFileData;
-	
+
 	if (!CEterPackManager::Instance().Get(kMappedFile, c_szFileName, &lpcvFileData))
 	{
 		Tracen("Error");
 		TraceError("CTerrainImpl::RAW_LoadTileMap - %s OPEN ERROR", c_szFileName);
 		return false;
 	}
-	
+
 	memcpy(m_abyTileMap, lpcvFileData, sizeof(BYTE)*(TILEMAP_RAW_XSIZE)*(TILEMAP_RAW_YSIZE));
-	
+
 	return true;
 
 }
 
-bool CTerrainImpl::LoadWaterMap(const char *c_szFileName)
-{	
+bool CTerrainImpl::LoadWaterMap(const char * c_szFileName)
+{
 	DWORD dwStart = ELTimer_GetMSec();
 
 	if (!LoadWaterMapFile(c_szFileName))
@@ -191,7 +191,7 @@ bool CTerrainImpl::LoadWaterMap(const char *c_szFileName)
 
 		m_byNumWater = 0;
 		memset(m_lWaterHeight, -1, sizeof(m_lWaterHeight));
-		
+
 		TraceError("CMapOutdoor::LoadWaterMap LoadWaterMapFile(%s) Failed", c_szFileName);
 
 		return false;
@@ -201,8 +201,8 @@ bool CTerrainImpl::LoadWaterMap(const char *c_szFileName)
 	return true;
 }
 
-bool CTerrainImpl::LoadWaterMapFile(const char *c_szFileName)
-{	
+bool CTerrainImpl::LoadWaterMapFile(const char * c_szFileName)
+{
 	CMappedFile	kMappedFile;
 	LPCVOID		lpcvFileData;
 
@@ -211,10 +211,10 @@ bool CTerrainImpl::LoadWaterMapFile(const char *c_szFileName)
 		Tracen("Error");
 		TraceError("CTerrainImpl::LoadWaterMap - %s OPEN ERROR", c_szFileName);
 		return false;
-	}	
+	}
 
 	DWORD	dwFileSize = kMappedFile.Size();
-	BYTE*	abFileData = (BYTE*)lpcvFileData;	
+	BYTE*	abFileData = (BYTE*)lpcvFileData;
 
 	{
 #pragma pack(push)
@@ -227,7 +227,7 @@ bool CTerrainImpl::LoadWaterMapFile(const char *c_szFileName)
 			BYTE m_byLayerCount;
 		};
 #pragma pack(pop)
-		
+
 		if (dwFileSize < sizeof(SWaterMapHeader))
 		{
 			TraceError("CTerrainImpl::LoadWaterMap - %s FILE SIZE ERROR", c_szFileName);
@@ -235,16 +235,16 @@ bool CTerrainImpl::LoadWaterMapFile(const char *c_szFileName)
 		}
 
 		SWaterMapHeader kWaterMapHeader;
-		memcpy(&kWaterMapHeader, abFileData, sizeof(kWaterMapHeader));		
+		memcpy(&kWaterMapHeader, abFileData, sizeof(kWaterMapHeader));
 
 		const WORD c_wWaterMapMagic = 5426;
-		
+
 		if (c_wWaterMapMagic != kWaterMapHeader.m_wMagic)
 		{
 			TraceError("CTerrainImpl::LoadWaterMap - %s MAGIC NUMBER(%d!=MAGIC[%d]) ERROR", c_szFileName, kWaterMapHeader.m_wMagic, c_wWaterMapMagic);
 			return false;
-		}	
-		
+		}
+
 		if (WATERMAP_XSIZE != kWaterMapHeader.m_wWidth)
 		{
 			TraceError("CTerrainImpl::LoadWaterMap - kWaterMapHeader(%s).m_width(%d)!=WATERMAP_XSIZE(%d)", c_szFileName, kWaterMapHeader.m_wWidth, WATERMAP_XSIZE);
@@ -265,9 +265,9 @@ bool CTerrainImpl::LoadWaterMapFile(const char *c_szFileName)
 		if (dwFileRestSize == dwFileNeedSize2)
 		{
 			WORD wWaterHeight[MAX_WATER_NUM + 1];
-			
+
 			BYTE * abSrcWaterData = abFileData + sizeof(kWaterMapHeader);
-			memcpy(m_abyWaterMap, abSrcWaterData, sizeof(m_abyWaterMap));	
+			memcpy(m_abyWaterMap, abSrcWaterData, sizeof(m_abyWaterMap));
 
 			BYTE * abSrcWaterHeight = abSrcWaterData + sizeof(m_abyWaterMap);
 
@@ -285,9 +285,9 @@ bool CTerrainImpl::LoadWaterMapFile(const char *c_szFileName)
 			TraceError("CTerrainImpl::LoadWaterMap - %s FILE DATA SIZE(rest %d != need %d) ERROR", c_szFileName, dwFileRestSize, dwFileNeedSize);
 			return false;
 		}
-	
+
 		BYTE * abSrcWaterData = abFileData + sizeof(kWaterMapHeader);
-		memcpy(m_abyWaterMap, abSrcWaterData, sizeof(m_abyWaterMap));	
+		memcpy(m_abyWaterMap, abSrcWaterData, sizeof(m_abyWaterMap));
 
 		BYTE * abSrcWaterHeight = abSrcWaterData + sizeof(m_abyWaterMap);
 

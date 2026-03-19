@@ -17,6 +17,7 @@ extern std::string g_strImagePath;
 #define GET_MOTION_INDEX(key) ((WORD)(((DWORD)(key) >> 8) & 0xFFFF))
 #define GET_MOTION_SUB_INDEX(key) ((BYTE)(((DWORD)(key)) & 0xFF))
 
+// Race Data
 namespace NRaceData
 {
 	enum EJobs
@@ -35,6 +36,7 @@ namespace NRaceData
 		SEX_MAX_NUM
 	};
 
+	// Character Attacking Data
 	enum EAttackType
 	{
 		ATTACK_TYPE_SPLASH,
@@ -107,7 +109,7 @@ namespace NRaceData
 		COLLISION_SHAPE_SPHERE,
 		COLLISION_SHAPE_CYLINDER,
 	};
-	
+
 	typedef struct SCollisionData
 	{
 		int					iCollisionType;
@@ -166,7 +168,7 @@ namespace NRaceData
 
 	typedef struct SAttachingData
 	{
-		SAttachingData() 
+		SAttachingData()
 			: dwType(0)
 			, isAttaching(false)
 			, dwAttachingModelIndex(0)

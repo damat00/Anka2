@@ -41,6 +41,7 @@ namespace quest
 			bool		InitializeLua();
 			lua_State *		GetLuaState() { return L; }
 			void		AddLuaFunctionTable(const char * c_pszName, luaL_reg * preg);
+			void		AddLuaFunctionSubTable(const char * c_pszName, const char * c_pszSubName, luaL_reg * preg);
 
 			TEventNameMap	m_mapEventName;
 
@@ -57,7 +58,10 @@ namespace quest
 			unsigned int	FindNPCIDByName(const string& name);
 
 			LPCHARACTER		GetCurrentNPCCharacterPtr();
-
+#ifdef ENABLE_MELEY_LAIR_DUNGEON
+			LPCHARACTER		GetCurrentNPCAttackCharacterPtr();
+			void		Attack(unsigned int pc, unsigned int npc);
+#endif
 			void		SetCurrentEventIndex(int index) { m_iRunningEventIndex = index; }
 
 			bool		UseItem(unsigned int pc, LPITEM item, bool bReceiveAll);
@@ -75,6 +79,7 @@ namespace quest
 			void		SetServerTimerArg(DWORD dwArg);
 			DWORD		GetServerTimerArg();
 
+			// event over state and stae
 			bool		ServerTimer(unsigned int npc, unsigned int arg);
 
 			void		Login(unsigned int pc, const char * c_pszQuestName = NULL);
@@ -89,13 +94,11 @@ namespace quest
 			bool		GiveItemToPC(unsigned int pc, LPCHARACTER pkChr);
 			void		Unmount(unsigned int pc);
 
-#ifdef ENABLE_EVENT_MANAGER
-			void		EventBegin(unsigned int pc);
-			void		EventEnd(unsigned int pc);
-			void		RequestEventQuest(const string& quest_name, unsigned int pc);
-#endif
-
+#ifdef ENABLE_COLLECT_WINDOW
+			void		QuestButton(unsigned int pc, unsigned int quest_index, BYTE buttonIndex);
+#else
 			void		QuestButton(unsigned int pc, unsigned int quest_index);
+#endif
 			void		QuestInfo(unsigned int pc, unsigned int quest_index);
 
 			void		EnterState(DWORD pc, DWORD quest_index, int state);
@@ -108,8 +111,10 @@ namespace quest
 
 			bool		CheckQuestLoaded(PC* pc) { return pc && pc->IsLoaded(); }
 
+			// event occurs in one state
 			void		Select(unsigned int pc, unsigned int selection);
 			void		Resume(unsigned int pc);
+
 			void		Input(unsigned int pc, const char* msg);
 			void		Confirm(unsigned int pc, EQuestConfirmType confirm, unsigned int pc2 = 0);
 			void		SelectItem(unsigned int pc, unsigned int selection);
@@ -204,7 +209,7 @@ namespace quest
 			PC*				m_pCurrentPC;
 
 			string			m_strScript;
-			bool 			m_bQuestInfoFlag;
+			bool			m_bQuestInfoFlag;
 
 			int				m_iCurrentSkin;
 
@@ -240,6 +245,8 @@ namespace quest
 			static bool ExecuteQuestScript(PC& pc, const string& quest_name, const int state, const char* code, const int code_size, vector<AArgScript*>* pChatScripts = NULL, bool bUseCache = true);
 			static bool ExecuteQuestScript(PC& pc, DWORD quest_index, const int state, const char* code, const int code_size, vector<AArgScript*>* pChatScripts = NULL, bool bUseCache = true);
 
+
+		// begin_other_pc_blcok, end_other_pc_block
 		public:
 			void		BeginOtherPCBlock(DWORD pid);
 			void		EndOtherPCBlock();
@@ -249,7 +256,10 @@ namespace quest
 		private:
 			PC*			m_pOtherPCBlockRootPC;
 			std::vector <DWORD>	m_vecPCStack;
-
+#ifdef ENABLE_SUNG_MAHI_TOWER
+		public:
+			LPEVENT		m_sung_mahi_reward_event;
+#endif
 #ifdef ENABLE_RENEWAL_QUEST
 		public:
 			std::map<WORD, unsigned int> QuestCategoryIndexMap;

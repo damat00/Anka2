@@ -5,7 +5,7 @@
 # ==============================================================================
 
 # >> DERLEYICI VE VERSIYON <<
-CC = ccache clang++-devel
+CC = clang++
 DB_VERSION = 40142
 
 # >> DOSYA SISTEMI YAPILANDIRMASI <<
@@ -25,7 +25,7 @@ DEPFILE = Depend
 endif
 
 # >> DERLEYICI BAYRAKLARI <<
-CFLAGS = -m32 -g -w -Ofast -pipe -fno-rtti -fno-exceptions -std=c++2a -static-libstdc++ -Wno-long-long -pthread -D_THREAD_SAFE
+CFLAGS = -m32 -g -w -Ofast -pipe -fno-rtti -fno-exceptions -std=c++14 -static-libstdc++ -Wno-long-long -pthread -D_THREAD_SAFE
 
 # >> VERSIYON VE SISTEM BILGISI <<
 CFLAGS += -D__USER__=\"$(USER)\" -D__HOSTNAME__=\"$(HOSTNAME)\" -D__PWD__=\"$(PWD)\" -D__DB_VERSION__=\"$(DB_VERSION)\"
@@ -38,7 +38,7 @@ LIBS += -lssl -lcrypto
 
 # MySQL Veritabani
 INCDIR += -I/usr/local/include/mysql
-LIBS += /usr/local/lib/mysql/libmysqlclient.a /usr/lib/libz.a
+LIBS += -L/usr/local/lib/mysql -lmariadbclient -lz
 
 # >> PROJE KUTUPHANELERI <<
 INCDIR += -I/usr/local/include
@@ -132,17 +132,17 @@ help:
 	@echo -e "${BOLD}${WHITE}AYARLAR:${RESET}"
 	@echo -e "  ${YELLOW}Derleyici:${RESET} $(CC)"
 	@echo -e "  ${YELLOW}DB Versiyon:${RESET} $(DB_VERSION)"
-	@echo -e "  ${YELLOW}C++ Standard:${RESET} C++2a"
-	@echo -e "  ${YELLOW}Mimari:${RESET} 32-bit"
+	@echo -e "  ${YELLOW}C++ Standard:${RESET} C++14"
+	@echo -e "  ${YELLOW}Mimari:${RESET} 64-bit"
 	@echo -e "  ${YELLOW}Cikti Dizini:${RESET} $(DBDIR)"
 	@echo -e "  ${YELLOW}Kaynak Dosya:${RESET} $(words $(CPPFILE)) adet"
 	@echo -e ""
 	@echo -e "${BOLD}${WHITE}OZELLIKLER:${RESET}"
-	@echo -e "  ${GREEN}✓${RESET} MySQL veritabani destegi"
-	@echo -e "  ${GREEN}✓${RESET} OpenSSL sifreleme"
-	@echo -e "  ${GREEN}✓${RESET} Cache ve buffer yonetimi"
-	@echo -e "  ${GREEN}✓${RESET} Client yonetimi"
-	@echo -e "  ${GREEN}✓${RESET} Guild sistemleri"
+	@echo -e "  ${GREEN}?${RESET} MySQL veritabani destegi"
+	@echo -e "  ${GREEN}?${RESET} OpenSSL sifreleme"
+	@echo -e "  ${GREEN}?${RESET} Cache ve buffer yonetimi"
+	@echo -e "  ${GREEN}?${RESET} Client yonetimi"
+	@echo -e "  ${GREEN}?${RESET} Guild sistemleri"
 
 # >> OTOMATIK BAGIMLILIK KONTROLU <<
 ifeq ($(ENABLE_GCC_AUTODEPEND), 1)

@@ -21,7 +21,7 @@ class CSoundManager3D : public CSoundBase
 		void				Destroy();
 
 		int					GetEmptyInstanceIndex();
-		int					SetInstance(const char *c_szFileName);
+		int					SetInstance(const char * c_szFileName);
 		ISoundInstance *	GetInstance(DWORD dwIndex);
 
 		void				SetListenerDirection(float fxDir, float fyDir, float fzDir, float fxUp, float fyUp, float fzUp);

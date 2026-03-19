@@ -1,4 +1,4 @@
-/* Copyright (C) John W. Ratcliff, 2001. 
+/* Copyright (C) John W. Ratcliff, 2001.
 * All rights reserved worldwide.
 *
 * This software is provided "as is" without express or implied
@@ -27,7 +27,7 @@
 
 enum SpherePackFlag
 {
-	
+
 	SPF_SUPERSPHERE =(1<<0), // this is a supersphere, allocated and deleted by us
 		SPF_ROOT_TREE   =(1<<1), // member of the root tree
 		SPF_LEAF_TREE   =(1<<2), // member of the leaf node tree
@@ -59,14 +59,14 @@ public:
 		SpherePack *sphere, // leaf node sphere in question
 		ViewState state) // new state it is in.
 	{};
-	
+
 	virtual void RayTraceCallback(const Vector3d &p1,   // source pos of ray
 		const Vector3d &dir,  // direction of ray
 		float distance,              // distance of ray
 		const Vector3d &sect, // intersection location
 		SpherePack *sphere)          // sphere ray hit
 	{};
-	
+
 	virtual void RangeTestCallback(const Vector3d &searchpos, // position we are performing range test against.
 		float distance,                     // squared distance we are range searching against.
 		SpherePack *sphere,
@@ -77,7 +77,7 @@ public:
 		SpherePack *sphere,
 		ViewState state) // sphere within range, VS_PARTIAL if sphere straddles range test
 	{};
-	
+
 private:
 };
 
@@ -87,7 +87,7 @@ class SpherePack : public Sphere
 {
 public:
 	SpherePack(void)
-	{		
+	{
 		mUserData         = 0; // default user data is null
 		mFactory          = 0; // factory we are a member of
 		mNext             = 0; // linked list pointers
@@ -106,7 +106,7 @@ public:
 	virtual ~SpherePack()
 	{
 	}
-	
+
 	void Init(SpherePackFactory *factory, // factory we belong to
 		const Vector3d &pos, // center of sphere
 		float radius,               // radius of sphere
@@ -124,7 +124,7 @@ public:
 		mCenter           = pos;
 		SetRadius(radius);
 	};
-	
+
 	// Access to SpherePack bit flags.
 	void SetSpherePackFlag(SpherePackFlag flag) { mFlags|=flag; };
 	void ClearSpherePackFlag(SpherePackFlag flag) { mFlags&=~flag; };
@@ -133,16 +133,16 @@ public:
 		if ( mFlags & flag ) return true;
 		return false;
 	};
-	
-	
+
+
 	void SetParent(SpherePack *pack) { mParent = pack; };
 	SpherePack * GetParent(void) const { return mParent; };
-	
+
 	// Sphere has a new position.
 	inline void NewPos(const Vector3d &pos);
 	// Sphere has a new position and radius
 	inline void NewPosRadius(const Vector3d &pos,float radius);
-	
+
 	void Unlink(void)
 	{
 		if ( mFifo1 ) // if we belong to fifo1, null us out
@@ -150,92 +150,92 @@ public:
 			*mFifo1 = 0;
 			mFifo1 = 0;
 		}
-		
+
 		if ( mFifo2 ) // if we belong to fifo2, null us out
 		{
 			*mFifo2 = 0;
 			mFifo2 = 0;
 		}
-		
+
 		if ( mParent ) mParent->LostChild(this);
-		
+
 		assert( !mChildren ); // can't unlink guys with children!
-		
+
 		mParent = 0; // got no father anymore
 	}
-	
-	
+
+
 	void AddChild(SpherePack *pack)
 	{
-		
+
 		SpherePack *my_child = mChildren;
 		mChildren = pack; // new head of list
-		
+
 		pack->SetNextSibling(my_child); // his next is my old next
 		pack->SetPrevSibling(0); // at head of list, no previous
 		pack->SetParent(this);
-		
+
 		if ( my_child ) my_child->SetPrevSibling(pack); // previous now this..
-		
+
 		mChildCount++;
 
 #if defined(_DEBUG)
 		float dist = DistanceSquared(pack);
 		float radius = sqrtf(dist) + pack->GetRadius();
-		
+
 		assert( radius <= GetRadius()+0.0001f );
 #endif
 	}
-	
+
 	void SetNextSibling(SpherePack *child) { mNextSibling = child; }
 	void SetPrevSibling(SpherePack *child) { mPrevSibling = child; }
-	
-	SpherePack * _GetNextSibling(void) const 
-	{ 
-		return mNextSibling; 
+
+	SpherePack * _GetNextSibling(void) const
+	{
+		return mNextSibling;
 	}
-	SpherePack * _GetPrevSibling(void) const 
-	{ 
-		return mPrevSibling; 
+	SpherePack * _GetPrevSibling(void) const
+	{
+		return mPrevSibling;
 	}
 	SpherePack * GetChildren(void)    const { return mChildren; }
-	
+
 	SpherePack * GetNext(void)     const { return mNext; };
 	SpherePack * GetPrevious(void) const { return mPrevious; };
-	
+
 	void SetNext(SpherePack *pack) { mNext = pack; };
 	void SetPrevious(SpherePack *pack) { mPrevious = pack; };
-	
+
 	void * GetUserData(void) const { return mUserData; };
 	void   SetUserData(void *data, bool isSphere) { mUserData = data; IS_SPHERE=isSphere;};
-	
+
 	float DistanceSquared(const SpherePack *pack) const { return mCenter.DistanceSq( pack->mCenter );  };
-	
+
 	void LostChild(SpherePack *pack);
-	
+
 	const Vector3d& GetPos(void) const { return mCenter; };
-	
+
 	inline void Render(unsigned int color);
-	
+
 	inline bool Recompute(float gravy);
-	
+
 	int GetChildCount(void) const { return mChildCount; };
-	
+
 #if DEMO
 	void SetColor(unsigned int color) { mColor = color; };
 	unsigned int GetColor(void) const { return mColor; };
 #endif
-	
+
 	void SetFifo1(SpherePack **fifo)
 	{
 		mFifo1 = fifo;
 	};
-	
+
 	void SetFifo2(SpherePack **fifo)
 	{
 		mFifo2 = fifo;
 	};
-	
+
 	void ComputeBindingDistance(SpherePack *parent)
 	{
 		mBindingDistance = parent->GetRadius() - GetRadius();
@@ -244,48 +244,48 @@ public:
 		else
 			mBindingDistance*=mBindingDistance;
 	}
-	
+
 	void VisibilityTest(const Frustum &f,
 		SpherePackCallback *callback,
 		ViewState state);
-	
+
 	void RayTrace(const Vector3d &p1,           // origin of Ray
 		const Vector3d &dir,          // direction of Ray
 		float distance,                      // length of ray.
 		SpherePackCallback *callback);
-	
-	
+
+
 	void RangeTest(const Vector3d &p,
 		float distance,
 		SpherePackCallback *callback,
 		ViewState state);
-	
+
 	void PointTest2d(const Vector3d &p,
 		SpherePackCallback *callback,
 		ViewState state);
 
 	void Reset(void);
-	
+
 private:
 	SpherePack       *mNext;
 	SpherePack       *mPrevious; // used by pool memory management linked list code
-	
+
 	SpherePack       *mParent;
 	SpherePack       *mChildren;  // *my* children
-	
+
 	SpherePack       *mNextSibling; // doubly linked list of my brothers
 	SpherePack       *mPrevSibling; // and sisters
-	
+
 	SpherePack      **mFifo1; // address of location inside of fifo1
 	SpherePack      **mFifo2; // address of location inside of fifo2
-	
+
 	long               mFlags; // my bit flags.
 	long               mChildCount; // number of children
-	
+
 	float             mBindingDistance;
-	
+
 	void             *mUserData;
-	
+
 	SpherePackFactory *mFactory; // the factory we are a member of.
 #if DEMO
 	unsigned long      mColor;
@@ -306,12 +306,12 @@ public:
 		mFifoSize = fifosize;
 		mFifo = new SpherePack *[mFifoSize];
 	};
-	
+
 	virtual ~SpherePackFifo(void)
 	{
 		delete [] mFifo;
 	};
-	
+
 	SpherePack ** Push(SpherePack *sphere)
 	{
 		mCount++;
@@ -321,7 +321,7 @@ public:
 		if ( mSP == mFifoSize ) mSP = 0;
 		return ret;
 	};
-	
+
 	SpherePack * Pop(void)
 	{
 		while ( mSP != mBottom )
@@ -334,7 +334,7 @@ public:
 		}
 		return 0;
 	}
-	
+
 	bool Flush(SpherePack *pack)
 	{
 		if ( mSP == mBottom ) return false;
@@ -351,9 +351,9 @@ public:
 		}
 		return false;
 	};
-	
+
 	int GetCount(void) const { return mCount; };
-	
+
 private:
 	int         mCount;
 	int         mSP; // stack pointer
@@ -366,78 +366,78 @@ private:
 class SpherePackFactory : public SpherePackCallback
 {
 public:
-	
+
 	SpherePackFactory(int maxspheres,
 		float rootsize,
 		float leafsize,
 		float gravy);
-	
-	
+
+
 	virtual ~SpherePackFactory(void);
-	
+
 	void Process(void);
-	
+
 	SpherePack *AddSphere_(const Vector3d &pos,
 		float radius,
 		void *userdata,
 		bool isSphere,
 		int flags=SPF_LEAF_TREE);
-	
+
 	void AddIntegrate(SpherePack *pack);          // add to the integration FIFO
 	void AddRecompute(SpherePack *recompute);     // add to the recomputation (balancing) FIFO.
-	
+
 	void Integrate(SpherePack *pack,SpherePack *supersphere,float node_size);
-	
+
 	void Render(void);
-	
+
 	void Remove(SpherePack *pack);
 	// see if any other spheres are contained within this one, if so
 	// collapse them and inherit their children.
 #if DEMO
 	unsigned int GetColor(void);
 #endif
-	
+
 	void FrustumTest(const Frustum &f,SpherePackCallback *callback);
-	
+
 	void RayTrace(const Vector3d &p1,           // source
 		const Vector3d &p2,           // dest
 		SpherePackCallback *callback);
-	
+
 	void RangeTest(const Vector3d &center,float radius,SpherePackCallback *callback);
 	void PointTest2d(const Vector3d &center, SpherePackCallback *callback);
-	
+
 	virtual void RayTraceCallback(const Vector3d &p1,          // source pos of ray
 		const Vector3d &dir,          // direction of ray
 		float distance,                      // distance of ray
 		const Vector3d &sect,          // intersection location
 		SpherePack *sphere);
-	
+
 	virtual void RangeTestCallback(const Vector3d &p,float distance,SpherePack *sphere,ViewState state);
 	virtual void PointTest2dCallback(const Vector3d &p, SpherePack *sphere,ViewState state);
-	
+
 	virtual void VisibilityCallback(const Frustum &f,SpherePack *sphere,ViewState state);
-	
-	
+
+
 	void Reset(void);
-	
+
 private:
-	
-	
+
+
 	SpherePack        *mRoot;     // 1024x1024 root node of all active spheres.
 	SpherePack        *mLeaf;     // 1024x1024 root node of all active spheres.
 	SpherePackCallback *mCallback;
-	
+
 	Pool< SpherePack > mSpheres;  // all spheres possibly represented.
-	
+
 	SpherePackFifo    *mIntegrate; // integration fifo
 	SpherePackFifo    *mRecompute; // recomputation fifo
-	
+
 #if DEMO
 #define MAXCOLORS 12
 	int               mColorCount;
 	unsigned int      mColors[MAXCOLORS];
 #endif
-	
+
 	float             mMaxRootSize;              // maximum size of a root node supersphere
 	float             mMaxLeafSize;              // maximum size of the leaf node supersphere
 	float             mSuperSphereGravy;         // binding distance gravy.
@@ -447,12 +447,12 @@ private:
 void SpherePack::NewPos(const Vector3d &pos)
 {
 	mCenter = pos;    // set our new center position.
-	
-	// is we have a parent (meaning we are a valid leaf node) and we have not already been flagged for re-integration, then.....	
+
+	// is we have a parent (meaning we are a valid leaf node) and we have not already been flagged for re-integration, then.....
 	if (mParent && !HasSpherePackFlag(SPF_INTEGRATE))
-	{	
+	{
 		float dist = DistanceSquared(mParent);  // compute squared distance to our parent.
-		
+
 		if (dist >= mBindingDistance) // if that exceeds our binding distance...
 		{
 			// If our parent, is not already marked to be recomputed (rebalance the sphere), then add him to the recomputation fifo.
@@ -463,14 +463,14 @@ void SpherePack::NewPos(const Vector3d &pos)
 			mFactory->AddIntegrate(this); // add ourselves to the re-integration fifo.
 		}
 	}
-	
+
 }
 
 void SpherePack::NewPosRadius(const Vector3d &pos,float radius)
 {
 	// New position and, possibly, a new radius.
 	mCenter = pos;
-	
+
 	if (mParent && !HasSpherePackFlag(SPF_INTEGRATE))
 	{
 		if (radius != GetRadius())
@@ -478,11 +478,11 @@ void SpherePack::NewPosRadius(const Vector3d &pos,float radius)
 			SetRadius(radius);
 			ComputeBindingDistance(mParent);
 		}
-		
+
 		mFactory->AddRecompute(mParent);
 
 		float dist = DistanceSquared(mParent);
-	
+
 		if (dist >= mBindingDistance)
 		{
 			Unlink();

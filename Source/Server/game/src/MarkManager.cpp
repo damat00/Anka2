@@ -129,7 +129,7 @@ CGuildMarkImage * CGuildMarkManager::__GetImage(DWORD imgIdx)
 		{
 			CGuildMarkImage * pkImage = __NewImage();
 			m_mapIdx_Image.insert(std::map<DWORD, CGuildMarkImage *>::value_type(imgIdx, pkImage));
-			
+
 			if (!pkImage->Load(imagePath.c_str()))
 			{
 				pkImage->Build(imagePath.c_str());
@@ -193,17 +193,19 @@ DWORD CGuildMarkManager::GetMarkCount() const
 	return m_mapGID_MarkID.size();
 }
 
+// SERVER
 void CGuildMarkManager::CopyMarkIdx(char * pcBuf) const
 {
 	WORD * pwBuf = (WORD *) pcBuf;
 
 	for (std::map<DWORD, DWORD>::const_iterator it = m_mapGID_MarkID.begin(); it != m_mapGID_MarkID.end(); ++it)
 	{
-		*(pwBuf++) = it->first;
-		*(pwBuf++) = it->second;
+		*(pwBuf++) = it->first; // guild id
+		*(pwBuf++) = it->second; // mark id
 	}
 }
 
+// SERVER
 DWORD CGuildMarkManager::SaveMark(DWORD guildID, BYTE * pbMarkImage)
 {
 	DWORD idMark;
@@ -235,6 +237,7 @@ DWORD CGuildMarkManager::SaveMark(DWORD guildID, BYTE * pbMarkImage)
 	return idMark;
 }
 
+// SERVER
 void CGuildMarkManager::DeleteMark(DWORD guildID)
 {
 	std::map<DWORD, DWORD>::iterator it = m_mapGID_MarkID.find(guildID);
@@ -253,6 +256,7 @@ void CGuildMarkManager::DeleteMark(DWORD guildID)
 	SaveMarkIndex();
 }
 
+// SERVER
 void CGuildMarkManager::GetDiffBlocks(DWORD imgIdx, const DWORD * crcList, std::map<BYTE, const SGuildMarkBlock *> & mapDiffBlocks)
 {
 	mapDiffBlocks.clear();
@@ -269,6 +273,7 @@ void CGuildMarkManager::GetDiffBlocks(DWORD imgIdx, const DWORD * crcList, std::
 		p->GetDiffBlocks(crcList, mapDiffBlocks);
 }
 
+// CLIENT
 bool CGuildMarkManager::SaveBlockFromCompressedData(DWORD imgIdx, DWORD posBlock, const BYTE * pbBlock, DWORD dwSize)
 {
 	CGuildMarkImage * pkImage = __GetImage(imgIdx);
@@ -279,6 +284,7 @@ bool CGuildMarkManager::SaveBlockFromCompressedData(DWORD imgIdx, DWORD posBlock
 	return false;
 }
 
+// CLIENT
 bool CGuildMarkManager::GetBlockCRCList(DWORD imgIdx, DWORD * crcList)
 {
 	if (m_mapIdx_Image.end() == m_mapIdx_Image.find(imgIdx))
@@ -288,13 +294,16 @@ bool CGuildMarkManager::GetBlockCRCList(DWORD imgIdx, DWORD * crcList)
 	}
 
 	CGuildMarkImage * p = __GetImage(imgIdx);
-	
+
 	if (p)
 		p->GetBlockCRCList(crcList);
 
 	return true;
 }
 
+///////////////////////////////////////////////////////////////////////////////////////
+// Symbol
+///////////////////////////////////////////////////////////////////////////////////////
 const CGuildMarkManager::TGuildSymbol * CGuildMarkManager::GetGuildSymbol(DWORD guildID)
 {
 	std::map<DWORD, TGuildSymbol>::iterator it = m_mapSymbol.find(guildID);
@@ -362,7 +371,7 @@ void CGuildMarkManager::SaveSymbol(const char* filename)
 void CGuildMarkManager::UploadSymbol(DWORD guildID, int iSize, const BYTE* pbyData)
 {
 	sys_log(0, "GuildSymbolUpload guildID %u Size %d", guildID, iSize);
-	
+
 	if (m_mapSymbol.find(guildID) == m_mapSymbol.end())
 		m_mapSymbol.insert(std::make_pair(guildID, TGuildSymbol()));
 
@@ -420,7 +429,7 @@ int main(int argc, char **argv)
 
 	srandomdev();
 
-	ilInit();
+	ilInit(); // DevIL Initialize
 	thecore_init(25, heartbeat);
 
 	mgr.SetMarkPathPrefix("mark");
@@ -430,7 +439,10 @@ int main(int argc, char **argv)
 	{
 		snprintf(f, sizeof(f), "%u.jpg", (random() % 5) + 1);
 		SaveMark(i, f);
+		//mgr.DeleteMark(i);
 	}
+	//snprintf(f, sizeof(f), "%u.jpg", (random() % 5) + 1);
+	//SaveMark(1, f);
 
 	DWORD idx_client[CGuildMarkImage::BLOCK_TOTAL_COUNT];
 	DWORD idx_server[CGuildMarkImage::BLOCK_TOTAL_COUNT];

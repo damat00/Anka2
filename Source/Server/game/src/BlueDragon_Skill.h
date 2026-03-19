@@ -10,9 +10,9 @@ struct FSkillBreath
 	{
 		pAttacker = p;
 
-		Set1 = static_cast<EJobs>(number(0,3));
-		Set2 = static_cast<EJobs>(number(0,3));
-		gender = static_cast<ESex>(number(0,2));
+		Set1 = static_cast<EJobs>(number(0, 3));
+		Set2 = static_cast<EJobs>(number(0, 3));
+		gender = static_cast<ESex>(number(0, 2));
 	}
 
 	void operator()(LPENTITY ent)
@@ -41,19 +41,22 @@ struct FSkillBreath
 					{
 						const char* ptr = NULL;
 
-						switch ( Set1 )
+						switch (Set1)
 						{
 							case JOB_WARRIOR:	ptr = "musa";	break;
 							case JOB_ASSASSIN:	ptr = "assa";	break;
 							case JOB_SURA:		ptr = "sura";	break;
 							case JOB_SHAMAN:	ptr = "muda";	break;
+#ifdef ENABLE_WOLFMAN_CHARACTER
+							case JOB_WOLFMAN:	ptr = "wolf";	break;
+#endif
 
 							default:
 							case JOB_MAX_NUM:	return;
 						}
 
+						int firstDamagePercent = number(BlueDragon_GetSkillFactor(4, "Skill0", "damage", ptr, "min"), BlueDragon_GetSkillFactor(4, "Skill0", "damage", ptr, "max"));
 
-						int firstDamagePercent =  number(BlueDragon_GetSkillFactor(4, "Skill0", "damage", ptr, "min"), BlueDragon_GetSkillFactor(4, "Skill0", "damage", ptr, "max"));
 						pct += firstDamagePercent;
 
 						if (firstDamagePercent > 0)
@@ -64,18 +67,22 @@ struct FSkillBreath
 					{
 						const char* ptr = NULL;
 
-						switch ( Set2 )
+						switch (Set2)
 						{
 							case JOB_WARRIOR:	ptr = "musa";	break;
 							case JOB_ASSASSIN:	ptr = "assa";	break;
 							case JOB_SURA:		ptr = "sura";	break;
 							case JOB_SHAMAN:	ptr = "muda";	break;
+#ifdef ENABLE_WOLFMAN_CHARACTER
+							case JOB_WOLFMAN:	ptr = "wolf";	break;
+#endif
 
 							default:
 							case JOB_MAX_NUM:	return;
 						}
 
 						int secondDamagePercent = number(BlueDragon_GetSkillFactor(4, "Skill0", "damage", ptr, "min"), BlueDragon_GetSkillFactor(4, "Skill0", "damage", ptr, "max"));
+
 						pct += secondDamagePercent;
 
 						if (secondDamagePercent > 0)
@@ -122,7 +129,7 @@ struct FSkillBreath
 					dam += (dam * addPct) / 100;
 					dam += (ch->GetMaxHP() * pct) / 100;
 
-					ch->Damage( pAttacker, dam, DAMAGE_TYPE_ICE );
+					ch->Damage(pAttacker, dam, DAMAGE_TYPE_ICE);
 
 					sys_log(0, "BlueDragon: Breath to %s pct(%d) dam(%d) overlap(%d)", ch->GetName(), pct, dam, overlapDamageCount);
 				}
@@ -153,18 +160,18 @@ struct FSkillWeakBreath
 					if (NULL != ch->FindAffect(AFFECT_REVIVE_INVISIBLE, APPLY_NONE))
 						return;
 
-					if ((signed)BlueDragon_GetSkillFactor(2, "Skill1", "damage_area") < DISTANCE_APPROX(pAttacker->GetX()-ch->GetX(), pAttacker->GetY()-ch->GetY()))
+					if ((signed)BlueDragon_GetSkillFactor(2, "Skill1", "damage_area") < DISTANCE_APPROX(pAttacker->GetX() - ch->GetX(), pAttacker->GetY() - ch->GetY()))
 					{
-						sys_log(0, "BlueDragon: Breath too far (%d)", DISTANCE_APPROX(pAttacker->GetX()-ch->GetX(), pAttacker->GetY()-ch->GetY()) );
+						sys_log(0, "BlueDragon: Breath too far (%d)", DISTANCE_APPROX(pAttacker->GetX() - ch->GetX(), pAttacker->GetY() - ch->GetY()));
 						return;
 					}
 
 					int addPct = BlueDragon_GetRangeFactor("hp_damage", pAttacker->GetHPPct());
+					int dam = number(BlueDragon_GetSkillFactor(3, "Skill1", "default_damage", "min"), BlueDragon_GetSkillFactor(3, "Skill1", "default_damage", "max"));
 
-					int dam = number( BlueDragon_GetSkillFactor(3, "Skill1", "default_damage", "min"), BlueDragon_GetSkillFactor(3, "Skill1", "default_damage", "max") );
 					dam += (dam * addPct) / 100;
 
-					ch->Damage( pAttacker, dam, DAMAGE_TYPE_ICE );
+					ch->Damage(pAttacker, dam, DAMAGE_TYPE_ICE);
 
 					sys_log(0, "BlueDragon: WeakBreath to %s addPct(%d) dam(%d)", ch->GetName(), addPct, dam);
 				}
@@ -189,9 +196,9 @@ struct FSkillEarthQuake
 		MaxDistance = 0;
 		pFarthestChar = NULL;
 
-		Set1 = static_cast<EJobs>(number(0,3));
-		Set2 = static_cast<EJobs>(number(0,3));
-		gender = static_cast<ESex>(number(0,2));
+		Set1 = static_cast<EJobs>(number(0, 3));
+		Set2 = static_cast<EJobs>(number(0, 3));
+		gender = static_cast<ESex>(number(0, 2));
 	}
 
 	void operator()(LPENTITY ent)
@@ -207,9 +214,9 @@ struct FSkillEarthQuake
 					if (NULL != ch->FindAffect(AFFECT_REVIVE_INVISIBLE, APPLY_NONE))
 						return;
 
-					if ((signed)BlueDragon_GetSkillFactor(2, "Skill2", "damage_area") < DISTANCE_APPROX(pAttacker->GetX()-ch->GetX(), pAttacker->GetY()-ch->GetY()))
+					if ((signed)BlueDragon_GetSkillFactor(2, "Skill2", "damage_area") < DISTANCE_APPROX(pAttacker->GetX() - ch->GetX(), pAttacker->GetY() - ch->GetY()))
 					{
-						sys_log(0, "BlueDragon: Breath too far (%d)", DISTANCE_APPROX(pAttacker->GetX()-ch->GetX(), pAttacker->GetY()-ch->GetY()) );
+						sys_log(0, "BlueDragon: Breath too far (%d)", DISTANCE_APPROX(pAttacker->GetX() - ch->GetX(), pAttacker->GetY() - ch->GetY()));
 						return;
 					}
 
@@ -219,12 +226,15 @@ struct FSkillEarthQuake
 					{
 						const char* ptr = NULL;
 
-						switch ( Set1 )
+						switch (Set1)
 						{
 							case JOB_WARRIOR:	ptr = "musa";	break;
 							case JOB_ASSASSIN:	ptr = "assa";	break;
 							case JOB_SURA:		ptr = "sura";	break;
 							case JOB_SHAMAN:	ptr = "muda";	break;
+#ifdef ENABLE_WOLFMAN_CHARACTER
+							case JOB_WOLFMAN:	ptr = "wolf";	break;
+#endif
 
 							default:
 							case JOB_MAX_NUM:	return;
@@ -237,12 +247,15 @@ struct FSkillEarthQuake
 					{
 						const char* ptr = NULL;
 
-						switch ( Set2 )
+						switch (Set2)
 						{
 							case JOB_WARRIOR:	ptr = "musa";	break;
 							case JOB_ASSASSIN:	ptr = "assa";	break;
 							case JOB_SURA:		ptr = "sura";	break;
 							case JOB_SHAMAN:	ptr = "muda";	break;
+#ifdef ENABLE_WOLFMAN_CHARACTER
+							case JOB_WOLFMAN:	ptr = "wolf";	break;
+#endif
 
 							default:
 							case JOB_MAX_NUM:	return;
@@ -266,37 +279,36 @@ struct FSkillEarthQuake
 					}
 
 					int addPct = BlueDragon_GetRangeFactor("hp_damage", pAttacker->GetHPPct());
+					int dam = number(BlueDragon_GetSkillFactor(3, "Skill2", "default_damage", "min"), BlueDragon_GetSkillFactor(3, "Skill2", "default_damage", "max"));
 
-					int dam = number( BlueDragon_GetSkillFactor(3, "Skill2", "default_damage", "min"), BlueDragon_GetSkillFactor(3, "Skill2", "default_damage", "max") );
 					dam += (dam * addPct) / 100;
 
-					ch->Damage( pAttacker, dam, DAMAGE_TYPE_ICE);
+					ch->Damage(pAttacker, dam, DAMAGE_TYPE_ICE);
 
-					SkillAttackAffect( ch, 1000, IMMUNE_STUN, AFFECT_STUN, POINT_NONE, 0, AFF_STUN, sec, "BDRAGON_STUN" );
+					SkillAttackAffect(ch, 1000, IMMUNE_STUN, AFFECT_STUN, POINT_NONE, 0, AFF_STUN, sec, "BDRAGON_STUN");
 
 					sys_log(0, "BlueDragon: EarthQuake to %s addPct(%d) dam(%d) sec(%d)", ch->GetName(), addPct, dam, sec);
-
 
 					VECTOR vec;
 					vec.x = static_cast<float>(pAttacker->GetX() - ch->GetX());
 					vec.y = static_cast<float>(pAttacker->GetY() - ch->GetY());
 					vec.z = 0.0f;
 
-					Normalize( &vec, &vec );
+					Normalize(&vec, &vec);
 
 					const int nFlyDistance = 1000;
 
 					long tx = ch->GetX() + vec.x * nFlyDistance;
 					long ty = ch->GetY() + vec.y * nFlyDistance;
 
-					for (int i=0 ; i < 5 ; ++i)
+					for (int i = 0; i < 5; ++i)
 					{
-						if (true == SECTREE_MANAGER::instance().IsMovablePosition( ch->GetMapIndex(), tx, ty ))
+						if (true == SECTREE_MANAGER::instance().IsMovablePosition(ch->GetMapIndex(), tx, ty))
 						{
 							break;
 						}
 
-						switch( i )
+						switch (i)
 						{
 							case 0:
 								tx = ch->GetX() + vec.x * nFlyDistance * -1;
@@ -311,23 +323,23 @@ struct FSkillEarthQuake
 								ty = ch->GetY() + vec.y * nFlyDistance * -1;
 								break;
 							case 3:
-								tx = ch->GetX() + vec.x * number(1,100);
-								ty = ch->GetY() + vec.y * number(1,100);
+								tx = ch->GetX() + vec.x * number(1, 100);
+								ty = ch->GetY() + vec.y * number(1, 100);
 								break;
 							case 4:
-								tx = ch->GetX() + vec.x * number(1,10);
-								ty = ch->GetY() + vec.y * number(1,10);
+								tx = ch->GetX() + vec.x * number(1, 10);
+								ty = ch->GetY() + vec.y * number(1, 10);
 								break;
 						}
 					}
 
-					ch->Sync( tx , ty );
-					ch->Goto( tx , ty );
+					ch->Sync(tx, ty);
+					ch->Goto(tx, ty);
 					ch->CalculateMoveDuration();
 
 					ch->SyncPacket();
 
-					long dist = DISTANCE_APPROX( pAttacker->GetX() - ch->GetX(), pAttacker->GetY() - ch->GetY() );
+					long dist = DISTANCE_APPROX(pAttacker->GetX() - ch->GetX(), pAttacker->GetY() - ch->GetY());
 
 					if (dist > MaxDistance)
 					{

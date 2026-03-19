@@ -1,4 +1,4 @@
-CC	= clang++-devel
+CC	= clang++
 BIN_DIR = ../lib
 BIN     = $(BIN_DIR)/libthecore.a
 INCLUDE = ../include
@@ -6,7 +6,7 @@ INCLUDE = ../include
 GCC_VERSION = $(shell $(CC) --version 2>&1 | grep "(GCC)" | cut -d' ' -f3  | cut -d'.' -f1)
 
 CFLAGS  = -m32 -Wall -w -O2 -pipe -g -I$(INCLUDE)
-CFLAGS += -std=c++2a
+CFLAGS += -std=c++14
 
 LIBS    = 
 
@@ -25,15 +25,16 @@ $(BIN): $(OBJFILES)
 clean:
 	rm -f *.o
 	rm -f $(BIN)
+	rm -f Depend
 
 dep:
 	$(CC) $(CFLAGS) -MM *.c > Depend
 
-$(OBJFILES):
-	$(CC) $(CFLAGS) -c $<
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 memcpy: memcpy.o utils.o log.o
 	$(CC) $(CFLAGS) -c -D__MAIN__ memcpy.c
 	$(CC) $(CFLAGS) -o memcpy memcpy.o utils.o log.o
 
-include Depend
+sinclude Depend

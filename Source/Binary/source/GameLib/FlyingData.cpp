@@ -24,7 +24,7 @@ void CFlyingData::__Initialize()
 	m_fGravity = 0;
 	m_bSpreading = false;
 	m_bMaintainParallel = false;
-	
+
 	m_bHitOnBackground = false;
 	m_bHitOnAnotherMonster = false;
 	m_iPierceCount = 0;
@@ -100,7 +100,7 @@ DWORD CFlyingData::AttachFlyEffect(int iType, const std::string & strFilename, f
 		// Do nothing
 		break;
 	}
-	
+
 	m_AttachDataVector.push_back(fad);
 	return m_AttachDataVector.size()-1;
 }
@@ -131,7 +131,7 @@ bool CFlyingData::LoadScriptFile(const char *c_szFilename)
 	StringPath(m_strFilename);
 	CTextFileLoader TextFileLoader;
 	if (!TextFileLoader.Load(m_strFilename.c_str()))
-		return false;	
+		return false;
 
 	TextFileLoader.SetTop();
 	int temp;
@@ -229,7 +229,7 @@ bool CFlyingData::LoadScriptFile(const char *c_szFilename)
 		CTextFileLoader::CGotoChild GotoChild(&TextFileLoader, i);
 
 		std::string strNodeName;
-		
+
 		TextFileLoader.GetCurrentNodeName(&strNodeName);
 
 		if (strNodeName=="attachdata")
@@ -300,7 +300,7 @@ bool CFlyingData::SaveScriptFile(const char *c_szFilename)
 	PrintfTabs(fp, 0, "HitOnAnotherMonster     %d\n",m_bHitOnAnotherMonster?1:0);
 	PrintfTabs(fp, 0, "PierceCount             %d\n",m_iPierceCount);
 	PrintfTabs(fp, 0, "CollisionSphereRadius   %f\n",m_fCollisionSphereRadius);
-	
+
 	PrintfTabs(fp, 0, "BombRange               %f\n", m_fBombRange);
 
 	std::string strGlobalPathName;
@@ -347,7 +347,7 @@ bool CFlyingData::SaveScriptFile(const char *c_szFilename)
 
 		PrintfTabs(fp, 0, "}\n");
 	}
-	
+
 	fclose(fp);
 	return true;
 }

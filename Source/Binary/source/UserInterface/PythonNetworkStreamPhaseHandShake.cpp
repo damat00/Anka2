@@ -22,7 +22,7 @@ void CPythonNetworkStream::HandShakePhase()
 		case HEADER_GC_BINDUDP:
 			{
 				TPacketGCBindUDP BindUDP;
-				
+
 				if (!Recv(sizeof(TPacketGCBindUDP), &BindUDP))
 					return;
 
@@ -103,7 +103,7 @@ bool CPythonNetworkStream::RecvHandshakePacket()
 
 	m_kServerTimeSync.m_dwChangeServerTime = kHandshakeData.dwTime + kHandshakeData.lDelta;
 	m_kServerTimeSync.m_dwChangeClientTime = ELTimer_GetMSec();
-	
+
 	kHandshakeData.dwTime = kHandshakeData.dwTime + kHandshakeData.lDelta + kHandshakeData.lDelta;
 	kHandshakeData.lDelta = 0;
 

@@ -1,9 +1,9 @@
 #include "StdAfx.h"
 #include <io.h>
-#include "../eterBase/CRC32.h"
-#include "../eterBase/Timer.h"
-#include "../eterBase/Stl.h"
-#include "../eterPack/EterPackManager.h"
+#include "../EterBase/CRC32.h"
+#include "../EterBase/Stl.h"
+#include "../EterBase/Timer.h"
+#include "../EterPack/EterPackManager.h"
 
 #include "ResourceManager.h"
 #include "GrpImage.h"
@@ -161,11 +161,11 @@ void CResourceManager::DestroyDeletingList()
 	CResource::SetDeleteImmediately(true);
 
 	__DestroyCacheMap();
-	__DestroyDeletingResourceMap();	
+	__DestroyDeletingResourceMap();
 }
 
 void CResourceManager::Destroy()
-{	
+{
 	assert(m_ResourceDeletingMap.empty() && "CResourceManager::Destroy - YOU MUST CALL DestroyDeletingList");
 	__DestroyResourceMap();
 }
@@ -186,7 +186,7 @@ CResource * CResourceManager::InsertResourcePointer(DWORD dwFileCRC, CResource* 
 	TResourcePointerMap::iterator itor = m_pResMap.find(dwFileCRC);
 
 	if (m_pResMap.end() != itor)
-	{		
+	{
 		TraceError("CResource::InsertResourcePointer: %s is already registered\n", pResource->GetFileName());
 		assert(!"CResource::InsertResourcePointer: Resource already resistered");
 		delete pResource;
@@ -393,7 +393,7 @@ float FDumpPrint::m_totalKB;
 struct FDumpCostPrint
 {
 	FILE * m_fp;
-	
+
 	void operator() (TDumpData & data)
 	{
 		fprintf(m_fp, "%-4d %s\n", data.cost, data.filename);
@@ -411,7 +411,7 @@ void CResourceManager::DumpFileListToTextFile(const char *c_szFileName)
 
 		if (pResource->IsEmpty())
 			continue;
-		
+
 		data.filename = pResource->GetFileName();
 
 		int filesize;
@@ -445,7 +445,7 @@ void CResourceManager::DumpFileListToTextFile(const char *c_szFileName)
 	if (fp)
 	{
 		std::sort(dumpVector.begin(), dumpVector.end(), DumpKBCompare);
-		
+
 		FDumpPrint DumpPrint;
 		DumpPrint.m_fp = fp;
 		DumpPrint.m_totalKB = 0;

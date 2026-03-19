@@ -56,6 +56,11 @@ class CGraphicObjectInstance : public CGraphicCollisionObject
 		void					SetRotationQuaternion(const D3DXQUATERNION &q);
 		void					SetRotationMatrix(const D3DXMATRIX & m);
 
+#ifdef __ENABLE_STEALTH_FIX__
+		void					ApplyAlwaysHidden();
+		void					ReleaseAlwaysHidden();
+#endif
+
 		void					Clear();
 		void					Update();
 		bool					Render();
@@ -65,18 +70,15 @@ class CGraphicObjectInstance : public CGraphicCollisionObject
 		void					RenderPCBlocker();
 		void					Deform();
 		void					Transform();
-		
+
 		void					Show();
 		void					Hide();
 		bool					isShow();
 
-		void					ApplyAlwaysHidden();
-		void					ReleaseAlwaysHidden();
-
 		// Camera Block
 		void					BlockCamera(bool bBlock) {m_BlockCamera = bBlock;}
 		bool					BlockCamera() { return m_BlockCamera; }
-		
+
 		// Ray Test
 		bool					isIntersect(const CRay & c_rRay, float * pu, float * pv, float * pt);
 
@@ -125,7 +127,6 @@ class CGraphicObjectInstance : public CGraphicCollisionObject
 		D3DXMATRIX				m_mRotation;
 
 		bool					m_isVisible;
-		bool					m_isAlwaysHidden;
 		D3DXMATRIX				m_worldMatrix;
 
 		// Camera Block
@@ -138,7 +139,6 @@ class CGraphicObjectInstance : public CGraphicCollisionObject
 
 		// Portal
 		BYTE					m_abyPortalID[PORTAL_ID_MAX_NUM];
-
 		// Culling
 		CCullingManager::CullingHandle	m_CullingHandle;
 
@@ -155,6 +155,9 @@ class CGraphicObjectInstance : public CGraphicCollisionObject
 		D3DXMATRIX				m_ScaleMatrix, m_PositionMatrix, m_TransformMatrix;
 #endif
 
+#ifdef __ENABLE_STEALTH_FIX__
+		bool					m_isAlwaysHidden = false;
+#endif
 	// Static Collision Data
 	public:
 		void					AddCollision(const CStaticCollisionData * pscd, const D3DXMATRIX * pMat);

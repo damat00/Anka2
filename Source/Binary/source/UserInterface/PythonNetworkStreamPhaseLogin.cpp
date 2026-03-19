@@ -126,8 +126,8 @@ bool CPythonNetworkStream::__RecvLoginSuccessPacket3()
 	TPacketGCLoginSuccess3 kPacketLoginSuccess;
 
 	if (!Recv(sizeof(kPacketLoginSuccess), &kPacketLoginSuccess))
-		return false;	
-	
+		return false;
+
 	for (int i = 0; i<PLAYER_PER_ACCOUNT3; ++i)
 	{
 		m_akSimplePlayerInfo[i]=kPacketLoginSuccess.akSimplePlayerInformation[i];
@@ -136,14 +136,14 @@ bool CPythonNetworkStream::__RecvLoginSuccessPacket3()
 	}
 
 	m_kMarkAuth.m_dwHandle=kPacketLoginSuccess.handle;
-	m_kMarkAuth.m_dwRandomKey=kPacketLoginSuccess.random_key;	
+	m_kMarkAuth.m_dwRandomKey=kPacketLoginSuccess.random_key;
 
 	if (__DirectEnterMode_IsSet())
 	{
 	}
 	else
 	{
-		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_SELECT], "Refresh", Py_BuildValue("()"));		
+		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_SELECT], "Refresh", Py_BuildValue("()"));
 	}
 
 	return true;
@@ -154,8 +154,8 @@ bool CPythonNetworkStream::__RecvLoginSuccessPacket4()
 	TPacketGCLoginSuccess4 kPacketLoginSuccess;
 
 	if (!Recv(sizeof(kPacketLoginSuccess), &kPacketLoginSuccess))
-		return false;	
-	
+		return false;
+
 	for (int i = 0; i<PLAYER_PER_ACCOUNT4; ++i)
 	{
 		m_akSimplePlayerInfo[i]=kPacketLoginSuccess.akSimplePlayerInformation[i];
@@ -164,14 +164,14 @@ bool CPythonNetworkStream::__RecvLoginSuccessPacket4()
 	}
 
 	m_kMarkAuth.m_dwHandle=kPacketLoginSuccess.handle;
-	m_kMarkAuth.m_dwRandomKey=kPacketLoginSuccess.random_key;	
+	m_kMarkAuth.m_dwRandomKey=kPacketLoginSuccess.random_key;
 
 	if (__DirectEnterMode_IsSet())
 	{
 	}
 	else
 	{
-		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_SELECT], "Refresh", Py_BuildValue("()"));		
+		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_SELECT], "Refresh", Py_BuildValue("()"));
 	}
 
 	return true;
@@ -186,7 +186,7 @@ void CPythonNetworkStream::OnConnectFailure()
 	}
 	else
 	{
-		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_LOGIN], "OnConnectFailure", Py_BuildValue("()"));	
+		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_LOGIN], "OnConnectFailure", Py_BuildValue("()"));
 	}
 }
 

@@ -14,15 +14,15 @@ public:
 		static TGradeUnit beltGradeByLevelTable[] =
 		{
 			0,
-			1, // +1
-			1, // +2
-			2, // +3
-			2, // +4,
-			3, // +5
-			4, // +6,
-			5, // +7,
-			6, // +8,
-			7, // +9
+			1,			// +1
+			1,			// +2
+			2,			// +3
+			2,			// +4,
+			3,			// +5
+			4,			// +6,
+			5,			// +7,
+			6,			// +8,
+			7,			// +9
 		};
 
 		if (level >= _countof(beltGradeByLevelTable))
@@ -46,9 +46,11 @@ public:
 		return availableRuleByGrade;
 	}
 
-	static bool IsAvailableCell(WORD cell, int beltGrade)
+	static bool IsAvailableCell(WORD cell, int beltGrade /* int beltLevel */)
 	{
+		//const TGradeUnit beltGrade = GetBeltGradeByRefineLevel(beltLevel);
 		const TGradeUnit* ruleTable = GetAvailableRuleTableByGrade();
+
 		return ruleTable[cell] <= beltGrade;
 	}
 
@@ -86,7 +88,6 @@ public:
 
 		return canMove;
 	}
-
 };
 
 #endif

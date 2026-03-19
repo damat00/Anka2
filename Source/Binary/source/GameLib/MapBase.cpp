@@ -54,10 +54,10 @@ bool CMapBase::LoadProperty()
 	std::string strFileName = GetName() + "\\MapProperty.txt";
 
 	CTokenVectorMap stTokenVectorMap;
-	
+
 	if (!LoadMultipleTextData(strFileName.c_str(), stTokenVectorMap))
 	{
-		TraceError("CMapBase::LoadProperty(FileName=%s) - LoadMultipleTextData ERROR ÆÄÀÏÀÌ ¾øÀ» °¡´É¼ºÀÌ ¸¹½À´Ï´Ù.", strFileName.c_str());
+		TraceError("CMapBase::LoadProperty(FileName=%s) - LoadMultipleTextData ERROR File not found.", strFileName.c_str());
 		return false;
 	}
 
@@ -73,9 +73,6 @@ bool CMapBase::LoadProperty()
 		return false;
 	}
 
-	// NOTE: ÀÌ¹Ì Á¸ÀçÇÏ´Â ¸Ê µ¥ÀÌÅÍ¿Í µ¿ÀÏÇÑ µ¥ÀÌÅÍ¸¦ »ç¿ëÇÏ´Â ¸ÊÀ» »õ·Î Ãß°¡ÇÒ ¶§, ¸Ê ¹èÆ÷ ¿ë·®À» ÁÙÀÌ±â À§ÇÑ ÀÛ¾÷.
-	// MapProperty.txt ÆÄÀÏ¿¡ ParentMapName °ªÀÌ ¼³Á¤µÇ¾î ÀÖ´Ù¸é, ½ÇÁ¦ ¸?µç µ¥ÀÌÅÍ´Â ParentMap¿¡¼­ À?¾î¿Â´Ù.
-	// µ¥ÀÌÅÍÀÇ ºÎº?°øÀ¯(ºÎº? ¿À¹ö¶óÀÌÆ®?) ±â´ÉÀº ÇÊ¿ä ¾ø´ë¼­, Parent Map¿¡¼­ ¸?µç µ¥ÀÌÅÍ¸¦ À?¾î¿È.
 	if (stTokenVectorMap.end() != stTokenVectorMap.find("parentmapname"))
 	{
 		m_strParentMapName = stTokenVectorMap["parentmapname"][0];
@@ -83,7 +80,7 @@ bool CMapBase::LoadProperty()
 
 	const std::string & c_rstrType = stTokenVectorMap["scripttype"][0];
 	const std::string & c_rstrMapType = stTokenVectorMap["maptype"][0];
-	
+
 	if (0 != c_rstrType.compare("MapProperty"))
 	{
 		TraceError("CMapBase::LoadProperty(FileName=%s) - Resourse Type ERROR", strFileName.c_str());

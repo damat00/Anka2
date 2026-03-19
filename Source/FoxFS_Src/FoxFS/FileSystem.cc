@@ -3,14 +3,6 @@
 
 #include <algorithm>
 
-// Splash screen window procedure kaldýrýldý - antivirüs uyarýsýný önlemek için
-// #if defined(_WIN32) || defined(_WIN64) || defined(WIN32) || defined(WIN64)
-// LRESULT CALLBACK SplashScreenProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-// {
-// 	return DefWindowProcW(hWnd, uMsg, wParam, lParam);
-// }
-// #endif
-
 namespace FoxFS
 {
 
@@ -93,7 +85,7 @@ namespace FoxFS
 #else
 		pthread_mutex_unlock(&mutex);
 #endif
-		return Archive::ERROR_ARCHIVE_NOT_FOUND;
+		return r;
 	}
 
 	unsigned int FileSystem::size(const char* filename) const

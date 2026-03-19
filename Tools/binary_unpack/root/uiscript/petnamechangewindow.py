@@ -1,3 +1,8 @@
+if __USE_DYNAMIC_MODULE__:
+	import pyapi
+
+app = __import__(pyapi.GetModuleName("app"))
+
 import uiScriptLocale
 
 WINDOW_WIDTH	= 176
@@ -73,7 +78,7 @@ window = {
 					"name" : "NameChangeMoneyWindow", "type" : "window", "x" : 13, "y" : 132, "width" : 150, "height" : 14, "style" : ("attach",),
 					"children" :
 					(
-						{"name":"NameChangeMoney", "type":"text", "x":0, "y":0, "text": "Coin : 100000 ¾ç", "r":1.0, "g":1.0, "b":1.0, "a":1.0, "all_align" : "center"},
+						{"name":"NameChangeMoney", "type":"text", "x":0, "y":0, "text": "Coin : 100000 ?", "r":1.0, "g":1.0, "b":1.0, "a":1.0, "all_align" : "center"},
 					),
 				},
 				
@@ -133,3 +138,6 @@ window = {
 		},
 	),
 }
+
+#"name":"pet_name"
+window["children"][0]["children"][5]["children"][0]["movable_text"]	= 1

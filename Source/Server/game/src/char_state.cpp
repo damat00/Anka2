@@ -23,10 +23,13 @@
 #include "BlueDragon.h"
 #include "../../common/service.h"
 #include "../../common/VnumHelper.h"
+#ifdef ENABLE_ZODIAC_MISSION
+	#include "dungeon.h"
+#endif
 
 BOOL g_test_server;
 extern LPCHARACTER FindVictim(LPCHARACTER pkChr, int iMaxDistance);
-#ifdef ENABLE_SHIP_DEFENCE_DUNGEON
+#ifdef ENABLE_DEFENSAWE_SHIP
 extern LPCHARACTER FindVictimHydra(LPCHARACTER pkChr, int iMaxDistance);
 #endif
 
@@ -358,6 +361,40 @@ bool CHARACTER::IsAttackMob() const
 	return IS_SET(m_pointsInstant.dwAIFlag, AIFLAG_ATTACKMOB);
 }
 
+#ifdef ENABLE_SUNG_MAHI_TOWER
+bool CHARACTER::IsNomove() const
+{
+	return IS_SET(m_pointsInstant.dwAIFlag, AIFLAG_NOMOVE);
+}
+
+void CHARACTER::SetNomove()
+{
+	SET_BIT(m_pointsInstant.dwAIFlag, AIFLAG_NOMOVE);
+}
+
+void CHARACTER::RemoveNomove()
+{
+	REMOVE_BIT(m_pointsInstant.dwAIFlag, AIFLAG_NOMOVE);
+}
+
+bool CHARACTER::IsNoattack() const
+{
+	return IS_SET(m_pointsInstant.dwAIFlag, AIFLAG_NOATTACK);
+}
+
+void CHARACTER::SetNoattack()
+{
+	SET_BIT(m_pointsInstant.dwAIFlag, AIFLAG_NOATTACK);
+}
+
+void CHARACTER::RemoveNoattack()
+{
+	REMOVE_BIT(m_pointsInstant.dwAIFlag, AIFLAG_NOATTACK);
+}
+#endif
+
+
+// STATE_IDLE_REFACTORING
 void CHARACTER::StateIdle()
 {
 	if (IsStone())
@@ -481,6 +518,22 @@ void CHARACTER::__StateIdle_Stone()
 		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
 		CHARACTER_MANAGER::instance().SpawnGroup(dwVnum, GetMapIndex(), GetX() - 1000, GetY() - 1000, GetX() + 1000, GetY() + 1000);
 		CHARACTER_MANAGER::instance().SelectStone(NULL);
+
+#ifdef ENABLE_ZODIAC_MISSION
+		if(GetMapIndex() >= 3570000 && GetMapIndex() <= 3579999 && GetDungeon() != NULL)
+		{
+			int PortalFlag = GetDungeon()->GetFlag("Portal");
+			if(PortalFlag >= 1 && PortalFlag <= 12)
+			{
+				DWORD vnum[] = {0, 35740, 35730,35726,35736,35744,35734,35746,35732,35742,35748,35728,35738};
+				SetMaxSP(3);
+				SendMovePacket(FUNC_ATTACK, 0, GetX(), GetY(), 0);
+				CHARACTER_MANAGER::instance().SelectStone(this);
+				CHARACTER_MANAGER::instance().SpawnGroup(vnum[PortalFlag], GetMapIndex(), GetX() - 500, GetY() - 500, GetX() + 500, GetY() + 500);
+				CHARACTER_MANAGER::instance().SelectStone(NULL);
+			}
+		}
+#endif
 	}
 	else if (iPercent <= 90 && GetMaxSP() < 2)
 	{
@@ -631,6 +684,33 @@ void CHARACTER::__StateIdle_NPC()
 
 void CHARACTER::__StateIdle_Monster()
 {
+#ifdef ENABLE_MELEY_LAIR_DUNGEON
+	if(IsMeley())
+	{
+		if(!IsStone() && time(0) > GetProtectTime("MeleyTime"))
+		{
+			if (HasMobSkill())
+			{
+				for (unsigned int iSkillIdx = 0; iSkillIdx < MOB_SKILL_MAX_NUM; ++iSkillIdx)
+				{
+					if (CanUseMobSkill(iSkillIdx))
+					{
+						if (UseMobSkill(iSkillIdx))
+						{
+							SendMovePacket(FUNC_MOB_SKILL, iSkillIdx, GetX(), GetY(), 0, get_dword_time());
+							float fDuration = CMotionManager::instance().GetMotionDuration(GetRaceNum(), MAKE_MOTION_KEY(MOTION_MODE_GENERAL, MOTION_SPECIAL_1 + iSkillIdx));
+							m_dwStateDuration = (DWORD) (fDuration == 0.0f ? PASSES_PER_SEC(2) : PASSES_PER_SEC(fDuration));
+							return;
+						}
+					}
+				}
+			}
+			SetProtectTime("MeleyTime",time(0)+5);
+		}
+		return;
+	}
+#endif
+	
 	if (IsStun())
 		return;
 
@@ -673,21 +753,34 @@ void CHARACTER::__StateIdle_Monster()
 		// Preemptive monster treatment
 		else if (!no_wander && IsAggressive())
 		{
-			if (GetMapIndex() == 61 && quest::CQuestManager::instance().GetEventFlag("xmas_tree"));
+			if (GetMapIndex() == 61 && quest::CQuestManager::instance().GetEventFlag("xmas_tree"))
+			{
+
+			}
 			else
-#ifdef ENABLE_SHIP_DEFENCE_DUNGEON
-				if(IsHydraMob() || IsHydra())
+			{
+#ifdef ENABLE_DEFENSAWE_SHIP
+				if (IsHydraMob() || IsHydra())
+				{
 					victim = FindVictimHydra(this, 40000);
+				}
 				else
+				{
 					victim = FindVictim(this, m_pkMobData->m_table.wAggressiveSight);
+				}
 #else
 				victim = FindVictim(this, m_pkMobData->m_table.wAggressiveSight);
 #endif
+			}
 		}
 	}
 
 	if (victim && !victim->IsDead())
 	{
+		SECTREE *tree = victim->GetSectree();
+		if (tree && tree->IsAttr(victim->GetX(), victim->GetY(), ATTR_BANPK))
+			return;
+      
 		if (CanBeginFight())
 			BeginFight(victim);
 
@@ -733,6 +826,8 @@ void CHARACTER::__StateIdle_Monster()
 						&& SECTREE_MANAGER::instance().IsMovablePosition(GetMapIndex(), GetX() + (int) fx/2, GetY() + (int) fy/2)))
 				return;
 
+			// NOTE: When a monster wanders around in IDLE state, it is currently run unconditionally. (Never walk)
+			// The graphics team wants to see the monsters walking, so they temporarily walk or run with a certain probability. (It only works once in test mode, because the overall feel of the game is wrong)
 			if (g_test_server)
 			{
 				if (number(0, 100) < 60)
@@ -811,6 +906,9 @@ void CHARACTER::StateMove()
 #endif
 	)
 	{
+#ifdef ENABLE_BOT_PLAYER
+		if (!IsBotCharacter())
+#endif
 		if (IsWalking() && GetStamina() < GetMaxStamina())
 		{
 			// Stamina increases after 5 seconds
@@ -818,7 +916,7 @@ void CHARACTER::StateMove()
 				PointChange(POINT_STAMINA, GetMaxStamina() / 1);
 		}
 
-		// If you're running while you're in combat
+		// If you're running while you're in combat (botlar icin ST tuketilmez - yurume moduna gecmezler)
 		if (!IsWalking() && !IsRiding()){
 			if ((get_dword_time() - GetLastAttackTime()) < 20000)
 			{
@@ -979,7 +1077,7 @@ void CHARACTER::StateBattle()
 				!no_wander && IsAggressive() && (!GetParty() || GetParty()->GetLeader() == this))
 		{
 			LPCHARACTER new_victim = NULL;
-#ifdef ENABLE_SHIP_DEFENCE_DUNGEON
+#ifdef ENABLE_DEFENSAWE_SHIP
 			if(IsHydraMob() || IsHydra())
 				new_victim = FindVictimHydra(this, 40000);
 			else
@@ -1071,6 +1169,12 @@ void CHARACTER::StateBattle()
 	LPCHARACTER pkChrProtege = GetProtege();
 
 	float fDist = DISTANCE_APPROX(GetX() - victim->GetX(), GetY() - victim->GetY());
+	float fDistCheck = 15000.0f;
+	
+#ifdef ENABLE_SUNG_MAHI_TOWER
+	if (GetMapIndex() >= (354 * 10000) && GetMapIndex() < ((354 + 1) * 10000))
+		fDistCheck = 16000.0f;
+#endif
 
 	if (fDist >= 4000.0f)
 	{

@@ -17,8 +17,8 @@ class CFileBase
 
 		void			Destroy();
 		void			Close();
-		
-		BOOL			Create(const char *filename, EFileMode mode);
+
+		BOOL			Create(const char* filename, EFileMode mode);
 		DWORD			Size();
 		void			SeekCur(DWORD size);
 		void			Seek(DWORD offset);
@@ -27,9 +27,9 @@ class CFileBase
 		virtual BOOL	Write(const void* src, int bytes);
 		BOOL			Read(void* dest, int bytes);
 
-		char *			GetFileName();
+		char*			GetFileName();
 		BOOL			IsNull();
-		
+
 	protected:
 		int				m_mode;
 		char			m_filename[MAX_PATH+1];

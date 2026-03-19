@@ -66,7 +66,7 @@ namespace quest
 
 		return 1;
 	}
-	
+
 	int oxevent_get_attender(lua_State* L)
 	{
 		lua_pushnumber(L, (int)COXEventManager::instance().GetAttenderCount());
@@ -77,7 +77,7 @@ namespace quest
 	{
 		int empty;
 
-		end_oxevent_info() 
+		end_oxevent_info()
 		: empty( 0 )
 		{
 		}
@@ -116,10 +116,10 @@ namespace quest
 
 		return 0;
 	}
-	
+
 	void RegisterOXEventFunctionTable()
 	{
-		luaL_reg oxevent_functions[] = 
+		luaL_reg oxevent_functions[] =
 		{
 			{	"get_status",	oxevent_get_status	},
 			{	"open",			oxevent_open		},

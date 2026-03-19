@@ -194,6 +194,11 @@ PyObject *appSetFrameSkip(PyObject *poSelf, PyObject *poArgs)
 	return Py_BuildNone();
 }
 
+PyObject* appGetLocaleServiceName(PyObject* poSelf, PyObject* poArgs)
+{
+	return Py_BuildValue("s", LocaleService_GetName());
+}
+
 bool LoadLocaleData(const char *localePath);
 
 #include "../eterBase/tea.h"
@@ -1234,6 +1239,8 @@ void initapp()
 		{ "GetTextFileLineCount",		appGetTextFileLineCount,		METH_VARARGS },
 		{ "GetTextFileLine",			appGetTextFileLine,				METH_VARARGS },
 
+		// LOCALE
+		{ "GetLocaleServiceName",		appGetLocaleServiceName,		METH_VARARGS },
 		{ "GetLocaleName",				appGetLocaleName,				METH_VARARGS },
 		{ "GetLocalePath",				appGetLocalePath,				METH_VARARGS },
 		{ "LoadLocaleAddr",				appLoadLocaleAddr,				METH_VARARGS },
@@ -1435,7 +1442,9 @@ void initapp()
 	PyModule_AddIntConstant(poModule, "HSIZE", CPythonApplication::CURSOR_SHAPE_HSIZE);
 	PyModule_AddIntConstant(poModule, "VSIZE", CPythonApplication::CURSOR_SHAPE_VSIZE);
 	PyModule_AddIntConstant(poModule, "HVSIZE", CPythonApplication::CURSOR_SHAPE_HVSIZE);
-
+#ifdef ENABLE_FISH_EVENT_SYSTEM
+	PyModule_AddIntConstant(poModule, "CAMERA_TO_POSITIVE",		CPythonApplication::CAMERA_TO_POSITIVE);
+#endif
 #ifdef ENABLE_FISH_GAME
 	PyModule_AddIntConstant(poModule, "FISH", CPythonApplication::CURSOR_SHAPE_FISH);
 #endif
@@ -1631,10 +1640,16 @@ void initapp()
 	PyModule_AddIntConstant(poModule, "ENABLE_EXTENDED_WHISPER_DETAILS", 0);
 #endif
 
-#ifdef ENABLE_RENEWAL_BONUS_BOARD
-	PyModule_AddIntConstant(poModule, "ENABLE_RENEWAL_BONUS_BOARD", 1);
+#ifdef ENABLE_KILL_STATISTICS
+	PyModule_AddIntConstant(poModule, "ENABLE_KILL_STATISTICS", 1);
 #else
-	PyModule_AddIntConstant(poModule, "ENABLE_RENEWAL_BONUS_BOARD", 0);
+	PyModule_AddIntConstant(poModule, "ENABLE_KILL_STATISTICS", 0);
+#endif
+
+#if defined(__BL__DETAILS_UI__)
+	PyModule_AddIntConstant(poModule, "ENABLE_DETAILS_UI", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_DETAILS_UI", 0);
 #endif
 
 #ifdef ENABLE_GOLD_LIMIT
@@ -1751,12 +1766,6 @@ void initapp()
 	PyModule_AddIntConstant(poModule, "ENABLE_ATTBONUS_METIN", 0);
 #endif
 
-#ifdef ENABLE_BIOLOG_SYSTEM
-	PyModule_AddIntConstant(poModule, "ENABLE_BIOLOG_SYSTEM", 1);
-#else
-	PyModule_AddIntConstant(poModule, "ENABLE_BIOLOG_SYSTEM", 0);
-#endif
-
 #ifdef ENABLE_MOB_DROP_INFO
 	PyModule_AddIntConstant(poModule, "ENABLE_MOB_DROP_INFO", 1);
 #else
@@ -1787,12 +1796,6 @@ void initapp()
 	PyModule_AddIntConstant(poModule, "ENABLE_RENEWAL_OFFLINESHOP", 0);
 #endif
 
-#ifdef ENABLE_TITLE_SYSTEM
-	PyModule_AddIntConstant(poModule, "ENABLE_TITLE_SYSTEM", 1);
-#else
-	PyModule_AddIntConstant(poModule, "ENABLE_TITLE_SYSTEM", 0);
-#endif
-
 #ifdef ENABLE_ATTBONUS_BOSS
 	PyModule_AddIntConstant(poModule, "ENABLE_ATTBONUS_BOSS", 1);
 #else
@@ -1805,28 +1808,16 @@ void initapp()
 	PyModule_AddIntConstant(poModule, "ENABLE_RENDER_TARGET", 0);
 #endif
 
-#ifdef ENABLE_EVENT_MANAGER
-	PyModule_AddIntConstant(poModule, "ENABLE_EVENT_MANAGER", 1);
-#else
-	PyModule_AddIntConstant(poModule, "ENABLE_EVENT_MANAGER", 0);
-#endif
-
 #ifdef ENABLE_RESTART_INSTANT
 	PyModule_AddIntConstant(poModule, "ENABLE_RESTART_INSTANT", 1);
 #else
 	PyModule_AddIntConstant(poModule, "ENABLE_RESTART_INSTANT", 0);
 #endif
 
-#ifdef ENABLE_MINIGAME_OKEY_CARDS_SYSTEM
-	PyModule_AddIntConstant(poModule, "ENABLE_MINIGAME_OKEY_CARDS_SYSTEM", 1);
+#ifdef ENABLE_MINI_GAME_OKEY
+	PyModule_AddIntConstant(poModule, "ENABLE_MINI_GAME_OKEY", 1);
 #else
-	PyModule_AddIntConstant(poModule, "ENABLE_MINIGAME_OKEY_CARDS_SYSTEM", 0);
-#endif
-
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-	PyModule_AddIntConstant(poModule, "ENABLE_RENEWAL_BATTLE_PASS", 1);
-#else
-	PyModule_AddIntConstant(poModule, "ENABLE_RENEWAL_BATTLE_PASS", 0);
+	PyModule_AddIntConstant(poModule, "ENABLE_MINI_GAME_OKEY", 0);
 #endif
 
 #ifdef ENABLE_MONSTER_TARGET_ELEMENT
@@ -1870,16 +1861,10 @@ void initapp()
 	PyModule_AddIntConstant(poModule, "ENABLE_SKILL_COLOR_SYSTEM", 0);
 #endif
 
-#ifdef ENABLE_RENEWAL_PREMIUM_SYSTEM
-	PyModule_AddIntConstant(poModule, "ENABLE_RENEWAL_PREMIUM_SYSTEM", 1);
+#ifdef ENABLE_WIKI_SYSTEM
+	PyModule_AddIntConstant(poModule, "ENABLE_WIKI_SYSTEM", 1);
 #else
-	PyModule_AddIntConstant(poModule, "ENABLE_RENEWAL_PREMIUM_SYSTEM", 0);
-#endif
-
-#ifdef ENABLE_INGAME_WIKI_SYSTEM
-	PyModule_AddIntConstant(poModule, "ENABLE_INGAME_WIKI_SYSTEM", 1);
-#else
-	PyModule_AddIntConstant(poModule, "ENABLE_INGAME_WIKI_SYSTEM", 0);
+	PyModule_AddIntConstant(poModule, "ENABLE_WIKI_SYSTEM", 0);
 #endif
 
 #ifdef ENABLE_PICKUP_ITEM_EFFECT
@@ -1951,18 +1936,6 @@ void initapp()
 	PyModule_AddIntConstant(poModule, "ENABLE_BONUS_COSTUME_SYSTEM", 0);
 #endif
 
-#ifdef ENABLE_NEW_DUNGEON_LIB
-	PyModule_AddIntConstant(poModule, "ENABLE_NEW_DUNGEON_LIB", 1);
-#else
-	PyModule_AddIntConstant(poModule, "ENABLE_NEW_DUNGEON_LIB", 0);
-#endif
-
-#ifdef ENABLE_RENEWAL_INGAME_ITEMSHOP
-	PyModule_AddIntConstant(poModule, "ENABLE_RENEWAL_INGAME_ITEMSHOP", 1);
-#else
-	PyModule_AddIntConstant(poModule, "ENABLE_RENEWAL_INGAME_ITEMSHOP", 0);
-#endif
-
 #ifdef ENABLE_SLOT_MARKING_SYSTEM
 	PyModule_AddIntConstant(poModule, "ENABLE_SLOT_MARKING_SYSTEM", 1);
 #else
@@ -1989,8 +1962,14 @@ void initapp()
 
 #ifdef ENABLE_GROWTH_PET_SYSTEM
 	PyModule_AddIntConstant(poModule, "ENABLE_GROWTH_PET_SYSTEM", 1);
+	#ifdef ENABLE_UPBRINGING_PET_CONQUEROR_LEVEL
+	PyModule_AddIntConstant(poModule, "ENABLE_UPBRINGING_PET_CONQUEROR_LEVEL", 1);
+	#else
+	PyModule_AddIntConstant(poModule, "ENABLE_UPBRINGING_PET_CONQUEROR_LEVEL", 0);
+	#endif
 #else
 	PyModule_AddIntConstant(poModule, "ENABLE_GROWTH_PET_SYSTEM", 0);
+	PyModule_AddIntConstant(poModule, "ENABLE_UPBRINGING_PET_CONQUEROR_LEVEL", 0);
 #endif
 
 #ifdef ENABLE_INVENTORY_EXPANSION_SYSTEM
@@ -1999,28 +1978,10 @@ void initapp()
 	PyModule_AddIntConstant(poModule, "ENABLE_INVENTORY_EXPANSION_SYSTEM", 0);
 #endif
 
-#ifdef ENABLE_SHIP_DEFENCE_DUNGEON
-	PyModule_AddIntConstant(poModule, "ENABLE_SHIP_DEFENCE_DUNGEON", 1);
-#else
-	PyModule_AddIntConstant(poModule, "ENABLE_SHIP_DEFENCE_DUNGEON", 0);
-#endif
-
 #ifdef ENABLE_RENEWAL_TELEPORT_SYSTEM
 	PyModule_AddIntConstant(poModule, "ENABLE_RENEWAL_TELEPORT_SYSTEM", 1);
 #else
 	PyModule_AddIntConstant(poModule, "ENABLE_RENEWAL_TELEPORT_SYSTEM", 0);
-#endif
-
-#ifdef ENABLE_DUNGEON_TRACKING_SYSTEM
-	PyModule_AddIntConstant(poModule, "ENABLE_DUNGEON_TRACKING_SYSTEM", 1);
-#else
-	PyModule_AddIntConstant(poModule, "ENABLE_DUNGEON_TRACKING_SYSTEM", 0);
-#endif
-
-#ifdef ENABLE_RENEWAL_REGEN
-	PyModule_AddIntConstant(poModule, "ENABLE_RENEWAL_REGEN", 1);
-#else
-	PyModule_AddIntConstant(poModule, "ENABLE_RENEWAL_REGEN", 0);
 #endif
 
 #ifdef ENABLE_CHANGE_LOOK_SYSTEM
@@ -2160,6 +2121,7 @@ void initapp()
 	#ifndef ENABLE_MEDAL_OF_HONOR
 	PyModule_AddIntConstant(poModule, "ENABLE_MEDAL_OF_HONOR", 0);
 	#endif
+
 	#ifndef ENABLE_GUILD_DONATE_ATTENDANCE
 	PyModule_AddIntConstant(poModule, "ENABLE_GUILD_DONATE_ATTENDANCE", 0);
 	#endif
@@ -2167,9 +2129,11 @@ void initapp()
 	#ifndef ENABLE_GUILD_WAR_SCORE
 	PyModule_AddIntConstant(poModule, "ENABLE_GUILD_WAR_SCORE", 0);
 	#endif
+
 	#ifndef ENABLE_GUILD_LAND_INFO
 	PyModule_AddIntConstant(poModule, "ENABLE_GUILD_LAND_INFO", 0);
 	#endif
+
 	#ifndef ENABLE_GUILDBANK_LOG
 	PyModule_AddIntConstant(poModule, "ENABLE_GUILDBANK_LOG", 0);
 	#endif
@@ -2196,38 +2160,399 @@ void initapp()
 #endif
 
 #ifdef ENABLE_NEW_SHINING_EFFEKT
-	PyModule_AddIntConstant(poModule, "ENABLE_NEW_SHINING_EFFEKT", true);
+	PyModule_AddIntConstant(poModule, "ENABLE_NEW_SHINING_EFFEKT", 1);
 	#ifdef ENABLE_LVL115_ARMOR_EFFECT
-	PyModule_AddIntConstant(poModule, "ENABLE_LVL115_ARMOR_EFFECT", true);
+	PyModule_AddIntConstant(poModule, "ENABLE_LVL115_ARMOR_EFFECT", 1);
 	#else
-	PyModule_AddIntConstant(poModule, "ENABLE_LVL115_ARMOR_EFFECT", false);
+	PyModule_AddIntConstant(poModule, "ENABLE_LVL115_ARMOR_EFFECT", 0);
 	#endif
 	#ifdef ENABLE_LVL96_WEAPON_EFFECT
-	PyModule_AddIntConstant(poModule, "ENABLE_LVL96_WEAPON_EFFECT", true);
+	PyModule_AddIntConstant(poModule, "ENABLE_LVL96_WEAPON_EFFECT", 1);
 	#else
-	PyModule_AddIntConstant(poModule, "ENABLE_LVL96_WEAPON_EFFECT", false);
+	PyModule_AddIntConstant(poModule, "ENABLE_LVL96_WEAPON_EFFECT", 0);
 	#endif
 	#ifdef ENABLE_LVL96_ARMOR_EFFECT
-	PyModule_AddIntConstant(poModule, "ENABLE_LVL96_ARMOR_EFFECT", true);
+	PyModule_AddIntConstant(poModule, "ENABLE_LVL96_ARMOR_EFFECT", 1);
 	#else
-	PyModule_AddIntConstant(poModule, "ENABLE_LVL96_ARMOR_EFFECT", false);
+	PyModule_AddIntConstant(poModule, "ENABLE_LVL96_ARMOR_EFFECT", 0);
 	#endif
 	#ifdef USE_BODY_COSTUME_WITH_EFFECT
-	PyModule_AddIntConstant(poModule, "USE_BODY_COSTUME_WITH_EFFECT", true);
+	PyModule_AddIntConstant(poModule, "USE_BODY_COSTUME_WITH_EFFECT", 1);
 	#else
-	PyModule_AddIntConstant(poModule, "USE_BODY_COSTUME_WITH_EFFECT", false);
+	PyModule_AddIntConstant(poModule, "USE_BODY_COSTUME_WITH_EFFECT", 0);
 	#endif
 	#ifdef USE_WEAPON_COSTUME_WITH_EFFECT
-	PyModule_AddIntConstant(poModule, "USE_WEAPON_COSTUME_WITH_EFFECT", true);
+	PyModule_AddIntConstant(poModule, "USE_WEAPON_COSTUME_WITH_EFFECT", 1);
 	#else
-	PyModule_AddIntConstant(poModule, "USE_WEAPON_COSTUME_WITH_EFFECT", false);
+	PyModule_AddIntConstant(poModule, "USE_WEAPON_COSTUME_WITH_EFFECT", 0);
 	#endif
 #else
-	PyModule_AddIntConstant(poModule, "ENABLE_NEW_SHINING_EFFEKT", false);
-	PyModule_AddIntConstant(poModule, "ENABLE_LVL115_ARMOR_EFFECT", false);
-	PyModule_AddIntConstant(poModule, "ENABLE_LVL96_WEAPON_EFFECT", false);
-	PyModule_AddIntConstant(poModule, "ENABLE_LVL96_ARMOR_EFFECT", false);
-	PyModule_AddIntConstant(poModule, "USE_BODY_COSTUME_WITH_EFFECT", false);
-	PyModule_AddIntConstant(poModule, "USE_WEAPON_COSTUME_WITH_EFFECT", false);
+	PyModule_AddIntConstant(poModule, "ENABLE_NEW_SHINING_EFFEKT", 0);
+	PyModule_AddIntConstant(poModule, "ENABLE_LVL115_ARMOR_EFFECT", 0);
+	PyModule_AddIntConstant(poModule, "ENABLE_LVL96_WEAPON_EFFECT", 0);
+	PyModule_AddIntConstant(poModule, "ENABLE_LVL96_ARMOR_EFFECT", 0);
+	PyModule_AddIntConstant(poModule, "USE_BODY_COSTUME_WITH_EFFECT", 0);
+	PyModule_AddIntConstant(poModule, "USE_WEAPON_COSTUME_WITH_EFFECT", 0);
+#endif
+
+#ifdef ENABLE_TEXTLINE_EMOJI
+	PyModule_AddIntConstant(poModule, "ENABLE_TEXTLINE_EMOJI", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_TEXTLINE_EMOJI", 0);
+#endif
+
+#ifdef ENABLE_PITTY_REFINE
+	PyModule_AddIntConstant(poModule, "ENABLE_PITTY_REFINE", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_PITTY_REFINE", 0);
+#endif
+
+#ifdef ENABLE_HYPERLINK_ITEM_ICON
+	PyModule_AddIntConstant(poModule, "ENABLE_HYPERLINK_ITEM_ICON", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_HYPERLINK_ITEM_ICON", 0);
+#endif
+
+#ifdef ENABLE_REWARD_SYSTEM
+	PyModule_AddIntConstant(poModule, "ENABLE_REWARD_SYSTEM", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_REWARD_SYSTEM", 0);
+#endif
+
+#ifdef ENABLE_ITEMSHOP
+	PyModule_AddIntConstant(poModule, "ENABLE_ITEMSHOP", 1);
+	#ifdef USE_ITEMSHOP_RENEWED
+	PyModule_AddIntConstant(poModule, "USE_ITEMSHOP_RENEWED", 1);
+	#else
+	PyModule_AddIntConstant(poModule, "USE_ITEMSHOP_RENEWED", 0);
+	#endif
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_ITEMSHOP", 0);
+	PyModule_AddIntConstant(poModule, "USE_ITEMSHOP_RENEWED", 0);
+#endif
+
+#ifdef ENABLE_YOHARA_SYSTEM
+	PyModule_AddIntConstant(poModule, "ENABLE_YOHARA_SYSTEM", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_YOHARA_SYSTEM", 0);
+#endif
+
+#ifdef ENABLE_DUNGEON_RENEWAL_SYSTEM
+	PyModule_AddIntConstant(poModule, "ENABLE_DUNGEON_RENEWAL_SYSTEM", 1);
+	#ifdef ENABLE_DUNGEON_INFO
+	PyModule_AddIntConstant(poModule, "ENABLE_DUNGEON_INFO", 1);
+	#else
+	PyModule_AddIntConstant(poModule, "ENABLE_DUNGEON_INFO", 0);
+	#endif
+	#ifdef __DUNGEON_INFO__
+	PyModule_AddIntConstant(poModule, "__DUNGEON_INFO__", 1);
+	#else
+	PyModule_AddIntConstant(poModule, "__DUNGEON_INFO__", 0);
+	#endif
+	#ifdef ENABLE_NEW_DUNGEON_LIB
+	PyModule_AddIntConstant(poModule, "ENABLE_NEW_DUNGEON_LIB", 1);
+	#else
+	PyModule_AddIntConstant(poModule, "ENABLE_NEW_DUNGEON_LIB", 0);
+	#endif
+	#ifdef ENABLE_TRACK_WINDOW
+	PyModule_AddIntConstant(poModule, "ENABLE_TRACK_WINDOW", 1);
+	#else
+	PyModule_AddIntConstant(poModule, "ENABLE_TRACK_WINDOW", 0);
+	#endif
+	#ifdef ENABLE_ULTIMATE_REGEN
+	PyModule_AddIntConstant(poModule, "ENABLE_ULTIMATE_REGEN", 1);
+	#else
+	PyModule_AddIntConstant(poModule, "ENABLE_ULTIMATE_REGEN", 0);
+	#endif
+	#else
+	PyModule_AddIntConstant(poModule, "ENABLE_DUNGEON_RENEWAL_SYSTEM", 0);
+	PyModule_AddIntConstant(poModule, "ENABLE_DUNGEON_INFO", 0);
+	PyModule_AddIntConstant(poModule, "__DUNGEON_INFO__", 0);
+	PyModule_AddIntConstant(poModule, "ENABLE_NEW_DUNGEON_LIB", 0);
+	PyModule_AddIntConstant(poModule, "ENABLE_TRACK_WINDOW", 0);
+	PyModule_AddIntConstant(poModule, "ENABLE_ULTIMATE_REGEN", 0);
+#endif
+
+#ifdef ENABLE_DUNGEON_MAPS_SYSTEM
+	PyModule_AddIntConstant(poModule, "ENABLE_DUNGEON_MAPS_SYSTEM", 1);
+	#ifdef ENABLE_MELEY_LAIR_DUNGEON
+	PyModule_AddIntConstant(poModule, "ENABLE_MELEY_LAIR_DUNGEON", 1);
+	#else
+	PyModule_AddIntConstant(poModule, "ENABLE_MELEY_LAIR_DUNGEON", 0);
+	#endif
+	#ifdef ENABLE_ZODIAC_MISSION
+	PyModule_AddIntConstant(poModule, "ENABLE_ZODIAC_MISSION", 1);
+	#else
+	PyModule_AddIntConstant(poModule, "ENABLE_ZODIAC_MISSION", 0);
+	#endif
+	#ifdef ENABLE_SUNG_MAHI_TOWER
+	PyModule_AddIntConstant(poModule, "ENABLE_SUNG_MAHI_TOWER",   1);
+	#else
+	PyModule_AddIntConstant(poModule, "ENABLE_SUNG_MAHI_TOWER",   0);
+	#endif
+	#ifdef ENABLE_QUEEN_NETHIS
+	PyModule_AddIntConstant(poModule, "ENABLE_QUEEN_NETHIS", 1);
+	#else
+	PyModule_AddIntConstant(poModule, "ENABLE_QUEEN_NETHIS", 0);
+	#endif
+	#ifdef ENABLE_DEFENSAWESHIP
+	PyModule_AddIntConstant(poModule, "ENABLE_DEFENSAWESHIP", 1);
+	#else
+	PyModule_AddIntConstant(poModule, "ENABLE_DEFENSAWESHIP", 0);
+	#endif
+	#ifdef ENABLE_OCHAO_TEMPLE_SYSTEM
+	PyModule_AddIntConstant(poModule, "ENABLE_OCHAO_TEMPLE_SYSTEM", 1);
+	#else
+	PyModule_AddIntConstant(poModule, "ENABLE_OCHAO_TEMPLE_SYSTEM", 0);
+	#endif
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_DUNGEON_MAPS_SYSTEM", 0);
+	PyModule_AddIntConstant(poModule, "ENABLE_MELEY_LAIR_DUNGEON", 0);
+	PyModule_AddIntConstant(poModule, "ENABLE_ZODIAC_MISSION", 0);
+	PyModule_AddIntConstant(poModule, "ENABLE_SUNG_MAHI_TOWER", 0);
+	PyModule_AddIntConstant(poModule, "ENABLE_QUEEN_NETHIS", 0);
+	PyModule_AddIntConstant(poModule, "ENABLE_DEFENSAWESHIP", 0);
+	PyModule_AddIntConstant(poModule, "ENABLE_OCHAO_TEMPLE_SYSTEM", 0);
+#endif
+
+#ifdef ENABLE_WHISPER_CLOSE_SHORTCUT
+    PyModule_AddIntConstant(poModule, "ENABLE_WHISPER_CLOSE_SHORTCUT", 1);
+#else
+    PyModule_AddIntConstant(poModule, "ENABLE_WHISPER_CLOSE_SHORTCUT", 0);
+#endif
+
+#ifdef ENABLE_AFFECT_BUFF_REMOVE
+	PyModule_AddIntConstant(poModule, "ENABLE_AFFECT_BUFF_REMOVE", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_AFFECT_BUFF_REMOVE", 0);
+#endif
+
+#ifdef LINK_IN_CHAT
+	PyModule_AddIntConstant(poModule, "LINK_IN_CHAT",	1);
+#else
+	PyModule_AddIntConstant(poModule, "LINK_IN_CHAT",	0);
+#endif
+
+#ifdef NAMECOLOR_BOSS_CLIENT
+    PyModule_AddIntConstant(poModule, "NAMECOLOR_BOSS_CLIENT", 1);
+#else
+    PyModule_AddIntConstant(poModule, "NAMECOLOR_BOSS_CLIENT", 0);
+#endif
+
+#ifdef ENABLE_REMOTE_SHOP_SYSTEM
+	PyModule_AddIntConstant(poModule, "ENABLE_REMOTE_SHOP_SYSTEM", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_REMOTE_SHOP_SYSTEM", 0);
+#endif
+
+#ifdef ENABLE_ADVANCED_GAME_OPTIONS
+	PyModule_AddIntConstant(poModule, "ENABLE_ADVANCED_GAME_OPTIONS", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_ADVANCED_GAME_OPTIONS", 0);
+#endif
+
+#ifdef ENABLE_EQUIPMENT_HAND_EFFECT
+	PyModule_AddIntConstant(poModule, "ENABLE_EQUIPMENT_HAND_EFFECT", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_EQUIPMENT_HAND_EFFECT", 0);
+#endif
+
+#ifdef ENABLE_RESP_SYSTEM
+	PyModule_AddIntConstant(poModule, "ENABLE_RESP_SYSTEM", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_RESP_SYSTEM", 0);
+#endif
+
+#ifdef ENABLE_COLLECT_WINDOW
+	PyModule_AddIntConstant(poModule, "ENABLE_COLLECT_WINDOW", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_COLLECT_WINDOW", 0);
+#endif
+
+#ifdef ENABLE_COLLECTIONS_SYSTEM
+	PyModule_AddIntConstant(poModule, "ENABLE_COLLECTIONS_SYSTEM", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_COLLECTIONS_SYSTEM", 0);
+#endif
+
+#ifdef ENABLE_MINI_GAME_OKEY
+	PyModule_AddIntConstant(poModule, "ENABLE_MINI_GAME_OKEY", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_MINI_GAME_OKEY", 0);
+#endif
+
+#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
+	PyModule_AddIntConstant(poModule, "ENABLE_SOUL_ROULETTE_SYSTEM", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_SOUL_ROULETTE_SYSTEM", 0);
+#endif
+
+#ifdef ENABLE_EVENT_SYSTEM
+	PyModule_AddIntConstant(poModule, "ENABLE_EVENT_SYSTEM", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_EVENT_SYSTEM", 0);
+#endif
+
+#ifdef ENABLE_FISH_EVENT_SYSTEM
+	PyModule_AddIntConstant(poModule, "FISH_EVENT_SHAPE_1", FISH_EVENT_SHAPE_1);
+	PyModule_AddIntConstant(poModule, "FISH_EVENT_SHAPE_2", FISH_EVENT_SHAPE_2);
+	PyModule_AddIntConstant(poModule, "FISH_EVENT_SHAPE_3", FISH_EVENT_SHAPE_3);
+	PyModule_AddIntConstant(poModule, "FISH_EVENT_SHAPE_4", FISH_EVENT_SHAPE_4);
+	PyModule_AddIntConstant(poModule, "FISH_EVENT_SHAPE_5", FISH_EVENT_SHAPE_5);
+	PyModule_AddIntConstant(poModule, "FISH_EVENT_SHAPE_6", FISH_EVENT_SHAPE_6);
+	PyModule_AddIntConstant(poModule, "FISH_EVENT_SHAPE_7", FISH_EVENT_SHAPE_7);
+	PyModule_AddIntConstant(poModule, "ENABLE_FISH_EVENT_SYSTEM", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_FISH_EVENT_SYSTEM", 0);
+#endif
+
+#ifdef ENABLE_MINI_GAME
+	PyModule_AddIntConstant(poModule, "ENABLE_MINI_GAME",	1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_MINI_GAME",	0);
+#endif
+
+#ifdef ENABLE_ATTENDANCE_EVENT
+	PyModule_AddIntConstant(poModule, "ENABLE_ATTENDANCE_EVENT",	1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_ATTENDANCE_EVENT",	0);
+#endif
+
+#ifdef ENABLE_MINI_GAME_CATCH_KING
+	PyModule_AddIntConstant(poModule, "ENABLE_MINI_GAME_CATCH_KING",	1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_MINI_GAME_CATCH_KING",	0);
+#endif
+
+#ifdef ENABLE_HALLOWEEN_EVENT_SYSTEM
+	PyModule_AddIntConstant(poModule, "ENABLE_HALLOWEEN_EVENT_SYSTEM", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_HALLOWEEN_EVENT_SYSTEM", 0);
+#endif
+
+#ifdef ENABLE_STONE_EVENT
+	PyModule_AddIntConstant(poModule, "ENABLE_STONE_EVENT", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_STONE_EVENT", 0);
+#endif
+
+#ifdef ENABLE_SOCCER_BALL_EVENT
+	PyModule_AddIntConstant(poModule, "ENABLE_SOCCER_BALL_EVENT", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_SOCCER_BALL_EVENT", 0);
+#endif
+
+#ifdef ENABLE_WORD_GAME_EVENT
+	PyModule_AddIntConstant(poModule, "ENABLE_WORD_GAME_EVENT", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_WORD_GAME_EVENT", 0);
+#endif
+
+#ifdef ENABLE_HUMAN_RESIST_PVP
+	PyModule_AddIntConstant(poModule, "ENABLE_HUMAN_RESIST_PVP", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_HUMAN_RESIST_PVP", 0);
+#endif
+
+#ifdef ENABLE_GAYA_SYSTEM
+	PyModule_AddIntConstant(poModule, "ENABLE_GAYA_SYSTEM",	1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_GAYA_SYSTEM",	0);
+#endif
+
+#ifdef ENABLE_GAYA_TICKET_SYSTEM
+	PyModule_AddIntConstant(poModule, "ENABLE_GAYA_TICKET_SYSTEM",	1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_GAYA_TICKET_SYSTEM",	0);
+#endif
+
+#ifdef ENABLE_BIOLOGIST_SYSTEM
+	PyModule_AddIntConstant(poModule, "ENABLE_BIOLOGIST_SYSTEM",	1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_BIOLOGIST_SYSTEM",	0);
+#endif
+
+#ifdef ENABLE_BATTLE_PASS
+	PyModule_AddIntConstant(poModule, "ENABLE_BATTLE_PASS", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_BATTLE_PASS", 0);
+#endif
+
+#ifdef ENABLE_RANKING
+	PyModule_AddIntConstant(poModule, "ENABLE_RANKING", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_RANKING", 0);
+#endif
+
+#ifdef ENABLE_AVG_PVM
+	PyModule_AddIntConstant(poModule, "ENABLE_MEDI_PVM", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_MEDI_PVM", 0);
+#endif
+
+#ifdef ENABLE_CONQUEROR_LEVEL
+	PyModule_AddIntConstant(poModule, "ENABLE_CONQUEROR_LEVEL", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_CONQUEROR_LEVEL", 0);
+#endif
+
+#ifdef ENABLE_NEW_BONUS_SYSTEM
+	PyModule_AddIntConstant(poModule, "ENABLE_NEW_BONUS_SYSTEM", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_NEW_BONUS_SYSTEM", 0);
+#endif
+
+#ifdef ENABLE_MAGIC_REDUCTION_SYSTEM
+	PyModule_AddIntConstant(poModule, "ENABLE_MAGIC_REDUCTION_SYSTEM", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_MAGIC_REDUCTION_SYSTEM", 0);
+#endif
+
+#ifdef ENABLE_EXPRESSING_EMOTION
+	PyModule_AddIntConstant(poModule, "ENABLE_EXPRESSING_EMOTION", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_EXPRESSING_EMOTION", 0);
+#endif
+
+#ifdef ENABLE_STATUS_UP_RENEWAL
+	PyModule_AddIntConstant(poModule, "ENABLE_STATUS_UP_RENEWAL", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_STATUS_UP_RENEWAL", 0);
+#endif
+
+#ifdef ENABLE_NINETH_SKILL
+	PyModule_AddIntConstant(poModule, "ENABLE_NINETH_SKILL", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_NINETH_SKILL", 0);
+#endif
+
+#ifdef ENABLE_PVP_BALANCE
+	PyModule_AddIntConstant(poModule, "ENABLE_PVP_BALANCE", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_PVP_BALANCE", 0);
+#endif
+
+#ifdef ENABLE_PASSIVE_SYSTEM
+	PyModule_AddIntConstant(poModule, "ENABLE_PASSIVE_SYSTEM", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_PASSIVE_SYSTEM", 0);
+#endif
+
+#ifdef ENABLE_TITLE_SYSTEM
+	PyModule_AddIntConstant(poModule, "ENABLE_TITLE_SYSTEM", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_TITLE_SYSTEM", 0);
+#endif
+
+#ifdef ENABLE_WOLFMAN_CHARACTER
+	PyModule_AddIntConstant(poModule, "ENABLE_WOLFMAN_CHARACTER", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_WOLFMAN_CHARACTER", 0);
+#endif
+
+#ifdef ENABLE_UI_DEBUG_WINDOW
+	PyModule_AddIntConstant(poModule, "ENABLE_UI_DEBUG_WINDOW", 1);
+#else
+	PyModule_AddIntConstant(poModule, "ENABLE_UI_DEBUG_WINDOW", 0);
 #endif
 }

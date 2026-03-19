@@ -1,6 +1,8 @@
 #ifndef __LOCALE_SERVCICE__
 #define __LOCALE_SERVCICE__
 
+#include "../../common/service.h"
+
 bool LocaleService_Init(const std::string& c_rstServiceName);
 void LocaleService_LoadLocaleStringFile();
 #ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
@@ -14,30 +16,6 @@ void LocaleService_TransferDefaultSetting();
 const std::string& LocaleService_GetBasePath();
 const std::string& LocaleService_GetMapPath();
 const std::string& LocaleService_GetQuestPath();
-
-enum ELanguages
-{
-	LANGUAGE_NONE,
-	LANGUAGE_EN,
-	LANGUAGE_AE,
-	LANGUAGE_CZ,
-	LANGUAGE_DK,
-	LANGUAGE_FR,
-	LANGUAGE_GR,
-	LANGUAGE_NL,
-	LANGUAGE_PL,
-	LANGUAGE_HU,
-	LANGUAGE_DE,
-	LANGUAGE_IT,
-	LANGUAGE_RU,
-	LANGUAGE_PT,
-	LANGUAGE_RO,
-	LANGUAGE_ES,
-	LANGUAGE_TR,
-
-	LANGUAGE_MAX_NUM,
-	LANGUAGE_DEFAULT = LANGUAGE_EN,
-};
 
 enum eLocalization
 {
@@ -76,9 +54,9 @@ enum eLocalization
 	LC_USA,
 	LC_WE_KOREA, ///< World Edition version for korea
 	LC_TAIWAN,
-//#ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
+#ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
 	LC_EUROPE,
-//#endif
+#endif
 
 	LC_MAX_VALUE
 };
@@ -104,4 +82,4 @@ bool LC_IsTaiwan();
 
 bool LC_IsWorldEdition();
 
-#endif
+#endif // __LOCALE_SERVCICE__

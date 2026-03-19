@@ -3,6 +3,10 @@
 #include "StateManager.h"
 
 #include "../eterBase/CRC32.h"
+//STATEMANAGER.SaveRenderState(D3DRS_SRCBLEND, D3DBLEND_INVDESTCOLOR);
+//STATEMANAGER.SaveRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+//STATEMANAGER.RestoreRenderState(D3DRS_SRCBLEND);
+//STATEMANAGER.RestoreRenderState(D3DRS_DESTBLEND);
 
 CDynamicPool<CGraphicImageInstance>		CGraphicImageInstance::ms_kPool;
 
@@ -51,6 +55,10 @@ void CGraphicImageInstance::OnRender(RECT* pClipRect)
 void CGraphicImageInstance::OnRender()
 #endif
 {
+#ifdef ENABLE_DIRECTX9_UPDATE
+    D3DPERF_BeginEvent(D3DCOLOR_ARGB(255, 50, 50, 0), L"** CGraphicImageInstance::OnRender **");
+#endif
+
 #ifdef ENABLE_RENDER_TARGET
 	CGraphicTexture* graphicTexture = m_roImage->GetTexturePointer();
 
@@ -80,105 +88,121 @@ void CGraphicImageInstance::OnRender()
 	float ev = (c_rRect.top + (c_rRect.bottom-c_rRect.top)) * texReverseHeight;
 #endif
 
-#ifdef ENABLE_CLIP_MASKING
-	float sx = m_v2Position.x - 0.5f;
-	float sy = m_v2Position.y - 0.5f;
-	float ex = m_v2Position.x + fimgWidth - 0.5f;
-	float ey = m_v2Position.y + fimgHeight - 0.5f;
-
-	if (pClipRect)
-	{
-		const float width = ex - sx;
-		const float height = ey - sy;
-		const float uDiff = eu - su;
-		const float vDiff = ev - sv;
-
-		if (ex < pClipRect->left)
-			return;
-
-		if (ey < pClipRect->top)
-			return;
-
-		if (sx > pClipRect->right)
-			return;
-
-		if (sy > pClipRect->bottom)
-			return;
-
-		if (sx < pClipRect->left)
-		{
-			su += (pClipRect->left - sx) / width * uDiff;
-			sx = pClipRect->left;
-		}
-
-		if (sy < pClipRect->top)
-		{
-			sv += (pClipRect->top - sy) / height * vDiff;
-			sy = pClipRect->top;
-		}
-
-		if (ex > pClipRect->right)
-		{
-			eu -= (ex - pClipRect->right) / width * uDiff;
-			ex = pClipRect->right;
-		}
-
-		if (ey > pClipRect->bottom)
-		{
-			ev -= (ey - pClipRect->bottom) / height * vDiff;
-			ey = pClipRect->bottom;
-		}
-	}
-
+#ifdef ENABLE_DIRECTX9_UPDATE
 	TPDTVertex vertices[4];
-	vertices[0].position.x = sx;
-	vertices[0].position.y = sy;
-	vertices[0].position.z = 0.0f;
-	vertices[0].texCoord = TTextureCoordinate(su, sv);
-	vertices[0].diffuse = m_DiffuseColor;
-
-	vertices[1].position.x = ex;
-	vertices[1].position.y = sy;
-	vertices[1].position.z = 0.0f;
-	vertices[1].texCoord = TTextureCoordinate(eu, sv);
-	vertices[1].diffuse = m_DiffuseColor;
-
-	vertices[2].position.x = sx;
-	vertices[2].position.y = ey;
-	vertices[2].position.z = 0.0f;
-	vertices[2].texCoord = TTextureCoordinate(su, ev);
-	vertices[2].diffuse = m_DiffuseColor;
-
-	vertices[3].position.x = ex;
-	vertices[3].position.y = ey;
-	vertices[3].position.z = 0.0f;
-	vertices[3].texCoord = TTextureCoordinate(eu, ev);
-	vertices[3].diffuse = m_DiffuseColor;
 #else
 	TPDTVertex vertices[4];
-	vertices[0].position.x = m_v2Position.x-0.5f;
-	vertices[0].position.y = m_v2Position.y-0.5f;
-	vertices[0].position.z = 0.0f;
-	vertices[0].texCoord = TTextureCoordinate(su, sv);
-	vertices[0].diffuse = m_DiffuseColor;
+#endif
 
-	vertices[1].position.x = m_v2Position.x + fimgWidth-0.5f;
-	vertices[1].position.y = m_v2Position.y-0.5f;
-	vertices[1].position.z = 0.0f;
-	vertices[1].texCoord = TTextureCoordinate(eu, sv);
-	vertices[1].diffuse = m_DiffuseColor;
+#ifdef ENABLE_CLIP_MASKING
+    if (pClipRect)
+    {
+        auto sx = m_v2Position.x - 0.5f;
+        auto sy = m_v2Position.y - 0.5f;
+        auto ex = m_v2Position.x + fimgWidth - 0.5f;
+        auto ey = m_v2Position.y + fimgHeight - 0.5f;
 
-	vertices[2].position.x = m_v2Position.x-0.5f;
-	vertices[2].position.y = m_v2Position.y + fimgHeight-0.5f;
-	vertices[2].position.z = 0.0f;
-	vertices[2].texCoord = TTextureCoordinate(su, ev);
-	vertices[2].diffuse = m_DiffuseColor;
+        const auto width = ex - sx;
+        const auto height = ey - sy;
+        const auto uDiff = eu - su;
+        const auto vDiff = ev - sv;
 
-	vertices[3].position.x = m_v2Position.x + fimgWidth - 0.5f;
-	vertices[3].position.y = m_v2Position.y + fimgHeight - 0.5f;
-	vertices[3].position.z = 0.0f;
-	vertices[3].texCoord = TTextureCoordinate(eu, ev);
-	vertices[3].diffuse = m_DiffuseColor;
+        if (ex < pClipRect->left)
+        {
+            return;
+        }
+
+        if (ey < pClipRect->top)
+        {
+            return;
+        }
+
+        if (sx > pClipRect->right)
+        {
+            return;
+        }
+
+        if (sy > pClipRect->bottom)
+        {
+            return;
+        }
+
+        if (sx < pClipRect->left)
+        {
+            su += (pClipRect->left - sx) / width * uDiff;
+            sx = pClipRect->left;
+        }
+
+        if (sy < pClipRect->top)
+        {
+            sv += (pClipRect->top - sy) / height * vDiff;
+            sy = pClipRect->top;
+        }
+
+        if (ex > pClipRect->right)
+        {
+            eu -= (ex - pClipRect->right) / width * uDiff;
+            ex = pClipRect->right;
+        }
+
+        if (ey > pClipRect->bottom)
+        {
+            ev -= (ey - pClipRect->bottom) / height * vDiff;
+            ey = pClipRect->bottom;
+        }
+
+        vertices[0].position.x = sx;
+        vertices[0].position.y = sy;
+        vertices[0].position.z = 0.0f;
+        vertices[0].texCoord = TTextureCoordinate(su, sv);
+        vertices[0].diffuse = m_DiffuseColor;
+
+        vertices[1].position.x = ex;
+        vertices[1].position.y = sy;
+        vertices[1].position.z = 0.0f;
+        vertices[1].texCoord = TTextureCoordinate(eu, sv);
+        vertices[1].diffuse = m_DiffuseColor;
+
+        vertices[2].position.x = sx;
+        vertices[2].position.y = ey;
+        vertices[2].position.z = 0.0f;
+        vertices[2].texCoord = TTextureCoordinate(su, ev);
+        vertices[2].diffuse = m_DiffuseColor;
+
+        vertices[3].position.x = ex;
+        vertices[3].position.y = ey;
+        vertices[3].position.z = 0.0f;
+        vertices[3].texCoord = TTextureCoordinate(eu, ev);
+        vertices[3].diffuse = m_DiffuseColor;
+    }
+    else
+    {
+#endif
+    vertices[0].position.x = m_v2Position.x - 0.5f;
+    vertices[0].position.y = m_v2Position.y - 0.5f;
+    vertices[0].position.z = 0.0f;
+    vertices[0].texCoord = TTextureCoordinate(su, sv);
+    vertices[0].diffuse = m_DiffuseColor;
+
+    vertices[1].position.x = m_v2Position.x + fimgWidth - 0.5f;
+    vertices[1].position.y = m_v2Position.y - 0.5f;
+    vertices[1].position.z = 0.0f;
+    vertices[1].texCoord = TTextureCoordinate(eu, sv);
+    vertices[1].diffuse = m_DiffuseColor;
+
+    vertices[2].position.x = m_v2Position.x - 0.5f;
+    vertices[2].position.y = m_v2Position.y + fimgHeight - 0.5f;
+    vertices[2].position.z = 0.0f;
+    vertices[2].texCoord = TTextureCoordinate(su, ev);
+    vertices[2].diffuse = m_DiffuseColor;
+
+    vertices[3].position.x = m_v2Position.x + fimgWidth - 0.5f;
+    vertices[3].position.y = m_v2Position.y + fimgHeight - 0.5f;
+    vertices[3].position.z = 0.0f;
+    vertices[3].texCoord = TTextureCoordinate(eu, ev);
+    vertices[3].diffuse = m_DiffuseColor;
+#ifdef ENABLE_CLIP_MASKING
+    }
 #endif
 
 #ifdef ENABLE_OFFICAL_FEATURES
@@ -201,10 +225,26 @@ void CGraphicImageInstance::OnRender()
 		STATEMANAGER.SetTexture(0, pTexture->GetD3DTexture());
 #endif
 		STATEMANAGER.SetTexture(1, nullptr);
-		STATEMANAGER.SetVertexShader(D3DFVF_XYZ|D3DFVF_DIFFUSE|D3DFVF_TEX1);
+#ifdef ENABLE_DIRECTX9_UPDATE
+		STATEMANAGER.SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
+#else
+		STATEMANAGER.SetVertexShader(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
+#endif
+
 		STATEMANAGER.DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 4, 0, 2);
 	}
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+    D3DPERF_EndEvent();
+#endif
 }
+
+#ifdef ENABLE_OFFICAL_FEATURES
+void CGraphicImageInstance::LeftRightReverse()
+{
+	m_bLeftRightReverse = true;
+}
+#endif
 
 const CGraphicTexture & CGraphicImageInstance::GetTextureReference() const
 {
@@ -360,11 +400,11 @@ D3DXCOLOR CGraphicImageInstance::GetPixelColor(int x, int y)
 	if (!pTexture)
 		return dxClr;
 
-	LPDIRECT3DTEXTURE8 d3dTexture = pTexture->GetD3DTexture();
+	LPDIRECT3DTEXTURE9 d3dTexture = pTexture->GetD3DTexture();
 	if (!d3dTexture)
 		return dxClr;
 
-	IDirect3DSurface8* surface;
+	IDirect3DSurface9* surface;
 	D3DSURFACE_DESC desc;
 	D3DLOCKED_RECT rect;
 	RECT rc;
@@ -398,21 +438,37 @@ D3DXCOLOR CGraphicImageInstance::GetPixelColor(int x, int y)
 }
 
 #ifdef ENABLE_NEW_DUNGEON_LIB
+#ifdef ENABLE_CLIP_MASKING
+void CGraphicImageInstance::RenderCoolTime(float fCoolTime, RECT* pClipRect)
+#else
 void CGraphicImageInstance::RenderCoolTime(float fCoolTime)
+#endif
 {
 	if (IsEmpty())
 		return;
 
 	assert(!IsEmpty());
 
-	OnRenderCoolTime(fCoolTime);
+#ifdef ENABLE_CLIP_MASKING
+    OnRenderCoolTime(fCoolTime, pClipRect);
+#else
+    OnRenderCoolTime(fCoolTime);
+#endif
 }
 
+#ifdef ENABLE_CLIP_MASKING
+void CGraphicImageInstance::OnRenderCoolTime(float fCoolTime, RECT* pClipRect)
+#else
 void CGraphicImageInstance::OnRenderCoolTime(float fCoolTime)
+#endif
 {
+	//if (fCoolTime >= 1.0f)
+	//	fCoolTime = 1.0f;
+
 	CGraphicImage* pImage = m_roImage.GetPointer();
 	CGraphicTexture* pTexture = pImage->GetTexturePointer();
 
+	// <!!!> ACHTUNG <!!!>
 	float fimgWidth = pImage->GetWidth() * m_v2Scale.x;
 	float fimgHeight = pImage->GetHeight() * m_v2Scale.y;
 
@@ -522,21 +578,16 @@ void CGraphicImageInstance::OnRenderCoolTime(float fCoolTime)
 			CGraphicBase::SetDefaultIndexBuffer(CGraphicBase::DEFAULT_IB_FILL_TRI);
 			STATEMANAGER.SetTexture(0, pTexture->GetD3DTexture());
 			STATEMANAGER.SetTexture(1, nullptr);
-#ifdef ENABLE_D3DX9
-			STATEMANAGER.SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+            STATEMANAGER.SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
 #else
-			STATEMANAGER.SetVertexShader(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
+            STATEMANAGER.SetVertexShader(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
 #endif
+
 			STATEMANAGER.DrawPrimitive(D3DPT_TRIANGLEFAN, 0, iTriCount);
 		}
 		STATEMANAGER.SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
 	}
-}
-#endif
-
-#ifdef ENABLE_OFFICAL_FEATURES
-void CGraphicImageInstance::LeftRightReverse()
-{
-	m_bLeftRightReverse = true;
 }
 #endif

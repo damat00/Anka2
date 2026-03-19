@@ -4,10 +4,6 @@
 #include "PythonGuild.h"
 #include "AbstractPlayer.h"
 
-#ifdef ENABLE_EVENT_MANAGER
-	#include "PythonGameEventManager.h"
-#endif
-
 #ifdef ENABLE_PYTHON_DYNAMIC_MODULE_NAME
 	#include "PythonDynamicModuleNames.h"
 #endif
@@ -73,6 +69,11 @@ PyObject *netStartGame(PyObject *poSelf, PyObject *poArgs)
 	rkNetStream.StartGame();
 
 	return Py_BuildNone();
+}
+
+PyObject * netIsTest(PyObject * poSelf, PyObject * poArgs)
+{
+	return Py_BuildValue("i", false); // backward-compatible
 }
 
 PyObject *netWarp(PyObject *poSelf, PyObject *poArgs)
@@ -1338,6 +1339,18 @@ PyObject *netSendMallCheckoutPacket(PyObject *poSelf, PyObject *poArgs)
 	return Py_BuildNone();
 }
 
+PyObject* netSendAnswerMakeGuildPacket(PyObject* poSelf, PyObject* poArgs)
+{
+	char * szName;
+	if (!PyTuple_GetString(poArgs, 0, &szName))
+		return Py_BuildException();
+
+	CPythonNetworkStream& rns=CPythonNetworkStream::Instance();
+	rns.SendAnswerMakeGuildPacket(szName);
+
+	return Py_BuildNone();
+}
+
 PyObject *netSendQuestInputStringPacket(PyObject *poSelf, PyObject *poArgs)
 {
 	char *szString;
@@ -1578,7 +1591,7 @@ PyObject *netSendRequestRefineInfoPacket(PyObject *poSelf, PyObject *poArgs)
 
 //	CPythonNetworkStream& rns=CPythonNetworkStream::Instance();
 //	rns.SendRequestRefineInfoPacket(iSlotIndex);
-	assert(!"netSendRequestRefineInfoPacket - 더이상 사용하지 않는 함수 입니다");
+	assert(!"netSendRequestRefineInfoPacket - This function is not used anymore");
 
 	return Py_BuildNone();
 }
@@ -1592,11 +1605,50 @@ PyObject *netSendRefinePacket(PyObject *poSelf, PyObject *poArgs)
 	if (!PyTuple_GetInteger(poArgs, 1, &iType))
 		return Py_BuildException();
 
+#ifdef ENABLE_PITTY_REFINE
+	bool bUseSealOfGod;
+	if (!PyTuple_GetBoolean(poArgs, 2, &bUseSealOfGod))
+	{
+		return Py_BuildException();
+	}
+#endif
+
 	CPythonNetworkStream& rns=CPythonNetworkStream::Instance();
-	rns.SendRefinePacket(iSlotIndex, iType);
+	rns.SendRefinePacket(iSlotIndex, iType
+#ifdef ENABLE_PITTY_REFINE
+, bUseSealOfGod
+#endif
+	);
 
 	return Py_BuildNone();
 }
+
+#ifdef ENABLE_FISH_EVENT_SYSTEM
+PyObject* netSendFishBoxUse(PyObject* poSelf, PyObject* poArgs)
+{
+	int iWindow;
+	if (!PyTuple_GetInteger(poArgs, 0, &iWindow))
+		return Py_BuildException();
+	
+	int iCell;
+	if (!PyTuple_GetInteger(poArgs, 1, &iCell))
+		return Py_BuildException();
+
+	CPythonNetworkStream::Instance().SendFishBoxUse(iWindow, iCell);
+	return Py_BuildNone();
+}
+
+PyObject* netSendFishShapeAdd(PyObject* poSelf, PyObject* poArgs)
+{
+	int iShapePos;
+	if (!PyTuple_GetInteger(poArgs, 0, &iShapePos))
+		return Py_BuildException();
+
+	CPythonNetworkStream::Instance().SendFishShapeAdd(iShapePos);
+
+	return Py_BuildNone();
+}
+#endif
 
 PyObject *netSendSelectItemPacket(PyObject *poSelf, PyObject *poArgs)
 {
@@ -1651,6 +1703,44 @@ PyObject *netRegisterErrorLog(PyObject *poSelf, PyObject *poArgs)
 
 	return Py_BuildNone();
 }
+
+#ifdef ENABLE_RESP_SYSTEM
+PyObject* netSendRespFetchDropPacket(PyObject* poSelf, PyObject* poArgs)
+{
+	uint32_t mobVnum;
+	if (!PyTuple_GetUnsignedInteger(poArgs, 0, &mobVnum))
+		return Py_BuildException();
+
+	CPythonNetworkStream& rns = CPythonNetworkStream::Instance();
+	rns.SendRespFetchDropPacket(mobVnum);
+
+	return Py_BuildNone();
+}
+
+PyObject* netSendRespFetchRespPacket(PyObject* poSelf, PyObject* poArgs)
+{
+	uint32_t mobVnum;
+	if (!PyTuple_GetUnsignedInteger(poArgs, 0, &mobVnum))
+		return Py_BuildException();
+
+	CPythonNetworkStream& rns = CPythonNetworkStream::Instance();
+	rns.SendRespFetchRespPacket(mobVnum);
+
+	return Py_BuildNone();
+}
+
+PyObject* netSendRespTeleportPacket(PyObject* poSelf, PyObject* poArgs)
+{
+	size_t id;
+	if (!PyTuple_GetUnsignedInteger(poArgs, 0, &id))
+		return Py_BuildException();
+
+	CPythonNetworkStream& rns = CPythonNetworkStream::Instance();
+	rns.SendRespTeleportPacket(id);
+
+	return Py_BuildNone();
+}
+#endif
 
 #ifdef ENABLE_STYLE_ATTRIBUTE_SYSTEM
 PyObject* netSendItemNewAttributePacket(PyObject* poSelf, PyObject* poArgs)
@@ -1849,53 +1939,26 @@ PyObject *netSendChestDropInfo(PyObject *poSelf, PyObject *poArgs)
 }
 #endif
 
-#ifdef ENABLE_EVENT_MANAGER
-PyObject *netSendRequestEventQuest(PyObject *poSelf, PyObject *poArgs)
+#ifdef ENABLE_ATTENDANCE_EVENT
+PyObject* netSendAttendanceGetReward(PyObject* poSelf, PyObject* poArgs)
 {
-	char *szString;
-	if (!PyTuple_GetString(poArgs, 0, &szString))
-		return Py_BuildException();
-
-	CPythonNetworkStream& rns = CPythonNetworkStream::Instance();
-	rns.SendRequestEventQuest(szString);
-
-	return Py_BuildNone();
-}
-
-PyObject *netSendRequestEventData(PyObject *poSelf, PyObject *poArgs)
-{
-	int iMonth;
-	if (!PyTuple_GetInteger(poArgs, 0, &iMonth))
-		return Py_BuildException();
-
-	if ((iMonth >= 0) && (iMonth <= InGameEventManager::MONTH_MAX_NUM))
-	{
-		CPythonNetworkStream& rns = CPythonNetworkStream::Instance();
-		rns.SendRequestEventData(iMonth);
-	}
-
+	CPythonNetworkStream::Instance().SendAttendanceGetReward();
 	return Py_BuildNone();
 }
 #endif
 
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-PyObject *netSendExtBattlePassAction(PyObject *poSelf, PyObject *poArgs)
+ #ifdef ENABLE_MINI_GAME_CATCH_KING
+PyObject* netSendMiniGameCatchKing(PyObject* poSelf, PyObject* poArgs)
 {
-	int iAction = 0;
-	if (!PyTuple_GetInteger(poArgs, 0, &iAction))
+	int iSubHeader;
+	if (!PyTuple_GetInteger(poArgs, 0, &iSubHeader))
 		return Py_BuildException();
-
-	CPythonNetworkStream::Instance().SendExtBattlePassAction(iAction);
-	return Py_BuildNone();
-}
-
-PyObject *netSendExtBattlePassPremiumItem(PyObject *poSelf, PyObject *poArgs)
-{
-	int slotindex = 0;
-	if (!PyTuple_GetInteger(poArgs, 0, &slotindex))
+	
+	int iSubArgument;
+	if (!PyTuple_GetInteger(poArgs, 1, &iSubArgument))
 		return Py_BuildException();
-
-	CPythonNetworkStream::Instance().SendExtBattlePassPremiumItem(slotindex);
+	
+	CPythonNetworkStream::Instance().SendMiniGameCatchKing(iSubHeader, iSubArgument);
 	return Py_BuildNone();
 }
 #endif
@@ -2238,6 +2301,30 @@ PyObject *netSendAuraRefineCancel(PyObject *poSelf, PyObject *poArgs)
 }
 #endif
 
+#ifdef ENABLE_BINARY_SERVERINFO
+static const char* ServerIPVName[1][2] = {
+	{"127.0.0.1", 	"Anka2"},	//Server ismi burdan de휓i힊tir 
+};
+
+static unsigned int ServerPORT[] = {
+	{30002},	//ch1
+	{30012},	//ch2
+	{30022},	//ch3
+	{30032},	//ch4
+	{30001}		//auth
+};
+
+PyObject* netGetServer_IPNAME(PyObject* poSelf, PyObject* poArgs)
+{
+	return Py_BuildValue("ss", ServerIPVName[0][0], ServerIPVName[0][1]);
+}
+
+PyObject* netGetServer_PORT(PyObject* poSelf, PyObject* poArgs)
+{
+	return Py_BuildValue("iiiii", ServerPORT[0], ServerPORT[1], ServerPORT[2], ServerPORT[3], ServerPORT[4]);
+}
+#endif
+
 #ifdef ENABLE_GROWTH_PET_SYSTEM
 PyObject *netCheckUsePetItem(PyObject *poSelf, PyObject *poArgs)
 {
@@ -2537,6 +2624,18 @@ PyObject *netSendHuntingAction(PyObject *poSelf, PyObject *poArgs)
 }
 #endif
 
+#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
+PyObject* netSoulRoulettePacket(PyObject* poSelf, PyObject* poArgs)
+{
+	int option;
+	if (!PyTuple_GetInteger(poArgs, 0, &option))
+		return Py_BuildException();
+
+	CPythonNetworkStream::Instance().SoulRoulette(option);
+	return Py_BuildNone();
+}
+#endif
+
 void initnet()
 {
 	static PyMethodDef s_methods[] =
@@ -2547,6 +2646,10 @@ void initnet()
 		{ "GetServerInfo", netGetServerInfo, METH_VARARGS },
 		{ "PreserveServerCommand", netPreserveServerCommand, METH_VARARGS },
 		{ "GetPreservedServerCommand", netGetPreservedServerCommand, METH_VARARGS },
+#ifdef ENABLE_FISH_EVENT_SYSTEM
+		{ "SendUseFishBox",						netSendFishBoxUse,						METH_VARARGS },
+		{ "SendAddFishBox",						netSendFishShapeAdd,					METH_VARARGS },
+#endif
 
 		{ "StartGame", netStartGame, METH_VARARGS },
 		{ "Warp", netWarp, METH_VARARGS },
@@ -2665,6 +2768,7 @@ void initnet()
 		{ "SendMallCheckoutPacket", netSendMallCheckoutPacket, METH_VARARGS },
 
 		// Guild
+		{ "SendAnswerMakeGuildPacket",				netSendAnswerMakeGuildPacket,				METH_VARARGS },
 		{ "SendQuestInputStringPacket", netSendQuestInputStringPacket, METH_VARARGS },
 		{ "SendQuestConfirmPacket", netSendQuestConfirmPacket, METH_VARARGS },
 		{ "SendGuildAddMemberPacket", netSendGuildAddMemberPacket, METH_VARARGS },
@@ -2697,6 +2801,12 @@ void initnet()
 
 		// Log
 		{ "RegisterErrorLog", netRegisterErrorLog, METH_VARARGS },
+
+#ifdef ENABLE_RESP_SYSTEM
+		{ "SendRespFetchDropPacket", netSendRespFetchDropPacket,					METH_VARARGS },
+		{ "SendRespFetchRespPacket", netSendRespFetchRespPacket,					METH_VARARGS },
+		{ "SendRespTeleportPacket", 	netSendRespTeleportPacket,					METH_VARARGS },
+#endif
 
 #ifdef ENABLE_STYLE_ATTRIBUTE_SYSTEM
 		{"SendItemNewAttributePacket", netSendItemNewAttributePacket, METH_VARARGS },
@@ -2733,16 +2843,6 @@ void initnet()
 		{ "SendChestDropInfo", netSendChestDropInfo, METH_VARARGS },
 #endif
 
-#ifdef ENABLE_EVENT_MANAGER
-		{ "SendRequestEventQuest", netSendRequestEventQuest, METH_VARARGS },
-		{ "SendRequestEventData", netSendRequestEventData, METH_VARARGS },
-#endif
-
-#ifdef ENABLE_RENEWAL_BATTLE_PASS
-		{ "SendExtBattlePassAction", netSendExtBattlePassAction, METH_VARARGS },
-		{ "SendExtBattlePassPremiumItem", netSendExtBattlePassPremiumItem, METH_VARARGS },
-#endif
-
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
 		{ "SendOfflineShopEndPacket", netSendOfflineShopEndPacket, METH_VARARGS },
 		{ "SendOfflineShopBuyPacket", netSendOfflineShopBuyPacket, METH_VARARGS },
@@ -2771,6 +2871,11 @@ void initnet()
 #ifdef ENABLE_CLIENT_PERFORMANCE
 		{ "LoadResourcesInCache", netLoadResourcesInCache, METH_VARARGS },
 		{ "RegisterSkills", netRegisterSkills, METH_VARARGS },
+#endif
+
+#ifdef ENABLE_BINARY_SERVERINFO
+		{ "GetServer_IPNAME",					netGetServer_IPNAME,					METH_VARARGS },
+		{ "GetServer_PORT",						netGetServer_PORT,						METH_VARARGS },
 #endif
 
 #ifdef ENABLE_AURA_COSTUME_SYSTEM
@@ -2811,6 +2916,21 @@ void initnet()
 
 #ifdef ENABLE_HUNTING_SYSTEM
 		{ "SendHuntingAction", netSendHuntingAction, METH_VARARGS },
+#endif
+
+#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
+		{ "SoulRoulettePacket",					netSoulRoulettePacket,					METH_VARARGS },
+#endif
+
+#ifdef ENABLE_FISH_EVENT_SYSTEM
+		{ "RegisterEmoticonString",				netRegisterEmoticonString,				METH_VARARGS },
+#endif
+#ifdef ENABLE_ATTENDANCE_EVENT
+		{ "SendAttendanceGetReward",				netSendAttendanceGetReward,					METH_VARARGS },
+#endif
+
+#ifdef ENABLE_MINI_GAME_CATCH_KING
+		{ "SendMiniGameCatchKing",					netSendMiniGameCatchKing,					METH_VARARGS },
 #endif
 
 		{ nullptr, nullptr },
@@ -2861,6 +2981,13 @@ void initnet()
 #ifdef ENABLE_AURA_COSTUME_SYSTEM
 	PyModule_AddIntConstant(poModule, "ACCOUNT_CHARACTER_SLOT_AURA", CPythonNetworkStream::ACCOUNT_CHARACTER_SLOT_AURA);
 #endif
+#ifdef ENABLE_CONQUEROR_LEVEL
+	PyModule_AddIntConstant(poModule, "ACCOUNT_CHARACTER_SLOT_CONQUEROR_LEVEL", CPythonNetworkStream::ACCOUNT_CHARACTER_SLOT_CONQUEROR_LEVEL);
+	PyModule_AddIntConstant(poModule, "ACCOUNT_CHARACTER_SLOT_SUNGMA_ST", CPythonNetworkStream::ACCOUNT_CHARACTER_SLOT_SUNGMA_ST);
+	PyModule_AddIntConstant(poModule, "ACCOUNT_CHARACTER_SLOT_SUNGMA_HP", CPythonNetworkStream::ACCOUNT_CHARACTER_SLOT_SUNGMA_HP);
+	PyModule_AddIntConstant(poModule, "ACCOUNT_CHARACTER_SLOT_SUNGMA_MOVE", CPythonNetworkStream::ACCOUNT_CHARACTER_SLOT_SUNGMA_MOVE);
+	PyModule_AddIntConstant(poModule, "ACCOUNT_CHARACTER_SLOT_SUNGMA_IMMUNE", CPythonNetworkStream::ACCOUNT_CHARACTER_SLOT_SUNGMA_IMMUNE);
+#endif
 	PyModule_AddIntConstant(poModule, "ACCOUNT_CHARACTER_SLOT_LAST_PLAYTIME", CPythonNetworkStream::ACCOUNT_CHARACTER_SLOT_LAST_PLAYTIME);
 	PyModule_AddIntConstant(poModule, "ACCOUNT_CHARACTER_SLOT_MAPINDEX", CPythonNetworkStream::ACCOUNT_CHARACTER_SLOT_MAPINDEX);
 
@@ -2878,10 +3005,4 @@ void initnet()
 	PyModule_AddIntConstant(poModule, "DS_SUB_HEADER_REFINE_FAIL_NOT_ENOUGH_MATERIAL", DS_SUB_HEADER_REFINE_FAIL_NOT_ENOUGH_MATERIAL);
 	PyModule_AddIntConstant(poModule, "DS_SUB_HEADER_REFINE_FAIL_TOO_MUCH_MATERIAL", DS_SUB_HEADER_REFINE_FAIL_TOO_MUCH_MATERIAL);
 	PyModule_AddIntConstant(poModule, "DS_SUB_HEADER_REFINE_SUCCEED", DS_SUB_HEADER_REFINE_SUCCEED);
-
-#ifdef ENABLE_BIOLOG_SYSTEM
-	PyModule_AddIntConstant(poModule, "BIOLOG_MANAGER_OPEN", CG_BIOLOG_MANAGER_OPEN);
-	PyModule_AddIntConstant(poModule, "BIOLOG_MANAGER_SEND", CG_BIOLOG_MANAGER_SEND);
-	PyModule_AddIntConstant(poModule, "BIOLOG_MANAGER_TIMER", CG_BIOLOG_MANAGER_TIMER);
-#endif
 }

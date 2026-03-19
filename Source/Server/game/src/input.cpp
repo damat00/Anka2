@@ -224,9 +224,9 @@ int CInputHandshake::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 
 	else if (bHeader == HEADER_CG_STATE_CHECKER)
 	{
-		if (d->isChannelStatusRequested())
+		if (d->isChannelStatusRequested()) {
 			return 0;
-
+		}
 		d->SetChannelStatusRequested(true);
 		db_clientdesc->DBPacket(HEADER_GD_REQUEST_CHANNELSTATUS, d->GetHandle(), NULL, 0);
 	}

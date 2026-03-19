@@ -93,7 +93,13 @@ void CBlockTexture::Render(int ix, int iy)
 
 		STATEMANAGER.SetTexture(0, m_lpd3dTexture);
 		STATEMANAGER.SetTexture(1, nullptr);
-		STATEMANAGER.SetVertexShader(D3DFVF_XYZ|D3DFVF_TEX1|D3DFVF_DIFFUSE);
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+        STATEMANAGER.SetFVF(D3DFVF_XYZ | D3DFVF_TEX1 | D3DFVF_DIFFUSE);
+#else
+        STATEMANAGER.SetVertexShader(D3DFVF_XYZ | D3DFVF_TEX1 | D3DFVF_DIFFUSE);
+#endif
+
 		STATEMANAGER.DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 4, 0, 2);
 	}
 }
@@ -153,7 +159,24 @@ void CBlockTexture::InvalidateRect(const RECT & c_rsrcRect)
 
 bool CBlockTexture::Create(CGraphicDib * pDIB, const RECT & c_rRect, DWORD dwWidth, DWORD dwHeight)
 {
-	if (FAILED(ms_lpd3dDevice->CreateTexture(dwWidth, dwHeight, 0, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &m_lpd3dTexture)))
+#ifdef ENABLE_DIRECTX9_UPDATE
+    if (FAILED(ms_lpd3dDevice->CreateTexture(dwWidth
+                                                , dwHeight
+                                                , 0
+                                                , 0
+                                                , D3DFMT_A8R8G8B8
+                                                , D3DPOOL_MANAGED
+                                                , &m_lpd3dTexture
+                                                , nullptr)))
+#else
+    if (FAILED(ms_lpd3dDevice->CreateTexture(dwWidth
+                                                , dwHeight
+                                                , 0
+                                                , 0
+                                                , D3DFMT_A8R8G8B8
+                                                , D3DPOOL_MANAGED
+                                                , &m_lpd3dTexture)))
+#endif
 	{
 		Tracef("Failed to create block texture %u, %u\n", dwWidth, dwHeight);
 		return false;

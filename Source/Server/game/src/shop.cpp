@@ -208,7 +208,7 @@ int CShop::Buy(LPCHARACTER ch, BYTE pos)
 
 	SHOP_ITEM& r_item = m_itemVector[pos];
 
-	if (r_item.price < 0) // Fix
+	if (r_item.price < 0)//@fixme275
 	{
 		LogManager::instance().HackLog("SHOP_BUY_GOLD_OVERFLOW", ch);
 		return SHOP_SUBHEADER_GC_NOT_ENOUGH_MONEY;
@@ -248,6 +248,23 @@ int CShop::Buy(LPCHARACTER ch, BYTE pos)
 	{
 		sys_log(1, "Shop::Buy : Not enough money : %s has %d, price %d", ch->GetName(), ch->GetGold(), dwPrice);
 		return SHOP_SUBHEADER_GC_NOT_ENOUGH_MONEY;
+	}
+#endif
+
+#ifdef ENABLE_ZODIAC_MISSION
+	if((r_item.vnum >= 33001 && r_item.vnum <= 33030) || (r_item.vnum == 33034))
+	{
+		char text[256];
+		snprintf(text,sizeof(text),"Zodiac_Item_%d",r_item.vnum);
+		if(ch->GetProtectTime(text) <= 0)
+		{
+			ch->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("Nesne tukendi."));
+			return SHOP_SUBHEADER_GC_NOT_ENOUGH_LUCKY;
+		}
+		else
+		{
+			ch->SetProtectTime(text,ch->GetProtectTime(text)-50);
+		}
 	}
 #endif
 
@@ -480,7 +497,6 @@ int CShop::Buy(LPCHARACTER ch, BYTE pos)
 #else
 		sys_log(0, "SHOP: BUY: name %s %s(x %d):%u price %u", ch->GetName(), item->GetName(), item->GetCount(), item->GetID(), dwPrice);
 #endif
-
 	ch->Save();
 
 	return (SHOP_SUBHEADER_GC_OK);
@@ -515,6 +531,7 @@ bool CShop::AddGuest(LPCHARACTER ch, DWORD owner_vid, bool bOtherEmpire)
 	{
 		const SHOP_ITEM & item = m_itemVector[i];
 
+		//END_HIVALUE_ITEM_EVENT
 		if (m_pkPC && !item.pkItem)
 			continue;
 

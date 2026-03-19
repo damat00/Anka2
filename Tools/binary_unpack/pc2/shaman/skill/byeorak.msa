@@ -1,7 +1,7 @@
 ScriptType               MotionData
 
 MotionFileName           "d:/ymir work/pc2/shaman/skill/byeorak.gr2"
-MotionDuration           1.666667
+MotionDuration           1.000001
 Accumulation           0.00	0.00	0.00
 
 Group MotionEventData

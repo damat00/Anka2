@@ -83,6 +83,7 @@ class CMouseController(object):
 		self.DeattachObject()
 
 		self.callbackDict = {}
+		self.IsAttachedIconRender = True
 
 	def __del__(self):
 		self.callbackDict = {}
@@ -125,10 +126,6 @@ class CMouseController(object):
 			app.VSIZE			: (-16, -16),
 			app.HVSIZE			: (-16, -16),
 		}
-
-		if app.ENABLE_FISH_GAME:
-			self.cursorDict[app.FISH] = CursorImage("D:/Ymir Work/UI/Cursor/cursor_no.sub")
-			self.cursorPosDict[app.FISH] = (0, 0)
 
 		app.SetCursor(app.NORMAL)
 
@@ -352,7 +349,6 @@ class CMouseController(object):
 		self.LastAttachedSlotNumber = self.AttachedSlotNumber
 
 		if self.AttachedIconHandle != 0:
-
 			if self.AttachedType == player.SLOT_TYPE_INVENTORY or\
 				self.AttachedType == player.SLOT_TYPE_PRIVATE_SHOP or\
 				self.AttachedType == player.SLOT_TYPE_SHOP or\
@@ -385,12 +381,17 @@ class CMouseController(object):
 			elif self.AttachedType == player.SLOT_TYPE_EMOTION:
 				grpImage.Delete(self.AttachedIconHandle)
 
-		self.AttachedFlag = FALSE
-		self.AttachedType = -1
-		self.AttachedItemIndex = -1
-		self.AttachedSlotNumber = -1
-		self.AttachedIconHandle = 0
-		wndMgr.SetAttachingFlag(FALSE)
+			if self.AttachedType == player.SLOT_TYPE_FISH_EVENT:
+					self.AttachedOwner.DropQuestionDialog()
+					return
+
+			self.DeattachObjectPostProcess()
+			self.AttachedFlag = FALSE
+			self.AttachedType = -1
+			self.AttachedItemIndex = -1
+			self.AttachedSlotNumber = -1
+			self.AttachedIconHandle = 0
+			wndMgr.SetAttachingFlag(False)
 
 		if self.countNumberLine:
 			self.countNumberLine.Hide()
@@ -443,9 +444,12 @@ class CMouseController(object):
 		self.x = x
 		self.y = y
 
-		if TRUE == self.isAttached():
+		if True == self.isAttached():
 			if 0 != self.AttachedIconHandle:
-				grpImage.SetDiffuseColor(self.AttachedIconHandle, 1.0, 1.0, 1.0, 0.5)
+				if player.SLOT_TYPE_FISH_EVENT == self.GetAttachedType():
+					grpImage.SetDiffuseColor(self.AttachedIconHandle, 1.0, 1.0, 1.0, 1.0)
+				else:
+					grpImage.SetDiffuseColor(self.AttachedIconHandle, 1.0, 1.0, 1.0, 0.5)
 				grpImage.SetPosition(self.AttachedIconHandle, self.x - self.AttachedIconHalfWidth, self.y - self.AttachedIconHalfHeight)
 				self.countNumberLine.SetPosition(self.x, self.y - self.AttachedIconHalfHeight - 3)
 
@@ -456,9 +460,10 @@ class CMouseController(object):
 	# Render
 	def Render(self):
 
-		if TRUE == self.isAttached():
+		if True == self.isAttached():
 			if 0 != self.AttachedIconHandle:
-				grpImage.Render(self.AttachedIconHandle)
+				if True == self.IsAttachedIconRender:
+					grpImage.Render(self.AttachedIconHandle)
 
 		if self.IsSoftwareCursor:
 			if TRUE == app.IsShowCursor():
@@ -484,5 +489,43 @@ class CMouseController(object):
 
 	def ClearCallBack(self):
 		self.callbackDict = {}
+
+	def AttachFishPiece(self, owner, shape, img_handle, adjust_x, adjust_y, width, height):
+		self.LastAttachedSlotNumber = self.AttachedSlotNumber
+		self.countNumberLine.SetNumber("")
+		self.countNumberLine.Hide()
+		
+		self.AttachedFlag = True
+		self.AttachedOwner = owner
+		self.AttachedType = player.SLOT_TYPE_FISH_EVENT
+		self.AttachedSlotNumber = -1
+		self.RealAttachedSlotNumber = -1
+		self.AttachedItemIndex = shape
+		self.AttachedCount = 0
+		self.AttachedIconHandle = img_handle
+		self.AttachedIconHalfWidth = grpImage.GetWidth(self.AttachedIconHandle) / 2 + adjust_x
+		self.AttachedIconHalfHeight = grpImage.GetHeight(self.AttachedIconHandle) / 2 + adjust_y
+		wndMgr.AttachIcon(self.AttachedType, self.AttachedItemIndex, self.AttachedSlotNumber, width, height)
+		
+	def DeattachObjectPostProcess(self):
+		self.AttachedOwner = 0
+		self.AttachedFlag = False
+		self.AttachedType = -1
+		self.AttachedItemIndex = -1
+		self.AttachedSlotNumber = -1
+		self.RealAttachedSlotNumber = -1
+		self.AttachedIconHandle = 0
+		wndMgr.SetAttachingFlag(False)
+
+		if self.countNumberLine:
+			self.countNumberLine.Hide()
+		
+		app.ShowCursor()
+		
+	def SetAttachedIconRender(self, flag):
+		self.IsAttachedIconRender = flag
+		
+	def GetAttachedIconRender(self):
+		return self.IsAttachedIconRender
 
 mouseController = CMouseController()

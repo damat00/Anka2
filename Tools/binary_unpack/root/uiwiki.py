@@ -31,63 +31,108 @@ AUTOLOAD_SPEED = 0.010
 AUTOLOAD_MONSTER_SPEED = 0.020
 
 IMG_DIR = "d:/ymir work/ui/game/wiki/"
+IMG_DIR_REWORK = "d:/ymir work/ui/wiki_rework/"
+REWORK = "d:/ymir work/ui/game/wiki_new/"
 
-class EncyclopediaofGame(ui.BoardWithTitleBar):
+class EncyclopediaofGame(ui.ScriptWindow):
 	def __del__(self):
-		ui.BoardWithTitleBar.__del__(self)
+		ui.ScriptWindow.__del__(self)
 
 	def Destroy(self):
 		if self.children.has_key("listBoxCube"):
 			self.children["listBoxCube"].ClearItem()
-			self.children["listBoxCube"] = None
+			self.children["listBoxCube"]=None
 			del self.children["listBoxCube"]
 
 		if self.children.has_key("resultpageListbox"):
 			self.children["resultpageListbox"].RemoveAllItems()
+			self.children["resultpageListbox"]=None
 			del self.children["resultpageListbox"]
-			self.children["resultpageListbox"] = None
 
 		self.selectArg = ""
 		self.AIAppendAlgoritm = None
 
 		if len(self.children) != 0:
-			ui.BoardWithTitleBar.Destroy(self)
+			ui.ScriptWindow.Destroy(self)
 			constInfo.SetMainParent(None)
 			constInfo.SetListBox(None)
 
 		self.children = {}
 
 	def __init__(self):
-		ui.BoardWithTitleBar.__init__(self)
+		ui.ScriptWindow.__init__(self)
 		self.SetWindowName("EncyclopediaofGame")
 		self.AddFlag("movable")
 		self.AddFlag("float")
+		# self.AddFlag("animate")  # Bu flag tanýmlý deðil, kaldýrýldý
+
+		self.RealBoard = ui.Board()
+		self.RealBoard.SetParent(self)
+		self.RealBoard.SetSize(801, 486)
+		self.RealBoard.SetPosition(0, 0)
+		self.RealBoard.SetWindowHorizontalAlignCenter()
+		self.RealBoard.SetWindowVerticalAlignCenter()
+		self.RealBoard.SetTop()
+		self.RealBoard.Show()
+
+		self.Board = ui.ImageBox()
+		self.Board.SetParent(self)
+		self.Board.LoadImage(REWORK + "board_with_innerboard.png")
+		self.Board.AddFlag("not_pick")
+		self.Board.SetPosition(6, 29)
+		self.Board.Show()	
+		
+		self.titleBar = ui.TitleBar()
+		self.titleBar.SetParent(self)
+		self.titleBar.MakeTitleBar(0, "red")
+		self.titleBar.SetPosition(6, 6)
+		self.titleBar.SetWidth((801) - 15)
+		self.titleBar.SetCloseEvent(ui.__mem_func__(self.Close))
+		self.titleBar.Show()
+
+		self.titleName = ui.TextLine()
+		self.titleName.SetParent(self.titleBar)
+		self.titleName.SetPosition(6, 4)
+		self.titleName.SetText("Wikipedia")
+		self.titleName.SetWindowHorizontalAlignCenter()
+		self.titleName.SetHorizontalAlignCenter()
+		self.titleName.Show()
+
 		self.children = {}
 
 		self.Destroy()
 
-		self.children["characterIndex"] = 0
+		# Default variable
+		self.children["characterIndex"]=0
 		self.Initialize()
 
 	def Initialize(self):
-		self.SetSize(720, 480)
-		self.SetTitleName(localeInfo.WIKI_TITLE)
+		self.SetSize(801, 486)
+		# self.SetTitleName(localeInfo.WIKI_TITLE)
 		self.SetCenterPosition()
 
-		self.LoadBackground()
 		self.LoadSearchInfos()
 		self.LoadCategoryInfos()
+		self.LoadBlock()
 		self.LoadResultPage()
 
 	def LoadResultPage(self):
+		resultPageImage = ui.Window()
+		resultPageImage.SetParent(self)
+		# resultPageImage.LoadImage(IMG_DIR+"result_wall.tga")
+		resultPageImage.SetSize(559,364)
+		resultPageImage.SetPosition(223,100)
+		resultPageImage.Show()
+		self.children["resultPageImage"] = resultPageImage
+
 		for j in xrange(4):
-			characterBtn = ui.RadioButton()
-			characterBtn.SetParent(self.children["backgroundImage"])
-			characterBtn.SetEvent(ui.__mem_func__(self.__SelectCharacters), j)
-			characterBtn.SetUpVisual(IMG_DIR + "character/%d_0.tga" % j)
-			characterBtn.SetOverVisual(IMG_DIR + "character/%d_1.tga" % j)
-			characterBtn.SetDownVisual(IMG_DIR + "character/%d_2.tga" % j)
-			characterBtn.SetPosition(155+(132*j), 86)
+			characterBtn =  ui.RadioButton()
+			characterBtn.SetParent(resultPageImage)
+			characterBtn.SetEvent(ui.__mem_func__(self.__SelectCharacters),j)
+			characterBtn.SetUpVisual(IMG_DIR+"character/%d_0.tga"%j)
+			characterBtn.SetOverVisual(IMG_DIR+"character/%d_1.tga"%j)
+			characterBtn.SetDownVisual(IMG_DIR+"character/%d_2.tga"%j)
+			characterBtn.SetPosition(16+(132*j),11)
 			characterBtn.Hide()
 			self.children["job_%d_characterBtn" % j] = characterBtn
 
@@ -104,8 +149,8 @@ class EncyclopediaofGame(ui.BoardWithTitleBar):
 		constInfo.SetListBox(resultpageListbox)
 
 		resultpagebtn = ui.ExpandedImageBox()
-		resultpagebtn.SetParent(self)
-		resultpagebtn.SetPosition(151, 32)
+		resultpagebtn.SetParent(self) # <board>
+		resultpagebtn.SetPosition(225,31)
 		resultpagebtn.SetEvent(ui.__mem_func__(self.LoadGuidePage), "mouse_click")
 		resultpagebtn.Show()
 		self.children["resultpagebtn"] = resultpagebtn
@@ -115,13 +160,13 @@ class EncyclopediaofGame(ui.BoardWithTitleBar):
 	def LoadGuidePage(self, emptyArg = ""):
 		self.__SelectType("System#0", FALSE, FALSE)
 
-	def LoadBackground(self):
-		backgroundImage = ui.ImageBox()
-		backgroundImage.SetParent(self)
-		backgroundImage.LoadImage(IMG_DIR + "background.tga")
-		backgroundImage.SetPosition(10, 31)
-		backgroundImage.Show()
-		self.children["backgroundImage"] = backgroundImage
+	def LoadBlock(self):
+		blockImage = ui.ImageBox()
+		blockImage.SetParent(self)
+		blockImage.LoadImage(IMG_DIR+"block.tga")
+		blockImage.SetPosition(140,32)
+		blockImage.Hide()
+		self.children["blockImage"] = blockImage
 
 	def LoadSearchInfos(self):
 		self.children["selectedMob"] = 0
@@ -129,18 +174,18 @@ class EncyclopediaofGame(ui.BoardWithTitleBar):
 
 		searchSlot = ui.ImageBox()
 		searchSlot.SetParent(self)
-		searchSlot.LoadImage(IMG_DIR + "input.tga")
-		searchSlot.SetPosition(15, 37)
+		searchSlot.LoadImage(REWORK+"search_input.png")
+		searchSlot.SetPosition(10, 33)
 		searchSlot.Show()
 		self.children["searchSlot"] = searchSlot
 
 		searchButton = ui.Button()
-		searchButton.SetParent(searchSlot)
-		searchButton.SetUpVisual(IMG_DIR + "search_btn_0.tga")
-		searchButton.SetOverVisual(IMG_DIR + "search_btn_1.tga")
-		searchButton.SetDownVisual(IMG_DIR + "search_btn_2.tga")
+		searchButton.SetParent(self)
+		searchButton.SetUpVisual("d:/ymir work/ui/game/newsearch/left_rectangle/search_button_norm.png")
+		searchButton.SetOverVisual("d:/ymir work/ui/game/newsearch/left_rectangle/search_button_over.png")
+		searchButton.SetDownVisual("d:/ymir work/ui/game/newsearch/left_rectangle/search_button_down.png")
 		searchButton.SAFE_SetEvent(self.StartSearchItem)
-		searchButton.SetPosition(103, 3)
+		searchButton.SetPosition(192, 35)
 		searchButton.Show()
 		self.children["searchButton"] = searchButton
 
@@ -148,7 +193,7 @@ class EncyclopediaofGame(ui.BoardWithTitleBar):
 		searchItemName.SetParent(searchSlot)
 		searchItemName.SetPosition(4, 5)
 		searchItemName.SetSize(91, 26)
-		searchItemName.SetInfoMessage(localeInfo.WIKI_SEARCH_ITEM_OVERLAY_TEXT)
+		searchItemName.SetInfoMessage(localeInfo.WIKI_ITEM_NAME)
 		searchItemName.SetMax(30)
 		searchItemName.isNeedEmpty = FALSE
 		searchItemName.OnPressEscapeKey = ui.__mem_func__(self.Close)
@@ -159,37 +204,38 @@ class EncyclopediaofGame(ui.BoardWithTitleBar):
 		self.children["searchItemName"] = searchItemName
 
 		searchClearBtn = ui.Button()
-		searchClearBtn.SetParent(searchSlot)
-		searchClearBtn.SetUpVisual(IMG_DIR + "clear_button_1.tga")
-		searchClearBtn.SetOverVisual(IMG_DIR + "clear_button_2.tga")
-		searchClearBtn.SetDownVisual(IMG_DIR + "clear_button_1.tga")
-		searchClearBtn.SetPosition(75, 5)
+		searchClearBtn.SetParent(self)
+		searchClearBtn.SetUpVisual("d:/ymir work/ui/game/newsearch/right_rectangle/resetbtn.png")
+		searchClearBtn.SetOverVisual("d:/ymir work/ui/game/newsearch/right_rectangle/resetbtn_over.png")
+		searchClearBtn.SetDownVisual("d:/ymir work/ui/game/newsearch/right_rectangle/resetbtn_down.png")
+		searchClearBtn.SetPosition(169, 38)
 		searchClearBtn.SAFE_SetEvent(self.ClearEditlineItem)
-		searchClearBtn.Hide()
+		searchClearBtn.Show()
 		self.children["searchClearBtn"] = searchClearBtn
 
 		mobSlot = ui.ImageBox()
 		mobSlot.SetParent(self)
-		mobSlot.LoadImage(IMG_DIR + "input.tga")
-		mobSlot.SetPosition(15, 67)
-		mobSlot.Show()
+		mobSlot.LoadImage(IMG_DIR+"search_slot.tga")
+		mobSlot.SetPosition(13,32+29)
+		mobSlot.Hide()
 		self.children["mobSlot"] = mobSlot
 
 		searchButtonMob = ui.Button()
 		searchButtonMob.SetParent(mobSlot)
-		searchButtonMob.SetUpVisual(IMG_DIR + "search_btn_0.tga")
-		searchButtonMob.SetOverVisual(IMG_DIR + "search_btn_1.tga")
-		searchButtonMob.SetDownVisual(IMG_DIR + "search_btn_2.tga")
+		searchButtonMob.SetUpVisual(IMG_DIR+"button_0.tga")
+		searchButtonMob.SetOverVisual(IMG_DIR+"button_1.tga")
+		searchButtonMob.SetDownVisual(IMG_DIR+"button_2.tga")
 		searchButtonMob.SAFE_SetEvent(self.StartSearchMob)
-		searchButtonMob.SetPosition(103, 3)
+		searchButtonMob.SetPosition(91,2)
 		searchButtonMob.Show()
 		self.children["searchButtonMob"] = searchButtonMob
 
 		searchMobName = ui.EditLine()
 		searchMobName.SetParent(mobSlot)
-		searchMobName.SetPosition(4, 5)
-		searchMobName.SetSize(91, 26)
-		searchMobName.SetInfoMessage(localeInfo.WIKI_SEARCH_MOB_OVERLAY_TEXT)
+		searchMobName.SetPosition(2,5)
+		searchMobName.SetSize(91,26)
+		#searchMobName.SetFontName("Tahoma:11")
+		searchMobName.SetInfoMessage(localeInfo.WIKI_MOB_NAME)
 		searchMobName.isNeedEmpty = FALSE
 		searchMobName.SetMax(30)
 		searchMobName.SetOutline()
@@ -217,31 +263,32 @@ class EncyclopediaofGame(ui.BoardWithTitleBar):
 		historySearch = self.children["historySearch"]
 
 		if len(historySearch) == 0:
-			historyNext.SetUpVisual(IMG_DIR + "next_arrow_btn_norm.tga")
-			historyNext.SetOverVisual(IMG_DIR + "next_arrow_btn_norm.tga")
-			historyNext.SetDownVisual(IMG_DIR + "next_arrow_btn_norm.tga")
-			historyBack.SetUpVisual(IMG_DIR + "back_arrow_btn_norm.tga")
-			historyBack.SetOverVisual(IMG_DIR + "back_arrow_btn_norm.tga")
-			historyBack.SetDownVisual(IMG_DIR + "back_arrow_btn_norm.tga")
+			historyNext.SetUpVisual(REWORK+"doublearrowleft.png")
+			historyNext.SetOverVisual(REWORK+"doublearrowleft.png")
+			historyNext.SetDownVisual(REWORK+"doublearrowleft.png")
+			historyBack.SetUpVisual(REWORK+"doublearrowright.png")
+			historyBack.SetOverVisual(REWORK+"doublearrowright.png")
+			historyBack.SetDownVisual(REWORK+"doublearrowright.png")
 			return
 
+		#chat.AppendChat(1,"currentIndex %d len %d"%(currentIndex, len(historySearch)))
 		if currentIndex > 0:
-			historyBack.SetUpVisual(IMG_DIR + "back_arrow_btn_norm.tga")
-			historyBack.SetOverVisual(IMG_DIR + "back_arrow_btn_hover.tga")
-			historyBack.SetDownVisual(IMG_DIR + "back_arrow_btn_down.tga")
+			historyBack.SetUpVisual(REWORK+"doublearrowright.png")
+			historyBack.SetOverVisual(REWORK+"doublearrowright.png")
+			historyBack.SetDownVisual(REWORK+"doublearrowright.png")
 		else:
-			historyBack.SetUpVisual(IMG_DIR + "back_arrow_btn_norm.tga")
-			historyBack.SetOverVisual(IMG_DIR + "back_arrow_btn_norm.tga")
-			historyBack.SetDownVisual(IMG_DIR + "back_arrow_btn_norm.tga")
+			historyBack.SetUpVisual(REWORK+"doublearrowright.png")
+			historyBack.SetOverVisual(REWORK+"doublearrowright.png")
+			historyBack.SetDownVisual(REWORK+"doublearrowright.png")
 
-		if currentIndex + 1 >= len(historySearch):
-			historyNext.SetUpVisual(IMG_DIR + "next_arrow_btn_norm.tga")
-			historyNext.SetOverVisual(IMG_DIR + "next_arrow_btn_norm.tga")
-			historyNext.SetDownVisual(IMG_DIR + "next_arrow_btn_norm.tga")
+		if currentIndex+1 >= len(historySearch):
+			historyNext.SetUpVisual(REWORK+"doublearrowleft.png")
+			historyNext.SetOverVisual(REWORK+"doublearrowleft.png")
+			historyNext.SetDownVisual(REWORK+"doublearrowleft.png")
 		else:
-			historyNext.SetUpVisual(IMG_DIR + "next_arrow_btn_norm.tga")
-			historyNext.SetOverVisual(IMG_DIR + "next_arrow_btn_hover.tga")
-			historyNext.SetDownVisual(IMG_DIR + "next_arrow_btn_down.tga")
+			historyNext.SetUpVisual(REWORK+"doublearrowleft.png")
+			historyNext.SetOverVisual(REWORK+"doublearrowleft.png")
+			historyNext.SetDownVisual(REWORK+"doublearrowleft.png")
 
 	def RunHistoryArgument(self, argument):
 		if argument.find("NEW") != -1:
@@ -284,9 +331,11 @@ class EncyclopediaofGame(ui.BoardWithTitleBar):
 		if input_len == 0:
 			self.ClearEditlineItem()
 			return FALSE
-
-		input_text = input_text_real.lower()
-		self.children["searchClearBtn"].Show()
+		if localeInfo.IsARABIC():
+			input_text = input_text_real
+		else:
+			input_text = input_text_real.lower()
+		# self.children["searchClearBtn"].Show()
 		items_list = item.GetItemsByName(str(input_text))
 		itemList = []
 		namesList = []
@@ -298,7 +347,10 @@ class EncyclopediaofGame(ui.BoardWithTitleBar):
 				if itemVnum != realVnum:
 					continue
 			item.SelectItem(itemVnum)
-			itemName = item.GetItemName().lower()
+			if localeInfo.IsARABIC():
+				itemName = item.GetItemName()
+			else:
+				itemName = item.GetItemName().lower()
 			if itemName.find("+") != -1:
 				itemName = itemName[:itemName.find("+")]
 			tempName = list(itemName)
@@ -339,12 +391,26 @@ class EncyclopediaofGame(ui.BoardWithTitleBar):
 	def ClearEditlineItem(self):
 		self.children["selectedItem"] = 0
 		self.children["searchItemName"].SetText("")
-		self.children["searchItemName"].SetInfoMessage(localeInfo.WIKI_SEARCH_ITEM_OVERLAY_TEXT)
-		self.children["searchClearBtn"].Hide()
+		self.children["searchItemName"].SetInfoMessage(localeInfo.WIKI_ITEM_NAME)
+		# self.children["searchClearBtn"].Hide()
 
 	def StartSearchItem(self):
 		if self.children["selectedItem"] != 0:
-			self.ShowItemInfo(self.children["selectedItem"], 0)
+			self.ShowItemInfo(self.children["selectedItem"],0)
+
+	def SearchItem(self, itemVnum):
+		item.SelectItem(itemVnum)
+
+		itemName = item.GetItemName()
+		if item.GetItemType() == item.ITEM_TYPE_WEAPON or item.GetItemType() == item.ITEM_TYPE_ARMOR:
+			refinePos = itemName.find('+')
+			if refinePos > 0:
+				itemName = itemName[:refinePos]
+
+		self.children["searchItemName"].SetText(itemName)
+		self.UpdateItemsList()
+
+		self.ShowItemInfo(self.children["selectedItem"],0)
 
 	def UpdateMobsList(self):
 		input_text_real = self.children["searchMobName"].GetText()
@@ -353,15 +419,19 @@ class EncyclopediaofGame(ui.BoardWithTitleBar):
 		if input_len == 0:
 			self.ClearEditlineMob()
 			return FALSE
-
-		input_text = input_text_real.lower()
+		if localeInfo.IsARABIC():
+			input_text = input_text_real
+		else:
+			input_text = input_text_real.lower()
 		self.children["searchClearBtnMob"].Show()
 		mobs_list = nonplayer.GetMobsByName(str(input_text))
 		mobList = []
 		namesList = []
-
-		for i, mobVnum in enumerate(mobs_list, start = 1):
-			mob_name = nonplayer.GetMonsterName(mobVnum).lower()
+		for i, mobVnum in enumerate(mobs_list, start=1):
+			if localeInfo.IsARABIC():
+				mob_name = nonplayer.GetMonsterName(mobVnum)
+			else:
+				mob_name = nonplayer.GetMonsterName(mobVnum).lower()
 			tempName = list(mob_name)
 			for i in xrange(input_len):
 				tempName[i]=list(input_text_real)[i]
@@ -399,7 +469,7 @@ class EncyclopediaofGame(ui.BoardWithTitleBar):
 	def ClearEditlineMob(self):
 		self.children["selectedMob"] = 0
 		self.children["searchMobName"].SetText("")
-		self.children["searchMobName"].SetInfoMessage(localeInfo.WIKI_SEARCH_MOB_OVERLAY_TEXT)
+		self.children["searchMobName"].SetInfoMessage(localeInfo.WIKI_MOB_NAME)
 		self.children["searchClearBtnMob"].Hide()
 
 	def StartSearchMob(self):
@@ -407,130 +477,185 @@ class EncyclopediaofGame(ui.BoardWithTitleBar):
 			self.ShowItemInfo(self.children["selectedMob"], 1)
 
 	def LoadCategoryInfos(self):
+
+		categoryText = ui.TextLine()
+		categoryText.SetParent(self)
+		categoryText.SetPosition(10,87)
+		categoryText.SetFontName("Verdana:17b")
+		categoryText.SetText(localeInfo.WIKI_CATEGORY)
+		categoryText.Show()
+		self.children["categoryText"] = categoryText
+
 		scrollBarListBoxCube = WikiUI.ScrollBarNew()
 		scrollBarListBoxCube.SetParent(self)
-		scrollBarListBoxCube.SetPosition(134, 105)
-
+		scrollBarListBoxCube.SetPosition(210, 114)
 		scrollBarListBoxCube.Show()
 		self.children["scrollBarListBoxCube"] = scrollBarListBoxCube
 
 		listBoxCube = WikiUI.CategoryList()
 		listBoxCube.SetParent(self)
-		listBoxCube.SetPosition(21, 105)
-		listBoxCube.SetSize(109, 355)
+		listBoxCube.SetPosition(8, 112)
+		listBoxCube.SetSize(200, 376)
 		listBoxCube.Show()
 		listBoxCube.SetScrollBar(scrollBarListBoxCube)
 		self.children["listBoxCube"] = listBoxCube
-		scrollBarListBoxCube.SetScrollBarSize(listBoxCube.GetHeight()-5)
+		scrollBarListBoxCube.SetScrollBarSize(356)
 
 		self.children["historySearch"] = []
 		self.children["currentIndex"] = 0
 
 		historyBack = ui.Button()
 		historyBack.SetParent(self)
-		historyBack.SetUpVisual(IMG_DIR + "back_arrow_btn_norm.tga")
-		historyBack.SetOverVisual(IMG_DIR + "back_arrow_btn_norm.tga")
-		historyBack.SetDownVisual(IMG_DIR + "back_arrow_btn_norm.tga")
-		historyBack.SetPosition(27, 94 + listBoxCube.GetHeight() - 5)
+		historyBack.SetUpVisual(REWORK+"doublearrowright.png")
+		historyBack.SetOverVisual(REWORK+"doublearrowright.png")
+		historyBack.SetDownVisual(REWORK+"doublearrowright.png")
+		historyBack.SetToolTipText("Back")
+		historyBack.SetPosition(175, 63)
 		historyBack.SAFE_SetEvent(self.ClickBackHistory)
 		historyBack.Show()
 		self.children["historyBack"] = historyBack
 
 		historyNext = ui.Button()
 		historyNext.SetParent(self)
-		historyNext.SetUpVisual(IMG_DIR + "next_arrow_btn_norm.tga")
-		historyNext.SetOverVisual(IMG_DIR + "next_arrow_btn_norm.tga")
-		historyNext.SetDownVisual(IMG_DIR + "next_arrow_btn_norm.tga")
-		historyNext.SetPosition(27 + historyBack.GetWidth()+2, 94 + listBoxCube.GetHeight() - 5)
+		historyNext.SetUpVisual(REWORK+"doublearrowleft.png")
+		historyNext.SetOverVisual(REWORK+"doublearrowleft.png")
+		historyNext.SetDownVisual(REWORK+"doublearrowleft.png")
+		historyNext.SetToolTipText("Next")
+		historyNext.SetPosition(200, 63)
 		historyNext.SAFE_SetEvent(self.ClickNextHistory)
 		historyNext.Show()
 		self.children["historyNext"] = historyNext
 
 		listBoxCubeItems = [
 		{
-			'item' : self.CreateCategoryItem(localeInfo.WIKI_CATEGORY_EQUIPEMENT, lambda arg = ("Equipment#"): self.__EmptyFunction(arg)),
+			'item': self.CreateCategoryItem(localeInfo.WIKI_EQUIPMENT, lambda arg=("Equipment#"): self.__EmptyFunction(arg),
+											miniIconPath=REWORK + "category_icons/equipment.png"), 
 			'children' : (
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_WEAPONS, lambda arg = ("Equipment#0"): self.__SelectType(arg)),},
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_ARMOR, lambda arg = ("Equipment#1"): self.__SelectType(arg)),},
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_HELMET, lambda arg = ("Equipment#2"): self.__SelectType(arg)),},
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_SHIELD, lambda arg = ("Equipment#3"): self.__SelectType(arg)),},
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_EARRINGS, lambda arg = ("Equipment#4"): self.__SelectType(arg)),},
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_BRACELET, lambda arg = ("Equipment#5"): self.__SelectType(arg)),},
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_NECKLACE, lambda arg = ("Equipment#6"): self.__SelectType(arg)),},
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_SHOES, lambda arg = ("Equipment#7"): self.__SelectType(arg)),},
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_BELTS, lambda arg = ("Equipment#8"): self.__SelectType(arg)),},
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_PENDANT, lambda arg = ("Equipment#9"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_EQUIPMENT_WEAPONS, lambda arg = ("Equipment#0"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_EQUIPMENT_ARMOR, lambda arg = ("Equipment#1"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_EQUIPMENT_HELMET, lambda arg = ("Equipment#2"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_EQUIPMENT_SHIELD, lambda arg = ("Equipment#3"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_EQUIPMENT_EARRING, lambda arg = ("Equipment#4"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_EQUIPMENT_BRACELET, lambda arg = ("Equipment#5"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_EQUIPMENT_NECKLACE, lambda arg = ("Equipment#6"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_EQUIPMENT_SHOES, lambda arg = ("Equipment#7"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_EQUIPMENT_BELT, lambda arg = ("Equipment#8"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_EQUIPMENT_TALISMAN, lambda arg = ("Equipment#9"): self.__SelectType(arg)),},
+				# {'item' : self.CreateCategorySubItem(localeInfo.WIKI_EQUIPMENT_RINGS, lambda arg = ("Equipment#10"): self.__SelectType(arg)),},
 			)
 		},
 		{
-			'item' : self.CreateCategoryItem(localeInfo.WIKI_CATEGORY_COSTUMES, lambda arg = ("Costume#"): self.__EmptyFunction(arg)),
+			'item' : self.CreateCategoryItem(localeInfo.WIKI_COSTUMES, lambda arg = ("Costume#"): self.__EmptyFunction(arg),
+											miniIconPath=REWORK + "category_icons/costume.png"), 
 			'children' : (
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_WEAPONS, lambda arg = ("Costume#0"): self.__SelectType(arg)),},
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_ARMOR, lambda arg = ("Costume#1"): self.__SelectType(arg)),},
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_HAIRSTYLES, lambda arg = ("Costume#2"): self.__SelectType(arg)),},
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_COSTUME_ACCE, lambda arg = ("Costume#3"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_WEAPON_SKIN, lambda arg = ("Costume#0"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_BODY_COSTUME, lambda arg = ("Costume#1"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_HAIR_COSTUME, lambda arg = ("Costume#2"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SASH_COSTUME, lambda arg = ("Costume#3"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SHINING, lambda arg = ("Costume#4"): self.__SelectType(arg)),},
 			)
 		},
 		{
-			'item' : self.CreateCategoryItem(localeInfo.WIKI_CATEGORY_COMPANION, lambda arg = ("Mount#"): self.__EmptyFunction(arg)), 
+			'item' : self.CreateCategoryItem(localeInfo.WIKI_MOUNT, lambda arg = ("Mount#"): self.__EmptyFunction(arg),
+											miniIconPath=REWORK + "category_icons/costume.png"), 
 			'children' : (
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_MOUNT, lambda arg = ("Mount#4"): self.__SelectType(arg)),},
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_PET, lambda arg = ("Mount#5"): self.__SelectType(arg)),},
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_COMPANION, lambda arg = ("Mount#6"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_MOUNT_ITEM, lambda arg = ("Mount#5"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_PET_ITEM, lambda arg = ("Mount#6"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_PET_LEVEABLE_ITEM, lambda arg = ("Mount#7"): self.__SelectType(arg)),},
 			)
 		},
 		{ 
-			'item' : self.CreateCategoryItem(localeInfo.WIKI_CATEGORY_CHESTS, lambda arg = ("Chests#"): self.__EmptyFunction(arg)), 
+			'item' : self.CreateCategoryItem(localeInfo.WIKI_CHESTS, lambda arg = ("Chests#"): self.__EmptyFunction(arg),
+											miniIconPath=REWORK + "category_icons/chests.png"), 
 			'children' : (
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_BOSS_CHESTS, lambda arg = ("Chests#0"): self.__SelectType(arg)),},
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_DUNGEON_CHESTS, lambda arg = ("Chests#1"): self.__SelectType(arg))},
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_EVENT_CHESTS, lambda arg = ("Chests#3"): self.__SelectType(arg))},
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_OTHER_CHESTS, lambda arg = ("Chests#2"): self.__SelectType(arg))},
+				# {'item' : self.CreateCategorySubItem(localeInfo.WIKI_CHESTS_BOSS, lambda arg = ("Chests#0"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_CHESTS_DUNGEON, lambda arg = ("Chests#1"): self.__SelectType(arg))},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_CHESTS_OTHER, lambda arg = ("Chests#2"): self.__SelectType(arg))},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_CHESTS_EVENT, lambda arg = ("Chests#3"): self.__SelectType(arg))},
 			)
 		},
 		{ 
-			'item' : self.CreateCategoryItem(localeInfo.WIKI_CATEGORY_BOSSES, lambda arg = ("Bosses#"): self.__EmptyFunction(arg)),
+			'item' : self.CreateCategoryItem(localeInfo.WIKI_BOSSES, lambda arg = ("Bosses#"): self.__EmptyFunction(arg),
+											miniIconPath=REWORK + "category_icons/bosses.png"), 
 			'children' : (
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_LV1_99, lambda arg = ("Bosses#0"): self.__SelectType(arg)),},
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_LV99_120, lambda arg = ("Bosses#1"): self.__SelectType(arg)),},
-				# {'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_LV120, lambda arg = ("Bosses#2"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_1_75, lambda arg = ("Bosses#0"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_76_100, lambda arg = ("Bosses#1"): self.__SelectType(arg)),},
 			)
 		},
-		# {
-			# 'item' : self.CreateCategoryItem(localeInfo.WIKI_CATEGORY_MONSTERS, lambda arg = ("Monster#"): self.__EmptyFunction(arg)), 
-			# 'children' : (
-				# {'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_LV1_99, lambda arg = ("Monster#0"): self.__SelectType(arg)),},
-				# {'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_LV99_120, lambda arg = ("Monster#1"): self.__SelectType(arg)),},
-				# {'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_LV120, lambda arg = ("Monster#2"): self.__SelectType(arg)),},
-			# )
-		# },
+#		{
+#			'item' : self.CreateCategoryItem(localeInfo.WIKI_MONSTER, lambda arg = ("Monster#"): self.__EmptyFunction(arg)), 
+#			'children' : (
+#				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_1_75, lambda arg = ("Monster#0"): self.__SelectType(arg)),},
+#				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_76_100, lambda arg = ("Monster#1"): self.__SelectType(arg)),},
+#			)
+#		},
 		{
-			'item' : self.CreateCategoryItem(localeInfo.WIKI_CATEGORY_METINSTONES, lambda arg = ("Metinstone#"): self.__EmptyFunction(arg)),
+			'item' : self.CreateCategoryItem(localeInfo.WIKI_METINSTONE, lambda arg = ("Metinstone#"): self.__EmptyFunction(arg),
+											miniIconPath=REWORK + "category_icons/metinstone.png"), 
 			'children' : (
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_LV1_99, lambda arg = ("Metinstone#0"): self.__SelectType(arg)),},
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_LV99_120, lambda arg = ("Metinstone#1"): self.__SelectType(arg)),},
-				# {'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_LV120, lambda arg = ("Metinstone#2"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_1_75, lambda arg = ("Metinstone#0"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_76_100, lambda arg = ("Metinstone#1"): self.__SelectType(arg)),},
+			)
+		},#WikiCategory
+		{
+			'item' : self.CreateCategoryItem(localeInfo.WIKI_GUIDES2, lambda arg = ("System#"): self.__EmptyFunction(arg),
+											miniIconPath=REWORK + "category_icons/guides.png"), 
+			'children' : (
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_FAQ2, lambda arg = ("System#0"): self.__SelectType(arg)),},
+				
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_THESTART2, lambda arg = ("System#1"): self.__SelectType(arg)),},
 			)
 		},
 		{
-			'item' : self.CreateCategoryItem(localeInfo.WIKI_CATEGORY_SYSTEMS, lambda arg = ("System#"): self.__EmptyFunction(arg)), 
+			'item' : self.CreateCategoryItem(localeInfo.WIKI_SYSTEM2, lambda arg = ("System#"): self.__EmptyFunction(arg),
+											miniIconPath=REWORK + "category_icons/systems.png"), 
 			'children' : (
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_CATEGORY_COSTUMES, lambda arg = ("System#1"): self.__SelectType(arg)),},
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_BATTLEPASS, lambda arg = ("System#2"): self.__SelectType(arg)),},
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_BIOLOG, lambda arg = ("System#3"): self.__SelectType(arg)),},
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_SKILL_COLOR, lambda arg = ("System#4"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_BIOLOGO, lambda arg = ("System#2"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_ALCHEMY, lambda arg = ("System#3"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_ATTR_RARE, lambda arg = ("System#4"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_COSTUME, lambda arg = ("System#5"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_PETS, lambda arg = ("System#6"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_TALISMAN, lambda arg = ("System#7"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_BOOSTER, lambda arg = ("System#8"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.ENERGY_CRYSTAL, lambda arg = ("System#22"): self.__SelectType(arg)),},
 			)
 		},
 		{
-			'item' : self.CreateCategoryItem(localeInfo.WIKI_CATEGORY_GUIDES, lambda arg = ("System#"): self.__EmptyFunction(arg)),
+			'item' : self.CreateCategoryItem(localeInfo.WIKI_TEMNITE, lambda arg = ("System#"): self.__EmptyFunction(arg),
+											miniIconPath=REWORK + "category_icons/dungeon.png"),  
 			'children' : (
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_GAME_RULES, lambda arg = ("System#0"): self.__SelectType(arg)),},
-				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_SUBCATEGORY_EVENTS, lambda arg = ("System#5"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.DEVILTOWER, lambda arg = ("System#9"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.SPIDERBARONESA, lambda arg = ("System#10"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.BERANSETAOU, lambda arg = ("System#11"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.CATACUMB, lambda arg = ("System#12"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.SNOWDUNGEON, lambda arg = ("System#13"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.FLAMEDUNGEON, lambda arg = ("System#14"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.JOTUN_DUNGEON, lambda arg = ("System#15"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.HYDRADUNGEON, lambda arg = ("System#16"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_ZODIAC, lambda arg = ("System#17"): self.__SelectType(arg)),},
+				{'item' : self.CreateCategorySubItem(localeInfo.MELEYDUNGEON, lambda arg = ("System#18"): self.__SelectType(arg)),},
+			    {'item' : self.CreateCategorySubItem(localeInfo.WIKI_AKZADUR, lambda arg = ("System#19"): self.__SelectType(arg)),},
+			)
+		},
+		{
+			'item' : self.CreateCategoryItem(localeInfo.WIKI_EVENTS, lambda arg = ("System#"): self.__EmptyFunction(arg),
+											miniIconPath=REWORK + "category_icons/events.png"), 
+			'children' : (
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_EVENTS, lambda arg = ("System#8"): self.__SelectType(arg)),},
+			)
+		},
+		{
+			'item' : self.CreateCategoryItem(localeInfo.WIKI_GAMERULES, lambda arg = ("System#"): self.__EmptyFunction(arg)), 
+			'children' : (
+				{'item' : self.CreateCategorySubItem(localeInfo.WIKI_GAME_RULES, lambda arg = ("System#23"): self.__SelectType(arg)),},
 			)
 		},
 		]
 
 		self.children["listBoxCube"].AppendItemList(listBoxCubeItems)
+		
+	def OpenRules(self):
+		self.__SelectType("System#23")
 
 	def __EmptyFunction(self, arg):
 		pass
@@ -581,23 +706,23 @@ class EncyclopediaofGame(ui.BoardWithTitleBar):
 			if len(argList) == 0 or argList[0] == "":
 				return
 
-			imageFile = "d:/ymir work/ui/game/wiki/banner.tga"
+			imageFile = WikiUI.GetResultPageImage(argList)
 			if imageFile:
 				self.children["resultpagebtn"].LoadImage(imageFile)
 				self.children["resultpagebtn"].Show()
 
 			if argList[0] == "Equipment" and isSpecial == FALSE:
 				self.SetCharacterImagesStatus(TRUE)
-				resultpageListbox.SetPosition(155, 160)
-				resultpageListbox.SetSize(540, 318)
-				resultpageListboxScrollbar.SetPosition(699, 160)
-				resultpageListboxScrollbar.SetScrollBarSize(resultpageListbox.GetHeight()-20)
+				resultpageListbox.SetPosition(232, 150)
+				resultpageListbox.SetSize(540, 337)
+				resultpageListboxScrollbar.SetPosition(782, 109)
+				resultpageListboxScrollbar.SetScrollBarSize(resultpageListbox.GetHeight()+22)
 			else:
 				self.SetCharacterImagesStatus(FALSE)
-				resultpageListbox.SetPosition(158, 109)
-				resultpageListbox.SetSize(540, 360)
-				resultpageListboxScrollbar.SetPosition(699, 109)
-				resultpageListboxScrollbar.SetScrollBarSize(350)
+				resultpageListbox.SetPosition(226,109)
+				resultpageListbox.SetSize(540, 374)
+				resultpageListboxScrollbar.SetPosition(782, 109)
+				resultpageListboxScrollbar.SetScrollBarSize(358)
 		except:
 			pass
 
@@ -680,6 +805,7 @@ class EncyclopediaofGame(ui.BoardWithTitleBar):
 				event_item = ArticleGUI(argList[1] + "#" + argList[2])
 			else:
 				event_item = ArticleGUI(int(argList[1]))
+			self.children["resultpageListbox"].SetSize(600, 374)
 			self.children["resultpageListbox"].AppendItem(event_item)
 			event_item.LoadItemInfos()
 			self.children["resultpageListboxScrollbar"].Hide()
@@ -900,8 +1026,8 @@ class EncyclopediaofGame(ui.BoardWithTitleBar):
 			child.Show()
 			y += child.GetHeight()
 
-	def CreateCategoryItem(self, text, event, offset = 0):
-		listboxItem = WikiUI.CategoryItem(text)
+	def CreateCategoryItem(self, text, event, offset = 0, miniIconPath = None):
+		listboxItem = WikiUI.CategoryItem(text, miniIconPath)
 		listboxItem.SetVisible(TRUE)
 		listboxItem.SetEvent(event)
 		listboxItem.SetOffset(offset)
@@ -926,6 +1052,62 @@ class EncyclopediaofGame(ui.BoardWithTitleBar):
 		self.SetTimeForHide(TRUE)
 
 	def Close(self):
+		# Tüm tooltip'leri kapat
+		from uiToolTip import ToolTip
+		for tooltip in ToolTip._allToolTips:
+			if tooltip and hasattr(tooltip, 'IsShow') and tooltip.IsShow():
+				if hasattr(tooltip, 'HideToolTip'):
+					tooltip.HideToolTip()
+				elif hasattr(tooltip, 'Hide'):
+					tooltip.Hide()
+		
+		# Tüm item'larýn OverOutItem metodunu çaðýr
+		# Tüm tooltip'leri kapat
+		from uiToolTip import ToolTip
+		for tooltip in ToolTip._allToolTips:
+			if tooltip and hasattr(tooltip, 'IsShow') and tooltip.IsShow():
+				if hasattr(tooltip, 'HideToolTip'):
+					tooltip.HideToolTip()
+				elif hasattr(tooltip, 'Hide'):
+					tooltip.Hide()
+		
+		# DefaultWikiWindow ve DefaultWikiImage class variable tooltip'lerini de kapat
+		try:
+			import WikiUI
+			# DefaultWikiWindow.tooltipItem class variable'ýný kapat
+			if hasattr(WikiUI.DefaultWikiWindow, 'tooltipItem'):
+				tooltip = WikiUI.DefaultWikiWindow.tooltipItem
+				if tooltip and hasattr(tooltip, 'IsShow') and tooltip.IsShow():
+					if hasattr(tooltip, 'HideToolTip'):
+						tooltip.HideToolTip()
+					elif hasattr(tooltip, 'Hide'):
+						tooltip.Hide()
+			
+			# DefaultWikiImage.tooltipItem class variable'ýný kapat
+			if hasattr(WikiUI.DefaultWikiImage, 'tooltipItem'):
+				tooltip = WikiUI.DefaultWikiImage.tooltipItem
+				if tooltip and hasattr(tooltip, 'IsShow') and tooltip.IsShow():
+					if hasattr(tooltip, 'HideToolTip'):
+						tooltip.HideToolTip()
+					elif hasattr(tooltip, 'Hide'):
+						tooltip.Hide()
+		except:
+			pass
+		
+		# Tüm item'larýn OverOutItem metodunu çaðýr
+		if self.children.has_key("resultpageListbox"):
+			try:
+				resultpageListbox = self.children["resultpageListbox"]
+				if resultpageListbox and hasattr(resultpageListbox, 'itemList'):
+					for item in resultpageListbox.itemList:
+						try:
+							if hasattr(item, 'OverOutItem'):
+								item.OverOutItem()
+						except:
+							pass
+			except:
+				pass
+		
 		self.SetRenderTargetsStatus(FALSE)
 		self.SetTimeForHide(FALSE)
 		self.children["searchMobName"].KillFocus()
@@ -933,6 +1115,32 @@ class EncyclopediaofGame(ui.BoardWithTitleBar):
 		self.Hide()
 
 	def OnRunMouseWheel(self, nLen):
+		# Mouse pozisyonunu al
+		try:
+			import wndMgr
+			(mx, my) = wndMgr.GetMousePosition()
+		except:
+			mx, my = 0, 0
+		
+		# Önce listBoxCube'un scroll bar'ýný kontrol et (mouse listBoxCube üzerindeyse)
+		if self.children.has_key("listBoxCube"):
+			listBoxCube = self.children["listBoxCube"]
+			if listBoxCube and hasattr(listBoxCube, 'scrollBar') and listBoxCube.scrollBar:
+				if listBoxCube.scrollBar.IsShow():
+					try:
+						(lx, ly) = listBoxCube.GetGlobalPosition()
+						lw, lh = listBoxCube.GetWidth(), listBoxCube.GetHeight()
+						# Mouse listBoxCube üzerindeyse onun scroll bar'ýný kullan
+						if lx <= mx <= lx + lw and ly <= my <= ly + lh:
+							if nLen > 0:
+								listBoxCube.scrollBar.OnUp()
+							else:
+								listBoxCube.scrollBar.OnDown()
+							return TRUE
+					except:
+						pass
+		
+		# Sonra resultpageListboxScrollbar'ý kontrol et
 		if self.children.has_key("resultpageListboxScrollbar"):
 			self.scrollBar = self.children["resultpageListboxScrollbar"]
 			if self.scrollBar.IsShow():
@@ -989,10 +1197,10 @@ class EquipmentItem(WikiUI.DefaultWikiImage):
 			step_price = ui.TextLine()
 			step_price.SetParent(self)
 			if SHOW_NEXT_ITEM_REFINE:
-				step_price.SetText(localeInfo.NumberToDecimalString(refineData["cost"]).replace(".000","k"))
+				step_price.SetText(localeInfo.MoneyFormat(refineData["cost"]).replace(".000","k"))
 			else:
 				if refine:
-					step_price.SetText(localeInfo.NumberToDecimalString(refineData["cost"]).replace(".000","k"))
+					step_price.SetText(localeInfo.MoneyFormat(refineData["cost"]).replace(".000","k"))
 				else:
 					step_price.SetText("-")
 			step_price.SetHorizontalAlignCenter()
@@ -1025,12 +1233,12 @@ class EquipmentItem(WikiUI.DefaultWikiImage):
 							refineItemCount = ui.NumberLine()
 							refineItemCount.SetParent(self)
 							refineItemCount.SetNumber(str(refineData["item_count_%d" % i]))
-							refineItemCount.SetPosition(20, 20+5+(i*(32+5+10))+32)
+							refineItemCount.SetPosition(5+28,20+5+(i*(32+5+10))+32)
 						else:
 							refineItemCount = ui.TextLine()
 							refineItemCount.SetParent(self)
 							refineItemCount.SetText(str(refineData["item_count_%d" % i]))
-							refineItemCount.SetPosition(20, 20+11+(i*(32+5+10))+20)
+							refineItemCount.SetPosition(5+28,20+5+(i*(32+5+10))+20)
 						refineItemCount.Show()
 						self.children.append(refineItemCount)
 				else:
@@ -1067,12 +1275,11 @@ class EquipmentItem(WikiUI.DefaultWikiImage):
 					self.InsertRefine(*argv)
 					continue
 			self.InsertRefine(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-
-		self.LoadImage(IMG_DIR + "slot/slot_%d.tga" % self.refineCount)
+		self.LoadImage(IMG_DIR+"slot/slot_%d.png"%self.refineCount)
 		self.children.append(self)
-
+		# add scrollbar extra height!
 		if self.refineLevel >= 11:
-			self.SetSize(self.GetWidth(), self.GetHeight() + 20)
+			self.SetSize(self.GetWidth(),self.GetHeight()+4)
 
 	def LoadItemInfos(self):
 		if self.IsLoaded == FALSE:
@@ -1082,17 +1289,17 @@ class EquipmentItem(WikiUI.DefaultWikiImage):
 
 			for i in xrange(item.LIMIT_MAX_NUM):
 				(limitType, limitValue) = item.GetLimit(i)
-				if item.LIMIT_LEVEL == limitType:
-					if limitValue != 0:
-						firstLevel = limitValue
+
+				if item.LIMIT_LEVEL == limitType and limitValue > 0:
+					firstLevel = limitValue
 					break
 
 			item.SelectItem(self.itemVnum)
 			for i in xrange(item.LIMIT_MAX_NUM):
 				(limitType, limitValue) = item.GetLimit(i)
-				if item.LIMIT_LEVEL == limitType:
-					if limitValue != 0:
-						secondLevel=limitValue
+
+				if item.LIMIT_LEVEL == limitType and limitValue > 0:
+					secondLevel = limitValue
 					break
 
 			itemName = ui.TextLine()
@@ -1108,9 +1315,10 @@ class EquipmentItem(WikiUI.DefaultWikiImage):
 			itemLevel = ui.TextLine()
 			itemLevel.SetParent(self)
 			if secondLevel != firstLevel:
-				itemLevel.SetText(localeInfo.WIKI_REFINEINFO_ITEM_LEVEL_RANGE % (firstLevel, secondLevel, 0, self.refineLevel))
+				itemLevel.SetText(localeInfo.WIKI_LEVEL_TEXT2 % (firstLevel, secondLevel, 0, self.refineLevel))
 			else:
-				itemLevel.SetText(localeInfo.WIKI_REFINEINFO_ITEM_LEVEL % (firstLevel, 0, self.refineLevel))
+				itemLevel.SetText(localeInfo.WIKI_LEVEL_TEXT % (firstLevel, 0, self.refineLevel))
+
 			itemLevel.SetPosition(355, 5)
 			itemLevel.Show()
 			self.children.append(itemLevel)
@@ -1134,14 +1342,14 @@ class EquipmentItem(WikiUI.DefaultWikiImage):
 
 			upgradeItem = ui.TextLine()
 			upgradeItem.SetParent(self)
-			upgradeItem.SetText(localeInfo.WIKI_REFINEINFO_NEXT_ITEM)
-			upgradeItem.SetPosition(70, 24)
+			upgradeItem.SetText(localeInfo.WIKI_UPGRADE_COSTS)
+			upgradeItem.SetPosition(50,24)
 			upgradeItem.Show()
 			self.children.append(upgradeItem)
 
 			yangCost = ui.TextLine()
 			yangCost.SetParent(self)
-			yangCost.SetText(localeInfo.WIKI_REFINEINFO_YANG_COSTS)
+			yangCost.SetText(localeInfo.WIKI_YANG_COSTS)
 			list = [140, 140, 140, 180, 230, 275]
 			yangCost.SetPosition(58, list[self.refineCount])
 			yangCost.Show()
@@ -1180,6 +1388,7 @@ class EquipmentItem(WikiUI.DefaultWikiImage):
 				scrollbar.SetParent(self)
 				scrollbar.SetPosition(0, scrollheightpos[self.refineCount])
 				scrollbar.SetScrollBarSize(540)
+				#scrollbar.SetScrollBarSize(10.0/float(self.refineLevel))
 				scrollbar.itsNeedDoubleRender = TRUE
 				scrollbar.Show()
 				Listbox.SetScrollBar(scrollbar)
@@ -1248,7 +1457,7 @@ class MonsterItemSpecial(WikiUI.DefaultWikiImage):
 		WikiUI.DefaultWikiImage.__init__(self)
 		self.vnum = vnum
 		self.isType = type
-		self.LoadImage(IMG_DIR + "slot/special_slot.tga")
+		self.LoadImage(IMG_DIR+"slot/special_slot.png")
 		self.children.append(self)
 
 	def LoadItemInfos(self):
@@ -1291,9 +1500,9 @@ class MonsterItemSpecial(WikiUI.DefaultWikiImage):
 				dropList = ui.TextLine()
 				dropList.SetParent(self)
 				if self.isType == 0:
-					dropList.SetText(localeInfo.WIKI_MONSTERINFO_DROPLISTOF % nonplayer.GetMonsterName(self.vnum))
+					dropList.SetText(localeInfo.WIKI_DROPLIST_INFO%nonplayer.GetMonsterName(self.vnum))
 				elif self.isType == 3:
-					dropList.SetText(localeInfo.WIKI_CHESTINFO_CONTENTOF % item.GetItemName())
+					dropList.SetText(localeInfo.WIKI_CONTENT_INFO%item.GetItemName())
 				dropList.SetPosition(300, 6)
 				dropList.Show()
 				self.children.append(dropList)
@@ -1301,9 +1510,9 @@ class MonsterItemSpecial(WikiUI.DefaultWikiImage):
 				monsterInfo = ui.TextLine()
 				monsterInfo.SetParent(self)
 				if self.isType == 0:
-					monsterInfo.SetText(localeInfo.WIKI_MONSTERINFO_STATISTICS % nonplayer.GetMonsterName(self.vnum))
+					monsterInfo.SetText(localeInfo.WIKI_STATICS_INFO%nonplayer.GetMonsterName(self.vnum))
 				elif self.isType == 3:
-					monsterInfo.SetText(localeInfo.WIKI_ITEMINFO_OPTAINEDFROM)
+					monsterInfo.SetText(localeInfo.WIKI_AVAIBLE_AT)
 				monsterInfo.SetHorizontalAlignCenter()
 				monsterInfo.SetPosition(245, 170)
 				monsterInfo.Show()
@@ -1393,7 +1602,7 @@ class MonsterItemSpecial(WikiUI.DefaultWikiImage):
 
 				avaible = ui.TextLine()
 				avaible.SetParent(self)
-				avaible.SetText(localeInfo.WIKI_ITEMINFO_OPTAINEDFROM)
+				avaible.SetText(localeInfo.WIKI_AVAIBLE_AT)
 				avaible.SetPosition(350, 6)
 				avaible.Show()
 				self.children.append(avaible)
@@ -1407,12 +1616,12 @@ class MonsterItemSpecial(WikiUI.DefaultWikiImage):
 				item.SelectItem(60001)
 				(itemVnum, isRefineItem) = WikiUI.getRealVnum(self.vnum)
 				(x , y, isHave, unknownItem) = (5, 5, FALSE, item.GetItemName())
-
+	
 				chest_list = wiki.GetItemDropFromChest(itemVnum, isRefineItem)
-				for i, chestVnum in enumerate(chest_list, start = 0):
+				for i, chestVnum in enumerate(chest_list, start=0):
 					if isHave == FALSE:
 						isHave = TRUE
-						self.AppendTextLine(Listbox, "|cFF0080FF" + localeInfo.WIKI_CATEGORY_CHESTS + ":", x, y)
+						self.AppendTextLine(Listbox, "|cFF0080FF"+localeInfo.WIKI_CHESTS+":", x, y)
 						y += 14
 					item.SelectItem(chestVnum)
 					self.AppendTextLine(Listbox, "|Eemoji/e_wiki|e " + item.GetItemName() if unknownItem != item.GetItemName() else "|Eemoji/e_wiki|e " + localeInfo.WIKI_UNKOWN_ITEM % chestVnum, x, y)
@@ -1426,7 +1635,7 @@ class MonsterItemSpecial(WikiUI.DefaultWikiImage):
 				for i, mobVnum in enumerate(mob_vnums, start = 0):
 					if isHave == FALSE:
 						isHave=TRUE
-						self.AppendTextLine(Listbox, "|cFF0080FF" + localeInfo.WIKI_CATEGORY_MONSTERS + ":", x, y)
+						self.AppendTextLine(Listbox, "|cFF0080FF"+localeInfo.WIKI_MONSTER+":",x,y)
 						y += 14
 					level = nonplayer.GetMonsterLevel(mobVnum)
 					self.AppendTextLine(Listbox, "|Eemoji/e_wiki|e " + localeInfo.WIKI_UNKOWN_MOB % mobVnum  if level <= 0 else "|Eemoji/e_wiki|e " + nonplayer.GetMonsterName(mobVnum) + " - Lv." + str(level), x, y)
@@ -1471,7 +1680,7 @@ class MonsterStatics(WikiUI.DefaultWikiImage):
 		self.Destroy()
 		self.mobVnum = mobVnum
 		self.isType = isType
-		self.LoadImage(IMG_DIR + "slot/big_empty.tga")
+		self.LoadImage(IMG_DIR+"slot/big_empty.png")
 		self.children.append(self)
 
 	def LoadItemInfos(self):
@@ -1492,7 +1701,7 @@ class MonsterStatics(WikiUI.DefaultWikiImage):
 				for i, chestVnum in enumerate(chest_list, start = 0):
 					if isHave == FALSE:
 						isHave = TRUE
-						self.AppendTextLine(ListBox, "|cFF0080FF" + localeInfo.WIKI_CATEGORY_CHESTS + ":", x, y)
+						self.AppendTextLine(ListBox, "|cFF0080FF"+localeInfo.WIKI_CHESTS+":", x, y)
 						y += 14
 					item.SelectItem(chestVnum)
 					self.AppendTextLine(ListBox, "|Eemoji/e_wiki|e " + item.GetItemName() if unknownItem != item.GetItemName() else "|Eemoji/e_wiki|e " + localeInfo.WIKI_UNKOWN_ITEM % chestVnum, x, y)
@@ -1506,28 +1715,29 @@ class MonsterStatics(WikiUI.DefaultWikiImage):
 				for i, mobVnum in enumerate(mob_vnums, start = 0):
 					if isHave == FALSE:
 						isHave = TRUE
-						self.AppendTextLine(ListBox, "|cFF0080FF" + localeInfo.WIKI_CATEGORY_MONSTERS + ":", x, y)
+						self.AppendTextLine(ListBox, "|cFF0080FF"+localeInfo.WIKI_MONSTER+":",x,y)
 						y += 14
 					level = nonplayer.GetMonsterLevel(mobVnum)
 					self.AppendTextLine(ListBox, "|Eemoji/e_wiki|e " + localeInfo.WIKI_UNKOWN_MOB % mobVnum  if level <= 0 else "|Eemoji/e_wiki|e " + nonplayer.GetMonsterName(mobVnum) + " - Lv." + str(level), x, y)
 					y += 14
 			elif self.isType == 0:
-				self.AppendTextLine(ListBox, "|Eemoji/e_wiki|e " + localeInfo.WIKI_MONSTERINFO_LEVEL % nonplayer.GetMonsterLevel(self.mobVnum), 5, 3)
+				self.AppendTextLine(ListBox, "|Eemoji/e_wiki|e " + localeInfo.WIKI_LEVEL_MOB_TEXT % nonplayer.GetMonsterLevel(self.mobVnum), 5, 3)
 				RACE_FLAG_TO_NAME = {
-					1 << 0  : localeInfo.WIKI_MONSTERINFO_RACE_ANIMAL,
-					1 << 1 	: localeInfo.WIKI_MONSTERINFO_RACE_UNDEAD,
-					1 << 2  : localeInfo.WIKI_MONSTERINFO_RACE_DEVIL,
-					1 << 3  : localeInfo.WIKI_MONSTERINFO_RACE_HUMAN,
-					1 << 4  : localeInfo.WIKI_MONSTERINFO_RACE_ORC,
-					1 << 5  : localeInfo.WIKI_MONSTERINFO_RACE_MILGYO,
+					1 << 0 : localeInfo.WIKI_INFO_RACE_ANIMAL,
+					1 << 1 : localeInfo.WIKI_INFO_RACE_UNDEAD,
+					1 << 2 : localeInfo.WIKI_INFO_RACE_DEVIL,
+					1 << 3 : localeInfo.WIKI_INFO_RACE_HUMAN,
+					1 << 4 : localeInfo.WIKI_INFO_RACE_ORC,
+					1 << 5 : localeInfo.WIKI_INFO_RACE_MILGYO,
 				}
 				SUB_RACE_FLAG_TO_NAME = {
-					1 << 11 : localeInfo.WIKI_MONSTERINFO_RACE_ELEC,
-					1 << 12 : localeInfo.WIKI_MONSTERINFO_RACE_FIRE,
-					1 << 13 : localeInfo.WIKI_MONSTERINFO_RACE_ICE,
-					1 << 14 : localeInfo.WIKI_MONSTERINFO_RACE_WIND,
-					1 << 15 : localeInfo.WIKI_MONSTERINFO_RACE_EARTH,
-					1 << 16 : localeInfo.WIKI_MONSTERINFO_RACE_DARK,
+					1 << 11 : localeInfo.WIKI_INFO_RACE_ELEC,
+					1 << 12 : localeInfo.WIKI_INFO_RACE_FIRE,
+					1 << 13 : localeInfo.WIKI_INFO_RACE_ICE,
+					1 << 14 : localeInfo.WIKI_INFO_RACE_WIND,
+					1 << 15 : localeInfo.WIKI_INFO_RACE_EARTH,
+					1 << 16 : localeInfo.WIKI_INFO_RACE_DARK,
+					1 << 17 : localeInfo.WIKI_INFO_RACE_ZODIAC,
 				}
 				mainrace = ""
 				subrace = ""
@@ -1540,37 +1750,37 @@ class MonsterStatics(WikiUI.DefaultWikiImage):
 						elif SUB_RACE_FLAG_TO_NAME.has_key(curFlag):
 							subrace += SUB_RACE_FLAG_TO_NAME[curFlag] + ", "
 				if nonplayer.IsMonsterStone(self.mobVnum):
-					mainrace += localeInfo.WIKI_MONSTERINFO_RACE_METIN + ", "
+					mainrace += localeInfo.WIKI_INFO_RACE_METIN + ", "
 				if mainrace == "":
-					mainrace = localeInfo.WIKI_MONSTERINFO_NO_RACE
+					mainrace = localeInfo.WIKI_INFO_NO_RACE
 				else:
 					mainrace = mainrace[:-2]
 				if subrace == "":
-					subrace = localeInfo.WIKI_MONSTERINFO_NO_RACE
+					subrace = localeInfo.WIKI_INFO_NO_RACE
 				else:
 					subrace = subrace[:-2]
-				self.AppendTextLine(ListBox, "|Eemoji/e_wiki|e " + localeInfo.WIKI_MONSTERINFO_STATISTICS_TYPE % (mainrace, subrace), 5, 3*(7*1))
+				self.AppendTextLine(ListBox, "|Eemoji/e_wiki|e "+localeInfo.WIKI_STATICS_INFO_TYPE%(mainrace,subrace), 5, 3*(7*1))
 				(mindmg, maxdmg) = nonplayer.GetMonsterDamage(self.mobVnum)
-				self.AppendTextLine(ListBox, "|Eemoji/e_wiki|e " + localeInfo.WIKI_MONSTERINFO_DMG_HP % (mindmg, maxdmg, nonplayer.GetMonsterMaxHP(self.mobVnum)), 5, 3*(7*2))
+				self.AppendTextLine(ListBox, "|Eemoji/e_wiki|e "+localeInfo.WIKI_STATICS_INFO_DMG%(mindmg,maxdmg,nonplayer.GetMonsterMaxHP(self.mobVnum)), 5, 3*(7*2))
 				(minyang, maxyang) = nonplayer.GetMonsterPrice(self.mobVnum)
 				exp = nonplayer.GetMonsterExp(self.mobVnum)
-				self.AppendTextLine(ListBox, "|Eemoji/e_wiki|e " + localeInfo.WIKI_MONSTERINFO_GOLD_EXP % (minyang, maxyang, exp), 5, 3*(7*3))
-				self.AppendTextLine(ListBox, "|Eemoji/e_wiki|e " + localeInfo.WIKI_MONSTERINFO_DEFENSE, 5, 3*(7*4))
+				self.AppendTextLine(ListBox, "|Eemoji/e_wiki|e "+localeInfo.WIKI_STATICS_INFO_YNG%(minyang,maxyang,exp), 5, 3*(7*3))
+				self.AppendTextLine(ListBox, "|Eemoji/e_wiki|e "+localeInfo.WIKI_STATICS_INFO_DEFENSES, 5, 3*(7*4))
 				resists = {
-					nonplayer.MOB_RESIST_SWORD : localeInfo.WIKI_MONSTERINFO_RESIST_SWORD,
-					nonplayer.MOB_RESIST_TWOHAND : localeInfo.WIKI_MONSTERINFO_RESIST_TWOHAND,
-					nonplayer.MOB_RESIST_DAGGER : localeInfo.WIKI_MONSTERINFO_RESIST_DAGGER,
-					nonplayer.MOB_RESIST_BELL : localeInfo.WIKI_MONSTERINFO_RESIST_BELL,
-					nonplayer.MOB_RESIST_FAN : localeInfo.WIKI_MONSTERINFO_RESIST_FAN,
-					nonplayer.MOB_RESIST_BOW : localeInfo.WIKI_MONSTERINFO_RESIST_BOW,
-					nonplayer.MOB_RESIST_MAGIC : localeInfo.WIKI_MONSTERINFO_RESIST_MAGIC,
+					nonplayer.MOB_RESIST_SWORD : localeInfo.WIKI_INFO_RESIST_SWORD,
+					nonplayer.MOB_RESIST_TWOHAND : localeInfo.WIKI_INFO_RESIST_TWOHAND,
+					nonplayer.MOB_RESIST_DAGGER : localeInfo.WIKI_INFO_RESIST_DAGGER,
+					nonplayer.MOB_RESIST_BELL : localeInfo.WIKI_INFO_RESIST_BELL,
+					nonplayer.MOB_RESIST_FAN : localeInfo.WIKI_INFO_RESIST_FAN,
+					nonplayer.MOB_RESIST_BOW : localeInfo.WIKI_INFO_RESIST_BOW,
+					nonplayer.MOB_RESIST_MAGIC : localeInfo.WIKI_INFO_RESIST_MAGIC,
 				}
 
-				c = 0
-				for resist, label in resists.items():
-					resistText = label % nonplayer.GetMonsterResist(self.mobVnum, resist)
-					self.AppendTextLine(ListBox, "|Eemoji/e_wiki|e %s" % resistText, 5+8, 3*(7*(5+c)))
-					c += 1
+				# c = 0
+				# for resist, label in resists.items():
+					# resistText = label % nonplayer.GetMonsterResist(self.mobVnum, resist)
+					# self.AppendTextLine(ListBox, "|Eemoji/e_wiki|e %s"%resistText, 5+8, 3*(7*(5+c)))
+					# c+=1
 
 			if ListBox.isNeedScrollBar():
 				scrollBar = WikiUI.ScrollBarNew()
@@ -1611,7 +1821,7 @@ class ListBoxItemSpecial(WikiUI.DefaultWikiImage):
 		self.mobVnum = mobVnum
 		self.isType = type
 
-		self.LoadImage(IMG_DIR + "slot/slot.tga")
+		self.LoadImage(IMG_DIR+"slot/slot.png")
 		self.children.append(self)
 
 	def LoadItemInfos(self):
@@ -1628,9 +1838,9 @@ class ListBoxItemSpecial(WikiUI.DefaultWikiImage):
 			itemName = ui.TextLine()
 			itemName.SetParent(self)
 			if self.isType == 0:
-				itemName.SetText(localeInfo.WIKI_CHESTINFO_CONTENTOF % item.GetItemName())
+				itemName.SetText(localeInfo.WIKI_CONTENT_INFO%item.GetItemName())
 			else:
-				itemName.SetText(localeInfo.WIKI_MONSTERINFO_DROPLISTOF % name)
+				itemName.SetText(localeInfo.WIKI_DROPLIST_INFO%name)
 				itemName.SetText(itemName.GetText() + " - Level %d" % nonplayer.GetMonsterLevel(self.itemVnum))
 				itemName.SetText(itemName.GetText() + " - Mob Vnum %d" % self.itemVnum)
 			itemName.SetPosition(270, 5)
@@ -1640,7 +1850,7 @@ class ListBoxItemSpecial(WikiUI.DefaultWikiImage):
 
 			origin = ui.TextLine()
 			origin.SetParent(self)
-			origin.SetText(localeInfo.WIKI_CHESTINFO_ORIGIN)
+			origin.SetText(localeInfo.WIKI_ORIGIN)
 			origin.SetPosition(480, 5)
 			origin.Show()
 			self.children.append(origin)
@@ -1786,8 +1996,7 @@ class ArticleGUI(WikiUI.DefaultWikiImage):
 		else:
 			self.index = index
 			self.scrollPos = 0.0
-
-		self.LoadImage(IMG_DIR + "slot/big2_empty.tga")
+		self.LoadImage(REWORK+"black_inner.png")
 		self.children.append(self)
 
 	def LoadItemInfos(self):
@@ -1807,12 +2016,29 @@ class ArticleGUI(WikiUI.DefaultWikiImage):
 
 	def GetFileName(self, index):
 		file_dict = {
-			0 : "wiki/gamerules.txt",
-			1 : "wiki/costume.txt",
-			2 : "wiki/battlepass.txt",
-			3 : "wiki/biolog.txt",
-			4 : "wiki/skillcolor.txt",
-			5 : "wiki/eventmanager.txt",
+			0 : "wiki/guides/faq.txt",
+			1 : "wiki/guides/the_start.txt",
+			2 : "wiki/systems/biologist.txt",
+			3 : "wiki/systems/alchemy.txt",
+			4 : "wiki/systems/bonus67.txt",
+			5 : "wiki/systems/costume.txt",
+			6 : "wiki/systems/pets.txt",
+			7 : "wiki/systems/talismane.txt",
+			8 : "wiki/systems/boosters.txt",
+			9 : "wiki/dungeon/devil.txt",
+			10 : "wiki/dungeon/spider.txt",
+			11 : "wiki/dungeon/dragon.txt",
+			12 : "wiki/dungeon/catacomb.txt",
+			13 : "wiki/dungeon/nemere.txt",
+			14 : "wiki/dungeon/razador.txt",
+			15 : "wiki/dungeon/jotun.txt",
+			16 : "wiki/dungeon/hydra.txt",
+			17 : "wiki/dungeon/zodiac.txt",
+			18 : "wiki/dungeon/meley.txt",
+			19 : "wiki/dungeon/akzadur.txt",
+			20 : "wiki/systems/energy.txt",
+			21 : "wiki/events.txt",
+			22 : "wiki/gamerules.txt",
 		}
 
 		if file_dict.has_key(index):
@@ -1871,10 +2097,11 @@ class ArticleGUI(WikiUI.DefaultWikiImage):
 		fileName = self.GetFileName(index)
 		if fileName == "":
 			return
+		lines = []
 		try:
 			lines = pack_open(fileName, "r").readlines()
 		except:
-			pass
+			lines = []
 		_y = 15
 		for i in lines:
 			(ret, tokenMap, i) = self.ParseToken(i)
@@ -2014,6 +2241,7 @@ class ArticleGUI(WikiUI.DefaultWikiImage):
 						height = int(tokenMap["height"])
 						tokenMap.pop("height")
 
+					#targetIndex = app.GetRandom(100,1000)
 					targetIndex = renderTarget.GetFreeIndex(1000, 1000000)
 					tmp = ui.RenderTarget()
 					tmp.SetParent(Listbox)
@@ -2038,7 +2266,12 @@ class ArticleGUI(WikiUI.DefaultWikiImage):
 					self.children.append(tmp)
 					Listbox.AppendItem(tmp)
 
-			if ret and not len(i):
+			# Token parse edildikten sonra text render et
+			# Eðer token varsa (ret == TRUE) ve token'dan sonra text yoksa, sadece özel elementler render edilir
+			# Eðer token yoksa (ret == FALSE), tüm satýr text olarak render edilir
+			
+			# i.strip() ile boþluk kontrolü yap, eðer boþsa continue et
+			if not i.strip():
 				continue
 
 			i = i.replace("*", "|Eemoji/e_wiki|e")
@@ -2059,7 +2292,7 @@ class ArticleGUI(WikiUI.DefaultWikiImage):
 				tmp.SetPackedFontColor(grp.GenerateColor(fontColor[0], fontColor[1], fontColor[2], fontColor[3]))
 				tokenMap.pop("color")
 
-			tmp.SetPosition(5, _y, TRUE)
+			tmp.SetPosition(30, _y, TRUE)
 			_y+=tmp.GetHeight()
 
 			if tokenMap.has_key("center_align"):
@@ -2080,8 +2313,8 @@ class ArticleGUI(WikiUI.DefaultWikiImage):
 		if Listbox.isNeedScrollBar():
 			scrollBar = WikiUI.ScrollBarNew()
 			scrollBar.SetParent(self)
-			scrollBar.SetPosition(self.GetWidth()-15+8, 2)
-			scrollBar.SetScrollBarSize(337)
+			scrollBar.SetPosition(self.GetWidth()-7,2)
+			scrollBar.SetScrollBarSize(355)
 			scrollBar.Show()
 			self.children.append(scrollBar)
 			Listbox.SetScrollBar(scrollBar)
@@ -2089,18 +2322,11 @@ class ArticleGUI(WikiUI.DefaultWikiImage):
 			Listbox.OnScroll()
 
 class SpecialClass(WikiUI.DefaultWikiWindow):
-	tooltipItem = uiToolTip.ItemToolTip()
-
 	def __del__(self):
 		WikiUI.DefaultWikiWindow.__del__(self)
-
 	def Destroy(self):
 		self.vnumList = []
 		WikiUI.DefaultWikiWindow.Destroy(self)
-
-		if self.tooltipItem:
-			self.tooltipItem.Hide()
-
 	def __init__(self, listIndex, isMonster):
 		WikiUI.DefaultWikiWindow.__init__(self)
 		self.Destroy()
@@ -2118,7 +2344,7 @@ class SpecialClass(WikiUI.DefaultWikiWindow):
 
 		bg = ui.ExpandedImageBox()
 		bg.SetParent(self)
-		bg.LoadImage(IMG_DIR + "slot/special_single.tga")
+		bg.LoadImage(REWORK+"grid/small_grid.png")
 		bg.SetPosition(xPos, 0)
 		bg.Show()
 		self.children.append(bg)
@@ -2166,27 +2392,30 @@ class SpecialClass(WikiUI.DefaultWikiWindow):
 
 	def OverOutItem(self):
 		if self.renderIndex != 0:
-			renderTarget.SetVisibility(self.renderIndex, FALSE)
+			renderTarget.SetVisibility(self.renderIndex, False)
 			renderTarget.ResetModel(self.renderIndex)
 		WikiUI.DefaultWikiWindow.OverOutItem(self)
 
 	def OverInItem(self, itemVnum):
-		if self.tooltipItem:
-			self.tooltipItem.ClearToolTip()
+		interface = constInfo.GetInterfaceInstance()
+		if interface:
+			tooltipItem = interface.tooltipItem
+			if tooltipItem:
+				tooltipItem.ClearToolTip()
 
-			self.renderIndex = renderTarget.GetFreeIndex(1000, 1000000)
+				self.renderIndex = renderTarget.GetFreeIndex(1000, 1000000)
 
-			self.tooltipItem.toolTipWidth -= 35
+				tooltipItem.toolTipWidth-= 35
 
-			renterTarget = ui.RenderTarget()
-			renterTarget.SetParent(self.tooltipItem)
-			renterTarget.SetPosition(10, 5)
-			renterTarget.SetSize(self.tooltipItem.toolTipWidth - 20, 150)
-			renterTarget.SetRenderTarget(self.renderIndex)
-			renterTarget.Show()
-			self.tooltipItem.childrenList.append(renterTarget)
-			self.tooltipItem.toolTipHeight += 150
-			self.tooltipItem.ResizeToolTip()
+				renterTarget = ui.RenderTarget()
+				renterTarget.SetParent(tooltipItem)
+				renterTarget.SetPosition(10, 5)
+				renterTarget.SetSize(tooltipItem.toolTipWidth-20,150)
+				renterTarget.SetRenderTarget(self.renderIndex)
+				renterTarget.Show()
+				tooltipItem.childrenList.append(renterTarget)
+				tooltipItem.toolTipHeight+=150
+				tooltipItem.ResizeToolTip()
 
-			WikiUI.SetItemToModelPreview(self.renderIndex, itemVnum)
-			self.tooltipItem.SetItemToolTipWiki(itemVnum)
+				WikiUI.SetItemToModelPreview(self.renderIndex, itemVnum)
+				tooltipItem.SetItemToolTipWiki(itemVnum)

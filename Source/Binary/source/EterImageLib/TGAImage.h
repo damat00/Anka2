@@ -10,7 +10,7 @@ class CTGAImage : public CImage
 		{
 			FLAG_RLE_COMPRESS = (1 << 0)
 		};
-			
+
 		CTGAImage();
 		CTGAImage(CImage &image);
 		virtual ~CTGAImage();

@@ -1,8 +1,7 @@
 #pragma once
 
 void Environment_Init(SEnvironmentData& envData);
-bool Environment_Load(SEnvironmentData& envData, const char *envFileName);
-
+bool Environment_Load(SEnvironmentData& envData, const char* envFileName);
 
 void GetInterpolatedPosition(float curPositionRate, TPixelPosition * PixelPosition);
 float GetLinearInterpolation(float begin, float end, float curRate);

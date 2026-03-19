@@ -1,4 +1,3 @@
-
 #include "stdafx.h"
 
 #include "../../common/length.h"
@@ -48,7 +47,7 @@ void CTableBySkill::SetSkillPowerByLevelFromType(int idx, const int* aTable)
 {
 	DeleteSkillPowerByLevelFromType(idx);
 
-	int* aiSkillTable = M2_NEW int[SKILL_MAX_LEVEL+1];
+	int* aiSkillTable = M2_NEW int[SKILL_MAX_LEVEL + 1];
 
 	memcpy (aiSkillTable, aTable, sizeof(int) * (SKILL_MAX_LEVEL + 1));
 	m_aiSkillPowerByLevelFromType[idx] = aiSkillTable;
@@ -90,4 +89,3 @@ void CTableBySkill::DeleteSkillDamageByLevelTable()
 		m_aiSkillDamageByLevel = NULL;
 	}
 }
-

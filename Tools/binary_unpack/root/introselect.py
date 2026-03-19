@@ -356,6 +356,9 @@ class SelectCharacterWindow(ui.Window):
 		self.dlgBoard.Show()
 		self.Show()
 
+		# Window'a focus ver (ENTER tuþu için gerekli)
+		self.SetFocus()
+
 		my_empire = net.GetEmpireID()
 		self.SetEmpire(my_empire)
 
@@ -540,17 +543,20 @@ class SelectCharacterWindow(ui.Window):
 			import chat
 			chat.Clear()
 
-		for i in xrange(self.LEN_STATPOINT):
-			# curGauge[i] deðerini integer'a çevir (TypeError önleme)
-			gaugeValue = self.curGauge[i]
-			if gaugeValue is None:
-				gaugeValue = 0
-			else:
-				try:
-					gaugeValue = int(float(gaugeValue))
-				except:
-					gaugeValue = 0
-			self.GaugeList[i].SetPercentage(gaugeValue, 1.0)
+		# LEN_STATPOINT, curGauge ve GaugeList None kontrolü
+		if self.LEN_STATPOINT is not None and self.curGauge is not None and self.GaugeList is not None:
+			for i in xrange(self.LEN_STATPOINT):
+				# curGauge[i] deðerini integer'a çevir (TypeError önleme)
+				if i < len(self.curGauge) and i < len(self.GaugeList):
+					gaugeValue = self.curGauge[i]
+					if gaugeValue is None:
+						gaugeValue = 0
+					else:
+						try:
+							gaugeValue = int(float(gaugeValue))
+						except:
+							gaugeValue = 0
+					self.GaugeList[i].SetPercentage(gaugeValue, 1.0)
 
 	def GetCharacterSlotPID(self, slotIndex):
 		return net.GetAccountCharacterSlotDataInteger(slotIndex, net.ACCOUNT_CHARACTER_SLOT_ID)
@@ -623,6 +629,8 @@ class SelectCharacterWindow(ui.Window):
 		self.Not_SelectMotion = FALSE
 		chr.SetLoopMotion(chr.MOTION_INTRO_WAIT)
 		self.EnableWindow()
+		# Focus'u geri ver (ENTER tuþu için gerekli)
+		self.SetFocus()
 		return TRUE
 
 	def OnDeleteSuccess(self, slot):
@@ -657,6 +665,12 @@ class SelectCharacterWindow(ui.Window):
 		self.stream.popupWindow.Open(msg, func, localeInfo.UI_OK)
 
 	def RefreshStat(self):
+		if self.LEN_STATPOINT is None or self.statpoint is None or self.statValue is None:
+			return
+			
+		if len(self.statpoint) < 4:
+			return
+			
 		statSummary = 90.0
 		self.curGauge = [
 			float(self.statpoint[0])/statSummary,
@@ -666,16 +680,21 @@ class SelectCharacterWindow(ui.Window):
 		]
 
 		for i in xrange(self.LEN_STATPOINT):
-			self.statValue[i].SetText(str(self.statpoint[i]))
+			if i < len(self.statValue) and i < len(self.statpoint):
+				self.statValue[i].SetText(str(self.statpoint[i]))
 
 	def ResetStat(self):
+		if self.LEN_STATPOINT is None or self.statpoint is None:
+			return
+			
 		myStatPoint = self.mycharacters.GetStatPoint(self.SelectSlot)
 
 		if not myStatPoint:
 			return
 
 		for i in xrange(self.LEN_STATPOINT):
-			self.statpoint[i] = myStatPoint[i]
+			if i < len(self.statpoint) and i < len(myStatPoint):
+				self.statpoint[i] = myStatPoint[i]
 
 		self.RefreshStat()
 
@@ -740,16 +759,14 @@ class SelectCharacterWindow(ui.Window):
 			self.SelectButton(3)
 		elif 6 == key:
 			self.SelectButton(4)
-		elif 13 == key or 28 == key: # Enter tuþu (13 = Enter, 28 = Return)
-			# Karakter seçiliyse oyuna gir
-			if self.mycharacters.GetMyCharacterCount() > 0 and self.SelectSlot != M2_INIT_VALUE:
+		elif 28 == key: #ENTER
 				self.StartGameButton()
 		elif 200 == key or 208 == key:
 			self.KeyInputUpDown(key)
 		else:
-			return TRUE
+			return True
 
-		return TRUE
+		return True
 
 	def KeyInputUpDown(self, key):
 		idx = self.SelectSlot
@@ -770,7 +787,7 @@ class SelectCharacterWindow(ui.Window):
 
 	def OnPressExitKey(self):
 		self.CloseButton()
-		return TRUE
+		return True
 
 	def DisableWindow(self):
 		self.PlayButton.Disable()

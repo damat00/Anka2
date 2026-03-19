@@ -39,7 +39,6 @@ bool Arabic_IsInSymbol(wchar_t code)
 			(code >= 0x7b && code <= 0x7e);
 }
 
-
 bool Arabic_IsInPresentation(wchar_t code)
 {
 	return (code >= 0xfb50 && code <= 0xfdff) || (code >= 0xfe70 && code <= 0xfeff) || (code == 0x08);

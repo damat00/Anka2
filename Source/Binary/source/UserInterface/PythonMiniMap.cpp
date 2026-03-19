@@ -163,6 +163,9 @@ void CPythonMiniMap::Update(float fCenterX, float fCenterY)
 #ifdef ENABLE_METIN_STONES_MINIMAP
 	m_MetinPositionVector.clear();
 #endif
+#ifdef NAMECOLOR_BOSS_CLIENT
+	m_BossPositionVector.clear();
+#endif
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
 	m_OfflineShopPositionVector.clear();
 #endif
@@ -206,7 +209,11 @@ void CPythonMiniMap::Update(float fCenterX, float fCenterY)
 			else
 				m_OtherPCPositionVector.push_back(aMarkPosition);
 		}
+#ifdef ENABLE_EVENT_BANNER_FLAG
+		else if (pkInstEach->IsNPC() && !pkInstEach->IsBannerFlag() && !pkInstEach->IsInvisibility())
+#else
 		else if (pkInstEach->IsNPC() && !pkInstEach->IsInvisibility())
+#endif
 		{
 #ifdef ENABLE_GRAPHIC_ON_OFF
 			if (CPythonSystem::instance().IsPetStatus() == 1)
@@ -225,13 +232,26 @@ void CPythonMiniMap::Update(float fCenterX, float fCenterY)
 			m_NPCPositionVector.push_back(aMarkPosition);
 #endif
 		}
+#ifdef NAMECOLOR_BOSS_CLIENT
+		else if (pkInstEach->IsEnemy() && !pkInstEach->IsBoss())
+#else
 		else if (pkInstEach->IsEnemy())
+#endif
 		{
 			aMarkPosition.m_fX = ( m_fWidth - (float)m_WhiteMark.GetWidth() ) / 2.0f + fDistanceFromCenterX + m_fScreenX;
 			aMarkPosition.m_fY = ( m_fHeight - (float)m_WhiteMark.GetHeight() ) / 2.0f + fDistanceFromCenterY + m_fScreenY;
 
 			m_MonsterPositionVector.push_back(aMarkPosition);
 		}
+#ifdef NAMECOLOR_BOSS_CLIENT
+		else if (pkInstEach->IsBoss())
+        {
+            aMarkPosition.m_fX = ( m_fWidth - (float)m_WhiteMark.GetWidth() ) / 2.0f + fDistanceFromCenterX + m_fScreenX;
+            aMarkPosition.m_fY = ( m_fHeight - (float)m_WhiteMark.GetHeight() ) / 2.0f + fDistanceFromCenterY + m_fScreenY;
+
+            m_BossPositionVector.push_back(aMarkPosition);
+        }
+#endif
 		else if (pkInstEach->IsWarp())
 		{
 			aMarkPosition.m_fX = ( m_fWidth - (float)m_WhiteMark.GetWidth() ) / 2.0f + fDistanceFromCenterX + m_fScreenX;
@@ -350,6 +370,19 @@ void CPythonMiniMap::Render(float fScreenX, float fScreenY)
 		__SetPosition();
 	}
 
+#ifdef ENABLE_DIRECTX9_UPDATE
+	STATEMANAGER.SaveSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
+	STATEMANAGER.SaveSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
+	STATEMANAGER.SaveSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
+
+	STATEMANAGER.SaveSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+	STATEMANAGER.SaveSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
+
+	STATEMANAGER.SaveTextureStageState(1, D3DTSS_TEXCOORDINDEX, D3DTSS_TCI_CAMERASPACEPOSITION);
+	STATEMANAGER.SaveTextureStageState(1, D3DTSS_TEXTURETRANSFORMFLAGS, D3DTTFF_COUNT2);
+	STATEMANAGER.SaveSamplerState(1, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+	STATEMANAGER.SaveSamplerState(1, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
+#else
 	STATEMANAGER.SaveTextureStageState(0, D3DTSS_MIPFILTER, D3DTEXF_POINT);
 	STATEMANAGER.SaveTextureStageState(0, D3DTSS_MINFILTER, D3DTEXF_POINT);
 	STATEMANAGER.SaveTextureStageState(0, D3DTSS_MAGFILTER, D3DTEXF_POINT);
@@ -361,6 +394,7 @@ void CPythonMiniMap::Render(float fScreenX, float fScreenY)
 	STATEMANAGER.SaveTextureStageState(1, D3DTSS_TEXTURETRANSFORMFLAGS, D3DTTFF_COUNT2);
 	STATEMANAGER.SaveTextureStageState(1, D3DTSS_ADDRESSU, D3DTADDRESS_CLAMP);
 	STATEMANAGER.SaveTextureStageState(1, D3DTSS_ADDRESSV, D3DTADDRESS_CLAMP);
+#endif
 
 	STATEMANAGER.SaveTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
 	STATEMANAGER.SaveTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
@@ -381,24 +415,40 @@ void CPythonMiniMap::Render(float fScreenX, float fScreenY)
 	STATEMANAGER.SetTexture(1, m_MiniMapFilterGraphicImageInstance.GetTexturePointer()->GetD3DTexture());
 	STATEMANAGER.SetTransform(D3DTS_TEXTURE1, &m_matMiniMapCover);
 
+#ifdef ENABLE_DIRECTX9_UPDATE
+	STATEMANAGER.SetFVF(D3DFVF_XYZ | D3DFVF_TEX1);
+#else
 	STATEMANAGER.SetVertexShader(D3DFVF_XYZ | D3DFVF_TEX1);
+#endif
 	STATEMANAGER.SetStreamSource(0, m_VertexBuffer.GetD3DVertexBuffer(), 20);
 	STATEMANAGER.SetIndices(m_IndexBuffer.GetD3DIndexBuffer(), 0);
 	STATEMANAGER.SetTransform(D3DTS_WORLD, &m_matWorld);
 
 	for (BYTE byTerrainNum = 0; byTerrainNum < AROUND_AREA_NUM; ++byTerrainNum)
 	{
+#ifdef ENABLE_DIRECTX9_UPDATE
+		LPDIRECT3DTEXTURE9 pMiniMapTexture = m_lpMiniMapTexture[byTerrainNum];
+#else
 		LPDIRECT3DTEXTURE8 pMiniMapTexture = m_lpMiniMapTexture[byTerrainNum];
+#endif
 		STATEMANAGER.SetTexture(0, pMiniMapTexture);
 		if (pMiniMapTexture)
 		{
 			CStateManager& rkSttMgr=CStateManager::Instance();
+#ifdef ENABLE_DIRECTX9_UPDATE
+			rkSttMgr.DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 4, byTerrainNum * 6, 2);
+#else
 			rkSttMgr.DrawIndexedPrimitive(D3DPT_TRIANGLELIST, byTerrainNum * 4, 4, byTerrainNum * 6, 2);
+#endif
 		}
 		else
 		{
 			STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TFACTOR);
+#ifdef ENABLE_DIRECTX9_UPDATE
+			STATEMANAGER.DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 4, byTerrainNum * 6, 2);
+#else
 			STATEMANAGER.DrawIndexedPrimitive(D3DPT_TRIANGLELIST, byTerrainNum * 4, 4, byTerrainNum * 6, 2);
+#endif
 			STATEMANAGER.SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
 		}
 	}
@@ -419,12 +469,21 @@ void CPythonMiniMap::Render(float fScreenX, float fScreenY)
 	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_COLORARG2);
 	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_COLOROP);
 
+#ifdef ENABLE_DIRECTX9_UPDATE
+	STATEMANAGER.RestoreSamplerState(0, D3DSAMP_ADDRESSU);
+	STATEMANAGER.RestoreSamplerState(0, D3DSAMP_ADDRESSV);
+	STATEMANAGER.RestoreTextureStageState(1, D3DTSS_TEXCOORDINDEX);
+	STATEMANAGER.RestoreTextureStageState(1, D3DTSS_TEXTURETRANSFORMFLAGS);
+	STATEMANAGER.RestoreSamplerState(1, D3DSAMP_ADDRESSU);
+	STATEMANAGER.RestoreSamplerState(1, D3DSAMP_ADDRESSV);
+#else
 	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_ADDRESSU);
 	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_ADDRESSV);
 	STATEMANAGER.RestoreTextureStageState(1, D3DTSS_TEXCOORDINDEX);
 	STATEMANAGER.RestoreTextureStageState(1, D3DTSS_TEXTURETRANSFORMFLAGS);
 	STATEMANAGER.RestoreTextureStageState(1, D3DTSS_ADDRESSU);
 	STATEMANAGER.RestoreTextureStageState(1, D3DTSS_ADDRESSV);
+#endif
 
 	SetDiffuseOperation();
 	STATEMANAGER.SetTransform(D3DTS_WORLD, &m_matIdentity);
@@ -511,6 +570,18 @@ void CPythonMiniMap::Render(float fScreenX, float fScreenY)
 	}
 #endif
 
+#ifdef NAMECOLOR_BOSS_CLIENT
+    STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_BOSS));
+    aIterator = m_BossPositionVector.begin();
+    while (aIterator != m_BossPositionVector.end())
+    {
+        TMarkPosition & rPosition = *aIterator;
+        m_WhiteMark.SetPosition(rPosition.m_fX, rPosition.m_fY);
+        m_WhiteMark.Render();
+        ++aIterator;
+    }
+#endif
+
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
 	STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_SHOP));
 	aIterator = m_OfflineShopPositionVector.begin();
@@ -532,12 +603,21 @@ void CPythonMiniMap::Render(float fScreenX, float fScreenY)
 	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_COLORARG2);
 	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_COLOROP);
 
+#ifdef ENABLE_DIRECTX9_UPDATE
+	STATEMANAGER.RestoreSamplerState(0, D3DSAMP_MIPFILTER);
+	STATEMANAGER.RestoreSamplerState(0, D3DSAMP_MINFILTER);
+	STATEMANAGER.RestoreSamplerState(0, D3DSAMP_MAGFILTER);
+
+	STATEMANAGER.SaveSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+	STATEMANAGER.SaveSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);;
+#else
 	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_MIPFILTER);
 	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_MINFILTER);
 	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_MAGFILTER);
 
 	STATEMANAGER.SaveTextureStageState(0, D3DTSS_MINFILTER, D3DTEXF_LINEAR);
 	STATEMANAGER.SaveTextureStageState(0, D3DTSS_MAGFILTER, D3DTEXF_LINEAR);
+#endif
 
 #ifdef __AUTO_HUNT__
 	if (m_bAutoHuntRageStatus && !m_MiniMapAutoHuntRange.IsEmpty())
@@ -642,8 +722,13 @@ void CPythonMiniMap::Render(float fScreenX, float fScreenY)
 #endif
 	}
 
+#ifdef ENABLE_DIRECTX9_UPDATE
+	STATEMANAGER.RestoreSamplerState(0, D3DSAMP_MINFILTER);
+	STATEMANAGER.RestoreSamplerState(0, D3DSAMP_MAGFILTER);
+#else
 	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_MINFILTER);
 	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_MAGFILTER);
+#endif
 }
 
 void CPythonMiniMap::SetScale(float fScale)
@@ -719,7 +804,7 @@ bool CPythonMiniMap::Create()
 #else
 	const std::string strWhiteMark = strImageRoot + "minimap/whitemark.sub";
 #endif
-#ifdef ENABLE_RENEWAL_REGEN
+#ifdef ENABLE_ULTIMATE_REGEN
 	const std::string strBossMark = strImageRoot + "minimap/bossmark.tga";
 #endif
 
@@ -751,7 +836,7 @@ bool CPythonMiniMap::Create()
 	pSubImage = (CGraphicSubImage *) CResourceManager::Instance().GetResourcePointer(strWhiteMark.c_str());
 	m_WhiteMark.SetImagePointer(pSubImage);
 
-#ifdef ENABLE_RENEWAL_REGEN
+#ifdef ENABLE_ULTIMATE_REGEN
 	pSubImage = (CGraphicSubImage *) CResourceManager::Instance().GetResourcePointer(strBossMark.c_str());
 	m_BossMark.SetImagePointer(pSubImage);
 #endif
@@ -900,13 +985,13 @@ void CPythonMiniMap::__SetPosition()
 void CPythonMiniMap::ClearAtlasMarkInfo()
 {
 	m_AtlasNPCInfoVector.clear();
-#ifdef ENABLE_RENEWAL_REGEN
+#ifdef ENABLE_ULTIMATE_REGEN
 	m_AtlasBossInfoVector.clear();
 #endif
 	m_AtlasWarpInfoVector.clear();
 }
 
-#ifdef ENABLE_RENEWAL_REGEN
+#ifdef ENABLE_ULTIMATE_REGEN
 void CPythonMiniMap::RegisterAtlasMark(BYTE byType, DWORD mobVnum, const char * c_szName, long lx, long ly, int regenTime)
 #else
 void CPythonMiniMap::RegisterAtlasMark(BYTE byType, const char *c_szName, long lx, long ly)
@@ -917,7 +1002,7 @@ void CPythonMiniMap::RegisterAtlasMark(BYTE byType, const char *c_szName, long l
 	aAtlasMarkInfo.m_fX = float(lx);
 	aAtlasMarkInfo.m_fY = float(ly);
 	aAtlasMarkInfo.m_strText = c_szName;
-#ifdef ENABLE_RENEWAL_REGEN
+#ifdef ENABLE_ULTIMATE_REGEN
 	aAtlasMarkInfo.mobVnum = mobVnum;
 	aAtlasMarkInfo.regenTime = regenTime;
 #endif
@@ -927,7 +1012,7 @@ void CPythonMiniMap::RegisterAtlasMark(BYTE byType, const char *c_szName, long l
 
 	switch(byType)
 	{
-#ifdef ENABLE_RENEWAL_REGEN
+#ifdef ENABLE_ULTIMATE_REGEN
 		case CActorInstance::TYPE_ENEMY:
 			aAtlasMarkInfo.m_fScreenX = aAtlasMarkInfo.m_fX / m_fAtlasMaxX * m_fAtlasImageSizeX - (float)m_BossMark.GetWidth() / 2.0f;
 			aAtlasMarkInfo.m_fScreenY = aAtlasMarkInfo.m_fY / m_fAtlasMaxY * m_fAtlasImageSizeY - (float)m_BossMark.GetHeight() / 2.0f;
@@ -1254,8 +1339,13 @@ void CPythonMiniMap::RenderAtlas(float fScreenX, float fScreenY)
 	}
 
 	STATEMANAGER.SetTransform(D3DTS_WORLD, &m_matWorldAtlas);
+#ifdef ENABLE_DIRECTX9_UPDATE
+	STATEMANAGER.SaveSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
+	STATEMANAGER.SaveSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
+#else
 	STATEMANAGER.SaveTextureStageState(0, D3DTSS_MINFILTER, D3DTEXF_POINT);
 	STATEMANAGER.SaveTextureStageState(0, D3DTSS_MAGFILTER, D3DTEXF_POINT);
+#endif
 	m_AtlasImageInstance.Render();
 
 	STATEMANAGER.SaveRenderState(D3DRS_TEXTUREFACTOR, 0xFFFFFFFF);
@@ -1283,8 +1373,13 @@ void CPythonMiniMap::RenderAtlas(float fScreenX, float fScreenY)
 		++m_AtlasMarkInfoVectorIterator;
 	}
 
+#ifdef ENABLE_DIRECTX9_UPDATE
+	STATEMANAGER.SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+	STATEMANAGER.SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+#else
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_MINFILTER, D3DTEXF_LINEAR);
 	STATEMANAGER.SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTEXF_LINEAR);
+#endif
 	STATEMANAGER.SetRenderState(D3DRS_TEXTUREFACTOR, CInstanceBase::GetIndexedNameColor(CInstanceBase::NAMECOLOR_WAYPOINT));
 	m_AtlasMarkInfoVectorIterator = m_AtlasWayPointInfoVector.begin();
 	for (; m_AtlasMarkInfoVectorIterator != m_AtlasWayPointInfoVector.end(); ++m_AtlasMarkInfoVectorIterator)
@@ -1306,7 +1401,7 @@ void CPythonMiniMap::RenderAtlas(float fScreenX, float fScreenY)
 		}
 	}
 
-#ifdef ENABLE_RENEWAL_REGEN
+#ifdef ENABLE_ULTIMATE_REGEN
 	m_AtlasMarkInfoVectorIterator = m_AtlasBossInfoVector.begin();
 	while (m_AtlasMarkInfoVectorIterator != m_AtlasBossInfoVector.end())
 	{
@@ -1372,8 +1467,13 @@ void CPythonMiniMap::RenderAtlas(float fScreenX, float fScreenY)
 		m_AtlasPlayerMark.Render();
 #endif
 
-	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_MINFILTER);
-	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_MAGFILTER);
+#ifdef ENABLE_DIRECTX9_UPDATE
+	STATEMANAGER.RestoreSamplerState(0, D3DSAMP_MINFILTER);
+	STATEMANAGER.RestoreSamplerState(0, D3DSAMP_MAGFILTER);
+#else
+	STATEMANAGER.SetTextureStageState(0, D3DTSS_MINFILTER, D3DTEXF_LINEAR);
+	STATEMANAGER.SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTEXF_LINEAR);
+#endif
 	STATEMANAGER.SetTransform(D3DTS_WORLD, &m_matIdentity);
 
 	{
@@ -1448,7 +1548,7 @@ bool CPythonMiniMap::GetPickedInstanceInfo(float fScreenX, float fScreenY, std::
 	return false;
 }
 
-#ifdef ENABLE_RENEWAL_REGEN
+#ifdef ENABLE_ULTIMATE_REGEN
 bool CPythonMiniMap::GetAtlasInfo(float fScreenX, float fScreenY, std::string & rReturnString, float * pReturnPosX, float * pReturnPosY, DWORD * pdwTextColor, DWORD * pdwGuildID, int * pdiRegenTime)
 #else
 bool CPythonMiniMap::GetAtlasInfo(float fScreenX, float fScreenY, std::string & rReturnString, float * pReturnPosX, float * pReturnPosY, DWORD * pdwTextColor, DWORD * pdwGuildID)
@@ -1467,7 +1567,7 @@ bool CPythonMiniMap::GetAtlasInfo(float fScreenX, float fScreenY, std::string & 
 
 	CInstanceBase * pkInst = CPythonCharacterManager::Instance().GetMainInstancePtr();
 
-#ifdef ENABLE_RENEWAL_REGEN
+#ifdef ENABLE_ULTIMATE_REGEN
 	*pdiRegenTime = 0;
 #endif
 
@@ -1538,7 +1638,7 @@ bool CPythonMiniMap::GetAtlasInfo(float fScreenX, float fScreenY, std::string & 
 	}
 #endif
 
-#ifdef ENABLE_RENEWAL_REGEN
+#ifdef ENABLE_ULTIMATE_REGEN
 	m_AtlasMarkInfoVectorIterator = m_AtlasBossInfoVector.begin();
 	while (m_AtlasMarkInfoVectorIterator != m_AtlasBossInfoVector.end())
 	{
@@ -1877,7 +1977,7 @@ void CPythonMiniMap::Destroy()
 	mAtlasPartyPlayerMark.clear();
 #endif
 	m_WhiteMark.Destroy();
-#ifdef ENABLE_RENEWAL_REGEN
+#ifdef ENABLE_ULTIMATE_REGEN
 	m_BossMark.Destroy();
 #endif
 

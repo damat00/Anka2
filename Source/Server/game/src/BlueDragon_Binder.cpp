@@ -215,4 +215,3 @@ unsigned int BlueDragon_GetIndexFactor(const char* container, const size_t idx, 
 
 	return ret;
 }
-

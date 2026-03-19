@@ -860,7 +860,7 @@ void CArea::__SetObjectInstance_SetTree(TObjectInstance * pObjectInstance, const
 	if (!pProperty->GetString("TreeFile", &c_szTreeName))
 		return;
 
-	pObjectInstance->SetTree(		
+	pObjectInstance->SetTree(
 		c_pData->Position.x,
 		c_pData->Position.y,
 		c_pData->Position.z + c_pData->m_fHeightBias,
@@ -1002,9 +1002,8 @@ void CArea::__SetObjectInstance_SetDungeonBlock(TObjectInstance * pObjectInstanc
 
 void CArea::__LoadAttribute(TObjectInstance * pObjectInstance, const char *c_szAttributeFileName)
 {
-	// OBB를 사용한 충돌 정보 자동 �?성.
 	const bool bFileExist = CResourceManager::Instance().IsFileExist(c_szAttributeFileName);
-	
+
 	CAttributeData * pAttributeData = (CAttributeData *) CResourceManager::Instance().GetResourcePointer(c_szAttributeFileName);
 
 	CAttributeInstance * pAttrInstance = ms_AttributeInstancePool.Alloc();
@@ -1017,7 +1016,6 @@ void CArea::__LoadAttribute(TObjectInstance * pObjectInstance, const char *c_szA
 		std::transform(attrFileName.begin(), attrFileName.end(), attrFileName.begin(), [](unsigned char c) { return std::tolower(c); });
 		const bool bIsDungeonObject = (std::string::npos != attrFileName.find("/dungeon/")) || (std::string::npos != attrFileName.find("\\dungeon\\"));
 
-		// NOTE: dungeon 오브젝트는 Dummy Collision을 자동으로 �?성하지 않도록 함 (던전의 경우 더미 컬리전때문에 문제가 된 경우가 수차례 있었음. 이렇게 하기로 그래픽 팀과 협의 완료)
 		if (pAttributeData->IsEmpty() && false == bIsDungeonObject)
 		{
 			if (NULL != pObjectInstance && NULL != pObjectInstance->pThingInstance)
@@ -1027,7 +1025,7 @@ void CArea::__LoadAttribute(TObjectInstance * pObjectInstance, const char *c_szA
 				D3DXVECTOR3 v3Min, v3Max;
 
 				object->GetBoundingAABB(v3Min, v3Max);
-				
+
 				CStaticCollisionData collision;
 				collision.dwType = COLLISION_TYPE_OBB;
 				D3DXQuaternionRotationYawPitchRoll(&collision.quatRotation, object->GetYaw(), object->GetPitch(), object->GetRoll());
@@ -1221,7 +1219,6 @@ bool CArea::__Load_LoadObject(const char * c_szFileName)
 		ObjectData.Position.z = atof(c_rstrzPosition.c_str());
 		ObjectData.dwCRC = atoi	(c_rstrCRC.c_str());
 
-		// 20041217.myevan.로테이션 공식 변경
 		ObjectData.InitializeRotation(); //ObjectData.m_fYaw = ObjectData.m_fPitch = ObjectData.m_fRoll = 0;
 		if (rVector.size() > 4)
 		{
@@ -1321,7 +1318,6 @@ bool CArea::__Load_LoadAmbience(const char *c_szFileName)
 		ObjectData.dwCRC = atoi	(c_rstrCRC.c_str());
 		ObjectData.dwRange = atoi(c_rstrRange.c_str());
 
-		// 20041217.myevan.로테이션 초기화
 		ObjectData.InitializeRotation();
 		ObjectData.m_fHeightBias = 0.0f;
 		ObjectData.fMaxVolumeAreaPercentage = 0.0f;
@@ -1581,7 +1577,6 @@ void CArea::__Clear_DestroyObjectInstance(TObjectInstance * pObjectInstance)
 
 
 //////////////////////////////////////////////////////////////////////////
-// Coordination 관련
 void CArea::GetCoordinate(unsigned short * usCoordX, unsigned short * usCoordY)
 {
 	*usCoordX = m_wX;

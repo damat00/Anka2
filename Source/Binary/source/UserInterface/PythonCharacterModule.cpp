@@ -70,13 +70,16 @@ PyObject *chrCreateInstance(PyObject *poSelf, PyObject *poArgs)
 		CInstanceBase::SCreateData kCreateData;
 		kCreateData.m_bType=CActorInstance::TYPE_PC;
 		kCreateData.m_dwLevel = 0;
+#ifdef ENABLE_CONQUEROR_LEVEL
+		kCreateData.m_dwConquerorLevel = 0;
+#endif
 		kCreateData.m_dwGuildID = 0;
 		kCreateData.m_dwEmpireID = 0;
 		kCreateData.m_dwVID = iVirtualID;
 		kCreateData.m_dwMountVnum = 0;
 		kCreateData.m_dwRace = 0;
 		kCreateData.m_fRot = CInstanceBase::DIR_NORTH;
- 		kCreateData.m_lPosX = 0;
+		kCreateData.m_lPosX = 0;
 		kCreateData.m_lPosY = 0;
 		kCreateData.m_stName = "NONAME";
 		kCreateData.m_dwStateFlags = 0;
@@ -84,9 +87,6 @@ PyObject *chrCreateInstance(PyObject *poSelf, PyObject *poArgs)
 		kCreateData.m_dwAtkSpd = 100;
 		kCreateData.m_sAlignment = 0;
 		kCreateData.m_byPKMode = 0;
-#ifdef ENABLE_TITLE_SYSTEM
-		kCreateData.m_iTitleID = 0;
-#endif
 		kCreateData.m_kAffectFlags.Clear();
 		kCreateData.m_dwArmor = 8;
 		kCreateData.m_dwWeapon = 0;
@@ -1256,21 +1256,6 @@ PyObject *chrGetHair(PyObject *poSelf, PyObject *poArgs)
 }
 #endif
 
-#ifdef ENABLE_RENEWAL_PREMIUM_SYSTEM
-PyObject *chrIsPremium(PyObject *poSelf, PyObject *poArgs)
-{
-	int iVirtualID;
-	if (!PyTuple_GetInteger(poArgs, 0, &iVirtualID))
-		return Py_BuildException();
-
-	CInstanceBase * pInstance = CPythonCharacterManager::Instance().GetInstancePtr(iVirtualID);
-	if (!pInstance)
-		return Py_BuildValue("i", 0);
-
-	return Py_BuildValue("i", pInstance->IsPremium());
-}
-#endif
-
 #ifdef ENABLE_AURA_COSTUME_SYSTEM
 PyObject *chrSetAura(PyObject* poSelf, PyObject* poArgs)
 {
@@ -1283,6 +1268,21 @@ PyObject *chrSetAura(PyObject* poSelf, PyObject* poArgs)
 		pCharacterInstance->SetAura(iAura);
 
 	return Py_BuildNone();
+}
+#endif
+
+#ifdef ENABLE_MELEY_LAIR_DUNGEON
+PyObject * chrIsStone(PyObject* poSelf, PyObject* poArgs)
+{
+	int iVirtualID;
+	if (!PyTuple_GetInteger(poArgs, 0, &iVirtualID))
+		return Py_BuildException();
+
+	CInstanceBase * pInstance = CPythonCharacterManager::Instance().GetInstancePtr(iVirtualID);
+	if (!pInstance)
+		return Py_BuildValue("i", 0);
+
+	return Py_BuildValue("i", pInstance->IsStone());
 }
 #endif
 
@@ -1392,8 +1392,8 @@ void initchr()
 		{ "GetHair", 						chrGetHair, 						METH_VARARGS },
 #endif
 
-#ifdef ENABLE_RENEWAL_PREMIUM_SYSTEM
-		{ "IsPremium",						chrIsPremium,						METH_VARARGS },
+#ifdef ENABLE_MELEY_LAIR_DUNGEON
+		{"IsStone", 						chrIsStone, 						METH_VARARGS },
 #endif
 
 #ifdef ENABLE_AURA_COSTUME_SYSTEM
@@ -1420,6 +1420,10 @@ void initchr()
 	PyModule_AddIntConstant(poModule, "MOTION_CHANGE_WEAPON", CRaceMotionData::NAME_CHANGE_WEAPON);
 	PyModule_AddIntConstant(poModule, "MOTION_DAMAGE", CRaceMotionData::NAME_DAMAGE);
 	PyModule_AddIntConstant(poModule, "MOTION_DAMAGE_FLYING", CRaceMotionData::NAME_DAMAGE_FLYING);
+#ifdef ENABLE_SUNG_MAHI_TOWER
+	PyModule_AddIntConstant(poModule, "NEW_AFFECT_SUNG_MAHI_BP", CInstanceBase::NEW_AFFECT_SUNG_MAHI_BP);
+	PyModule_AddIntConstant(poModule, "NEW_AFFECT_SUNG_MAHI_CURSE", CInstanceBase::NEW_AFFECT_SUNG_MAHI_CURSE);
+#endif
 	PyModule_AddIntConstant(poModule, "MOTION_STAND_UP", CRaceMotionData::NAME_STAND_UP);
 	PyModule_AddIntConstant(poModule, "MOTION_DAMAGE_BACK", CRaceMotionData::NAME_DAMAGE_BACK);
 	PyModule_AddIntConstant(poModule, "MOTION_DAMAGE_FLYING_BACK", CRaceMotionData::NAME_DAMAGE_FLYING_BACK);
@@ -1580,16 +1584,17 @@ void initchr()
 	PyModule_AddIntConstant(poModule, "AFFECT_PABEOP", CInstanceBase::AFFECT_PABEOP);
 	PyModule_AddIntConstant(poModule, "AFFECT_FALLEN_CHEONGEUN", CInstanceBase::AFFECT_FALLEN_CHEONGEUN);
 	PyModule_AddIntConstant(poModule, "AFFECT_CHINA_FIREWORK", CInstanceBase::AFFECT_CHINA_FIREWORK);
+
 #ifdef ENABLE_MULTI_FARM_BLOCK
 	PyModule_AddIntConstant(poModule, "NEW_AFFECT_MULTI_FARM", CInstanceBase::NEW_AFFECT_MULTI_FARM);
-#endif
-#ifdef ENABLE_RENEWAL_PREMIUM_SYSTEM
-	PyModule_AddIntConstant(poModule, "NEW_AFFECT_PREMIUM_ACCOUNT", CInstanceBase::NEW_AFFECT_PREMIUM_ACCOUNT);
 #endif
 #ifdef __AUTO_HUNT__
 	PyModule_AddIntConstant(poModule, "NEW_AFFECT_AUTO_HUNT", CInstanceBase::NEW_AFFECT_AUTO_HUNT);
 #endif
-
+#ifdef ENABLE_NINETH_SKILL
+	PyModule_AddIntConstant(poModule, "AFFECT_CHEONUN",						CInstanceBase::AFFECT_CHEONUN);
+	PyModule_AddIntConstant(poModule, "AFFECT_CHUNWOON",					CInstanceBase::AFFECT_CHUNWOON);
+#endif
 	PyModule_AddIntConstant(poModule, "NEW_AFFECT_MALL", CInstanceBase::NEW_AFFECT_MALL);
 	PyModule_AddIntConstant(poModule, "NEW_AFFECT_NO_DEATH_PENALTY", CInstanceBase::NEW_AFFECT_NO_DEATH_PENALTY);
 	PyModule_AddIntConstant(poModule, "NEW_AFFECT_SKILL_BOOK_BONUS", CInstanceBase::NEW_AFFECT_SKILL_BOOK_BONUS);
@@ -1616,6 +1621,11 @@ void initchr()
 	PyModule_AddIntConstant(poModule, "NEW_AFFECT_BLEND", CInstanceBase::NEW_AFFECT_BLEND);
 	PyModule_AddIntConstant(poModule, "NEW_AFFECT_MALL_PLUS", CInstanceBase::NEW_AFFECT_MALL_PLUS);
 	PyModule_AddIntConstant(poModule, "NEW_AFFECT_BLEND_PLUS", CInstanceBase::NEW_AFFECT_BLEND_PLUS);
+#endif
+#ifdef ENABLE_QUEEN_NETHIS
+	PyModule_AddIntConstant(poModule, "NEW_AFFECT_SUNGMA_MOVE_DEBUFF", CInstanceBase::NEW_AFFECT_SUNGMA_MOVE_DEBUFF);
+	PyModule_AddIntConstant(poModule, "NEW_AFFECT_SUNGMA_STR_DEBUFF", CInstanceBase::NEW_AFFECT_SUNGMA_STR_DEBUFF);
+	PyModule_AddIntConstant(poModule, "EFFECT_SNAKE_REGEN", CInstanceBase::EFFECT_SNAKE_REGEN);
 #endif
 
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
@@ -1650,5 +1660,31 @@ void initchr()
 	PyModule_AddIntConstant(poModule, "PET_SKILL_AFFECT_EXP", CInstanceBase::PET_SKILL_AFFECT_EXP);
 	PyModule_AddIntConstant(poModule, "PET_SKILL_FEATHER", CInstanceBase::PET_SKILL_FEATHER);
 	PyModule_AddIntConstant(poModule, "PET_SKILL_AFFECT_MAX", CInstanceBase::PET_SKILL_AFFECT_MAX);
+#endif
+
+#ifdef ENABLE_MELEY_LAIR_DUNGEON
+	PyModule_AddIntConstant(poModule, "AFFECT_STATUE1", CInstanceBase::AFFECT_STATUE1);
+	PyModule_AddIntConstant(poModule, "AFFECT_STATUE2", CInstanceBase::AFFECT_STATUE2);
+	PyModule_AddIntConstant(poModule, "AFFECT_STATUE3", CInstanceBase::AFFECT_STATUE3);
+	PyModule_AddIntConstant(poModule, "AFFECT_STATUE4", CInstanceBase::AFFECT_STATUE4);
+#endif
+
+#ifdef ENABLE_EQUIPMENT_HAND_EFFECT
+	PyModule_AddIntConstant(poModule, "AFF_DBONE_BRONZE", CInstanceBase::AFF_DBONE_BRONZE);
+	PyModule_AddIntConstant(poModule, "AFF_DBONE_SILVER", CInstanceBase::AFF_DBONE_SILVER);
+	PyModule_AddIntConstant(poModule, "AFF_DBONE_GOLD", CInstanceBase::AFF_DBONE_GOLD);
+	PyModule_AddIntConstant(poModule, "AFF_DBONE_DIAMOND", CInstanceBase::AFF_DBONE_DIAMOND);
+	PyModule_AddIntConstant(poModule, "AFF_DBONE_PLATIN", CInstanceBase::AFF_DBONE_PLATIN);
+	PyModule_AddIntConstant(poModule, "AFF_DBONE_EMERALD", CInstanceBase::AFF_DBONE_EMERALD);
+	PyModule_AddIntConstant(poModule, "AFFECT_DBONE_BRONZE", CInstanceBase::AFFECT_DBONE_BRONZE);
+	PyModule_AddIntConstant(poModule, "AFFECT_DBONE_SILVER", CInstanceBase::AFFECT_DBONE_SILVER);
+	PyModule_AddIntConstant(poModule, "AFFECT_DBONE_GOLD", CInstanceBase::AFFECT_DBONE_GOLD);
+	PyModule_AddIntConstant(poModule, "AFFECT_DBONE_DIAMOND", CInstanceBase::AFFECT_DBONE_DIAMOND);
+	PyModule_AddIntConstant(poModule, "AFFECT_DBONE_PLATIN", CInstanceBase::AFFECT_DBONE_PLATIN);
+	PyModule_AddIntConstant(poModule, "AFFECT_DBONE_EMERALD", CInstanceBase::AFFECT_DBONE_EMERALD);
+#endif
+#ifdef ENABLE_ATTENDANCE_EVENT
+	PyModule_AddIntConstant(poModule, "NEW_AFFECT_EXP_BONUS_EVENT",			CInstanceBase::NEW_AFFECT_EXP_BONUS_EVENT);
+	PyModule_AddIntConstant(poModule, "NEW_AFFECT_ATT_SPEED_SLOW",			CInstanceBase::NEW_AFFECT_ATT_SPEED_SLOW);
 #endif
 }

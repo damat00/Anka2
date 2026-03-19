@@ -1,4 +1,5 @@
 #pragma once
+#include "../UserInterface/Locale_inc.h"
 
 #include "StdAfx.h"
 
@@ -103,6 +104,10 @@ namespace UI
 			void		DeattachIcon();
 			void		SetAttachingFlag(BOOL bFlag);
 			void		SetAttachingRealSlotNumber(DWORD dwRealslotNumber);
+#ifdef ENABLE_FISH_EVENT_SYSTEM
+			void		SetDisableDeattach(bool bFlag) { m_bIsDisableDettach = bFlag; }
+			bool		IsDisableDeattach() { return m_bIsDisableDettach; }
+#endif
 			// Attaching Icon
 
 			void		OnceIgnoreMouseLeftButtonUpEvent();
@@ -148,7 +153,7 @@ namespace UI
 		private:
 			void		SetMousePosition(long x, long y);
 			CWindow *	__PickWindow(long x, long y);
-			
+
 			CWindow *	__NewWindow(PyObject *po, DWORD dwWndType);
 			void		__ClearReserveDeleteWindowList();
 
@@ -175,6 +180,9 @@ namespace UI
 			DWORD					m_dwAttachingRealSlotNumber;
 			BYTE					m_byAttachingIconWidth;
 			BYTE					m_byAttachingIconHeight;
+#ifdef ENABLE_FISH_EVENT_SYSTEM
+			bool					m_bIsDisableDettach;
+#endif
 			// Attaching Icon
 
 			CWindow	*				m_pActiveWindow;

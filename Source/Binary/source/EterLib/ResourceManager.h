@@ -17,7 +17,7 @@ class CResourceManager : public CSingleton<CResourceManager>
 
 		void		DestroyDeletingList();
 		void		Destroy();
-		
+
 		void		BeginThreadLoading();
 		void		EndThreadLoading();
 
@@ -26,7 +26,6 @@ class CResourceManager : public CSingleton<CResourceManager>
 		CResource *	GetResourcePointer(const char *c_szFileName);
 		CResource *	GetTypeResourcePointer(const char *c_szFileName, int iType=-1);
 
-		// 추가
 		bool		isResourcePointerData(DWORD dwFileCRC);
 
 		void		RegisterResourceNewFunctionPointer(const char *c_szFileExt, CResource* (*pResNewFunc)(const char *c_szFileName));
@@ -48,7 +47,7 @@ class CResourceManager : public CSingleton<CResourceManager>
 		void		__DestroyCacheMap();
 
 		DWORD		__GetFileCRC(const char *c_szFileName, const char ** c_pszLowerFile = nullptr);
-	
+
 	protected:
 		typedef std::map<DWORD,	CResource *>									TResourcePointerMap;
 		typedef std::map<std::string, CResource* (*)(const char *)>				TResourceNewFunctionPointerMap;
@@ -63,7 +62,7 @@ class CResourceManager : public CSingleton<CResourceManager>
 		TResourceNewFunctionPointerMap			m_pResNewFuncMap;
 		TResourceNewFunctionByTypePointerMap	m_pResNewFuncByTypeMap;
 		TResourceDeletingMap					m_ResourceDeletingMap;
-		TResourceRequestMap						m_RequestMap;	// 쓰레드로 로딩 요청한 리스트
+		TResourceRequestMap						m_RequestMap;
 		TResourceRequestMap						m_WaitingMap;
 		TResourceRefDecreaseWaitingMap			m_pResRefDecreaseWaitingMap;
 

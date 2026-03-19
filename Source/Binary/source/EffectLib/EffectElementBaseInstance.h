@@ -21,20 +21,18 @@ class CEffectElementBaseInstance
 		void SetActive();
 		void SetDeactive();
 
+#ifdef USE_EFFECTS_LOD
+        bool IsHiddenByLod();
+        void SetHiddenByLod();
+        void SetShownByLod();
+#endif
+
 #ifdef ENABLE_RENDER_TARGET
 	protected:
 		bool m_ignoreFrustum;
 
 	public:
 		void SetIgnoreFrustum(bool frustum) { m_ignoreFrustum = frustum; }
-#endif
-
-#ifdef ENABLE_INGAME_WIKI_SYSTEM
-	public:
-		void SetWikiIgnoreFrustum(bool flag) { m_wikiIgnoreFrustum = flag; }
-
-	protected:
-		bool m_wikiIgnoreFrustum;
 #endif
 
 	protected:
@@ -50,6 +48,10 @@ class CEffectElementBaseInstance
 		const D3DXMATRIX *mc_pmatLocal;
 
 		bool m_isActive;
+
+#ifdef USE_EFFECTS_LOD
+        bool m_isHiddenByLod;
+#endif
 
 		float m_fLocalTime;
 		DWORD m_dwStartTime;
@@ -68,5 +70,12 @@ class CEffectElementBaseInstance
 	protected:
 		float m_fParticleScale;
 		D3DXVECTOR3 m_v3MeshScale;
+#endif
+#ifdef ENABLE_WIKI_SYSTEM
+	public:
+		void SetWikiIgnoreFrustum(bool flag) { m_wikiIgnoreFrustum = flag; }
+	
+	protected:
+		bool m_wikiIgnoreFrustum;
 #endif
 };

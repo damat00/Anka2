@@ -11,6 +11,10 @@
 	#include "../EterLib/RenderTargetManager.h"
 #endif
 
+#ifdef ENABLE_UI_DEBUG_WINDOW
+	#include <fmt/format.h>
+#endif
+
 BOOL g_bOutlineBoxEnable = FALSE;
 
 #ifdef ENABLE_FISH_GAME
@@ -106,7 +110,7 @@ void GetDeltaByDegree(float fDegree, float fDistance, float* x, float* y)
 
 namespace UI
 {
-	CWindow::CWindow(PyObject *ppyObject) : 
+	CWindow::CWindow(PyObject * ppyObject) :
 		m_x(0),
 		m_y(0),
 		m_lWidth(0),
@@ -116,6 +120,9 @@ namespace UI
 		m_pParent(nullptr),
 		m_dwFlag(0),
 		m_isUpdatingChildren(FALSE)
+#ifdef INSIDE_RENDER
+		, m_isInsideRender(false)
+#endif
 	{
 #ifdef _DEBUG
 		static DWORD DEBUG_dwGlobalCounter=0;
@@ -127,12 +134,15 @@ namespace UI
 		m_HorizontalAlign = HORIZONTAL_ALIGN_LEFT;
 		m_VerticalAlign = VERTICAL_ALIGN_TOP;
 		m_rect.bottom = m_rect.left = m_rect.right = m_rect.top = 0;
+		m_limitBiasRect.bottom = m_limitBiasRect.left = m_limitBiasRect.right = m_limitBiasRect.top = 0;
+#ifdef INSIDE_RENDER
+		memset(&m_renderBox, 0, sizeof(m_renderBox));
+#endif
 #ifdef ENABLE_CLIP_MASKING
 		m_bEnableMask = false;
 		m_pMaskWindow = NULL;
 		memset(&m_rMaskRect, 0, sizeof(m_rMaskRect));
 #endif
-		m_limitBiasRect.bottom = m_limitBiasRect.left = m_limitBiasRect.right = m_limitBiasRect.top = 0;
 		m_windowType = WINDOW_TYPE_WINDOW;
 	}
 
@@ -195,6 +205,18 @@ namespace UI
 		m_bShow = false;
 	}
 
+#ifdef INSIDE_RENDER
+	void CWindow::OnHideWithChilds()
+	{
+		OnHide();
+		std::for_each(m_pChildList.begin(), m_pChildList.end(), std::mem_fn(&CWindow::OnHideWithChilds));
+	}
+	void CWindow::OnHide()
+	{
+		PyCallClassMemberFunc(m_poHandler, "OnHide", BuildEmptyTuple());
+	}
+#endif
+
 	bool CWindow::IsRendering()
 	{
 		if (!IsShow())
@@ -240,6 +262,20 @@ namespace UI
 		m_isUpdatingChildren = FALSE;
 	}
 
+#ifdef INSIDE_RENDER
+	bool CWindow::IsShow()
+	{
+		if (!m_bShow)
+			return false;
+
+		if (m_isInsideRender)
+			if (m_renderBox.left + m_renderBox.right >= m_lWidth || m_renderBox.top + m_renderBox.bottom >= m_lHeight)
+				return false;
+
+		return true;
+	}
+#endif
+
 	void CWindow::Render()
 	{
 		if (!IsShow())
@@ -247,13 +283,68 @@ namespace UI
 
 		OnRender();
 
+#ifdef ENABLE_UI_DEBUG_WINDOW
+        if (g_bOutlineBoxEnable)
+        {
+            if (CWindowManager::instance().GetPointWindow() == this)
+            {
+                const auto parentRect = m_pParent ? m_pParent->m_rect : RECT{ 0, 0, 0, 0 };
+                CPythonGraphic::Instance().SetDiffuseColor(0.0f, 0.0f, 1.0f);
+                CPythonGraphic::Instance().RenderBox2d(parentRect.left, parentRect.top, parentRect.right, parentRect.bottom);
+
+                CPythonGraphic::Instance().SetDiffuseColor(0.0f, 1.0f, 0.0f);
+                CPythonGraphic::Instance().RenderBox2d(m_rect.left, m_rect.top, m_rect.right, m_rect.bottom);
+
+                std::ostringstream oss;
+                oss << m_strName << " (" << Type() << ")";
+                CPythonGraphic::Instance().RenderTextLine(m_rect.left + 5, m_rect.top - 30, oss.str().c_str(), 0xFFFFFF00);
+
+                const auto flags = m_dwFlag;
+                std::string flagInfo;
+                if (flags & FLAG_MOVABLE)
+                    flagInfo += "FLAG_MOVABLE ";
+                if (flags & FLAG_SNAP)
+                    flagInfo += "FLAG_SNAP ";
+                if (flags & FLAG_DRAGABLE)
+                    flagInfo += "FLAG_DRAGABLE ";
+                if (flags & FLAG_ATTACH)
+                    flagInfo += "FLAG_ATTACH ";
+                if (flags & FLAG_RESTRICT_X)
+                    flagInfo += "FLAG_RESTRICT_X ";
+                if (flags & FLAG_RESTRICT_Y)
+                    flagInfo += "FLAG_RESTRICT_Y ";
+                if (flags & FLAG_FLOAT)
+                    flagInfo += "FLAG_FLOAT ";
+                if (flags & FLAG_NOT_PICK)
+                    flagInfo += "FLAG_NOT_PICK ";
+                if (flags & FLAG_IGNORE_SIZE)
+                    flagInfo += "FLAG_IGNORE_SIZE ";
+                if (flags & FLAG_RTL)
+                    flagInfo += "FLAG_RTL ";
+
+                const auto parentName = m_pParent ? m_pParent->GetName() : "None";
+
+                std::ostringstream ossInfo;
+                ossInfo << "Pos: (" << m_rect.left << ", " << m_rect.top << "), "
+                        << "Size: " << (m_rect.right - m_rect.left) << "x" << (m_rect.bottom - m_rect.top) << ", "
+                        << "Flags: " << flagInfo << ", "
+                        << "Parent: " << parentName;
+
+                CPythonGraphic::Instance().RenderTextLine(m_rect.left + 5, m_rect.top - 15, ossInfo.str().c_str(), 0xFFFFFFFF);
+            }
+        }
+#else
 		if (g_bOutlineBoxEnable)
 		{
 			CPythonGraphic::Instance().SetDiffuseColor(1.0f, 1.0f, 1.0f);
 			CPythonGraphic::Instance().RenderBox2d(m_rect.left, m_rect.top, m_rect.right, m_rect.bottom);
 		}
+#endif
 
 		std::for_each(m_pChildList.begin(), m_pChildList.end(), std::mem_fn(&CWindow::Render));
+#ifdef INSIDE_RENDER
+		OnAfterRender();
+#endif
 	}
 
 	void CWindow::OnUpdate()
@@ -280,6 +371,17 @@ namespace UI
 		PyCallClassMemberFunc(m_poHandler, "OnRender", BuildEmptyTuple());
 	}
 
+#ifdef INSIDE_RENDER
+	void CWindow::OnAfterRender()
+	{
+		if (!m_poHandler)
+			return;
+		if (!IsShow())
+			return;
+		PyCallClassMemberFunc(m_poHandler, "OnAfterRender", BuildEmptyTuple());
+	}
+#endif
+
 	void CWindow::SetName(const char *c_szName)
 	{
 		m_strName = c_szName;
@@ -292,12 +394,21 @@ namespace UI
 
 		m_rect.right = m_rect.left + m_lWidth;
 		m_rect.bottom = m_rect.top + m_lHeight;
+
+#ifdef INSIDE_RENDER
+		if (m_isInsideRender)
+			UpdateRenderBoxRecursive();
+#endif
 	}
 
 	void CWindow::SetHorizontalAlign(DWORD dwAlign)
 	{
 		m_HorizontalAlign = (EHorizontalAlign)dwAlign;
 		UpdateRect();
+#ifdef INSIDE_RENDER
+		if (m_isInsideRender)
+			UpdateRenderBoxRecursive();
+#endif
 	}
 
 	void CWindow::SetVerticalAlign(DWORD dwAlign)
@@ -309,10 +420,23 @@ namespace UI
 	void CWindow::SetPosition(long x, long y)
 	{
 		m_x = x;
-		m_y = y; 
+		m_y = y;
 
 		UpdateRect();
+#ifdef INSIDE_RENDER
+		if (m_isInsideRender)
+			UpdateRenderBoxRecursive();
+#endif
 	}
+
+#ifdef INSIDE_RENDER
+	void CWindow::UpdateRenderBoxRecursive()
+	{
+		UpdateRenderBox();
+		for (auto it = m_pChildList.begin(); it != m_pChildList.end(); ++it)
+			(*it)->UpdateRenderBoxRecursive();
+	}
+#endif
 
 	void CWindow::GetPosition(long * plx, long * ply)
 	{
@@ -418,7 +542,91 @@ namespace UI
 	{
 		m_pChildList.push_back(pWin);
 		pWin->m_pParent = this;
+#ifdef INSIDE_RENDER
+		if (m_isInsideRender && !pWin->m_isInsideRender)
+			pWin->SetInsideRender(m_isInsideRender);
+#endif
 	}
+
+#ifdef INSIDE_RENDER
+	void CWindow::SetInsideRender(BOOL flag)
+	{
+		if (!m_pParent || m_isInsideRender && m_pParent->m_isInsideRender)
+			return;
+		if (m_isInsideRender && flag)
+			return;
+		m_isInsideRender = flag;
+		UpdateRenderBox();
+		for (auto it = m_pChildList.begin(); it != m_pChildList.end(); ++it)
+			(*it)->SetInsideRender(m_isInsideRender);
+	}
+	void CWindow::GetRenderBox(RECT* box)
+	{
+		memcpy(box, &m_renderBox, sizeof(RECT));
+	}
+	void CWindow::UpdateTextLineRenderBox()
+	{
+		int width, height;
+		((CTextLine*)this)->GetTextSize(&width, &height);
+
+		int pWidth = m_pParent->GetWidth();
+		int pHeight = m_pParent->GetHeight();
+
+		if (m_x - m_pParent->m_renderBox.left < 0)
+			m_renderBox.left = -m_x + m_pParent->m_renderBox.left;
+		else
+			m_renderBox.left = 0;
+
+		if (m_y - m_pParent->m_renderBox.top < 0)
+			m_renderBox.top = -m_y + m_pParent->m_renderBox.top;
+		else
+			m_renderBox.top = 0;
+
+		if (m_x + width > pWidth - m_pParent->m_renderBox.right)
+			m_renderBox.right = m_x + width - pWidth + m_pParent->m_renderBox.right;
+		else
+			m_renderBox.right = 0;
+
+		if (m_y + height > pHeight - m_pParent->m_renderBox.bottom)
+			m_renderBox.bottom = m_y + height - pHeight + m_pParent->m_renderBox.bottom;
+		else
+			m_renderBox.bottom = 0;
+	}
+	void CWindow::UpdateRenderBox()
+	{
+#ifdef __DUNGEON_INFO__
+		if (std::string(GetName()) == "not_render_tooltip")
+			return;
+#endif
+
+		if (!m_isInsideRender || !m_pParent)
+			memset(&m_renderBox, 0, sizeof(m_renderBox));
+		else
+		{
+			const int width = m_lWidth;
+			const int height = m_lHeight;
+			const int pWidth = m_pParent->GetWidth();
+			const int pHeight = m_pParent->GetHeight();
+			if (m_x - m_pParent->m_renderBox.left < 0)
+				m_renderBox.left = -m_x + m_pParent->m_renderBox.left;
+			else
+				m_renderBox.left = 0;
+			if (m_y - m_pParent->m_renderBox.top < 0)
+				m_renderBox.top = -m_y + m_pParent->m_renderBox.top;
+			else
+				m_renderBox.top = 0;
+			if (m_x + width > pWidth - m_pParent->m_renderBox.right)
+				m_renderBox.right = m_x + width - pWidth + m_pParent->m_renderBox.right;
+			else
+				m_renderBox.right = 0;
+			if (m_y + height > pHeight - m_pParent->m_renderBox.bottom)
+				m_renderBox.bottom = m_y + height - pHeight + m_pParent->m_renderBox.bottom;
+			else
+				m_renderBox.bottom = 0;
+		}
+		OnUpdateRenderBox();
+	}
+#endif
 
 	CWindow * CWindow::GetRoot()
 	{
@@ -434,7 +642,11 @@ namespace UI
 		return m_pParent;
 	}
 
+#ifdef INSIDE_RENDER
+	bool CWindow::IsChild(CWindow* pWin, bool bCheckRecursive)
+#else
 	bool CWindow::IsChild(CWindow * pWin)
+#endif
 	{
 		std::list<CWindow *>::iterator itor = m_pChildList.begin();
 
@@ -442,6 +654,12 @@ namespace UI
 		{
 			if (*itor == pWin)
 				return true;
+
+#ifdef INSIDE_RENDER
+			if (bCheckRecursive)
+				if ((*itor)->IsChild(pWin, true))
+					return true;
+#endif
 
 			++itor;
 		}
@@ -540,16 +758,19 @@ namespace UI
 		for (itor = m_pChildList.rbegin(); itor != m_pChildList.rend(); ++itor)
 		{
 			CWindow* pWindow = *itor;
-
 			if (pWindow)
+			{
 				pWindow->SetClippingMaskRect(rMask);
+			}
 		}
 	}
 
 	void CWindow::SetClippingMaskWindow(CWindow* pMaskWindow)
 	{
 		if (!pMaskWindow)
+		{
 			return;
+		}
 
 		m_bEnableMask = true;
 		m_pMaskWindow = pMaskWindow;
@@ -558,9 +779,10 @@ namespace UI
 		for (itor = m_pChildList.rbegin(); itor != m_pChildList.rend(); ++itor)
 		{
 			CWindow* pWindow = *itor;
-
 			if (pWindow)
+			{
 				pWindow->SetClippingMaskWindow(pMaskWindow);
+			}
 		}
 	}
 #endif
@@ -715,7 +937,7 @@ namespace UI
 	BOOL CWindow::OnMouseLeftButtonUp()
 	{
 		PyCallClassMemberFunc(m_poHandler, "OnMouseLeftButtonUp", BuildEmptyTuple());
-		return TRUE; // NOTE : ButtonUp은 예외로 무조건 TRUE
+		return TRUE; // NOTE : ButtonUp?º ¿¹¿?·? ¹??¶°? TRUE
 	}
 
 	BOOL CWindow::OnMouseLeftButtonDoubleClick()
@@ -1049,7 +1271,7 @@ namespace UI
 	CRenderTarget::CRenderTarget(PyObject *ppyObject) : CWindow(ppyObject)
 	{
 		m_dwIndex = -1;
-#ifdef ENABLE_INGAME_WIKI_SYSTEM
+#ifdef ENABLE_WIKI_SYSTEM
 		memset(&rect_ex, 0, sizeof(rect_ex));
 #endif
 	}
@@ -1072,7 +1294,7 @@ namespace UI
 		return true;
 	}
 
-#ifdef ENABLE_INGAME_WIKI_SYSTEM
+#ifdef ENABLE_WIKI_SYSTEM
 	void CRenderTarget::SetRenderingRect(float fLeft, float fTop, float fRight, float fBottom)
 	{
 		memset(&rect_ex, 0, sizeof(rect_ex));
@@ -1095,7 +1317,7 @@ namespace UI
 			return;
 		}
 
-#ifdef ENABLE_INGAME_WIKI_SYSTEM
+#ifdef ENABLE_WIKI_SYSTEM
 		RECT rect_real;
 		rect_real.left = m_rect.left - rect_ex.left;
 		rect_real.top = m_rect.top - rect_ex.top;
@@ -1107,6 +1329,46 @@ namespace UI
 #endif
 		target->RenderTexture();
 	}
+
+#ifdef INSIDE_RENDER
+	void CWindow::iSetRenderingRect(int iLeft, int iTop, int iRight, int iBottom)
+	{
+		m_renderingRect.left = iLeft;
+		m_renderingRect.top = iTop;
+		m_renderingRect.right = iRight;
+		m_renderingRect.bottom = iBottom;
+		OnSetRenderingRect();
+	}
+	void CWindow::SetRenderingRect(float fLeft, float fTop, float fRight, float fBottom)
+	{
+		float fWidth = float(GetWidth());
+		float fHeight = float(GetHeight());
+		if (IsType(CTextLine::Type()))
+		{
+			int iWidth, iHeight;
+			((CTextLine*)this)->GetTextSize(&iWidth, &iHeight);
+			fWidth = float(iWidth);
+			fHeight = float(iHeight);
+		}
+		iSetRenderingRect(fWidth * fLeft, fHeight * fTop, fWidth * fRight, fHeight * fBottom);
+	}
+	int CWindow::GetRenderingWidth()
+	{
+		return max(0, GetWidth() + m_renderingRect.right + m_renderingRect.left);
+	}
+	int CWindow::GetRenderingHeight()
+	{
+		return max(0, GetHeight() + m_renderingRect.bottom + m_renderingRect.top);
+	}
+	void CWindow::ResetRenderingRect(bool bCallEvent)
+	{
+		m_renderingRect.bottom = m_renderingRect.left = m_renderingRect.right = m_renderingRect.top = 0;
+		if (bCallEvent)
+			OnSetRenderingRect();
+	}
+	void CWindow::OnSetRenderingRect() {}
+#endif
+
 #endif
 
 	CBox::CBox(PyObject *ppyObject) : CWindow(ppyObject), m_dwColor(0xff000000)
@@ -1124,14 +1386,18 @@ namespace UI
 	void CBox::OnRender()
 	{
 		CPythonGraphic::Instance().SetDiffuseColor(m_dwColor);
+#ifdef INSIDE_RENDER
+		CPythonGraphic::Instance().RenderBar2d(m_rect.left + m_renderBox.left, m_rect.top + m_renderBox.top, m_rect.right - m_renderBox.right, m_rect.bottom - m_renderBox.bottom);
+#else
 		CPythonGraphic::Instance().RenderBox2d(m_rect.left, m_rect.top, m_rect.right, m_rect.bottom);
+#endif
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	CBar::CBar(PyObject *ppyObject) : CWindow(ppyObject), m_dwColor(0xff000000)
+	CBar::CBar(PyObject * ppyObject) : CWindow(ppyObject), m_dwColor(0xff000000)
 	{
 	}
 	CBar::~CBar()
@@ -1153,7 +1419,7 @@ namespace UI
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	CLine::CLine(PyObject *ppyObject) : CWindow(ppyObject), m_dwColor(0xff000000)
+	CLine::CLine(PyObject * ppyObject) : CWindow(ppyObject), m_dwColor(0xff000000)
 	{
 	}
 	CLine::~CLine()
@@ -1182,7 +1448,7 @@ namespace UI
 		return (s_dwType);
 	}
 
-	CBar3D::CBar3D(PyObject *ppyObject) : CWindow(ppyObject)
+	CBar3D::CBar3D(PyObject * ppyObject) : CWindow(ppyObject)
 	{
 		m_dwLeftColor = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
 		m_dwRightColor = D3DXCOLOR(0.7f, 0.7f, 0.7f, 1.0f);
@@ -1219,7 +1485,7 @@ namespace UI
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	CTextLine::CTextLine(PyObject *ppyObject) : CWindow(ppyObject)
+	CTextLine::CTextLine(PyObject * ppyObject) : CWindow(ppyObject)
 	{
 		m_TextInstance.SetColor(0.78f, 0.78f, 0.78f);
 		m_TextInstance.SetHorizonalAlign(CGraphicTextInstance::HORIZONTAL_ALIGN_LEFT);
@@ -1229,6 +1495,14 @@ namespace UI
 	{
 		m_TextInstance.Destroy();
 	}
+
+#ifdef INSIDE_RENDER
+	DWORD CTextLine::Type()
+	{
+		static DWORD s_dwType = GetCRC32("CTextLine", strlen("CTextLine"));
+		return (s_dwType);
+	}
+#endif
 
 	void CTextLine::SetMax(int iMax)
 	{
@@ -1258,7 +1532,7 @@ namespace UI
 	{
 		m_TextInstance.SetMultiLine(bFlag ? true : false);
 	}
-	void CTextLine::SetFontName(const char *c_szFontName)
+	void CTextLine::SetFontName(const char * c_szFontName)
 	{
 		std::string stFontName = c_szFontName;
 		stFontName += ".fnt";
@@ -1276,7 +1550,7 @@ namespace UI
 	{
 		m_TextInstance.SetLimitWidth(fWidth);
 	}
-	void CTextLine::SetText(const char *c_szText)
+	void CTextLine::SetText(const char * c_szText)
 	{
 		OnSetText(c_szText);
 	}
@@ -1285,24 +1559,30 @@ namespace UI
 		m_TextInstance.GetTextSize(pnWidth, pnHeight);
 	}
 #ifdef ENABLE_MULTI_TEXTLINE
-	int CTextLine::GetTextLineCount() 
-	{ 
-		return m_TextInstance.GetTextLineCount(); 
+	int CTextLine::GetTextLineCount()
+	{
+		return m_TextInstance.GetTextLineCount();
 	}
-	void CTextLine::DisableEnterToken() 
-	{ 
-		m_TextInstance.DisableEnterToken(); 
+	void CTextLine::DisableEnterToken()
+	{
+		m_TextInstance.DisableEnterToken();
 	}
-	void CTextLine::SetLineHeight(int iHeight) 
-	{ 
-		m_TextInstance.SetLineHeight(iHeight); 
+	void CTextLine::SetLineHeight(int iHeight)
+	{
+		m_TextInstance.SetLineHeight(iHeight);
 	}
-	int CTextLine::GetLineHeight() 
-	{ 
-		return m_TextInstance.GetLineHeight(); 
+	int CTextLine::GetLineHeight()
+	{
+		return m_TextInstance.GetLineHeight();
 	}
 #endif
-	const char *CTextLine::GetText()
+#ifdef ENABLE_SUNG_MAHI_TOWER
+	void CTextLine::GetCharSize(short* sWidth)
+	{
+		m_TextInstance.GetCharacterWidth(sWidth);
+	}
+#endif
+	const char * CTextLine::GetText()
 	{
 		return m_TextInstance.GetValueStringReference().c_str();
 	}
@@ -1314,6 +1594,12 @@ namespace UI
 	{
 		m_TextInstance.HideCursor();
 	}
+#ifdef INSIDE_RENDER
+	bool CTextLine::IsShowCursor()
+	{
+		return m_TextInstance.IsShowCursor();
+	}
+#endif
 	int CTextLine::GetCursorPosition()
 	{
 		long lx, ly;
@@ -1321,45 +1607,82 @@ namespace UI
 		return m_TextInstance.PixelPositionToCharacterPosition(lx);
 	}
 
-	void CTextLine::OnSetText(const char *c_szText)
+	void CTextLine::OnSetText(const char * c_szText)
 	{
 		m_TextInstance.SetValue(c_szText);
 		m_TextInstance.Update();
+#ifdef INSIDE_RENDER
+		if (m_isInsideRender)
+			UpdateRenderBoxRecursive();
+#endif
 	}
 
+    void CTextLine::OnUpdate()
+    {
+        if (IsShow())
+        {
 #ifdef ENABLE_CLIP_MASKING
-	void CTextLine::OnUpdate()
-	{
-		if (!IsShow())
-			return;
+            if (m_bEnableMask && m_pMaskWindow)
+            {
+                m_rMaskRect = m_pMaskWindow->GetRect();
+            }
+#endif
 
-		if (m_bEnableMask && m_pMaskWindow)
-			m_rMaskRect = m_pMaskWindow->GetRect();
+            m_TextInstance.Update();
+        }
+    }
 
-		m_TextInstance.Update();
-	}
-
-	void CTextLine::OnRender()
-	{
-		if (IsShow())
-			m_TextInstance.Render(m_bEnableMask ? &m_rMaskRect : NULL);
-	}
+    void CTextLine::OnRender()
+    {
+        if (IsShow())
+        {
+#ifdef ENABLE_CLIP_MASKING
+            m_TextInstance.Render(m_bEnableMask ? &m_rMaskRect : nullptr);
 #else
-	void CTextLine::OnUpdate()
+            m_TextInstance.Render();
+#endif
+        }
+    }
+
+#ifdef INSIDE_RENDER
+	bool CTextLine::IsShow()
 	{
-		if (IsShow())
-			m_TextInstance.Update();
+		if (!m_bShow)
+			return false;
+		if (m_isInsideRender)
+		{
+			int cW, cH;
+			GetTextSize(&cW, &cH);
+			if (m_renderBox.left + m_renderBox.right >= cW || m_renderBox.top + m_renderBox.bottom >= cH)
+				return false;
+		}
+		return true;
 	}
 
-	void CTextLine::OnRender()
+	int CTextLine::GetRenderingWidth()
 	{
-		if (IsShow())
-			m_TextInstance.Render();
+		int iTextWidth, iTextHeight;
+		GetTextSize(&iTextWidth, &iTextHeight);
+		return iTextWidth + m_renderingRect.right + m_renderingRect.left;
+	}
+	int CTextLine::GetRenderingHeight()
+	{
+		int iTextWidth, iTextHeight;
+		GetTextSize(&iTextWidth, &iTextHeight);
+		return iTextHeight + m_renderingRect.bottom + m_renderingRect.top;
+	}
+	void CTextLine::OnSetRenderingRect()
+	{
+		int iTextWidth, iTextHeight;
+		GetTextSize(&iTextWidth, &iTextHeight);
+		m_TextInstance.iSetRenderingRect(m_renderingRect.left, -m_renderingRect.top, m_renderingRect.right, m_renderingRect.bottom);
 	}
 #endif
 
 	void CTextLine::OnChangePosition()
 	{
+		// FOR_ARABIC_ALIGN
+		//if (m_TextInstance.GetHorizontalAlign() == CGraphicTextInstance::HORIZONTAL_ALIGN_ARABIC)
 		if( GetDefaultCodePage() == CP_ARABIC )
 		{
 			m_TextInstance.SetPosition(m_rect.right, m_rect.top);
@@ -1370,7 +1693,7 @@ namespace UI
 		}
 	}
 
-	CNumberLine::CNumberLine(PyObject *ppyObject) : CWindow(ppyObject)
+	CNumberLine::CNumberLine(PyObject * ppyObject) : CWindow(ppyObject)
 	{
 		m_strPath = "d:/ymir work/ui/game/taskbar/";
 		m_iHorizontalAlign = HORIZONTAL_ALIGN_LEFT;
@@ -1389,7 +1712,7 @@ namespace UI
 		ClearNumber();
 	}
 
-	void CNumberLine::SetPath(const char *c_szPath)
+	void CNumberLine::SetPath(const char * c_szPath)
 	{
 		m_strPath = c_szPath;
 	}
@@ -1397,7 +1720,7 @@ namespace UI
 	{
 		m_iHorizontalAlign = iType;
 	}
-	void CNumberLine::SetNumber(const char *c_szNumber)
+	void CNumberLine::SetNumber(const char * c_szNumber)
 	{
 		if (0 == m_strNumber.compare(c_szNumber))
 			return;
@@ -1510,7 +1833,7 @@ namespace UI
 		}
 	}
 
-	CImageBox::CImageBox(PyObject *ppyObject) : CWindow(ppyObject)
+	CImageBox::CImageBox(PyObject * ppyObject) : CWindow(ppyObject)
 #ifdef ENABLE_NEW_DUNGEON_LIB
 		,m_fCoolTime(0.0f),
 		m_fCoolTimeStart(0.0f)
@@ -1538,7 +1861,7 @@ namespace UI
 	void CImageBox::OnCreateInstance()
 	{
 		OnDestroyInstance();
-		
+
 		m_pImageInstance = CGraphicImageInstance::New();
 	}
 
@@ -1598,64 +1921,92 @@ namespace UI
 		return m_pImageInstance->GetHeight();
 	}
 
+    void CImageBox::OnUpdate()
+    {
 #ifdef ENABLE_CLIP_MASKING
-	void CImageBox::OnUpdate()
-	{
-		if (!m_pImageInstance)
-			return;
+        if (!m_pImageInstance)
+        {
+            return;
+        }
 
-		if (!IsShow())
-			return;
+        if (!IsShow())
+        {
+            return;
+        }
 
-		if (!m_bEnableMask)
-			return;
+        if (!m_bEnableMask)
+        {
+            return;
+        }
 
-		if (!m_pMaskWindow)
-			return;
+        if (!m_pMaskWindow)
+        {
+            return;
+        }
 
-		m_rMaskRect = m_pMaskWindow->GetRect();
-	}
+        m_rMaskRect = m_pMaskWindow->GetRect();
+#endif
+    }
 
-	void CImageBox::OnRender()
-	{
-		if (!m_pImageInstance)
-			return;
+    void CImageBox::OnRender()
+    {
+        if (!m_pImageInstance)
+        {
+            return;
+        }
 
-		if (IsShow())
-#ifdef ENABLE_NEW_DUNGEON_LIB
+#ifdef ENABLE_NEW_TARGET_UI
+		if (IsShow() && m_bIsShowImage)
 		{
-			if (m_fCoolTime == 0.0f)
-				m_pImageInstance->Render(m_bEnableMask ? &m_rMaskRect : NULL);
-			else
-				m_pImageInstance->RenderCoolTime((CTimer::Instance().GetCurrentSecond() - m_fCoolTimeStart) / m_fCoolTime);
+			if (m_fDisplayProcent != -1.0f)
+				m_pImageInstance->DisplayImageProcent(m_fDisplayProcent);
+#ifdef ENABLE_NEW_DUNGEON_LIB
+            else if (m_fCoolTime == 0.0f)
+            {
+#endif
+#ifdef ENABLE_CLIP_MASKING
+            m_pImageInstance->Render(m_bEnableMask ? &m_rMaskRect : nullptr);
+#else
+            m_pImageInstance->Render();
+#endif
+#ifdef ENABLE_NEW_DUNGEON_LIB
+            }
+            else
+            {
+#ifdef ENABLE_CLIP_MASKING
+                m_pImageInstance->RenderCoolTime((CTimer::Instance().GetCurrentSecond() - m_fCoolTimeStart) / m_fCoolTime, m_bEnableMask ? &m_rMaskRect : nullptr);
+#else
+                m_pImageInstance->RenderCoolTime((CTimer::Instance().GetCurrentSecond() - m_fCoolTimeStart) / m_fCoolTime);
+#endif
+            }
+#endif
 		}
 #else
-			m_pImageInstance->Render(m_bEnableMask ? &m_rMaskRect : NULL);
-#endif
-	}
-#else
-	void CImageBox::OnUpdate()
-	{
-	}
-
-	void CImageBox::OnRender()
-	{
-		if (!m_pImageInstance)
-			return;
-
 		if (IsShow())
-#ifdef ENABLE_NEW_DUNGEON_LIB
 		{
-			if (m_fCoolTime == 0.0f)
-				m_pImageInstance->Render();
-			else
-				m_pImageInstance->RenderCoolTime((CTimer::Instance().GetCurrentSecond() - m_fCoolTimeStart) / m_fCoolTime);
-		}
+#ifdef ENABLE_NEW_DUNGEON_LIB
+            if (m_fCoolTime == 0.0f)
+            {
+#endif
+#ifdef ENABLE_CLIP_MASKING
+            m_pImageInstance->Render(m_bEnableMask ? &m_rMaskRect : nullptr);
 #else
-			m_pImageInstance->Render();
+            m_pImageInstance->Render();
 #endif
-	}
+#ifdef ENABLE_NEW_DUNGEON_LIB
+            }
+            else
+            {
+#ifdef ENABLE_CLIP_MASKING
+                m_pImageInstance->RenderCoolTime((CTimer::Instance().GetCurrentSecond() - m_fCoolTimeStart) / m_fCoolTime, m_bEnableMask ? &m_rMaskRect : nullptr);
+#else
+                m_pImageInstance->RenderCoolTime((CTimer::Instance().GetCurrentSecond() - m_fCoolTimeStart) / m_fCoolTime);
 #endif
+            }
+#endif
+		}
+#endif
+    }
 
 	void CImageBox::OnChangePosition()
 	{
@@ -1700,10 +2051,10 @@ namespace UI
 		}
 	}
 
-	void CMarkBox::LoadImage(const char *c_szFilename)
+	void CMarkBox::LoadImage(const char * c_szFilename)
 	{
 		OnCreateInstance();
-		
+
 		m_pMarkInstance->SetImageFileName(c_szFilename);
 		m_pMarkInstance->Load();
 		SetSize(m_pMarkInstance->GetWidth(), m_pMarkInstance->GetHeight());
@@ -1770,7 +2121,7 @@ namespace UI
 		return FALSE;
 	}
 
-	CExpandedImageBox::CExpandedImageBox(PyObject *ppyObject) : CImageBox(ppyObject)
+	CExpandedImageBox::CExpandedImageBox(PyObject * ppyObject) : CImageBox(ppyObject)
 	{
 		m_windowType = WINDOW_TYPE_EX_IMAGE;
 	}
@@ -1836,6 +2187,7 @@ namespace UI
 		((CGraphicExpandedImageInstance*)m_pImageInstance)->SetRenderingRectWithScale(fLeft, fTop, fRight, fBottom);
 	}
 
+// #if defined(ENABLE_IMAGE_CLIP_RECT) || defined(ENABLE_BATTLE_PASS_SYSTEM)
 	void CExpandedImageBox::SetImageClipRect(float fLeft, float fTop, float fRight, float fBottom, bool bIsVertical)
 	{
 		if (!m_pImageInstance)
@@ -1853,14 +2205,62 @@ namespace UI
 		else
 			((CGraphicExpandedImageInstance*)m_pImageInstance)->SetRenderingRect(fDifLeft, fDifTop, fDifRight, fDifBottom);
 	}
+// #endif
 
 	void CExpandedImageBox::SetRenderingMode(int iMode)
 	{
 		((CGraphicExpandedImageInstance*)m_pImageInstance)->SetRenderingMode(iMode);
 	}
 
+#ifdef INSIDE_RENDER
+	int CExpandedImageBox::GetRenderingWidth()
+	{
+		return CWindow::GetWidth() + m_renderingRect.right + m_renderingRect.left;
+	}
+	int CExpandedImageBox::GetRenderingHeight()
+	{
+		return CWindow::GetHeight() + m_renderingRect.bottom + m_renderingRect.top;
+	}
+	void CExpandedImageBox::OnSetRenderingRect()
+	{
+		if (!m_pImageInstance)
+			return;
+
+		((CGraphicExpandedImageInstance*)m_pImageInstance)->iSetRenderingRect(m_renderingRect.left, m_renderingRect.top, m_renderingRect.right, m_renderingRect.bottom);
+	}
+	void CExpandedImageBox::SetExpandedRenderingRect(float fLeftTop, float fLeftBottom, float fTopLeft, float fTopRight, float fRightTop, float fRightBottom, float fBottomLeft, float fBottomRight)
+	{
+		if (!m_pImageInstance)
+			return;
+
+		((CGraphicExpandedImageInstance*)m_pImageInstance)->SetExpandedRenderingRect(fLeftTop, fLeftBottom, fTopLeft, fTopRight, fRightTop, fRightBottom, fBottomLeft, fBottomRight);
+	}
+	void CExpandedImageBox::SetTextureRenderingRect(float fLeft, float fTop, float fRight, float fBottom)
+	{
+		if (!m_pImageInstance)
+			return;
+
+		((CGraphicExpandedImageInstance*)m_pImageInstance)->SetTextureRenderingRect(fLeft, fTop, fRight, fBottom);
+	}
+	DWORD CExpandedImageBox::GetPixelColor(DWORD x, DWORD y)
+	{
+		return ((CGraphicExpandedImageInstance*)m_pImageInstance)->GetPixelColor(x, y);
+	}
+	void CExpandedImageBox::OnUpdateRenderBox()
+	{
+		if (!m_pImageInstance)
+			return;
+
+		((CGraphicExpandedImageInstance*)m_pImageInstance)->SetRenderBox(m_renderBox);
+	}
+#endif
+
 	void CExpandedImageBox::OnUpdate()
 	{
+#ifdef __DUNGEON_INFO__
+		static PyObject* poFuncName_OnUpdate = PyString_InternFromString("OnUpdate");
+		PyCallClassMemberFunc_ByPyString(m_poHandler, poFuncName_OnUpdate, BuildEmptyTuple());
+#endif
 	}
 
 	void CExpandedImageBox::OnRender()
@@ -2615,7 +3015,7 @@ namespace UI
 
 		Over();
 		PyCallClassMemberFunc(m_poHandler, "ShowToolTip", BuildEmptyTuple());
-#ifdef ENABLE_SKILL_COLOR_SYSTEM
+#if defined(__BL__DETAILS_UI__) && defined(ENABLE_SKILL_COLOR_SYSTEM)
 		PyCallClassMemberFunc(m_poHandler, "OnMouseOverIn", BuildEmptyTuple());
 #endif
 	}
@@ -2627,12 +3027,12 @@ namespace UI
 
 		SetUp();
 		PyCallClassMemberFunc(m_poHandler, "HideToolTip", BuildEmptyTuple());
-#ifdef ENABLE_SKILL_COLOR_SYSTEM
+#if defined(__BL__DETAILS_UI__) && defined(ENABLE_SKILL_COLOR_SYSTEM)
 		PyCallClassMemberFunc(m_poHandler, "OnMouseOverOut", BuildEmptyTuple());
 #endif
 	}
 
-#ifdef ENABLE_DUNGEON_TRACKING_SYSTEM
+#if defined(ENABLE_TRACK_WINDOW) && defined(ENABLE_ADVANCED_GAME_OPTIONS)
 	DWORD CButton::Type()
 	{
 		static DWORD s_dwType = GetCRC32("CButton", strlen("CButton"));
@@ -2672,6 +3072,23 @@ namespace UI
 		return m_isPressed;
 	}
 
+#ifdef INSIDE_RENDER
+	void CButton::OnUpdateRenderBox()
+	{
+		m_upVisual.SetRenderBox(m_renderBox);
+		m_overVisual.SetRenderBox(m_renderBox);
+		m_downVisual.SetRenderBox(m_renderBox);
+		m_disableVisual.SetRenderBox(m_renderBox);
+	}
+	void CButton::OnSetRenderingRect()
+	{
+		m_upVisual.iSetRenderingRect(m_renderingRect.left, m_renderingRect.top, m_renderingRect.right, m_renderingRect.bottom);
+		m_overVisual.iSetRenderingRect(m_renderingRect.left, m_renderingRect.top, m_renderingRect.right, m_renderingRect.bottom);
+		m_downVisual.iSetRenderingRect(m_renderingRect.left, m_renderingRect.top, m_renderingRect.right, m_renderingRect.bottom);
+		m_disableVisual.iSetRenderingRect(m_renderingRect.left, m_renderingRect.top, m_renderingRect.right, m_renderingRect.bottom);
+	}
+#endif
+
 #ifdef ENABLE_OFFICAL_FEATURES
 	void CButton::LeftRightReverse()
 	{
@@ -2686,14 +3103,14 @@ namespace UI
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	CRadioButton::CRadioButton(PyObject *ppyObject) : CButton(ppyObject)
+	CRadioButton::CRadioButton(PyObject * ppyObject) : CButton(ppyObject)
 	{
 	}
 	CRadioButton::~CRadioButton()
 	{
 	}
 
-#ifdef ENABLE_DUNGEON_TRACKING_SYSTEM
+#if defined(ENABLE_TRACK_WINDOW) && defined(ENABLE_ADVANCED_GAME_OPTIONS)
 	DWORD CRadioButton::Type()
 	{
 		static DWORD s_dwType = GetCRC32("CRadioButton", strlen("CRadioButton"));
@@ -2761,7 +3178,7 @@ namespace UI
 	{
 	}
 
-#ifdef ENABLE_DUNGEON_TRACKING_SYSTEM
+#if defined(ENABLE_TRACK_WINDOW) && defined(ENABLE_ADVANCED_GAME_OPTIONS)
 	DWORD CToggleButton::Type()
 	{
 		static DWORD s_dwType = GetCRC32("CToggleButton", strlen("CToggleButton"));

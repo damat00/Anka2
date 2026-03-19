@@ -2,7 +2,10 @@
 #define __INC_REFINE_H
 
 #include "constants.h"
-
+#define PADDER_INCREASE_VALUE "REFINE.INCREASE_PERCENTAGE_"
+#define PADDER_MODE "REFINE.MODE_%d"
+#define PADDER_MIN 0
+#define PADDER_SAVE 1
 enum
 {
 	BLACKSMITH_MOB = 20016,
@@ -34,5 +37,4 @@ class CRefineManager : public singleton<CRefineManager>
 		TRefineRecipeMap m_map_RefineRecipe;
 
 };
-
 #endif

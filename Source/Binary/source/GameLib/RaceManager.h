@@ -26,9 +26,11 @@ class CRaceManager : public CSingleton<CRaceManager>
 		void SetPathName(const char *c_szPathName);
 		const char *GetFullPathFileName(const char *c_szFileName);
 
+		// Handling
 		void CreateRace(DWORD dwRaceIndex);
 		void SelectRace(DWORD dwRaceIndex);
 		CRaceData * GetSelectedRaceDataPointer();
+		// Handling
 
 		BOOL GetRaceDataPointer(DWORD dwRaceIndex, CRaceData ** ppRaceData);
 

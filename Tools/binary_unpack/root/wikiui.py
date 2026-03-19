@@ -15,13 +15,14 @@ import localeInfo
 import playersettingmodule
 import item
 import nonplayer
+import uiToolTip
 import renderTarget
 import constInfo
 
-import uiToolTip
-
 IMG_DIR = "d:/ymir work/ui/game/wiki/"
-
+IMG_DIR_REWORK = "d:/ymir work/ui/wiki_rework/"
+IMG_DIR_CATEGORY = "d:/ymir work/ui/game/wiki/category/"
+REWORK = "d:/ymir work/ui/game/wiki_new/"
 HIDE_Y_DIFFERENCE = 250
 
 def calculateRect(curValue, maxValue):
@@ -35,8 +36,14 @@ def ChildToList(images, textLines, child):
 		images.append(child)
 	elif isinstance(child, CategoryItem):
 		images.append(child.children["directionIcon"])
+		images.append(child.children["arrowIcon"])
+		images.append(child.children["miniIcon"])
 		textLines.append(child.children["textLine"])
-	elif isinstance(child, ui.TextLine) or isinstance(child, TextlineLink) or isinstance(child, ui.NumberLine) or isinstance(child, ScrollBarNew) or isinstance(child, CategorySubItem) or isinstance(child, HorizontalScrollBarNew):
+	elif isinstance(child, CategorySubItem):
+		images.append(child.children["directionIcon"])
+		images.append(child.children["underBoard"])
+		textLines.append(child.children["textLine"])
+	elif isinstance(child, ui.TextLine) or isinstance(child, TextlineLink) or isinstance(child, ui.NumberLine) or isinstance(child, ScrollBarNew) or isinstance(child, HorizontalScrollBarNew):
 		textLines.append(child)
 	elif isinstance(child, ui.ToggleButton) or isinstance(child, ui.RadioButton):
 		if child.ButtonText != None:
@@ -192,6 +199,7 @@ class CategoryList(ui.Window):
 			self.onCollapseEvent = None
 			self.onExpandEvent = None
 			self.parent = 0
+			self.isSubCategory = 0
 			self.overLine = FALSE
 			self.itemList = []
 
@@ -220,7 +228,10 @@ class CategoryList(ui.Window):
 			self.expanded = FALSE
 			if self.onCollapseEvent:
 				self.onCollapseEvent()
-
+		def SetSubCategory(self, flag):
+			self.isSubCategory = flag
+		def GetSubCategory(self):
+			return self.isSubCategory
 		def SetOnExpandEvent(self, event):
 			self.onExpandEvent = event
 
@@ -258,16 +269,17 @@ class CategoryList(ui.Window):
 
 	def SetScrollBar(self, scrollBar):
 		scrollBar.SetScrollEvent(ui.__mem_func__(self.RefreshList))
-		self.scrollBar = scrollBar
+		self.scrollBar=scrollBar
 
-	def OnRunMouseWheel(self, nLen):
+	def OnMouseWheel(self, nLen):
+		# C++ tarafýndan OnMouseWheel çaðrýlýyor, scroll bar'ý kontrol et
 		if self.scrollBar:
 			if nLen > 0:
 				self.scrollBar.OnUp()
 			else:
 				self.scrollBar.OnDown()
-			return TRUE
-		return FALSE
+			return True
+		return False
 
 	def GetSelectedItem(self):
 		return self.selectedItem
@@ -275,13 +287,18 @@ class CategoryList(ui.Window):
 	def SelectItem(self, selectedItem):
 		self.selectedItem = selectedItem
 		if selectedItem != None:
-			try:
+			if selectedItem.GetSubCategory() != 1:
 				if selectedItem.IsExpanded():
 					selectedItem.Collapse()
 				else:
 					selectedItem.Expand()
-			except:
-				return
+			else:
+				for j in xrange(len(self.itemList)):
+					itemList = self.itemList[j].itemList
+					for x in xrange(len(itemList)):
+						if itemList[x].GetSubCategory() == 1:
+							itemList[x].Collapse()
+							selectedItem.Expand()
 		self.RefreshList()
 
 	def SetBasePos(self, basePos):
@@ -395,21 +412,33 @@ class CategoryList(ui.Window):
 class CategoryItem(CategoryList.CategoryDefaultItem):
 	def __del__(self):
 		CategoryList.CategoryDefaultItem.__del__(self)
-
-	def __init__(self, text):
+	def __init__(self, text, miniIconPath=None):
 		CategoryList.CategoryDefaultItem.__init__(self)
 		directionIcon = ui.ExpandedImageBox()
 		directionIcon.SetParent(self)
 		directionIcon.AddFlag("not_pick")
 		directionIcon.SetPosition(0, 0)
-		directionIcon.LoadImage(IMG_DIR + "plus.tga")
+		directionIcon.LoadImage("d:/ymir work/ui/game/newsearch/left_rectangle/category_on.png")
 		directionIcon.Show()
 		self.children["directionIcon"] = directionIcon
-
-		textLine = ui.TextLine()
+		arrowIcon = ui.ExpandedImageBox()
+		arrowIcon.SetParent(directionIcon)
+		arrowIcon.AddFlag("not_pick")
+		arrowIcon.SetPosition(182,16)
+		arrowIcon.LoadImage(REWORK + "new_arrow_down.png")
+		arrowIcon.Show()
+		self.children["arrowIcon"] = arrowIcon
+		miniIcon = ui.ExpandedImageBox()
+		miniIcon.SetParent(directionIcon)
+		miniIcon.AddFlag("not_pick")
+		miniIcon.SetPosition(6, 8)
+		miniIcon.LoadImage(miniIconPath)
+		miniIcon.Show()
+		self.children["miniIcon"] = miniIcon
+		textLine=ui.TextLine()
 		textLine.SetParent(directionIcon)
 		textLine.AddFlag("not_pick")
-		textLine.SetPosition(0, 1)
+		textLine.SetPosition(42,13)
 		textLine.SetWindowHorizontalAlignLeft()
 		textLine.SetText("  " + text)
 		textLine.Show()
@@ -417,14 +446,14 @@ class CategoryItem(CategoryList.CategoryDefaultItem):
 
 		self.SetOnExpandEvent(self.ExpandEvent)
 		self.SetOnCollapseEvent(self.CollapseEvent)
-		self.SetSize(100, 20)
-
+		self.SetSize(201,39)
 	def CollapseEvent(self):
-		self.children["directionIcon"].LoadImage(IMG_DIR + "plus.tga")
+		self.children["directionIcon"].LoadImage("d:/ymir work/ui/game/newsearch/left_rectangle/category_on.png")
+		self.children["arrowIcon"].LoadImage(REWORK + "new_arrow_down.png")
 		self.children["directionIcon"].Show()
-
 	def ExpandEvent(self):
-		self.children["directionIcon"].LoadImage(IMG_DIR + "minus.tga")
+		self.children["directionIcon"].LoadImage("d:/ymir work/ui/game/newsearch/left_rectangle/category_off.png")
+		self.children["arrowIcon"].LoadImage(REWORK + "new_arrow_up.png")
 		self.children["directionIcon"].Show()
 
 class CategorySubItem(CategoryList.CategoryDefaultItem):
@@ -433,51 +462,37 @@ class CategorySubItem(CategoryList.CategoryDefaultItem):
 
 	def __init__(self, text):
 		CategoryList.CategoryDefaultItem.__init__(self)
-		textLine = ui.TextLine()
-		textLine.SetParent(self)
+		underBoard = ui.ExpandedImageBox()
+		underBoard.SetParent(self)
+		underBoard.AddFlag("not_pick")
+		underBoard.SetPosition(0,0)
+		# underBoard.LoadImage(IMG_DIR_REWORK + "slid.png")
+		underBoard.Hide()
+		self.children["underBoard"] = underBoard
+		directionIcon = ui.ExpandedImageBox()
+		directionIcon.SetParent(self)
+		directionIcon.AddFlag("not_pick")
+		directionIcon.SetPosition(0,0)
+		directionIcon.LoadImage(REWORK + "subcategory_off.png")
+		directionIcon.Show()
+		self.children["directionIcon"] = directionIcon
+		textLine=ui.TextLine()
+		textLine.SetParent(directionIcon)
 		textLine.AddFlag("not_pick")
-		textLine.SetFontName(localeInfo.UI_DEF_FONT)
-		textLine.SetWindowHorizontalAlignLeft()
-		textLine.SetText("  " + text)
+		textLine.SetPosition(100,6)
+		textLine.SetHorizontalAlignCenter()
+		textLine.SetText("  "+text)
 		textLine.Show()
 		self.children["textLine"] = textLine
-		self.SetSize(100, 16)
-
-	def OnMouseOverIn(self):
-		self.overLine = TRUE
-
-	def OnMouseOverOut(self):
-		self.overLine = FALSE
-
-	def OnRender(self):
-		parent = self.parent
-		if self.overLine and parent.GetSelectedItem() != self:
-			grp.SetColor(grp.GenerateColor(1.0, 1.0, 1.0, 0.2))
-		elif parent.GetSelectedItem() == self:
-			grp.SetColor(grp.GenerateColor(0.0, 0.0, 1.0, 1.0))
-		else:
-			grp.SetColor(grp.GenerateColor(0.0, 0.0, 0.0, 1.0))
-		(_x, _y) = self.GetGlobalPosition()
-		(_wx, _wy) = parent.GetGlobalPosition()
-		if _y < _wy + 5:
-			grp.RenderBar(_x, _y+(_wy-_y), self.GetWidth(), self.GetHeight()-(_wy-_y))
-		elif _y + self.GetHeight() > _wy+parent.GetHeight():
-			grp.RenderBar(_x, _y, self.GetWidth(), self.GetHeight()-((_y+self.GetHeight())-abs(_wy+parent.GetHeight())))
-		else:
-			grp.RenderBar(_x, _y, self.GetWidth(), self.GetHeight())
-
-		if self.children.has_key("textLine"):
-			textLine = self.children["textLine"]
-			(_x, _y) = textLine.GetGlobalPosition()
-			if _y < _wy:
-				if textLine.IsShow():
-					textLine.Hide()
-			elif _y > _wy + parent.GetHeight() - 10:
-				if textLine.IsShow():
-					textLine.Hide()
-			else:
-				if not textLine.IsShow():
-					textLine.Show()
+		self.SetOnExpandEvent(self.ExpandEvent)
+		self.SetOnCollapseEvent(self.CollapseEvent)
+		self.SetSize(202,30)
+	def CollapseEvent(self):
+		self.children["directionIcon"].LoadImage(REWORK + "subcategory_off.png")
+		self.children["directionIcon"].Show()
+	def ExpandEvent(self):
+		self.children["directionIcon"].LoadImage(REWORK + "subcategory_on.png")
+		self.children["directionIcon"].Show()
 
 class ScrollBarNew(ui.Window):
 	SCROLLBAR_WIDTH = 7
@@ -610,7 +625,8 @@ class ScrollBarNew(ui.Window):
 		middleImageScale = float((height - self.SCROLL_BTN_YDIST*2) - self.middleImage.GetHeight()) / float(self.middleImage.GetHeight())
 		self.middleImage.SetRenderingRect(0, 0, 0, middleImageScale)
 		self.bottomImage.SetPosition(0, height - self.bottomImage.GetHeight())
-		self.middleBar.SetRestrictMovementArea(self.SCROLL_BTN_XDIST, self.SCROLL_BTN_YDIST, self.middleBar.GetWidth(), height - self.SCROLL_BTN_YDIST * 2)
+		self.middleBar.SetRestrictMovementArea(self.SCROLL_BTN_XDIST, self.SCROLL_BTN_YDIST, \
+			self.middleBar.GetWidth(), height - self.SCROLL_BTN_YDIST * 2)
 		self.middleBar.SetPosition(self.SCROLL_BTN_XDIST, self.SCROLL_BTN_YDIST)
 
 	def SetScrollStep(self, step):
@@ -627,14 +643,11 @@ class ScrollBarNew(ui.Window):
 
 	def GetPos(self):
 		return self.curPos
-
 	def OnUp(self):
 		self.SetPos(self.curPos-self.scrollStep)
-
 	def OnDown(self):
-		self.SetPos(self.curPos + self.scrollStep)
-
-	def SetPos(self, pos, moveEvent = TRUE):
+		self.SetPos(self.curPos+self.scrollStep)
+	def SetPos(self, pos, moveEvent = True):
 		pos = max(0.0, pos)
 		pos = min(1.0, pos)
 
@@ -712,9 +725,9 @@ class ListBox(ui.Window):
 
 	def SetScrollBar(self, scrollBar):
 		scrollBar.SetScrollEvent(ui.__mem_func__(self.__OnScroll))
-		self.scrollBar = scrollBar
+		self.scrollBar=scrollBar
 
-	def OnRunMouseWheel(self, nLen):
+	def OnMouseWheel(self, nLen):
 		if self.scrollBar:
 			if self.scrollBar.IsShow():
 				if nLen > 0:
@@ -798,7 +811,7 @@ class DefaultWikiWindow(ui.Window):
 			self.Listbox = None
 
 		if self.tooltipItem:
-			self.tooltipItem.Hide()
+			self.tooltipItem.HideToolTip()
 
 	def OnClickItem(self, arg, type, vnum):
 		self.OverOutItem()
@@ -867,7 +880,7 @@ class DefaultWikiImage(ui.ExpandedImageBox):
 			self.Listbox = None
 
 		if self.tooltipItem:
-			self.tooltipItem.Hide()
+			self.tooltipItem.HideToolTip()
 
 	def OnClickItem(self, arg, type, vnum):
 		self.OverOutItem()
@@ -899,7 +912,7 @@ class DefaultWikiImage(ui.ExpandedImageBox):
 			__height = self.Listbox.GetHeight()
 			for child in self.children:
 				if child.itsNeedDoubleRender:
-					RenderWindowMultiple(child, _x, _y, _height, __x, __y, __height)
+					RenderWindowMultiple(child, _x, _y - 15, _height, __x, __y, __height)
 				else:
 					RenderWindow(child, _x, _y, _height)
 		else:
@@ -1024,8 +1037,8 @@ class ListBoxEx(ui.Window):
 		scrollBar.SetScrollEvent(ui.__mem_func__(self.__OnScroll))
 		self.scrollBar = scrollBar
 
-	def OnRunMouseWheel(self, nLen):
-		if self.scrollBar and self.mouseWhell == TRUE:
+	def OnMouseWheel(self, nLen):
+		if self.scrollBar and self.mouseWhell == True:
 			if nLen > 0:
 				self.scrollBar.OnUp()
 			else:
@@ -1119,7 +1132,7 @@ class ListBoxGrid(ui.Window):
 	def AddRenderEvent(self, func):
 		self.func = ui.__mem_func__(func)
 
-	def OnRunMouseWheel(self, nLen):
+	def OnMouseWheel(self, nLen):
 		if self.scrollBar:
 			if self.scrollBar.IsShow():
 				if nLen > 0:
@@ -1458,7 +1471,10 @@ def GetValidRace(raceIndex = 0):
 				5 : [ playersettingmodule.RACE_SHAMAN_W, playersettingmodule.RACE_SHAMAN_M ],
 			}
 			item_type = item.GetValue(3)
-			return raceDict[item_type][sex]
+			races = raceDict.get(item_type)
+			if races is not None:
+				return races[sex]
+			return raceDict[0][sex]
 		else:
 			raceDict = {
 				0 : [ playersettingmodule.RACE_WARRIOR_W, playersettingmodule.RACE_WARRIOR_M ],
@@ -1500,11 +1516,22 @@ def IsCanModelPreview(itemVnum):
 		return TRUE
 	elif itemType == item.ITEM_TYPE_GROWTH_PET:
 		return TRUE
-	elif itemType == item.ITEM_TYPE_MOUNT:
+	elif hasattr(item, 'ITEM_TYPE_TITLE') and itemType == item.ITEM_TYPE_TITLE:
 		return TRUE
 	elif itemType == item.ITEM_TYPE_ARMOR and itemSubType == item.ARMOR_BODY:
 		return TRUE
-	elif itemType == item.ITEM_TYPE_COSTUME and (itemSubType == item.COSTUME_TYPE_WEAPON or itemSubType == item.COSTUME_TYPE_BODY or itemSubType == item.COSTUME_TYPE_HAIR or itemSubType == item.COSTUME_TYPE_ACCE or (app.ENABLE_MOUNT_PET_SKIN and itemSubType == item.COSTUME_TYPE_MOUNT or itemSubType == item.COSTUME_TYPE_PET)):
+	elif itemType == item.ITEM_TYPE_COSTUME and (
+			itemSubType == item.COSTUME_TYPE_WEAPON
+			or itemSubType == item.COSTUME_TYPE_BODY
+			or itemSubType == item.COSTUME_TYPE_HAIR
+			or itemSubType == item.COSTUME_TYPE_ACCE
+			or itemSubType == item.COSTUME_TYPE_WEAPON
+			or itemSubType == item.COSTUME_TYPE_MOUNT
+			or itemSubType == item.COSTUME_TYPE_PET
+			or itemSubType == item.COSTUME_TYPE_AURA
+			or (hasattr(app, 'ENABLE_MOUNT_PET_SKIN') and app.ENABLE_MOUNT_PET_SKIN and itemSubType == item.COSTUME_TYPE_MOUNT)
+			or (hasattr(app, 'ENABLE_MOUNT_PET_SKIN') and app.ENABLE_MOUNT_PET_SKIN and itemSubType == item.COSTUME_TYPE_PET)
+		):
 		return TRUE
 	return FALSE
 
@@ -1530,18 +1557,20 @@ def SetItemToModelPreview(modelIndex, itemVnum):
 	itemType = item.GetItemType()
 	itemSubType = item.GetItemSubType()
 
-	if itemType == item.ITEM_TYPE_COSTUME and (app.ENABLE_MOUNT_PET_SKIN and itemSubType == item.COSTUME_TYPE_MOUNT or itemSubType == item.COSTUME_TYPE_PET):
-		renderTarget.SelectModel(modelIndex, item.GetValue(1))
+	if itemType == item.ITEM_TYPE_COSTUME and (itemSubType == item.COSTUME_TYPE_MOUNT or itemSubType == item.COSTUME_TYPE_PET or (hasattr(app, 'ENABLE_MOUNT_SKIN') and app.ENABLE_MOUNT_SKIN and itemSubType == item.COSTUME_TYPE_MOUNT_SKIN)):
+		renderTarget.SelectModel(modelIndex, item.GetValue(0))
 		renderTarget.SetVisibility(modelIndex, TRUE)
 		renderTarget.SetArmor(modelIndex, 0)
 	elif itemType == item.ITEM_TYPE_PET:
-		renderTarget.SelectModel(modelIndex, item.GetValue(1))
+		renderTarget.SelectModel(modelIndex,  item.GetValue(0))
 		renderTarget.SetVisibility(modelIndex, TRUE)
 	elif itemType == item.ITEM_TYPE_GROWTH_PET:
-		renderTarget.SelectModel(modelIndex, item.GetValue(0))
+		renderTarget.SelectModel(modelIndex,  item.GetValue(0))
 		renderTarget.SetVisibility(modelIndex, TRUE)
-	elif itemType == item.ITEM_TYPE_MOUNT:
-		renderTarget.SelectModel(modelIndex, item.GetValue(1))
+	elif hasattr(item, 'ITEM_TYPE_TITLE') and itemType == item.ITEM_TYPE_TITLE:
+		# Title item'larý için özel iþlem gerekebilir
+		raceIndex = GetValidRace(app.GetRandom(0,4))
+		renderTarget.SelectModel(modelIndex, raceIndex)
 		renderTarget.SetVisibility(modelIndex, TRUE)
 	else:
 		raceIndex = GetValidRace(app.GetRandom(0, 4))
@@ -1625,7 +1654,7 @@ def MakeStringToList(args, buf):
 		goldLink = arg_list[j].find("Y")
 		if goldLink >= 0:
 			if arg_list[j][goldLink+1].isdigit() == TRUE:
-				new_buf = new_buf.replace(arg_list[j], localeInfo.NumberToDecimalString(int(arg_list[j][1:])))
+				new_buf = new_buf.replace(arg_list[j],constInfo.NumberToString(int(arg_list[j][1:])))
 				continue
 
 	return new_buf
@@ -1644,7 +1673,68 @@ def GetArgToString(buf):
 		except:
 			return new_text
 
-	return new_text
+			return new_text
+
+def GetResultPageImage(argument):
+	imgDict = {
+		"Equipment":
+			{
+				0 : IMG_DIR_CATEGORY+"equipment_0.tga",
+				1 : IMG_DIR_CATEGORY+"equipment_1.tga",
+				2 : IMG_DIR_CATEGORY+"equipment_2.tga",
+				3 : IMG_DIR_CATEGORY+"equipment_3.tga",
+				4 : IMG_DIR_CATEGORY+"equipment_4.tga",
+				5 : IMG_DIR_CATEGORY+"equipment_5.tga",
+				6 : IMG_DIR_CATEGORY+"equipment_6.tga",
+				7 : IMG_DIR_CATEGORY+"equipment_7.tga",
+				8 : IMG_DIR_CATEGORY+"equipment_8.tga",
+				9 : IMG_DIR_CATEGORY+"equipment_9.tga",
+				10 : IMG_DIR_CATEGORY+"equipment_10.tga",
+			},
+		"Costume":
+			{
+				0 : IMG_DIR_CATEGORY+"costume_weapons.tga",
+				1 : IMG_DIR_CATEGORY+"costume_armor.tga",
+				2 : IMG_DIR_CATEGORY+"costume_hair.tga",
+				3 : IMG_DIR_CATEGORY+"sash_skins.tga",
+				4 : IMG_DIR_CATEGORY+"costume_shining.tga",
+			},
+		"Mount":
+			{
+				5 : IMG_DIR_CATEGORY+"costume_mount.tga",
+				6 : IMG_DIR_CATEGORY+"costume_pet.tga",
+				7 : IMG_DIR_CATEGORY+"costume_pet.tga",
+			},
+		"Chests":
+			{
+				0 : IMG_DIR_CATEGORY+"chests_0.tga",
+				1 : IMG_DIR_CATEGORY+"dungeon_chests.tga",
+				2 : IMG_DIR_CATEGORY+"chests_2.tga",
+				3 : IMG_DIR_CATEGORY+"events_chests.tga",
+			},
+		"Bosses":
+			{
+				0 : IMG_DIR_CATEGORY+"bosses_wall.tga",
+				1 : IMG_DIR_CATEGORY+"bosses_wall.tga",
+				2 : IMG_DIR_CATEGORY+"bosses_wall.tga",
+			},
+		"Monster":
+			{
+				0 : IMG_DIR_CATEGORY+"monster_wall.tga",
+				1 : IMG_DIR_CATEGORY+"monster_wall.tga",
+				2 : IMG_DIR_CATEGORY+"monster_wall.tga",
+			},
+		"Metinstone":
+			{
+				0 : IMG_DIR_CATEGORY+"metinstone_wall.tga",
+				1 : IMG_DIR_CATEGORY+"metinstone_wall.tga",
+				2 : IMG_DIR_CATEGORY+"metinstone_wall.tga",
+			},
+	}
+	if imgDict.has_key(argument[0]):
+		if imgDict[argument[0]].has_key(int(argument[1])):
+			return imgDict[argument[0]][int(argument[1])]
+	return ""
 
 def IsArticleCategory(argument):
 	if argument[0] == "System" or argument[0] == "Dungeon":

@@ -167,7 +167,7 @@ void CPythonPlayerEventHandler::FlushVictimList()
 	for (unsigned int i = 0; i < uiVictimCount; ++i)
 	{
 		const SVictim& rkVictim =  m_kVctkVictim[i];
-		rkStream.SendSyncPositionElementPacket(rkVictim.m_dwVID, rkVictim.m_lPixelX, rkVictim.m_lPixelY);		
+		rkStream.SendSyncPositionElementPacket(rkVictim.m_dwVID, rkVictim.m_lPixelX, rkVictim.m_lPixelY);
 	}
 
 	rkStream.SendSequence();
@@ -216,7 +216,7 @@ void CPythonPlayerEventHandler::CNormalBowAttack_FlyEventHandler_AutoClear::OnEx
 {
 	return;
 
-	Tracef("Shoot : 다른 target에 맞았습니다 : %d, %d\n", dwSkillIndex, dwVID);
+	Tracef("Shoot : Hitting another target : %d, %d\n", dwSkillIndex, dwVID);
 
 	CPythonNetworkStream& rkStream=CPythonNetworkStream::Instance();
 	rkStream.SendAttackPacket(dwSkillIndex, dwVID);
@@ -230,7 +230,6 @@ void CPythonPlayerEventHandler::CNormalBowAttack_FlyEventHandler_AutoClear::OnEx
 }
 void CPythonPlayerEventHandler::CNormalBowAttack_FlyEventHandler_AutoClear::OnExplodingAtTarget(DWORD dwSkillIndex)
 {
-//	Tracef("Shoot : 원하는 target에 맞았습니다 : %d, %d\n", dwSkillIndex, m_pInstTarget->GetVirtualID());
 //	CPythonNetworkStream& rkStream=CPythonNetworkStream::Instance();
 //	rkStream.SendAttackPacket(dwSkillIndex, m_pInstTarget->GetVirtualID());
 }

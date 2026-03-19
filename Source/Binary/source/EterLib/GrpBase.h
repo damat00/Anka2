@@ -147,11 +147,6 @@ class CGraphicBase
 		CGraphicBase();
 		virtual	~CGraphicBase();
 
-#ifdef ENABLE_FIX_MOBS_LAG
-		static IDirect3DVertexBuffer8* GetSmallPdtVertexBuffer() { return m_smallPdtVertexBuffer; }
-		static IDirect3DVertexBuffer8 * GetLargePdtVertexBuffer() { return m_largePdtVertexBuffer; }
-#endif
-
 		void		SetSimpleCamera(float x, float y, float z, float pitch, float roll);
 		void		SetEyeCamera(float xEye, float yEye, float zEye, float xCenter, float yCenter, float zCenter, float xUp, float yUp, float zUp);
 		void		SetAroundCamera(float distance, float pitch, float roll, float lookAtZ = 0.0f);
@@ -172,6 +167,7 @@ class CGraphicBase
 #else
 		float		GetFOV();
 #endif
+
 		void		GetClipPlane(float * fNearY, float * fFarY)
 		{
 			*fNearY = ms_fNearY;
@@ -222,6 +218,15 @@ class CGraphicBase
 		static void SetDefaultIndexBuffer(UINT eDefIB);
 		static bool SetPDTStream(SPDTVertexRaw* pVertices, UINT uVtxCount);
 		static bool SetPDTStream(SPDTVertex* pVertices, UINT uVtxCount);
+#ifdef ENABLE_FIX_MOBS_LAG
+#ifdef ENABLE_DIRECTX9_UPDATE
+		static IDirect3DVertexBuffer9* GetSmallPdtVertexBuffer();
+		static IDirect3DVertexBuffer9* GetLargePdtVertexBuffer();
+#else
+		static IDirect3DVertexBuffer8* GetSmallPdtVertexBuffer();
+		static IDirect3DVertexBuffer8* GetLargePdtVertexBuffer();
+#endif
+#endif
 
 	protected:
 		static D3DXMATRIX				ms_matIdentity;
@@ -255,19 +260,44 @@ class CGraphicBase
 
 		static HWND						ms_hWnd;
 		static HDC						ms_hDC;
-		static LPDIRECT3D8				ms_lpd3d;
-		static LPDIRECT3DDEVICE8		ms_lpd3dDevice;
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+		static LPDIRECT3D9				ms_lpd3d;
+		static LPDIRECT3DDEVICE9		ms_lpd3dDevice;
+#else
+        static LPDIRECT3D8				ms_lpd3d;
+        static LPDIRECT3DDEVICE8		ms_lpd3dDevice;
+#endif
+
 		static ID3DXMatrixStack*		ms_lpd3dMatStack;
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+		static D3DVIEWPORT9				ms_Viewport;
+#else
 		static D3DVIEWPORT8				ms_Viewport;
+#endif
 
 		static DWORD					ms_faceCount;
-		static D3DCAPS8					ms_d3dCaps;
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+        static D3DCAPS9					ms_d3dCaps;
+#else
+        static D3DCAPS8					ms_d3dCaps;
+#endif
+
 		static D3DPRESENT_PARAMETERS	ms_d3dPresentParameter;
 
 		static DWORD					ms_dwD3DBehavior;
-		static DWORD					ms_ptVS;
-		static DWORD					ms_pntVS;
-		static DWORD					ms_pnt2VS;
+
+#ifdef ENABLE_DIRECTX9_UPDATE
+		static LPDIRECT3DVERTEXDECLARATION9 ms_ptVS;
+		static LPDIRECT3DVERTEXDECLARATION9 ms_pntVS;
+		static LPDIRECT3DVERTEXDECLARATION9 ms_pnt2VS;
+#else
+		static DWORD ms_ptVS;
+		static DWORD ms_pntVS;
+		static DWORD ms_pnt2VS;
+#endif
 
 		static D3DXMATRIX				ms_matScreen0;
 		static D3DXMATRIX				ms_matScreen1;
@@ -281,6 +311,7 @@ class CGraphicBase
 		static float					ms_fNearY;
 		static float					ms_fFarY;
 
+		// Screen Effect - Waving, Flashing and so on..
 		static DWORD					ms_dwWavingEndTime;
 		static int						ms_iWavingPower;
 		static DWORD					ms_dwFlashingEndTime;
@@ -298,10 +329,22 @@ class CGraphicBase
 		};
 
 #ifdef ENABLE_FIX_MOBS_LAG
-		static IDirect3DVertexBuffer8* m_smallPdtVertexBuffer;
-		static IDirect3DVertexBuffer8 * m_largePdtVertexBuffer;
+#ifdef ENABLE_DIRECTX9_UPDATE
+		static IDirect3DVertexBuffer9* m_smallPdtVertexBuffer;
+		static IDirect3DVertexBuffer9* m_largePdtVertexBuffer;
+		static LPDIRECT3DINDEXBUFFER9 ms_alpd3dDefIB[DEFAULT_IB_NUM];
 #else
-		static LPDIRECT3DVERTEXBUFFER8	ms_alpd3dPDTVB[PDT_VERTEXBUFFER_NUM];
+		static IDirect3DVertexBuffer8* m_smallPdtVertexBuffer;
+		static IDirect3DVertexBuffer8* m_largePdtVertexBuffer;
+		static LPDIRECT3DINDEXBUFFER8 ms_alpd3dDefIB[DEFAULT_IB_NUM];
 #endif
-		static LPDIRECT3DINDEXBUFFER8	ms_alpd3dDefIB[DEFAULT_IB_NUM];
+#else
+#ifdef ENABLE_DIRECTX9_UPDATE
+		static LPDIRECT3DVERTEXBUFFER9 ms_alpd3dPDTVB[PDT_VERTEXBUFFER_NUM];
+		static LPDIRECT3DINDEXBUFFER9 ms_alpd3dDefIB[DEFAULT_IB_NUM];
+#else
+		static LPDIRECT3DVERTEXBUFFER8 ms_alpd3dPDTVB[PDT_VERTEXBUFFER_NUM];
+		static LPDIRECT3DINDEXBUFFER8 ms_alpd3dDefIB[DEFAULT_IB_NUM];
+#endif
+#endif
 };

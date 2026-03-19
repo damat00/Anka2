@@ -26,6 +26,9 @@ struct CUBE_RENEWAL_DATA
 	std::string category;
 	int percent;
 	unsigned int gold;
+#ifdef ENABLE_GAYA_SYSTEM
+	unsigned int gem;
+#endif
 	bool allowCopyAttr;
 
 	CUBE_RENEWAL_DATA();

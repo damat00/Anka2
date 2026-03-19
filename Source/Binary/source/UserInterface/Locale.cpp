@@ -8,6 +8,18 @@
 #include "../eterLocale/Japanese.h"
 #include <windowsx.h>
 
+const char* LSS_YMIR		= "YMIR";
+const char* LSS_JAPAN		= "JAPAN";
+const char* LSS_ENGLISH		= "ENGLISH";
+const char* LSS_HONGKONG	= "HONGKONG";
+const char* LSS_TAIWAN		= "TAIWAN";
+const char* LSS_NEWCIBN		= "NEWCIBN";
+const char* LSS_EUROPE		= "EUROPE";
+const char* LSS_GLOBAL		= "GLOBAL";
+
+static bool IS_CHEONMA = false;
+
+char	MULTI_LOCALE_SERVICE[256]	= "YMIR";
 char MULTI_LOCALE_PATH[256] = "locale/ymir";
 char MULTI_LOCALE_NAME[256] = "ymir";
 
@@ -207,3 +219,8 @@ bool LocaleService_SaveLocale(int iCodePage, const char *szLocale)
 	return true;
 }
 #endif
+
+const char* LocaleService_GetName()
+{
+	return MULTI_LOCALE_SERVICE;
+}

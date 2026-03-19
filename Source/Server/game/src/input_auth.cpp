@@ -13,29 +13,25 @@
 
 extern time_t get_global_time();
 
-bool FN_IS_VALID_LOGIN_STRING(const char* str)
+bool FN_IS_VALID_LOGIN_STRING(const char *str)
 {
 	const char*	tmp;
 
 	if (!str || !*str)
-	{
 		return false;
-	}
 
-	if (strlen (str) < 2)
-	{
+	if (strlen(str) < 2)
 		return false;
-	}
 
 	for (tmp = str; *tmp; ++tmp)
 	{
-		if (isdigit (*tmp) || isalpha (*tmp))
-		{
+		// Only alphanumeric characters allowed
+		if (isdigit(*tmp) || isalpha(*tmp))
 			continue;
-		}
 
 		return false;
 	}
+
 	return true;
 }
 
@@ -50,29 +46,33 @@ CInputAuth::CInputAuth()
 {
 }
 
-void CInputAuth::Login(LPDESC d, const char* c_pData)
+void CInputAuth::Login(LPDESC d, const char * c_pData)
 {
 	TPacketCGLogin3 * pinfo = (TPacketCGLogin3 *) c_pData;
 
 	if (!g_bAuthServer)
 	{
-		sys_err ("CInputAuth class is not for game server. IP %s might be a hacker.", 
+		sys_err ("CInputAuth class is not for game server. IP %s might be a hacker.",
 			inet_ntoa(d->GetAddr().sin_addr));
 		d->DelayedDisconnect(5);
 		return;
 	}
 
+	// copy for string integrity
 	char login[LOGIN_MAX_LEN + 1];
 	trim_and_lower(pinfo->login, login, sizeof(login));
 
 	char passwd[PASSWD_MAX_LEN + 1];
 	strlcpy(passwd, pinfo->passwd, sizeof(passwd));
 
-	sys_log(0, "InputAuth::Login : %s(%d) desc %p", login, strlen(login), get_pointer(d));
+	sys_log(0, "InputAuth::Login : %s(%d) desc %p",
+			login, strlen(login), get_pointer(d));
 
+	// check login string
 	if (false == FN_IS_VALID_LOGIN_STRING(login))
 	{
-		sys_log(0, "InputAuth::Login : IS_NOT_VALID_LOGIN_STRING(%s) desc %p", login, get_pointer(d));
+		sys_log(0, "InputAuth::Login : IS_NOT_VALID_LOGIN_STRING(%s) desc %p",
+				login, get_pointer(d));
 		LoginFailure(d, "NOID");
 		return;
 	}
@@ -120,6 +120,7 @@ void CInputAuth::Login(LPDESC d, const char* c_pData)
 	char szLogin[LOGIN_MAX_LEN * 2 + 1];
 	DBManager::instance().EscapeString(szLogin, sizeof(szLogin), login, strlen(login));
 
+	// CHANNEL_SERVICE_LOGIN
 	if (Login_IsInChannelService(szLogin))
 	{
 		sys_log(0, "ChannelServiceLogin [%s]", szLogin);
@@ -142,6 +143,7 @@ void CInputAuth::Login(LPDESC d, const char* c_pData)
 
 				szPasswd, szLogin);
 	}
+	// END_OF_CHANNEL_SERVICE_LOGIN
 	else
 	{
 		DBManager::instance().ReturnQuery(QID_AUTH_LOGIN, dwKey, p, 
@@ -169,7 +171,7 @@ int CInputAuth::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 {
 	if (!g_bAuthServer)
 	{
-		sys_err ("CInputAuth class is not for game server. IP %s might be a hacker.", 
+		sys_err ("CInputAuth class is not for game server. IP %s might be a hacker.",
 			inet_ntoa(d->GetAddr().sin_addr));
 		d->DelayedDisconnect(5);
 		return 0;

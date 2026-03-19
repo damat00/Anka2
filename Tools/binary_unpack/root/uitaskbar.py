@@ -13,8 +13,8 @@ import localeInfo
 import wndMgr
 import constInfo
 import mouseModule
-import uiToolTip
 import uiScriptLocale
+import uiToolTip
 
 MOUSE_SETTINGS = [0, 0]
 
@@ -98,29 +98,39 @@ class GiftBox(ui.ScriptWindow):
 
 class ExpandedMoneyTaskBar(ui.ScriptWindow):
 	def __init__(self):
-		ui.Window.__init__(self)
-
+		ui.ScriptWindow.__init__(self)
+		
 		self.toolTip = None
-
 		self.wndMoney = None
 		self.wndMoneySlot = None
 		self.wndMoneyIcon = None
-
+		
+		# Gem sistemi (mevcut sistem)
+		self.Gem = None
+		self.wndGemSlotIcon = None
+		self.wndGemSlot = None
+		
 		if app.ENABLE_COINS_INVENTORY:
 			self.wndCoins = None
 			self.wndCoinsIcon = None
 			self.wndCoinsSlot = None
+		
+		self.LoadWindow()
 
 	def __del__(self):
-		ui.Window.__del__(self)
+		ui.ScriptWindow.__del__(self)
 
 	def Destroy(self):
 		self.toolTip = None
-
 		self.wndMoney = None
 		self.wndMoneySlot = None
 		self.wndMoneyIcon = None
-
+		
+		# Gem sistemi (mevcut sistem)
+		self.Gem = None
+		self.wndGemSlotIcon = None
+		self.wndGemSlot = None
+		
 		if app.ENABLE_COINS_INVENTORY:
 			self.wndCoins = None
 			self.wndCoinsIcon = None
@@ -130,32 +140,54 @@ class ExpandedMoneyTaskBar(ui.ScriptWindow):
 		try:
 			pyScrLoader = ui.PythonScriptLoader()
 			pyScrLoader.LoadScriptFile(self, "UIScript/ExpandedMoneyTaskbar.py")
-
+		except:
+			import exception
+			exception.Abort("ExpandedMoneyTaskBar.LoadWindow.LoadObject")
+		
+		try:
 			self.wndMoney = self.GetChild("Money")
 			self.wndMoneyIcon = self.GetChild("Money_Icon")
 			self.wndMoneySlot = self.GetChild("Money_Slot")
-
+			
+			# Gem sistemi (mevcut sistem)
+			try:
+				self.Gem = self.GetChild("Gem")
+				self.wndGemSlotIcon = self.GetChild("Gem_Icon")
+				self.wndGemSlot = self.GetChild("Gem_Slot")
+			except:
+				self.Gem = None
+				self.wndGemSlotIcon = None
+				self.wndGemSlot = None
+			
 			if app.ENABLE_COINS_INVENTORY:
 				self.wndCoins = self.GetChild("Coins")
 				self.wndCoinsIcon = self.GetChild("Coins_Icon")
 				self.wndCoinsSlot = self.GetChild("Coins_Slot")
-
-			self.toolTip = uiToolTip.ToolTip()
-			self.toolTip.ClearToolTip()
-
-			self.wndMoneyIcon.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowMoneyTitleToolTip)
-			self.wndMoneyIcon.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideTitleToolTip)
-
-			if app.ENABLE_COINS_INVENTORY:
-				self.wndCoinsIcon.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowCoinsTitleToolTip)
-				self.wndCoinsIcon.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideTitleToolTip)
 		except:
 			import exception
-			exception.Abort("ExpandedMoneyTaskBar.LoadWindow.LoadObject")
+			exception.Abort("ExpandedMoneyTaskBar.LoadWindow.BindObject")
+
+		self.toolTip = uiToolTip.ToolTip()
+		self.toolTip.ClearToolTip()
+		
+		self.wndMoneyIcon.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowMoneyTitleToolTip)
+		self.wndMoneyIcon.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideTitleToolTip)
+		
+		# Gem sistemi event'leri (mevcut sistem)
+		if self.wndGemSlotIcon:
+			self.wndGemSlotIcon.SetEvent(ui.__mem_func__(self.EventProgress), "mouse_over_in", uiScriptLocale.GAYA_NEW)
+			self.wndGemSlotIcon.SetEvent(ui.__mem_func__(self.EventProgress), "mouse_over_out", "")
+		
+		if app.ENABLE_COINS_INVENTORY:
+			self.wndCoinsIcon.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowCoinsTitleToolTip)
+			self.wndCoinsIcon.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideTitleToolTip)
+
+		self.RefreshStatus()
 
 	def __ShowMoneyTitleToolTip(self):
-		if not self.toolTip:	return
-
+		if not self.toolTip:
+			return
+		
 		self.toolTip.ClearToolTip()
 		self.toolTip.AlignHorizonalCenter()
 		self.toolTip.AutoAppendNewTextLine(localeInfo.TOOLTIP_EXPANDED_YANG, grp.GenerateColor((255.0/255.0), (255.0/255.0), (102.0/255.0), 1.0))
@@ -163,17 +195,34 @@ class ExpandedMoneyTaskBar(ui.ScriptWindow):
 
 	if app.ENABLE_COINS_INVENTORY:
 		def __ShowCoinsTitleToolTip(self):
-			if not self.toolTip:	return
-
+			if not self.toolTip:
+				return
+			
 			self.toolTip.ClearToolTip()
 			self.toolTip.AlignHorizonalCenter()
 			self.toolTip.AutoAppendNewTextLine(localeInfo.TOOLTIP_EXPANDED_COINS, grp.GenerateColor((255.0/255.0), (255.0/255.0), (102.0/255.0), 1.0))
 			self.toolTip.Show()
 
 	def __HideTitleToolTip(self):
-		if not self.toolTip:	return
-
+		if not self.toolTip:
+			return
+		
 		self.toolTip.HideToolTip()
+
+	def EventProgress(self, event_type, arg):
+		if "mouse_over_in" == str(event_type):
+			if not self.toolTip:
+				return
+			self.toolTip.ClearToolTip()
+			self.toolTip.AlignHorizonalCenter()
+			self.toolTip.AutoAppendNewTextLine(arg, grp.GenerateColor((255.0/255.0), (255.0/255.0), (102.0/255.0), 1.0))
+			self.toolTip.Show()
+		elif "mouse_over_out" == str(event_type):
+			if not self.toolTip:
+				return
+			self.toolTip.HideToolTip()
+		else:
+			return
 
 	def GetMoneySlot(self):
 		if self.wndMoneySlot:
@@ -216,13 +265,27 @@ class ExpandedMoneyTaskBar(ui.ScriptWindow):
 		ui.ScriptWindow.Show(self)
 		self.SetTop()
 
-	def RefreshStatus(self):
-		money = player.GetElk()
-		self.wndMoney.SetText(localeInfo.NumberToMoneyString(money))
+	def Close(self):
+		self.__HideTitleToolTip()
+		self.Hide()
 
+	def OnPressEscapeKey(self):
+		self.Close()
+		return True
+
+	def RefreshStatus(self):
+		if self.wndMoney:
+			money = player.GetElk()
+			self.wndMoney.SetText(localeInfo.NumberToMoneyString(money))
+		
+		# Gem sistemi (mevcut sistem)
+		if self.Gem:
+			self.Gem.SetText(localeInfo.NumberToString(player.GetGem()))
+		
 		if app.ENABLE_COINS_INVENTORY:
-			coins = player.GetCoins()
-			self.wndCoins.SetText(localeInfo.NumberToSecondaryCoinString(coins))
+			if self.wndCoins:
+				coins = player.GetCoins()
+				self.wndCoins.SetText(localeInfo.NumberToSecondaryCoinString(coins))
 
 	if app.ENABLE_COINS_INVENTORY:
 		def OnUpdate(self):
@@ -239,10 +302,11 @@ class ExpandedMoneyTaskBar(ui.ScriptWindow):
 
 			if not (overMoney or overCoins):
 				self.toolTip.HideToolTip()
-
-	def Close(self):
-		self.__HideTitleToolTip()
-		self.Hide()
+	else:
+		def OnUpdate(self):
+			# Gem sistemi güncellemesi (mevcut sistem)
+			if self.Gem:
+				self.Gem.SetText(localeInfo.NumberToString(player.GetGem()))
 
 class ExpandedTaskBar(ui.ScriptWindow):
 	SIDEBAR_TELEPORT = 0
@@ -250,7 +314,7 @@ class ExpandedTaskBar(ui.ScriptWindow):
 	SIDEBAR_OFFLINE_SHOP = 2
 	SIDEBAR_SWITCHBOT = 3
 	SIDEBAR_POTIONS = 4
-	SIDEBAR_WIKIPEDIA = 5
+	BUTTON_WIKI = 5
 	if app.ENABLE_GROWTH_PET_SYSTEM:
 		BUTTON_PET_INFO = 6
 	if app.ENABLE_HUNTING_SYSTEM:
@@ -259,6 +323,8 @@ class ExpandedTaskBar(ui.ScriptWindow):
 		BUTTON_AUTO_WINDOW = 8
 	if app.ENABLE_AUTO_SELL_SYSTEM:
 		BUTTON_AUTO_SELL = 9
+	if app.ENABLE_BIOLOGIST_SYSTEM:
+		BUTTON_BIOLOGIST = 10
 
 	def __init__(self):
 		ui.Window.__init__(self)
@@ -311,9 +377,9 @@ class ExpandedTaskBar(ui.ScriptWindow):
 		self.sidebarButtonDict[ExpandedTaskBar.SIDEBAR_POTIONS] = self.GetChild("SidebarPotionsButton")
 		self.sidebarButtonDict[ExpandedTaskBar.SIDEBAR_POTIONS].SetParent(self)
 
-		if app.ENABLE_INGAME_WIKI_SYSTEM:
-			self.sidebarButtonDict[ExpandedTaskBar.SIDEBAR_WIKIPEDIA] = self.GetChild("SidebarWikipediaButton")
-			self.sidebarButtonDict[ExpandedTaskBar.SIDEBAR_WIKIPEDIA].SetParent(self)
+		if app.ENABLE_WIKI_SYSTEM:
+			self.toggleButtonDict[ExpandedTaskBar.BUTTON_WIKI] = self.GetChild("WikiButton")
+			self.toggleButtonDict[ExpandedTaskBar.BUTTON_WIKI].SetParent(self)
 
 		if app.__AUTO_HUNT__:
 			self.toggleButtonDict[ExpandedTaskBar.BUTTON_AUTO_WINDOW] = self.GetChild("AutoButton")
@@ -323,22 +389,45 @@ class ExpandedTaskBar(ui.ScriptWindow):
 			self.toggleButtonDict[ExpandedTaskBar.BUTTON_AUTO_SELL] = self.GetChild("AutoSell")
 			self.toggleButtonDict[ExpandedTaskBar.BUTTON_AUTO_SELL].SetParent(self)
 
+		if app.ENABLE_BIOLOGIST_SYSTEM:
+			try:
+				self.toggleButtonDict[ExpandedTaskBar.BUTTON_BIOLOGIST] = self.GetChild("BiologistButton")
+				if self.toggleButtonDict[ExpandedTaskBar.BUTTON_BIOLOGIST]:
+					self.toggleButtonDict[ExpandedTaskBar.BUTTON_BIOLOGIST].SetParent(self)
+			except:
+				import dbg
+				dbg.TraceError("BiologistButton not found in ExpandedTaskBar")
+				self.toggleButtonDict[ExpandedTaskBar.BUTTON_BIOLOGIST] = None
+
 		self.RePositionButton()
 
 	def RePositionButton(self):
 		button_order = []
+		# expandedtaskbar.py'deki sýraya göre: PetInfo, Hunting, Wiki, AutoButton, AutoSell, Biologist
 		if app.ENABLE_GROWTH_PET_SYSTEM:
 			if not ExpandedTaskBar.BUTTON_PET_INFO in self.exclusion_list:
 				button_order.append( ExpandedTaskBar.BUTTON_PET_INFO )
+
 		if app.ENABLE_HUNTING_SYSTEM:
 			if not ExpandedTaskBar.BUTTON_HUNTING in self.exclusion_list:
 				button_order.append( ExpandedTaskBar.BUTTON_HUNTING )
+
+		if app.ENABLE_WIKI_SYSTEM:
+			if not ExpandedTaskBar.BUTTON_WIKI in self.exclusion_list:
+				if ExpandedTaskBar.BUTTON_WIKI in self.toggleButtonDict:
+					button_order.append( ExpandedTaskBar.BUTTON_WIKI )
+
 		if app.__AUTO_HUNT__:
 			if not ExpandedTaskBar.BUTTON_AUTO_WINDOW in self.exclusion_list:
 				button_order.append( ExpandedTaskBar.BUTTON_AUTO_WINDOW )
+
 		if app.ENABLE_AUTO_SELL_SYSTEM:
 			if not ExpandedTaskBar.BUTTON_AUTO_SELL in self.exclusion_list:
 				button_order.append( ExpandedTaskBar.BUTTON_AUTO_SELL )
+		if app.ENABLE_BIOLOGIST_SYSTEM:
+			if not ExpandedTaskBar.BUTTON_BIOLOGIST in self.exclusion_list:
+				if ExpandedTaskBar.BUTTON_BIOLOGIST in self.toggleButtonDict:
+					button_order.append( ExpandedTaskBar.BUTTON_BIOLOGIST )
 
 		## Sidebar butonlarýný sýraya ekle
 		sidebar_order = []
@@ -356,9 +445,6 @@ class ExpandedTaskBar(ui.ScriptWindow):
 				sidebar_order.append( ExpandedTaskBar.SIDEBAR_SWITCHBOT )
 		if ExpandedTaskBar.SIDEBAR_POTIONS in self.sidebarButtonDict:
 			sidebar_order.append( ExpandedTaskBar.SIDEBAR_POTIONS )
-		if app.ENABLE_INGAME_WIKI_SYSTEM:
-			if ExpandedTaskBar.SIDEBAR_WIKIPEDIA in self.sidebarButtonDict:
-				sidebar_order.append( ExpandedTaskBar.SIDEBAR_WIKIPEDIA )
 
 		## Toplam buton sayýsý (DragonSoul + toggle + sidebar)
 		total_count = 1 + len(button_order) + len(sidebar_order)
@@ -411,10 +497,12 @@ class ExpandedTaskBar(ui.ScriptWindow):
 		self.Hide()
 
 	def SetToolTipText(self, eButton, text):
-		self.toggleButtonDict[eButton].SetToolTipText(text)
+		if eButton in self.toggleButtonDict and self.toggleButtonDict[eButton]:
+			self.toggleButtonDict[eButton].SetToolTipText(text)
 
 	def SetToggleButtonEvent(self, eButton, kEventFunc):
-		self.toggleButtonDict[eButton].SetEvent(kEventFunc)
+		if eButton in self.toggleButtonDict and self.toggleButtonDict[eButton]:
+			self.toggleButtonDict[eButton].SetEvent(kEventFunc)
 
 	def OnPressEscapeKey(self):
 		self.Close()
@@ -461,7 +549,7 @@ class ExpandedTaskBar(ui.ScriptWindow):
 
 	def OnClickSidebarWikipedia(self):
 		"""Wikipedia butonuna týklandýðýnda çaðrýlýr"""
-		if app.ENABLE_INGAME_WIKI_SYSTEM:
+		if app.ENABLE_WIKI_SYSTEM:
 			if self.interface:
 				self.interface.OpenWikiWindow()
 
@@ -472,8 +560,9 @@ class TaskBar(ui.ScriptWindow):
 	BUTTON_MESSENGER = 2
 	BUTTON_SYSTEM = 3
 	BUTTON_CHAT = 4
-	BUTTON_EXPAND = 4
-	IS_EXPANDED = False
+	BUTTON_EXPAND = 5
+	BUTTON_EXPAND_MONEY = 6
+	IS_EXPANDED = FALSE
 
 	MOUSE_BUTTON_LEFT = 0
 	MOUSE_BUTTON_RIGHT = 1
@@ -678,6 +767,7 @@ class TaskBar(ui.ScriptWindow):
 		toggleButtonDict[TaskBar.BUTTON_INVENTORY] = self.GetChild("InventoryButton")
 		toggleButtonDict[TaskBar.BUTTON_MESSENGER] = self.GetChild("MessengerButton")
 		toggleButtonDict[TaskBar.BUTTON_SYSTEM] = self.GetChild("SystemButton")
+		toggleButtonDict[TaskBar.BUTTON_EXPAND_MONEY]=self.GetChild("ExpandMoneyButton")
 
 		# ChatButton, ExpandButton.
 		try:
@@ -686,11 +776,13 @@ class TaskBar(ui.ScriptWindow):
 			toggleButtonDict[TaskBar.BUTTON_EXPAND]=self.GetChild("ExpandButton")
 			TaskBar.IS_EXPANDED = True
 
-		systemButton = toggleButtonDict[TaskBar.BUTTON_SYSTEM]
-		if systemButton.ToolTipText:
-			tx, ty = systemButton.ToolTipText.GetLocalPosition()
-			tw = systemButton.ToolTipText.GetWidth() 
-			systemButton.ToolTipText.SetPosition(-tw/2, ty)
+		if localeInfo.IsARABIC():
+			systemButton = toggleButtonDict[TaskBar.BUTTON_SYSTEM]
+			if systemButton.ToolTipText:
+				tx, ty = systemButton.ToolTipText.GetLocalPosition()
+				tw = systemButton.ToolTipText.GetWidth()
+				systemButton.ToolTipText.SetPosition(-tw/2, ty)
+
 
 		expGauge = []
 		expGauge.append(self.GetChild("EXPGauge_01"))
@@ -700,6 +792,16 @@ class TaskBar(ui.ScriptWindow):
 
 		for exp in expGauge:
 			exp.SetSize(0, 0)
+
+		if app.ENABLE_CONQUEROR_LEVEL:
+			expConquerorGauge = []
+			expConquerorGauge.append(self.GetChild("NewExpGauge_01"))
+			expConquerorGauge.append(self.GetChild("NewExpGauge_02"))
+			expConquerorGauge.append(self.GetChild("NewExpGauge_03"))
+			expConquerorGauge.append(self.GetChild("NewExpGauge_04"))
+			
+			for expConqueror in expConquerorGauge:
+				expConqueror.SetSize(0, 0)
 
 		self.quickPageNumImageBox=self.GetChild("QuickPageNumber")
 
@@ -748,9 +850,10 @@ class TaskBar(ui.ScriptWindow):
 
 		self.toggleButtonDict = toggleButtonDict
 		self.expGauge = expGauge
-
+		if app.ENABLE_CONQUEROR_LEVEL:
+			self.expConquerorGauge = expConquerorGauge
 		if constInfo.IN_GAME_SHOP_ENABLE:
-			self.rampageGauge1 = self.GetChild("RampageGauge")
+			self.rampageGauge1  = self.GetChild("RampageGauge")
 			self.rampageGauge1.OnMouseOverIn = ui.__mem_func__(self.__RampageGauge_OverIn)
 			self.rampageGauge2 = self.GetChild("RampageGauge2")
 			self.rampageGauge2.OnMouseOverOut = ui.__mem_func__(self.__RampageGauge_OverOut)
@@ -792,11 +895,17 @@ class TaskBar(ui.ScriptWindow):
 		self.rampageGauge1.Show()
 
 	def __RampageGauge_Click(self):
-		if app.ENABLE_RENEWAL_INGAME_ITEMSHOP:
-			self.interface.OpenItemShopWindow()
-		else:
+		print "rampage_up"
+
+		if app.ENABLE_ITEMSHOP:
 			net.SendChatPacket("/in_game_mall")
+		else:
+			# net.SendChatPacket("/in_game_mall")
+			# gift icon hide when click mall icon
 			self.wndGiftBox.Hide()
+			import event
+			constInfo.ITEMSHOP["questCMD"] = 'LOAD#'+str(constInfo.ITEMSHOP['tableUpdate'])
+			event.QuestButtonClick(int(constInfo.ITEMSHOP["qid"]))
 
 	if app.ENABLE_ANTI_EXP:
 		def __AntiExpButton_Click(self):
@@ -807,7 +916,7 @@ class TaskBar(ui.ScriptWindow):
 			LoadMouseButtonSettings()
 			(mouseLeftButtonEvent, mouseRightButtonEvent) = GetMouseButtonSettings()
 			if not self.__IsInSafeMouseButtonSettingRange(mouseLeftButtonEvent) or not self.__IsInSafeMouseButtonSettingRange(mouseRightButtonEvent):
-				raise RuntimeError, "INVALID_MOUSE_BUTTON_SETTINGS"
+					raise RuntimeError, "INVALID_MOUSE_BUTTON_SETTINGS"
 		except:
 			InitMouseButtonSettings(self.EVENT_MOVE_AND_ATTACK, self.EVENT_CAMERA)
 			(mouseLeftButtonEvent, mouseRightButtonEvent) = GetMouseButtonSettings()
@@ -837,6 +946,8 @@ class TaskBar(ui.ScriptWindow):
 		self.selectSkillButtonList = 0
 
 		self.expGauge = None
+		if app.ENABLE_CONQUEROR_LEVEL:
+			self.expConquerorGauge = None
 		self.hpGauge = None
 		self.mpGauge = None
 		self.stGauge = None
@@ -868,7 +979,8 @@ class TaskBar(ui.ScriptWindow):
 		player.SetQuickPage(player.GetQuickPage()+1)
 
 	def SetToggleButtonEvent(self, eButton, kEventFunc):
-		self.toggleButtonDict[eButton].SetEvent(kEventFunc)
+		if eButton in self.toggleButtonDict and self.toggleButtonDict[eButton]:
+			self.toggleButtonDict[eButton].SetEvent(kEventFunc)
 
 	def SetItemToolTip(self, tooltipItem):
 		self.tooltipItem = tooltipItem
@@ -892,8 +1004,16 @@ class TaskBar(ui.ScriptWindow):
 		maxHP = player.GetStatus(player.MAX_HP)
 		curSP = player.GetStatus(player.SP)
 		maxSP = player.GetStatus(player.MAX_SP)
-		curEXP = unsigned32(player.GetStatus(player.EXP))
-		nextEXP = unsigned32(player.GetStatus(player.NEXT_EXP))
+		if app.ENABLE_CONQUEROR_LEVEL:
+			if player.GetStatus(player.CONQUEROR_LEVEL) >= 1:
+				curEXP = unsigned32(player.GetStatus(player.CONQUEROR_EXP))
+				nextEXP = unsigned32(player.GetStatus(player.CONQUEROR_NEXT_EXP))
+			else:
+				curEXP = unsigned32(player.GetStatus(player.EXP))
+				nextEXP = unsigned32(player.GetStatus(player.NEXT_EXP))			
+		else:
+			curEXP = unsigned32(player.GetStatus(player.EXP))
+			nextEXP = unsigned32(player.GetStatus(player.NEXT_EXP))
 		recoveryHP = player.GetStatus(player.HP_RECOVERY)
 		recoverySP = player.GetStatus(player.SP_RECOVERY)
 
@@ -901,7 +1021,13 @@ class TaskBar(ui.ScriptWindow):
 
 		self.SetHP(curHP, recoveryHP, maxHP)
 		self.SetSP(curSP, recoverySP, maxSP)
-		self.SetExperience(curEXP, nextEXP)
+		if app.ENABLE_CONQUEROR_LEVEL:
+			if player.GetStatus(player.CONQUEROR_LEVEL) >= 1:
+				self.SetConquerorExperience(curEXP, nextEXP)
+			else:
+				self.SetExperience(curEXP, nextEXP)
+		else:
+			self.SetExperience(curEXP, nextEXP)
 
 	def RefreshStamina(self):
 		curST = player.GetStatus(player.STAMINA)
@@ -960,7 +1086,9 @@ class TaskBar(ui.ScriptWindow):
 			self.tooltipST.SetText("%s : %d / %d" % (localeInfo.TASKBAR_ST, curPoint, maxPoint))
 
 	def SetExperience(self, curPoint, maxPoint):
-
+		if app.ENABLE_CONQUEROR_LEVEL:
+			for i in xrange(4):
+				self.expConquerorGauge[i].Hide()
 		curPoint = min(curPoint, maxPoint)
 		curPoint = max(curPoint, 0)
 		maxPoint = max(maxPoint, 0)
@@ -986,6 +1114,38 @@ class TaskBar(ui.ScriptWindow):
 
 		#####
 		self.tooltipEXP.SetText("%s : %.2f%%" % (localeInfo.TASKBAR_EXP, float(curPoint) / max(1, float(maxPoint)) * 100))
+
+	if app.ENABLE_CONQUEROR_LEVEL:
+		def SetConquerorExperience(self, curPoint, maxPoint):
+		
+			for i in xrange(4):
+				self.expGauge[i].Hide()
+
+			curPoint = min(curPoint, maxPoint)
+			curPoint = max(curPoint, 0)
+			maxPoint = max(maxPoint, 0)
+
+			quarterPoint = maxPoint / 4
+			FullCount = 0
+
+			if 0 != quarterPoint:
+				FullCount = min(4, curPoint / quarterPoint)
+
+			for i in xrange(4):
+				self.expConquerorGauge[i].Hide()
+
+			for i in xrange(FullCount):
+				self.expConquerorGauge[i].SetRenderingRect(0.0, 0.0, 0.0, 0.0)
+				self.expConquerorGauge[i].Show()
+
+			if 0 != quarterPoint:
+				if FullCount < 4:
+					Percentage = float(curPoint % quarterPoint) / quarterPoint - 1.0
+					self.expConquerorGauge[FullCount].SetRenderingRect(0.0, Percentage, 0.0, 0.0)
+					self.expConquerorGauge[FullCount].Show()
+
+			#####
+			self.tooltipEXP.SetText("%s : %.2f%%" % (localeInfo.TASKBAR_EXP, float(curPoint) / max(1, float(maxPoint)) * 100))
 
 	## QuickSlot
 	def RefreshQuickSlot(self):
@@ -1293,8 +1453,8 @@ class TaskBar(ui.ScriptWindow):
 
 			getSkillIndex=player.GetSkillIndex
 			getSkillLevel=player.GetSkillLevel
-
 			for i in range(PAGE_SLOT_COUNT):
+
 				skillIndex = getSkillIndex(startNumber+i)
 				skillLevel = getSkillLevel(startNumber+i)
 

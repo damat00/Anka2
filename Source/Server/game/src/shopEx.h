@@ -1,8 +1,5 @@
 #ifndef __INC_METIN_II_GAME_SHOP_SECONDARY_COIN_H__
 #define __INC_METIN_II_GAME_SHOP_SECONDARY_COIN_H__
-
-#include "../../common/service.h"
-
 #include "typedef.h"
 #include "shop.h"
 

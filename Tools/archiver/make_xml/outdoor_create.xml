@@ -1,4 +1,0 @@
-<ScriptFile>
-	<CreateEterPackXml Input="../binary_unpack/outdoor/:" ArchivePath="../../Client/pack/outdoor" XmlPath="xml/outdoor_create.xml">
-	</CreateEterPackXml>
-</ScriptFile>

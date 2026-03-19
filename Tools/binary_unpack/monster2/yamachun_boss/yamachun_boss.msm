@@ -10,6 +10,7 @@ Group ShapeData
 Group AttachingData
 {
     AttachingDataCount       8
+	MainSphereRadius		260.000000
     
     Group AttachingData00
     {

@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //  Name: BoundaryShapeManager.cpp
 //
 //  *** INTERACTIVE DATA VISUALIZATION (IDV) PROPRIETARY INFORMATION ***
@@ -14,12 +14,12 @@
 //      Web:   http://www.idvinc.com
 //
 //  This software is supplied under the terms of a license agreement or
-//  nondisclosure agreement with Interactive Data Visualization and may not 
-//  be copied or disclosed except in accordance with the terms of that 
+//  nondisclosure agreement with Interactive Data Visualization and may not
+//  be copied or disclosed except in accordance with the terms of that
 //  agreement.
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	Preprocessor
 #include "StdAfx.h"
 
@@ -27,16 +27,16 @@
 #include "../eterbase/Random.h"
 #include "BoundaryShapeManager.h"
 
-using namespace std;
+//using namespace std;
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CBoundaryShapeManager::CBoundaryShapeManager
 CBoundaryShapeManager::CBoundaryShapeManager()
 {
 }
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CBoundaryShapeManager::~CBoundaryShapeManager
 
 CBoundaryShapeManager::~CBoundaryShapeManager()
@@ -44,10 +44,10 @@ CBoundaryShapeManager::~CBoundaryShapeManager()
 }
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CBoundaryShapeManager::LoadBsfFile
 
-bool CBoundaryShapeManager::LoadBsfFile(const char *pszFilename)
+bool CBoundaryShapeManager::LoadBsfFile(const char* pszFilename)
 {
 	bool bSuccess = true;
 	try
@@ -62,7 +62,7 @@ bool CBoundaryShapeManager::LoadBsfFile(const char *pszFilename)
 				for (unsigned int i = 0; i < nNumBoundaries && bSuccess; ++i)
 				{
 					SBoundaryShape sShape;
-					
+
 					// number of contours for this shape
 					unsigned int nNumContours;
 					if (fread(&nNumContours, sizeof(unsigned int), 1, pFile) == 1)
@@ -70,7 +70,7 @@ bool CBoundaryShapeManager::LoadBsfFile(const char *pszFilename)
 						for (unsigned int j = 0; j < nNumContours && bSuccess; ++j)
 						{
 							// number of points in this contour
-							vector<SPoint> vPoints;
+							std::vector<SPoint> vPoints;
 							unsigned int nNumPoints;
 							if (fread(&nNumPoints, sizeof(unsigned int), 1, pFile) == 1)
 							{
@@ -136,11 +136,11 @@ bool CBoundaryShapeManager::LoadBsfFile(const char *pszFilename)
 		}
 		else
 		{
-			m_strCurrentError = string("Error in CBoundaryShapeManager::LoadBsfFile(): Could not open ") + string(pszFilename);
+			m_strCurrentError = std::string("Error in CBoundaryShapeManager::LoadBsfFile(): Could not open ") + std::string(pszFilename);
 			bSuccess = false;
 		}
 	}
-	
+
 	catch(...)
 	{
 		m_strCurrentError = "Error in CBoundaryShapeManager::LoadBsfFile(): Unknown exception";
@@ -150,7 +150,7 @@ bool CBoundaryShapeManager::LoadBsfFile(const char *pszFilename)
 }
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CBoundaryShapeManager::PointInside
 
 bool CBoundaryShapeManager::PointInside(float fX, float fY)
@@ -164,7 +164,7 @@ bool CBoundaryShapeManager::PointInside(float fX, float fY)
 }
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CBoundaryShapeManager::PointInShape
 
 bool CBoundaryShapeManager::PointInShape(SBoundaryShape& sShape, float fX, float fY)
@@ -188,7 +188,7 @@ bool CBoundaryShapeManager::PointInShape(SBoundaryShape& sShape, float fX, float
 }
 
 
-///////////////////////////////////////////////////////////////////////  
+///////////////////////////////////////////////////////////////////////
 //	CBoundaryShapeManager::RandomPoint
 
 bool CBoundaryShapeManager::RandomPoint(float& fX, float& fY)

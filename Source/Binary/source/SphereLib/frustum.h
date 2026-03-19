@@ -4,12 +4,12 @@
 
 enum ViewState
 {
-	VS_INSIDE,
-	VS_PARTIAL,
-	VS_OUTSIDE
+	VS_INSIDE,   // completely inside the frustum.
+	VS_PARTIAL,  // partially inside and partially outside the frustum.
+	VS_OUTSIDE   // completely outside the frustum
 };
 
-class Frustum 
+class Frustum
 {
 	public:
 		void BuildViewFrustum(D3DXMATRIX & mat);

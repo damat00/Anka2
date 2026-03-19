@@ -26,7 +26,7 @@
 #endif
 
 BOOL HAIR_COLOR_ENABLE = FALSE;
-BOOL USE_ARMOR_SPECULAR = TRUE;	// Original -> FALSE
+BOOL USE_ARMOR_SPECULAR = FALSE;	// Original -> FALSE
 BOOL RIDE_HORSE_ENABLE = TRUE;
 #ifndef ENABLE_SET_NO_CHARACTER_ROTATION
 const float c_fDefaultRotationSpeed = 1200.0f;
@@ -34,9 +34,16 @@ const float c_fDefaultRotationSpeed = 1200.0f;
 const float c_fDefaultRotationSpeed = 2400.0f;
 #endif
 #ifndef ENABLE_SET_NO_MOUNT_ROTATION
-const float c_fDefaultHorseRotationSpeed = 300.0f;
-#else
 const float c_fDefaultHorseRotationSpeed = 1500.0f;
+#else
+const float c_fDefaultHorseRotationSpeed = 600.0f;
+#endif
+#ifdef ENABLE_STANDING_MOUNT
+#ifndef ENABLE_SET_NO_STANDING_MOUNT_ROTATION
+const float c_fDefaultStandingMountRotationSpeed = 1500.0f;
+#else
+const float c_fDefaultStandingMountRotationSpeed = 600.0f;
+#endif
 #endif
 
 bool IsWall(unsigned race)
@@ -146,11 +153,139 @@ UINT CInstanceBase::SHORSE::GetLevel()
 		DWORD mount = m_pkActor->GetRace();
 		switch (mount)
 		{
-#ifdef ENABLE_STANDING_MOUNT
-			case 40003:
-			case 40004:
-			case 40005:
+          // Normal At
+			case 20101:
+			case 20102:
+			case 20103:
+				return 1;
+          // Zýrhlý At
+			case 20104:
+			case 20105:
+			case 20106:
+				return 2;
+          // Asker At
+			case 20107:
+			case 20108:
+			case 20109:
+#ifdef ENABLE_RIDING_EXTENDED
+			case 20149:
+			case 20150:
+			case 20151:
 #endif
+			case 20110:
+			case 20111:
+			case 20112:
+			case 20113:
+			case 20114:
+			case 20115:
+			case 20116:
+			case 20117:
+			case 20118:
+			case 20120:
+			case 20121:
+			case 20122:
+			case 20123:
+			case 20124:
+			case 20125:
+			case 20226:
+			case 20227:
+			case 20119:
+          // Attack Fix
+			case 20201:
+			case 20202:
+			case 20203:
+			case 20204:
+			case 20205:
+			case 20206:
+			case 20207:
+			case 20208:
+			case 20209:
+			case 20210:
+			case 20211:
+			case 20212:
+			case 20213:
+			case 20214:
+			case 20215:
+			case 20216:
+			case 20217:
+			case 20218:
+          // Attack Fix
+			case 20219:
+			case 20220:
+			case 20221:
+			case 20222:
+			case 20224:
+			case 20225:
+			case 20229:
+			case 20230:
+			case 20231:
+			case 20232:
+			case 20233:
+			case 20234:
+			case 20235:
+			case 20236:
+			case 20237:
+			case 20238:
+			case 20239:
+			case 20240:
+			case 20241:
+			case 20242:
+			case 20243:
+			case 20244:
+			case 20245:
+			case 20246:
+			case 20247:
+			case 20248:
+			case 20249:
+			case 20250:
+			case 20251:
+			case 20252:
+			case 20253:
+			case 20254:
+			case 20255:
+			case 20256:
+			case 20257:
+			case 20258:
+			case 20259:
+			case 20260:
+			case 20261:
+			case 20262:
+			case 20263:
+			case 20264:
+			case 20265:
+			case 20266:
+			case 20267:
+			case 20268:
+			case 20269:
+			case 20270:
+			case 20271:
+			case 20272:
+			case 20273:
+			case 20274:
+			case 20275:
+			case 20276:
+			case 20277:
+			case 20278:
+			case 20279:
+				return 3;
+		}
+
+		{
+			if ((20205 <= mount && 20208 >= mount) ||
+				(20214 == mount) || (20217 == mount) ||
+				(20224 == mount) || (20229 == mount) ||
+				(20234 == mount) || (20237 == mount)
+				)
+				return 2;
+
+			if ((20209 <= mount &&  20212 >= mount) || 
+				(20215 == mount) || (20218 == mount) ||
+				(20225 == mount) || (20230 == mount) ||
+				(20235 == mount) || (20238 == mount)
+#ifdef ENABLE_STANDING_MOUNT
+				|| (40003 == mount) || (40004 == mount) || (40005 == mount)
+#endif
+				)
 				return 3;
 		}
 	}
@@ -161,6 +296,22 @@ bool CInstanceBase::SHORSE::IsNewMount()
 {
 	if (!m_pkActor)
 		return false;
+	DWORD mount = m_pkActor->GetRace();
+
+	if ((20205 <= mount &&  20208 >= mount) ||
+		(20214 == mount) || (20217 == mount) ||
+		(20224 == mount) || (20229 == mount) ||
+		(20234 == mount) || (20237 == mount)
+		)
+		return true;
+
+	// °í±Þ Å»°Í
+	if ((20209 <= mount && 20212 >= mount) ||
+		(20215 == mount) || (20218 == mount) ||
+		(20225 == mount) || (20230 == mount) ||
+		(20235 == mount) || (20238 == mount)
+		)
+		return true;
 
 	return false;
 }
@@ -197,6 +348,10 @@ bool CInstanceBase::SHORSE::CanUseSkill()
 
 bool CInstanceBase::SHORSE::CanAttack()
 {
+	if (IsMounting())
+		if (GetLevel()<=1)
+			return false;
+
 	return true;
 }
 
@@ -382,7 +537,7 @@ void CInstanceBase::__EnableSkipCollision()
 {
 	if (__IsMainInstance())
 	{
-		TraceError("CInstanceBase::__EnableSkipCollision - ÀÚ½ÅÀº Ãæµ¹°Ë»ç½ºÅµÀÌ µÇ¸é ¾ÈµÈ´Ù!!");
+		TraceError("CInstanceBase::__EnableSkipCollision - You should not skip your own collisions!!");
 		return;
 	}
 	m_GraphicThingInstance.EnableSkipCollision();
@@ -443,15 +598,6 @@ BOOL CInstanceBase::IsGameMaster()
 #endif
 	return false;
 }
-
-#ifdef ENABLE_RENEWAL_PREMIUM_SYSTEM
-BOOL CInstanceBase::IsPremium()
-{
-	if (m_kAffectFlagContainer.IsSet(AFFECT_PREMIUM))
-		return true;
-	return false;
-}
-#endif
 
 BOOL CInstanceBase::IsSameEmpire(CInstanceBase& rkInstDst)
 {
@@ -559,13 +705,6 @@ int CInstanceBase::GetAlignmentType()
 
 	return ALIGNMENT_TYPE_NORMAL;
 }
-
-#ifdef ENABLE_TITLE_SYSTEM
-int CInstanceBase::GetTitleID()
-{
-	return m_iTitleID;
-}
-#endif
 
 BYTE CInstanceBase::GetPKMode()
 {
@@ -763,7 +902,7 @@ bool CInstanceBase::Create(const SCreateData& c_rkCreateData)
 		unsigned center_y;
 
 		c_rkCreateData.m_kAffectFlags.ConvertToPosition(&center_x, &center_y);
-		
+
 		float center_z = __GetBackgroundHeight(center_x, center_y);
 		NEW_SetPixelPosition(TPixelPosition(float(c_rkCreateData.m_lPosX), float(c_rkCreateData.m_lPosY), center_z));
 	}
@@ -825,7 +964,10 @@ bool CInstanceBase::Create(const SCreateData& c_rkCreateData)
 	}
 
 	__Create_SetName(c_rkCreateData);
-
+#ifdef ENABLE_CONQUEROR_LEVEL
+	if(IsPC())
+		m_dwConquerorLevel = c_rkCreateData.m_dwConquerorLevel;
+#endif
 	m_dwLevel = c_rkCreateData.m_dwLevel;
 #ifdef ENABLE_SHOW_MOB_INFO
 	m_dwAIFlag = c_rkCreateData.m_dwAIFlag;
@@ -837,13 +979,8 @@ bool CInstanceBase::Create(const SCreateData& c_rkCreateData)
 #endif
 	SetVirtualNumber(c_rkCreateData.m_dwRace);
 	SetRotation(c_rkCreateData.m_fRot);
-
 	SetAlignment(c_rkCreateData.m_sAlignment);
-#ifdef ENABLE_TITLE_SYSTEM
-	SetTitleSystem(c_rkCreateData.m_iTitleID);
-#endif
 	SetPKMode(c_rkCreateData.m_byPKMode);
-
 	SetMoveSpeed(c_rkCreateData.m_dwMovSpd);
 	SetAttackSpeed(c_rkCreateData.m_dwAtkSpd);
 
@@ -1037,9 +1174,16 @@ void CInstanceBase::ChangeSkillColor(const DWORD *c_dwSkillColor)
 				byBuffSkillVnum = 111;
 				break;
 
+#ifdef ENABLE_NINETH_SKILL
 			case BUFF_BEGIN + 5:
+				byBuffSkillVnum = 182;
+				break;
+#endif
+#ifdef ENABLE_WOLFMAN_CHARACTER
+			case BUFF_BEGIN + 6:
 				byBuffSkillVnum = 175;
 				break;
+#endif
 		}
 
 		if (byBuffSkillVnum == 0)
@@ -1179,11 +1323,32 @@ void CInstanceBase::MountHorse(UINT eRace)
 	m_kHorse.Create(m_GraphicThingInstance.NEW_GetCurPixelPositionRef(), eRace, ms_adwCRCAffectEffect[EFFECT_HIT]);
 
 	SetMotionMode(CRaceMotionData::MODE_HORSE);
+#ifdef ENABLE_STANDING_MOUNT
+	if (m_kHorse.IsHoverBoard())
+		SetRotationSpeed(c_fDefaultStandingMountRotationSpeed);
+	else
+		SetRotationSpeed(c_fDefaultHorseRotationSpeed);
+#else
 	SetRotationSpeed(c_fDefaultHorseRotationSpeed);
+#endif
 
 	m_GraphicThingInstance.MountHorse(m_kHorse.GetActorPtr());
 	m_GraphicThingInstance.Stop();
 	m_GraphicThingInstance.RefreshActorInstance();
+
+#ifdef ENABLE_STANDING_MOUNT
+	// Standing mount'a ilk bini?te silah attach s?ras? nedeniyle fan bazen çift elde kalabiliyor.
+	// Tak/ç?kar yap?nca düzeldi?i için, hoverboard + fan durumunda burada bir kere yeniden attach ediyoruz.
+	if (m_kHorse.IsHoverBoard())
+	{
+		if (GetWeaponType() == CItemData::WEAPON_FAN)
+		{
+			const DWORD dwWeapon = GetPart(CRaceData::PART_WEAPON);
+			m_GraphicThingInstance.AttachWeapon(dwWeapon);
+			m_GraphicThingInstance.RefreshActorInstance();
+		}
+	}
+#endif
 }
 
 void CInstanceBase::DismountHorse()
@@ -1456,8 +1621,7 @@ void CInstanceBase::PushTCPState(DWORD dwCmdTime, const TPixelPosition& c_rkPPos
 {
 	if (__IsMainInstance())
 	{
-		//TraceError("CInstanceBase::PushTCPState ÇÃ·¹ÀÌ¾î ÀÚ½Å¿¡°Ô ÀÌµ¿Æ?Å¶Àº ¿À¸é ¾ÈµÈ´Ù!");
-		TraceError("CInstanceBase::PushTCPState: Oyuncu kendi karakterine hareket paketi gönderemez!");
+		TraceError("CInstanceBase::PushTCPState You can't send move packets to yourself!");
 		return;
 	}
 
@@ -1467,7 +1631,7 @@ void CInstanceBase::PushTCPState(DWORD dwCmdTime, const TPixelPosition& c_rkPPos
 
 	SCommand kCmdNew;
 	kCmdNew.m_kPPosDst = c_rkPPosDst;
-	kCmdNew.m_dwChkTime = dwCmdTime+m_nAverageNetworkGap;
+	kCmdNew.m_dwChkTime = dwCmdTime+m_nAverageNetworkGap;//m_dwBaseChkTime + (dwCmdTime - m_dwBaseCmdTime);// + nNetworkGap;
 	kCmdNew.m_dwCmdTime = dwCmdTime;
 	kCmdNew.m_fDstRot = fDstRot;
 	kCmdNew.m_eFunc = eFunc;
@@ -1514,20 +1678,20 @@ void CInstanceBase::StateProcess()
 			return;
 
 		DWORD dwDstChkTime = m_kQue_kCmdNew.front().m_dwChkTime;
-		DWORD dwCurChkTime = ELTimer_GetServerFrameMSec();	
+		DWORD dwCurChkTime = ELTimer_GetServerFrameMSec();
 
 		if (dwCurChkTime < dwDstChkTime)
 			return;
 
 		SCommand kCmdTop = m_kQue_kCmdNew.front();
-		m_kQue_kCmdNew.pop_front();	
+		m_kQue_kCmdNew.pop_front();
 
 		TPixelPosition kPPosDst = kCmdTop.m_kPPosDst;
 
 		FLOAT fRotDst = kCmdTop.m_fDstRot;
 		UINT eFunc = kCmdTop.m_eFunc;
 		UINT uArg = kCmdTop.m_uArg;
-		UINT uVID = GetVirtualID();	
+		UINT uVID = GetVirtualID();
 		UINT uTargetVID = kCmdTop.m_uTargetVID;
 
 		TPixelPosition kPPosCur;
@@ -1538,7 +1702,7 @@ void CInstanceBase::StateProcess()
 
 		if (!__CanProcessNetworkStatePacket())
 		{
-			Lognf(0, "vid=%d ¿òÁ÷ÀÏ ¼ö ¾ø´Â »óÅÂ¶ó ½ºÅµ IsDead=%d, IsKnockDown=%d", uVID, m_GraphicThingInstance.IsDead(), m_GraphicThingInstance.IsKnockDown());
+			Lognf(0, "vid=%d Skip State as unable to process IsDead=%d, IsKnockDown=%d", uVID, m_GraphicThingInstance.IsDead(), m_GraphicThingInstance.IsKnockDown());
 			return;
 		}
 
@@ -2296,24 +2460,26 @@ void CInstanceBase::SetInstanceType(int iInstanceType)
 	m_GraphicThingInstance.SetActorType(iInstanceType);
 }
 
+#ifdef ENABLE_CONQUEROR_LEVEL
+void CInstanceBase::SetConquerorLevelText(int sLevel)
+{
+	m_dwConquerorLevel = sLevel;
+	UpdateTextTailConquerorLevel(sLevel);
+}
+#endif
+
 void CInstanceBase::SetAlignment(short sAlignment)
 {
 	m_sAlignment = sAlignment;
 	RefreshTextTailTitle();
 }
 
-#ifdef ENABLE_TITLE_SYSTEM
-void CInstanceBase::SetTitleSystem(int iTitle)
-{
-	m_iTitleID = iTitle;
-	RefreshTextTailTitle();
-}
-#endif
-
 void CInstanceBase::SetPKMode(BYTE byPKMode)
 {
 	if (m_byPKMode == byPKMode)
+	{
 		return;
+	}
 
 	m_byPKMode = byPKMode;
 
@@ -2327,7 +2493,9 @@ void CInstanceBase::SetPKMode(BYTE byPKMode)
 void CInstanceBase::SetKiller(bool bFlag)
 {
 	if (m_isKiller == bFlag)
+	{
 		return;
+	}
 
 	m_isKiller = bFlag;
 	RefreshTextTail();
@@ -2341,14 +2509,22 @@ void CInstanceBase::SetPartyMemberFlag(bool bFlag)
 void CInstanceBase::SetStateFlags(DWORD dwStateFlags)
 {
 	if (dwStateFlags & ADD_CHARACTER_STATE_KILLER)
-		SetKiller(TRUE);
+	{
+		SetKiller (TRUE);
+	}
 	else
-		SetKiller(FALSE);
+	{
+		SetKiller (FALSE);
+	}
 
 	if (dwStateFlags & ADD_CHARACTER_STATE_PARTY)
-		SetPartyMemberFlag(TRUE);
+	{
+		SetPartyMemberFlag (TRUE);
+	}
 	else
-		SetPartyMemberFlag(FALSE);
+	{
+		SetPartyMemberFlag (FALSE);
+	}
 }
 
 void CInstanceBase::SetComboType(UINT uComboType)
@@ -2442,7 +2618,7 @@ bool CInstanceBase::IsAttackableInstance(CInstanceBase& rkInstVictim)
 
 		if (rkInstVictim.IsPC())
 		{
-#ifdef ENABLE_RENEWAL_REGEN
+#ifdef ENABLE_ULTIMATE_REGEN
 			CPythonPlayer& rkPlayer = CPythonPlayer::Instance();
 			if (rkPlayer.CheckBossSafeRange())
 				return false;
@@ -2460,6 +2636,7 @@ bool CInstanceBase::IsAttackableInstance(CInstanceBase& rkInstVictim)
 						return false;
 				}
 			}
+
 			if (PK_MODE_GUILD == GetPKMode())
 				if (GetGuildID() == rkInstVictim.GetGuildID())
 					return false;
@@ -2514,7 +2691,7 @@ bool CInstanceBase::IsAttackableInstance(CInstanceBase& rkInstVictim)
 
 		if (rkInstVictim.IsBuilding())
 			return true;
-		
+
 	}
 	else if (IsPoly())
 	{
@@ -2591,7 +2768,7 @@ bool CInstanceBase::CanViewTargetHP(CInstanceBase& rkInstVictim)
 	if (rkInstVictim.IsPC())
 		return true;
 #endif
-#ifdef ENABLE_SHIP_DEFENCE_DUNGEON
+#ifdef ENABLE_DEFENSAWESHIP
 	if (rkInstVictim.IsHydraNPC())
 		return true;
 #endif
@@ -2734,6 +2911,125 @@ BOOL CInstanceBase::IsStoneDoor()
 	return m_GraphicThingInstance.IsDoor() && 13001 == GetVirtualNumber();
 }
 
+#ifdef NAMECOLOR_BOSS_CLIENT
+BOOL CInstanceBase::IsBoss()
+{
+    if (GetRace() == 691)
+        return TRUE;
+    if (GetRace() == 692)
+        return TRUE;
+    if (GetRace() == 693)
+        return TRUE;
+    if (GetRace() == 791)
+        return TRUE;
+    if (GetRace() == 991)
+        return TRUE;
+    if (GetRace() == 992)
+        return TRUE;
+    if (GetRace() == 993)
+        return TRUE;
+    if (GetRace() == 1091)
+        return TRUE;
+    if (GetRace() == 1092)
+        return TRUE;
+    if (GetRace() == 1093)
+        return TRUE;
+    if (GetRace() == 1094)
+        return TRUE;
+    if (GetRace() == 1095)
+        return TRUE;
+    if (GetRace() == 2191)
+        return TRUE;
+    if (GetRace() == 1191)
+        return TRUE;
+    if (GetRace() == 1192)
+        return TRUE;
+    if (GetRace() == 1304)
+        return TRUE;
+    if (GetRace() == 1306)
+        return TRUE;
+    if (GetRace() == 1307)
+        return TRUE;
+    if (GetRace() == 1901)
+        return TRUE;
+    if (GetRace() == 1902)
+        return TRUE;
+    if (GetRace() == 1903)
+        return TRUE;
+    if (GetRace() == 2206)
+        return TRUE;
+    if (GetRace() == 2207)
+        return TRUE;
+    if (GetRace() == 2291)
+        return TRUE;
+    if (GetRace() == 2306)
+        return TRUE;
+    if (GetRace() == 2307)
+        return TRUE;
+    if (GetRace() == 2492)
+        return TRUE;
+    if (GetRace() == 2493)
+        return TRUE;
+    if (GetRace() == 2494)
+        return TRUE;
+    if (GetRace() == 2598)
+        return TRUE;
+    if (GetRace() == 3090)
+        return TRUE;
+    if (GetRace() == 3091)
+        return TRUE;
+    if (GetRace() == 3190)
+        return TRUE;
+    if (GetRace() == 3191)
+        return TRUE;
+    if (GetRace() == 3290)
+        return TRUE;
+    if (GetRace() == 3291)
+        return TRUE;
+    if (GetRace() == 3390)
+        return TRUE;
+    if (GetRace() == 3391)
+        return TRUE;
+    if (GetRace() == 3490)
+        return TRUE;
+    if (GetRace() == 3491)
+        return TRUE;
+    if (GetRace() == 3590)
+        return TRUE;
+    if (GetRace() == 3591)
+        return TRUE;
+    if (GetRace() == 3690)
+        return TRUE;
+    if (GetRace() == 3691)
+        return TRUE;
+    if (GetRace() == 3790)
+        return TRUE;
+    if (GetRace() == 3791)
+        return TRUE;
+    if (GetRace() == 3890)
+        return TRUE;
+    if (GetRace() == 3891)
+        return TRUE;
+    if (GetRace() == 5001)
+        return TRUE;
+    if (GetRace() == 5004)
+        return TRUE;
+    if (GetRace() == 5002)
+        return TRUE;
+    if (GetRace() == 5161)
+        return TRUE;
+    if (GetRace() == 5162)
+        return TRUE;
+    if (GetRace() == 5163)
+        return TRUE;
+    if (GetRace() == 6091)
+        return TRUE;
+    if (GetRace() == 6191)
+        return TRUE;
+    return FALSE;
+}
+#endif
+
 BOOL CInstanceBase::IsFlag()
 {
 	if (GetRace() == 20035)
@@ -2756,6 +3052,16 @@ BOOL CInstanceBase::IsForceVisible()
 
 	return FALSE;
 }
+
+#ifdef ENABLE_EVENT_BANNER_FLAG
+BOOL CInstanceBase::IsBannerFlag()
+{
+	if (GetRace() >= 20127 && GetRace() <= 20143)
+		return TRUE;
+
+	return FALSE;
+}
+#endif
 
 int	CInstanceBase::GetInstanceType()
 {
@@ -3306,7 +3612,7 @@ UINT CInstanceBase::__GetRefinedEffect(CItemData* pItem)
 	/*----------Kabarcýk-Zýrh----------*/
 				if ((12010 <= vnum && vnum <= 12019) ||	// Mavi Plaka Zýrhý
 					(12020 <= vnum && vnum <= 12029) ||	// Mavi Ejderha Suiti
-					(12030 <= vnum && vnum <= 12039) ||	// Auraplattenpanzer
+					(12030 <= vnum && vnum <= 12039) ||	// Aura Taþ Zýrhý
 					(12040 <= vnum && vnum <= 12049)	// Ejderha Elbisesi
 #ifdef ENABLE_WOLFMAN_CHARACTER
 					|| (21080 <= vnum && vnum <= 21089)	// Ormancý zýrhý
@@ -3329,6 +3635,8 @@ UINT CInstanceBase::__GetRefinedEffect(CItemData* pItem)
 #endif
 					|| (21320 <= vnum && vnum <= 21325)	// Yýlan Mantosu
 					|| (21340 <= vnum && vnum <= 21345)	// Yýlan Yeleði
+					|| (21350 <= vnum && vnum <= 21365)	// Kötü yýlan mantosu
+					|| (21370 <= vnum && vnum <= 21385)	// Saf yýlan mantosu
 					)
 				{
 					default_effect = false;
@@ -3359,10 +3667,10 @@ UINT CInstanceBase::__GetRefinedEffect(CItemData* pItem)
 					(20920 <= vnum && vnum <= 20920) ||	// Ölüm Gecesi Kýyafeti
 
 					// Þaman
-					(20790 <= vnum && vnum <= 20790) ||	// Ýnanç Kýyafeti
-					(20890 <= vnum && vnum <= 20890) ||	// Ahenk Kýyafeti
-					(20840 <= vnum && vnum <= 20840) ||	// Ateþ Kýyafeti
-					(20940 <= vnum && vnum <= 20940)	// Ay Kýyafeti
+					(20790 <= vnum && vnum <= 20799) ||	// Ýnanç Kýyafeti
+					(20890 <= vnum && vnum <= 20899) ||	// Ahenk Kýyafeti
+					(20840 <= vnum && vnum <= 20849) ||	// Ateþ Kýyafeti
+					(20940 <= vnum && vnum <= 20949)	// Ay Kýyafeti
 
 #ifdef ENABLE_WOLFMAN_CHARACTER
 					// Wolfman
@@ -3408,7 +3716,11 @@ UINT CInstanceBase::__GetRefinedEffect(CItemData* pItem)
 				case CItemData::WEAPON_FAN:
 					if (40025 == vnum)
 					{
-						if (m_kHorse.IsMounting())
+						if (m_kHorse.IsMounting()
+#ifdef ENABLE_STANDING_MOUNT
+							&& !m_kHorse.IsHoverBoard()
+#endif
+							)
 						{
 							m_dwSpecialEffect = EFFECT_REFINED + EFFECT_SPECIAL_FAN_30;
 							m_dwSpecialEffectLeft = EFFECT_REFINED + EFFECT_SPECIAL_FAN_30_LEFT;
@@ -3420,7 +3732,11 @@ UINT CInstanceBase::__GetRefinedEffect(CItemData* pItem)
 					}
 					else if (40026 == vnum)
 					{
-						if (m_kHorse.IsMounting())
+						if (m_kHorse.IsMounting()
+#ifdef ENABLE_STANDING_MOUNT
+							&& !m_kHorse.IsHoverBoard()
+#endif
+							)
 						{
 							m_dwSpecialEffect = EFFECT_REFINED + EFFECT_SPECIAL_FAN_90;
 							m_dwSpecialEffectLeft = EFFECT_REFINED + EFFECT_SPECIAL_FAN_90_LEFT;
@@ -3536,6 +3852,7 @@ bool CInstanceBase::SetWeapon(DWORD eWeapon)
 	m_GraphicThingInstance.AttachWeapon(eWeapon);
 	m_awPart[CRaceData::PART_WEAPON] = eWeapon;
 
+	//Weapon Effect
 	CItemData * pItemData;
 	if (CItemManager::Instance().GetItemDataPointer(eWeapon, &pItemData))
 	{
@@ -3980,9 +4297,19 @@ void CInstanceBase::__Warrior_Initialize()
 	m_kWarrior.m_dwGeomgyeongEffect=0;
 }
 
+#ifdef ENABLE_PVP_BALANCE
+void CInstanceBase::__Assassin_Initialize()
+{
+	m_kAssassin.m_dwGyeongGongEffect = 0;
+}
+#endif
+
 void CInstanceBase::__Initialize()
 {
 	__Warrior_Initialize();
+#ifdef ENABLE_PVP_BALANCE
+	__Assassin_Initialize();
+#endif
 	__StoneSmoke_Inialize();
 	__EffectContainer_Initialize();
 	__InitializeRotationSpeed();
@@ -3992,6 +4319,9 @@ void CInstanceBase::__Initialize()
 	m_kAffectFlagContainer.Clear();
 
 	m_dwLevel = 0;
+#ifdef ENABLE_CONQUEROR_LEVEL
+	m_dwConquerorLevel = 0;
+#endif
 #ifdef ENABLE_SHOW_MOB_INFO
 	m_dwAIFlag = 0;
 #endif
@@ -4036,10 +4366,12 @@ void CInstanceBase::__Initialize()
 	m_dwLastComboIndex = 0;
 
 	m_swordRefineEffectRight = 0;
-	m_swordRefineEffectLeft = 0;
-	m_armorRefineEffect[0] = 0;
-	m_armorRefineEffect[1] = 0;
-
+	 m_swordRefineEffectLeft = 0;
+	 m_armorRefineEffect[0] = 0;
+	 m_armorRefineEffect[1] = 0;
+#ifdef ENABLE_TITLE_SYSTEM
+	 m_dwOverHeadSpecialEffect = 0;
+#endif
 #ifdef ENABLE_MDE_EFFECT
 	m_dwSpecialEffect = 0;
 	m_dwSpecialEffectLeft = 0;
@@ -4054,9 +4386,6 @@ void CInstanceBase::__Initialize()
 #endif
 
 	m_sAlignment = 0;
-#ifdef ENABLE_TITLE_SYSTEM
-	m_iTitleID = 0;
-#endif
 	m_byPKMode = 0;
 	m_isKiller = false;
 	m_isPartyMember = false;
@@ -4230,7 +4559,7 @@ bool CInstanceBase::SetAura(DWORD eAura)
 }
 #endif
 
-#ifdef ENABLE_SHIP_DEFENCE_DUNGEON
+#ifdef ENABLE_DEFENSAWESHIP
 BOOL CInstanceBase::IsHydraNPC()
 {
 	switch (m_dwVirtualNumber)
@@ -4241,3 +4570,4 @@ BOOL CInstanceBase::IsHydraNPC()
 	return FALSE;
 }
 #endif
+

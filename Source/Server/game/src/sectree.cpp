@@ -134,6 +134,7 @@ bool SECTREE::InsertEntity(LPENTITY pkEnt)
 		pkCurTree->m_set_entity.erase(pkEnt);
 
 	pkEnt->SetSectree(this);
+	//pkEnt->UpdateSectree();
 
 	m_set_entity.insert(pkEnt);
 
@@ -216,4 +217,3 @@ int SECTREE::GetEventAttribute(long x, long y)
 {
 	return GetAttribute(x, y) >> 8;
 }
-

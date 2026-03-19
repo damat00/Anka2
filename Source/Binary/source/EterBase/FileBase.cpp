@@ -25,7 +25,7 @@ void CFileBase::Close()
 {
 	if (m_hFile)
 	{
-		CloseHandle(m_hFile);	
+		CloseHandle(m_hFile);
 		m_hFile = nullptr;
 	}
 }
@@ -95,7 +95,7 @@ BOOL CFileBase::Write(const void* src, int bytes)
 {
 	DWORD dwUseless;
 	BOOL ret = WriteFile(m_hFile, src, bytes, &dwUseless, nullptr);
-	
+
 	if (!ret)
 		return false;
 

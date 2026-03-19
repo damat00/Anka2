@@ -30,7 +30,6 @@ void CActorInstance::INSTANCEBASE_Transform()
 		m_bNeedUpdateCollision = TRUE;
 	}
 
-
 	Update();
 	TransformProcess();
 	Transform();
@@ -355,7 +354,7 @@ bool CActorInstance::IsDoor()
 	if (TYPE_DOOR == m_eActorType)
 		return true;
 
-#ifdef ENABLE_SHIP_DEFENCE_DUNGEON
+#ifdef ENABLE_DEFENSAWESHIP
 	if (m_eRace == 9016 || m_eRace == 9036 || m_eRace == 9037)
 		return true;
 #endif
@@ -653,7 +652,7 @@ void CActorInstance::AdjustDynamicCollisionMovement(const CActorInstance * c_pAc
 
 	if (isAttacking() )
 		return;
-	
+
 	UINT uActorType = c_pActorInstance->GetActorType();
 	if( (uActorType == TYPE_BUILDING) || (uActorType == TYPE_OBJECT) || (uActorType == TYPE_DOOR) || (uActorType == TYPE_STONE))
 	{
@@ -708,7 +707,7 @@ void CActorInstance::__AdjustCollisionMovement(const CGraphicObjectInstance * c_
 		return;
 	}
 
-	if (m_v3Movement.x == 0.0f && m_v3Movement.y == 0.0f && m_v3Movement.z == 0.0f) 
+	if (m_v3Movement.x == 0.0f && m_v3Movement.y == 0.0f && m_v3Movement.z == 0.0f)
 		return;
 
 	float move_length = D3DXVec3Length(&m_v3Movement);
@@ -915,7 +914,7 @@ void CActorInstance::__InitializeStateData()
 	m_iRenderMode = RENDER_MODE_NORMAL;
 	m_fAlphaValue = 0.0f;
 	m_AddColor = D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f);
-	
+
 	m_dwMtrlColor=0xffffffff;
 	m_dwMtrlAlpha=0xff000000;
 
@@ -924,7 +923,7 @@ void CActorInstance::__InitializeStateData()
 }
 
 void CActorInstance::__InitializeMotionData()
-{	
+{
 	m_wcurMotionMode = CRaceMotionData::MODE_GENERAL;
 	m_wcurComboType = 0;
 

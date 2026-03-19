@@ -23,7 +23,7 @@ typedef struct SColor
 	float r, g, b, a;
 } TColor;
 
-typedef struct 
+typedef struct
 {
 	TColor	m_FirstColor;
 	TColor	m_SecondColor;
@@ -54,16 +54,16 @@ public:
 		const float & c_rfBlue,
 		const float & c_rfAlpha,
 		DWORD dwDuration);
-	
+
 	void SetVertex(const unsigned char & c_rucNumVertex, const TPDTVertex & c_rPDTVertex);
-	
+
 	void StartTransition();
 	bool Update();
 	void Render();
-	
+
 private:
 	TPDTVertex m_Vertex[4];
-	TIndex m_Indices[4];					// 인덱스 버퍼...
+	TIndex m_Indices[4];
 	CColorTransitionHelper m_Helper[4];
 };
 
@@ -94,16 +94,15 @@ public:
 	const bool & isTransitionStarted() { return m_bTransitionStarted; }
 
 protected:
-	CGraphicImageInstance * GenerateTexture(const char *szfilename);
+	CGraphicImageInstance * GenerateTexture(const char * szfilename);
 	void DeleteTexture(CGraphicImageInstance * pGraphicImageInstance);
 
 protected:
 	//////////////////////////////////////////////////////////////////////////
-	// 타입 정의
 
 	typedef std::vector<CSkyObjectQuad> TSkyObjectQuadVector;
 	typedef TSkyObjectQuadVector::iterator TSkyObjectQuadIterator;
-	
+
 	typedef struct SSkyObjectFace
 	{
 		void StartTransition();
@@ -117,9 +116,8 @@ protected:
 	typedef std::map <std::string, CGraphicImageInstance*> TGraphicImageInstanceMap;
 
 	//////////////////////////////////////////////////////////////////////////
-	
-	// 구름...
-	TSkyObjectFace m_FaceCloud;		// 구름 일단 한장...
+
+	TSkyObjectFace m_FaceCloud;
 	D3DXMATRIX m_matWorldCloud, m_matTranslationCloud, m_matTextureCloud;
 	D3DXVECTOR3 m_v3PositionCloud;
 	float m_fCloudScaleX, m_fCloudScaleY, m_fCloudHeight;
@@ -129,21 +127,19 @@ protected:
 
 	DWORD m_dwlastTime;
 
-	// 스카이 박스 이미지...
 	TGraphicImageInstanceMap m_GraphicImageInstanceMap;
-	
+
 	// Transform...
 	D3DXMATRIX m_matWorld, m_matTranslation;
 	D3DXVECTOR3 m_v3Position;
 	float m_fScaleX, m_fScaleY, m_fScaleZ;
 
-	// 랜더링 관련... 임시 변수..
 	unsigned char m_ucRenderMode;
 
 	std::string m_strCurTime;
 	bool m_bTransitionStarted;
 	bool m_bSkyMatrixUpdated;
-	
+
 	CGraphicImageInstance m_CloudAlphaImageInstance;
 };
 
