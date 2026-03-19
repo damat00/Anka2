@@ -1,8 +1,8 @@
 # ============================================================
-# FreeBSD Sistem Paket Güncelleme Komutları
+# FreeBSD Sistem Paket GÃ¼ncelleme KomutlarÄ±
 # ============================================================
-# Bu komutlar sistem paketlerini ve portları güncellemek için kullanılır.
-# Önce paket listesini güncelleyin, ardından port snapshots'ı çekin.
+# Bu komutlar sistem paketlerini ve portlarÄ± gÃ¼ncellemek iÃ§in kullanÄ±lÄ±r.
+# Ã–nce paket listesini gÃ¼ncelleyin, ardÄ±ndan port snapshots'Ä± Ã§ekin.
 
 pkg update
 portsnap fetch extract
@@ -11,66 +11,66 @@ portsnap fetch update
 # ============================================================
 # Kurulacak Gerekli Paketler
 # ============================================================
-# Aşağıdaki paketler projenin derlenmesi ve çalışması için gereklidir.
-# Bu paketleri kurmak için: pkg install <paket_adı>
-# Örnek: pkg install boost-all cryptopp ccache
+# AÅŸaÄŸÄ±daki paketler projenin derlenmesi ve Ã§alÄ±ÅŸmasÄ± iÃ§in gereklidir.
+# Bu paketleri kurmak iÃ§in: pkg install <paket_adÄ±>
+# Ã–rnek: pkg install boost-all cryptopp ccache
 
-boost-all          	# Boost C++ kütüphaneleri (tüm modüller)
-cryptopp           	# Crypto++ şifreleme kütüphanesi
-ccache             	# Derleme önbelleği (hızlandırma için)
-llvm-devel         	# LLVM derleyici geliştirme araçları
-gmake              	# GNU Make (derleme aracı)
-devil              	# OpenIL/DevIL görüntü işleme kütüphanesi
-lzo2               	# LZO sıkıştırma kütüphanesi
-mariadb106-server   # MySQL 5.6 veritabanı sunucusu
-mariadb106-client   # MySQL 5.6 istemci araçları
+boost-all          	# Boost C++ kÃ¼tÃ¼phaneleri (tÃ¼m modÃ¼ller)
+cryptopp           	# Crypto++ ÅŸifreleme kÃ¼tÃ¼phanesi
+ccache             	# Derleme Ã¶nbelleÄŸi (hÄ±zlandÄ±rma iÃ§in)
+llvm-devel         	# LLVM derleyici geliÅŸtirme araÃ§larÄ±
+gmake              	# GNU Make (derleme aracÄ±)
+devil              	# OpenIL/DevIL gÃ¶rÃ¼ntÃ¼ iÅŸleme kÃ¼tÃ¼phanesi
+lzo2               	# LZO sÄ±kÄ±ÅŸtÄ±rma kÃ¼tÃ¼phanesi
+mariadb106-server   # MariaDB 10.6 veritabanÄ± sunucusu
+mariadb106-client   # MariaDB 10.6 istemci araÃ§larÄ±
 python27            # Python 2.7 programlama dili
-openssl             # OpenSSL şifreleme ve SSL/TLS kütüphanesi
-makedepend          # Bağımlılık analizi aracı
+openssl             # OpenSSL ÅŸifreleme ve SSL/TLS kÃ¼tÃ¼phanesi
+makedepend          # BaÄŸÄ±mlÄ±lÄ±k analizi aracÄ±
 subversion          # SVN versiyon kontrol sistemi
-binutils            # İkili dosya araçları (ar, nm, objdump vb.)
+binutils            # Ä°kili dosya araÃ§larÄ± (ar, nm, objdump vb.)
 
 # ============================================================
-# MSL Kütüphanesi Kurulum Talimatları
+# MSL KÃ¼tÃ¼phanesi Kurulum TalimatlarÄ±
 # ============================================================
-# msl.tar.gz dosyasını kurmak için aşağıdaki adımları izleyin:
+# msl.tar.gz dosyasÄ±nÄ± kurmak iÃ§in aÅŸaÄŸÄ±daki adÄ±mlarÄ± izleyin:
 # 1. /usr/local/include/ dizinine gidin
-# 2. msl.tar.gz dosyasını bu dizine çıkarın
+# 2. msl.tar.gz dosyasÄ±nÄ± bu dizine Ã§Ä±karÄ±n
 # 
-# Komut örneği:
+# Komut Ã¶rneÄŸi:
 # cd /usr/local/include/
 # tar -xzf msl.tar.gz
 
 /*------------------------*\
 
-msl.tar.gz dosyasını kurmak için /usr/local/include/ dizinine gidin ve 
-orada msl.tar.gz dosyasını çıkarın.
+msl.tar.gz dosyasÄ±nÄ± kurmak iÃ§in /usr/local/include/ dizinine gidin ve 
+orada msl.tar.gz dosyasÄ±nÄ± Ã§Ä±karÄ±n.
 
 \*------------------------*/
 
 # ============================================================
-# FreeBSD Root Şifresi Sıfırlama Talimatları
+# FreeBSD Root Åifresi SÄ±fÄ±rlama TalimatlarÄ±
 # ============================================================
-# Eğer root şifresini unuttuysanız, aşağıdaki adımları izleyin:
+# EÄŸer root ÅŸifresini unuttuysanÄ±z, aÅŸaÄŸÄ±daki adÄ±mlarÄ± izleyin:
 # 
-# 1. Sistemi yeniden başlatın
-# 2. Boot menüsünde "single user mode" (tek kullanıcı modu) seçeneğini seçin (genellikle 2 numaralı seçenek)
-# 3. Aşağıdaki komutları sırasıyla çalıştırın:
+# 1. Sistemi yeniden baÅŸlatÄ±n
+# 2. Boot menÃ¼sÃ¼nde "single user mode" (tek kullanÄ±cÄ± modu) seÃ§eneÄŸini seÃ§in (genellikle 2 numaralÄ± seÃ§enek)
+# 3. AÅŸaÄŸÄ±daki komutlarÄ± sÄ±rasÄ±yla Ã§alÄ±ÅŸtÄ±rÄ±n:
 
 reboot
 select boot single (2)
 --
-mount -u -a -o rw    # Dosya sistemlerini okuma-yazma modunda bağla
-fsck -y              # Dosya sistemi kontrolü yap (otomatik onar)
-mount -u /           # Root dosya sistemini güncelle
-mount -a -t ufs      # Tüm UFS dosya sistemlerini bağla
-passwd               # Root şifresini değiştir
-mount -u -a -o rw    # Tekrar okuma-yazma modunda bağla
-passwd               # Şifreyi tekrar onayla (gerekirse)
+mount -u -a -o rw    # Dosya sistemlerini okuma-yazma modunda baÄŸla
+fsck -y              # Dosya sistemi kontrolÃ¼ yap (otomatik onar)
+mount -u /           # Root dosya sistemini gÃ¼ncelle
+mount -a -t ufs      # TÃ¼m UFS dosya sistemlerini baÄŸla
+passwd               # Root ÅŸifresini deÄŸiÅŸtir
+mount -u -a -o rw    # Tekrar okuma-yazma modunda baÄŸla
+passwd               # Åifreyi tekrar onayla (gerekirse)
 --
-reboot               # Sistemi normal modda yeniden başlat
+reboot               # Sistemi normal modda yeniden baÅŸlat
 
-# Not: Bu işlemler sırasında sistem tek kullanıcı modunda çalışır.
-# Şifre değişikliğinden sonra mutlaka sistemi yeniden başlatın.
+# Not: Bu iÅŸlemler sÄ±rasÄ±nda sistem tek kullanÄ±cÄ± modunda Ã§alÄ±ÅŸÄ±r.
+# Åifre deÄŸiÅŸikliÄŸinden sonra mutlaka sistemi yeniden baÅŸlatÄ±n.
 
 \*------------------------*/

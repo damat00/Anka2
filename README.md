@@ -16,8 +16,8 @@ Bu proje, Anka2 MMORPG oyunu için geliştirilmiş sunucu ve istemci kaynak kodl
 ## 🏗️ Altyapı Bilgileri
 
 - **Altyapı**: Mainline
-- **İşletim Sistemi**: FreeBSD 13.1 ve üzeri
-- **Veritabanı**: MySQL 5.6 (libmysqlclient.a)
+- **İşletim Sistemi**: FreeBSD 13.3 ve üzeri
+- **Veritabanı**: MariaDB 10.6 (MySQL uyumlu client / libmysqlclient)
 - **Server Derleyici**: ccache clang++-devel (C++2a/C++20 standardı)
 - **Client Derleyici**: Visual Studio 2022 (v143 toolset)
 - **Server C++ Standardı**: C++2a (C++20)
@@ -57,7 +57,7 @@ Source/Binary/
 │   │   ├── boost/            # Boost C++ kütüphaneleri
 │   │   ├── cryptopp/         # Crypto++ şifreleme
 │   │   ├── Python-2.7/       # Python 2.7 headers
-│   │   ├── d3d8/             # DirectX 8 headers
+│   │   ├── d3d9/             # DirectX 9 headers
 │   │   ├── FoxFS.h           # FoxFS dosya sistemi
 │   │   └── ...
 │   └── library/              # Derlenmiş kütüphaneler (.lib)
@@ -68,7 +68,7 @@ Source/Binary/
 **Client Modülleri:**
 - **UserInterface**: Ana oyun arayüzü, ağ yönetimi, oyuncu yönetimi, envanter sistemi
 - **GameLib**: Oyun nesneleri, aktörler, çarpışma tespiti, hareket sistemi
-- **EterLib**: Grafik motoru, DirectX 8 wrapper, render sistemi
+- **EterLib**: Grafik motoru, DirectX 9 wrapper, render sistemi
 - **EterPythonLib**: Python script entegrasyonu, UI modülleri
 - **EffectLib**: Parçacık efektleri, ışık efektleri, görsel efektler
 
@@ -118,7 +118,7 @@ Source/Server/
 **Gerekli Paketler:**
 ```bash
 pkg install boost-all cryptopp ccache llvm-devel gmake devil lzo2 \
-             mysql56-server mysql56-client python27 openssl \
+             mariadb106-server mariadb106-client python27 openssl \
              makedepend subversion binutils
 ```
 
@@ -130,13 +130,13 @@ make
 ```
 
 **Özellikler:**
-- FreeBSD 13.1+ gereklidir
+- FreeBSD 13.3+ gereklidir
 - ccache clang++-devel derleyici kullanılır
 - C++20 (C++2a) standardı
 - 32-bit (x32) mimari
 - Makefile tabanlı build sistemi
 - ccache ile hızlandırılmış derleme
-- MySQL 5.6 client library (libmysqlclient.a)
+- MariaDB 10.6 client (libmysqlclient uyumlu)
 
 ### Client (Windows)
 
@@ -183,7 +183,7 @@ cd Source\Binary
 
 - **Programlama Dili**: C++20 (C++2a)
 - **Script Dili**: Lua 5.x
-- **Veritabanı**: MySQL 5.6 (libmysqlclient.a)
+- **Veritabanı**: MariaDB 10.6
 - **Kütüphaneler**:
   - Boost C++ Libraries
   - Crypto++ (şifreleme)
@@ -193,132 +193,29 @@ cd Source\Binary
 
 ---
 
-## 📝 Kod Yapısı Örnekleri
-
-### Client - Python Entegrasyonu
-
-```cpp
-// UserInterface/PythonNetworkStream.cpp
-// Python script'lerinden ağ işlemlerine erişim
-
-class CPythonNetworkStream {
-    void SetLanguage(BYTE bLanguage);
-    void SendChangeLanguagePacket(BYTE bLanguage);
-    // ...
-};
-```
-
-### Server - Karakter Yönetimi
-
-```cpp
-// game/src/char.cpp
-// Karakter oluşturma, güncelleme, kaydetme
-
-class CHARACTER {
-    bool Create(const char* name, DWORD vid, bool isPC);
-    void Update();
-    void Save();
-    // ...
-};
-```
-
-### Server - Görev Sistemi
-
-```cpp
-// game/src/questmanager.cpp
-// Lua tabanlı görev sistemi
-
-class CQuestManager {
-    bool RunState(const char* quest_name, const char* state_name);
-    void ExecuteQuestScript(const char* quest_name);
-    // ...
-};
-```
-
----
-
-## 📄 Önemli Dosyalar
-
-### Client
-
-- `UserInterface/PythonNetworkStream.cpp`: Ağ iletişimi ve paket yönetimi
-- `UserInterface/Locale.cpp`: Lokalizasyon yönetimi
-- `GameLib/ActorInstance.cpp`: Oyun karakterleri ve NPC'ler
-- `EterLib/GrpDevice.cpp`: DirectX 8 grafik cihazı yönetimi
-
-### Server
-
-- `game/src/char.cpp`: Karakter sistemi (162+ dosya içinde en önemlisi)
-- `game/src/questmanager.cpp`: Görev yönetim sistemi
-- `game/src/item.cpp`: Eşya sistemi
-- `game/src/mob_manager.cpp`: Mob yönetimi
-- `db/src/DBManager.cpp`: Veritabanı yönetimi
-- `common/service.h`: Tüm özellik flag'leri ve yapılandırma
-
----
-
 ## ✨ Özellikler
 
-Proje, `common/service.h` dosyasında tanımlanan 100+ özellik flag'i ile genişletilebilir bir yapıya sahiptir:
+Proje, `common/service.h` dosyasında tanımlanan 300+ özellik flag'i ile genişletilebilir bir yapıya sahiptir:
 
 - 🐾 Pet Sistemi
 - 🐴 Binek Sistemi
 - 📜 Görev Sistemi (Lua tabanlı)
 - 🏰 Lonca Sistemi (Guild System)
-  - Temel lonca yönetimi
-  - Lonca seviye sistemi (20 seviye, ENABLE_EXTENDED_GUILD_LEVEL ile 40 seviyeye çıkarılabilir)
-  - Lonca bankası (para yatırma/çekme)
-  - Lonca üye yönetimi
-  - Lonca yetki sistemi
-  - Lonca savaşı
 - 👥 Parti Sistemi
 - 🛒 Çevrimdışı Pazar
 - 👗 Kostüm Sistemi
 - 🌍 Çoklu Dil Desteği
-- 💎 Premium Sistemi
+- 💎 Premium Sistemi (Kaldırıldı)
 - 🏛️ Zindan Sistemi
 - 🎣 Avcılık Sistemi
-- 🐉 Büyüme Pet Sistemi
+- 🐉 Resmi Pet Sistemi
+- 🔬 Biyolog Sistemi (yeni altyapı)
+- 🎫 Savaş Bileti / Battle Pass (Normal + Premium)
+- 🌐 Global sıralama
+- ✨ Ruh kalıntısı (kalıntı bonusu)
+- 📛 Ünvan (başlık) sistemi
+- 🏆 Şampiyon seviye sistemi
 - Ve daha fazlası...
-
-### 🏰 Lonca Sistemi (Guild System) Detayları
-
-Lonca sistemi `Source/Server/game/src/guild.cpp` dosyasında implemente edilmiştir. Sistem aşağıdaki özelliklere sahiptir:
-
-**Temel Özellikler:**
-- Lonca oluşturma ve yönetimi
-- Üye ekleme/çıkarma
-- Lonca seviye sistemi (GUILD_MAX_LEVEL = 20, ENABLE_EXTENDED_GUILD_LEVEL ile 40)
-- Lonca bankası (para yatırma/çekme)
-- Lonca yetki sistemi (15 seviye)
-- Lonca yorum sistemi
-
-**Güvenlik Özellikleri:**
-- SQL injection koruması (EscapeString kullanımı)
-- Null pointer kontrolleri
-- Integer overflow kontrolleri
-- Buffer overflow koruması
-- Memory leak önleme
-
-**Yapılandırılabilir Özellikler (service.h):**
-- `ENABLE_GUILDRENEWAL_SYSTEM`: Gelişmiş lonca altyapısı
-- `ENABLE_EXTENDED_GUILD_LEVEL`: Lonca seviye kapasitesinin 40'a çıkarılması
-- `ENABLE_NEW_WAR_OPTIONS`: Tur, puan ve süre bazlı modern lonca savaşı seçenekleri
-- `ENABLE_GUILD_DONATE_ATTENDANCE`: Günlük lonca bağışı ve katılım takip sistemi
-- `ENABLE_GUILD_WAR_SCORE`: Lonca savaş istatistiklerinin detaylı skor ekranı
-- `ENABLE_GUILD_LAND_INFO`: Lonca arazilerine ait detaylı bilgi arayüzü
-- `ENABLE_GUILDBANK_LOG`: Lonca banka ve işlem kayıtlarının günlük sistemi
-- `ENABLE_GUILDBANK_EXTENDED_LOGS`: Genişletilmiş günlükler için Log.cpp bağlantısı
-- `ENABLE_EXTENDED_RENEWAL_FEATURES`: Lonca lideri devri ve arazi silme yönetimi
-- `ENABLE_COLEADER_WAR_PRIVILEGES`: Lider çevrimdışı olduğunda, Yardımcı Lider lider ile aynı yetkilere sahip olur
-- `ENABLE_GUILDWAR_BUTTON`: Arayüzde Lonca Savaşı erişim düğmesini aktif eder
-
-**Güvenlik Düzeltmeleri:**
-- SQL sorgu sonuçları için null pointer kontrolleri eklendi
-- Kullanıcı girdileri EscapeString ile sanitize ediliyor
-- Integer overflow kontrolleri eklendi (GOLD_MAX kontrolü)
-- Buffer overflow koruması (strlcpy, snprintf kullanımı)
-- Memory leak önleme (unique_ptr kullanımı)
 
 ---
 
@@ -381,6 +278,11 @@ Sorularınız için proje issue'larını kullanabilirsiniz.
 
 ---
 
-## 📅 Son Güncellemeler
+## 📅 Son Güncellemeler (2026)
 
-Detaylı değişiklik notları için `CHANGELOG_2025.md` dosyasına bakın.
+- **Altyapı**: FreeBSD sürümü yükseltildi; veritabanı **MariaDB 10.6**; FreeBSD tarafında kurulumu kolaylaştıran özel script (talimatlar konsolda; ayrıntı `CHANGELOG_2026.md`).
+- **Oyun**: Yeni biyolog; çevrimdışı pazar / depo / sistem seçenekleri / otomatik av düzeltmeleri; zindan ve dünya patronu notice; vuruş-kaçırma; client kamera; binek/kaykay rotasyon; şaman skill ve animasyon düzeltmeleri; skill 6–9 etkin.
+- **Araçlar**: DumpProto Release `.txt` kapatma davranışı iyileştirildi.
+- **Client**: İsteğe bağlı `ENABLE_BINARY_SERVERINFO` — sunucu bilgisi `PythonNetworkStreamModule.cpp` / binary üzerinden.
+
+**Tam liste:** `CHANGELOG_2026.md`
