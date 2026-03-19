@@ -15,20 +15,20 @@ portsnap fetch update
 # Bu paketleri kurmak için: pkg install <paket_adý>
 # Örnek: pkg install boost-all cryptopp ccache
 
-boost-all          # Boost C++ kütüphaneleri (tüm modüller)
-cryptopp           # Crypto++ þifreleme kütüphanesi
-ccache             # Derleme önbelleði (hýzlandýrma için)
-llvm-devel         # LLVM derleyici geliþtirme araçlarý
-gmake              # GNU Make (derleme aracý)
-devil              # OpenIL/DevIL görüntü iþleme kütüphanesi
-lzo2               # LZO sýkýþtýrma kütüphanesi
-mysql56-server     # MySQL 5.6 veritabaný sunucusu
-mysql56-client     # MySQL 5.6 istemci araçlarý
-python27           # Python 2.7 programlama dili
-openssl            # OpenSSL þifreleme ve SSL/TLS kütüphanesi
-makedepend         # Baðýmlýlýk analizi aracý
-subversion         # SVN versiyon kontrol sistemi
-binutils           # Ýkili dosya araçlarý (ar, nm, objdump vb.)
+boost-all          	# Boost C++ kütüphaneleri (tüm modüller)
+cryptopp           	# Crypto++ þifreleme kütüphanesi
+ccache             	# Derleme önbelleði (hýzlandýrma için)
+llvm-devel         	# LLVM derleyici geliþtirme araçlarý
+gmake              	# GNU Make (derleme aracý)
+devil              	# OpenIL/DevIL görüntü iþleme kütüphanesi
+lzo2               	# LZO sýkýþtýrma kütüphanesi
+mariadb106-server   # MySQL 5.6 veritabaný sunucusu
+mariadb106-client   # MySQL 5.6 istemci araçlarý
+python27            # Python 2.7 programlama dili
+openssl             # OpenSSL þifreleme ve SSL/TLS kütüphanesi
+makedepend          # Baðýmlýlýk analizi aracý
+subversion          # SVN versiyon kontrol sistemi
+binutils            # Ýkili dosya araçlarý (ar, nm, objdump vb.)
 
 # ============================================================
 # MSL Kütüphanesi Kurulum Talimatlarý
