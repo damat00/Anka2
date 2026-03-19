@@ -62,12 +62,20 @@
 	#include "PythonAcce.h"
 #endif
 
+#ifdef ENABLE_BIOLOG_SYSTEM
+	#include "PythonBiologManager.h"
+#endif
+
 #ifdef ENABLE_RENDER_TARGET
 	#include "../EterLib/RenderTarget.h"
 	#include "../EterLib/RenderTargetManager.h"
 #endif
 
-#ifdef ENABLE_WIKI_SYSTEM
+#ifdef ENABLE_EVENT_MANAGER
+	#include "PythonGameEventManager.h"
+#endif
+
+#ifdef ENABLE_INGAME_WIKI_SYSTEM
 	#include "PythonWiki.h"
 #endif
 
@@ -77,10 +85,6 @@
 
 #ifdef ENABLE_RIDING_EXTENDED)
 	#include "PythonMountUpGrade.h"
-#endif
-
-#ifdef ENABLE_DUNGEON_INFO
-	#include "PythonDungeonInfo.h"
 #endif
 
 #ifdef ENABLE_FOV_OPTION
@@ -104,25 +108,6 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 			CURSOR_MODE_HARDWARE,
 			CURSOR_MODE_SOFTWARE,
 		};
-
-#ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
-		enum ELocales
-		{
-			LOCALE_DEFAULT,
-			LOCALE_EN,
-			LOCALE_RO,
-			LOCALE_PT,
-			LOCALE_ES,
-			LOCALE_FR,
-			LOCALE_DE,
-			LOCALE_PL,
-			LOCALE_IT,
-			LOCALE_CZ,
-			LOCALE_HU,
-			LOCALE_TR,
-			LOCALE_MAX_NUM,
-		};
-#endif
 
 		enum ECursorShape
 		{
@@ -179,6 +164,25 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 			EVENT_CAMERA_NUMBER = 101,
 		};
 
+#ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
+		enum ELocales
+		{
+			LOCALE_DEFAULT,
+			LOCALE_EN,
+			LOCALE_RO,
+			LOCALE_PT,
+			LOCALE_ES,
+			LOCALE_FR,
+			LOCALE_DE,
+			LOCALE_PL,
+			LOCALE_IT,
+			LOCALE_CZ,
+			LOCALE_HU,
+			LOCALE_TR,
+			LOCALE_MAX_NUM,
+		};
+#endif
+
 		struct SCameraSpeed
 		{
 			float m_fUpDir;
@@ -203,7 +207,7 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 		void NotifyHack(const char *c_szFormat, ...);
 		void GetInfo(UINT eInfo, std::string* pstInfo);
 		void GetMousePosition(POINT* ppt);
-
+		
 		static CPythonApplication& Instance()
 		{
 			assert(ms_pInstance != nullptr);
@@ -267,10 +271,11 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 		void SetUpDirCameraSpeed(float fSpeed);
 		float GetRotation();
 		float GetPitch();
+		float GetCameraZoomSpeed() { return m_fCameraZoomSpeed; }
+
 #ifdef ENABLE_MULTI_FARM_BLOCK
 		void MultiFarmBlockIcon(BYTE bStatus);
 #endif
-		float GetCameraZoomSpeed() { return m_fCameraZoomSpeed; }
 
 		void SetFPS(int iFPS);
 		void SetServerTime(time_t tTime);
@@ -312,11 +317,10 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 
 		void SetCameraSetting(const SCameraSetting & c_rCameraSetting);
 		void GetCameraSetting(SCameraSetting * pCameraSetting);
-		void SaveCameraSetting(const char * c_szFileName);
-		bool LoadCameraSetting(const char * c_szFileName);
+		void SaveCameraSetting(const char *c_szFileName);
+		bool LoadCameraSetting(const char *c_szFileName);
 
 		void SetForceSightRange(int iRange);
-
 #ifdef ENABLE_BLINK_ALERT
 		void FlashApplication();
 #endif
@@ -440,11 +444,19 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 		CPythonAcce m_pyAcce;
 #endif
 
+#ifdef ENABLE_BIOLOG_SYSTEM
+		CPythonBiologManager m_pyBiolog;
+#endif
+
 #ifdef ENABLE_RENDER_TARGET
 		CRenderTargetManager m_kRenderTargetManager;
 #endif
 
-#ifdef ENABLE_WIKI_SYSTEM
+#ifdef ENABLE_EVENT_MANAGER
+		InGameEventManager m_pyInGameEventMgr;
+#endif
+
+#ifdef ENABLE_INGAME_WIKI_SYSTEM
 		CPythonWiki m_pyWiki;
 #endif
 
@@ -454,10 +466,6 @@ class CPythonApplication : public CMSApplication, public CInputKeyboard, public 
 
 #ifdef ENABLE_RIDING_EXTENDED
 		CPythonMountUpGrade m_pyMountUpGrade;
-#endif
-
-#ifdef ENABLE_DUNGEON_INFO
-		CPythonDungeonInfo 			m_pyDungeonInfo;
 #endif
 
 		PyObject *					m_poMouseHandler;

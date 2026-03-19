@@ -1,10 +1,10 @@
-CXX	= clang++
+CXX	= clang++-devel
 BIN = ./libpoly.a
 
 GCC_VERSION = $(shell $(CC) --version 2>&1 | grep "(GCC)" | cut -d' ' -f3  | cut -d'.' -f1)
 
 CFLAGS  = -m32 -Wall -w -O2 -pipe -fno-exceptions -fno-rtti
-CFLAGS += -std=c++14
+CFLAGS += -std=c++2a
 
 LIBS =
 
@@ -21,14 +21,13 @@ $(BIN): $(OBJFILES)
 clean:
 	rm -f *.o
 	rm -f $(BIN)
-	rm -f Depend
 
 dep:
 	touch Depend
 	$(CXX) $(CFLAGS) -MM *.cc > Depend
 
-# Pattern rule for .cc to .o
-%.o: %.cc
-	$(CXX) $(CFLAGS) -c $< -o $@
+$(OBJFILES):
+	$(CXX) $(CFLAGS) -c $<
 
-sinclude Depend
+include Depend
+

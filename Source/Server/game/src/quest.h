@@ -40,10 +40,6 @@ namespace quest
 		QUEST_LOGIN_EVENT,
 		QUEST_LOGOUT_EVENT,
 		QUEST_BUTTON_EVENT,
-#ifdef ENABLE_COLLECT_WINDOW
-		QUEST_BUTTON_EVENT2,
-		QUEST_OPEN_WINDOW,
-#endif
 		QUEST_INFO_EVENT,
 		QUEST_CHAT_EVENT,
 		QUEST_ATTR_IN_EVENT,
@@ -60,13 +56,14 @@ namespace quest
 		QUEST_ITEM_PICK_EVENT,
 		QUEST_SIG_USE_EVENT,
 		QUEST_ITEM_INFORMER_EVENT,
-#ifdef ENABLE_MELEY_LAIR_DUNGEON
-		QUEST_ATTACK_EVENT,
+#ifdef ENABLE_EVENT_MANAGER
+		QUEST_GAME_EVENT_BEGIN,
+		QUEST_GAME_EVENT_END,
 #endif
 		QUEST_EVENT_COUNT
 	};
 
-	enum
+	enum 
 	{
 		SUSPEND_STATE_NONE,
 		SUSPEND_STATE_PAUSE,
@@ -95,10 +92,10 @@ namespace quest
 	{
 		//
 		// script syntax example
-		//
+		// 
 		// when namespace.func.arg with when_condition begin ...
 		//                     ---      --------------
-		//                      |             +
+		//                      |             + 
 		std::string arg;  // <--+             |
 		std::vector<char> when_condition;// <-+
 		AStateScriptType script;
@@ -123,6 +120,7 @@ namespace quest
 		std::string	_title;
 		std::string	_clock_name;
 		std::string	_counter_name;
+		std::string	quest_name;
 		int		_clock_value;
 		int		_counter_value;
 		std::string	_icon_file;

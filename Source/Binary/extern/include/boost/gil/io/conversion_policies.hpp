@@ -1,22 +1,31 @@
-//
-// Copyright 2007-2008 Christian Henning, Andreas Pokorny
-//
-// Distributed under the Boost Software License, Version 1.0
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
-//
+/*
+    Copyright 2007-2008 Andreas Pokorny, Christian Henning
+    Use, modification and distribution are subject to the Boost Software License,
+    Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+    http://www.boost.org/LICENSE_1_0.txt).
+*/
+
+/*************************************************************************************************/
+
 #ifndef BOOST_GIL_IO_CONVERSION_POLICIES_HPP
 #define BOOST_GIL_IO_CONVERSION_POLICIES_HPP
 
-#include <boost/gil/image_view_factory.hpp>
-#include <boost/gil/io/error.hpp>
+////////////////////////////////////////////////////////////////////////////////////////
+/// \file
+/// \brief
+/// \author Andreas Pokorny, Christian Henning \n
+///
+/// \date   2007-2008 \n
+///
+////////////////////////////////////////////////////////////////////////////////////////
 
 #include <algorithm>
 #include <iterator>
+#include <boost/gil/image_view_factory.hpp>
 
 namespace boost{namespace gil{ namespace detail {
 
-struct read_and_no_convert
+struct read_and_no_convert 
 {
 public:
     typedef void* color_converter_type;
@@ -29,7 +38,7 @@ public:
              , OutIterator       /* out   */
              , typename disable_if< typename pixels_are_compatible< typename std::iterator_traits<InIterator>::value_type
                                                                   , typename std::iterator_traits<OutIterator>::value_type
-                                                                  >::type
+                                                                  >::type 
                                   >::type* /* ptr */ = 0
              )
     {
@@ -44,7 +53,7 @@ public:
              , OutIterator       out
              , typename enable_if< typename pixels_are_compatible< typename std::iterator_traits<InIterator>::value_type
                                                                  , typename std::iterator_traits<OutIterator>::value_type
-                                                                 >::type
+                                                                 >::type 
                                  >::type* /* ptr */ = 0
              )
     {

@@ -4,6 +4,8 @@
 #define ACMD(name)  void (name)(LPCHARACTER ch, const char *argument, int cmd, int subcmd)
 #define CMD_NAME(name) cmd_info[cmd].command
 
+#include "../../common/service.h"
+
 struct command_info
 {
 	const char * command;
@@ -48,9 +50,6 @@ enum SCMD_XMAS
 	SCMD_XMAS_BOOM,
 	SCMD_XMAS_SNOW,
 	SCMD_XMAS_SANTA,
-#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
-	SCMD_XMAS_SOUL,
-#endif
 };
 
 extern void Shutdown(int iSec);
@@ -69,13 +68,17 @@ extern void SendLocaleNotice(BYTE type, BYTE empire, long mapidx, DWORD id, cons
 extern void BroadcastLocaleNotice(BYTE type, BYTE empire, long mapidx, DWORD id, const char* format, ...);
 #endif
 
-// LUA_ADD_BGM_INFO
+#ifdef ENABLE_EVENT_MANAGER
+extern void SendEventBeginNotification();
+extern void SendEventEndNotification();
+
+extern void BroadcastEventReload();
+extern void ReloadEvent();
+#endif
+
 void CHARACTER_SetBGMVolumeEnable();
 void CHARACTER_AddBGMInfo(unsigned mapIndex, const char* name, float vol);
-// END_OF_LUA_ADD_BGM_INFO
 
-// LUA_ADD_GOTO_INFO
 extern void CHARACTER_AddGotoInfo(const std::string& c_st_name, BYTE empire, int mapIndex, DWORD x, DWORD y);
-// END_OF_LUA_ADD_GOTO_INFO
 
 #endif

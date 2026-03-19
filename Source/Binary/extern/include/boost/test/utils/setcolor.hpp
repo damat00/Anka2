@@ -77,11 +77,9 @@ struct term_color { enum _ {
 class setcolor {
 public:
     // Constructor
-    explicit    setcolor( bool is_color_output = false,
-                          term_attr::_  attr = term_attr::NORMAL,
+    explicit    setcolor( term_attr::_  attr = term_attr::NORMAL,
                           term_color::_ fg   = term_color::ORIGINAL,
                           term_color::_ bg   = term_color::ORIGINAL )
-    : m_is_color_output(is_color_output)
     {
         m_command_size = std::sprintf( m_control_command, "%c[%d;%d;%dm", 0x1B, attr, fg + 30, bg + 40 );
     }
@@ -89,7 +87,7 @@ public:
     friend std::ostream&
     operator<<( std::ostream& os, setcolor const& sc )
     {
-       if (sc.m_is_color_output && (&os == &std::cout || &os == &std::cerr)) {
+       if (&os == &std::cout || &os == &std::cerr) {
           return os.write( sc.m_control_command, sc.m_command_size );
        }
        return os;
@@ -97,7 +95,6 @@ public:
 
 private:
     // Data members
-    bool        m_is_color_output;
     char        m_control_command[13];
     int         m_command_size;
 };
@@ -108,9 +105,6 @@ class setcolor {
 
 protected:
   void set_console_color(std::ostream& os, WORD *attributes = NULL) const {
-    if (!m_is_color_output) {
-      return;
-    }
     DWORD console_type;
     if (&os == &std::cout) {
       console_type = STD_OUTPUT_HANDLE;
@@ -133,7 +127,9 @@ protected:
 
     CONSOLE_SCREEN_BUFFER_INFO consoleInfo;
     GetConsoleScreenBufferInfo(hConsole, &consoleInfo);
-    saved_attributes = consoleInfo.wAttributes;
+    //if(!has_written_console_ext) {
+        saved_attributes = consoleInfo.wAttributes;
+    //}
 
     WORD fg_attr = 0;
     switch(m_fg)
@@ -205,19 +201,20 @@ protected:
       break;
     }
 
-    SetConsoleTextAttribute(hConsole, fg_attr | bg_attr | text_attr);
+    SetConsoleTextAttribute(hConsole, fg_attr | bg_attr | text_attr); 
+
+    //has_written_console_ext = true;
     return;
   }
 
 public:
   // Constructor
   explicit    setcolor( 
-    bool is_color_output = false,
     term_attr::_  attr = term_attr::NORMAL,
     term_color::_ fg   = term_color::ORIGINAL,
     term_color::_ bg   = term_color::ORIGINAL ) 
-  : m_is_color_output(is_color_output)
-  , m_attr(attr)
+  : /*has_written_console_ext(false)
+  , */m_attr(attr)
   , m_fg(fg)
   , m_bg(bg)
   {}
@@ -230,7 +227,6 @@ public:
   }
 
 private:
-  bool m_is_color_output;
   term_attr::_ m_attr;
   term_color::_ m_fg;
   term_color::_ m_bg;
@@ -238,6 +234,7 @@ private:
 protected:
   // Data members
   mutable WORD saved_attributes;
+  //mutable bool has_written_console_ext;
 };
 
 #endif
@@ -249,27 +246,24 @@ protected:
 
 struct scope_setcolor {
     scope_setcolor() : m_os( 0 ) {}
-    explicit    scope_setcolor( bool is_color_output,
-                                std::ostream& os,
+    explicit    scope_setcolor( std::ostream& os,
                                 term_attr::_  attr = term_attr::NORMAL,
                                 term_color::_ fg   = term_color::ORIGINAL,
                                 term_color::_ bg   = term_color::ORIGINAL )
     : m_os( &os )
-    , m_is_color_output( is_color_output )
     {
-        os << setcolor( is_color_output, attr, fg, bg );
+        os << setcolor( attr, fg, bg );
     }
     ~scope_setcolor()
     {
         if( m_os )
-            *m_os << setcolor( m_is_color_output );
+            *m_os << setcolor();
     }
 private:
     scope_setcolor(const scope_setcolor& r);
     scope_setcolor& operator=(const scope_setcolor& r);
     // Data members
     std::ostream* m_os;
-    bool m_is_color_output;
 };
 
 #else
@@ -277,13 +271,13 @@ private:
 struct scope_setcolor : setcolor {
   scope_setcolor() : m_os( 0 ) {}
   explicit    scope_setcolor( 
-    bool is_color_output,
     std::ostream& os,
     term_attr::_  attr = term_attr::NORMAL,
     term_color::_ fg   = term_color::ORIGINAL,
     term_color::_ bg   = term_color::ORIGINAL )
-  : setcolor(is_color_output, attr, fg, bg)
-  , m_os( &os )
+    : 
+    setcolor(attr, fg, bg), 
+    m_os( &os )
   {
     os << *this;
   }
@@ -304,9 +298,12 @@ private:
 
 #endif
 
-#define BOOST_TEST_SCOPE_SETCOLOR( is_color_output, os, attr, color )               \
-    utils::scope_setcolor const sc(is_color_output, os, utils::attr, utils::color); \
-    ut_detail::ignore_unused_variable_warning( sc )                                 \
+#define BOOST_TEST_SCOPE_SETCOLOR( is_color_output, os, attr, color )       \
+    utils::scope_setcolor const sc(                                         \
+              os,                                                           \
+              is_color_output ? utils::attr : utils::term_attr::NORMAL,     \
+              is_color_output ? utils::color : utils::term_color::ORIGINAL);\
+    ut_detail::ignore_unused_variable_warning( sc )                         \
 /**/
 
 } // namespace utils

@@ -400,14 +400,14 @@ struct XmlProcessor
 
 int main(int argc, char** argv)
 {
-	std::cout << "FoxFS | Custom Anka2 Project Server Client Files" << std::endl;
+	std::cout << "--- © 2025 | BestStudio Production | Anka2 Project ---" << std::endl;
 	if (argc > 5)
 	{
-		std::cout << "Bekleyin..." << std::endl << std::endl;
+		std::cout << "Wait..." << std::endl << std::endl;
 	}
 	else
 	{
-		std::cout << "© 2026 BestStudio. All Rights Reserved." << std::endl << std::endl;
+		std::cout << "Optimized & Deployed for TURKMMO Network" << std::endl << std::endl;
 	}
 
 	try

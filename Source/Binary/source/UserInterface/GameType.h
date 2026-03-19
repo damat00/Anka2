@@ -49,26 +49,22 @@ const DWORD c_Special_Inventory_Page_Count = 3;
 const DWORD c_Special_ItemSlot_Count = c_Special_Inventory_Page_Size * c_Special_Inventory_Page_Count;
 #endif
 
-#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
-const int ROULETTE_ITEM_MAX = 20;
-#endif
-
 const DWORD c_ItemSlot_Count = c_Inventory_Page_Size * c_Inventory_Page_Count;
 const DWORD c_Equipment_Count = 12;
 
 const DWORD c_Equipment_Start = c_ItemSlot_Count;
 
-const DWORD c_Equipment_Body 	= c_Equipment_Start + CItemData::WEAR_BODY;
-const DWORD c_Equipment_Head 	= c_Equipment_Start + CItemData::WEAR_HEAD;
-const DWORD c_Equipment_Shoes 	= c_Equipment_Start + CItemData::WEAR_FOOTS;
-const DWORD c_Equipment_Wrist 	= c_Equipment_Start + CItemData::WEAR_WRIST;
-const DWORD c_Equipment_Weapon 	= c_Equipment_Start + CItemData::WEAR_WEAPON;
-const DWORD c_Equipment_Neck 	= c_Equipment_Start + CItemData::WEAR_NECK;
-const DWORD c_Equipment_Ear 	= c_Equipment_Start + CItemData::WEAR_EAR;
+const DWORD c_Equipment_Body = c_Equipment_Start + CItemData::WEAR_BODY;
+const DWORD c_Equipment_Head = c_Equipment_Start + CItemData::WEAR_HEAD;
+const DWORD c_Equipment_Shoes = c_Equipment_Start + CItemData::WEAR_FOOTS;
+const DWORD c_Equipment_Wrist = c_Equipment_Start + CItemData::WEAR_WRIST;
+const DWORD c_Equipment_Weapon = c_Equipment_Start + CItemData::WEAR_WEAPON;
+const DWORD c_Equipment_Neck = c_Equipment_Start + CItemData::WEAR_NECK;
+const DWORD c_Equipment_Ear = c_Equipment_Start + CItemData::WEAR_EAR;
 const DWORD c_Equipment_Unique1 = c_Equipment_Start + CItemData::WEAR_UNIQUE1;
 const DWORD c_Equipment_Unique2 = c_Equipment_Start + CItemData::WEAR_UNIQUE2;
-const DWORD c_Equipment_Arrow 	= c_Equipment_Start + CItemData::WEAR_ARROW;
-const DWORD c_Equipment_Shield 	= c_Equipment_Start + CItemData::WEAR_SHIELD;
+const DWORD c_Equipment_Arrow = c_Equipment_Start + CItemData::WEAR_ARROW;
+const DWORD c_Equipment_Shield = c_Equipment_Start + CItemData::WEAR_SHIELD;
 
 #ifdef ENABLE_NEW_EQUIPMENT_SYSTEM
 	const DWORD c_New_Equipment_Start = c_Equipment_Start + CItemData::WEAR_RING1;
@@ -83,38 +79,16 @@ const DWORD c_Equipment_Shield 	= c_Equipment_Start + CItemData::WEAR_SHIELD;
 #ifdef ENABLE_PET_SYSTEM
 	const DWORD c_Equipment_Pet = c_Equipment_Start + CItemData::WEAR_PET;
 #endif
+#ifdef ENABLE_TITLE_SYSTEM
+	const DWORD c_Equipment_Title = c_Equipment_Start + CItemData::WEAR_TITLE;
+#endif
 #ifdef ENABLE_PENDANT_SYSTEM
 	const DWORD c_Equipment_Pendant = c_Equipment_Start + CItemData::WEAR_PENDANT;
-#endif
-#ifdef ENABLE_PASSIVE_SYSTEM
-	const DWORD c_Equipment_Passive = c_Equipment_Start + CItemData::WEAR_PASSIVE;
 #endif
 #endif
 
 #ifdef ENABLE_RIDING_EXTENDED
 const int HORSE_MAX_LEVEL = 40;
-#endif
-
-#ifdef ENABLE_SKILL_COLOR_SYSTEM
-enum ESkillColorLength
-{
-#ifdef ENABLE_NINETH_SKILL
-	MAX_SKILL_COUNT = 9,
-	MAX_NORMAL_SKILL_COUNT = 6,
-#else
-	MAX_SKILL_COUNT = 6,
-#endif
-	MAX_EFFECT_COUNT = 5,
-#if defined(ENABLE_WOLFMAN_CHARACTER) && defined(ENABLE_NINETH_SKILL)
-	MAX_BUFF_COUNT = 7,
-#elif defined(ENABLE_WOLFMAN_CHARACTER) && !defined(ENABLE_NINETH_SKILL)
-	MAX_BUFF_COUNT = 6,
-#else
-	MAX_BUFF_COUNT = 5,
-#endif
-	BUFF_BEGIN = MAX_SKILL_COUNT,
-	MAX_COLOR_SLOTS = MAX_SKILL_COUNT + MAX_BUFF_COUNT,
-};
 #endif
 
 enum EDragonSoulDeckType
@@ -235,6 +209,24 @@ const DWORD c_DragonSoul_Inventory_Box_Size = 32;
 const DWORD c_DragonSoul_Inventory_Count = CItemData::DS_SLOT_NUM_TYPES * DRAGON_SOUL_GRADE_MAX * c_DragonSoul_Inventory_Box_Size;
 const DWORD c_DragonSoul_Inventory_End = c_DragonSoul_Inventory_Start + c_DragonSoul_Inventory_Count;
 
+#ifdef ENABLE_BIOLOG_SYSTEM
+enum EBiologBonuses
+{
+	MAX_BONUSES_LENGTH = 3,
+};
+#endif
+
+#ifdef ENABLE_SKILL_COLOR_SYSTEM
+enum ESkillColorLength
+{
+	MAX_SKILL_COUNT = 6,
+	MAX_EFFECT_COUNT = 5,
+	BUFF_BEGIN = MAX_SKILL_COUNT,
+	MAX_BUFF_COUNT = 6,
+	MAX_COLOR_SLOTS = MAX_SKILL_COUNT + MAX_BUFF_COUNT,
+};
+#endif
+
 #ifdef ENABLE_SLOT_MARKING_SYSTEM
 enum ETopWindowTypes
 {
@@ -287,9 +279,6 @@ enum ESlotType
 #endif
 #ifdef ENABLE_CHANGE_LOOK_SYSTEM
 	SLOT_TYPE_CHANGE_LOOK,
-#endif
-#ifdef ENABLE_FISH_EVENT_SYSTEM
-	SLOT_TYPE_FISH_EVENT,
 #endif
 	SLOT_TYPE_MAX,
 };
@@ -364,21 +353,6 @@ enum EWindows
 
 	WINDOW_TYPE_MAX,
 };
-
-#ifdef ENABLE_FISH_EVENT_SYSTEM
-enum EFishEventInfo
-{
-	FISH_EVENT_SHAPE_NONE,
-	FISH_EVENT_SHAPE_1,
-	FISH_EVENT_SHAPE_2,
-	FISH_EVENT_SHAPE_3,
-	FISH_EVENT_SHAPE_4,
-	FISH_EVENT_SHAPE_5,
-	FISH_EVENT_SHAPE_6,
-	FISH_EVENT_SHAPE_7,
-	FISH_EVENT_SHAPE_MAX_NUM,
-};
-#endif
 
 enum EDSInventoryMaxNum
 {
@@ -614,12 +588,8 @@ const float c_fBattleCommand_Script_Version = 1.0f;
 const float c_fEmotionCommand_Script_Version = 1.0f;
 const float c_fActive_Script_Version = 1.0f;
 const float c_fPassive_Script_Version = 1.0f;
-
-// Used by PushMove
-#ifdef ENABLE_FISH_EVENT_SYSTEM
 const float c_fWalkDistance = 175.0f;
 const float c_fRunDistance = 310.0f;
-#endif
 
 #define FILE_MAX_LEN 128
 
@@ -707,6 +677,33 @@ typedef struct packet_shop_item
 #endif
 } TShopItemData;
 
+#ifdef ENABLE_RENEWAL_BATTLE_PASS
+typedef struct SExtBattlePassRewardItem
+{
+	DWORD dwVnum;
+#ifdef ENABLE_STACK_LIMIT
+	WORD bCount;
+#else
+	BYTE bCount;
+#endif
+} TExtBattlePassRewardItem;
+
+typedef struct SExtBattlePassMissionInfo
+{
+	BYTE bMissionIndex;
+	BYTE bMissionType;
+	DWORD dwMissionInfo[3];
+	TExtBattlePassRewardItem aRewardList[3];
+} TExtBattlePassMissionInfo;
+
+typedef struct SExtBattlePassRanking
+{
+	BYTE bPos;
+	char playerName[24 + 1];
+	DWORD dwFinishTime;
+} TExtBattlePassRanking;
+#endif
+
 #ifdef ENABLE_CHANGE_LOOK_SYSTEM
 enum class ETRANSMUTATIONTYPE : BYTE
 {
@@ -734,7 +731,7 @@ enum class ETRANSMUTATIONSETTINGS : DWORD
 
 #pragma pack(pop)
 
-inline float GetSqrtDistance(int ix1, int iy1, int ix2, int iy2) // By sqrt
+inline float GetSqrtDistance(int ix1, int iy1, int ix2, int iy2)
 {
 	float dx, dy;
 
@@ -744,19 +741,18 @@ inline float GetSqrtDistance(int ix1, int iy1, int ix2, int iy2) // By sqrt
 	return sqrtf(dx*dx + dy*dy);
 }
 
-// DEFAULT_FONT
 void DefaultFont_Startup();
 void DefaultFont_Cleanup();
 void DefaultFont_SetName(const char *c_szFontName);
 CResource *DefaultFont_GetResource();
-#ifdef ENABLE_FISH_EVENT_SYSTEM
 CResource *DefaultItalicFont_GetResource();
-#endif
-// END_OF_DEFAULT_FONT
 
 void SetGuildSymbolPath(const char *c_szPathName);
 const char *GetGuildSymbolFileName(DWORD dwGuildID);
 BYTE SlotTypeToInvenType(BYTE bSlotType);
 #ifdef ENABLE_AURA_COSTUME_SYSTEM
 int *GetAuraRefineInfo(BYTE bLevel);
+#endif
+#ifdef ENABLE_RENEWAL_BONUS_BOARD
+BYTE ApplyTypeToPointType(BYTE bApplyType);
 #endif

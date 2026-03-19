@@ -1,14 +1,14 @@
 #include "StdAfx.h"
 
-#ifdef ENABLE_WIKI_SYSTEM
+#ifdef ENABLE_INGAME_WIKI_SYSTEM
 #include <map>
+
+#include "../GameLib/ItemManager.h"
+#include "../eterPack/EterPackManager.h"
 
 #include "PythonWiki.h"
 #include "PythonNetworkStream.h"
 #include "PythonPlayer.h"
-#include "../GameLib/ItemManager.h"
-#include <map>
-#include "../eterPack/EterPackManager.h"
 
 bool printLocalDatainSysser = false;
 
@@ -32,95 +32,29 @@ constexpr DWORD bossChests[][2] =
 	{50071,791},
 	{50073,2091},
 	{50076,2191},
-	{50079,2206},
 	{50078,1304},
 	{50077,1901},
+	{50079,2206},
 };
 
 constexpr DWORD dungeonChests[][2] =
 {
 	{50082,1093},
-	{31310,1093},
-	{31280,1093},
-	{80030,2092},
-	{31311,2092},
-	{31281,2092},
-	{51112,2092},
-	{31312,2092},
-	{31282,2092},
 	{50186,2598},
-	{31313,2598},
-	{31283,2598},
-	{51110,6091},
-	{31314,6091},
-	{31284,6091},
-	{51111,6191},
-	{31315,6191},
-	{31285,6191},
-	{50266,6192},
-	{31316,6192},
-	{31286,6192},
-	{54705,6812},
-	{31317,6812},
-	{31287,6812},
-	{33028,9838},
-	{31318,9838},
-	{31288,9838},
-	{51116,6231},
-	{31319,6231},
-	{31289,6231},
-	{41959,6500},
-	{31320,6500},
-	{31290,6500},
-	{31275,6605},
-	{31321,6605},
-	{31291,6605},
-	{31276,6606},
-	{31322,6606},
-	{31292,6606},
-	{70429,6756},
-	{31323,6756},
-	{31293,6756},
-	{70411,6791},
-	{31324,6791},
-	{31294,6791},
-	{70412,6790},
-	{31325,6790},
-	{31295,6790},
-	// {51117,6231},
 };
 
-constexpr DWORD otherChests[][2] = {
-	{41946,0},
-	{41947,0},
-	{41954,0},
-	{50033,0},
-	{54710,0},
-	{54708,0},
-	{25111,0},
-	{25112,0},
-	{25113,0},
-	{77904,0},
-	{77912,0},
-	{77900,0},
-	{77901,0},
-	{77902,0},
-	{77903,0},
-	{55009,0},
+constexpr DWORD otherChests[][2] =
+{
+	{27999,0},
 };
 
-constexpr DWORD eventChests[][2] = {
-	{77924,0},
-	{31412,0},
-	{31413,0},
-	{31414,0},
+constexpr DWORD eventChests[][2] =
+{
 	{50011,0},
-	{77916,0},
-	{50275,0},
-	{50276,0},
-	{50277,0},
-	{50213,0},
-	{50215,0},
+	{50037,0},
+	{71196,0},
+	{71195,0},
+	{71194,0},
 };
 
 constexpr DWORD eventBoss[] =
@@ -429,10 +363,6 @@ bool CPythonWiki::LoadItemTable(const char *c_szFileName)
 
 bool CPythonWiki::BlackList(DWORD vnum, DWORD type, DWORD subtype)
 {
-	// Talisman blacklist.
-	//if (type == CItemData::ITEM_TYPE_ARMOR && subtype == CItemData::ARMOR_PENDANT)
-	//	return false;
-
 	switch (vnum)
 	{
 		// warrior & weapon blacklist. begin
@@ -440,113 +370,24 @@ bool CPythonWiki::BlackList(DWORD vnum, DWORD type, DWORD subtype)
 		case 239:
 		case 269:
 		case 3189:
-		case 529:
-		case 579:
-		case 569:
-		case 359:
-		case 3249:
-		case 1909:
-		case 1949:
-		case 709:
-		case 749:
-		case 809:
-		case 849:
-		case 909:
-		case 949:
 		case 3209:
-		case 3200:
 		case 3179:
-		case 18109:
-		case 18039:
-		case 18119:
-		// warrior & Armour blacklist. begin
-		// warrior & Helmets blacklist. begi
 		// Ninja & weapon blacklist. begin
-		case 1209:
 		case 1149:
-		case 539:
-		case 519:
-		case 2229:
-		case 1929:
-		case 1939:
-		case 729:
-		case 739:
-		case 829:
-		case 929:
-		case 939:
-		case 1920:
-		case 1930:
-		case 930:
-		case 920:
-		case 720:
-		case 730:
-		case 530:
-		case 4039:
 		case 1159:
-		case 839:
-		// Ninja & Armour blacklist. begin
-		// Ninja & Helmets blacklist. begi
+		case 4039:
 		// Shaman & weapon blacklist. begin
-		case 5189:
-		case 509:
-		case 5159:
-		case 7329:
-		case 1959:
-		case 759:
-		case 859:
-		case 869:
-		case 959:
-		case 1950:
-		case 950:
-		case 750:
-		case 7189:
 		case 5139:
 		case 5149:
+		case 5159:
+		case 7189:
 		case 7179:
-		case 1969:
-		// Shaman & Armour blacklist. begin
-		case 12009:
-		// Ninja & Helmets blacklist. begi
 		// Sura & weapon blacklist. begin
-		case 559:
 		case 219:
-		case 1919:
-		case 719:
-		case 819:
-		case 919:
-		case 190:
-		case 710:
-		case 209:
-		case 910:
-		// Sura & Armour blacklist. begin
-		// Sura & Helmets blacklist. begin
 		// Shields blacklist. begin
+		case 13169:
 		case 13189:
-		case 17579:
-		case 17589:
-		case 17609:
-		case 14589:
-		case 14599:
-		case 14619:
-		case 16589:
-		case 16599:
-		case 16619:
-		case 13309:
-		case 13239:
-		case 13249:
-		// pendientes blacklist begin
-		case 17309:
-		// brazaletes blacklist begin
-		case 14309:
-		//collares blacklist begin
-		case 16309:
-		// Belts blacklist. begin
-		case 18129:
-		case 18139:
-		case 18149:
-		case 18159:
 		// Shoes blacklist. begin
-		case 15469:
 		case 15249:
 			return false;
 	}
@@ -558,8 +399,6 @@ BYTE CPythonWiki::GetRefineLevel(DWORD vnum, DWORD type, DWORD subtype)
 {
 	if (type == CItemData::ITEM_TYPE_ARMOR && subtype == CItemData::ARMOR_PENDANT)
 		return 20;
-
-	// Ymir new weapon and armor set!
 
 	constexpr DWORD darkVnums[] = {
 		320,
@@ -583,10 +422,7 @@ BYTE CPythonWiki::GetRefineLevel(DWORD vnum, DWORD type, DWORD subtype)
 		21210,
 		21230,
 		21250,
-		21310,
 		21270,
-		3260,
-		1220,
 		21310,
 		21330,
 		21350,
@@ -700,24 +536,21 @@ void CPythonWiki::ListReverse()
 
 bool BlackListMonster(DWORD vnum)
 {
-	//metines
 	if (vnum >= 8001 && vnum <= 8014)
 		return false;
+
 	if (vnum >= 8024 && vnum <= 8027)
 		return false;
-	if (vnum >= 8051 && vnum <= 8056)
+
+	if (vnum >= 8051 && vnum <= 8058 || vnum == 8062)
 		return false;
-	if (vnum >= 8059 && vnum <= 8059)
+
+	if (vnum >= 8494 && vnum <= 8497)
 		return false;
-	if (vnum >= 8062 && vnum <= 8065)
-		return false;
-	// if (vnum >= 8469
-		// return false;
+
 	switch (vnum)
 	{
-		//monsters
 		case 191:
-		case 5163:
 		case 192:
 		case 193:
 		case 194:
@@ -769,24 +602,6 @@ bool BlackListMonster(DWORD vnum)
 		case 4388:
 		case 6091:
 		case 6191:
-		case 6192:
-		case 9018:
-		case 20442:
-		case 9838:
-		case 6500:
-		case 6706:
-		case 6717:
-		case 6724:
-		case 6731:
-		case 6764:
-		case 6881:
-		case 6775:
-		case 6887:
-		case 6790:
-		case 6791:
-		case 6605:
-		case 6606:
-		case 6756:
 
 		return false;
 	}
@@ -798,7 +613,7 @@ void CPythonWiki::LoadMonster(CPythonNonPlayer::TMobTable* monster)
 	if (BlackListMonster(monster->dwVnum))
 		return;
 
-	if (monster->bType == 0 || monster->bType == 2) // monster & stone
+	if (monster->bType == 0 || monster->bType == 2)
 	{
 		if (monster->bLevel >= 1 && monster->bLevel <= 99)
 		{
@@ -809,7 +624,7 @@ void CPythonWiki::LoadMonster(CPythonNonPlayer::TMobTable* monster)
 			else
 				m_vecMonsterCategory[0].emplace_back(character_data(monster->dwVnum, monster->bLevel));
 		}
-		else if (monster->bLevel >= 100 && monster->bLevel <= 150)
+		else if (monster->bLevel >= 100 && monster->bLevel <= 120)
 		{
 			if (monster->bType == 2)
 				m_vecStoneCategory[1].emplace_back(character_data(monster->dwVnum, monster->bLevel));
@@ -818,7 +633,7 @@ void CPythonWiki::LoadMonster(CPythonNonPlayer::TMobTable* monster)
 			else
 				m_vecMonsterCategory[1].emplace_back(character_data(monster->dwVnum, monster->bLevel));
 		}
-		else if (monster->bLevel >= 151)
+		else if (monster->bLevel >= 121)
 		{
 			if (monster->bType == 2)
 				m_vecStoneCategory[2].emplace_back(character_data(monster->dwVnum, monster->bLevel));
@@ -870,20 +685,6 @@ void CPythonWiki::LoadItem(CItemData::TItemTable* item)
 			return;
 
 		DWORD itemLevel = 0;
-
-/*#ifdef ENABLE_YOHARA_SYSTEM
-		for (DWORD j = 0; j < CItemData::ITEM_LIMIT_MAX_NUM; j++)
-		{
-			if (item->aLimits[j].bType == CItemData::LIMIT_CONQUEROR_LEVEL && item->aLimits[j].lValue > 0)
-			{
-				itemLevel = 120 + item->aLimits[j].lValue;
-				break;
-			}
-		}
-
-		if (itemLevel == 0)
-		{
-#endif*/
 		for (DWORD j = 0; j < CItemData::ITEM_LIMIT_MAX_NUM; j++)
 		{
 			if (item->aLimits[j].bType == CItemData::LIMIT_LEVEL)
@@ -892,9 +693,6 @@ void CPythonWiki::LoadItem(CItemData::TItemTable* item)
 				break;
 			}
 		}
-/*#ifdef ENABLE_YOHARA_SYSTEM
-		}
-#endif*/
 
 		if (item->bType == CItemData::ITEM_TYPE_WEAPON)
 		{
@@ -1346,9 +1144,6 @@ PyObject *wikiGetItemDropFromChest(PyObject *poSelf, PyObject *poArgs)
 					{
 						const auto obj = Py_BuildValue("i", chestVnum);
 						PyList_Append(poList, obj);
-#ifdef ENABLE_LEAK_FIX
-						fix_leak.push_back(obj);
-#endif
 						break;
 					}
 				}
@@ -1361,9 +1156,6 @@ PyObject *wikiGetItemDropFromChest(PyObject *poSelf, PyObject *poArgs)
 					{
 						const auto obj = Py_BuildValue("i", chestVnum);
 						PyList_Append(poList, obj);
-#ifdef ENABLE_LEAK_FIX
-						fix_leak.push_back(obj);
-#endif
 						break;
 					}
 
@@ -1372,9 +1164,6 @@ PyObject *wikiGetItemDropFromChest(PyObject *poSelf, PyObject *poArgs)
 
 		}
 	}
-#ifdef ENABLE_LEAK_FIX
-	fix_leak.push_back(poList);
-#endif
 	return Py_BuildValue("O", poList);
 }
 
@@ -1403,10 +1192,6 @@ PyObject *wikiGetItemDropFromMonster(PyObject *poSelf, PyObject *poArgs)
 					{
 						const auto obj = Py_BuildValue("i", mobVnum);
 						PyList_Append(poList, obj);
-#ifdef ENABLE_LEAK_FIX
-						fix_leak.push_back(obj);
-#endif
-
 						break;
 					}
 				}
@@ -1419,9 +1204,6 @@ PyObject *wikiGetItemDropFromMonster(PyObject *poSelf, PyObject *poArgs)
 					{
 						const auto obj = Py_BuildValue("i", mobVnum);
 						PyList_Append(poList, obj);
-#ifdef ENABLE_LEAK_FIX
-						fix_leak.push_back(obj);
-#endif
 						break;
 					}
 
@@ -1429,9 +1211,7 @@ PyObject *wikiGetItemDropFromMonster(PyObject *poSelf, PyObject *poArgs)
 			}
 		}
 	}
-#ifdef ENABLE_LEAK_FIX
-	fix_leak.push_back(poList);
-#endif
+
 	return Py_BuildValue("O", poList);
 }
 

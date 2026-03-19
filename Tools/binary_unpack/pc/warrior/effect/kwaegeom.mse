@@ -367,7 +367,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\pc\shaman\effect\white_sphere.dds"
+            "white_sphere.dds"
         }
     }
 }

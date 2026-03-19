@@ -8,7 +8,6 @@
 	#include "growth_pet.h"
 #endif
 
-
 enum EMonsterChatState
 {
 	MONSTER_CHAT_WAIT,
@@ -40,24 +39,24 @@ typedef struct SBattleTypeStat
 
 typedef struct SJobInitialPoints
 {
-	int		st, ht, dx, iq;
-	int		max_hp, max_sp;
-	int		hp_per_ht, sp_per_iq;
-	int		hp_per_lv_begin, hp_per_lv_end;
-	int		sp_per_lv_begin, sp_per_lv_end;
-	int		max_stamina;
-	int		stamina_per_con;
-	int		stamina_per_lv_begin, stamina_per_lv_end;
+	int st, ht, dx, iq;
+	int max_hp, max_sp;
+	int hp_per_ht, sp_per_iq;
+	int hp_per_lv_begin, hp_per_lv_end;
+	int sp_per_lv_begin, sp_per_lv_end;
+	int max_stamina;
+	int stamina_per_con;
+	int stamina_per_lv_begin, stamina_per_lv_end;
 } TJobInitialPoints;
 
 typedef struct __coord
 {
-	int		x, y;
+	int x, y;
 } Coord;
 
 typedef struct SApplyInfo
 {
-	BYTE	bPointType;                          // APPLY -> POINT
+	BYTE bPointType;
 } TApplyInfo;
 
 enum {
@@ -102,9 +101,6 @@ extern const TMobRankStat MobRankStats[MOB_RANK_MAX_NUM];
 extern TBattleTypeStat BattleTypeStats[BATTLE_TYPE_MAX_NUM];
 
 extern const DWORD party_exp_distribute_table[PLAYER_MAX_LEVEL_CONST + 1];
-#ifdef ENABLE_CONQUEROR_LEVEL
-extern const DWORD		exp_coqueror_table[PLAYER_MAX_CONQUEROR_LEVEL_CONST + 1];
-#endif
 
 extern const DWORD exp_table_common[PLAYER_EXP_TABLE_MAX + 1];
 
@@ -203,13 +199,10 @@ extern const TPetBonus arPetSPBonusTable[PET_MAX_BONUS_NUM];
 extern const TPetBonus arPetDefBonusTable[PET_MAX_BONUS_NUM];
 #endif
 
-#ifdef ENABLE_BIOLOGIST_SYSTEM
-extern const DWORD		BiyologSistemi[11][14];
-#endif
-
 #ifdef ENABLE_HUNTING_SYSTEM
 extern const DWORD THuntingMissions[HUNTING_MISSION_COUNT+1][2][2];
 extern const DWORD THuntingRewardItem[HUNTING_MISSION_COUNT+1][2][4][2];
+
 
 struct SHuntingRewardMoney
 {
@@ -224,7 +217,6 @@ struct SHuntingRewardEXP
 	DWORD dLevelTo;
 	DWORD dPerc[2];
 };
-
 extern const SHuntingRewardMoney THuntingRewardMoney[HUNTING_MONEY_TABLE_SIZE];
 extern const SHuntingRewardEXP THuntingRewardEXP[HUNTING_EXP_TABLE_SIZE];
 
@@ -247,7 +239,6 @@ typedef struct
 
 extern TGuildWarInfo KOR_aGuildWarInfo[GUILD_WAR_TYPE_MAX_NUM];
 
-// ACCESSORY_REFINE
 enum
 {
 	ITEM_ACCESSORY_SOCKET_MAX_NUM = 3
@@ -258,13 +249,5 @@ extern const int aiAccessorySocketEffectivePct[ITEM_ACCESSORY_SOCKET_MAX_NUM + 1
 extern const int aiAccessorySocketDegradeTime[ITEM_ACCESSORY_SOCKET_MAX_NUM + 1];
 extern const int aiAccessorySocketPutPct[ITEM_ACCESSORY_SOCKET_MAX_NUM + 1];
 long FN_get_apply_type(const char *apply_type_string);
-#ifdef ENABLE_RESP_SYSTEM
-extern std::set<uint32_t> g_setRespAllowedMap;
-#endif
 
-// END_OF_ACCESSORY_REFINE
-
-#ifdef __DUNGEON_INFO__
-extern const std::map<DWORD, std::pair<std::pair<BYTE, BYTE>, std::string>> m_mapDungeonList;
-#endif
 #endif

@@ -39,11 +39,7 @@ class CLight : public CGraphicBase, public CLightBase
 
 		void		Update();
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-		void		SetParameter(TLightID id, const D3DLIGHT9 & c_rLight);
-#else
 		void		SetParameter(TLightID id, const D3DLIGHT8 & c_rLight);
-#endif
 
 		void		SetDistance(float fDistance);
 		float		GetDistance() const { return m_fDistance;	}
@@ -67,11 +63,7 @@ class CLight : public CGraphicBase, public CLightBase
 	private:
 		TLightID		m_LightID;		// Light ID. equal to D3D light index
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-		D3DLIGHT9		m_d3dLight;
-#else
 		D3DLIGHT8		m_d3dLight;
-#endif
 		BOOL			m_isEdited;
 		float			m_fDistance;
 
@@ -108,11 +100,7 @@ class CLightManager : public CGraphicBase, public CLightBase, public CSingleton<
 		void		RestoreLight();
 
 		/////
-#ifdef ENABLE_DIRECTX9_UPDATE
-		void		RegisterLight(ELightType LightType, TLightID * poutLightID, D3DLIGHT9 & LightData);
-#else
 		void		RegisterLight(ELightType LightType, TLightID * poutLightID, D3DLIGHT8 & LightData);
-#endif
 		CLight *	GetLight(TLightID LightID);
 		void		DeleteLight(TLightID LightID);
 		/////

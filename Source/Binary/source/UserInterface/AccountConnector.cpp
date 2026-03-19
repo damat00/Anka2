@@ -178,14 +178,10 @@ bool CAccountConnector::__AuthState_RecvHandshake()
 	if (!Recv(sizeof(kPacketHandshake), &kPacketHandshake))
 		return false;
 
-	// HandShake
 	{
 		Tracenf("HANDSHAKE RECV %u %d", kPacketHandshake.dwTime, kPacketHandshake.lDelta);
 
-		ELTimer_SetServerMSec(kPacketHandshake.dwTime + kPacketHandshake.lDelta);
-
-		//DWORD dwBaseServerTime = kPacketHandshake.dwTime+ kPacketHandshake.lDelta;
-		//DWORD dwBaseClientTime = ELTimer_GetMSec();
+		ELTimer_SetServerMSec(kPacketHandshake.dwTime+ kPacketHandshake.lDelta);
 
 		kPacketHandshake.dwTime = kPacketHandshake.dwTime + kPacketHandshake.lDelta + kPacketHandshake.lDelta;
 		kPacketHandshake.lDelta = 0;
@@ -262,7 +258,7 @@ bool CAccountConnector::__AuthState_RecvAuthFailure()
 	return true;
 }
 
-bool CAccountConnector::__AnalyzePacket(UINT uHeader, UINT uPacketSize, bool (CAccountConnector::* pfnDispatchPacket)())
+bool CAccountConnector::__AnalyzePacket(UINT uHeader, UINT uPacketSize, bool (CAccountConnector::*pfnDispatchPacket)())
 {
 	BYTE bHeader;
 	if (!Peek(sizeof(bHeader), &bHeader))
@@ -304,12 +300,12 @@ void CAccountConnector::__OfflineState_Set()
 
 void CAccountConnector::__HandshakeState_Set()
 {
-	m_eState = STATE_HANDSHAKE;
+	m_eState=STATE_HANDSHAKE;
 }
 
 void CAccountConnector::__AuthState_Set()
 {
-	m_eState = STATE_AUTH;
+	m_eState=STATE_AUTH;
 }
 
 void CAccountConnector::OnConnectFailure()
@@ -355,7 +351,7 @@ void CAccountConnector::__BuildClientKey()
 
 void CAccountConnector::__Inialize()
 {
-	m_eState = STATE_OFFLINE;
+	m_eState=STATE_OFFLINE;
 	m_isWaitKey = FALSE;
 }
 

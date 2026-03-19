@@ -5,7 +5,7 @@
 void CPythonShop::SetTabCoinType(BYTE tabIdx, BYTE coinType)
 {
 	if (tabIdx >= m_bTabCount)
-	{
+	{	
 		TraceError("Out of Index. tabIdx(%d) must be less than %d.", tabIdx, SHOP_TAB_COUNT_MAX);
 		return;
 	}
@@ -25,7 +25,7 @@ BYTE CPythonShop::GetTabCoinType(BYTE tabIdx)
 void CPythonShop::SetTabName(BYTE tabIdx, const char *name)
 {
 	if (tabIdx >= m_bTabCount)
-	{
+	{	
 		TraceError("Out of Index. tabIdx(%d) must be less than %d.", tabIdx, SHOP_TAB_COUNT_MAX);
 		return;
 	}
@@ -47,7 +47,7 @@ void CPythonShop::SetItemData(DWORD dwIndex, const TShopItemData & c_rShopItemDa
 {
 	BYTE tabIdx = dwIndex / SHOP_HOST_ITEM_MAX_NUM;
 	DWORD dwSlotPos = dwIndex % SHOP_HOST_ITEM_MAX_NUM;
-
+	
 	SetItemData(tabIdx, dwSlotPos, c_rShopItemData);
 }
 

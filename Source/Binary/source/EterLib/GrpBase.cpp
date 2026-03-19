@@ -1,6 +1,8 @@
 #include "StdAfx.h"
+
 #include "../eterBase/Utils.h"
 #include "../eterBase/Timer.h"
+
 #include "GrpBase.h"
 #include "Camera.h"
 #include "StateManager.h"
@@ -27,22 +29,11 @@ D3D_CDisplayModeAutoDetector				CGraphicBase::ms_kD3DDetector;
 HWND CGraphicBase::ms_hWnd;
 HDC CGraphicBase::ms_hDC;
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-LPDIRECT3D9 CGraphicBase::ms_lpd3d = nullptr;
-LPDIRECT3DDEVICE9 CGraphicBase::ms_lpd3dDevice = nullptr;
-#else
-LPDIRECT3D8 CGraphicBase::ms_lpd3d = nullptr;
-LPDIRECT3DDEVICE8 CGraphicBase::ms_lpd3dDevice = nullptr;
-#endif
-
+LPDIRECT3D8				CGraphicBase::ms_lpd3d = nullptr;
+LPDIRECT3DDEVICE8		CGraphicBase::ms_lpd3dDevice = nullptr;
 ID3DXMatrixStack *		CGraphicBase::ms_lpd3dMatStack = nullptr;
 D3DPRESENT_PARAMETERS	CGraphicBase::ms_d3dPresentParameter;
-
-#ifdef ENABLE_DIRECTX9_UPDATE
-D3DVIEWPORT9 CGraphicBase::ms_Viewport;
-#else
-D3DVIEWPORT8 CGraphicBase::ms_Viewport;
-#endif
+D3DVIEWPORT8			CGraphicBase::ms_Viewport;
 
 HRESULT					CGraphicBase::ms_hLastResult = NULL;
 
@@ -51,23 +42,13 @@ int						CGraphicBase::ms_iHeight;
 
 DWORD					CGraphicBase::ms_faceCount = 0;
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-D3DCAPS9				CGraphicBase::ms_d3dCaps;
-#else
 D3DCAPS8				CGraphicBase::ms_d3dCaps;
-#endif
 
 DWORD					CGraphicBase::ms_dwD3DBehavior = 0;
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-LPDIRECT3DVERTEXDECLARATION9 CGraphicBase::ms_ptVS = 0;
-LPDIRECT3DVERTEXDECLARATION9 CGraphicBase::ms_pntVS = 0;
-LPDIRECT3DVERTEXDECLARATION9 CGraphicBase::ms_pnt2VS = 0;
-#else
 DWORD					CGraphicBase::ms_ptVS = 0;
 DWORD					CGraphicBase::ms_pntVS = 0;
 DWORD					CGraphicBase::ms_pnt2VS = 0;
-#endif
 
 D3DXMATRIX				CGraphicBase::ms_matIdentity;
 
@@ -106,24 +87,13 @@ LPD3DXMESH				CGraphicBase::ms_lpCylinderMesh = nullptr;
 LPD3DXMESH				CGraphicBase::ms_lpBoxMesh = nullptr;
 
 #ifdef ENABLE_FIX_MOBS_LAG
-#ifdef ENABLE_DIRECTX9_UPDATE
-IDirect3DVertexBuffer9* CGraphicBase::m_smallPdtVertexBuffer;
-IDirect3DVertexBuffer9* CGraphicBase::m_largePdtVertexBuffer;
-LPDIRECT3DINDEXBUFFER9 CGraphicBase::ms_alpd3dDefIB[DEFAULT_IB_NUM];
-#else
 IDirect3DVertexBuffer8* CGraphicBase::m_smallPdtVertexBuffer;
-IDirect3DVertexBuffer8* CGraphicBase::m_largePdtVertexBuffer;
-LPDIRECT3DINDEXBUFFER8 CGraphicBase::ms_alpd3dDefIB[DEFAULT_IB_NUM];
-#endif
+IDirect3DVertexBuffer8 * CGraphicBase::m_largePdtVertexBuffer;
 #else
-#ifdef ENABLE_DIRECTX9_UPDATE
-LPDIRECT3DVERTEXBUFFER9 CGraphicBase::ms_alpd3dPDTVB[PDT_VERTEXBUFFER_NUM];
-LPDIRECT3DINDEXBUFFER9 CGraphicBase::ms_alpd3dDefIB[DEFAULT_IB_NUM];
-#else
-LPDIRECT3DVERTEXBUFFER8 CGraphicBase::ms_alpd3dPDTVB[PDT_VERTEXBUFFER_NUM];
-LPDIRECT3DINDEXBUFFER8 CGraphicBase::ms_alpd3dDefIB[DEFAULT_IB_NUM];
+LPDIRECT3DVERTEXBUFFER8	CGraphicBase::ms_alpd3dPDTVB[PDT_VERTEXBUFFER_NUM];
 #endif
-#endif
+
+LPDIRECT3DINDEXBUFFER8	CGraphicBase::ms_alpd3dDefIB[DEFAULT_IB_NUM];
 
 bool CGraphicBase::IsLowTextureMemory()
 {
@@ -181,114 +151,65 @@ bool CGraphicBase::SetPDTStream(SPDTVertexRaw* pSrcVertices, UINT uVtxCount)
 		return false;
 	}
 
-#ifdef ENABLE_FIX_MOBS_LAG
 	assert(uVtxCount <= LARGE_PDT_VERTEX_BUFFER_SIZE);
 
+	IDirect3DVertexBuffer8* plpd3dFillRectVB = nullptr;
+
+	if (uVtxCount <= SMALL_PDT_VERTEX_BUFFER_SIZE)
+		plpd3dFillRectVB = GetSmallPdtVertexBuffer();
+	else
+		plpd3dFillRectVB = GetLargePdtVertexBuffer();
+
+	if (!plpd3dFillRectVB)
+		return false;
+
+	TPDTVertex* pDstVertices;
+	if (FAILED(plpd3dFillRectVB->Lock(0, sizeof(TPDTVertex) * uVtxCount, (BYTE**)&pDstVertices, D3DLOCK_DISCARD)))
+	{
+		STATEMANAGER.SetStreamSource(0, nullptr, 0);
+		return false;
+	}
+
+	memcpy(pDstVertices, pSrcVertices, sizeof(TPDTVertex) * uVtxCount);
+	plpd3dFillRectVB->Unlock();
+	STATEMANAGER.SetStreamSource(0, plpd3dFillRectVB, sizeof(TPDTVertex));
+	return true;
+}
+#else
+bool CGraphicBase::SetPDTStream(SPDTVertexRaw* pSrcVertices, UINT uVtxCount)
+{
 	if (!uVtxCount)
 		return false;
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-	IDirect3DVertexBuffer9* vb = nullptr;
-#else
-	IDirect3DVertexBuffer8* vb = nullptr;
-#endif
+	static DWORD s_dwVBPos=0;
 
-	if (uVtxCount <= SMALL_PDT_VERTEX_BUFFER_SIZE)
-		vb = GetSmallPdtVertexBuffer();
-	else
-		vb = GetLargePdtVertexBuffer();
+	if (s_dwVBPos>=PDT_VERTEXBUFFER_NUM)
+		s_dwVBPos=0;
 
-	if (!vb)
-	{
-		STATEMANAGER.SetStreamSource(0, nullptr, 0);
-		return false;
-	}
-
-	const auto bytes = sizeof(TPDTVertex) * uVtxCount;
-	
-	TPDTVertex* dst;
-#ifdef ENABLE_DIRECTX9_UPDATE
-	if (FAILED(vb->Lock(0, bytes, (void**)&dst, D3DLOCK_DISCARD))) 
-#else
-	if (FAILED(vb->Lock(0, bytes, (BYTE**)&dst, D3DLOCK_DISCARD)))
-#endif
-	{
-		STATEMANAGER.SetStreamSource(0, nullptr, 0);
-		return false;
-	}
-
-	std::memcpy(dst, pSrcVertices, bytes);
-	vb->Unlock();
-	STATEMANAGER.SetStreamSource(0, vb, sizeof(TPDTVertex));
-
-	return true;
-#else
-	static DWORD s_dwVBPos = 0;
-
-	if (s_dwVBPos >= PDT_VERTEXBUFFER_NUM)
-	{
-		s_dwVBPos = 0;
-	}
-
-#ifdef ENABLE_DIRECTX9_UPDATE
-    IDirect3DVertexBuffer9* plpd3dFillRectVB = ms_alpd3dPDTVB[s_dwVBPos];
-#else
-    IDirect3DVertexBuffer8* plpd3dFillRectVB = ms_alpd3dPDTVB[s_dwVBPos];
-#endif
-
+	IDirect3DVertexBuffer8* plpd3dFillRectVB=ms_alpd3dPDTVB[s_dwVBPos];
 	++s_dwVBPos;
-	assert(PDT_VERTEX_NUM >= uVtxCount);
 
+	assert(PDT_VERTEX_NUM>=uVtxCount);
 	if (uVtxCount >= PDT_VERTEX_NUM)
-	{
 		return false;
-	}
 
 	TPDTVertex* pDstVertices;
-
-#ifdef ENABLE_DIRECTX9_UPDATE
-    if (FAILED(plpd3dFillRectVB->Lock(0
-                                        , sizeof(TPDTVertex) * uVtxCount
-                                        , (void**)&pDstVertices
-                                        , D3DLOCK_DISCARD)))
-#else
-	if (FAILED(plpd3dFillRectVB->Lock(0, sizeof(TPDTVertex)*uVtxCount, (BYTE**)&pDstVertices, D3DLOCK_DISCARD)))
-#endif
+	if (FAILED(
+		plpd3dFillRectVB->Lock(0, sizeof(TPDTVertex)*uVtxCount, (BYTE**)&pDstVertices, D3DLOCK_DISCARD)
+	)) 
 	{
 		STATEMANAGER.SetStreamSource(0, nullptr, 0);
 		return false;
 	}
 
 	memcpy(pDstVertices, pSrcVertices, sizeof(TPDTVertex)*uVtxCount);
+
 	plpd3dFillRectVB->Unlock();
-	STATEMANAGER.SetStreamSource(0, plpd3dFillRectVB, sizeof(TPDTVertex));
+
+	STATEMANAGER.SetStreamSource(0, plpd3dFillRectVB, sizeof(TPDTVertex));	
+
 	return true;
-#endif
-#endif
 }
-
-#ifdef ENABLE_FIX_MOBS_LAG
-#ifdef ENABLE_DIRECTX9_UPDATE
-IDirect3DVertexBuffer9* CGraphicBase::GetSmallPdtVertexBuffer()
-{
-	return m_smallPdtVertexBuffer;
-}
-
-IDirect3DVertexBuffer9* CGraphicBase::GetLargePdtVertexBuffer()
-{
-	return m_largePdtVertexBuffer;
-}
-#else
-IDirect3DVertexBuffer8* CGraphicBase::GetSmallPdtVertexBuffer()
-{
-	return m_smallPdtVertexBuffer;
-}
-
-IDirect3DVertexBuffer8* CGraphicBase::GetLargePdtVertexBuffer()
-{
-	return m_largePdtVertexBuffer;
-}
-#endif
 #endif
 
 DWORD CGraphicBase::GetAvailableTextureMemory()

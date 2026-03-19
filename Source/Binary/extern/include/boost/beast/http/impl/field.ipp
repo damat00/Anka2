@@ -51,7 +51,7 @@ struct field_table
         {
             auto p1 = lhs.data();
             auto p2 = rhs.data();
-            auto pend = p1 + lhs.size();
+            auto pend = lhs.end();
             char a, b;
             while(p1 < pend)
             {

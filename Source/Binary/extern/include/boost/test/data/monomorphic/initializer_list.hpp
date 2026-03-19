@@ -17,9 +17,6 @@
 #include <boost/test/data/monomorphic/fwd.hpp>
 
 #include <boost/core/ignore_unused.hpp>
-
-#include <vector>
-
 #include <boost/test/detail/suppress_warnings.hpp>
 
 //____________________________________________________________________________//

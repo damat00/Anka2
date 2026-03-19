@@ -129,7 +129,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\effect\hit\water_breathe01.dds"
+            "water_breathe01.dds"
         }
     }
 }
@@ -261,7 +261,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\effect\hit\water_light05.dds"
+            "water_light05.dds"
         }
     }
 }
@@ -399,7 +399,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\monster2\ch_water_dragon\water_breathe02.dds"
+            "water_breathe02.dds"
         }
     }
 }

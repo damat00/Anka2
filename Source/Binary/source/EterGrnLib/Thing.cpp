@@ -60,7 +60,7 @@ bool CGraphicThing::CreateDeviceObjects()
 {
 	if (!m_pgrnFileInfo)
 		return true;
-
+	
 	for (int m = 0; m < m_pgrnFileInfo->ModelCount; ++m)
 	{
 		CGrannyModel & rModel = m_models[m];
@@ -112,7 +112,7 @@ bool CGraphicThing::CheckMotionIndex(int iMotion) const
 
 	if (iMotion < 0)
 		return false;
-
+	
 	if (iMotion >= m_pgrnFileInfo->AnimationCount)
 		return false;
 
@@ -120,7 +120,7 @@ bool CGraphicThing::CheckMotionIndex(int iMotion) const
 }
 
 CGrannyModel * CGraphicThing::GetModelPointer(int iModel)
-{
+{	
 	assert(CheckModelIndex(iModel));
 	assert(m_models != nullptr);
 	return m_models + iModel;
@@ -207,9 +207,9 @@ bool CGraphicThing::LoadModels()
 {
 	assert(m_pgrnFile != nullptr);
 	assert(m_models == nullptr);
-
+	
 	if (m_pgrnFileInfo->ModelCount <= 0)
-		return false;
+		return false;	
 
 	// SUPPORT_LOCAL_TEXTURE
 	const std::string& fileName = GetFileNameString();

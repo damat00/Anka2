@@ -4,9 +4,7 @@
 
 void CDibBar::Invalidate()
 {
-//#ifdef ENABLE_DIRECTX9_UPDATE
-    RECT rect = {0, 0, static_cast<LONG>(m_dwWidth), static_cast<LONG>(m_dwHeight)};
-//#endif
+	RECT rect = { static_cast<long>(0), static_cast<long>(0), static_cast<long>(m_dwWidth), static_cast<long>(m_dwHeight)};
 
 	std::vector<CBlockTexture *>::iterator itor = m_kVec_pkBlockTexture.begin();
 	for (; itor != m_kVec_pkBlockTexture.end(); ++itor)
@@ -80,9 +78,7 @@ CBlockTexture * CDibBar::__BuildTextureBlock(DWORD dwxPos, DWORD dwyPos, DWORD d
 	if (dwTextureWidth == 0 || dwTextureHeight == 0)
 		return NULL;
 
-//#ifdef ENABLE_DIRECTX9_UPDATE
-    RECT posRect = {static_cast<LONG>(dwxPos), static_cast<LONG>(dwyPos), static_cast<LONG>(dwxPos + dwImageWidth), static_cast<LONG>(dwyPos + dwImageHeight)};
-//#endif
+	RECT posRect = { static_cast<long>(dwxPos), static_cast<long>(dwyPos), static_cast<long>(dwxPos+dwImageWidth), static_cast<long>(dwyPos+dwImageHeight)};
 
 	CBlockTexture * pBlockTexture = new CBlockTexture;
 	if (!pBlockTexture->Create(&m_dib, posRect, dwTextureWidth, dwTextureHeight))

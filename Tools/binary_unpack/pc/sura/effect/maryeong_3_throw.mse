@@ -1,5 +1,4 @@
-BoundingSphereRadius   0.000000
-BoundingSpherePosition 0.000000 0.000000 0.000000
+BoundingSphereRadius 0.000000
 
 Group Particle
 {

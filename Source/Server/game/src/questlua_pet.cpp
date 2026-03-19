@@ -50,7 +50,6 @@ namespace quest
 		return 1;
 	}
 
-	// syntax in LUA: pet.unsummon(mob_vnum)
 	int pet_unsummon(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
@@ -81,7 +80,6 @@ namespace quest
 		return 1;
 	}
 
-	// syntax in LUA: pet.is_summon(mob_vnum)
 	int pet_is_summon(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();

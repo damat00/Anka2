@@ -404,7 +404,7 @@ void CHARACTER::GetRundRank(char * buffer, size_t buflen)
 		else
 			len += len2;
 
-		len2 = snprintf(buffer + len, buflen - len, "%d. Sýra - %s - %d puan.", 
+		len2 = snprintf(buffer + len, buflen - len, "%d. Place - %s - %d points.", 
 				pos,
 				row[0],
 				points);

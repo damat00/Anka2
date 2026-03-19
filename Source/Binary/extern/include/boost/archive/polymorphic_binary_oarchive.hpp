@@ -23,15 +23,13 @@
 namespace boost { 
 namespace archive {
 
-class BOOST_SYMBOL_VISIBLE polymorphic_binary_oarchive :
-    public detail::polymorphic_oarchive_route<binary_oarchive>
-{
-public:
-    polymorphic_binary_oarchive(std::ostream & os, unsigned int flags = 0) :
-        detail::polymorphic_oarchive_route<binary_oarchive>(os, flags)
-    {}
-    ~polymorphic_binary_oarchive(){}
-};
+typedef detail::polymorphic_oarchive_route<
+    binary_oarchive_impl<
+        binary_oarchive, 
+        std::ostream::char_type, 
+        std::ostream::traits_type
+    >
+ > polymorphic_binary_oarchive;
 
 } // namespace archive
 } // namespace boost

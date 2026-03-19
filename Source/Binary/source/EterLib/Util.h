@@ -1,15 +1,12 @@
 #pragma once
 
+
 #include "../eterBase/FileLoader.h"
 
 #include <map>
 #include <vector>
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-#include <d3dx9.h>
-#else
 #include <d3dx8.h>
-#endif
 
 template<typename T>
 class CTransitor
@@ -87,6 +84,7 @@ typedef CTransitor<D3DXCOLOR>		TTransitorColor;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 void PrintfTabs(FILE * File, int iTabCount, const char *c_szString, ...);
+
 
 //typedef CTokenVector TTokenVector;
 

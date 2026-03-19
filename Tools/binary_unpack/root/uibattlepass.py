@@ -2,424 +2,1478 @@ if __USE_DYNAMIC_MODULE__:
 	import pyapi
 
 app = __import__(pyapi.GetModuleName("app"))
+player = __import__(pyapi.GetModuleName("player"))
 net = __import__(pyapi.GetModuleName("net"))
+pack = __import__(pyapi.GetModuleName("pack"))
 
+import os
 import ui
+import mouseModule
+import snd
 import item
-import constInfo
-import localeInfo
-import wndMgr
-import dbg
-import uiCommon
-import uiToolTip
+import chat
+import grp
+import time
 import uiScriptLocale
-from uiToolTip import ItemToolTip
-AFFECT_DICT = ItemToolTip.AFFECT_DICT
+import localeInfo
+import constInfo
+import ime
+import wndMgr
+import uiToolTip
+import uiCommon
+import uiPickMoney
+import nonplayer
 
-class Battlepass(ui.ScriptWindow):
+from datetime import datetime
+from _weakref import proxy
+
+PREMIUM_BATTLEPASS_ITEM = 93100
+RANKING_MAX_NUM = 8
+
+ROOT_PATH = "d:/ymir work/ui/public/battlepass/"
+GAUGE_PATH = "d:/ymir work/ui/public/battlepass/gauges/"
+RANKLIST_PATH = "d:/ymir work/ui/public/battlepass/ranklist/"
+
+NORMAL_PATH = "d:/ymir work/ui/public/battlepass/normal/"
+PREMIUM_PATH = "d:/ymir work/ui/public/battlepass/premium/"
+
+class BattlePassWindow(ui.ScriptWindow):
 	def __init__(self):
+		self.lastUpdateBattlePass = 0
+		self.page = "NORMAL"
+		self.missionInfoDict = {}
+		self.generalInfoDict = {}
+
+		self.BattlePassIDNormal = -1
+		self.BattlePassIDPremium = -1
+
+		self.next_normal_battlepass_time = 0
+		self.next_premium_battlepass_time = 0
+
+		self.rankingFirstOpen = 0
+		self.rankingRefreshLastTime = 0
+		self.rankingInfoNormal = {}
+		self.rankingInfoPremium = {}
+		self.rankingItems = []
+		self.ranklistNormalCurrentPage = 1
+		self.ranklistPremiumCurrentPage = 1
+
+		self.rewardTable = [ [[], []], [[], []], [ [], [] ] ]
+		self.rewardDict = {}
+
+		self.battlePassGeneralInfo = { 1 : {}, 2 : {}, 3 : {} }
+		self.rewardSlotIndex = 0
+
+		self.scrollBarPosNormal = 0.0
+		self.scrollBarPosPremium = 0.0
+
+		self.isActivePremiumWindow = 0
+		self.lastUpdateTimeGauge = 0
+
 		ui.ScriptWindow.__init__(self)
-		self.tooltipItem = uiToolTip.ItemToolTip()
-		self.tooltipItem.HideToolTip()
-
-		self.tab = {}
-		self.gauge = {}
-		self.gauge_f = None
-		self.text = {}
-		self.reward1 = {}
-		self.reward2 = {}
-		self.reward3 = {}
-		self.icon = {}
-		self.list_bg = {}
-		self.bitirici = {}
-		self.oldugoruntu = None
-		self.odulbackground = None
-		self.odulbackgroundkapat = None
-		self.odul = {}
-		self.rewardbonus1 = {}
-		self.rewardbonus2 = {}
-		self.rewardbonus3 = {}
-		self.LoadWindow()
-
-		self.Type_Desc = [0,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_1,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_2,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_3,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_4,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_5,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_6,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_7,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_8,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_9,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_10,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_11,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_12,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_13,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_14,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_15,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_16,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_17,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_18,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_19,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_20,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_21,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_22,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_23,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_24,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_25,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_26,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_27,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_28,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_29,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_30,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_31,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_32,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_33,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_34,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_35,
-		uiScriptLocale.BATTLEPASS_QUEST_TYPE_36,
-		]
-
-		self.Type_Images = [0,
-		"new_battlepas/quest_icon/kill_id_any.png",#1
-		"new_battlepas/quest_icon/kill_id_any.png",#2
-		"new_battlepas/quest_icon/kill_id_any.png",#3
-		"new_battlepas/quest_icon/kill_boss_uni.png",#4
-		"new_battlepas/quest_icon/kill_stone_any.png",#5
-		"new_battlepas/quest_icon/use_refine_id_uni.png",#6
-		"new_battlepas/quest_icon/hatch_id_uni.png",#7
-		"new_battlepas/quest_icon/shout.png",#8
-		"new_battlepas/quest_icon/kill_boss_uni.png",#9
-		"new_battlepas/quest_icon/kill_boss_uni.png",#10
-		"new_battlepas/quest_icon/kill_boss_uni.png",#11
-		"new_battlepas/quest_icon/kill_boss_uni.png",#12
-		"new_battlepas/quest_icon/kill_boss_uni.png",#13
-		"new_battlepas/quest_icon/kill_boss_uni.png",#14
-		"new_battlepas/quest_icon/kill_boss_uni.png",#15
-		"new_battlepas/quest_icon/kill_boss_uni.png",#16
-		"new_battlepas/quest_icon/kill_boss_uni.png",#17
-		"new_battlepas/quest_icon/kill_boss_uni.png",#18
-		"new_battlepas/quest_icon/kill_boss_uni.png",#19
-		"new_battlepas/quest_icon/kill_boss_uni.png",#20
-		"new_battlepas/quest_icon/kill_boss_uni.png",#21
-		"new_battlepas/quest_icon/kill_boss_any.png",#22
-		"new_battlepas/quest_icon/kill_boss_any.png",#23
-		"new_battlepas/quest_icon/kill_boss_any.png",#24
-		"new_battlepas/quest_icon/kill_boss_any.png",#25
-		"new_battlepas/quest_icon/kill_boss_any.png",#26
-		"new_battlepas/quest_icon/kill_boss_any.png",#27
-		"new_battlepas/quest_icon/kill_boss_any.png",#28
-		"new_battlepas/quest_icon/kill_boss_any.png",#29
-		"new_battlepas/quest_icon/kill_boss_any.png",#30
-		"new_battlepas/quest_icon/kill_boss_any.png",#31
-		"new_battlepas/quest_icon/kill_boss_any.png",#32
-		"new_battlepas/quest_icon/kill_boss_any.png",#33
-		"new_battlepas/quest_icon/kill_boss_any.png",#34
-		"new_battlepas/quest_icon/kill_boss_any.png",#35
-		"new_battlepas/quest_icon/kill_boss_any.png",#36
-		]
+		self.__LoadWindow()
 
 	def __del__(self):
 		ui.ScriptWindow.__del__(self)
 
 	def Show(self):
-		self.LoadWindow()
-		size_safe = max(1, int(constInfo.size_battle_pass))
-		self.ScrollBar.SetMiddleBarSize(float(2) / float(size_safe))
-		self.final_reward.SetItemSlot(0, constInfo.final_rewards[0], constInfo.final_rewards[3])
-		self.final_reward.SetItemSlot(1, constInfo.final_rewards[1], constInfo.final_rewards[4])
-		self.final_reward.SetItemSlot(2, constInfo.final_rewards[2], constInfo.final_rewards[5])
-		for i in range(9):
-			self.MakeButton(
-				i,\
-				self.board,\
-				13, 33 + (50 * i)
-			)
-		self.SetCenterPosition()
-		self.select = None
 		ui.ScriptWindow.Show(self)
 
-	def LoadWindow(self):
-		try:
-			PythonScriptLoader = ui.PythonScriptLoader()
-			PythonScriptLoader.LoadScriptFile(self, "UIScript/battlepass.py")
-		except:
-			import exception
-			exception.Abort("battlepass.LoadWindow.LoadObject")
-		try:
-			self.titleBar = self.GetChild("TitleBar")
-			self.board = self.GetChild("board")
-			self.ScrollBar = self.GetChild("ScrollBar")
-			self.info1 = self.GetChild("Text1Info")
-			self.info2 = self.GetChild("Text2Info")
-			self.info3 = self.GetChild("Text3Info")
-			self.info5 = self.GetChild("Text6Info")
-			self.f_button = self.GetChild("FinalReward")
-			self.ScrollBar.SetScrollEvent(ui.__mem_func__(self.OnScroll))
-		except:
-			import exception
-			exception.Abort("battlepass.__LoadWindow.BindObject")
-
-		self.titleBar.SetCloseEvent(ui.__mem_func__(self.Close))
-		self.f_button.SetEvent(lambda : net.SendChatPacket("/final_reward"))
-		self.final_reward = ui.GridSlotWindow()
-		self.final_reward.SetParent(self)
-		self.final_reward.SetPosition(405, 360)
-		self.final_reward.SetSlotStyle(wndMgr.SLOT_STYLE_NONE)
-		self.final_reward.ArrangeSlot(0, 6, 3, 32, 32, 0, 3)
-		self.final_reward.SetSlotBaseImage("d:/ymir work/ui/public/chestdrop_slot.sub", 1.0, 1.0, 1.0, 1.0)
-
-		self.final_reward.SetOverInItemEvent(ui.__mem_func__(self.OverInItemFinal))
-		self.final_reward.SetOverOutItemEvent(ui.__mem_func__(self.OverOutItem))
-		self.final_reward.RefreshSlot()
-		self.final_reward.Show()
-
 	def Close(self):
-		if self.tooltipItem:
+		# Tooltip'leri temizle - ESC ile kapatýldýðýnda tooltip ekranda kalmasýn
+		# Merkezi tooltip sistemini kullanarak tüm tooltip'leri gizle
+		if hasattr(uiToolTip.ToolTip, '_allToolTips'):
+			for tooltip in uiToolTip.ToolTip._allToolTips:
+				if tooltip:
+					try:
+						if hasattr(tooltip, 'IsShow'):
+							if tooltip.IsShow():
+								tooltip.HideToolTip()
+						else:
+							# IsShow metodu yoksa direkt HideToolTip çaðýr
+							if hasattr(tooltip, 'HideToolTip'):
+								tooltip.HideToolTip()
+							if hasattr(tooltip, 'Hide'):
+								tooltip.Hide()
+					except:
+						pass
+		
+		# Kendi tooltip'lerini de temizle
+		if self.tooltipItem and self.tooltipItem != 0:
 			self.tooltipItem.HideToolTip()
+			self.tooltipItem.ClearToolTip()
+		
+		if self.tooltip and self.tooltip != 0:
+			self.tooltip.Hide()
+			self.tooltip.ClearToolTip()
+		
+		# Mission list içindeki tüm item'larýn tooltip'lerini temizle
+		if self.missionList:
+			# Normal mission list
+			if hasattr(self.missionList, 'missionlist_type_normal'):
+				for item in self.missionList.missionlist_type_normal:
+					if item and hasattr(item, 'tooltipItem') and item.tooltipItem:
+						item.tooltipItem.HideToolTip()
+						item.tooltipItem.ClearToolTip()
+			
+			# Premium mission list
+			if hasattr(self.missionList, 'missionlist_type_premium'):
+				for item in self.missionList.missionlist_type_premium:
+					if item and hasattr(item, 'tooltipItem') and item.tooltipItem:
+						item.tooltipItem.HideToolTip()
+						item.tooltipItem.ClearToolTip()
+		
 		self.Hide()
 
 	def Destroy(self):
-		self.ClearDictionary()
-		self.tooltipItem = None
+		ui.ScriptWindow.__del__(self)
 
-	def OnUpdate(self):
-		if self.select != None:
-			if self.Get2(self.select, "iStatus") > 0:
-				self.info2.SetText(uiScriptLocale.BATTLE_PASSFINISHED)
+	def __LoadWindow(self):
+		try:
+			pyScrLoader = ui.PythonScriptLoader()
+			pyScrLoader.LoadScriptFile(self, "UIScript/battlepasswindow.py")
+		except:
+			import exception
+			exception.Abort("uiBattlePass.Open.battlepasswindow.py")
+
+		try:
+			self.tooltipItem = uiToolTip.ItemToolTip()
+			self.tooltipItem.Hide()
+
+			self.tooltip = uiToolTip.ToolTip()
+			self.tooltip.Hide()
+
+			self.GetChild("board").SetCloseEvent(self.Close)
+
+			self.missionNameDict = {
+				1 : {"name" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_1, "desc" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_1_DESC_1, "desc_non_condition" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_1_DESC_2},
+				2 : {"name" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_2, "desc" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_2_DESC_1, "desc_non_condition" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_2_DESC_2},
+				3 : {"name" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_3, "desc" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_3_DESC_1, "desc_non_condition" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_3_DESC_2},
+				4 : {"name" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_4, "desc" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_4_DESC_1, "desc_non_condition" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_4_DESC_2},
+				5 : {"name" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_5, "desc" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_5_DESC_1, "desc_non_condition" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_5_DESC_2},
+				6 : {"name" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_6, "desc" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_6_DESC_1, "desc_non_condition" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_6_DESC_2},
+				7 : {"name" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_7, "desc" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_7_DESC_1, "desc_non_condition" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_7_DESC_2},
+				8 : {"name" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_8, "desc" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_8_DESC_1, "desc_non_condition" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_8_DESC_2},
+				9 : {"name" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_9, "desc" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_9_DESC_1, "desc_non_condition" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_9_DESC_2},
+				10 : {"name" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_10, "desc" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_10_DESC_1, "desc_non_condition" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_10_DESC_2},
+				11 : {"name" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_11, "desc" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_11_DESC_1, "desc_non_condition" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_11_DESC_2},
+				12 : {"name" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_12, "desc" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_12_DESC_1, "desc_non_condition" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_12_DESC_2},
+				13 : {"name" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_13, "desc" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_13_DESC_1, "desc_non_condition" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_13_DESC_2},
+				14 : {"name" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_14, "desc" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_14_DESC_1, "desc_non_condition" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_14_DESC_2},
+				15 : {"name" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_15, "desc" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_15_DESC_1, "desc_non_condition" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_15_DESC_2},
+				# 16 : {"name" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_15, "desc" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_15_DESC_1, "desc_non_condition" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_15_DESC_2},
+				# 17 : {"name" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_15, "desc" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_15_DESC_1, "desc_non_condition" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_15_DESC_2},
+				# 18 : {"name" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_15, "desc" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_15_DESC_1, "desc_non_condition" : uiScriptLocale.EXTENDED_BATTLE_PASS_TYPENAME_15_DESC_2},
+			}
+
+			self.mapNameDict = {
+				64 : uiScriptLocale.EXTENDED_BATTLE_PASS_MAP_NAME_BY_IDX_64,
+				65 : uiScriptLocale.EXTENDED_BATTLE_PASS_MAP_NAME_BY_IDX_65,
+				72 : uiScriptLocale.EXTENDED_BATTLE_PASS_MAP_NAME_BY_IDX_72,
+			}
+
+			self.guildwarTypeNameDict = {
+				1 : uiScriptLocale.EXTENDED_BATTLE_PASS_GUILDWAR_TYPE_NAME_1,
+				2 : uiScriptLocale.EXTENDED_BATTLE_PASS_GUILDWAR_TYPE_NAME_2,
+				3 : uiScriptLocale.EXTENDED_BATTLE_PASS_GUILDWAR_TYPE_NAME_3,
+			}
+
+			self.dungeonNameDict = {
+				1 : uiScriptLocale.EXTENDED_BATTLE_PASS_DUNGEON_NAME_1,
+				2 : uiScriptLocale.EXTENDED_BATTLE_PASS_DUNGEON_NAME_2,
+				3 : uiScriptLocale.EXTENDED_BATTLE_PASS_DUNGEON_NAME_3,
+				4 : uiScriptLocale.EXTENDED_BATTLE_PASS_DUNGEON_NAME_4,
+			}
+
+			self.uiImageDict = {
+				1 : NORMAL_PATH,
+				2 : PREMIUM_PATH,
+			}
+
+			self.tabDict = {
+				"NORMAL" : self.GetChild("tab_normal"),
+				"PREMIUM" : self.GetChild("tab_premium"),
+			}
+
+			self.tabButtonDict = {
+				"NORMAL" : self.GetChild("tab_button_normal"),
+				"PREMIUM" : self.GetChild("tab_button_premium"),
+			}
+
+			self.tabWindowDict = {
+				"NORMAL" : self.GetChild("area_normal"),
+				"PREMIUM" : self.GetChild("area_premium"),
+			}
+
+			self.subTabDict = {
+				"MISSIONS" : self.GetChild("tab_missions"),
+				"GENERAL" : self.GetChild("tab_general"),
+			}
+
+			self.subTabButtonDict = {
+				"MISSIONS" : self.GetChild("tab_button_missions"),
+				"GENERAL" : self.GetChild("tab_button_general"),
+			}
+
+			self.infoPagesList = [
+				self.GetChild("NormalInfoBoard"),
+				self.GetChild("NormalTextInfo"),
+				self.GetChild("PremiumInfoBoard"),
+				self.GetChild("InputTicketBoard"),
+				self.GetChild("PremiumTextInfo"),
+				self.GetChild("PremiumTextInfo")
+			]
+
+			for i in xrange(len(self.infoPagesList)):
+				self.infoPagesList[i].Hide()
+
+			for tabValue in self.tabDict.itervalues():
+				tabValue.Hide()
+
+			for (stateKey, tabButton) in self.tabButtonDict.items():
+				tabButton.SetEvent(ui.__mem_func__(self.__OnClickTabButton), stateKey)
+
+			for (subStateKey, subTabButton) in self.subTabButtonDict.items():
+				subTabButton.SetEvent(ui.__mem_func__(self.__OnClickSubTabButton), subStateKey)
+
+			self.GetChild("BorderRanking").Hide()
+			self.GetChild("RankingButton").SetEvent(ui.__mem_func__(self.__OnClickRankingButton))
+			self.GetChild("RewardButton").SetEvent(ui.__mem_func__(self.__OnClickRewardButton))
+
+			self.GetChild("reward_slots").SetOverInItemEvent(ui.__mem_func__(self.OverInItem))
+			self.GetChild("reward_slots").SetOverOutItemEvent(ui.__mem_func__(self.OverOutItem))
+
+			self.GetChild("ranking_title_icon_rank").SetEvent(ui.__mem_func__(self.RanklistIconTooltip), "mouse_over_in", 1)
+			self.GetChild("ranking_title_icon_rank").SetEvent(ui.__mem_func__(self.RanklistIconTooltip), "mouse_over_out", 1)
+			self.GetChild("ranking_title_icon_name").SetEvent(ui.__mem_func__(self.RanklistIconTooltip), "mouse_over_in", 2)
+			self.GetChild("ranking_title_icon_name").SetEvent(ui.__mem_func__(self.RanklistIconTooltip), "mouse_over_out", 2)
+			self.GetChild("ranking_title_icon_time").SetEvent(ui.__mem_func__(self.RanklistIconTooltip), "mouse_over_in", 3)
+			self.GetChild("ranking_title_icon_time").SetEvent(ui.__mem_func__(self.RanklistIconTooltip), "mouse_over_out", 3)
+
+			self.GetChild("ticket_slot").SetSelectEmptySlotEvent(ui.__mem_func__(self.SelectEmptySlotSrc))
+			self.GetChild("ticket_slot").SetSelectItemSlotEvent(ui.__mem_func__(self.SelectItemSlotSrc))
+
+			self.GetChild("prev_page_button").SetEvent(ui.__mem_func__(self.__OnClickPrevRankingPage))
+			self.GetChild("next_page_button").SetEvent(ui.__mem_func__(self.__OnClickNextRankingPage))
+			self.GetChild("first_page_button").SetEvent(ui.__mem_func__(self.__OnClickRankingPageButton), 1)
+			self.GetChild("last_page_button").SetEvent(ui.__mem_func__(self.__OnClickRankingPageButton), 5)
+			self.GetChild("refresh_ranklist_button").SetEvent(ui.__mem_func__(self.__OnClickRefreshRanklist))
+
+			for i in xrange(1, 6):
+				self.GetChild("page%d_button" % int(i)).SetEvent(ui.__mem_func__(self.__OnClickRankingPageButton), i)
+
+			self.scrollBar = MissionScrollBar()
+			self.scrollBar.SetParent(self.GetChild("BorderScroll"))
+			self.scrollBar.SetScrollEvent(ui.__mem_func__(self.OnScroll))
+			self.scrollBar.SetUpVisual(NORMAL_PATH + "scrollbar.sub")
+			self.scrollBar.SetOverVisual(NORMAL_PATH + "scrollbar.sub")
+			self.scrollBar.SetDownVisual(NORMAL_PATH + "scrollbar.sub")
+			self.scrollBar.SetRestrictMovementArea(12, 2, 6, 249)
+			self.scrollBar.SetPosition(12, 2)
+			self.scrollBar.Show()
+
+			self.missionList = ListBoxMissions()
+			self.missionList.SetParent(self.GetChild("BorderMissions"))
+			self.missionList.SetGlobalParent(self)
+			self.missionList.SetPosition(4, 4)
+			self.missionList.SetSize(300, 249)
+			self.missionList.Show()
+			self.missionList.ShowMissionsByBattlePassType(1)
+			self.SetPage("NORMAL")
+			self.SetSubPage("MISSIONS")
+			self.__OnClickRankingPageButton(1)
+		except:
+			import exception
+			exception.Abort("uiBattlePass.LoadWindow.BindObject")
+
+	def __OnClickTabButton(self, stateKey):
+		self.SetPage(stateKey)
+
+	def __OnClickSubTabButton(self, subStateKey):
+		self.SetSubPage(subStateKey)
+
+	def __OnClickRewardButton(self):
+		if self.page == "NORMAL":
+			net.SendExtBattlePassAction(10)
+
+		if self.page == "PREMIUM":
+			net.SendExtBattlePassAction(11)
+
+	def __OnClickRankingButton(self):
+		if self.GetChild("BorderRanking").IsShow():
+			self.GetChild("BorderRanking").Hide()
+		else:
+			if self.rankingFirstOpen == 0:
+				self.rankingFirstOpen = 1
+				net.SendExtBattlePassAction(2)
+				self.rankingRefreshLastTime = app.GetTime() + 10
+			self.GetChild("BorderRanking").Show()
+
+	def __OnClickRankingPageButton(self, pageIndex):
+		new_page = min(5, pageIndex)
+		new_page = max(1, new_page)
+		for i in xrange(1, 6):
+			if i != new_page:
+				self.GetChild("page%d_button" % int(i)).SetUp()
 			else:
-				self.info2.SetText(uiScriptLocale.BATTLE_PASS_LOADING)
+				self.GetChild("page%d_button" % int(i)).Down()
 
-			self.info3.SetText(uiScriptLocale.BATTLE_PASS_PROGRESS + str(self.Get2(self.select, "iCounts")) + " / " + str(self.Get(self.select, "iCount")))
-		self.gauge_f.SetPercentage(self.GetFinishedMission(), max(1, int(constInfo.size_battle_pass)))
-		for i in range(len(self.text)):
-			self.gauge[i].SetPercentage(self.Get2(i, "iCounts"), max(1, self.Get(i, "iCount")))
-			if self.Get2(i, "iStatus") > 0:
-				self.list_bg[i].LoadImage("new_battlepas/big_finished.png")
-				self.list_bg[i].Show()
-		for i in range(len(self.tab)):
-			if self.tab[i].IsDown():
-				self.select = i
-				MissionName = str(constInfo.info_missions_bp[int(i)]["Name"]).replace("Oldur", "Oldur")
-				self.info1.SetText(uiScriptLocale.BATTLE_PASS_MISSION_NAME + str(MissionName))
+		if self.page == "NORMAL":
+			self.ranklistNormalCurrentPage = new_page
 
-				if self.Get2(i, "iStatus") > 0:
-					self.info2.SetText(uiScriptLocale.BATTLE_PASSFINISHED)
+		if self.page == "PREMIUM":
+			self.ranklistPremiumCurrentPage = new_page
+
+		self.RefreshRanklist()
+
+	def __OnClickNextRankingPage(self):
+		if self.page == "NORMAL":
+			self.__OnClickRankingPageButton(self.ranklistNormalCurrentPage + 1)
+
+		if self.page == "PREMIUM":
+			self.__OnClickRankingPageButton(self.ranklistPremiumCurrentPage + 1)
+
+	def __OnClickPrevRankingPage(self):
+		if self.page == "NORMAL":
+			self.__OnClickRankingPageButton(self.ranklistNormalCurrentPage - 1)
+
+		if self.page == "PREMIUM":
+			self.__OnClickRankingPageButton(self.ranklistPremiumCurrentPage - 1)
+
+	def __OnClickRefreshRanklist(self):
+		if self.rankingRefreshLastTime < app.GetTime():
+			self.rankingRefreshLastTime = app.GetTime() + 11
+			self.rankingInfoNormal = {}
+			self.rankingInfoPremium = {}
+
+			net.SendExtBattlePassAction(2)
+			chat.AppendChat(chat.CHAT_TYPE_INFO, localeInfo.EXTENDED_BATTLE_PASS_RANKLIST_REFRESH)
+		else:
+			chat.AppendChat(chat.CHAT_TYPE_INFO, localeInfo.EXTENDED_BATTLE_PASS_RANKLIST_WAIT_TO_REFRESH % int((self.rankingRefreshLastTime - app.GetTime()) + 1))
+
+	def SetPage(self, stateKey, isClear = FALSE):
+		if self.page == "NORMAL" and not isClear:
+			self.scrollBarPosNormal = self.scrollBar.GetPos()
+
+		if self.page == "PREMIUM" and not isClear:
+			self.scrollBarPosPremium = self.scrollBar.GetPos()
+
+		self.page = stateKey
+
+		for (tabKey, tabButton) in self.tabButtonDict.items():
+			if stateKey!=tabKey:
+				tabButton.SetUp()
+
+		for (tabKey, tabWindow) in self.tabWindowDict.items():
+			if stateKey==tabKey:
+				tabWindow.Show()
+			else:
+				tabWindow.Hide()
+
+		for tabValue in self.tabDict.itervalues():
+			tabValue.Hide()
+
+		self.GetChild("UIArea").Show()
+		for i in xrange(len(self.infoPagesList)):
+			self.infoPagesList[i].Hide()
+
+		self.tabDict[stateKey].Show()
+
+		if stateKey == "NORMAL":
+			self.SetNormalPage()
+			self.missionList.ShowMissionsByBattlePassType(1)
+			self.scrollBar.SetPos(self.scrollBarPosNormal)
+			self.__OnClickRankingPageButton(self.ranklistNormalCurrentPage)
+			self.SetGeneralInfo()
+
+		if stateKey == "PREMIUM":
+			self.SetPremiumPage()
+			self.missionList.ShowMissionsByBattlePassType(2)
+			self.scrollBar.SetPos(self.scrollBarPosPremium)
+			self.__OnClickRankingPageButton(self.ranklistPremiumCurrentPage)
+			self.SetGeneralInfo()
+
+		self.missionList.SelectMissionByPage()
+		self.RefreshRewardSlots()
+		self.RefreshRanklist()
+
+	def GetPage(self):
+		return self.page
+
+	def SetSubPage(self, subStateKey):
+		self.subpage = subStateKey
+
+		for (subTabKey, subTabButton) in self.subTabButtonDict.items():
+			if subStateKey!=subTabKey:
+				subTabButton.SetUp()
+
+		for subTabValue in self.subTabDict.itervalues():
+			subTabValue.Hide()
+
+		self.subTabDict[subStateKey].Show()
+
+		if subStateKey == "MISSIONS":
+			self.GetChild("BorderInfoGeneral").Hide()
+			self.GetChild("BorderInfoMission").Show()
+			if self.GetChild("BorderRanking").IsShow():
+				self.GetChild("BorderRanking").Hide()
+
+		if subStateKey == "GENERAL":
+			self.GetChild("BorderInfoMission").Hide()
+			self.GetChild("BorderInfoGeneral").Show()
+			self.SetGeneralInfo()
+			self.RefreshRewardSlots()
+
+	def SetNormalPage(self):
+		if self.battlePassGeneralInfo[1].has_key(self.BattlePassIDNormal) and self.battlePassGeneralInfo[1][self.BattlePassIDNormal]["start_time"] < app.GetGlobalTimeStamp() and self.battlePassGeneralInfo[1][self.BattlePassIDNormal]["end_time"] > app.GetGlobalTimeStamp():
+			self.GetChild("UIArea").Show()
+			self.GetChild("NormalInfoBoard").Hide()
+			self.GetChild("NormalTextInfo").Hide()
+			self.__ChangeUI(1)
+		else:
+			self.GetChild("UIArea").Hide()
+			self.GetChild("NormalInfoBoard").Show()
+			self.GetChild("NormalTextInfo").Show()
+			self.GetChild("NormalInfoTextTime").Hide()
+			for battlepass in self.battlePassGeneralInfo[1].itervalues():
+				if battlepass["start_time"] > app.GetGlobalTimeStamp():
+					self.next_normal_battlepass_time = battlepass["start_time"]
+					break
+
+			if self.next_normal_battlepass_time != 0:
+				self.GetChild("NormalInfoText").SetText(uiScriptLocale.EXTENDED_BATTLE_PASS_PLANNED)
+				self.GetChild("NormalInfoText").SetPosition(0, -17)
+				self.GetChild("NormalInfoTextTime").Show()
+				self.GetChild("NormalInfoTextTime").SetText(uiScriptLocale.EXTENDED_BATTLE_PASS_PLANNED_TIME % localeInfo.SecondToDHM(self.next_normal_battlepass_time - app.GetGlobalTimeStamp()))
+			else:
+				self.GetChild("NormalInfoText").SetText(uiScriptLocale.EXTENDED_BATTLE_PASS_NOTHING_PLANNED)
+				self.GetChild("NormalInfoText").SetPosition(0, -2)
+
+	def SetPremiumPage(self):
+		self.isActivePremiumWindow = 0
+		if self.battlePassGeneralInfo[2].has_key(self.BattlePassIDPremium) and self.battlePassGeneralInfo[2][self.BattlePassIDPremium]["start_time"] < app.GetGlobalTimeStamp() and self.battlePassGeneralInfo[2][self.BattlePassIDPremium]["end_time"] > app.GetGlobalTimeStamp():
+			if player.GetPremiumBattlePassID() != self.BattlePassIDPremium:
+				self.GetChild("UIArea").Hide()
+				self.GetChild("PremiumInfoBoard").Show()
+				self.GetChild("InputTicketBoard").Show()
+				self.GetChild("ActivateTicketButton").Hide()
+				self.GetChild("ActivateTicketButton").SetEvent(ui.__mem_func__(self.__OnClickSendPremiumTicket))
+				self.GetChild("ticket_slot").ClearSlot(0)
+				self.slotItemPos = -1
+			else:
+				self.GetChild("UIArea").Show()
+				self.GetChild("PremiumInfoBoard").Hide()
+				self.GetChild("PremiumTextInfo").Hide()
+				self.GetChild("InputTicketBoard").Hide()
+				self.isActivePremiumWindow = 1
+				self.__ChangeUI(2)
+		else:
+			self.GetChild("UIArea").Hide()
+			self.GetChild("PremiumInfoBoard").Show()
+			self.GetChild("PremiumTextInfo").Show()
+			self.GetChild("PremiumInfoTextTime").Hide()
+			for battlepass in self.battlePassGeneralInfo[2].itervalues():
+				if battlepass["start_time"] > app.GetGlobalTimeStamp():
+					self.next_premium_battlepass_time = battlepass["start_time"]
+					break
+
+			if self.next_premium_battlepass_time != 0:
+				self.GetChild("PremiumInfoText").SetText(uiScriptLocale.EXTENDED_BATTLE_PASS_PLANNED)
+				self.GetChild("PremiumInfoText").SetPosition(0, -17)
+				self.GetChild("PremiumInfoTextTime").Show()
+				self.GetChild("PremiumInfoTextTime").SetText(uiScriptLocale.EXTENDED_BATTLE_PASS_PLANNED_TIME % localeInfo.SecondToDHM(self.next_premium_battlepass_time - app.GetGlobalTimeStamp()))
+			else:
+				self.GetChild("PremiumInfoText").SetText(uiScriptLocale.EXTENDED_BATTLE_PASS_NOTHING_PLANNED)
+				self.GetChild("PremiumInfoText").SetPosition(0, -2)
+
+	def SetGeneralInfo(self):
+		missionCount = self.missionList.GetMissionCount()
+		completedMissionCount = self.missionList.GetCompletedMissionCount()
+		battlepasstype = self.GetShowBattlePassType()
+		battlepassid = self.GetActualBattlePassIDByType()
+
+		if battlepassid != -1:
+			self.GetChild("GeneralTitleText").SetText(uiScriptLocale.EXTENDED_BATTLE_PASS_SEASON_TITLE)
+
+			self.GetChild("GeneralInfoStartDateText").SetText(datetime.fromtimestamp(self.battlePassGeneralInfo[battlepasstype][battlepassid]["start_time"]).strftime('%d.%m.%Y %H:%M:%S'))
+			self.GetChild("GeneralInfoEndDateText").SetText(datetime.fromtimestamp(self.battlePassGeneralInfo[battlepasstype][battlepassid]["end_time"]).strftime('%d.%m.%Y %H:%M:%S'))
+			self.GetChild("GeneralInfoFinishMissionsText").SetText(uiScriptLocale.EXTENDED_BATTLE_PASS_SEASON_CURRENT_MISSIONS % (completedMissionCount, missionCount))
+
+			self.GetChild("GaugeMission").SetPercentage(completedMissionCount, missionCount)
+			self.UpdateTimeGauge()
+
+	def SetMissionInfo(self, mission_index, mission_type):
+		(mission_name, mission_condition, actual_value, total_value) = self.missionList.GetMissionInfo(mission_index)
+
+		self.GetChild("MissionInfoTitle").SetText(mission_name)
+
+		if actual_value >= total_value:
+			self.GetChild("MissionStatusText").SetText(uiScriptLocale.EXTENDED_BATTLE_PASS_MISSION_STATUS + ": " + uiScriptLocale.EXTENDED_BATTLE_PASS_MISSION_STATUS_FINISH)
+		else:
+			self.GetChild("MissionStatusText").SetText(uiScriptLocale.EXTENDED_BATTLE_PASS_MISSION_STATUS + ": " + uiScriptLocale.EXTENDED_BATTLE_PASS_MISSION_STATUS_IN_PROGRESS)
+
+		if mission_condition != 0:
+			self.GetChild("MissionInformationText1").Show()
+			self.GetChild("MissionInformationText1").SetText(self.GetMissionConditionText(mission_type, mission_condition))
+		else:
+			self.GetChild("MissionInformationText1").Hide()
+
+		self.GetChild("MissionInformationText2").SetText(uiScriptLocale.EXTENDED_BATTLE_PASS_MISSION_INFORMATION_COUNT % (localeInfo.NumberToDecimalString(actual_value), localeInfo.NumberToDecimalString(total_value)))
+
+		if actual_value == 0:
+			self.GetChild("MissionInformationText3").SetText(uiScriptLocale.EXTENDED_BATTLE_PASS_MISSION_INFORMATION_PERCENT % (float(0.00)))
+		else:
+			self.GetChild("MissionInformationText3").SetText(uiScriptLocale.EXTENDED_BATTLE_PASS_MISSION_INFORMATION_PERCENT % (float(actual_value) / float(total_value) * 100.0))
+
+		self.SetMissionDescText(mission_type, mission_condition, total_value)
+
+	def GetTitleTextInfo(self, mission_type, mission_condition, total_value):
+		if mission_condition != 0:
+			if mission_type in [2]:
+				return nonplayer.GetMonsterName(mission_condition)
+			if mission_type in [7, 8, 9, 10, 11, 12]:
+				item.SelectItem(mission_condition)
+				return item.GetItemName()
+			if mission_type in [3, 13]:
+				return localeInfo.NumberToDecimalString(total_value)
+			# if mission_type in [15, 16, 17, 18]:
+			if mission_type in [15]:
+				return self.dungeonNameDict[mission_condition]
+		else:
+			if mission_type in [2]:
+				return uiScriptLocale.EXTENDED_BATTLE_PASS_NONE_COND_TITLE_MOB
+			if mission_type in [7, 8, 9]:
+				return uiScriptLocale.EXTENDED_BATTLE_PASS_NONE_COND_TITLE_ITEM
+			if mission_type in [10, 11, 12]:
+				return uiScriptLocale.EXTENDED_BATTLE_PASS_NONE_COND_TITLE_FISH
+			if mission_type in [3, 13]:
+				return localeInfo.NumberToDecimalString(total_value)
+			# if mission_type in [15, 16, 17, 18]:
+			if mission_type in [15]:
+				return uiScriptLocale.EXTENDED_BATTLE_PASS_NONE_COND_TITLE_DUNGEON
+
+	def GetMissionConditionText(self, mission_type, mission_condition):
+		if mission_type in [2, 4, 1, 5]:
+			return (uiScriptLocale.EXTENDED_BATTLE_PASS_MISSION_INFORMATION_MONSTER % nonplayer.GetMonsterName(mission_condition))
+		if mission_type in [3, 6]:
+			return (uiScriptLocale.EXTENDED_BATTLE_PASS_MISSION_INFORMATION_MINLEVEL % str(mission_condition))
+		if mission_type in [7, 8, 9]:
+			item.SelectItem(mission_condition)
+			return (uiScriptLocale.EXTENDED_BATTLE_PASS_MISSION_INFORMATION_ITEM % item.GetItemName())
+		if mission_type in [10, 11, 12]:
+			item.SelectItem(mission_condition)
+			return (uiScriptLocale.EXTENDED_BATTLE_PASS_MISSION_INFORMATION_FISH % item.GetItemName())
+		if mission_type in [13]:
+			return (uiScriptLocale.EXTENDED_BATTLE_PASS_MISSION_INFORMATION_MAPNAME % (self.mapNameDict[mission_condition]))
+		if mission_type in [14]:
+			return (uiScriptLocale.EXTENDED_BATTLE_PASS_MISSION_INFORMATION_GUILDWARTYPE % (self.guildwarTypeNameDict[mission_condition]))
+		# if mission_type in [15, 16, 17, 18]:
+		if mission_type in [15]:
+			return (uiScriptLocale.EXTENDED_BATTLE_PASS_MISSION_INFORMATION_DUNGEON % (self.dungeonNameDict[mission_condition]))
+
+	def SetMissionDescText(self, mission_type, mission_condition, total_value):
+		value = localeInfo.NumberToDecimalString(total_value)
+		text = ""
+		if mission_condition != 0:
+			if mission_type in [2, 4, 1, 5]:
+				text = (self.missionNameDict[mission_type]["desc"] % (value, nonplayer.GetMonsterName(mission_condition)))
+			if mission_type in [3, 6]:
+				text = (self.missionNameDict[mission_type]["desc"] % (value, mission_condition))
+			if mission_type in [7, 8, 9, 10, 11, 12]:
+				item.SelectItem(mission_condition)
+				text = (self.missionNameDict[mission_type]["desc"] % (value, item.GetItemName()))
+			if mission_type in [13]:
+				text = (self.missionNameDict[mission_type]["desc"] % (value, self.mapNameDict[mission_condition]))
+			if mission_type in [14]:
+				text = (self.missionNameDict[mission_type]["desc"] % (value, self.guildwarTypeNameDict[mission_condition]))
+			# if mission_type in [15, 16, 17, 18]:
+			if mission_type in [15]:
+				text = (self.missionNameDict[mission_type]["desc"] % (self.dungeonNameDict[mission_condition], value))
+		else:
+			text = (self.missionNameDict[mission_type]["desc_non_condition"] % (value))
+
+		self.SetDesc(text, self.GetChild("bgImageMission"))
+
+	def GetShowBattlePassType(self):
+		if self.page == "NORMAL":
+			return 1
+
+		if self.page == "PREMIUM":
+			return 2
+
+		return 0
+
+	def GetActualBattlePassIDByType(self):
+		if self.page == "NORMAL":
+			return self.BattlePassIDNormal
+
+		if self.page == "PREMIUM":
+			return self.BattlePassIDPremium
+
+		return -1
+
+	def RefreshRewardSlots(self):
+		if self.page == "NORMAL":
+			reward_items = self.rewardTable[0]
+
+		if self.page == "PREMIUM":
+			reward_items = self.rewardTable[1]
+
+		if len(reward_items[0]) != 0:
+			self.rewardSlotIndex = 0
+			self.rewardDict = {}
+
+			for slot in xrange(6):
+				self.GetChild("reward_slots").ClearSlot(slot)
+
+			for i in xrange(len(reward_items[0])):
+				self.GetChild("reward_slots").SetItemSlot(self.rewardSlotIndex, reward_items[0][i], reward_items[1][i])
+				self.rewardDict[self.rewardSlotIndex] = [reward_items[0][i], reward_items[1][i]]
+				item.SelectItem(reward_items[0][i])
+				self.rewardSlotIndex += 1 if item.GetItemSize()[1] == 1 else 2
+
+	def RecvGeneralInfo(self, BattlePassType, BattlePassName, BattlePassID, battlePassStartTime, battlePassEndTime):
+		if not self.battlePassGeneralInfo[BattlePassType].has_key(BattlePassID):
+			self.battlePassGeneralInfo[BattlePassType][BattlePassID] = {"name" : str(BattlePassName), "start_time" : battlePassStartTime, "end_time" : battlePassEndTime}
+			if battlePassStartTime < app.GetGlobalTimeStamp() and battlePassEndTime > app.GetGlobalTimeStamp():
+				if BattlePassType == 1:
+					self.BattlePassIDNormal = BattlePassID
+
+				if BattlePassType == 2:
+					self.BattlePassIDPremium = BattlePassID
+
+	def AddMission(self, battlepass_type, battlepass_id, mission_index, mission_type, info_value, current_value, total_value):
+		if self.battlePassGeneralInfo[battlepass_type].has_key(battlepass_id) and self.battlePassGeneralInfo[battlepass_type][battlepass_id]["start_time"] < app.GetGlobalTimeStamp() and self.battlePassGeneralInfo[battlepass_type][battlepass_id]["end_time"] > app.GetGlobalTimeStamp():
+			if self.missionList.HaveMission(battlepass_type, mission_index, mission_type):
+				self.missionList.SetProgress(battlepass_type, mission_index, total_value, current_value)
+			else:
+				textInfo = self.GetTitleTextInfo(mission_type, info_value, current_value)
+
+				if self.missionNameDict.has_key(mission_type):
+					if mission_type in [4, 6, 14, 1, 5]:
+						missionName = self.missionNameDict[mission_type]["name"]
+					else:
+						missionName = (self.missionNameDict[mission_type]["name"] % textInfo)
 				else:
-					self.info2.SetText(uiScriptLocale.BATTLE_PASS_LOADING)
+					missionName = "Unknown name"
 
-				self.info3.SetText(uiScriptLocale.BATTLE_PASS_PROGRESS + str(self.Get2(i, "iCounts")) + " / " + str(self.Get(i, "iCount")))
-				idx = self.Get(i, "iType")
-				self.info5.SetText("|cffffcc00" + (self.Type_Desc[idx] if 0 <= idx < len(self.Type_Desc) else ""))
+				self.missionList.AppendMission(47, battlepass_type, battlepass_id, mission_index, mission_type, missionName, info_value)
+				self.missionList.SetProgress(battlepass_type, mission_index, total_value, current_value)
 
-	def SetItemToolTip(self, tooltipItem):
-		self.tooltipItem = tooltipItem
+	def AddMissionReward(self, battlepass_type, battlepass_id, missionIndex, missionType, itemVnum, itemCount):
+		if self.battlePassGeneralInfo[battlepass_type].has_key(battlepass_id) and self.battlePassGeneralInfo[battlepass_type][battlepass_id]["start_time"] < app.GetGlobalTimeStamp() and self.battlePassGeneralInfo[battlepass_type][battlepass_id]["end_time"] > app.GetGlobalTimeStamp():
+			if self.missionList:
+				self.missionList.AddMissionReward(battlepass_type, missionIndex, itemVnum, itemCount)
 
-	def OnScroll(self):
-		board_count = 9
-		pos = int(self.ScrollBar.GetPos() * max(0, int(constInfo.size_battle_pass) - board_count))
+	def UpdateMission(self, battlepass_type, missionIndex, mission_type, current_value):
+		if self.missionList.HaveMission(battlepass_type, missionIndex, mission_type):
+			self.missionList.UpdateProgress(battlepass_type, missionIndex, current_value)
+			if self.missionList.GetSelectedMission() == missionIndex:
+				self.SetMissionInfo(missionIndex, mission_type)
 
-		for i in xrange(board_count):
-			realPos = i + pos
-			self.MakeButton(
-				realPos,\
-				self.board,\
-				13, 33 + (50 * i)
-			)
+	def AddReward(self, battlepass_type, battlepass_id, itemVnum, itemCount):
+		if self.battlePassGeneralInfo[battlepass_type].has_key(battlepass_id) and self.battlePassGeneralInfo[battlepass_type][battlepass_id]["start_time"] < app.GetGlobalTimeStamp() and self.battlePassGeneralInfo[battlepass_type][battlepass_id]["end_time"] > app.GetGlobalTimeStamp():
+			self.rewardTable[battlepass_type-1][0].append(itemVnum)
+			self.rewardTable[battlepass_type-1][1].append(itemCount)
 
-	def GetFinishedMission(self):
-		finished = 0
-		for i in range(constInfo.size_battle_pass):
-			if int(constInfo.info_missions_bp[int(i)]["iStatus"]) > 0:
-				finished = finished + 1
-		return finished
+	def AddRankingEntry(self, playername, battlepassType, battlepassID, startTime, endTime):
+		if battlepassType == 1:
+			self.rankingInfoNormal[len(self.rankingInfoNormal)] = { "playername" : playername, "battlepass_id" : battlepassID, "starttime" : startTime, "endtime" : endTime }
 
-	def OnRunMouseWheel(self, nLen):
-		if self.IsInPosition():
-			if nLen > 0 and self.ScrollBar:
-				self.ScrollBar.OnUp()
-			else:
-				self.ScrollBar.OnDown()
+		if battlepassType == 2:
+			self.rankingInfoPremium[len(self.rankingInfoPremium)] = { "playername" : playername, "battlepass_id" : battlepassID, "starttime" : startTime, "endtime" : endTime }
 
-			return True
+		self.RefreshRanklist()
 
-		return False
+	def RefreshRanklist(self):
+		pos_y = 27
+		self.rankingItems = []
+		for i in xrange(RANKING_MAX_NUM):
 
-	def Get(self,index, var2):
-		try:
-			return int(constInfo.missions_bp[int(index)][var2])
-		except (KeyError, IndexError):
-			return 0
+			if self.page == "NORMAL":
+				rank_range = i + (self.ranklistNormalCurrentPage*RANKING_MAX_NUM) - RANKING_MAX_NUM + 1
+				slot_image = NORMAL_PATH + "ranklist_item.sub"
+				info_list = self.rankingInfoNormal
 
-	def Get2(self,index, var2):
-		try:
-			return int(constInfo.info_missions_bp[int(index)][var2])
-		except (KeyError, IndexError):
-			return 0
+			if self.page == "PREMIUM":
+				rank_range = i + (self.ranklistPremiumCurrentPage*RANKING_MAX_NUM) - RANKING_MAX_NUM + 1
+				slot_image = PREMIUM_PATH + "ranklist_item.sub"
+				info_list = self.rankingInfoPremium
 
-	def Get3(self,index, var2):
-		try:
-			return int(constInfo.rewards_bp[int(index)][var2])
-		except (KeyError, IndexError):
-			return 0
+			if info_list.has_key(rank_range-1):
+				image = ui.ImageBox()
+				image.SetParent(self.GetChild("BorderRanking"))
+				image.SetPosition(3, pos_y)
+				image.LoadImage(slot_image)
+				image.Show()
 
-	def Get4(self, index, var2):
-		try:
-			return int(constInfo.rewards_bonus_bp[int(index)][var2])
-		except (KeyError, IndexError):
-			return 0
+				rankText = ui.TextLine()
+				rankText.SetParent(image)
+				rankText.SetHorizontalAlignCenter()
+				rankText.SetPosition(21,4)
+				rankText.SetText(str(rank_range))
+				rankText.AddFlag("not_pick")
+				rankText.Show()
 
-	def MakeButton(self, index, parent, x, y):
-		size_bp = int(constInfo.size_battle_pass)
-		if not size_bp or index >= size_bp:
+				nameText = ui.TextLine()
+				nameText.SetParent(image)
+				nameText.SetHorizontalAlignCenter()
+				nameText.SetPosition(107,4)
+				nameText.SetText(str(info_list[rank_range-1]["playername"]))
+				nameText.AddFlag("not_pick")
+				nameText.Show()
+
+				timeText = ui.TextLine()
+				timeText.SetParent(image)
+				timeText.SetHorizontalAlignCenter()
+				timeText.SetPosition(236,4)
+				timeText.SetText(localeInfo.SecondToDHM(info_list[rank_range-1]["endtime"] - info_list[rank_range-1]["starttime"]))
+				timeText.AddFlag("not_pick")
+				timeText.Show()
+
+				self.rankingItems.append([])
+				self.rankingItems[i].append(image)
+				self.rankingItems[i].append(rankText)
+				self.rankingItems[i].append(nameText)
+				self.rankingItems[i].append(timeText)
+				pos_y += 25
+
+	def __ChangeUI(self, battlepass_type):
+		self.GetChild("bgImageMission").LoadImage(self.uiImageDict[battlepass_type] + "mission_info_background.tga")
+		self.GetChild("bgImageGeneral").LoadImage(self.uiImageDict[battlepass_type] + "mission_info_background.tga")
+		self.GetChild("RankingButton").SetUpVisual(self.uiImageDict[battlepass_type] + "button_ranklist_normal.sub")
+		self.GetChild("RankingButton").SetOverVisual(self.uiImageDict[battlepass_type] + "button_ranklist_hover.sub")
+		self.GetChild("RankingButton").SetDownVisual(self.uiImageDict[battlepass_type] + "button_ranklist_down.sub")
+		self.GetChild("RewardButton").SetUpVisual(self.uiImageDict[battlepass_type] + "button_recive_reward_normal.sub")
+		self.GetChild("RewardButton").SetOverVisual(self.uiImageDict[battlepass_type] + "button_recive_reward_hover.sub")
+		self.GetChild("RewardButton").SetDownVisual(self.uiImageDict[battlepass_type] + "button_recive_reward_down.sub")
+		self.GetChild("reward_slot_background").LoadImage(self.uiImageDict[battlepass_type] + "reward_slots.sub")
+		self.scrollBar.SetUpVisual(self.uiImageDict[battlepass_type] + "scrollbar.sub")
+		self.scrollBar.SetOverVisual(self.uiImageDict[battlepass_type] + "scrollbar.sub")
+		self.scrollBar.SetDownVisual(self.uiImageDict[battlepass_type] + "scrollbar.sub")
+		self.GetChild("RankingTitle").LoadImage(self.uiImageDict[battlepass_type] + "ranklist_titlebar.sub")
+
+	def __ClearAll(self):
+		if self.missionList:
+			self.missionList.ClearAll()
+
+		self.missionInfoDict = {}
+		self.generalInfoDict = {}
+
+		self.BattlePassIDNormal = -1
+		self.BattlePassIDPremium = -1
+
+		self.next_normal_battlepass_time = 0
+		self.next_premium_battlepass_time = 0
+
+		self.rankingFirstOpen = 0
+		self.rankingInfoNormal = {}
+		self.rankingInfoPremium = {}
+		self.rankingItems = []
+		self.ranklistNormalCurrentPage = 1
+		self.ranklistPremiumCurrentPage = 1
+
+		self.rewardTable = [ [[], []], [[], []], [ [], [] ] ]
+		self.rewardDict = {}
+
+		self.battlePassGeneralInfo = { 1 : {}, 2 : {}, 3 : {} }
+		self.rewardSlotIndex = 0
+
+		self.scrollBarPosNormal = 0.0
+		self.scrollBarPosPremium = 0.0
+
+	def __OnClickSendPremiumTicket(self):
+		if self.slotItemPos != -1:
+			net.SendExtBattlePassPremiumItem(self.slotItemPos)
+			self.slotItemPos = -1
+			self.GetChild("ActivateTicketButton").Hide()
+			self.GetChild("ticket_slot").ClearSlot(0)
+
+	def SelectEmptySlotSrc(self, selectedSlotPos):
+		if mouseModule.mouseController.isAttached():
+			attachedSlotType = mouseModule.mouseController.GetAttachedType()
+			attachedSlotPos = mouseModule.mouseController.GetAttachedSlotNumber()
+			attachedItemCount = mouseModule.mouseController.GetAttachedItemCount()
+			attachedItemIndex = mouseModule.mouseController.GetAttachedItemIndex()
+			selectedItemVNum = player.GetItemIndex(attachedSlotPos)
+
+			item.SelectItem(selectedItemVNum)
+
+			if selectedItemVNum != PREMIUM_BATTLEPASS_ITEM:
+				chat.AppendChat(chat.CHAT_TYPE_INFO, localeInfo.EXTENDED_BATTLE_PASS_ITS_NOT_BATTLEPASS_ITEM)
+				mouseModule.mouseController.DeattachObject()
+				return
+
+			self.GetChild("ticket_slot").SetItemSlot(selectedSlotPos, attachedItemIndex, 0)
+			snd.PlaySound("sound/ui/drop.wav")
+			self.slotItemPos = attachedSlotPos
+			self.GetChild("ActivateTicketButton").Show()
+
+			mouseModule.mouseController.DeattachObject()
 			return
 
-		self.tab[index] = ui.MakeButton(parent, x, y+10-3, False, "new_battlepas/", "mission_btn_0.png", "mission_btn_1.png", "mission_btn_2.png")
-		self.gauge[index] = ui.MakeGauge(self.tab[index], 49, 30, 163)
-		self.gauge_f = ui.MakeGauge(parent, 392, 163, 220)
-		self.text[index] = ui.TextLine()
-		self.text[index].SetParent(self.tab[index])
-		self.text[index].SetPosition(53, 5)
-		MissionName2 = str(constInfo.info_missions_bp[int(index)]["Name"]).replace("Oldur", "Oldur")
-		self.text[index].SetText(str(MissionName2))
-		self.text[index].Show()
+	def SelectItemSlotSrc(self, itemSlotIndex):
+		self.GetChild("ActivateTicketButton").Hide()
+		snd.PlaySound("sound/ui/pickup_item_in_inventory.wav")
+		self.GetChild("ticket_slot").ClearSlot(0)
+		self.GetChild("ticket_slot").RefreshSlot()
 
-		self.list_bg[index] = ui.MakeImageBox(self.tab[index], "new_battlepas/big_finished.png", 49, 30)
-		self.list_bg[index].Hide()
+	def SetDesc(self, desc, parent):
+		lines = SplitDescription(desc, 40)
+		if not lines:
+			return
 
-		self.icon[index] = ui.MakeImageBoxNoImg(self.tab[index], 1, 1)
+		self.childrenList = []
+		self.toolTipHeight = 165
+		for line in lines:
+			if len(self.childrenList) >= 4:
+				return
 
-		if self.Get(index, "iType") > 0:
-			self.icon[index].LoadImage(self.Type_Images[self.Get(index, "iType")])
+			textLine = ui.TextLine()
+			textLine.SetParent(parent)
+			textLine.SetText(line)
+			textLine.SetOutline()
+			textLine.Show()
 
-		self.oldugoruntu = ui.ThinBoardCircle()
-		self.oldugoruntu.SetParent(self)
-		self.oldugoruntu.SetSize(self.GetWidth()-10, self.GetHeight()-36)
-		self.oldugoruntu.SetPosition(5,30)
-		self.oldugoruntu.SetAlpha(0.5)
-		self.oldugoruntu.Hide()
+			textLine.SetPosition(4, self.toolTipHeight)
+			self.childrenList.append(textLine)
+			self.toolTipHeight += 14
 
-		self.bitirici[index] = ui.MakeButton(self.tab[index], 273, 13, False, "", "new_battlepas/bonus.png", "new_battlepas/bonus.png", "new_battlepas/bonus.png")
-		self.bitirici[index].SetEvent(ui.__mem_func__(self.__SelectBitirici),index)
-		self.bitirici[index].SetToolTipText(localeInfo.BATTLEPASSBITIR)
-		self.bitirici[index].Show()
+	def OverInToolTip(self, arg):
+		arglen = len(str(arg))
+		pos_x, pos_y = wndMgr.GetMousePosition()
 
-		self.odul[index] = ui.MakeButton(self.tab[index], 308, 13, False, "", "new_battlepas/odul.png", "new_battlepas/odul.png", "new_battlepas/odul.png")
-		self.odul[index].SetEvent(ui.__mem_func__(self.__SelectOdul),index)
-		self.odul[index].SetToolTipText(localeInfo.BATTLEPASSODUL)
-		self.odul[index].Show()
+		self.tooltip.ClearToolTip()
+		self.tooltip.SetThinBoardSize(11 + 6 * arglen)
+		self.tooltip.SetToolTipPosition(pos_x + 5, pos_y - 5)
+		self.tooltip.AppendTextLine(arg, 0xffffff00)
+		self.tooltip.Show()
 
-		self.odulbackground = ui.ImageBox()
-		self.odulbackground.SetParent(self.oldugoruntu)
-		self.odulbackground.SetPosition(205, 145)
-		self.odulbackground.LoadImage("new_battlepas/yeni_gorev.png")
-		self.odulbackground.Hide()
+	def OverOutToolTip(self):
+		self.tooltip.Hide()
 
-		self.odulbackgroundkapat = ui.Button()
-		self.odulbackgroundkapat.SetParent(self.oldugoruntu)
-		self.odulbackgroundkapat.SetUpVisual("d:/ymir work/ui/public/close_button_01.sub")
-		self.odulbackgroundkapat.SetOverVisual("d:/ymir work/ui/public/close_button_02.sub")
-		self.odulbackgroundkapat.SetDownVisual("d:/ymir work/ui/public/close_button_03.sub")
-		self.odulbackgroundkapat.SetToolTipText(localeInfo.UI_CLOSE)
-		self.odulbackgroundkapat.SetEvent(ui.__mem_func__(self.OdulPencereKapat))
-		self.odulbackgroundkapat.SetPosition(400, 147)
-		self.odulbackgroundkapat.Hide()
+	def RanklistIconTooltip(self, event_type, idx):
+		if "mouse_over_in" == str(event_type):
+			if idx == 1:
+				self.OverInToolTip(uiScriptLocale.EXTENDED_BATTLE_PASS_RANK_ICON_RANK)
+			elif idx == 2:
+				self.OverInToolTip(uiScriptLocale.EXTENDED_BATTLE_PASS_RANK_ICON_NAME)
+			elif idx == 3:
+				self.OverInToolTip(uiScriptLocale.EXTENDED_BATTLE_PASS_RANK_ICON_TIME)
+			else:
+				return
+		elif "mouse_over_out" == str(event_type) :
+			self.OverOutToolTip()
+		else:
+			return
 
-	def __SelectBitirici(self, index):
-		bitiricisorgu = uiCommon.QuestionDialog()
-		bitiricisorgu.SetAcceptEvent(lambda arg=True: self.ConfirmBitirici(index))
-		bitiricisorgu.SetCancelEvent(lambda arg=False: self.CancelBitirici(index))
-		bitiricisorgu.SetText(localeInfo.BATTLEPASSEP % (self.Get(index, "iEp")))
-		bitiricisorgu.Open()
-
-		self.bitiricisorgu = bitiricisorgu
-
-	def ConfirmBitirici(self,index):
-		net.SendChatPacket("/battlepass_bitirici %d" % int(index))
-		self.bitiricisorgu.Close()
-		self.bitiricisorgu = None
-		return True
-
-	def CancelBitirici(self,index):
-		self.bitiricisorgu.Close()
-		self.bitiricisorgu = None
-		return True
-
-	def __SelectOdul(self, index):
-		self.oldugoruntu.Show()
-		self.odulbackground.Show()
-		self.odulbackgroundkapat.Show()
-
-		self.reward1 = {}
-		self.reward1[index] = ui.MakeGridSlot2(self.oldugoruntu, 255, 163, self.Get3(index, "iVnum1"), self.Get3(index, "iCount1"))
-		self.reward1[index].SetOverInItemEvent(lambda slotindex = 0, ivnumz = index: self.OverInItem(slotindex, ivnumz, "iVnum1"))
-		self.reward1[index].SetOverOutItemEvent(ui.__mem_func__(self.OverOutItem))
-
-		self.reward2 = {}
-		self.reward2[index] = ui.MakeGridSlot2(self.oldugoruntu, 295, 163, self.Get3(index, "iVnum2"), self.Get3(index, "iCount2"))
-		self.reward2[index].SetOverInItemEvent(lambda slotindex = 0, ivnumz = index: self.OverInItem(slotindex, ivnumz, "iVnum2"))
-		self.reward2[index].SetOverOutItemEvent(ui.__mem_func__(self.OverOutItem))
-
-		self.reward3 = {}
-		self.reward3[index] = ui.MakeGridSlot2(self.oldugoruntu, 335, 163, self.Get3(index, "iVnum3"), self.Get3(index, "iCount3"))
-		self.reward3[index].SetOverInItemEvent(lambda slotindex = 0, ivnumz = index: self.OverInItem(slotindex, ivnumz, "iVnum3"))
-		self.reward3[index].SetOverOutItemEvent(ui.__mem_func__(self.OverOutItem))
-
-		if self.Get4(index, "iVnum1") > 0 or self.Get4(index, "iVnum2") > 0 or self.Get4(index, "iVnum3") > 0:
-			def _affect_text(vnum_key, count_key):
-				vnum = int(self.Get4(index, vnum_key))
-				cnt = int(self.Get4(index, count_key))
-				if vnum in AFFECT_DICT:
-					return str(AFFECT_DICT[vnum](cnt))
-				return str(cnt) if cnt else ""
-			self.rewardbonus1 = {}
-			self.rewardbonus1[index] = ui.MakeTextLineNew(self.oldugoruntu, 250, 212, _affect_text("iVnum1", "iCount1"))
-			self.rewardbonus1[index].SetPackedFontColor(0xffFFFFFF)
-			self.rewardbonus1[index].SetOutline()
-
-			self.rewardbonus2 = {}
-			self.rewardbonus2[index] = ui.MakeTextLineNew(self.oldugoruntu, 250, 242, _affect_text("iVnum2", "iCount2"))
-			self.rewardbonus2[index].SetPackedFontColor(0xffFFFFFF)
-			self.rewardbonus2[index].SetOutline()
-
-			self.rewardbonus3 = {}
-			self.rewardbonus3[index] = ui.MakeTextLineNew(self.oldugoruntu, 250, 268, _affect_text("iVnum3", "iCount3"))
-			self.rewardbonus3[index].SetPackedFontColor(0xffFFFFFF)
-			self.rewardbonus3[index].SetOutline()
-
-	def OdulPencereKapat(self):
-		if self.oldugoruntu.IsShow():
-			self.oldugoruntu.Hide()
-		if self.odulbackground.IsShow():
-			self.odulbackground.Hide()
-		if self.odulbackgroundkapat.IsShow():
-			self.odulbackgroundkapat.Hide()
-
-	def OverInItem(self, slotindex, i, var):
-		if 0 != self.tooltipItem:
-			self.tooltipItem.SetItemToolTip(self.Get3(i, var))
-
-	def OverInItemFinal(self, slotindex):
-		if 0 != self.tooltipItem:
-			self.tooltipItem.SetItemToolTip(constInfo.final_rewards[slotindex])
+	def OverInItem(self, slotPos):
+		if self.tooltipItem:
+			self.tooltipItem.ClearToolTip()
+			if self.rewardDict.has_key(slotPos):
+				self.tooltipItem.AddItemData(self.rewardDict[slotPos][0], metinSlot = [0 for i in xrange(player.METIN_SOCKET_MAX_NUM)])
+				self.tooltipItem.ShowToolTip()
 
 	def OverOutItem(self):
 		if self.tooltipItem:
 			self.tooltipItem.HideToolTip()
 
+	def OnScroll(self):
+		if self.missionList:
+			self.missionList.OnScroll(self.scrollBar.GetPos())
+
+	def OnRunMouseWheel(self, nLen):
+		if not self.scrollBar or not self.scrollBar.IsShow():
+			return
+
+		if nLen > 0 and self.scrollBar:
+			if self.missionList.GetMissionCount() < 11:
+				self.scrollBar.OnUp()
+			else:
+				self.scrollBar.OnUp2()
+		else:
+			if self.missionList.GetMissionCount() < 11:
+				self.scrollBar.OnDown()
+			else:
+				self.scrollBar.OnDown2()
+
 	def OnPressEscapeKey(self):
-		if self.oldugoruntu.IsShow():
-			self.oldugoruntu.Hide()
-
-		if self.odulbackground.IsShow():
-			self.odulbackground.Hide()
-
-		if self.odulbackgroundkapat.IsShow():
-			self.odulbackgroundkapat.Hide()
-
 		self.Close()
-		return True
+		return TRUE
 
-	def OnCancel(self):
-		self.Hide()
-		return True
+	def OnUpdate(self):
+		missionCount = self.missionList.GetMissionCount()
+		completedMissionCount = self.missionList.GetCompletedMissionCount()
+		battlepasstype = self.GetShowBattlePassType()
+		battlepassid = self.GetActualBattlePassIDByType()
+
+		if self.page == "PREMIUM" and player.GetPremiumBattlePassID() != self.BattlePassIDPremium and self.isActivePremiumWindow == 1:
+			self.SetPage(self.page)
+
+		if battlepassid != -1:
+			if self.battlePassGeneralInfo[battlepasstype][battlepassid]["end_time"]+1 < app.GetGlobalTimeStamp():
+				self.__ClearAll()
+				net.SendExtBattlePassAction(1)
+				self.SetPage(self.page)
+
+		if self.next_normal_battlepass_time != 0:
+			if self.next_normal_battlepass_time+1 < app.GetGlobalTimeStamp():
+				self.__ClearAll()
+				net.SendExtBattlePassAction(1)
+				self.SetPage(self.page, TRUE)
+			else:
+				self.GetChild("NormalInfoTextTime").SetText(uiScriptLocale.EXTENDED_BATTLE_PASS_PLANNED_TIME % localeInfo.RTSecondToDHMS(self.next_normal_battlepass_time+2 - app.GetGlobalTimeStamp()))
+
+		if self.next_premium_battlepass_time != 0:
+			if self.next_premium_battlepass_time+1 < app.GetGlobalTimeStamp():
+				self.__ClearAll()
+				net.SendExtBattlePassAction(1)
+				self.SetPage(self.page, TRUE)
+			elif self.GetChild("PremiumInfoTextTime").IsShow():
+				self.GetChild("PremiumInfoTextTime").SetText(uiScriptLocale.EXTENDED_BATTLE_PASS_PLANNED_TIME % localeInfo.RTSecondToDHMS(self.next_premium_battlepass_time+2 - app.GetGlobalTimeStamp()))	
+
+		if self.subpage == "GENERAL":
+			if self.battlePassGeneralInfo[battlepasstype].has_key(battlepassid) and self.battlePassGeneralInfo[battlepasstype][battlepassid]["start_time"] < app.GetGlobalTimeStamp() and self.battlePassGeneralInfo[battlepasstype][battlepassid]["end_time"]+1 > app.GetGlobalTimeStamp():
+				self.GetChild("GeneralInfoEndTimeText").SetText(uiScriptLocale.EXTENDED_BATTLE_PASS_PLANNED_TIME % str(localeInfo.RTSecondToDHMS(self.battlePassGeneralInfo[battlepasstype][battlepassid]["end_time"] - app.GetGlobalTimeStamp())))
+				self.GetChild("GeneralInfoFinishMissionsText").SetText(uiScriptLocale.EXTENDED_BATTLE_PASS_SEASON_CURRENT_MISSIONS % (completedMissionCount, missionCount))
+				self.GetChild("GaugeMission").SetPercentage(completedMissionCount, missionCount)
+				self.UpdateTimeGauge()
+
+	def UpdateTimeGauge(self):
+		battlepasstype = self.GetShowBattlePassType()
+		battlepassid = self.GetActualBattlePassIDByType()
+		range = self.battlePassGeneralInfo[battlepasstype][battlepassid]["end_time"] - self.battlePassGeneralInfo[battlepasstype][battlepassid]["start_time"]
+		percent = float((float(app.GetGlobalTimeStamp()) - float(self.battlePassGeneralInfo[battlepasstype][battlepassid]["start_time"])) / float(range))
+		if percent >= 0.9:
+			self.GetChild("GaugeTime").LoadImage(GAUGE_PATH + "large_red.sub")
+		else:
+			if percent <= 0.7:
+				self.GetChild("GaugeTime").LoadImage(GAUGE_PATH + "large_green.sub")
+			else:
+				self.GetChild("GaugeTime").LoadImage(GAUGE_PATH + "large_yellow.sub")
+		self.GetChild("GaugeTime").SetPercentageEx(self.battlePassGeneralInfo[battlepasstype][battlepassid]["start_time"], app.GetGlobalTimeStamp(), self.battlePassGeneralInfo[battlepasstype][battlepassid]["end_time"])
+
+class ListBoxMissions(ui.Window):
+	class Item(ui.Window):
+		def __init__(self, BattlePassType, battlePassID, mission_index, mission_type):
+			ui.Window.__init__(self)
+			self.SetWindowName("ListBoxMissions_Item")
+			self.bIsSelected = FALSE
+			self.battlePassType = BattlePassType
+			self.battlePassID = battlePassID
+			self.missionIndex = mission_index
+			self.missionId = mission_type
+			self.percentActual = 0
+			self.percentTotal = 0
+			self.rewardCount = 0
+			self.missionInfo1 = 0
+			self.xBase, self.yBase = 0, 0
+
+			self.tooltipItem = uiToolTip.ItemToolTip()
+			self.tooltipItem.Hide()
+
+			self.listImages = []
+			self.rewardList = [[0, 0], [0, 0], [0, 0]]
+			self.rewardImages = []
+			self.rewardListCount = []
+
+			if BattlePassType == 1:
+				bgImage = ui.MakeExpandedImageBox(self, NORMAL_PATH + "mission_item_normal.sub", 0, 0, "not_pick")
+
+			if BattlePassType == 2:
+				bgImage = ui.MakeExpandedImageBox(self, PREMIUM_PATH + "mission_item_normal.sub", 0, 0, "not_pick")
+
+			bgGauge = ui.MakeExpandedImageBox(bgImage, GAUGE_PATH + "small_background.sub", 47, 28, "not_pick")
+			bgGaugeFull = ui.MakeExpandedImageBox(bgGauge, GAUGE_PATH + "small_green.sub", 8, 2, "not_pick")
+			bgGaugeFull.SetWindowName("gaugeFull")
+
+			self.listImages.append(bgImage)
+			self.listImages.append(bgGauge)
+			self.listImages.append(bgGaugeFull)
+
+			for i in xrange(3):
+				rewardImage = ui.MakeExpandedImageBox(self, "d:/ymir work/ui/game/windows/skill_enable_button.sub", 186 + (32 * i), 6)
+				rewardImage.SetEvent(ui.__mem_func__(self.OverInItem), "MOUSE_OVER_IN", i)
+				rewardImage.SetEvent(ui.__mem_func__(self.OverOutItem), "MOUSE_OVER_OUT")
+				self.rewardImages.append(rewardImage)
+
+				itemCount = ui.NumberLine()
+				itemCount.SetParent(rewardImage)
+				itemCount.SetWindowName("itemCount_%d" % i)
+				itemCount.SetHorizontalAlignRight()
+				itemCount.SetPosition(32 - 4, 32 - 10)
+				itemCount.Show()
+				self.rewardListCount.append(itemCount)
+
+			self.missionName = ui.AddTextLine(bgImage, 53, 6, "", 1)
+
+		def __del__(self):
+			ui.Window.__del__(self)
+			self.bIsSelected = FALSE
+			self.missionId = 0
+			self.battlePassType = 0
+			self.missionIndex = 0
+			self.battlePassID = 0
+			self.percentActual = 0
+			self.percentTotal = 0
+			self.rewardCount = 0
+			self.missionInfo1 = 0
+			self.xBase, self.yBase = 0, 0
+			self.missionName = None
+			self.tooltipItem = None
+
+			self.listImages = []
+			self.rewardList = [[0, 0], [0, 0], [0, 0]]
+			self.rewardImages = []
+			self.rewardListCount = []
+
+		def OverInItem(self, eventType, rewardIndex):
+			if self.tooltipItem:
+				self.tooltipItem.ClearToolTip()
+				if self.rewardList[rewardIndex][0]:
+					self.tooltipItem.AddItemData(self.rewardList[rewardIndex][0], metinSlot = [0 for i in xrange(player.METIN_SOCKET_MAX_NUM)])
+					self.tooltipItem.ShowToolTip()
+
+		def OverOutItem(self):
+			if self.tooltipItem:
+				self.tooltipItem.HideToolTip()
+
+		def SetBasePosition(self, x, y):
+			self.xBase = x
+			self.yBase = y
+
+		def GetBasePosition(self):
+			return (self.xBase, self.yBase)
+
+		def GetMissionIndex(self):
+			return self.missionIndex
+
+		def GetMissionId(self):
+			return self.missionId
+
+		def GetPattlePassType(self):
+			return self.battlePassType
+
+		def GetBattlePassId(self):
+			return self.battlePassID
+
+		def OnMouseLeftButtonUp(self):
+			snd.PlaySound("sound/ui/click.wav")
+			self.Select()
+
+		def Select(self):
+			self.bIsSelected = TRUE
+			self.parent.SetSelectedMission(self.missionIndex, self.missionId)
+
+			if len(self.listImages) > 0:
+				if self.battlePassType == 1:
+					self.listImages[0].LoadImage(NORMAL_PATH + "mission_item_active.sub")
+
+				if self.battlePassType == 2:
+					self.listImages[0].LoadImage(PREMIUM_PATH + "mission_item_active.sub")
+
+		def Deselect(self):
+			self.bIsSelected = FALSE
+
+			if len(self.listImages) > 0:
+				if self.battlePassType == 1:
+					self.listImages[0].LoadImage(NORMAL_PATH + "mission_item_normal.sub")
+
+				if self.battlePassType == 2:
+					self.listImages[0].LoadImage(PREMIUM_PATH + "mission_item_normal.sub")
+
+		def SetProgress(self, progressActual, pregressTotal):
+			self.percentActual = progressActual
+			self.percentTotal = pregressTotal
+
+			self.UpdateGauge()
+
+		def UpdateProgress(self, newProgress):
+			self.percentActual = newProgress
+			self.UpdateGauge()
+
+		def UpdateGauge(self):
+			for image in self.listImages:
+				if image.GetWindowName() == "gaugeFull":
+					if self.percentActual == self.percentTotal:
+						image.LoadImage(GAUGE_PATH + "small_green.sub")
+					else:
+						if self.percentActual <= int(self.percentTotal / 2):
+							image.LoadImage(GAUGE_PATH + "small_blue.sub")
+						else:
+							image.LoadImage(GAUGE_PATH + "small_yellow.sub")
+
+		def IsCompleted(self):
+			if self.percentActual >= self.percentTotal:
+				return TRUE
+
+			return FALSE
+
+		def SetMissionName(self, missionName):
+			if self.missionName:
+				self.missionName.SetText(missionName)
+
+		def SetMissionInfo1(self, missionInfo):
+			self.missionInfo1 = missionInfo
+
+		def GetMissionInfo(self):
+			return (self.missionName.GetText(), self.missionInfo1, self.percentActual, self.percentTotal)
+
+		def AddMissionReward(self, itemVnum, itemCount):
+			if self.rewardCount == -1:
+				return
+
+			if itemVnum and itemCount > 0:
+				if self.rewardCount < len(self.rewardImages):
+					item.SelectItem(itemVnum)
+					self.rewardImages[self.rewardCount].LoadImage(item.GetIconImageFileName())
+					self.rewardListCount[self.rewardCount].SetNumber(str(itemCount))
+					self.rewardList[self.rewardCount] = [itemVnum, itemCount]
+					self.rewardCount += 1
+			else:
+				self.rewardCount = -1
+
+		def Show(self):
+			ui.Window.Show(self)
+
+		def SetParent(self, parent):
+			ui.Window.SetParent(self, parent)
+			self.parent = proxy(parent)
+
+		def OnUpdate(self):
+			isInMissionRewards = None
+			if self.rewardImages[0].IsIn():
+				isInMissionRewards = 0
+			elif self.rewardImages[1].IsIn():
+				isInMissionRewards = 1
+			elif self.rewardImages[2].IsIn():
+				isInMissionRewards = 2
+
+			if isInMissionRewards != None:
+				if self.tooltipItem:
+					self.tooltipItem.ClearToolTip()
+					if self.rewardList[isInMissionRewards][0] and self.rewardList[isInMissionRewards][0] != 0:
+						self.tooltipItem.AddItemData(self.rewardList[isInMissionRewards][0], metinSlot = [0 for i in xrange(player.METIN_SOCKET_MAX_NUM)])
+						self.tooltipItem.ShowToolTip()
+					else:
+						self.tooltipItem.HideToolTip()
+			else:
+				if self.tooltipItem:
+					self.tooltipItem.HideToolTip()
+
+			for count in self.rewardListCount:
+				xList, yList = self.parent.GetGlobalPosition()
+				xText, yText = count.GetGlobalPosition()
+				wText, hText = count.GetWidth(), 7
+
+				if yText < yList or (yText + hText > yList + self.parent.GetHeight()):
+					count.Hide()
+				else:
+					count.Show()
+
+		def OnRender(self):
+			xList, yList = self.parent.GetGlobalPosition()
+
+			for item in self.listImages + self.rewardImages:
+				if item.GetWindowName() == "gaugeFull":
+					if self.percentTotal == 0:
+						self.percentTotal = 1
+					item.SetClipRect(0.0, yList, -1.0 + float(self.percentActual) / float(self.percentTotal), yList + self.parent.GetHeight(), TRUE)
+				else:
+					item.SetClipRect(xList, yList, xList + self.parent.GetWidth(), yList + self.parent.GetHeight())
+
+			if self.missionName:
+				xText, yText = self.missionName.GetGlobalPosition()
+				wText, hText = self.missionName.GetTextSize()
+
+				if yText < yList or (yText + hText > yList + self.parent.GetHeight()):
+					self.missionName.Hide()
+				else:
+					self.missionName.Show()
+
+			for count in self.rewardListCount:
+				xList, yList = self.parent.GetGlobalPosition()
+				xText, yText = count.GetGlobalPosition()
+				wText, hText = count.GetWidth(), 7
+
+				if yText < yList or (yText + hText > yList + self.parent.GetHeight()):
+					count.Hide()
+				else:
+					count.Show()
+
+	def __init__(self):
+		ui.Window.__init__(self)
+		self.SetWindowName("ListBoxMissions")
+		self.missionlist_type_normal = []
+		self.missionlist_type_premium = []
+
+		self.selected_list = self.missionlist_type_normal
+
+		self.selectedBattlePassType = 1
+		self.selectedMissionNormal = -1
+		self.selectedMissionPremium = -1
+
+	def __del__(self):
+		ui.Window.__del__(self)
+
+		self.missionlist_type_normal = []
+		self.missionlist_type_premium = []
+
+		self.selectedBattlePassType = 1
+		self.selectedMissionNormal = -1
+		self.selectedMissionPremium = -1
+		self.globalParent = None
+
+	def SelectMissionByPage(self):
+		if self.selectedBattlePassType == 1:
+			selected_mission = self.selectedMissionNormal
+
+		if self.selectedBattlePassType == 2:
+			selected_mission = self.selectedMissionPremium
+
+		if len(self.selected_list) != 0:
+			if selected_mission == -1:
+				selected_mission = self.selected_list[0].GetMissionIndex()
+			for item in self.selected_list:
+				if selected_mission == item.GetMissionIndex():
+					item.Select()
+				else:
+					item.Deselect()
+
+	def SetSelectedMission(self, missionIndex, missionId):
+		if self.selectedBattlePassType == 1:
+			self.selectedMissionNormal = missionIndex
+
+		if self.selectedBattlePassType == 2:
+			self.selectedMissionPremium = missionIndex
+
+		if len(self.selected_list) != 0:
+			for item in self.selected_list:
+				if missionIndex != item.GetMissionIndex():
+					item.Deselect()
+
+			if self.globalParent:
+				self.globalParent.SetMissionInfo(missionIndex, missionId)
+
+	def GetSelectedMission(self):
+		if self.selectedBattlePassType == 1:
+			return self.selectedMissionNormal
+
+		if self.selectedBattlePassType == 2:
+			return self.selectedMissionPremium
+
+	def HaveMission(self, battlePassType, missionIndex, missionId):
+		if battlePassType == 1:
+			select_list = self.missionlist_type_normal
+
+		if battlePassType == 2:
+			select_list = self.missionlist_type_premium
+
+		for item in select_list:
+			if missionIndex == item.GetMissionIndex():
+				return TRUE
+
+		return FALSE
+
+	def GetMissionInfo(self, mission_index):
+		for item in self.selected_list:
+			if mission_index == item.GetMissionIndex():
+				return item.GetMissionInfo()
+
+		return (0, 0, 0)
+
+	def GetMissionCount(self):
+		return len(self.selected_list)
+
+	def GetCompletedMissionCount(self):
+		completedCount = 0
+		for item in self.selected_list:
+			if item.IsCompleted():
+				completedCount += 1
+
+		return completedCount
+
+	def SetProgress(self, battlePassType, missionIndex, progressActual, pregressTotal):
+		if battlePassType == 1:
+			select_list = self.missionlist_type_normal
+
+		if battlePassType == 2:
+			select_list = self.missionlist_type_premium
+
+		for item in select_list:
+			if missionIndex == item.GetMissionIndex():
+				item.SetProgress(progressActual, pregressTotal)
+
+	def UpdateProgress(self, battlePassType, missionIndex, newProgress):
+		if battlePassType == 1:
+			select_list = self.missionlist_type_normal
+
+		if battlePassType == 2:
+			select_list = self.missionlist_type_premium
+
+		for item in select_list:
+			if missionIndex == item.GetMissionIndex():
+				item.UpdateProgress(newProgress)
+
+	def AddMissionReward(self, battlePassType, missionIndex, itemVnum, itemCount):
+		if battlePassType == 1:
+			select_list = self.missionlist_type_normal
+
+		if battlePassType == 2:
+			select_list = self.missionlist_type_premium
+
+		for item in select_list:
+			if missionIndex == item.GetMissionIndex():
+				item.AddMissionReward(itemVnum, itemCount)
+
+	def SetGlobalParent(self, parent):
+		self.globalParent = proxy(parent)
+
+	def OnRunMouseWheel(self, nLen):
+		if nLen > 0:
+			self.scrollBar.OnUp()
+		else:
+			self.scrollBar.OnDown()
+
+	def OnScroll(self, scrollPos):
+		totalHeight = 0
+		for itemH in self.selected_list:
+			totalHeight += itemH.GetHeight() 
+
+		totalHeight -= self.GetHeight()
+
+		for i in xrange(len(self.selected_list)):
+			x, y = self.selected_list[i].GetLocalPosition()
+			xB, yB = self.selected_list[i].GetBasePosition()
+			setPos = yB - int(scrollPos * totalHeight)
+			self.selected_list[i].SetPosition(xB, setPos)
+
+	def AppendMission(self, itemHeight, battlePassType, battlePassID, mission_index, mission_type, missionName, missionInfo1):
+		if battlePassType == 1:
+			selected_list = self.missionlist_type_normal
+
+		if battlePassType == 2:
+			selected_list = self.missionlist_type_premium
+
+		item = self.Item(battlePassType, battlePassID, mission_index, mission_type)
+		item.SetParent(self)
+		item.SetSize(self.GetWidth() - 3, itemHeight)
+		item.SetMissionName(missionName)
+		item.SetMissionInfo1(missionInfo1)
+
+		if len(selected_list) == 0:
+			item.SetPosition(0, 0)
+			item.SetBasePosition(0, 0)
+		else:
+			x, y = selected_list[-1].GetLocalPosition()
+			item.SetPosition(0, y + selected_list[-1].GetHeight())
+			item.SetBasePosition(0, y + selected_list[-1].GetHeight())
+
+		selected_list.append(item)
+
+	def ShowMissionsByBattlePassType(self, BattlePassType):
+		self.selectedBattlePassType = BattlePassType
+
+		for i in xrange(len(self.missionlist_type_normal)):
+			self.missionlist_type_normal[i].Hide()
+
+		for i in xrange(len(self.missionlist_type_premium)):
+			self.missionlist_type_premium[i].Hide()
+
+		if self.globalParent.scrollBar:
+			self.globalParent.scrollBar.Show()
+
+		if BattlePassType == 1:
+			if len(self.missionlist_type_normal) <= 5:
+				self.globalParent.scrollBar.Hide()
+			for i in xrange(len(self.missionlist_type_normal)):
+				self.missionlist_type_normal[i].Show()
+				self.selected_list = self.missionlist_type_normal
+
+		if BattlePassType == 2:
+			if len(self.missionlist_type_premium) <= 5:
+				self.globalParent.scrollBar.Hide()
+			for i in xrange(len(self.missionlist_type_premium)):
+				self.missionlist_type_premium[i].Show()
+				self.selected_list = self.missionlist_type_premium
+
+	def ClearAll(self):
+		self.missionlist_type_normal = []
+		self.missionlist_type_premium = []
+		self.selectedBattlePassType = 1
+		self.selectedMissionNormal = -1
+		self.selectedMissionPremium = -1
+
+class MissionScrollBar(ui.DragButton):
+	def __init__(self):
+		ui.DragButton.__init__(self)
+		self.AddFlag("float")
+		self.AddFlag("movable")
+		self.AddFlag("restrict_x")
+
+		self.eventScroll = lambda *arg: None
+		self.currentPos = 0.0
+		self.scrollStep = 0.10
+		self.scrollStep2 = 0.05
+
+	def __del__(self):
+		ui.DragButton.__del__(self)
+		self.currentPos = 0.0
+		self.scrollStep = 0.10
+		self.scrollStep2 = 0.05
+		self.eventScroll = lambda *arg: None
+
+	def SetScrollEvent(self, event):
+		self.eventScroll = event
+
+	def SetScrollStep(self, step):
+		self.scrollStep = step
+
+	def SetPos(self, pos):
+		pos = max(0.0, pos)
+		pos = min(1.0, pos)
+
+		yPos = float(pos * 165)
+
+		self.SetPosition(12, yPos + 2)
+		self.OnMove()
+
+	def GetPos(self):
+		return self.currentPos
+
+	def OnUp(self):
+		self.SetPos(self.currentPos - self.scrollStep)
+
+	def OnDown(self):
+		self.SetPos(self.currentPos + self.scrollStep)
+
+	def OnUp2(self):
+		self.SetPos(self.currentPos - self.scrollStep2)
+
+	def OnDown2(self):
+		self.SetPos(self.currentPos + self.scrollStep2)
+
+	def OnMove(self):
+		(xLocal, yLocal) = self.GetLocalPosition()
+		self.currentPos = float(yLocal - 2) / float(165) 
+
+		self.eventScroll()
+
+def SplitDescription(desc, limit):
+	total_tokens = desc.split()
+	line_tokens = []
+	line_len = 0
+	lines = []
+	for token in total_tokens:
+		line_len += len(token)
+		if len(line_tokens) + line_len > limit:
+			lines.append(" ".join(line_tokens))
+			line_len = len(token)
+			line_tokens = [token]
+		else:
+			line_tokens.append(token)
+
+	if line_tokens:
+		lines.append(" ".join(line_tokens))
+
+	return lines

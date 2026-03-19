@@ -6,12 +6,12 @@ class CMSWindow
 {
 	public:
 		CMSWindow();
-
+		
 		virtual ~CMSWindow();
-
+		
 		void Destroy();
 		bool Create(const char *c_szName, int brush=BLACK_BRUSH, DWORD cs=0, DWORD ws=WS_OVERLAPPEDWINDOW, HICON hIcon=nullptr, int iCursorResource=32512);
-
+		
 		void Show();
 		void Hide();
 
@@ -40,19 +40,19 @@ class CMSWindow
 
 		virtual LRESULT	WindowProcedure(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam);
 		virtual void	OnSize(WPARAM wParam, LPARAM lParam);
-
+		
 	protected:
 		const char *RegisterWindowClass(DWORD style, int brush, WNDPROC pfnWndProc, HICON hIcon=nullptr, int iCursorResource=32512);
 
 	protected:
 		typedef std::set<char *, stl_sz_less> TWindowClassSet;
-
+		
 	protected:
 		HWND m_hWnd;
 		RECT m_rect;
 		bool m_isActive;
 		bool m_isVisible;
-
+		
 	protected:
 		static TWindowClassSet ms_stWCSet;
 		static HINSTANCE ms_hInstance;

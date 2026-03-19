@@ -18,6 +18,8 @@
 #include <boost/test/detail/fwd_decl.hpp>
 #include <boost/test/detail/throw_exception.hpp>
 
+#include <boost/test/utils/trivial_singleton.hpp>
+
 #include <boost/test/detail/suppress_warnings.hpp>
 
 // STL

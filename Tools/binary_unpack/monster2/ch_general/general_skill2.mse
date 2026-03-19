@@ -264,7 +264,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\pc\warrior\effect\rotation of gihyeol_spash.dds"
+            "D:\Ymir Work\effect\monster2\Rotation of gihyeol_spash.dds"
         }
     }
 }

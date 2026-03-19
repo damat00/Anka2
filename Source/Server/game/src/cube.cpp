@@ -318,24 +318,6 @@ void Cube_close (LPCHARACTER ch)
 	ch->ChatPacket(CHAT_TYPE_COMMAND, "cube close");
 }
 
-#if defined(ENABLE_CUBE_RELOAD_FIX)
-#include "desc.h"
-#include "desc_manager.h"
-static void CubeReload()
-{
-	cube_info_map.clear();
-	cube_result_info_map_by_npc.clear();
-	Cube_InformationInitialize();
-	for (DESC_MANAGER::DESC_SET::const_iterator it = DESC_MANAGER::instance().GetClientSet().begin(); it != DESC_MANAGER::instance().GetClientSet().end(); ++it) {
-		LPCHARACTER ch = (*it)->GetCharacter();
-		if (ch) {
-			Cube_close(ch);
-			ch->ChatPacket(CHAT_TYPE_COMMAND, "cube reload");
-		}
-	}
-}
-#endif
-
 void Cube_init()
 {
 	CUBE_DATA * p_cube = NULL;
@@ -356,10 +338,6 @@ void Cube_init()
 
 	if (false == Cube_load(file_name))
 		sys_err("Cube_Init failed");
-#if defined(ENABLE_CUBE_RELOAD_FIX)
-	if (s_isInitializedCubeMaterialInformation)
-		CubeReload();
-#endif
 }
 
 bool Cube_load (const char *file)
@@ -390,7 +368,6 @@ bool Cube_load (const char *file)
 		if (NULL == token_string)
 			continue;
 
-		// set value1, value2
 		if ((v = strtok(NULL, delim)))
 			str_to_number(value1, v);
 
@@ -879,7 +856,6 @@ void Cube_request_material_info(LPCHARACTER ch, int requestStartIndex, int reque
 	bool bCatchInfo = false;
 
 	const TCubeResultList& resultList = cube_info_map[npcVNUM];
-
 	for (TCubeResultList::const_iterator iter = resultList.begin(); resultList.end() != iter; ++iter)
 	{
 		const SCubeMaterialInfo& materialInfo = *iter;
@@ -888,7 +864,7 @@ void Cube_request_material_info(LPCHARACTER ch, int requestStartIndex, int reque
 		{
 			bCatchInfo = true;
 		}
-
+		
 		if (bCatchInfo)
 		{
 			materialInfoText += materialInfo.infoText + "@";

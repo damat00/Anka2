@@ -16,6 +16,7 @@
 #include "locale_service.h"
 #include "log.h"
 #include "questmanager.h"
+
 #include "../../common/service.h"
 
 	SGuildMember::SGuildMember(LPCHARACTER ch, BYTE grade, DWORD offer_exp)
@@ -71,21 +72,36 @@ CGuild::CGuild(TGuildCreateParameter & cp)
 
 	strlcpy(m_data.name, cp.name, sizeof(m_data.name));
 	m_data.master_pid = cp.master->GetPlayerID();
-	strlcpy(m_data.grade_array[0].grade_name, "Lider", sizeof(m_data.grade_array[0].grade_name));
+	strlcpy(m_data.grade_array[0].grade_name, "Leader", sizeof(m_data.grade_array[0].grade_name));
 	m_data.grade_array[0].auth_flag = GUILD_AUTH_ADD_MEMBER | GUILD_AUTH_REMOVE_MEMBER | GUILD_AUTH_NOTICE | GUILD_AUTH_USE_SKILL;
 
 	for (int i = 1; i < GUILD_GRADE_COUNT; ++i)
 	{
-		strlcpy(m_data.grade_array[i].grade_name, "Üye", sizeof(m_data.grade_array[i].grade_name));
+		strlcpy(m_data.grade_array[i].grade_name, "Member", sizeof(m_data.grade_array[i].grade_name));
 		m_data.grade_array[i].auth_flag = 0;
 	}
 
-	std::unique_ptr<SQLMsg> pmsg (DBManager::instance().DirectQuery(
-				"INSERT INTO guild%s(name, master, sp, level, exp, skill_point, skill) "
-				"VALUES('%s', %u, 1000, 1, 0, 0, '\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0')",
-				get_table_postfix(), m_data.name, m_data.master_pid));
+#ifdef ENABLE_GUILD_TOKEN_AUTH
+	m_data.token = CGuildManager::instance().GenerateTokenHashNumber();
+#endif
 
-	// TODO if error occur?
+	std::unique_ptr<SQLMsg> pmsg (DBManager::instance().DirectQuery(
+				"INSERT INTO guild%s(name, master, sp, level, exp, skill_point, skill, markpass"
+#ifdef ENABLE_GUILD_TOKEN_AUTH
+				", token"
+#endif
+				") "
+				"VALUES('%s', %u, 1000, 1, 0, 0, '\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0\\0', %d"
+#ifdef ENABLE_GUILD_TOKEN_AUTH
+				", %" PRIu64
+#endif
+				")",
+				get_table_postfix(), m_data.name, m_data.master_pid, number(214748364, 2147483640)
+#ifdef ENABLE_GUILD_TOKEN_AUTH
+				, m_data.token
+#endif
+			));
+
 	m_data.guild_id = pmsg->Get()->uiInsertID;
 
 	for (int i = 0; i < GUILD_GRADE_COUNT; ++i)
@@ -643,6 +659,10 @@ void CGuild::LoadGuildData(SQLMsg* pmsg)
 	str_to_number(m_data.draw, row[9]);
 	str_to_number(m_data.loss, row[10]);
 	str_to_number(m_data.gold, row[11]);
+	str_to_number(m_data.markPass, row[12]);
+#ifdef ENABLE_GUILD_TOKEN_AUTH
+	str_to_number(m_data.token, row[13]);
+#endif
 
 	ComputeGuildPoints();
 }
@@ -654,7 +674,11 @@ void CGuild::Load(DWORD guild_id)
 	m_data.guild_id = guild_id;
 
 	DBManager::instance().FuncQuery(std::bind(&CGuild::LoadGuildData, this, std::placeholders::_1),
-			"SELECT master, level, exp, name, skill_point, skill, sp, ladder_point, win, draw, loss, gold FROM guild%s WHERE id = %u", get_table_postfix(), m_data.guild_id);
+			"SELECT master, level, exp, name, skill_point, skill, sp, ladder_point, win, draw, loss, gold, markpass"
+#ifdef ENABLE_GUILD_TOKEN_AUTH
+			", token"
+#endif
+			" FROM guild%s WHERE id = %u", get_table_postfix(), m_data.guild_id);
 
 	sys_log(0, "GUILD: loading guild id %12s %u", m_data.name, guild_id);
 
@@ -1979,6 +2003,14 @@ EVENTFUNC( GuildInviteEvent )
 
 void CGuild::Invite( LPCHARACTER pchInviter, LPCHARACTER pchInvitee )
 {
+#ifdef ENABLE_BOT_PLAYER
+	if (pchInvitee && pchInvitee->IsBotCharacter())
+	{
+		pchInviter->ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<±æµå> »ó´ë¹æÀÌ ±æµå ÃÊ´ë °ÅºÎ »óÅÂÀÔ´Ï´Ù."));
+		return;
+	}
+#endif
+
 	if (quest::CQuestManager::instance().GetPCForce(pchInviter->GetPlayerID())->IsRunning() == true)
 	{
 		pchInviter->LocaleChatPacket(CHAT_TYPE_INFO, 390, "");
@@ -1987,14 +2019,6 @@ void CGuild::Invite( LPCHARACTER pchInviter, LPCHARACTER pchInvitee )
 
 	if (quest::CQuestManager::instance().GetPCForce(pchInvitee->GetPlayerID())->IsRunning() == true)
 		return;
-
-#ifdef ENABLE_BOT_PLAYER
-	if (pchInvitee && pchInvitee->IsBotCharacter())
-	{
-		pchInviter->LocaleChatPacket(CHAT_TYPE_INFO, 391, "");
-		return;
-	}
-#endif
 
 	if (pchInvitee->IsBlockMode(BLOCK_GUILD_INVITE))
 	{
@@ -2199,7 +2223,7 @@ void CGuild::SendGuildDataUpdateToAllMember(SQLMsg* pmsg)
 {
 	TGuildMemberOnlineContainer::iterator iter = m_memberOnline.begin();
 
-	for (; iter != m_memberOnline.end(); ++iter)	//@fixme541
+	for (; iter != m_memberOnline.end(); iter++ )
 	{
 		SendGuildInfoPacket(*iter);
 		SendAllGradePacket(*iter);

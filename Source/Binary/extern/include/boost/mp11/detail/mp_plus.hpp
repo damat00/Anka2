@@ -9,6 +9,7 @@
 //  http://www.boost.org/LICENSE_1_0.txt
 
 #include <boost/mp11/detail/config.hpp>
+#include <boost/config/workaround.hpp>
 #include <type_traits>
 
 namespace boost
@@ -20,7 +21,7 @@ namespace mp11
 namespace detail
 {
 
-#if defined( BOOST_MP11_HAS_FOLD_EXPRESSIONS ) && !BOOST_MP11_WORKAROUND( BOOST_MP11_MSVC, <= 1915 )
+#if defined( BOOST_MP11_HAS_FOLD_EXPRESSIONS )
 
 template<class... T> struct mp_plus_impl
 {
@@ -37,7 +38,7 @@ template<> struct mp_plus_impl<>
     using type = std::integral_constant<int, 0>;
 };
 
-#if BOOST_MP11_WORKAROUND( BOOST_MP11_GCC, < 40800 )
+#if BOOST_WORKAROUND( BOOST_GCC, < 40800 )
 
 template<class T1, class... T> struct mp_plus_impl<T1, T...>
 {

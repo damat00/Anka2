@@ -22,12 +22,12 @@ CFlyingInstance::~CFlyingInstance()
 {
 	Destroy();
 }
-
+	
 void CFlyingInstance::__Initialize()
 {
 	m_qAttachRotation=m_qRot=D3DXQUATERNION(0.0f, 0.0f, 0.0f, 0.0f);
 	m_v3Accel=m_v3LocalVelocity=m_v3Velocity=m_v3Position=D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-
+	
 	m_pHandler=NULL;
 	m_pData=NULL;
 	m_pOwner=NULL;
@@ -38,7 +38,7 @@ void CFlyingInstance::__Initialize()
 	m_dwSkillIndex = 0;
 
 	m_iPierceCount=0;
-
+	
 	m_fStartTime=0.0f;
 	m_fRemainRange=0.0f;
 
@@ -120,6 +120,7 @@ void CFlyingInstance::__SetTargetDirection(const CFlyTarget& c_rkTarget)
 {
 	D3DXVECTOR3 v3TargetPos=c_rkTarget.GetFlyTargetPosition();
 
+	// 임시 코드
 	if (m_pData->m_bMaintainParallel)
 	{
 		v3TargetPos.z += 50.0f;
@@ -139,6 +140,7 @@ void CFlyingInstance::__SetTargetNormalizedDirection(const D3DXVECTOR3 & v3Nomal
 	Vec3TransformQuaternion(&m_v3Accel, &m_pData->m_v3Accel, &m_qRot);
 }
 
+// 2004. 3. 26. myevan. 기능을 몰라 일단 주석 처리. 적�?한 네이밍이 필요. 게임에서 사용하지 않는다면 툴에서 툴 전용으로 상속�?아 만들도록 하자
 void CFlyingInstance::SetFlyTarget(const CFlyTarget & cr_Target)
 {
 	//m_pFlyTarget = pTarget;
@@ -159,7 +161,7 @@ void CFlyingInstance::AdjustDirectionForHoming(const D3DXVECTOR3 & v3TargetPosit
 	const auto vv1 = (vVel - vTargetDir);
 	if (D3DXVec3LengthSq(&vv1) < 0.001f)
 		return;
-
+	
 	D3DXQUATERNION q = SafeRotationNormalizedArc(vVel,vTargetDir);
 
 	if (m_pData->m_fHomingMaxAngle > 180)
@@ -304,7 +306,7 @@ struct FCheckBackgroundDuringFlying {
 		{
 			if (p->CollisionDynamicSphere(s))
 			{
-				bHit = true;
+				bHit = true; 
 			}
 		}
 	}
@@ -336,7 +338,7 @@ struct FCheckAnotherMonsterDuringFlying {
 			IActorInstance * pa = (IActorInstance*) p;
 			if (pa != pOwner && pa->TestCollisionWithDynamicSphere(s))
 			{
-				pInst = p;
+				pInst = p; 
 			}
 		}
 	}
@@ -470,6 +472,7 @@ bool CFlyingInstance::Update()
 
 	if (m_pData->m_bHitOnBackground)
 	{
+		// 지형 충돌
 
 		if (CFlyingManager::Instance().GetMapManagerPtr())
 		{
@@ -484,10 +487,11 @@ bool CFlyingInstance::Update()
 			}
 		}
 
+		// 건물+나무 충돌
 
 		FCheckBackgroundDuringFlying kCheckBackgroundDuringFlying(v3LastPosition,m_v3Position);
 		rkCullingMgr.ForInRange(vecStart,fCollisionSphereRadius, &kCheckBackgroundDuringFlying);
-
+		
 		if (kCheckBackgroundDuringFlying.IsHitted())
 		{
 			if (m_pHandler)
@@ -496,7 +500,7 @@ bool CFlyingInstance::Update()
 			__Explode();
 			return false;
 		}
-	}
+	}	
 
 	return true;
 }
@@ -579,7 +583,7 @@ void CFlyingInstance::SetDataPointer(CFlyingData * pData, const D3DXVECTOR3 & v3
 void CFlyingInstance::__SetDataPointer(CFlyingData * pData, const D3DXVECTOR3 & v3StartPosition)
 {
 	m_pData = pData;
-	m_qRot = D3DXQUATERNION(0.0f,0.0f,0.0f,1.0f),
+	m_qRot = D3DXQUATERNION(0.0f,0.0f,0.0f,1.0f), 
 	m_v3Position = (v3StartPosition);
 	m_bAlive = (true);
 

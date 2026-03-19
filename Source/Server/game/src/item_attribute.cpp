@@ -177,13 +177,6 @@ void CItem::PutAttributeWithLevel(BYTE bLevel)
 		}
 	}
 
-	// total==0 veya liste boş ise number(1,total) crash olur.
-	if (avail.empty() || total <= 0)
-	{
-		sys_err("Cannot put item attribute %d %d %s item_id(%u)", iAttributeSet, bLevel, GetName(), GetID());
-		return;
-	}
-
 	unsigned int prob = number(1, total);
 	int attr_idx = APPLY_NONE;
 
@@ -198,6 +191,13 @@ void CItem::PutAttributeWithLevel(BYTE bLevel)
 		}
 
 		prob -= r.dwProb;
+	}
+
+	// Fix
+	if (avail.empty())
+	{
+		sys_err("Cannot put item attribute %d %d %s item_id(%u)", iAttributeSet, bLevel, GetName(), GetID());
+		return;
 	}
 
 	if (!attr_idx)
@@ -249,7 +249,7 @@ void CItem::ChangeAttribute(const int* aiChangeProb)
 
 	static const int tmpChangeProb[ITEM_ATTRIBUTE_MAX_LEVEL] =
 	{
-		0, 10, 40, 35, 15,
+		0, 100, 100, 100, 100,
 	};
 
 	for (int i = GetAttributeCount(); i < iAttributeCount; ++i)
@@ -595,7 +595,7 @@ void CItem::ChangeAttrCostume()
 
 	static const int tmpChangeProb[ITEM_ATTRIBUTE_MAX_LEVEL] =
 	{
-		0, 10, 40, 35, 15,
+		0, 100, 100, 100, 100,
 	};
 
 	for (int i = GetAttributeCount(); i < iAttributeCount; ++i)
@@ -723,7 +723,7 @@ void CItem::ChangeAttrCostumeHair()
 
 	static const int tmpChangeProb[ITEM_ATTRIBUTE_MAX_LEVEL] =
 	{
-		0, 10, 40, 35, 15,
+		0, 100, 100, 100, 100,
 	};
 
 	for (int i = GetAttributeCount(); i < iAttributeCount; ++i)

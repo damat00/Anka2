@@ -156,12 +156,12 @@ struct dms_parser
         }
     }
 
-    static inline dms_result<T> apply(std::string const& is)
+    dms_result<T> apply(std::string const& is) const
     {
         return apply(is.c_str());
     }
 
-    static inline dms_result<T> apply(const char* is)
+    dms_result<T> apply(const char* is) const
     {
         dms_value dms;
         bool has_value = false;

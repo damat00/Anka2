@@ -290,7 +290,7 @@ CGraphicFontTexture::TCharacterInfomation* CGraphicFontTexture::UpdateCharacterI
 	m_x += size.cx;
 
 	if (m_step < size.cy)
-		m_step = size.cy;
+		m_step = size.cy;	
 
 	m_isDirty = true;
 

@@ -8,7 +8,8 @@
 //  See accompanying file LICENSE_1_0.txt or copy at
 //  http://www.boost.org/LICENSE_1_0.txt
 
-#include <boost/mp11/detail/config.hpp>
+#include <boost/config.hpp>
+#include <boost/config/workaround.hpp>
 
 namespace boost
 {
@@ -24,7 +25,7 @@ template<class L, class V, template<class...> class F> struct mp_fold_impl
 // An error "no type named 'type'" here means that the first argument to mp_fold is not a list
 };
 
-#if BOOST_MP11_WORKAROUND( BOOST_MP11_MSVC, <= 1800 )
+#if defined( BOOST_MSVC ) && BOOST_WORKAROUND( BOOST_MSVC, <= 1800 )
 
 template<template<class...> class L, class... T, class V, template<class...> class F> struct mp_fold_impl<L<T...>, V, F>
 {

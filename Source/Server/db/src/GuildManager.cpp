@@ -114,6 +114,7 @@ void CGuildManager::ParseResult(SQLResult * pRes)
 		str_to_number(r_info.loss, row[5]);
 		str_to_number(r_info.gold, row[6]);
 		str_to_number(r_info.level, row[7]);
+		str_to_number(r_info.markpass, row[8]);
 
 		sys_log(0,
 				"GuildWar: %-24s ladder %-5d win %-3d draw %-3d loss %-3d",
@@ -128,7 +129,7 @@ void CGuildManager::ParseResult(SQLResult * pRes)
 void CGuildManager::Initialize()
 {
 	char szQuery[1024];
-	snprintf(szQuery, sizeof(szQuery), "SELECT id, name, ladder_point, win, draw, loss, gold, level FROM guild%s", GetTablePostfix());
+	snprintf(szQuery, sizeof(szQuery), "SELECT id, name, ladder_point, win, draw, loss, gold, level, markpass FROM guild%s", GetTablePostfix());
 	std::unique_ptr<SQLMsg> pmsg(CDBManager::instance().DirectQuery(szQuery));
 
 	if (pmsg->Get()->uiNumRows)
@@ -159,7 +160,7 @@ void CGuildManager::Load(DWORD dwGuildID)
 {
 	char szQuery[1024];
 
-	snprintf(szQuery, sizeof(szQuery), "SELECT id, name, ladder_point, win, draw, loss, gold, level FROM guild%s WHERE id=%u", GetTablePostfix(), dwGuildID);
+	snprintf(szQuery, sizeof(szQuery), "SELECT id, name, ladder_point, win, draw, loss, gold, level, markpass FROM guild%s WHERE id=%u", GetTablePostfix(), dwGuildID);
 	std::unique_ptr<SQLMsg> pmsg(CDBManager::instance().DirectQuery(szQuery));
 
 	if (pmsg->Get()->uiNumRows)

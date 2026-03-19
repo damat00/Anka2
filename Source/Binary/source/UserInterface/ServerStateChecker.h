@@ -14,7 +14,7 @@ class CServerStateChecker : public CSingleton<CServerStateChecker>
 		void Update();
 
 		void Initialize();
-
+		
 	private:
 		typedef struct SChannel
 		{
@@ -24,7 +24,7 @@ class CServerStateChecker : public CSingleton<CServerStateChecker>
 		} TChannel;
 
 		PyObject *m_poWnd;
-
+		
 		std::list<TChannel> m_lstChannel;
 
 		CNetworkStream m_kStream;

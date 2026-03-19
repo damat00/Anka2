@@ -1,15 +1,28 @@
-//
-// Copyright 2005-2007 Adobe Systems Incorporated
-//
-// Distributed under the Boost Software License, Version 1.0
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
-//
-#ifndef BOOST_GIL_COLOR_BASE_HPP
-#define BOOST_GIL_COLOR_BASE_HPP
+/*
+    Copyright 2005-2007 Adobe Systems Incorporated
+   
+    Use, modification and distribution are subject to the Boost Software License,
+    Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+    http://www.boost.org/LICENSE_1_0.txt).
 
-#include <boost/gil/utilities.hpp>
-#include <boost/gil/concepts.hpp>
+    See http://stlab.adobe.com/gil for most recent version including documentation.
+*/
+
+/*************************************************************************************************/
+
+#ifndef GIL_COLOR_BASE_HPP
+#define GIL_COLOR_BASE_HPP
+
+////////////////////////////////////////////////////////////////////////////////////////
+/// \file               
+/// \brief pixel class and related utilities
+/// \author Lubomir Bourdev and Hailin Jin \n
+///         Adobe Systems Incorporated
+/// \date   2005-2007 \n Last updated on May 6, 2007
+///
+////////////////////////////////////////////////////////////////////////////////////////
+
+#include <cassert>
 
 #include <boost/config.hpp>
 #include <boost/mpl/range_c.hpp>
@@ -18,7 +31,9 @@
 #include <boost/type_traits.hpp>
 #include <boost/utility/enable_if.hpp>
 
-#include <cassert>
+#include "gil_config.hpp"
+#include "utilities.hpp"
+#include "gil_concept.hpp"
 
 namespace boost { namespace gil {
 

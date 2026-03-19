@@ -247,7 +247,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\pc\assassin\effect\2-star.dds"
+            "bottom.dds"
         }
     }
 }
@@ -372,7 +372,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\pc\assassin\effect\half_ring_rainbow_line.dds"
+            "half_ring_rainbow_line.dds"
         }
     }
 }
@@ -497,7 +497,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\pc\assassin\effect\rotation of 3.dds"
+            "Rsotation of 3.dds"
         }
     }
 }
@@ -758,7 +758,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\pc\assassin\effect\men-1.dds"
+            "men.dds"
         }
     }
 }

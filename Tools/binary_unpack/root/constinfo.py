@@ -8,69 +8,13 @@ net = __import__(pyapi.GetModuleName("net"))
 
 import item
 
-NEW_678TH_SKILL_ENABLE = False # load 6th warrior / ninja skills (instead of app.NEW_678TH_SKILL_ENABLE)
-
-# MINI_GAME
-if app.ENABLE_MINI_GAME_OKEY:
-	RUMI_GAME_EVENT = False
-if app.ENABLE_MINI_GAME_CATCH_KING:
-	CATCH_KING_GAME_EVENT = False
-# END_OF_MINI_GAME
-
-if app.ENABLE_EVENT_SYSTEM:
-	IS_OPEN_EVENT_INFORMATION = 0
-
-if app.ENABLE_HALLOWEEN_EVENT_SYSTEM:
-	haloun_rewards = {}
-	haloun_lvl = 0
-	haloun_points = 0
-	IsHaloun = 0
-
-if app.ENABLE_BATTLE_PASS:
-	missions_bp = {}
-	info_missions_bp = {}
-	rewards_bp = {}
-	rewards_bonus_bp = {}
-	final_rewards = []
-	size_battle_pass = 0
-	status_battle_pass = 0
-	missions_bp_premium = {}
-	info_missions_bp_premium = {}
-	rewards_bp_premium = {}
-	rewards_bonus_bp_premium = {}
-	final_rewards_premium = []
-	size_battle_pass_premium = 0
-	status_battle_pass_premium = 0
-
-if app.ENABLE_KILL_STATISTICS:
-	KILL_STATISTICS_DATA = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,]
-
-LEADERSHIP_POWER = 0
 ALREADY_NOTIFY_LIST = []
-SHOW_REFINE_ITEM_DESC = TRUE
+
 # Taskbar buttons
 ENABLE_EXPANDED_TASKBAR = 0
-ENABLE_ANTIFLAG_TEXTLINE = 1
-ZAPAMIETAJ_OKNO_TPMETKIBOSSY = False
-ALREADY_SENT = 0
-
-if app.ENABLE_COLLECT_WINDOW:
-	CollectWindowQID = [0 for i in xrange(5)]
-
-if app.ENABLE_ZODIAC_MISSION:
-	ZodiacLua=0
-
-if app.__DUNGEON_INFO__:
-	dungeonInfoCMD = ""
-	dungeonInfoQuestIdx = -1
-
-ENABLE_UI_DEBUG_WINDOW = False # load DebugWindow.py from client folder instead of login window
 
 _game_instance = None
 _interface_instance = None
-
-finder_counts = 0
-finder_items = {}
 
 def GetGameInstance():
 	global _game_instance
@@ -96,52 +40,6 @@ def SetInterfaceInstance(instance):
 
 	_interface_instance = instance
 
-if app.ENABLE_WIKI_SYSTEM:
-	_main_wiki_instance = None
-	_listbox_wiki_instance = None
-	def SetMainParent(instance):
-		global _main_wiki_instance
-		if _main_wiki_instance:
-			del _main_wiki_instance
-		_main_wiki_instance = instance
-	def GetMainParent():
-		global _main_wiki_instance
-		return _main_wiki_instance
-	def SetListBox(instance):
-		global _listbox_wiki_instance
-		if _listbox_wiki_instance:
-			del _listbox_wiki_instance
-		_listbox_wiki_instance = instance
-	def GetListBox():
-		global _listbox_wiki_instance
-		return _listbox_wiki_instance
-	def IS_SET(value, flag):
-		return (value & flag) == flag
-
-if app.ENABLE_DUNGEON_INFO:
-	DungeonWarp = ""
-	dungeon_qf_index = 0
-	py_Flag = {}
-	def GetFlag(flagname):
-		global py_Flag
-		return py_Flag.get(flagname, 0)
-	def SetFlag(flagname,value):
-		global py_Flag
-		py_Flag[flagname] = value
-	def take_first(elem):
-		return elem[1]
-	def CalculateDungeonList(data):
-		newList = sorted(data, key=take_first)
-		return newList
-
-def minutetoday(time):
-	return int(int((time / 60) / 60) / 24)
-def minutetohour(time):
-	return int((time / 60) / 60) % 24
-def minutetominute(time):
-	return int((time / 60) % 60)
-def minutetosecond(time):
-	return int(time % 60)
 
 if app.__AUTO_HUNT__:
 	autoHuntAutoLoginDict = {
@@ -157,69 +55,19 @@ if app.__AUTO_HUNT__:
 		"newOptions" : None,
 		"slotStatus" : {},
 		"skillDict" : None,
+		"is_mounting" : 0,  # Bineðe binme durumu (0 = binmiyor, 1 = biniyor)
 	}
-ITEMSHOP = {
-	'items' : {
-			'startpage' : {
-					'mostBought' : [],
-					'hotOffers' : [],
-					},
-			'itemshop' : {},
-			'voteshop' : {},
-			'achievementshop' : {},
-		},
-	'category': [], ##(id, name, image)
-	'subCategories': {}, ## categoryId: [...name]
-	'tableUpdate' : '0000-00-00 00:00:00',
-	'qid'	: 0,
-	'questCMD' : '',
-}
 INPUT_IGNORE = 0
 SELECT_CHARACTER_ROTATION = 1
 IN_GAME_SHOP_ENABLE = 1
 # option
 CONSOLE_ENABLE = 0
 
-if app.ENABLE_UI_DEBUG_WINDOW:
-    # Debug: UI outline boxes (PythonWindow.cpp: g_bOutlineBoxEnable)
-    OUTLINE_DEBUG_ENABLE = 1    #0 yaparsan kapanÄ±r 1 yaparsan debug penceresi aÃ§Ä±lÄ±r
-
-    def SetOutlineDebug(flag):
-        global OUTLINE_DEBUG_ENABLE
-        try:
-            iFlag = int(flag)
-        except:
-            iFlag = 0
-        iFlag = 1 if iFlag else 0
-        OUTLINE_DEBUG_ENABLE = iFlag
-        try:
-            import wndMgr
-            wndMgr.SetOutlineFlag(iFlag)
-        except:
-            pass
-        return OUTLINE_DEBUG_ENABLE
-
-    # Kisayol: constInfo.ornek(1) ac, constInfo.ornek(0) kapa
-    def ornek(flag):
-        return SetOutlineDebug(flag)
-
-    # Dosyadan OUTLINE_DEBUG_ENABLE=1 yapildiysa, import'ta uygula.
-    try:
-        SetOutlineDebug(OUTLINE_DEBUG_ENABLE)
-    except:
-        pass
-
 PVPMODE_ENABLE = 1
 PVPMODE_TEST_ENABLE = 0
 PVPMODE_ACCELKEY_ENABLE = 1
 PVPMODE_ACCELKEY_DELAY = 0.5
 PVPMODE_PROTECTED_LEVEL = 15
-
-IS_ENABLE_FISH_EVENT_SYSTEM = True
-IS_ENABLE_ATTENDANCE_EVENT = True
-IS_ENABLE_CATCH_KING_EVENT = True
-IS_ENABLE_CARDS_EVENT = True
-EVENT_BANNER = False # Show event banner instead of mini-game rumi button
 
 FOG_LEVEL0 = 4800.0
 FOG_LEVEL1 = 9600.0
@@ -234,12 +82,8 @@ CAMERA_MAX_DISTANCE = CAMERA_MAX_DISTANCE_SHORT
 
 CHRNAME_COLOR_INDEX = 0
 
-if app.ENABLE_SOUL_ROULETTE_SYSTEM:
-	ENVIRONMENT_RED="d:/ymir work/environment/metin2_map_n_flame_dragon_01.msenv"
-
 ENVIRONMENT_NIGHT = "d:/ymir work/environment/moonlight04.msenv"
 
-# constant
 HIGH_PRICE = 500000
 MIDDLE_PRICE = 50000
 ERROR_METIN_STONE = 28960
@@ -261,7 +105,6 @@ ARMOR_SPECULAR_ENABLE = 1
 WEAPON_SPECULAR_ENABLE = 1
 KEEP_ACCOUNT_CONNETION_ENABLE = 1
 MINIMAP_POSITIONINFO_ENABLE = 0
-SPEED_BUTTON=0
 
 isItemQuestionDialog = 0
 
@@ -282,12 +125,10 @@ def SET_DEFAULT_FOG_LEVEL():
 def SET_FOG_LEVEL_INDEX(index):
 	global FOG_LEVEL
 	global FOG_LEVEL_LIST
-
 	try:
 		FOG_LEVEL=FOG_LEVEL_LIST[index]
 	except IndexError:
-		FOG_LEVEL = FOG_LEVEL_LIST[0]
-
+		FOG_LEVEL=FOG_LEVEL_LIST[0]
 	app.SetMinFog(FOG_LEVEL)
 
 def GET_FOG_LEVEL_INDEX():
@@ -359,7 +200,7 @@ import item
 
 ACCESSORY_MATERIAL_LIST = [50623, 50624, 50625, 50626, 50627, 50628, 50629, 50630, 50631, 50632, 50633, 50634, 50635, 50636, 50637, 50638]
 
-# Cevher socket sayÃ½sÃ½ - cevher_bilgisi.txt'ye gÃ¶re deÃ°iÃ¾tirilebilir
+# Cevher socket sayýsý - cevher_bilgisi.txt'ye göre deðiþtirilebilir
 ACCESSORY_SOCKET_MAX_SIZE = 3
 
 JewelAccessoryInfos = [
@@ -442,14 +283,6 @@ def IS_AUTO_POTION_SP(itemVnum):
 		return 1
 
 	return 0
-
-if app.ENABLE_SUNG_MAHI_TOWER:
-	sungMahiInfo = []
-	sungMahiLevelInfo = 0
-	sungMahiQuest = 0
-
-	sungMahiRewardInfo = []
-	sungMahiElementInfo = []
 
 if app.ENABLE_RENEWAL_AFFECT:
 	def IS_AFFECT_PLUS(itemVnum):
@@ -541,9 +374,6 @@ if app.ENABLE_RENEWAL_SHOPEX:
 			result += roman * factor
 		return result
 
-if app.ENABLE_RENDER_TARGET:
-	enable_item_preview = 1
-
 if app.ENABLE_AUTO_REFINE:
 	IS_AUTO_REFINE = FALSE
 	AUTO_REFINE_TYPE = 0
@@ -587,6 +417,34 @@ if app.ENABLE_RENEWAL_OFFLINESHOP:
 				return TRUE
 
 		return FALSE
+
+if app.ENABLE_INGAME_WIKI_SYSTEM:
+	_main_wiki_instance = None
+	_listbox_wiki_instance = None
+
+	def SetMainParent(instance):
+		global _main_wiki_instance
+
+		if _main_wiki_instance:
+			del _main_wiki_instance
+
+		_main_wiki_instance = instance
+
+	def GetMainParent():
+		global _main_wiki_instance
+		return _main_wiki_instance
+
+	def SetListBox(instance):
+		global _listbox_wiki_instance
+
+		if _listbox_wiki_instance:
+			del _listbox_wiki_instance
+
+		_listbox_wiki_instance = instance
+
+	def GetListBox():
+		global _listbox_wiki_instance
+		return _listbox_wiki_instance
 
 if app.ENABLE_AUTOMATIC_PICK_UP_SYSTEM:
 	PICKUPMODE = 0

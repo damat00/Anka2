@@ -1,8 +1,8 @@
 ScriptType               MotionData
 
-MotionFileName           "D:/Ymir Work/monster2/zombie_bigboss2/normal_attack01.GR2"
+MotionFileName           "D:\Ymir Work\monster2\zombie_bigboss2\normal_attack01.GR2"
 MotionDuration           1.466667
-Accumulation             0.00	0.00	0.00
+Accumulation           0.00	0.00	0.00
 
 Group MotionEventData
 {

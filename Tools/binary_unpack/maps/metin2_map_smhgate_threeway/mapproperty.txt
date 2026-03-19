@@ -1,6 +1,0 @@
-ScriptType MapProperty
-
-MapType "Outdoor"
-
-ParentMapName "map_n_threeway"
-

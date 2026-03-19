@@ -23,7 +23,7 @@ void CDir::Destroy()
 bool CDir::Create(const char *c_szFilter, const char *c_szPath, BOOL bCheckedExtension)
 {
 	Destroy();
-
+	
 	std::string stPath = c_szPath;
 
 	if (stPath.length())
@@ -37,7 +37,7 @@ bool CDir::Create(const char *c_szFilter, const char *c_szPath, BOOL bCheckedExt
 	std::string stQuery;
 	stQuery += stPath;
 	stQuery += "*.*";
-
+	
 	m_wfd.dwFileAttributes |= FILE_ATTRIBUTE_DIRECTORY;
 	m_hFind = FindFirstFile(stQuery.c_str(), &m_wfd);
 
@@ -49,7 +49,7 @@ bool CDir::Create(const char *c_szFilter, const char *c_szPath, BOOL bCheckedExt
 		if (*m_wfd.cFileName == '.')
 			continue;
 
-		if (IsFolder())
+		if (IsFolder())	
 		{
 			if (!OnFolder(c_szFilter, stPath.c_str(), m_wfd.cFileName))
 				return false;
@@ -60,6 +60,9 @@ bool CDir::Create(const char *c_szFilter, const char *c_szPath, BOOL bCheckedExt
 			if (!c_szExtension)
 				continue;
 
+			// NOTE : 임시 변수 - [levites]
+			//        최종적으로는 무조건 TRUE 형태로 만든다.
+			//        그전에 전 프로젝트의 CDir을 사용하는 곳에서 Extension을 "wav", "gr2" 이런식으로 넣게끔 한다. - [levites]
 			if (bCheckedExtension)
 			{
 				std::string strFilter = c_szFilter;
@@ -81,7 +84,7 @@ bool CDir::Create(const char *c_szFilter, const char *c_szPath, BOOL bCheckedExt
 			if (!OnFile(stPath.c_str(), m_wfd.cFileName))
 				return false;
 		}
-	}
+	} 			
 	while (FindNextFile(m_hFind, &m_wfd));
 
 	return true;
@@ -91,12 +94,12 @@ bool CDir::IsFolder()
 {
 	if (m_wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 		return true;
-
+	
 	return false;
-}
+}		
 
 void CDir::Initialize()
 {
 	memset(&m_wfd, 0, sizeof(m_wfd));
-	m_hFind = nullptr;
+	m_hFind = nullptr;				
 }

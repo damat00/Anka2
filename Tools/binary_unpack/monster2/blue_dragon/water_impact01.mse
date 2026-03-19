@@ -383,7 +383,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\effect\hit\water_light01.dds"
+            "water_light01.dds"
         }
     }
 }
@@ -640,7 +640,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\effect\hit\water_light03.dds"
+            "water_light03.dds"
         }
     }
 }

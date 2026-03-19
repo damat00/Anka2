@@ -43,6 +43,9 @@ struct SNetworkActorData
 
 	short m_sAlignment;
 	BYTE m_byPKMode;
+#ifdef ENABLE_TITLE_SYSTEM
+	int m_iTitleID;
+#endif
 	DWORD m_dwMountVnum;
 
 	DWORD m_dwGuildID;
@@ -50,9 +53,7 @@ struct SNetworkActorData
 	BYTE m_dwGuildLeader;
 #endif
 	DWORD m_dwLevel;
-#ifdef ENABLE_CONQUEROR_LEVEL
-	DWORD m_dwConquerorLevel;
-#endif
+
 #ifdef ENABLE_SHOW_MOB_INFO
 	DWORD m_dwAIFlag;
 #endif
@@ -121,8 +122,8 @@ struct SNetworkUpdateActorData
 	DWORD m_dwMovSpd;
 	DWORD m_dwAtkSpd;
 	short m_sAlignment;
-#ifdef ENABLE_CONQUEROR_LEVEL
-	DWORD	m_dwConquerorLevel;
+#ifdef ENABLE_TITLE_SYSTEM
+	int m_iTitleID;
 #endif
 	BYTE m_byPKMode;
 	DWORD m_dwMountVnum;
@@ -158,8 +159,8 @@ struct SNetworkUpdateActorData
 		m_dwMovSpd = 0;
 		m_dwAtkSpd = 0;
 		m_sAlignment = 0;
-#ifdef ENABLE_CONQUEROR_LEVEL
-		m_dwConquerorLevel=0;
+#ifdef ENABLE_TITLE_SYSTEM
+		m_iTitleID = 0;
 #endif
 		m_byPKMode = 0;
 		m_dwMountVnum = 0;

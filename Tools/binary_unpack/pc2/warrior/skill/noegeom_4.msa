@@ -10,13 +10,13 @@ Group MotionEventData
     Group Event00
     {
         MotionEventType      1
-        StartingTime         1.114355
+        StartingTime         1.107692
         
         IndependentFlag      0
         AttachingEnable      1
         AttachingBoneName    "Bip01 Footsteps"
         FollowingEnable      1
-        EffectFileName       "d:/ymir work/pc/warrior/effect/noegeomdorae_4.mse"
+        EffectFileName       "d:/metin2data/season1/effect/pc/warrior/effect/noegeomdorae_4.mse"
         EffectPosition       0.000000 -80.000000 0.000000
     }
     Group Event01
@@ -28,39 +28,38 @@ Group MotionEventData
         AttachingEnable      1
         AttachingBoneName    "Bip01 R Hand"
         FollowingEnable      1
-        EffectFileName       "d:/ymir work/pc/warrior/effect/noegeomdorae_loop_4.mse"
+        EffectFileName       "d:/metin2data/season1/effect/pc/warrior/effect/noegeomdorae_loop_4.mse"
         EffectPosition       0.000000 0.000000 0.000000
     }
     Group Event02
     {
         MotionEventType      4
-        StartingTime         1.055961
+        StartingTime         1.167883
         DuringTime           0.200000
-        EnableHitProcess     1
+        EnableHitProcess     0
         
         AttackType           0
         HittingType          1
         StiffenTime          0.000000
-        InvisibleTime        0.200000
+        InvisibleTime        2.000000
         ExternalForce        0.000000
-        HitLimitCount        10
+        HitLimitCount        18
         CollisionType        4
         
         SphereDataCount      1
         Group SphereData00
         {
-            Radius           250.000000
+            Radius           400.000000
             Position         0.000000 0.000000 0.000000
         }
     }
     Group Event03
     {
         MotionEventType      2
-        StartingTime         1.090024
+        StartingTime         1.080292
         
-        DuringTime           0.100000
-        Power                100
-        AffectingRange       100
+        DuringTime           0.200000
+        Power                300
+        AffectingRange       200
     }
-
 }

@@ -140,6 +140,10 @@ typedef struct SGuildData
 	int		loss;
 
 	int		gold;
+	DWORD	markPass;
+#ifdef ENABLE_GUILD_TOKEN_AUTH
+	uint64_t	token{};
+#endif
 } TGuildData;
 
 struct TGuildCreateParameter
@@ -184,6 +188,11 @@ class CGuild
 		DWORD		GetMasterPID() const	{ return m_data.master_pid; }
 		LPCHARACTER	GetMasterCharacter();
 		BYTE		GetLevel() const		{ return m_data.level; }
+		DWORD		GetMarkPass() const		{ return m_data.markPass; }
+
+#ifdef ENABLE_GUILD_TOKEN_AUTH
+		uint64_t	GetToken() const		{ return m_data.token; }
+#endif
 
 		void		Reset() { m_data.power = m_data.max_power; }
 
@@ -316,7 +325,7 @@ class CGuild
 		void		GuildWarEntryAccept(DWORD guild_opp, LPCHARACTER ch);
 
 		// War state relative
-		void		NotifyGuildMaster(const char* msg);
+		void		NotifyGuildMaster(BYTE type, DWORD id, const char* format, ...);
 		void		RequestDeclareWar(DWORD guild_id, BYTE type);
 		void		RequestRefuseWar(DWORD guild_id);
 
@@ -404,25 +413,5 @@ class CGuild
 		EventMap	m_GuildInviteEventMap;
 		// END_OF_GUILD_JOIN_BUG_FIX
 };
-
-#define ENABLE_NEWGUILDMAKE
-
-#ifdef ENABLE_D_NJGUILD
-#include "char.h"
-template <class Func> void CGuild::ForEachOnMapMember (Func & f, long lMapIndex)
-{
-	TGuildMemberOnlineContainer::iterator it;
-
-	for (it = m_memberOnline.begin(); it!=m_memberOnline.end();++it)
-	{
-		LPCHARACTER ch = *it;
-		if (ch)
-		{
-			if (ch->GetMapIndex () == lMapIndex)
-				f(ch);
-		}
-	}
-}
-#endif
 
 #endif

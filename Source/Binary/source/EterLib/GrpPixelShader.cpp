@@ -5,72 +5,51 @@
 
 CPixelShader::CPixelShader()
 {
-    Initialize();
+	Initialize();
 }
 
 CPixelShader::~CPixelShader()
 {
-    Destroy();
+	Destroy();
 }
 
 void CPixelShader::Initialize()
 {
-    m_handle = 0;
+	m_handle=0;
 }
 
 void CPixelShader::Destroy()
 {
-#ifdef ENABLE_DIRECTX9_UPDATE
-    if (m_handle)
-    {
-        m_handle = 0;
-    }
-#else
-    if (m_handle)
-    {
-        if (ms_lpd3dDevice)
-        {
-            ms_lpd3dDevice->DeletePixelShader(m_handle);
-        }
-
-        m_handle = 0;
-    }
-#endif
+	if (m_handle)
+	{
+		if (ms_lpd3dDevice)
+			ms_lpd3dDevice->DeletePixelShader(m_handle);
+		m_handle=0;
+	}
 }
 
-bool CPixelShader::CreateFromDiskFile(const char* c_szFileName)
+bool CPixelShader::CreateFromDiskFile(const char *c_szFileName)
 {
-    Destroy();
+	Destroy();
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-    return false;
-#else
-    LPD3DXBUFFER lpd3dxShaderBuffer;
-    LPD3DXBUFFER lpd3dxErrorBuffer;
-    if (FAILED(D3DXAssembleShaderFromFile(c_szFileName
-                                            , 0
-                                            , NULL
-                                            , &lpd3dxShaderBuffer
-                                            , &lpd3dxErrorBuffer)))
-    {
-        return false;
-    }
+	LPD3DXBUFFER lpd3dxShaderBuffer;
+	LPD3DXBUFFER lpd3dxErrorBuffer;
+	
+	if (FAILED(
+		D3DXAssembleShaderFromFile(c_szFileName, 0, nullptr, &lpd3dxShaderBuffer, &lpd3dxErrorBuffer)
+	))
+		return false;
 
-    CDirect3DXBuffer shaderBuffer(lpd3dxShaderBuffer);
-    CDirect3DXBuffer errorBuffer(lpd3dxErrorBuffer);
+	CDirect3DXBuffer shaderBuffer(lpd3dxShaderBuffer);
+	CDirect3DXBuffer errorBuffer(lpd3dxErrorBuffer);
 
-    if (FAILED(ms_lpd3dDevice->CreatePixelShader((DWORD*)shaderBuffer.GetPointer(), &m_handle)))
-    {
-        return false;
-    }
+	if (FAILED(ms_lpd3dDevice->CreatePixelShader((DWORD*)shaderBuffer.GetPointer(), &m_handle)))
+		return false;
 
-    return true;
-#endif
+	return true;
 }
 
 void CPixelShader::Set()
 {
-#ifndef ENABLE_DIRECTX9_UPDATE
-    STATEMANAGER.SetPixelShader(m_handle);
-#endif
+	STATEMANAGER.SetPixelShader(m_handle);
 }

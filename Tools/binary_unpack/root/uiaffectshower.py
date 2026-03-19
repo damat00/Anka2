@@ -15,8 +15,6 @@ import math
 import wndMgr
 import collections
 
-AFF_LEADERSHIP = 901
-
 if app.ENABLE_MULTI_FARM_BLOCK:
 	import uiCommon
 	import constInfo
@@ -84,7 +82,7 @@ if app.ENABLE_GROWTH_PET_SYSTEM:
 
 			self.toolTipText.SetText(text)
 			w, h = self.toolTipText.GetTextSize()
-			if localeInfo.IsARABIC():
+			if hasattr(localeInfo, 'IsARABIC') and localeInfo.IsARABIC():
 				self.toolTipText.SetPosition(w+20, y)
 			else:
 				self.toolTipText.SetPosition(max(0, x + self.GetWidth()/2 - w/2), y)
@@ -99,63 +97,6 @@ if app.ENABLE_GROWTH_PET_SYSTEM:
 		def OnMouseOverOut(self):
 			if self.toolTipText:
 				self.toolTipText.Hide()
-
-if app.ENABLE_CONQUEROR_LEVEL:
-	#Sungma
-	class SungMaAffectImage(ui.ExpandedImageBox):		
-		FILE_PATH_SUNGMA = "d:/ymir work/ui/skill/common/affect/sungma_buff.sub"
-
-		def __init__(self, str, hp, move, immune):
-			ui.ExpandedImageBox.__init__(self)
-			
-			self.str = str
-			self.hp = hp
-			self.move = move
-			self.immune = immune
-			
-			self.toolTip = uiToolTip.ToolTip(300)
-			self.toolTip.HideToolTip()
-
-		def __del__(self):
-			ui.ExpandedImageBox.__del__(self)
-
-		def SetSungmaValue(self, str, hp, move, immune):
-			self.str = str
-			self.hp = hp
-			self.move = move
-			self.immune = immune
-			
-			self.__Refresh()
-		
-		def __Refresh(self):
-			self.str = self.str
-			self.hp = self.hp
-			self.move = self.move
-			self.immune = self.immune
-			
-			fileName = self.FILE_PATH_SUNGMA
-			
-			try:
-				self.LoadImage(fileName)
-			except:
-				import dbg
-				dbg.TraceError("SungmaPointImage.(STR=%d, HP %d, MOVE %d, IMMUNE %d) - LoadError %s" % (self.str, self.hp, self.move, self.immune, fileName))
-
-			self.SetScale(0.7, 0.7)
-
-			self.toolTip.ClearToolTip()
-			self.toolTip.SetTitle(localeInfo.TOOLTIP_AFFECT_SUNGMA_DESC)
-			self.toolTip.AppendTextLine(localeInfo.TOOLTIP_AFFECT_SUNGMA_STR % (self.str))
-			self.toolTip.AppendTextLine(localeInfo.TOOLTIP_AFFECT_SUNGMA_HP % (self.hp))
-			self.toolTip.AppendTextLine(localeInfo.TOOLTIP_AFFECT_SUNGMA_MOVE % (self.move))
-			self.toolTip.AppendTextLine(localeInfo.TOOLTIP_AFFECT_SUNGMA_IMMUNE % (self.immune))
-			self.toolTip.ResizeToolTip()
-			
-		def OnMouseOverIn(self):
-			self.toolTip.ShowToolTip()
-
-		def OnMouseOverOut(self):
-			self.toolTip.HideToolTip()
 
 class LovePointImage(ui.ExpandedImageBox):
 
@@ -220,8 +161,6 @@ class LovePointImage(ui.ExpandedImageBox):
 	def OnMouseOverOut(self):
 		self.SetScale(0.7,0.7)
 		self.toolTip.HideToolTip()
-# END_OF_WEDDING
-
 
 class HorseImage(ui.ExpandedImageBox):
 
@@ -395,38 +334,12 @@ class AffectImage(ui.ExpandedImageBox):
 		self.endTime = 0
 		self.affect = None
 		self.isClocked = TRUE
-		if app.ENABLE_AFFECT_BUFF_REMOVE:
-			self.buffQuestionDialog = None
-			self.skillIndex = None
-			self.SetEvent(ui.__mem_func__(self.OnBuffQuestionDialog), "mouse_click")
 
 	def SetAffect(self, affect):
 		self.affect = affect
 
 	def GetAffect(self):
 		return self.affect
-
-	def FormatTime(self, time):
-		text = ""
-
-		d = time // (24 * 3600)
-		time = time % (24 * 3600)
-		h = time // 3600
-		time %= 3600
-		m = time // 60
-		time %= 60
-		s = time
-
-		if d:
-			text += "%dd " % d
-		if text or h:
-			text += "%dg " % h
-		if text or m:
-			text += "%dm " % m
-		if text or s:
-			text += "%ds " % s
-
-		return text[:-1]
 
 	def SetToolTipText(self, text, x = 0, y = -19):
 		self.toolTip.ClearToolTip()
@@ -441,44 +354,9 @@ class AffectImage(ui.ExpandedImageBox):
 		self.endTime = 0
 		if duration > 0:
 			self.endTime = app.GetGlobalTimeStamp() + duration
-			leftTime = self.FormatTime(self.endTime - app.GetGlobalTimeStamp())
-			self.toolTip.AppendTextLine("%s : %s" % (localeInfo.LEFT_TIME, leftTime))
+			leftTime = localeInfo.RTSecondToDHMS(self.endTime - app.GetGlobalTimeStamp())
+			self.toolTip.AppendTextLine("(%s : %s)" % (localeInfo.LEFT_TIME, leftTime))
 			self.toolTip.ResizeToolTip()
-
-	def SetSkillAffectFlag(self, flag):
-		self.isSkillAffect = flag
-
-	if app.ENABLE_AFFECT_BUFF_REMOVE:
-		def SetSkillIndex(self, skillIndex):
-			self.skillIndex = skillIndex
-
-	def IsSkillAffect(self):
-		return self.isSkillAffect
-
-	if app.ENABLE_AFFECT_BUFF_REMOVE:
-		def OnBuffQuestionDialog(self):
-			skillIndex = self.skillIndex
-			if not skillIndex or skillIndex == 66:
-				return
-			self.buffQuestionDialog = uiCommon.QuestionDialog()
-			self.buffQuestionDialog.SetWidth(350)
-			self.buffQuestionDialog.SetText(localeInfo.BUFF_AFFECT_REMOVE_QUESTION % (skill.GetSkillName(skillIndex)))
-			self.buffQuestionDialog.SetAcceptEvent(lambda arg = skillIndex: self.OnCloseBuffQuestionDialog(arg))
-			self.buffQuestionDialog.SetCancelEvent(lambda arg = 0: self.OnCloseBuffQuestionDialog(arg))
-			self.buffQuestionDialog.Open()
-
-		def OnCloseBuffQuestionDialog(self, answer):
-			if not self.buffQuestionDialog:
-				return
-
-			self.buffQuestionDialog.Close()
-			self.buffQuestionDialog = None
-
-			if not answer:
-				return
-
-			net.SendChatPacket("/remove_buff %d" % answer)
-			return TRUE
 
 	def UpdateAutoPotionDescription(self):
 		potionType = player.AUTO_POTION_TYPE_HP if self.affect == chr.NEW_AFFECT_AUTO_HP_RECOVERY\
@@ -505,7 +383,7 @@ class AffectImage(ui.ExpandedImageBox):
 
 		if self.endTime > 0:
 			leftTime = localeInfo.RTSecondToDHMS(self.endTime - app.GetGlobalTimeStamp())
-			self.toolTip.childrenList[-1].SetText("%s : %s" % (localeInfo.LEFT_TIME, leftTime))
+			self.toolTip.childrenList[-1].SetText("(%s : %s)" % (localeInfo.LEFT_TIME, leftTime))
 
 	def __UpdateDescription2(self):
 		if not self.description:
@@ -513,6 +391,12 @@ class AffectImage(ui.ExpandedImageBox):
 
 		toolTip = self.description
 		self.SetToolTipText(toolTip, 0, 40)
+
+	def SetSkillAffectFlag(self, flag):
+		self.isSkillAffect = flag
+
+	def IsSkillAffect(self):
+		return self.isSkillAffect
 
 	def OnMouseOverIn(self):
 		self.SetScale(0.8,0.8)
@@ -576,7 +460,6 @@ class AffectShower(ui.Window):
 			28 : (localeInfo.SKILL_FIRE, "d:/ymir work/ui/skill/sura/hwayeom_03.sub",),
 			chr.AFFECT_CHINA_FIREWORK : (localeInfo.SKILL_POWERFUL_STRIKE, "d:/ymir work/ui/skill/common/affect/powerfulstrike.sub",),
 
-			#64 - END
 			chr.NEW_AFFECT_EXP_BONUS : (localeInfo.TOOLTIP_MALL_EXPBONUS_STATIC, RENEWAL_AFFECT_ICON + "affect_1.png"),
 
 			chr.NEW_AFFECT_ITEM_BONUS : (localeInfo.TOOLTIP_MALL_ITEMBONUS_STATIC, RENEWAL_AFFECT_ICON + "affect_2.png"),
@@ -602,8 +485,6 @@ class AffectShower(ui.Window):
 			MALL_DESC_IDX_START+player.POINT_MAX_SP_PCT : (localeInfo.TOOLTIP_MAX_SP_PCT, RENEWAL_AFFECT_ICON + "affect_24.png"),
 			MALL_DESC_IDX_START+player.POINT_CRITICAL_PCT : (localeInfo.TOOLTIP_APPLY_CRITICAL_PCT, RENEWAL_AFFECT_ICON + "affect_26.png"),
 			MALL_DESC_IDX_START+player.POINT_PENETRATE_PCT : (localeInfo.TOOLTIP_APPLY_PENETRATE_PCT, RENEWAL_AFFECT_ICON + "affect_27.png"),
-
-			AFF_LEADERSHIP: ("Liderlik", "d:/ymir work/ui/skill/common/affect/leadership.png"),
 	}
 
 	if app.ENABLE_RENEWAL_AFFECT:
@@ -635,15 +516,11 @@ class AffectShower(ui.Window):
 		AFFECT_DATA_DICT[DEW_EX_DESC_IDX_START+player.ATT_BONUS] = (localeInfo.TOOLTIP_ATT_GRADE, RENEWAL_AFFECT_ICON + "affect_19_p.png")
 		AFFECT_DATA_DICT[DEW_EX_DESC_IDX_START+player.DEF_BONUS] = (localeInfo.TOOLTIP_DEF_GRADE, RENEWAL_AFFECT_ICON + "affect_20_p.png")
 
-	if app.ENABLE_ATTENDANCE_EVENT:
-		AFFECT_DATA_DICT[chr.NEW_AFFECT_EXP_BONUS_EVENT] = (localeInfo.TOOLTIP_EXP_BONUS_EVENT, "d:/ymir work/ui/skill/common/affect/exp_bonus.sub")
-		AFFECT_DATA_DICT[chr.NEW_AFFECT_ATT_SPEED_SLOW] = (localeInfo.TOOLTIP_ATT_SPEED_SLOW, "d:/ymir work/ui/skill/common/affect/att_slow.sub")
-
 	if app.ENABLE_MULTI_FARM_BLOCK:
 		AFFECT_DATA_DICT[chr.NEW_AFFECT_MULTI_FARM] = (localeInfo.MULTI_FARM_PREMIUM_EFFECT, RENEWAL_AFFECT_ICON + "premium_farm.png")
 
-	if app.ENABLE_SUNG_MAHI_TOWER:
-		AFFECT_DATA_DICT[chr.NEW_AFFECT_SUNG_MAHI_CURSE] = (localeInfo.SUNG_MAHI_CURSE_TOOLTIP, "d:/ymir work/ui/skill/common/affect/sungmahee_tower_debuff.sub",)
+	if app.ENABLE_RENEWAL_PREMIUM_SYSTEM:
+		AFFECT_DATA_DICT[chr.NEW_AFFECT_PREMIUM_ACCOUNT] = (localeInfo.TOOLTIP_NEW_AFFECT_PREMIUM_ACCOUNT, RENEWAL_AFFECT_ICON + "premium.png")
 
 	if app.ENABLE_RENEWAL_OFFLINESHOP:
 		AFFECT_DATA_DICT[chr.NEW_AFFECT_DECORATION] = (localeInfo.OFFLINESHOP_AFFECT_DECORATION, RENEWAL_AFFECT_ICON + "shop_deco.png")
@@ -653,10 +530,6 @@ class AffectShower(ui.Window):
 
 	if app.__AUTO_HUNT__:
 		AFFECT_DATA_DICT[chr.NEW_AFFECT_AUTO_HUNT] =  (localeInfo.NEW_AFFECT_AUTO_HUNT, RENEWAL_AFFECT_ICON + "auto_hunt.tga")
-
-	if app.ENABLE_CONQUEROR_LEVEL:
-		AFFECT_DATA_DICT[chr.AFFECT_CHEONUN] = (localeInfo.SKILL_CHEONUN, "d:/ymir work/ui/skill/shaman/cheonun_03.sub")
-		# AFFECT_DATA_DICT[43] = (localeInfo.SKILL_CHEONUN, "d:/ymir work/ui/skill/shaman/cheonun" + END_STRING + ".sub")
 
 	def __init__(self):
 		ui.Window.__init__(self)
@@ -668,9 +541,6 @@ class AffectShower(ui.Window):
 		self.affectImageDict = {}
 		self.horseImage = None
 		self.lovePointImage = None
-		self.SetLeaderShipStatus(False)
-		if app.ENABLE_CONQUEROR_LEVEL:
-			self.SungmaImage = None
 
 		if app.ENABLE_MULTI_FARM_BLOCK:
 			self.multiFarmBlockDialog = None
@@ -687,11 +557,11 @@ class AffectShower(ui.Window):
 	def ClearAllAffects(self):
 		self.horseImage = None
 		self.lovePointImage = None
-		if app.ENABLE_CONQUEROR_LEVEL:
-			self.SungmaImage = None
+
 		if app.ENABLE_MULTI_FARM_BLOCK:
 			self.multiFarmBlockDialog = None
 			self.farmStatusImage = None
+
 		self.affectImageDict = {}
 		self.__ArrangeImageList()
 
@@ -703,61 +573,13 @@ class AffectShower(ui.Window):
 		self.affectImageDict = self.living_affectImageDict
 		self.__ArrangeImageList()
 
-	def SetLeaderShipStatus(self, status, pointIdx = 0, value = 0):
-		if not self.affectImageDict.has_key(AFF_LEADERSHIP):
-			self.BINARY_NEW_AddAffect(AFF_LEADERSHIP, 0, 0, 0)
-		
-		# AFF_LEADERSHIP key'i hala yoksa erken dönü?
-		if not self.affectImageDict.has_key(AFF_LEADERSHIP):
-			return
-		
-		ACTIVE_IMG = "d:/ymir work/ui/skill/common/affect/leadership.png"
-		DEACTIVE_IMG = "d:/ymir work/ui/skill/common/affect/leadership.png"
-
-		if self.affectImageDict[AFF_LEADERSHIP].toolTip == None:
-			self.affectImageDict[AFF_LEADERSHIP].toolTip = uiToolTip.ToolTip()
-			self.affectImageDict[AFF_LEADERSHIP].toolTip.HideToolTip()
-		
-		toolTip = self.affectImageDict[AFF_LEADERSHIP].toolTip
-		
-		toolTip.ClearToolTip()
-		toolTip.SetTitle(localeInfo.LEADERSHIP_TITLE)
-		toolTip.AppendDescription(localeInfo.LEADERSHIP_DESCRIPTION, 26)
-		toolTip.AppendSpace(5)
-		toolTip.AppendTextLine("--------------------------")
-		toolTip.AppendTextLine(localeInfo.LEADER_BONUS_RECIVED)
-		
-		if status == 1:
-			AFFECT_STRING_DICT = {
-				91 : localeInfo.PARTY_BONUS_ATTACKER,
-				92 : localeInfo.PARTY_BONUS_TANKER,
-				103 : localeInfo.PARTY_BONUS_BUFFER,
-				104 : localeInfo.PARTY_BONUS_SKILL_MASTER,
-				110 : localeInfo.PARTY_BONUS_BERSERKER,
-				111 : localeInfo.PARTY_BONUS_DEFENDER,
-			}
-			
-			self.affectImageDict[AFF_LEADERSHIP].LoadImage(ACTIVE_IMG)
-			self.affectImageDict[AFF_LEADERSHIP].SetScale(0.7, 0.7)
-			
-			if AFFECT_STRING_DICT.has_key(pointIdx):
-				toolTip.AppendTextLine(AFFECT_STRING_DICT[pointIdx](value))
-			
-			toolTip.AppendSpace(5)
-			toolTip.AppendTextLine("--------------------------")
-			toolTip.AppendTextLine("Aktif")
-
-		elif status == 0:
-			self.affectImageDict[AFF_LEADERSHIP].LoadImage(DEACTIVE_IMG)
-			self.affectImageDict[AFF_LEADERSHIP].SetScale(0.7, 0.7)
-			
-			toolTip.AppendSpace(5)
-			toolTip.AppendTextLine("--------------------------")
-			toolTip.AppendTextLine("Pasif")
-
 	def BINARY_NEW_AddAffect(self, type, pointIdx, value, duration):
-		if type < 500:
-			return
+		if app.ENABLE_RENEWAL_PREMIUM_SYSTEM:
+			if type < 500 and not type == chr.NEW_AFFECT_PREMIUM_ACCOUNT:
+				return
+		else:
+			if type < 500:
+				return
 
 		if type == chr.NEW_AFFECT_MALL:
 			affect = self.MALL_DESC_IDX_START + pointIdx
@@ -794,21 +616,16 @@ class AffectShower(ui.Window):
 			value = 1 + float(value) / 100.0
 
 		trashValue = 123
-		#if affect == chr.NEW_AFFECT_AUTO_SP_RECOVERY or affect == chr.NEW_AFFECT_AUTO_HP_RECOVERY:
 		if trashValue == 1:
 			try:
-				#image = AutoPotionImage()
-				#image.SetParent(self)
 				image = None
 
 				if affect == chr.NEW_AFFECT_AUTO_SP_RECOVERY:
 					image.SetPotionType(player.AUTO_POTION_TYPE_SP)
 					image = self.autoPotionImageSP
-					#self.autoPotionImageSP = image;
 				else:
 					image.SetPotionType(player.AUTO_POTION_TYPE_HP)
 					image = self.autoPotionImageHP
-					#self.autoPotionImageHP = image;
 
 				image.SetParent(self)
 				image.Show()
@@ -825,11 +642,11 @@ class AffectShower(ui.Window):
 			if affect != chr.NEW_AFFECT_AUTO_SP_RECOVERY and affect != chr.NEW_AFFECT_AUTO_HP_RECOVERY:
 				# description bir string veya fonksiyon olabilir
 				if isinstance(description, str) or isinstance(description, unicode):
-					# E?er description bir string ise, format string olarak kullan
+					# Eðer description bir string ise, format string olarak kullan
 					try:
 						# Format placeholder kontrolü (%d, %s, %f, %%, vb.)
 						if '%' in description:
-							# Placeholder say?s?n? kontrol et
+							# Placeholder sayýsýný kontrol et
 							placeholder_count = description.count('%') - description.count('%%')
 							if placeholder_count > 0:
 								description = description % float(value)
@@ -840,10 +657,10 @@ class AffectShower(ui.Window):
 							# Format placeholder yoksa, value'yu ekle
 							description = description + " " + str(float(value))
 					except (TypeError, ValueError):
-						# Format hatas? olursa, sadece string'i kullan
+						# Format hatasý olursa, sadece string'i kullan
 						description = str(description)
 				else:
-					# E?er description bir fonksiyon ise ça??r
+					# Eðer description bir fonksiyon ise çaðýr
 					description = description(float(value))
 
 			try:
@@ -854,12 +671,8 @@ class AffectShower(ui.Window):
 				image.SetDescription(description)
 				image.SetDuration(duration)
 				image.SetAffect(affect)
-				if affect == chr.NEW_AFFECT_EXP_BONUS_EURO_FREE or\
-					affect == chr.NEW_AFFECT_EXP_BONUS_EURO_FREE_UNDER_15 or\
+				if affect == chr.NEW_AFFECT_EXP_BONUS_EURO_FREE or affect == chr.NEW_AFFECT_EXP_BONUS_EURO_FREE_UNDER_15 or\
 					self.INFINITE_AFFECT_DURATION < duration:
-					image.SetClock(FALSE)
-					image.UpdateDescription()
-				elif app.ENABLE_ATTENDANCE_EVENT and affect == chr.NEW_AFFECT_ATT_SPEED_SLOW:
 					image.SetClock(FALSE)
 					image.UpdateDescription()
 				elif affect == chr.NEW_AFFECT_AUTO_SP_RECOVERY or affect == chr.NEW_AFFECT_AUTO_HP_RECOVERY:
@@ -889,10 +702,6 @@ class AffectShower(ui.Window):
 			affect = self.DEW_EX_DESC_IDX_START + pointIdx
 		else:
 			affect = type
-
-		if affect == AFF_LEADERSHIP:
-			self.SetLeaderShipStatus(False)
-			return
 
 		self.__RemoveAffect(affect)
 		self.__ArrangeImageList()
@@ -942,16 +751,6 @@ class AffectShower(ui.Window):
 			self.horseImage=image
 			self.__ArrangeImageList()
 
-	if app.ENABLE_CONQUEROR_LEVEL:
-		def SetSungMaAffectImage(self, str, hp, move, immune):
-			image = SungMaAffectImage(str, hp, move, immune)
-			image.SetParent(self)
-			image.SetSungmaValue(str, hp, move, immune)
-			image.Show()
-
-			self.SungmaImage=image
-			self.__ArrangeImageList()
-
 	def SetPlayTime(self, playTime):
 		self.serverPlayTime = playTime
 		self.clientPlayTime = app.GetTime()
@@ -976,9 +775,6 @@ class AffectShower(ui.Window):
 		image.SetParent(self)
 		image.SetSkillAffectFlag(TRUE)
 
-		if app.ENABLE_AFFECT_BUFF_REMOVE:
-			image.SetSkillIndex(skillIndex)
-
 		try:
 			image.LoadImage(filename)
 		except:
@@ -998,16 +794,17 @@ class AffectShower(ui.Window):
 		self.__ArrangeImageList()
 
 	def __ArrangeImageList(self):
-		numberOnRow = 21
-		self.SetSize(numberOnRow * self.IMAGE_STEP, self.IMAGE_STEP_Y + 26 * 4)
+		self.SetSize(15 * self.IMAGE_STEP, self.IMAGE_STEP_Y + 26 * 4)
 
 		xPos = 0
 		i = 0
-		width = 0
 
-		if app.ENABLE_CONQUEROR_LEVEL:
-			if self.SungmaImage:
-				width += self.IMAGE_STEP
+		if str(wndMgr.GetScreenWidth()) >= "1920":
+			numberOnRow = 14
+		elif str(wndMgr.GetScreenWidth()) >= "1366" and str(wndMgr.GetScreenWidth()) < "1920":
+			numberOnRow = 10
+		else:
+			numberOnRow = 7
 
 		if self.lovePointImage:
 			if self.lovePointImage.IsShow():
@@ -1038,12 +835,6 @@ class AffectShower(ui.Window):
 			i = i + 1
 
 		newDict = collections.OrderedDict(sorted(self.affectImageDict.items()))
-
-		if app.ENABLE_CONQUEROR_LEVEL:
-			if self.SungmaImage:
-				if self.SungmaImage.IsShow():
-					self.SungmaImage.SetPosition(xPos, 0)
-					xPos += self.IMAGE_STEP
 
 		for image in newDict.values():
 			if i >= numberOnRow and i < numberOnRow * 2:
@@ -1146,7 +937,6 @@ class AffectShower(ui.Window):
 	def OnUpdate(self):
 		try:
 			if app.GetGlobalTime() - self.lastUpdateTime > 500:
-			#if 0 < app.GetGlobalTime():
 				self.lastUpdateTime = app.GetGlobalTime()
 
 				for image in self.affectImageDict.values():
@@ -1158,4 +948,3 @@ class AffectShower(ui.Window):
 						image.UpdateDescription()
 		except Exception, e:
 			print "AffectShower::OnUpdate error : ", e
-

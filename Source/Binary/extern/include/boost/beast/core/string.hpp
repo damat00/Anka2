@@ -12,35 +12,19 @@
 
 #include <boost/beast/core/detail/config.hpp>
 #include <boost/version.hpp>
-
-#if defined(BOOST_BEAST_USE_STD_STRING_VIEW)
-#include <string_view>
-#else
 #include <boost/utility/string_view.hpp>
-#endif
-
 #include <algorithm>
 
 namespace boost {
 namespace beast {
 
-#if defined(BOOST_BEAST_USE_STD_STRING_VIEW)
-  /// The type of string view used by the library
-  using string_view = std::string_view;
+/// The type of string view used by the library
+using string_view = boost::string_view;
 
-  /// The type of basic string view used by the library
-  template<class CharT, class Traits>
-  using basic_string_view =
-      std::basic_string_view<CharT, Traits>;
-#else
-  /// The type of string view used by the library
-  using string_view = boost::string_view;
-
-  /// The type of basic string view used by the library
-  template<class CharT, class Traits>
-  using basic_string_view =
-      boost::basic_string_view<CharT, Traits>;
-#endif
+/// The type of basic string view used by the library
+template<class CharT, class Traits>
+using basic_string_view =
+    boost::basic_string_view<CharT, Traits>;
 
 namespace detail {
 

@@ -31,14 +31,10 @@ bool CGraphicTexture::IsEmpty() const
 void CGraphicTexture::SetTextureStage(int stage) const
 {
 	assert(ms_lpd3dDevice != nullptr);
-	STATEMANAGER.SetTexture(stage, m_lpd3dTexture);
+	STATEMANAGER.SetTexture(stage, m_lpd3dTexture);	
 }
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-LPDIRECT3DTEXTURE9 CGraphicTexture::GetD3DTexture() const
-#else
 LPDIRECT3DTEXTURE8 CGraphicTexture::GetD3DTexture() const
-#endif
 {
 	return m_lpd3dTexture;
 }
@@ -58,6 +54,6 @@ CGraphicTexture::CGraphicTexture()
 	Initialize();
 }
 
-CGraphicTexture::~CGraphicTexture()
+CGraphicTexture::~CGraphicTexture()	
 {
 }

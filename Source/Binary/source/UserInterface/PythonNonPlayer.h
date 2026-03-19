@@ -25,11 +25,11 @@ class CPythonNonPlayer : public CSingleton<CPythonNonPlayer>
 	public:
 		enum  EClickEvent
 		{
-			ON_CLICK_EVENT_NONE		= 0,
-			ON_CLICK_EVENT_BATTLE	= 1,
-			ON_CLICK_EVENT_SHOP		= 2,
-			ON_CLICK_EVENT_TALK		= 3,
-			ON_CLICK_EVENT_VEHICLE	= 4,
+			ON_CLICK_EVENT_NONE = 0,
+			ON_CLICK_EVENT_BATTLE = 1,
+			ON_CLICK_EVENT_SHOP = 2,
+			ON_CLICK_EVENT_TALK = 3,
+			ON_CLICK_EVENT_VEHICLE = 4,
 
 			ON_CLICK_EVENT_MAX_NUM,
 		};
@@ -58,7 +58,7 @@ class CPythonNonPlayer : public CSingleton<CPythonNonPlayer>
 			MOB_RESIST_MAGIC,
 			MOB_RESIST_WIND,
 			MOB_RESIST_POISON,
-			MOB_RESISTS_MAX_NUM
+			MOB_RESISTS_MAX_NUM 
 		};
 
 		enum EMobRank
@@ -78,8 +78,8 @@ class CPythonNonPlayer : public CSingleton<CPythonNonPlayer>
 #pragma pack(1)
 		typedef struct SMobSkillLevel
 		{
-			DWORD       dwVnum;
-			BYTE        bLevel;
+			DWORD dwVnum;
+			BYTE bLevel;
 		} TMobSkillLevel;
 
 		typedef struct SMobTable
@@ -139,8 +139,6 @@ class CPythonNonPlayer : public CSingleton<CPythonNonPlayer>
 			BYTE bGodSpeedPoint;
 			BYTE bDeathBlowPoint;
 			BYTE bRevivePoint;
-
-			float fHitRange;
 		} TMobTable;
 #pragma pack(pop)
 
@@ -195,8 +193,6 @@ class CPythonNonPlayer : public CSingleton<CPythonNonPlayer>
 		DWORD GetMonsterColor(DWORD dwVnum);
 		const char * GetMonsterName(DWORD dwVnum);
 
-		float GetMonsterHitRange(DWORD dwVnum);
-
 #ifdef ENABLE_MONSTER_TARGET_ELEMENT
 		bool MonsterHasRaceFlag(DWORD dwVnum, const char *szSearchString);
 #endif
@@ -206,7 +202,7 @@ class CPythonNonPlayer : public CSingleton<CPythonNonPlayer>
 		DWORD GetMonsterRank(DWORD dwVnum);
 #endif
 
-#ifdef ENABLE_WIKI_SYSTEM
+#ifdef ENABLE_INGAME_WIKI_SYSTEM
 		DWORD GetMonsterPrice1(DWORD dwVnum);
 		DWORD GetMonsterPrice2(DWORD dwVnum);
 		TNonPlayerDataMap GetMonsterData() {return m_NonPlayerDataMap;}

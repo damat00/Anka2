@@ -97,8 +97,8 @@ bool CPythonItem::TGroundItemInstance::Update()
 		D3DXQuaternionConjugate(&qc, &q);
 		D3DXQuaternionMultiply(&qAdjust,&qAdjust,&q);
 		D3DXQuaternionMultiply(&qAdjust,&qc,&qAdjust);
-
-		ThingInstance.SetPosition(v3NewPosition.x+qAdjust.x,
+		
+		ThingInstance.SetPosition(v3NewPosition.x+qAdjust.x, 
 			v3NewPosition.y+qAdjust.y,
 			v3NewPosition.z+qAdjust.z);
 	}
@@ -150,7 +150,7 @@ void CPythonItem::SetUseSoundFileName(DWORD eItemType, const std::string& c_rstF
 	if (eItemType>=USESOUND_NUM)
 		return;
 
-	m_astUseSoundFileName[eItemType]=c_rstFileName;
+	m_astUseSoundFileName[eItemType]=c_rstFileName;	
 }
 
 void CPythonItem::SetDropSoundFileName(DWORD eItemType, const std::string& c_rstFileName)
@@ -417,7 +417,7 @@ void CPythonItem::CreateItem(DWORD dwVirtualID, DWORD dwVirtualNumber, float x, 
 		{
 			if (f[0].second == 0)
 			{
-				pGroundItemInstance->qEnd =
+				pGroundItemInstance->qEnd = 
 					RotationArc(
 						D3DXVECTOR3(
 						((float)(random()%2))*2-1+frandom(-0.1f,0.1f),
@@ -427,7 +427,7 @@ void CPythonItem::CreateItem(DWORD dwVirtualID, DWORD dwVirtualNumber, float x, 
 			}
 			else if (f[0].second == 1)
 			{
-				pGroundItemInstance->qEnd =
+				pGroundItemInstance->qEnd = 
 					RotationArc(
 						D3DXVECTOR3(
 							0+frandom(-0.1f,0.1f),
@@ -435,9 +435,9 @@ void CPythonItem::CreateItem(DWORD dwVirtualID, DWORD dwVirtualNumber, float x, 
 							0+frandom(-0.1f,0.1f)),
 						D3DXVECTOR3(0,0,1));
 			}
-			else
+			else 
 			{
-				pGroundItemInstance->qEnd =
+				pGroundItemInstance->qEnd = 
 					RotationArc(
 					D3DXVECTOR3(
 					0+frandom(-0.1f,0.1f),

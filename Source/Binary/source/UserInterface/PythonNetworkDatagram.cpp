@@ -168,7 +168,7 @@ void CPythonNetworkDatagram::SendCharacterStatePacket(DWORD dwVID, DWORD dwCmdTi
 
 	if (fDstRot<0)
 		fDstRot=360.0f-fDstRot;
-
+	
 	TPacketCCState kStatePacket;
 	kStatePacket.bHeader=HEADER_CC_STATE_WALKING;
 	kStatePacket.dwVID=dwVID;

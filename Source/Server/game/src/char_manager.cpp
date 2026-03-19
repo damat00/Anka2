@@ -22,16 +22,7 @@
 #include "locale_service.h"
 #include "safebox.h"
 #include "item.h"
-#ifdef ENABLE_ITEMSHOP
-#include "desc_client.h"
-#include "desc_manager.h"
-#endif
-#ifdef ENABLE_ITEMSHOP
 #include "item_manager.h"
-#endif
-#ifdef ENABLE_EVENT_SYSTEM
-	#include "auto_event_list.h"
-#endif
 
 #include <boost/bind.hpp>
 
@@ -57,9 +48,6 @@ CHARACTER_MANAGER::CHARACTER_MANAGER() :
 
 	m_iUserDamageRate = 100;
 	m_iUserDamageRatePremium = 100;
-#ifdef ENABLE_EVENT_BANNER_FLAG
-	m_bIsLoadedBanners = false;
-#endif
 }
 
 CHARACTER_MANAGER::~CHARACTER_MANAGER()
@@ -72,14 +60,15 @@ CHARACTER_MANAGER::~CHARACTER_MANAGER()
 
 void CHARACTER_MANAGER::Destroy()
 {
-#ifdef ENABLE_ITEMSHOP
+#ifdef ENABLE_RENEWAL_INGAME_ITEMSHOP
 	m_IShopManager.clear();
 #endif
 
 	itertype(m_map_pkChrByVID) it = m_map_pkChrByVID.begin();
-	while (it != m_map_pkChrByVID.end()) {
+	while (it != m_map_pkChrByVID.end())
+	{
 		LPCHARACTER ch = it->second;
-		M2_DESTROY_CHARACTER(ch); // m_map_pkChrByVID is changed here
+		M2_DESTROY_CHARACTER(ch);
 		it = m_map_pkChrByVID.begin();
 	}
 }
@@ -125,19 +114,7 @@ void CHARACTER_MANAGER::DestroyCharacter(LPCHARACTER ch)
 		return;
 
 	// <Factor> Check whether it has been already deleted or not.
-	// Safely get VID - if pointer is invalid, GetVID() might crash
-	DWORD dwVID = 0;
-	try
-	{
-		dwVID = ch->GetVID();
-	}
-	catch (...)
-	{
-		sys_err("[CHARACTER_MANAGER::DestroyCharacter] Invalid pointer, cannot get VID");
-		return;
-	}
-
-	itertype(m_map_pkChrByVID) it = m_map_pkChrByVID.find(dwVID);
+	itertype(m_map_pkChrByVID) it = m_map_pkChrByVID.find(ch->GetVID());
 	if (it == m_map_pkChrByVID.end())
 	{
 		sys_err("[CHARACTER_MANAGER::DestroyCharacter] <Factor> %d not found", (long)(ch->GetVID()));
@@ -213,11 +190,6 @@ void CHARACTER_MANAGER::DestroyCharacter(LPCHARACTER ch)
 
 LPCHARACTER CHARACTER_MANAGER::Find(DWORD dwVID)
 {
-	// Güvenlik kontrolü: m_map_pkChrByVID map'i destroy edilmiþ olabilir
-	// Bu durumda crash'i önlemek için null check yap
-	if (m_map_pkChrByVID.empty())
-		return NULL;
-
 	itertype(m_map_pkChrByVID) it = m_map_pkChrByVID.find(dwVID);
 
 	if (m_map_pkChrByVID.end() == it)
@@ -306,20 +278,6 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMobRandomPosition(DWORD dwVnum, long lMapInd
 			return NULL;
 		}
 	}
-
-#ifdef ENABLE_ATTENDANCE_EVENT
-	if (dwVnum >= 6500 && dwVnum <= 6504 && !quest::CQuestManager::instance().GetEventFlag("enable_attendance_event"))
-	{
-		sys_log(1, "ATTENDANCE [6500 - 6504] regen disabled.");
-		return NULL;
-	}
-	
-	if (dwVnum >= 8041 && dwVnum <= 8050 && !quest::CQuestManager::instance().GetEventFlag("enable_easter_event"))
-	{
-		sys_log(1, "Easter Event [8041 - 8050] regen disabled.");
-		return NULL;
-	}
-#endif
 
 	const CMob * pkMob = CMobManager::instance().Get(dwVnum);
 
@@ -514,95 +472,6 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMob(DWORD dwVnum, long lMapIndex, long x, lo
 	return (ch);
 }
 
-#ifdef STONE_REGEN_FIX
-LPCHARACTER CHARACTER_MANAGER::SpawnMobRangeStone(DWORD dwVnum, long lMapIndex, int sx, int sy, int ex, int ey, bool bIsException, bool bSpawnMotion, bool bAggressive)
-{
-	const CMob* pkMob = CMobManager::instance().Get(dwVnum);
-
-	if (!pkMob)
-		return NULL;
-
-	if (pkMob->m_table.bType == CHAR_TYPE_STONE)
-		bSpawnMotion = false;
-
-	// Ensure sx <= ex and sy <= ey
-	int min_x = (sx < ex) ? sx : ex;
-	int max_x = (sx < ex) ? ex : sx;
-	int min_y = (sy < ey) ? sy : ey;
-	int max_y = (sy < ey) ? ey : sy;
-
-	int i = 3;
-	while (i--)
-	{
-		int x = number(min_x, max_x);
-		int y = number(min_y, max_y);
-
-		LPCHARACTER ch = SpawnMobStone(11, dwVnum, lMapIndex, x, y, 0, bSpawnMotion);
-		if (ch)
-		{
-			return (ch);
-		}
-	}
-
-	return NULL;
-}
-
-LPCHARACTER CHARACTER_MANAGER::SpawnMobStone(DWORD dwType, DWORD dwVnum, long lMapIndex, long x, long y, long z, bool bSpawnMotion, int iRot, bool bShow, bool bAggressive)
-{
-	const CMob* pkMob = CMobManager::instance().Get(dwVnum);
-	if (!pkMob)
-	{
-		sys_err("SpawnMobStone: no mob data for vnum %u (map %u)", dwVnum, lMapIndex);
-		return NULL;
-	}
-
-	LPSECTREE sectree = SECTREE_MANAGER::instance().Get(lMapIndex, x, y);
-	if (!sectree)
-	{
-		sys_log(0, "SpawnMobStone: cannot create monster at non-exist sectree %d x %d (map %d)", x, y, lMapIndex);
-		return NULL;
-	}
-
-	if (!pkMob)
-	{
-		sys_err("SpawnMobStone: no mob data for vnum %u (map %u)", dwVnum, lMapIndex);
-		return NULL;
-	}
-
-	LPCHARACTER ch = CHARACTER_MANAGER::instance().CreateCharacter(pkMob->m_table.szLocaleName, 2);
-	if (!ch)
-	{
-		sys_log(0, "SpawnMobStone: cannot create new character");
-		return NULL;
-	}
-
-	if (iRot == -1)
-		iRot = number(0, 360);
-
-	if (!pkMob)
-	{
-		sys_err("SpawnMobStone: no mob data for vnum %u (map %u)", dwVnum, lMapIndex);
-		return NULL;
-	}
-
-	ch->SetProto(pkMob);
-	if (pkMob->m_table.bType == CHAR_TYPE_NPC)
-		if (ch->GetEmpire() == 0)
-			ch->SetEmpire(SECTREE_MANAGER::instance().GetEmpireFromMapIndex(lMapIndex));
-
-	ch->SetRotation(iRot);
-
-	if (bShow && !ch->Show(lMapIndex, x, y, z, bSpawnMotion))
-	{
-		M2_DESTROY_CHARACTER(ch);
-		sys_log(0, "SpawnMobStone: cannot show monster");
-		return NULL;
-	}
-
-	return (ch);
-}
-#endif
-
 LPCHARACTER CHARACTER_MANAGER::SpawnMobRange(DWORD dwVnum, long lMapIndex, int sx, int sy, int ex, int ey, bool bIsException, bool bSpawnMotion, bool bAggressive )
 {
 	const CMob * pkMob = CMobManager::instance().Get(dwVnum);
@@ -611,24 +480,18 @@ LPCHARACTER CHARACTER_MANAGER::SpawnMobRange(DWORD dwVnum, long lMapIndex, int s
 		return NULL;
 
 	if (pkMob->m_table.bType == CHAR_TYPE_STONE
-#ifdef ENABLE_DEFENSAWE_SHIP
-	|| dwVnum == 6512
+#ifdef ENABLE_SHIP_DEFENCE_DUNGEON
+		|| dwVnum == 6801
 #endif
 	)
 		bSpawnMotion = true;
 
 	int i = 16;
 
-	// Ensure sx <= ex and sy <= ey
-	int min_x = (sx < ex) ? sx : ex;
-	int max_x = (sx < ex) ? ex : sx;
-	int min_y = (sy < ey) ? sy : ey;
-	int max_y = (sy < ey) ? ey : sy;
-
 	while (i--)
 	{
-		int x = number(min_x, max_x);
-		int y = number(min_y, max_y);
+		int x = number(sx, ex);
+		int y = number(sy, ey);
 
 #ifdef ENABLE_SHOW_MOB_INFO
 		LPCHARACTER ch = SpawnMob(dwVnum, lMapIndex, x, y, 0, bSpawnMotion, -1, true, bAggressive);
@@ -806,14 +669,6 @@ LPCHARACTER CHARACTER_MANAGER::SpawnGroup(DWORD dwVnum, long lMapIndex, int sx, 
 
 		if (bAggressive)
 			tch->SetAggressive();
-
-#ifdef ENABLE_SUNG_MAHI_TOWER
-		if (tch && pDungeon)
-		{
-			BYTE bDungeonLevel = pDungeon->GetDungeonDifficulty();
-			tch->SetDungeonMultipliers(bDungeonLevel);
-		}
-#endif
 	}
 
 	return chLeader;
@@ -825,9 +680,6 @@ struct FuncUpdateAndResetChatCounter
 	{
 		ch->ResetChatCounter();
 		ch->CFSM::Update();
-#ifdef ENABLE_EVENT_SYSTEM
-		CGameEventsManager::instance().SendEventCharacter(ch);
-#endif
 	}
 };
 
@@ -1028,32 +880,23 @@ bool CHARACTER_MANAGER::GetCharactersByRaceNum(DWORD dwRaceNum, CharacterVectorI
 	return true;
 }
 
-#define FIND_JOB_WARRIOR_0	(1 << 3)
-#define FIND_JOB_WARRIOR_1	(1 << 4)
-#define FIND_JOB_WARRIOR_2	(1 << 5)
-#define FIND_JOB_WARRIOR	(FIND_JOB_WARRIOR_0 | FIND_JOB_WARRIOR_1 | FIND_JOB_WARRIOR_2)
-#define FIND_JOB_ASSASSIN_0	(1 << 6)
-#define FIND_JOB_ASSASSIN_1	(1 << 7)
-#define FIND_JOB_ASSASSIN_2	(1 << 8)
-#define FIND_JOB_ASSASSIN	(FIND_JOB_ASSASSIN_0 | FIND_JOB_ASSASSIN_1 | FIND_JOB_ASSASSIN_2)
-#define FIND_JOB_SURA_0		(1 << 9)
-#define FIND_JOB_SURA_1		(1 << 10)
-#define FIND_JOB_SURA_2		(1 << 11)
-#define FIND_JOB_SURA		(FIND_JOB_SURA_0 | FIND_JOB_SURA_1 | FIND_JOB_SURA_2)
-#define FIND_JOB_SHAMAN_0	(1 << 12)
-#define FIND_JOB_SHAMAN_1	(1 << 13)
-#define FIND_JOB_SHAMAN_2	(1 << 14)
-#define FIND_JOB_SHAMAN		(FIND_JOB_SHAMAN_0 | FIND_JOB_SHAMAN_1 | FIND_JOB_SHAMAN_2)
-#ifdef ENABLE_WOLFMAN_CHARACTER
-#define FIND_JOB_WOLFMAN_0	(1 << 15)
-#define FIND_JOB_WOLFMAN_1	(1 << 16)
-#define FIND_JOB_WOLFMAN_2	(1 << 17)
-#define FIND_JOB_WOLFMAN		(FIND_JOB_WOLFMAN_0 | FIND_JOB_WOLFMAN_1 | FIND_JOB_WOLFMAN_2)
-#endif
+#define FIND_JOB_WARRIOR_0 (1 << 3)
+#define FIND_JOB_WARRIOR_1 (1 << 4)
+#define FIND_JOB_WARRIOR_2 (1 << 5)
+#define FIND_JOB_WARRIOR (FIND_JOB_WARRIOR_0 | FIND_JOB_WARRIOR_1 | FIND_JOB_WARRIOR_2)
+#define FIND_JOB_ASSASSIN_0 (1 << 6)
+#define FIND_JOB_ASSASSIN_1 (1 << 7)
+#define FIND_JOB_ASSASSIN_2 (1 << 8)
+#define FIND_JOB_ASSASSIN (FIND_JOB_ASSASSIN_0 | FIND_JOB_ASSASSIN_1 | FIND_JOB_ASSASSIN_2)
+#define FIND_JOB_SURA_0 (1 << 9)
+#define FIND_JOB_SURA_1 (1 << 10)
+#define FIND_JOB_SURA_2 (1 << 11)
+#define FIND_JOB_SURA (FIND_JOB_SURA_0 | FIND_JOB_SURA_1 | FIND_JOB_SURA_2)
+#define FIND_JOB_SHAMAN_0 (1 << 12)
+#define FIND_JOB_SHAMAN_1 (1 << 13)
+#define FIND_JOB_SHAMAN_2 (1 << 14)
+#define FIND_JOB_SHAMAN (FIND_JOB_SHAMAN_0 | FIND_JOB_SHAMAN_1 | FIND_JOB_SHAMAN_2)
 
-//
-// (job+1)*3+(skill_group)
-//
 LPCHARACTER CHARACTER_MANAGER::FindSpecifyPC(unsigned int uiJobFlag, long lMapIndex, LPCHARACTER except, int iMinLevel, int iMaxLevel)
 {
 	LPCHARACTER chFind = NULL;
@@ -1204,88 +1047,13 @@ void CHARACTER_MANAGER::FlushPendingDestroy()
 
 		CHARACTER_SET::iterator it = m_set_pkChrPendingDestroy.begin(),
 			end = m_set_pkChrPendingDestroy.end();
-		for (; it != end; ++it)
-		{
+		for ( ; it != end; ++it) {
 			M2_DESTROY_CHARACTER(*it);
 		}
 
 		m_set_pkChrPendingDestroy.clear();
 	}
 }
-
-#ifdef ENABLE_REAL_TIME_REGEN
-void CHARACTER_MANAGER::EraseRealTimeRegenCharacter(WORD wNum)
-{
-	for (const auto & chr : m_map_pkChrByVID)
-	{
-		LPCHARACTER ch = chr.second;
-		
-		if (!ch)
-			continue;
-		
-		if (ch->GetDungeon())
-			continue;
-		
-		if (!ch->IsMonster() && !ch->IsStone())
-			continue;
-		
-		if (ch->GetRealTimeRegenNum() == wNum)
-		{
-			M2_DESTROY_CHARACTER(ch);
-			break;
-		}
-	}
-}
-
-LPCHARACTER CHARACTER_MANAGER::FindRealTimeRegenMonster(WORD wNum)
-{
-	for (const auto & chr : m_map_pkChrByVID)
-	{
-		LPCHARACTER ch = chr.second;
-		
-		if (!ch)
-			continue;
-		
-		if (ch->GetDungeon())
-			continue;
-		
-		if (!ch->IsMonster() && !ch->IsStone())
-			continue;
-		
-		if (ch->GetRealTimeRegenNum() == wNum)
-			return ch;
-	}
-	
-	return nullptr;
-}
-
-void CHARACTER_MANAGER::RefreshAllMonsters()
-{
-	std::unordered_set<LPCHARACTER> monster_list;
-	
-	for (const auto & chr : m_map_pkChrByVID)
-	{
-		LPCHARACTER ch = chr.second;
-		
-		if (!ch)
-			continue;
-		
-		if (ch->GetDungeon())
-			continue;
-		
-		if (!ch->IsMonster() || ch->IsStone() || ch->IsBoss())
-			continue;
-		
-		if (ch->GetRegen())
-			event_reset_time(ch->GetRegen()->event, 2);
-		
-		monster_list.insert(ch);
-	}
-	
-	for (const auto & ch : monster_list)
-		M2_DESTROY_CHARACTER(ch);
-}
-#endif
 
 void CHARACTER_MANAGER::DestroyCharacterInMap(long lMapIndex)
 {
@@ -1440,7 +1208,7 @@ void CHARACTER_MANAGER::CheckMultiFarmAccount(const char* szIP, const DWORD play
 	int farmPlayerCount = GetMultiFarmCount(szIP, m_mapNames);
 	if (bStatus)
 	{
-		if (farmPlayerCount >= 2)
+		if (farmPlayerCount >= 3)
 		{
 			CheckMultiFarmAccount(szIP, playerID, playerName, false);
 			return;
@@ -1486,29 +1254,26 @@ void CHARACTER_MANAGER::CheckMultiFarmAccount(const char* szIP, const DWORD play
 }
 #endif
 
-#ifdef ENABLE_ITEMSHOP
+#ifdef ENABLE_RENEWAL_INGAME_ITEMSHOP
+#include "desc_client.h"
+#include "desc_manager.h"
+
 void CHARACTER_MANAGER::LoadItemShopLogReal(LPCHARACTER ch, const char* c_pData)
 {
-	LPDESC d = ch ? ch->GetDesc() : nullptr;
-	if (!d)
-	{
+	if (!ch)
 		return;
-	}
 
 	BYTE subIndex = ITEMSHOP_LOG;
 
 	const int logCount = *(int*)c_pData;
 	c_pData += sizeof(int);
-
 	std::vector<TIShopLogData> m_vec;
-
 	if (logCount)
 	{
 		for (DWORD j = 0; j < logCount; ++j)
 		{
 			const TIShopLogData logData = *(TIShopLogData*)c_pData;
 			m_vec.emplace_back(logData);
-
 			c_pData += sizeof(TIShopLogData);
 		}
 	}
@@ -1522,23 +1287,16 @@ void CHARACTER_MANAGER::LoadItemShopLogReal(LPCHARACTER ch, const char* c_pData)
 	buf.write(&subIndex, sizeof(BYTE));
 	buf.write(&logCount, sizeof(int));
 
-	if (logCount > 0)
-	{
+	if(logCount)
 		buf.write(m_vec.data(), sizeof(TIShopLogData)* logCount);
-	}
 
-	d->Packet(buf.read_peek(), buf.size());
+	ch->GetDesc()->Packet(buf.read_peek(), buf.size());
 }
+
 void CHARACTER_MANAGER::LoadItemShopLog(LPCHARACTER ch)
 {
-	LPDESC d = ch ? ch->GetDesc() : nullptr;
-	if (!d)
-	{
-		return;
-	}
-
 	BYTE subIndex = ITEMSHOP_LOG;
-	DWORD accountID = d->GetAccountTable().id;
+	DWORD accountID = ch->GetDesc()->GetAccountTable().id;
 
 	db_clientdesc->DBPacketHeader(HEADER_GD_ITEMSHOP, ch->GetDesc()->GetHandle(), sizeof(BYTE)+sizeof(DWORD));
 	db_clientdesc->Packet(&subIndex, sizeof(BYTE));
@@ -1547,24 +1305,11 @@ void CHARACTER_MANAGER::LoadItemShopLog(LPCHARACTER ch)
 
 void CHARACTER_MANAGER::LoadItemShopData(LPCHARACTER ch, bool isAll)
 {
-	LPDESC d = ch ? ch->GetDesc() : nullptr;
-	if (!d)
-	{
-		return;
-	}
-
 	TEMP_BUFFER buf;
-
 	TPacketGCItemShop p;
 	p.header = HEADER_GC_ITEMSHOP;
 
-	long long act_lldCoins;
-#ifdef USE_ITEMSHOP_RENEWED
-	long long act_lldJCoins;
-	ch->GetAccountMoney(act_lldCoins, act_lldJCoins);
-#else
-	ch->GetAccountMoney(act_lldCoins);
-#endif
+	long long dragonCoin = ch->GetCoins();
 
 	if (isAll)
 	{
@@ -1572,11 +1317,8 @@ void CHARACTER_MANAGER::LoadItemShopData(LPCHARACTER ch, bool isAll)
 		BYTE subIndex = ITEMSHOP_LOAD;
 		calculateSize += sizeof(BYTE);
 
-		calculateSize += sizeof(long long); // dragon coins
-#ifdef USE_ITEMSHOP_RENEWED
-		calculateSize += sizeof(long long); // dragon jetons
-#endif
-		calculateSize += sizeof(int); // updatetime
+		calculateSize += sizeof(long long);
+		calculateSize += sizeof(int);
 
 		int categoryTotalSize = m_IShopManager.size();
 		calculateSize += sizeof(int);
@@ -1587,7 +1329,6 @@ void CHARACTER_MANAGER::LoadItemShopData(LPCHARACTER ch, bool isAll)
 			{
 				BYTE categoryIndex = it->first;
 				calculateSize += sizeof(BYTE);
-
 				BYTE categorySize = it->second.size();
 				calculateSize += sizeof(BYTE);
 
@@ -1597,14 +1338,10 @@ void CHARACTER_MANAGER::LoadItemShopData(LPCHARACTER ch, bool isAll)
 					{
 						BYTE categorySubIndex = itEx->first;
 						calculateSize += sizeof(BYTE);
-
 						BYTE categorySubSize = itEx->second.size();
 						calculateSize += sizeof(BYTE);
-
 						if (categorySubSize)
-						{
 							calculateSize += sizeof(TIShopData) * categorySubSize;
-						}
 					}
 				}
 			}
@@ -1614,10 +1351,7 @@ void CHARACTER_MANAGER::LoadItemShopData(LPCHARACTER ch, bool isAll)
 
 		buf.write(&p, sizeof(TPacketGCItemShop));
 		buf.write(&subIndex, sizeof(BYTE));
-		buf.write(&act_lldCoins, sizeof(act_lldCoins));
-#ifdef USE_ITEMSHOP_RENEWED
-		buf.write(&act_lldJCoins, sizeof(act_lldJCoins));
-#endif
+		buf.write(&dragonCoin, sizeof(long long));
 		buf.write(&itemshopUpdateTime, sizeof(int));
 		buf.write(&categoryTotalSize, sizeof(int));
 
@@ -1627,24 +1361,18 @@ void CHARACTER_MANAGER::LoadItemShopData(LPCHARACTER ch, bool isAll)
 			{
 				BYTE categoryIndex = it->first;
 				buf.write(&categoryIndex, sizeof(BYTE));
-
 				BYTE categorySize = it->second.size();
 				buf.write(&categorySize, sizeof(BYTE));
-
 				if (it->second.size())
 				{
 					for (auto itEx = it->second.begin(); itEx != it->second.end(); ++itEx)
 					{
 						BYTE categorySubIndex = itEx->first;
 						buf.write(&categorySubIndex, sizeof(BYTE));
-
 						BYTE categorySubSize = itEx->second.size();
 						buf.write(&categorySubSize, sizeof(BYTE));
-
 						if (categorySubSize)
-						{
 							buf.write(itEx->second.data(), sizeof(TIShopData) * categorySubSize);
-						}
 					}
 				}
 			}
@@ -1653,32 +1381,21 @@ void CHARACTER_MANAGER::LoadItemShopData(LPCHARACTER ch, bool isAll)
 	else
 	{
 		p.size = sizeof(TPacketGCItemShop) + sizeof(BYTE)+sizeof(int)+sizeof(int);
-
 		buf.write(&p, sizeof(TPacketGCItemShop));
-
 		BYTE subIndex = ITEMSHOP_LOAD;
 		buf.write(&subIndex, sizeof(BYTE));
-
-		buf.write(&act_lldCoins, sizeof(act_lldCoins));
-#ifdef USE_ITEMSHOP_RENEWED
-		buf.write(&act_lldJCoins, sizeof(act_lldJCoins));
-#endif
+		buf.write(&dragonCoin, sizeof(long long));
 		buf.write(&itemshopUpdateTime, sizeof(int));
-
 		int categoryTotalSize = 9999;
 		buf.write(&categoryTotalSize, sizeof(int));
 	}
-
-	d->Packet(buf.read_peek(), buf.size());
+	ch->GetDesc()->Packet(buf.read_peek(), buf.size());
 }
 
 void CHARACTER_MANAGER::LoadItemShopBuyReal(LPCHARACTER ch, const char* c_pData)
 {
-	LPDESC d = ch ? ch->GetDesc() : nullptr;
-	if (!d)
-	{
+	if (!ch)
 		return;
-	}
 
 	const BYTE returnType = *(BYTE*)c_pData;
 	c_pData += sizeof(BYTE);
@@ -1707,23 +1424,6 @@ void CHARACTER_MANAGER::LoadItemShopBuyReal(LPCHARACTER ch, const char* c_pData)
 		ch->LocaleChatPacket(CHAT_TYPE_INFO, 688, "");
 		return;
 	}
-	else if (returnType == 5)
-	{
-		ch->LocaleChatPacket(CHAT_TYPE_INFO, 1500, "");
-		return;
-	}
-#ifdef USE_ITEMSHOP_RENEWED
-	else if (returnType == 6)
-	{
-		ch->LocaleChatPacket(CHAT_TYPE_INFO, 1501, "");
-		return;
-	}
-	else if (returnType == 7)
-	{
-		ch->LocaleChatPacket(CHAT_TYPE_INFO, 1502, "");
-		return;
-	}
-#endif
 
 	const bool isOpenLog = *(bool*)c_pData;
 	c_pData += sizeof(bool);
@@ -1737,9 +1437,53 @@ void CHARACTER_MANAGER::LoadItemShopBuyReal(LPCHARACTER ch, const char* c_pData)
 	const long long itemPrice = *(long long*)c_pData;
 	c_pData += sizeof(long long);
 
-#ifdef USE_ITEMSHOP_RENEWED
-	const long long itemPriceJD = *(long long*)c_pData;
-	c_pData += sizeof(long long);
+	// DB tarafýnda coin düþüþü yapýldý, þimdi güncel coin deðerini al ve POINT_COINS'i güncelle
+	long long dragonCoin = ch->GetCoins();
+	ch->SetPoint(POINT_COINS, dragonCoin);
+
+#ifndef ENABLE_ITEMSHOP_TO_INVENTORY
+	// Item Shop'tan alýnan item'larý mall deposuna ekle
+	if (!ch->GetMall())
+	{
+		// Mall açýk deðilse oluþtur (LoadMall boþ item listesi ile çaðrýlarak mall oluþturulur)
+		ch->LoadMall(0, NULL);
+	}
+
+	// Item'ý oluþtur
+	LPITEM item = ITEM_MANAGER::instance().CreateItem(itemVnum, itemCount);
+	if (item && ch->GetMall())
+	{
+		// Mall'da boþ slot bul ve ekle
+		bool bAdded = false;
+		for (DWORD pos = 0; pos < 3 * SAFEBOX_PAGE_SIZE; ++pos)
+		{
+			if (ch->GetMall()->IsValidPosition(pos) && ch->GetMall()->IsEmpty(pos, item->GetSize()))
+			{
+				if (ch->GetMall()->Add(pos, item))
+				{
+					item->SetSkipSave(false);
+					bAdded = true;
+					break;
+				}
+			}
+		}
+		
+		// Eðer eklenemediyse item'ý yok et
+		if (!bAdded)
+		{
+			item->SetSkipSave(true);
+			ITEM_MANAGER::instance().RemoveItem(item, "ITEMSHOP_MALL_FULL");
+		}
+	}
+	else if (!item)
+	{
+		sys_err("cannot create item vnum %d (name: %s)", itemVnum, ch->GetName());
+	}
+	else if (!ch->GetMall())
+	{
+		// Mall oluþturulamadýysa normal envantere ekle
+		ch->AutoGiveItem(itemVnum, itemCount);
+	}
 #endif
 
 	TEMP_BUFFER buf;
@@ -1747,31 +1491,15 @@ void CHARACTER_MANAGER::LoadItemShopBuyReal(LPCHARACTER ch, const char* c_pData)
 	p.header = HEADER_GC_ITEMSHOP;
 	p.size = sizeof(TPacketGCItemShop) + sizeof(BYTE) + sizeof(long long) + sizeof(bool);
 
-	if (isOpenLog)
-	{
+	if(isOpenLog)
 		p.size += sizeof(TIShopLogData);
-	}
-
-	long long act_lldCoins;
-#ifdef USE_ITEMSHOP_RENEWED
-	long long act_lldJCoins;
-	ch->GetAccountMoney(act_lldCoins, act_lldJCoins, true);
-#else
-	ch->GetAccountMoney(act_lldCoins, true);
-#endif
-
-	ch->AutoGiveItem(itemVnum, itemCount, -1, false);
 
 	BYTE subIndex = ITEMSHOP_DRAGONCOIN;
 
 	buf.write(&p, sizeof(TPacketGCItemShop));
 	buf.write(&subIndex, sizeof(BYTE));
-	buf.write(&act_lldCoins, sizeof(act_lldCoins));
-#ifdef USE_ITEMSHOP_RENEWED
-	buf.write(&act_lldJCoins, sizeof(act_lldJCoins));
-#endif
+	buf.write(&dragonCoin, sizeof(long long));
 	buf.write(&isOpenLog, sizeof(bool));
-
 	if (isOpenLog)
 	{
 		const TIShopLogData logData = *(TIShopLogData*)c_pData;
@@ -1779,189 +1507,66 @@ void CHARACTER_MANAGER::LoadItemShopBuyReal(LPCHARACTER ch, const char* c_pData)
 
 		buf.write(&logData, sizeof(TIShopLogData));
 	}
+	ch->GetDesc()->Packet(buf.read_peek(), buf.size());
 
-	d->Packet(buf.read_peek(), buf.size());
-
-#ifdef USE_ITEMSHOP_RENEWED
-	if (itemPrice > 0 && itemPriceJD > 0)
-	{
-		if (itemCount > 1)
-		{
-			ch->LocaleChatPacket(CHAT_TYPE_INFO, 1508, "%d I%d %lld %lld", itemCount, itemVnum, itemPrice, itemPriceJD);
-			ch->LocaleChatPacket(CHAT_TYPE_INFO, 1503, "");
-		}
-		else
-		{
-			ch->LocaleChatPacket(CHAT_TYPE_INFO, 1509, "I%d %lld %lld", itemVnum, itemPrice, itemPriceJD);
-			ch->LocaleChatPacket(CHAT_TYPE_INFO, 1503, "");
-		}
-	}
-	else if (itemPrice > 0)
-	{
-		if (itemCount > 1)
-		{
-			ch->LocaleChatPacket(CHAT_TYPE_INFO, 1504, "%d I%d %lld", itemCount, itemVnum, itemPrice);
-			ch->LocaleChatPacket(CHAT_TYPE_INFO, 1503, "");
-		}
-		else
-		{
-			ch->LocaleChatPacket(CHAT_TYPE_INFO, 1505, "I%d %lld", itemVnum, itemPrice);
-			ch->LocaleChatPacket(CHAT_TYPE_INFO, 1503, "");
-		}
-	}
-	else if (itemPriceJD > 0)
-	{
-		if (itemCount > 1)
-		{
-			ch->LocaleChatPacket(CHAT_TYPE_INFO, 1506, "%d I%d %lld", itemCount, itemVnum, itemPriceJD);
-			ch->LocaleChatPacket(CHAT_TYPE_INFO, 1503, "");
-		}
-		else
-		{
-			ch->LocaleChatPacket(CHAT_TYPE_INFO, 1507, "I%d %lld", itemVnum, itemPriceJD);
-			ch->LocaleChatPacket(CHAT_TYPE_INFO, 1503, "");
-		}
-	}
+	if(itemCount > 1)
+		ch->LocaleChatPacket(CHAT_TYPE_INFO, 691, "%d#%d#%lld", itemVnum, itemCount, itemPrice);
 	else
-	{
-		if (itemCount > 1)
-		{
-			ch->LocaleChatPacket(CHAT_TYPE_INFO, 1508, "%d I%d %lld %lld", itemCount, itemVnum, itemPrice, itemPriceJD);
-			ch->LocaleChatPacket(CHAT_TYPE_INFO, 1503, "");
-		}
-		else
-		{
-			ch->LocaleChatPacket(CHAT_TYPE_INFO, 1509, "I%d %lld %lld", itemVnum, itemPrice, itemPriceJD);
-			ch->LocaleChatPacket(CHAT_TYPE_INFO, 1503, "");
-		}
-	}
-#else
-	if (itemCount > 1)
-	{
-		ch->ChatPacket(CHAT_TYPE_INFO, "992 I%d %d %lld", itemVnum, itemCount, itemPrice);
-	}
-	else
-	{
-		ch->ChatPacket(CHAT_TYPE_INFO, "993 I%d %lld", itemVnum, itemPrice);
-	}
-#endif
+		ch->LocaleChatPacket(CHAT_TYPE_INFO, 692, "%d#%lld", itemVnum, itemPrice);
 }
 
 void CHARACTER_MANAGER::LoadItemShopBuy(LPCHARACTER ch, int itemID, int itemCount)
 {
-	if (itemID < 0 || itemCount < 1 || itemCount > 20)
-	{
+	if (itemCount <= 0 || itemCount > 20)
 		return;
-	}
 
-	LPDESC d = ch ? ch->GetDesc() : nullptr;
-	if (!d)
-	{
-		return;
-	}
-
-	if (!m_IShopManager.empty())
+	if (m_IShopManager.size())
 	{
 		for (auto it = m_IShopManager.begin(); it != m_IShopManager.end(); ++it)
 		{
-			if (!it->second.empty())
+			if (it->second.size())
 			{
 				for (auto itEx = it->second.begin(); itEx != it->second.end(); ++itEx)
 				{
-					if (!itEx->second.empty())
+					if (itEx->second.size())
 					{
 						for (auto itReal = itEx->second.begin(); itReal != itEx->second.end(); ++itReal)
 						{
 							const TIShopData& itemData = *itReal;
 							if (itemData.id == itemID)
 							{
-								const TItemTable* pItemProto = ITEM_MANAGER::Instance().GetTable(itemData.itemVnum);
-								if (!pItemProto)
-								{
-									sys_err("Item vnum: %u doesn't exists!", itemData.itemVnum);
-									return;
-								}
-
-								if (itemCount > 1)
-								{
-									if (pItemProto->dwAntiFlags & ITEM_ANTIFLAG_STACK || !(pItemProto->dwFlags & ITEM_FLAG_STACKABLE))
-									{
-										sys_err("Item vnum: %u is not stackable!", itemData.itemVnum);
-										return;
-									}
-								}
-
-								long long act_lldCoins;
-#ifdef USE_ITEMSHOP_RENEWED
-								long long act_lldJCoins;
-								ch->GetAccountMoney(act_lldCoins, act_lldJCoins);
-#else
-								ch->GetAccountMoney(act_lldCoins);
-#endif
-
+								long long dragonCoin = ch->GetCoins();
 								long long itemPrice = itemData.itemPrice * itemCount;
-#ifdef USE_ITEMSHOP_RENEWED
-								long long itemPriceJD = itemData.itemPriceJD * itemCount;
-#endif
-
 								if (itemData.discount > 0)
-								{
-									itemPrice = static_cast<long long>((float(itemData.itemPrice) / 100.0) * float(100 - itemData.discount));
-#ifdef USE_ITEMSHOP_RENEWED
-									itemPriceJD = static_cast<long long>((float(itemData.itemPriceJD) / 100.0) * float(100 - itemData.discount));
-#endif
-								}
+									itemPrice = long((float(itemData.itemPrice) / 100.0) * float(100 - itemData.discount));
 
-								if (itemPrice < 0)
-								{
-									return;
-								}
-
-								if (act_lldCoins < itemPrice)
+								if (itemPrice > dragonCoin)
 								{
 									ch->LocaleChatPacket(CHAT_TYPE_INFO, 687, "");
 									return;
 								}
 
-#ifdef USE_ITEMSHOP_RENEWED
-								if (itemPriceJD < 0)
-								{
-									return;
-								}
-
-								if (act_lldJCoins < itemPriceJD)
-								{
-									ch->LocaleChatPacket(CHAT_TYPE_INFO, 1502, "");
-									return;
-								}
-#endif
-
-								DWORD accountID = d->GetAccountTable().id;
-								if (accountID == 0)
-								{
-									return;
-								}
-
+								DWORD accountID = ch->GetDesc()->GetAccountTable().id;
 								BYTE subIndex = ITEMSHOP_BUY;
+								char playerName[CHARACTER_NAME_MAX_LEN + 1];
+								strlcpy(playerName, ch->GetName(), sizeof(playerName));
 
-								char szName[CHARACTER_NAME_MAX_LEN + 1] = {};
-								strlcpy(szName, ch->GetName(), sizeof(szName));
-
-								char szIP[16];
-								strlcpy(szIP, d->GetHostName(), sizeof(szIP));
+								char ipAdress[16];
+								strlcpy(ipAdress, ch->GetDesc()->GetHostName(), sizeof(ipAdress));
 
 								TEMP_BUFFER buf;
 								buf.write(&subIndex, sizeof(BYTE));
 								buf.write(&accountID, sizeof(DWORD));
-								buf.write(&szName, sizeof(szName));
-								buf.write(&szIP, sizeof(szIP));
+								buf.write(&playerName, sizeof(playerName));
+								buf.write(&ipAdress, sizeof(ipAdress));
 								buf.write(&itemID, sizeof(int));
 								buf.write(&itemCount, sizeof(int));
-								bool isLogOpen = (ch->GetProtectTime("itemshop.log") == 1) ? true : false;
+								bool isLogOpen = (ch->GetProtectTime("itemshop.log") == 1)?true:false;
 								buf.write(&isLogOpen, sizeof(bool));
 
-								db_clientdesc->DBPacketHeader(HEADER_GD_ITEMSHOP, d->GetHandle(), buf.size());
+								db_clientdesc->DBPacketHeader(HEADER_GD_ITEMSHOP, ch->GetDesc()->GetHandle(), buf.size());
 								db_clientdesc->Packet(buf.read_peek(), buf.size());
+
 								return;
 							}
 						}
@@ -1979,25 +1584,19 @@ void CHARACTER_MANAGER::UpdateItemShopItem(const char* c_pData)
 
 	bool sendPacketProcess = false;
 
-	if (!m_IShopManager.empty())
+	if (m_IShopManager.size())
 	{
 		for (auto it = m_IShopManager.begin(); it != m_IShopManager.end(); ++it)
 		{
 			if (sendPacketProcess)
-			{
 				break;
-			}
-
-			if (!it->second.empty())
+			if (it->second.size())
 			{
 				for (auto itEx = it->second.begin(); itEx != it->second.end(); ++itEx)
 				{
 					if (sendPacketProcess)
-					{
 						break;
-					}
-
-					if (!itEx->second.empty())
+					if (itEx->second.size())
 					{
 						for (auto itReal = itEx->second.begin(); itReal != itEx->second.end(); ++itReal)
 						{
@@ -2018,11 +1617,9 @@ void CHARACTER_MANAGER::UpdateItemShopItem(const char* c_pData)
 	if (sendPacketProcess)
 	{
 		TEMP_BUFFER buf;
-
 		TPacketGCItemShop p;
 		p.header = HEADER_GC_ITEMSHOP;
 		p.size = sizeof(TPacketGCItemShop) + sizeof(BYTE) + sizeof(TIShopData);
-
 		BYTE subIndex = ITEMSHOP_UPDATE_ITEM;
 		buf.write(&p, sizeof(TPacketGCItemShop));
 		buf.write(&subIndex, sizeof(BYTE));
@@ -2052,19 +1649,18 @@ void CHARACTER_MANAGER::UpdateItemShopItem(const char* c_pData)
 
 void RefreshItemShop(LPDESC d)
 {
-	LPCHARACTER ch = d ? d->GetCharacter() : nullptr;
+	LPCHARACTER ch = d->GetCharacter();
+
 	if (!ch)
-	{
 		return;
-	}
 
 	if (ch->GetProtectTime("itemshop.load") == 1)
 	{
+		ch->LocaleChatPacket(CHAT_TYPE_INFO, 686, "");
 		CHARACTER_MANAGER::Instance().LoadItemShopData(ch, true);
-
-		ch->LocaleChatPacket(CHAT_TYPE_INFO, 990, "");
 	}
 }
+
 void CHARACTER_MANAGER::LoadItemShopData(const char* c_pData)
 {
 	m_IShopManager.clear();
@@ -2080,18 +1676,17 @@ void CHARACTER_MANAGER::LoadItemShopData(const char* c_pData)
 
 	itemshopUpdateTime = updateTime;
 
-	for (auto j = 0; j < categoryTotalSize; ++j)
+	for (DWORD j = 0; j < categoryTotalSize; ++j)
 	{
 		const BYTE categoryIndex = *(BYTE*)c_pData;
 		c_pData += sizeof(BYTE);
-
 		const BYTE categorySize = *(BYTE*)c_pData;
 		c_pData += sizeof(BYTE);
 
 		std::map<BYTE, std::vector<TIShopData>> m_map;
 		m_map.clear();
 
-		for (auto x = 0; x < categorySize; ++x)
+		for (DWORD x = 0; x < categorySize; ++x)
 		{
 			const BYTE categorySubIndex = *(BYTE*)c_pData;
 			c_pData += sizeof(BYTE);
@@ -2102,7 +1697,7 @@ void CHARACTER_MANAGER::LoadItemShopData(const char* c_pData)
 			std::vector<TIShopData> m_vec;
 			m_vec.clear();
 
-			for (auto b = 0; b < categorySubSize; ++b)
+			for (DWORD b = 0; b < categorySubSize; ++b)
 			{
 				const TIShopData itemData = *(TIShopData*)c_pData;
 
@@ -2110,16 +1705,11 @@ void CHARACTER_MANAGER::LoadItemShopData(const char* c_pData)
 				c_pData += sizeof(TIShopData);
 			}
 
-			if (!m_vec.empty())
-			{
+			if(m_vec.size())
 				m_map.emplace(categorySubIndex, m_vec);
-			}
 		}
-
-		if (!m_map.empty())
-		{
+		if(m_map.size())
 			m_IShopManager.emplace(categoryIndex, m_map);
-		}
 	}
 
 	if (isManuelUpdate)
@@ -2191,228 +1781,5 @@ DWORD CHARACTER_MANAGER::GetReserverPID(DWORD dwTargetVID)
 		return 0; // Rezerve edilmemiþ
 	
 	return it->second; // Rezerve eden oyuncunun PID'si
-}
-#endif
-
-#ifdef __DUNGEON_INFO__
-bool sortByTime(const TDungeonRank& a, const TDungeonRank& b){return a.value < b.value;}
-bool sortByVal(const TDungeonRank& a, const TDungeonRank& b){return a.value > b.value;}
-void CHARACTER_MANAGER::SendDungeonRank(LPCHARACTER ch, DWORD mobIdx, BYTE rankIdx)
-{
-	const auto it = m_mapDungeonList.find(mobIdx);
-	if (it == m_mapDungeonList.end())
-		return;
-
-	bool reLoad = false;
-
-	auto itMob = m_mapDungeonRank.find(mobIdx);
-	if (itMob == m_mapDungeonRank.end())
-	{
-		std::map<BYTE, std::pair<std::vector<TDungeonRank>, int>> m_data;
-		m_mapDungeonRank.emplace(mobIdx, m_data);
-		itMob = m_mapDungeonRank.find(mobIdx);
-		reLoad = true;
-	}
-
-	auto itRank = itMob->second.find(rankIdx);
-	if (itRank == itMob->second.end())
-	{
-		reLoad = true;
-		std::pair<std::vector<TDungeonRank>, int> m_vec;
-		itMob->second.emplace(rankIdx, m_vec);
-		itRank = itMob->second.find(rankIdx);
-	}
-
-	if (!reLoad && itRank->second.second < time(0))
-		reLoad = true;
-
-
-	if (reLoad)
-	{
-		itRank->second.first.clear();
-		char szQuery[1024];
-		if(rankIdx == 0)
-			snprintf(szQuery, sizeof(szQuery), "SELECT dwPID, lValue FROM player.quest WHERE szName = 'dungeon' and szState = '%u_completed' and lValue > 0 ORDER BY lValue DESC LIMIT 10", mobIdx);
-		else if(rankIdx == 1)
-			snprintf(szQuery, sizeof(szQuery), "SELECT dwPID, lValue FROM player.quest WHERE szName = 'dungeon' and szState = '%u_fastest' and lValue > 0 ORDER BY lValue ASC LIMIT 10", mobIdx);
-		else if (rankIdx == 2)
-			snprintf(szQuery, sizeof(szQuery), "SELECT dwPID, lValue FROM player.quest WHERE szName = 'dungeon' and szState = '%u_damage' and lValue > 0 ORDER BY lValue DESC LIMIT 10", mobIdx);
-
-		std::unique_ptr<SQLMsg> pMsg(DBManager::Instance().DirectQuery(szQuery));
-		if (pMsg->Get()->pSQLResult)
-		{
-			MYSQL_ROW mRow;
-			while (NULL != (mRow = mysql_fetch_row(pMsg->Get()->pSQLResult)))
-			{
-				TDungeonRank dungeonRank;
-				memset(&dungeonRank, 0, sizeof(dungeonRank));
-				DWORD playerID;
-				str_to_number(playerID, mRow[0]);
-				str_to_number(dungeonRank.value, mRow[1]);
-				snprintf(szQuery, sizeof(szQuery), "SELECT name, level FROM player.player WHERE id = %d", playerID);
-				std::unique_ptr<SQLMsg> pMsg2(DBManager::instance().DirectQuery(szQuery));
-				MYSQL_ROW  playerRow = mysql_fetch_row(pMsg2->Get()->pSQLResult);
-				if (playerRow)
-				{
-					strlcpy(dungeonRank.name, playerRow[0], sizeof(dungeonRank.name));
-					str_to_number(dungeonRank.level, playerRow[1]);
-				}
-				itRank->second.first.emplace_back(dungeonRank);
-			}
-			if (itRank->second.first.size())
-			{
-				if(rankIdx == 1)
-					std::sort(itRank->second.first.begin(), itRank->second.first.end(), sortByTime);
-				else
-					std::sort(itRank->second.first.begin(), itRank->second.first.end(), sortByVal);
-			}
-		}
-		itRank->second.second = time(0) + (60 * 5);
-	}
-
-	std::string cmd("");
-
-	for (BYTE j = 0; j < itRank->second.first.size(); ++j)
-	{
-		const auto& rank = itRank->second.first[j];
-
-		cmd += rank.name;
-		cmd += "|";
-		cmd += std::to_string(rank.value);
-		cmd += "|";
-		cmd += std::to_string(rank.level);
-		cmd += "#";
-	}
-	if (cmd == "")
-		cmd = "-";
-	ch->ChatPacket(CHAT_TYPE_COMMAND, "dungeon_log_info %u %u %s", mobIdx, rankIdx, cmd.c_str());
-}
-#endif
-
-#ifdef ENABLE_EVENT_BANNER_FLAG
-#include "CsvReader.h"
-bool CHARACTER_MANAGER::InitializeBanners()
-{
-	if (m_bIsLoadedBanners)
-		return false;
-
-	const char* c_szFileName = "data/banner/list.txt";
-
-	cCsvTable nameData;
-	if (!nameData.Load(c_szFileName, '\t'))
-	{
-		sys_log(0, "%s couldn't be loaded or its format is incorrect.", c_szFileName);
-		return false;
-	}
-	else
-	{
-		nameData.Next();
-		while (nameData.Next())
-		{
-			if (nameData.ColCount() < 2)
-				continue;
-
-			BannerMap.insert(std::make_pair(atoi(nameData.AsStringByIndex(0)), nameData.AsStringByIndex(1)));
-		}
-	}
-	nameData.Destroy();
-
-	m_bIsLoadedBanners = true;
-
-	DWORD dwFlagVnum = quest::CQuestManager::instance().GetEventFlag("banner");
-	if (dwFlagVnum > 0)
-		SpawnBanners(dwFlagVnum);
-
-	return true;
-}
-
-bool CHARACTER_MANAGER::SpawnBanners(int iEnable, const char* c_szBannerName)
-{
-	if (!m_bIsLoadedBanners)
-		InitializeBanners();
-
-	bool bDestroy = true;
-	bool bSpawn = false;
-
-	DWORD dwBannerVnum = 0;
-	std::string strBannerName;
-
-	if (!c_szBannerName)
-	{
-		BannerMapType::const_iterator it = BannerMap.find(iEnable);
-		if (it == BannerMap.end())
-			return false;
-
-		dwBannerVnum = it->first;
-		strBannerName = it->second;
-	}
-	else
-	{
-		for (BannerMapType::const_iterator it = BannerMap.begin(); BannerMap.end() != it; ++it)
-		{
-			if (!strcmp(it->second.c_str(), c_szBannerName))
-			{
-				dwBannerVnum = it->first;
-				strBannerName = it->second;
-				break;
-			}
-		}
-	}
-
-	if (dwBannerVnum == 0 || strBannerName.empty())
-		return false;
-
-	if (iEnable > 0)
-		bSpawn = true;
-
-	if (bDestroy)
-	{
-		quest::CQuestManager::instance().RequestSetEventFlag("banner", 0);
-
-		CharacterVectorInteractor i;
-		CHARACTER_MANAGER::GetCharactersByRaceNum(dwBannerVnum, i);
-
-		for (CharacterVectorInteractor::iterator it = i.begin(); it != i.end(); it++)
-		{
-			M2_DESTROY_CHARACTER(*it);
-		}
-	}
-
-	if (bSpawn)
-	{
-		quest::CQuestManager::instance().RequestSetEventFlag("banner", dwBannerVnum);
-
-		if (map_allow_find(EBannerMapIndex::EMPIRE_A))
-		{
-			std::string strBannerFile = "data/banner/a/" + strBannerName + ".txt";
-
-			if (LPSECTREE_MAP pkMap = SECTREE_MANAGER::instance().GetMap(EBannerMapIndex::EMPIRE_A))
-			{
-				regen_do(strBannerFile.c_str(), EBannerMapIndex::EMPIRE_A, pkMap->m_setting.iBaseX, pkMap->m_setting.iBaseY, NULL, false);
-			}
-		}
-
-		if (map_allow_find(EBannerMapIndex::EMPIRE_B))
-		{
-			std::string strBannerFile = "data/banner/b/" + strBannerName + ".txt";
-
-			if (LPSECTREE_MAP pkMap = SECTREE_MANAGER::instance().GetMap(EBannerMapIndex::EMPIRE_B))
-			{
-				regen_do(strBannerFile.c_str(), EBannerMapIndex::EMPIRE_B, pkMap->m_setting.iBaseX, pkMap->m_setting.iBaseY, NULL, false);
-			}
-		}
-
-		if (map_allow_find(EBannerMapIndex::EMPIRE_C))
-		{
-			std::string strBannerFile = "data/banner/c/" + strBannerName + ".txt";
-
-			if (LPSECTREE_MAP pkMap = SECTREE_MANAGER::instance().GetMap(EBannerMapIndex::EMPIRE_C))
-			{
-				regen_do(strBannerFile.c_str(), EBannerMapIndex::EMPIRE_C, pkMap->m_setting.iBaseX, pkMap->m_setting.iBaseY, NULL, false);
-			}
-		}
-	}
-
-	return true;
 }
 #endif

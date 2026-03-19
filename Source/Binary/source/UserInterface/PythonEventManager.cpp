@@ -322,7 +322,7 @@ void CPythonEventManager::InsertText(int iIndex, const char *c_szText,int iX_pos
 			pEventSet->pCurrentTextLine->SetHorizonalAlign(CGraphicTextInstance::HORIZONTAL_ALIGN_CENTER);
 		}
 	}
-
+	
 	pEventSet->pCurrentTextLine->Update();
 	__InsertLine(*pEventSet, FALSE, iX_pos);
 }
@@ -1029,14 +1029,12 @@ void CPythonEventManager::ProcessEventSet(TEventSet * pEventSet)
 			break;
 		}
 
-		// HIDE_QUEST_LETTER
 		case EVENT_TYPE_QUEST_BUTTON_CLOSE:
 		{
-			PyCallClassMemberFunc(m_poInterface, "BINARY_ClearQuest",
+			PyCallClassMemberFunc(m_poInterface, "BINARY_ClearQuest", 
 				Py_BuildValue("(i)", atoi(GetArgument("idx", ScriptCommand.argList))));
 			break;
 		}
-		// END_OF_HIDE_QUEST_LETTER
 
 		case EVENT_TYPE_QUEST_BUTTON:
 		{
@@ -1498,7 +1496,7 @@ void CPythonEventManager::__InsertLine(TEventSet& rEventSet, BOOL isCenter, int 
 		}
 		kLine.pInstance = rEventSet.pCurrentTextLine;
 		rEventSet.ScriptTextLineList.push_back(kLine);
-		__AddSpace(rEventSet, c_fLine_Temp);
+		__AddSpace(rEventSet, c_fLine_Temp);		
 	}
 
 	// DEFAULT_FONT
@@ -1522,7 +1520,7 @@ void CPythonEventManager::__InsertLine(TEventSet& rEventSet, BOOL isCenter, int 
 
 	rEventSet.pCurrentTextLine->SetColor(1.0f, 1.0f, 1.0f);
 	rEventSet.pCurrentTextLine->SetValue("");
-
+	
 	if (rEventSet.isTextCenterMode || isCenter)
 	{
 		rEventSet.pCurrentTextLine->SetHorizonalAlign(CGraphicTextInstance::HORIZONTAL_ALIGN_CENTER);
@@ -1539,7 +1537,7 @@ void CPythonEventManager::__InsertLine(TEventSet& rEventSet, BOOL isCenter, int 
 		{
 			rEventSet.pCurrentTextLine->SetHorizonalAlign(CGraphicTextInstance::HORIZONTAL_ALIGN_LEFT);
 			rEventSet.pCurrentTextLine->SetPosition(rEventSet.ix, rEventSet.iy + rEventSet.iyLocal);
-		}
+		}		
 	}
 
 	rEventSet.iCurrentLetter = 0;
@@ -1590,7 +1588,7 @@ bool CPythonEventManager::GetScriptEventIndex(const char *c_szName, int * pEvent
 		*pEventPosition = EVENT_POSITION_START;
 		c_szEventName = &c_szName[0];
 	}
-
+	
 	std::map<std::string,int>::iterator it = EventTypeMap.find(c_szEventName);
 	if (it == EventTypeMap.end())
 	{
@@ -1692,24 +1690,6 @@ int CPythonEventManager::GetTotalLineCount(int iIndex)
 		return 0;
 
 	return pEventSet->iTotalLineCount;
-}
-
-void CPythonEventManager::SetFontColor(int iIndex, float r, float g, float b)
-{
-	if (!CheckEventSetIndex(iIndex))
-		return;
-
-	TEventSet * pEventSet = m_EventSetVector[iIndex];
-	if (!pEventSet)
-		return;
-
-	if (pEventSet->pCurrentTextLine)
-	{
-		pEventSet->CurrentColor.r = r;
-		pEventSet->CurrentColor.g = g;
-		pEventSet->CurrentColor.b = b;
-		pEventSet->pCurrentTextLine->SetColor(pEventSet->CurrentColor.r, pEventSet->CurrentColor.g, pEventSet->CurrentColor.b);
-	}
 }
 #endif
 

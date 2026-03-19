@@ -220,8 +220,7 @@ void CGrannyLODController::AddModel(CGraphicThing * pThing, int iSrcModel, CGran
 
 	if (pSkelLODController && pSkelLODController->m_que_pkModelInst.empty())
 	{
-		// CANNON LINK için skeleton boþ, kostüm dosyasýnda eksik veya yanlýþ tanýmlanmýþ olabilir
-		// Assertion yerine sadece return yapýyoruz (asset hatasý, kostüm yüklenmeyecek)
+		assert(!"EMPTY SKELETON(CANNON LINK)");
 		return;
 	}
 
@@ -498,14 +497,11 @@ void CGrannyLODController::UpdateTime(float fElapsedTime)
 
 void CGrannyLODController::SetCurrentModelInstance(CGrannyModelInstance * pgrnModelInstance)
 {
-	// Copy Motion
 	pgrnModelInstance->CopyMotion(m_pCurrentModelInstance, true);
 	m_pCurrentModelInstance = pgrnModelInstance;
 
-	// Change children attaching link
 	RefreshAttachedModelInstance();
 
-	// Change parent attaching link
 	if (m_pAttachedParentModel)
 	{
 		m_pAttachedParentModel->RefreshAttachedModelInstance();

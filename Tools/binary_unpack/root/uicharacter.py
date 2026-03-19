@@ -14,82 +14,151 @@ import snd
 import mouseModule
 import wndMgr
 import skill
-import item
 import playerSettingModule
 import quest
 import localeInfo
 import uiToolTip
-import uiCommon
 import constInfo
 import emotion
-import interfaceModule
 import chat
-if app.ENABLE_TITLE_SYSTEM:
-	import uicharactertitle
 
 if app.ENABLE_RENEWAL_QUEST:
 	import math
 	import uiQuest
 
+if app.ENABLE_RENEWAL_BONUS_BOARD:
+	import item
+	from uiToolTip import ItemToolTip
+
 if app.ENABLE_SKILL_COLOR_SYSTEM:
 	import uiSkillColor
 
-if app.ENABLE_DETAILS_UI:
-	import uiCharacterDetails
-
-
-PARTY_AFFECT_ATTACKER			= 1
-PARTY_AFFECT_TANKER				= 2
-PARTY_AFFECT_BUFFER				= 3
-PARTY_AFFECT_SKILL_MASTER		= 4
-PARTY_AFFECT_BERSERKER			= 5
-PARTY_AFFECT_DEFENDER			= 6
-
 SHOW_ONLY_ACTIVE_SKILL = False
-SHOW_LIMIT_SUPPORT_SKILL_LIST = []
-HIDE_SUPPORT_SKILL_POINT = False
 
-if app.ENABLE_CONQUEROR_LEVEL:
-	HIDE_SUPPORT_SKILL_POINT = TRUE
-	SHOW_LIMIT_SUPPORT_SKILL_LIST = [121, 122, 123, 124, 126, 127, 129, 128, 131, 137, 138, 139, 140, 132, 133, 134, 246]
-else:
-	if localeInfo.IsYMIR():
-		SHOW_LIMIT_SUPPORT_SKILL_LIST = [121, 122, 123, 124, 126, 127, 129, 128, 131, 137, 138, 139, 140,141,142]
-		[121, 122, 123, 124, 126, 127, 129, 128, 131, 137, 138, 139, 140, 0, 0, 0, 0]
-		if not localeInfo.IsCHEONMA():
-			HIDE_SUPPORT_SKILL_POINT = TRUE 
-			SHOW_LIMIT_SUPPORT_SKILL_LIST = [121, 122, 123, 124, 126, 127, 129, 128, 131, 137, 138, 139, 140,141,142]
-	elif localeInfo.IsJAPAN() or   (localeInfo.IsEUROPE() and app.GetLocalePath() != "locale/ca") and (localeInfo.IsEUROPE() and app.GetLocalePath() != "locale/br"):
-		HIDE_SUPPORT_SKILL_POINT = TRUE	
-		SHOW_LIMIT_SUPPORT_SKILL_LIST = [121, 122, 123, 124, 126, 127, 129, 128, 131, 137, 138, 139, 140]
+HIDE_SUPPORT_SKILL_POINT = True
 
-	else:
-		HIDE_SUPPORT_SKILL_POINT = TRUE
+SHOW_LIMIT_SUPPORT_SKILL_LIST = [121, 122, 123, 124, 126, 127, 128, 129, 130, 131, 137, 138, 139, 140]
 
 FACE_IMAGE_DICT = {
-	playerSettingModule.RACE_WARRIOR_M	: "icon/face/warrior_m.tga",
-	playerSettingModule.RACE_WARRIOR_W	: "icon/face/warrior_w.tga",
-	playerSettingModule.RACE_ASSASSIN_M	: "icon/face/assassin_m.tga",
-	playerSettingModule.RACE_ASSASSIN_W	: "icon/face/assassin_w.tga",
-	playerSettingModule.RACE_SURA_M		: "icon/face/sura_m.tga",
-	playerSettingModule.RACE_SURA_W		: "icon/face/sura_w.tga",
-	playerSettingModule.RACE_SHAMAN_M	: "icon/face/shaman_m.tga",
-	playerSettingModule.RACE_SHAMAN_W	: "icon/face/shaman_w.tga",
+	playerSettingModule.RACE_WARRIOR_M : "icon/face/warrior_m.tga",
+	playerSettingModule.RACE_WARRIOR_W : "icon/face/warrior_w.tga",
+	playerSettingModule.RACE_ASSASSIN_M : "icon/face/assassin_m.tga",
+	playerSettingModule.RACE_ASSASSIN_W : "icon/face/assassin_w.tga",
+	playerSettingModule.RACE_SURA_M : "icon/face/sura_m.tga",
+	playerSettingModule.RACE_SURA_W : "icon/face/sura_w.tga",
+	playerSettingModule.RACE_SHAMAN_M : "icon/face/shaman_m.tga",
+	playerSettingModule.RACE_SHAMAN_W : "icon/face/shaman_w.tga",
 }
 
 def unsigned32(n):
 	return n & 0xFFFFFFFFL
 
+if app.ENABLE_RENEWAL_BONUS_BOARD:
+	bonus_list = [
+		[localeInfo.BONUS_BOARD_CATEGORY_1,
+			[
+				[item.APPLY_ATTBONUS_HUMAN, 43],
+				[item.APPLY_ATTBONUS_MONSTER, 53],
+				[item.APPLY_ATTBONUS_ANIMAL, 44],
+				[item.APPLY_ATTBONUS_ORC, 45],
+				[item.APPLY_ATTBONUS_MILGYO, 46],
+				[item.APPLY_ATTBONUS_UNDEAD, 47],
+				[item.APPLY_ATTBONUS_DEVIL, 48],
+				[item.APPLY_ATTBONUS_METIN, 141],
+				[item.APPLY_ATTBONUS_BOSS, 164],
+				[item.APPLY_ATT_GRADE_BONUS, 95],
+				[item.APPLY_DEF_GRADE_BONUS, 96],
+				[item.APPLY_SKILL_DAMAGE_BONUS, 121],
+				[item.APPLY_NORMAL_HIT_DAMAGE_BONUS, 122],
+				[item.APPLY_SKILL_DEFEND_BONUS, 123],
+				[item.APPLY_NORMAL_HIT_DEFEND_BONUS, 124],
+				[item.APPLY_MELEE_MAGIC_ATTBONUS_PER, 130],
+				[item.APPLY_MAGIC_ATTBONUS_PER, 97],
+				[item.APPLY_CRITICAL_PCT, 40],
+				[item.APPLY_PENETRATE_PCT, 41],
+				[item.APPLY_ANTI_CRITICAL_PCT, 134],
+				[item.APPLY_ANTI_PENETRATE_PCT, 135],
+			]
+		],
+		[localeInfo.BONUS_BOARD_CATEGORY_2,
+			[
+				[item.APPLY_RESIST_MAGIC, 77],
+				[item.APPLY_RESIST_ELEC, 76],
+				[item.APPLY_ATTBONUS_ELEC, 136],
+				[item.APPLY_RESIST_ICE, 131],
+				[item.APPLY_ATTBONUS_ICE, 51],
+				[item.APPLY_RESIST_DARK, 133],
+				[item.APPLY_ATTBONUS_DARK, 139],
+				[item.APPLY_RESIST_FIRE, 75],
+				[item.APPLY_ATTBONUS_FIRE, 50],
+				[item.APPLY_RESIST_WIND, 78],
+				[item.APPLY_ATTBONUS_WIND, 137],
+				[item.APPLY_RESIST_EARTH, 132],
+				[item.APPLY_ATTBONUS_EARTH, 138],
+			]
+		],
+		[localeInfo.BONUS_BOARD_CATEGORY_3,
+			[
+				[item.APPLY_ATTBONUS_WARRIOR, 54],
+				[item.APPLY_RESIST_WARRIOR, 59],
+				[item.APPLY_ATTBONUS_ASSASSIN, 55],
+				[item.APPLY_RESIST_ASSASSIN, 60],
+				[item.APPLY_ATTBONUS_SURA, 56],
+				[item.APPLY_RESIST_SURA, 61],
+				[item.APPLY_ATTBONUS_SHAMAN, 57],
+				[item.APPLY_RESIST_SHAMAN, 62],
+			]
+		],
+		[localeInfo.BONUS_BOARD_CATEGORY_4,
+			[
+				[item.APPLY_RESIST_SWORD, 69],
+				[item.APPLY_RESIST_TWOHAND, 70],
+				[item.APPLY_RESIST_DAGGER, 71],
+				[item.APPLY_RESIST_BELL, 72],
+				[item.APPLY_RESIST_FAN, 73],
+				[item.APPLY_RESIST_BOW, 74],
+			]
+		],
+		[localeInfo.BONUS_BOARD_CATEGORY_5,
+			[
+				[item.APPLY_CAST_SPEED, 21],
+				[item.APPLY_STUN_PCT, 38],
+				[item.APPLY_SLOW_PCT, 39],
+				[item.APPLY_POISON_PCT, 37],
+				[item.APPLY_POISON_REDUCE, 81],
+				[item.APPLY_STEAL_HP, 63],
+				[item.APPLY_STEAL_SP, 64],
+				[item.APPLY_HP_REGEN, 32],
+				[item.APPLY_SP_REGEN, 33],
+				[item.APPLY_BLOCK, 67],
+				[item.APPLY_DODGE, 68],
+				[item.APPLY_REFLECT_MELEE, 79],
+				[item.APPLY_KILL_HP_RECOVER, 87],
+				[item.APPLY_KILL_SP_RECOVER, 82],
+				[item.APPLY_EXP_DOUBLE_BONUS, 83],
+				[item.APPLY_GOLD_DOUBLE_BONUS, 84],
+				[item.APPLY_ITEM_DROP_BONUS, 85],
+			]
+		],
+	]
+
+	stat_list = [
+		[localeInfo.STATS_BOARD_JINNO_PLAYERS, player.POINT_BLUE_PLAYER_KILLED],
+		[localeInfo.STATS_BOARD_SHINSOO_PLAYERS, player.POINT_YELLOW_PLAYER_KILLED],
+		[localeInfo.STATS_BOARD_CHUNJO_PLAYERS, player.POINT_RED_PLAYER_KILLED],
+		[localeInfo.STATS_BOARD_PLAYERS_KILLED, player.POINT_ALL_PLAYER_KILLED],
+		[localeInfo.STATS_BOARD_DUELS_WON, player.POINT_KILL_DUELWON],
+		[localeInfo.STATS_BOARD_LOST_DUELS, player.POINT_KILL_DUELLOST],
+		[localeInfo.STATS_BOARD_KILLED_MONSTER, player.POINT_MONSTER_KILLED],
+		[localeInfo.STATS_BOARD_DEFEATED_BOSSES, player.POINT_BOSS_KILLED],
+		[localeInfo.STATS_BOARD_DESTROYED_STONES, player.POINT_STONE_KILLED]
+	]
+
 if app.ENABLE_RENEWAL_QUEST:
 	quest_slot_listbar = {
-		"name" : "Quest_Slot",
-		"type" : "listbar",
-
-		"x" : 0,
-		"y" : 0,
-
-		"width" : 210,
-		"height" : 20,
+		"name" : "Quest_Slot", "type" : "listbar",
+		"x" : 0, "y" : 0,
+		"width" : 210, "height" : 20,
 
 		"text" : "Quest title",
 		"align" : "left",
@@ -126,21 +195,17 @@ if app.ENABLE_RENEWAL_QUEST:
 
 class CharacterWindow(ui.ScriptWindow):
 
-	if app.ENABLE_NINETH_SKILL:
-		ACTIVE_PAGE_SLOT_COUNT = 9
-		SUPPORT_PAGE_SLOT_COUNT = 18
-	else:
-		ACTIVE_PAGE_SLOT_COUNT = 8
-		SUPPORT_PAGE_SLOT_COUNT = 18
+	ACTIVE_PAGE_SLOT_COUNT = 8
+	SUPPORT_PAGE_SLOT_COUNT = 12
 
 	PAGE_SLOT_COUNT = 12
 	PAGE_HORSE = 2
 
 	SKILL_GROUP_NAME_DICT = {
-		playerSettingModule.JOB_WARRIOR		: { 1 : localeInfo.SKILL_GROUP_WARRIOR_1,	2 : localeInfo.SKILL_GROUP_WARRIOR_2, },
-		playerSettingModule.JOB_ASSASSIN	: { 1 : localeInfo.SKILL_GROUP_ASSASSIN_1,	2 : localeInfo.SKILL_GROUP_ASSASSIN_2, },
-		playerSettingModule.JOB_SURA		: { 1 : localeInfo.SKILL_GROUP_SURA_1,		2 : localeInfo.SKILL_GROUP_SURA_2, },
-		playerSettingModule.JOB_SHAMAN		: { 1 : localeInfo.SKILL_GROUP_SHAMAN_1,	2 : localeInfo.SKILL_GROUP_SHAMAN_2, },
+		playerSettingModule.JOB_WARRIOR : { 1 : localeInfo.SKILL_GROUP_WARRIOR_1, 2 : localeInfo.SKILL_GROUP_WARRIOR_2, },
+		playerSettingModule.JOB_ASSASSIN : { 1 : localeInfo.SKILL_GROUP_ASSASSIN_1, 2 : localeInfo.SKILL_GROUP_ASSASSIN_2, },
+		playerSettingModule.JOB_SURA : { 1 : localeInfo.SKILL_GROUP_SURA_1, 2 : localeInfo.SKILL_GROUP_SURA_2, },
+		playerSettingModule.JOB_SHAMAN : { 1 : localeInfo.SKILL_GROUP_SHAMAN_1, 2 : localeInfo.SKILL_GROUP_SHAMAN_2, },
 	}
 
 	STAT_DESCRIPTION = {
@@ -148,41 +213,23 @@ class CharacterWindow(ui.ScriptWindow):
 		"INT" : localeInfo.STAT_TOOLTIP_INT,
 		"STR" : localeInfo.STAT_TOOLTIP_STR,
 		"DEX" : localeInfo.STAT_TOOLTIP_DEX,
-		"HTH_QUICK" : localeInfo.STAT_TOOLTIP_CON_QUICK,
-		"INT_QUICK" : localeInfo.STAT_TOOLTIP_INT_QUICK,
-		"STR_QUICK" : localeInfo.STAT_TOOLTIP_STR_QUICK,
-		"DEX_QUICK" : localeInfo.STAT_TOOLTIP_DEX_QUICK,
 	}
 
 	STAT_MINUS_DESCRIPTION = localeInfo.STAT_MINUS_DESCRIPTION
-
-	if app.ENABLE_PASSIVE_SYSTEM:
-		wndPassive = None
-
 	if app.ENABLE_RENEWAL_QUEST:
 		MAX_QUEST_PAGE_HEIGHT = 336.5
 
 	def __init__(self):
-		if app.ENABLE_DETAILS_UI:
-			self.chDetailsWnd = None
-			self.isOpenedDetailsWnd = False
+		ui.ScriptWindow.__init__(self)
+		self.state = "STATUS"
+		self.isLoaded = 0
+
+		if app.ENABLE_RENEWAL_BONUS_BOARD:
+			self.BonusToolTip = uiToolTip.ItemToolTip()
+			self.BonusToolTip.Hide()
 
 		if app.ENABLE_RENEWAL_QUEST:
 			self.isQuestCategoryLoad = FALSE
-
-		ui.ScriptWindow.__init__(self)
-		self.state = "STATUS"
-		if app.ENABLE_CONQUEROR_LEVEL:
-			self.substate = "BASE"
-
-			self.statusConquerorPlusCommandDict={
-				"SMH_STR" : "/conqueror_stat smh_str",
-				"SMH_HP" : "/conqueror_stat smh_hp",
-				"SMH_MOVE" : "/conqueror_stat smh_move",
-				"SMH_IMMUNE" : "/conqueror_stat smh_immune",
-			}
-
-		self.isLoaded = 0
 
 		if app.ENABLE_SKILL_COLOR_SYSTEM:
 			self.skillColorWnd = None
@@ -194,21 +241,13 @@ class CharacterWindow(ui.ScriptWindow):
 		self.__LoadWindow()
 
 		self.statusPlusCommandDict = {
-			"HTH" : "/stat ht",
-			"INT" : "/stat iq",
-			"STR" : "/stat st",
-			"DEX" : "/stat dx",
+			"HTH" : "/stat_val ht ",
+			"INT" : "/stat_val iq ",
+			"STR" : "/stat_val st ",
+			"DEX" : "/stat_val dx ",
 		}
 
-		if app.ENABLE_STATUS_UP_RENEWAL:
-			self.faststatusPlusCommandDict={
-				"HTH" : "/stat ht 10",
-				"INT" : "/stat iq 10",
-				"STR" : "/stat st 10",
-				"DEX" : "/stat dx 10",
-			}
-
-		self.statusMinusCommandDict={
+		self.statusMinusCommandDict = {
 			"HTH-" : "/stat- ht",
 			"INT-" : "/stat- iq",
 			"STR-" : "/stat- st",
@@ -227,6 +266,7 @@ class CharacterWindow(ui.ScriptWindow):
 		self.toolTipJob = None
 		self.toolTipAlignment = None
 		self.toolTipSkill = None
+		self.toolTipCharacterBoard = None
 
 		self.faceImage = None
 		self.statusPlusLabel = None
@@ -234,14 +274,15 @@ class CharacterWindow(ui.ScriptWindow):
 		self.activeSlot = None
 		self.tabDict = None
 		self.tabButtonDict = None
+		self.tabCharacterPageDict = None
 		self.pageDict = None
 		self.titleBarDict = None
 		self.statusPlusButtonDict = None
+		self.statusPlusButtonDict2 = None
 		self.statusMinusButtonDict = None
-		if app.ENABLE_CONQUEROR_LEVEL:
-			self.statusConquerorPlusButtonDict = None
 
 		self.skillPageDict = None
+
 		if app.ENABLE_RENEWAL_QUEST:
 			self.questScrollBar = None
 			self.questLastScrollPosition = 0
@@ -304,36 +345,9 @@ class CharacterWindow(ui.ScriptWindow):
 		self.currentPageBack = None
 		self.currentPageText = None
 		self.currentPage = 1
-		if app.ENABLE_TITLE_SYSTEM:
-			self.wndTitleSystem = None
-			self.titleSystemButton = None
-			self.titleSystemUnlockedIDs = set()
-			self.titleSystemActiveID = 0
-
-		if app.ENABLE_CONQUEROR_LEVEL:
-			self.toolTipConquerorInfoButton = None
-			self.tabSungmaButtonDict = None
-			self.SungmaButton = None
-
-	if app.ENABLE_DETAILS_UI:
-		def OnTop(self):
-			if self.chDetailsWnd:
-				self.chDetailsWnd.SetTop()
-
-	if app.ENABLE_DETAILS_UI:
-		def Hide(self):
-			if self.chDetailsWnd:
-				self.isOpenedDetailsWnd = self.chDetailsWnd.IsShow()
-				self.chDetailsWnd.Close()
-			wndMgr.Hide(self.hWnd)
 
 	def Show(self):
 		self.__LoadWindow()
-
-		if app.ENABLE_DETAILS_UI:
-			self.__InitCharacterDetailsUIButton()
-			if self.chDetailsWnd and self.isOpenedDetailsWnd:
-				self.chDetailsWnd.Show()
 
 		ui.ScriptWindow.Show(self)
 
@@ -345,36 +359,11 @@ class CharacterWindow(ui.ScriptWindow):
 		self.toolTip = uiToolTip.ToolTip()
 		self.toolTipJob = uiToolTip.ToolTip()
 		self.toolTipAlignment = uiToolTip.ToolTip(130)
-
-		if app.ENABLE_CONQUEROR_LEVEL:
-			self.toolTipConquerorInfoButton = uiToolTip.ToolTip()
+		self.toolTipCharacterBoard = uiToolTip.ToolTip()
 
 		self.faceImage = self.GetChild("Face_Image")
-		GetObject = self.GetChild
 
 		faceSlot = self.GetChild("Face_Slot")
-		if 949 == app.GetDefaultCodePage():
-			faceSlot.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowJobToolTip)
-			faceSlot.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideJobToolTip)
-
-		self.boardLeader = self.GetChild("leader_board")
-		self.boardLeader.Hide()  # Panel ba?lang?Ã§ta kapal?, skill 121'e t?kland???nda aÃ§?lacak
-		self.selectedLeadership = None  # SeÃ§ili leadership bonus'u (None = seÃ§ilmemi?)
-		
-		list_leader = {
-			"LeaderAttacker" : PARTY_AFFECT_ATTACKER, 
-			"LeaderBerserker" : PARTY_AFFECT_BERSERKER, 
-			"LeaderTanker" : PARTY_AFFECT_TANKER, 
-			"LeaderDefender" : PARTY_AFFECT_DEFENDER, 
-			"LeaderBuffer" : PARTY_AFFECT_BUFFER, 
-			"LeaderSkillMaster" : PARTY_AFFECT_SKILL_MASTER
-		}
-
-		for key in list_leader:
-			self.GetChild(key).SetEvent(ui.__mem_func__(self.SelectLeaderBonus), list_leader[key])
-			
-			self.GetChild(key).SetEventOverIn(ui.__mem_func__(self.OverInLeaderBonus), list_leader[key])
-			self.GetChild(key).SetEventOverOut(ui.__mem_func__(self.OverOutLeaderBonus), list_leader[key])
 
 		self.statusPlusLabel = self.GetChild("Status_Plus_Label")
 		self.statusPlusValue = self.GetChild("Status_Plus_Value")
@@ -393,17 +382,6 @@ class CharacterWindow(ui.ScriptWindow):
 		self.skillGroupButton2 = self.GetChild("Skill_Group_Button_2")
 		self.activeSkillGroupName = self.GetChild("Active_Skill_Group_Name")
 
-		if app.ENABLE_TITLE_SYSTEM:
-			try:
-				self.titleSystemButton = self.GetChild("Face_Button")
-				self.titleSystemButton.SetEvent(ui.__mem_func__(self.__ToggleTitleSystemWindow))
-			except:
-				self.titleSystemButton = None
-
-		if app.ENABLE_PASSIVE_SYSTEM:
-			self.passiveexpandedbtn = self.GetChild("passive_expanded_btn")
-			self.passiveexpandedbtn.SetEvent(ui.__mem_func__(self.__ShowPassiveButton))
-
 		if app.ENABLE_RENEWAL_QUEST:
 			self.questScrollBar = self.GetChild("Quest_ScrollBar")
 			self.questPage = self.GetChild("Quest_Page")
@@ -412,45 +390,58 @@ class CharacterWindow(ui.ScriptWindow):
 			self.quest_object_board_window = self.GetChild("quest_object_board_window")
 
 		self.tabDict = {
-			"STATUS"	: self.GetChild("Tab_01"),
-			"SKILL"		: self.GetChild("Tab_02"),
-			"EMOTICON"	: self.GetChild("Tab_03"),
-			"QUEST"		: self.GetChild("Tab_04"),
+			"STATUS" : self.GetChild("Tab_01"),
+			"SKILL" : self.GetChild("Tab_02"),
+			"EMOTICON" : self.GetChild("Tab_03"),
+			"QUEST" : self.GetChild("Tab_04"),
 		}
 
 		self.tabButtonDict = {
-			"STATUS"	: self.GetChild("Tab_Button_01"),
-			"SKILL"		: self.GetChild("Tab_Button_02"),
-			"EMOTICON"	: self.GetChild("Tab_Button_03"),
-			"QUEST"		: self.GetChild("Tab_Button_04")
+			"STATUS" : self.GetChild("Tab_Button_01"),
+			"SKILL" : self.GetChild("Tab_Button_02"),
+			"EMOTICON" : self.GetChild("Tab_Button_03"),
+			"QUEST" : self.GetChild("Tab_Button_04"),
+		}
+
+		self.tabCharacterPageDict = {
+			0 : self.GetChild("change_status_button"),
+			1 : self.GetChild("bonus_board_button"),
+			2 : self.GetChild("stats_board_button"),
 		}
 
 		self.pageDict = {
-			"STATUS"	: self.GetChild("Character_Page"),
-			"SKILL"		: self.GetChild("Skill_Page"),
-			"EMOTICON"	: self.GetChild("Emoticon_Page"),
-			"QUEST"		: self.GetChild("Quest_Page")
+			"STATUS" : self.GetChild("Character_Page"),
+			"SKILL" : self.GetChild("Skill_Page"),
+			"EMOTICON" : self.GetChild("Emoticon_Page"),
+			"QUEST" : self.GetChild("Quest_Page"),
 		}
 
 		self.titleBarDict = {
-			"STATUS"	: self.GetChild("Character_TitleBar"),
-			"SKILL"		: self.GetChild("Skill_TitleBar"),
-			"EMOTICON"	: self.GetChild("Emoticon_TitleBar"),
-			"QUEST"		: self.GetChild("Quest_TitleBar")
+			"STATUS" : self.GetChild("Character_TitleBar"),
+			"SKILL" : self.GetChild("Skill_TitleBar"),
+			"EMOTICON" : self.GetChild("Emoticon_TitleBar"),
+			"QUEST" : self.GetChild("Quest_TitleBar"),
 		}
 
 		self.statusPlusButtonDict = {
-			"HTH"		: self.GetChild("HTH_Plus"),
-			"INT"		: self.GetChild("INT_Plus"),
-			"STR"		: self.GetChild("STR_Plus"),
-			"DEX"		: self.GetChild("DEX_Plus"),
+			"HTH" : self.GetChild("HTH_Plus"),
+			"INT" : self.GetChild("INT_Plus"),
+			"STR" : self.GetChild("STR_Plus"),
+			"DEX" : self.GetChild("DEX_Plus"),
+		}
+
+		self.statusPlusButtonDict2 = {
+			"HTH" : self.GetChild("HTH_Plus2"),
+			"INT" : self.GetChild("INT_Plus2"),
+			"STR" : self.GetChild("STR_Plus2"),
+			"DEX" : self.GetChild("DEX_Plus2"),
 		}
 
 		self.statusMinusButtonDict = {
-			"HTH-"		: self.GetChild("HTH_Minus"),
-			"INT-"		: self.GetChild("INT_Minus"),
-			"STR-"		: self.GetChild("STR_Minus"),
-			"DEX-"		: self.GetChild("DEX_Minus"),
+			"HTH-" : self.GetChild("HTH_Minus"),
+			"INT-" : self.GetChild("INT_Minus"),
+			"STR-" : self.GetChild("STR_Minus"),
+			"DEX-" : self.GetChild("DEX_Minus"),
 		}
 
 		self.skillPageDict = {
@@ -460,9 +451,21 @@ class CharacterWindow(ui.ScriptWindow):
 		}
 
 		self.skillPageStatDict = {
-			"SUPPORT"	: player.SKILL_SUPPORT,
-			"ACTIVE"	: player.SKILL_ACTIVE,
-			"HORSE"		: player.SKILL_HORSE,
+			"SUPPORT" : player.SKILL_SUPPORT,
+			"ACTIVE" : player.SKILL_ACTIVE,
+			"HORSE" : player.SKILL_HORSE,
+		}
+
+		self.labelPageStatDict = {
+			"SUPPORT" : self.GetChild("Support_Skill_Point_Label"),
+			"ACTIVE" : self.GetChild("Active_Skill_Point_Label"),
+			"HORSE" : self.GetChild("Horse_Skill_Point_Label"),
+		}
+
+		self.characterPageDict = {
+			0 : self.GetChild("Status_Window"),
+			1 : self.GetChild("Bonus_Window"),
+			2 : self.GetChild("Stats_Window"),
 		}
 
 		self.skillGroupButton = (
@@ -470,108 +473,69 @@ class CharacterWindow(ui.ScriptWindow):
 			self.GetChild("Skill_Group_Button_2"),
 		)
 
-		if app.ENABLE_CONQUEROR_LEVEL:
-			self.tabSungmaButtonDict = {
-				"BASE"		: self.GetChild("change_base_button"),
-				"SUNGMA"	: self.GetChild("change_conqueror_button")
-			}
+		self.HTH_IMG = self.GetChild("HTH_IMG")
+		self.INT_IMG = self.GetChild("INT_IMG")
+		self.STR_IMG = self.GetChild("STR_IMG")
+		self.DEX_IMG = self.GetChild("DEX_IMG")
 
-			self.SungmaPageDict = {
-				"BASE" : self.GetChild("base_info"),
-				"SUNGMA" : self.GetChild("sungma_info"),
-			}
+		self.HEL_IMG = self.GetChild("HEL_IMG")
+		self.SP_IMG = self.GetChild("SP_IMG")
+		self.ATT_IMG = self.GetChild("ATT_IMG")
+		self.DEF_IMG = self.GetChild("DEF_IMG")
 
-			self.statusConquerorPlusButtonDict = {
-				"SMH_STR"		: self.GetChild("sungma_str_plus"),
-				"SMH_HP"		: self.GetChild("sungma_hp_plus"),
-				"SMH_MOVE"		: self.GetChild("sungma_move_plus"),
-				"SMH_IMMUNE"		: self.GetChild("sungma_immune_plus"),
-			}
-			
-			self.HTH_IMG = self.GetChild("HTH_IMG")
-			self.INT_IMG = self.GetChild("INT_IMG")
-			self.STR_IMG = self.GetChild("STR_IMG")
-			self.DEX_IMG = self.GetChild("DEX_IMG")
+		self.HTH_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowHTHToolTip)
+		self.HTH_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideHTHToolTip)
 
-			if app.ENABLE_CONQUEROR_LEVEL:
-				self.SUNGMA_STR_IMG = self.GetChild("SUNGMA_STR_IMG")
-				self.SUNGMA_HP_IMG = self.GetChild("SUNGMA_HP_IMG")
-				self.SUNGMA_MOVE_IMG = self.GetChild("SUNGMA_MOVE_IMG")
-				self.SUNGMA_IMMUNE_IMG = self.GetChild("SUNGMA_IMMUNE_IMG")
+		self.INT_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowINTToolTip)
+		self.INT_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideINTToolTip)
 
-			self.HTH_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowHTHToolTip)
-			self.HTH_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideHTHToolTip)
-			
-			self.INT_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowINTToolTip)
-			self.INT_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideINTToolTip)
-			
-			self.STR_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowSTRToolTip)
-			self.STR_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideSTRToolTip)
-			
-			self.DEX_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowDEXToolTip)
-			self.DEX_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideDEXToolTip)
-			
-			self.MSPD_IMG = self.GetChild("MSPD_IMG")
-			self.ASPD_IMG = self.GetChild("ASPD_IMG")
-			self.CSPD_IMG = self.GetChild("CSPD_IMG")
-			self.MATT_IMG = self.GetChild("MATT_IMG")
-			self.MDEF_IMG = self.GetChild("MDEF_IMG")
-			
-			self.HEL_IMG = self.GetChild("HEL_IMG")
-			self.SP_IMG = self.GetChild("SP_IMG")
-			self.ATT_IMG = self.GetChild("ATT_IMG")
-			self.DEF_IMG = self.GetChild("DEF_IMG")
-			
-			if app.ENABLE_CONQUEROR_LEVEL:
-				self.ER_IMG = self.GetChild("ER_IMG")
-			
-			self.MSPD_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowMSPDToolTip)
-			self.MSPD_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideMSPDToolTip)
-			
-			self.ASPD_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowASPDToolTip)
-			self.ASPD_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideASPDToolTip)
-			
-			self.CSPD_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowCSPDToolTip)
-			self.CSPD_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideCSPDToolTip)
-			
-			self.MATT_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowMATTToolTip)
-			self.MATT_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideMATTToolTip)
+		self.STR_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowSTRToolTip)
+		self.STR_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideSTRToolTip)
 
-			self.MDEF_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowMDEFToolTip)
-			self.MDEF_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideMDEFToolTip)
+		self.DEX_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowDEXToolTip)
+		self.DEX_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideDEXToolTip)
 
-			self.HEL_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowHELToolTip)
-			self.HEL_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideHELToolTip)
+		self.HEL_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowHELToolTip)
+		self.HEL_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideHELToolTip)
 
-			self.SP_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowSPToolTip)
-			self.SP_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideSPToolTip)
+		self.SP_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowSPToolTip)
+		self.SP_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideSPToolTip)
 
-			self.ATT_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowATTToolTip)
-			self.ATT_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideATTToolTip)
+		self.ATT_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowATTToolTip)
+		self.ATT_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideATTToolTip)
 
-			self.DEF_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowDEFolTip)
-			self.DEF_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideDEFToolTip)
+		self.DEF_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowDEFToolTip)
+		self.DEF_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideDEFToolTip)
 
-			if app.ENABLE_CONQUEROR_LEVEL:
-				self.ER_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowMERToolTip)
-				self.ER_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideMERToolTip)
-				
-				self.SUNGMA_STR_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowSungmaStrToolTip)
-				self.SUNGMA_STR_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideSungmaStrToolTip)
+		self.MSPD_IMG = self.GetChild("MSPD_IMG")
+		self.ASPD_IMG = self.GetChild("ASPD_IMG")
+		self.CSPD_IMG = self.GetChild("CSPD_IMG")
+		self.MATT_IMG = self.GetChild("MATT_IMG")
+		self.MDEF_IMG = self.GetChild("MDEF_IMG")
+		self.ER_IMG = self.GetChild("ER_IMG")
 
-				self.SUNGMA_HP_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowSungmaHpToolTip)
-				self.SUNGMA_HP_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideSungmaHpToolTip)
+		self.MSPD_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowMSPDToolTip)
+		self.MSPD_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideMSPDToolTip)
 
-				self.SUNGMA_MOVE_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowSunmaMoveToolTip)
-				self.SUNGMA_MOVE_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideSunmaMoveToolTip)
+		self.ASPD_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowASPDToolTip)
+		self.ASPD_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideASPDToolTip)
 
-				self.SUNGMA_IMMUNE_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowSungmaImmuneToolTip)
-				self.SUNGMA_IMMUNE_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideSungmaImmuneToolTip)
+		self.CSPD_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowCSPDToolTip)
+		self.CSPD_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideCSPDToolTip)
 
-		global SHOW_ONLY_ACTIVE_SKILL
-		global HIDE_SUPPORT_SKILL_POINT
-		if SHOW_ONLY_ACTIVE_SKILL or HIDE_SUPPORT_SKILL_POINT:
-			self.GetChild("Support_Skill_Point_Label").Hide()
+		self.MATT_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowMATTToolTip)
+		self.MATT_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideMATTToolTip)
+
+		self.MDEF_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowMDEFToolTip)
+		self.MDEF_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideMDEFToolTip)
+
+		self.ER_IMG.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowERToolTip)
+		self.ER_IMG.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideERToolTip)
+
+		for _, label in self.labelPageStatDict.items():
+			label.Hide()
+
+		self.GetChild("Support_Skill_Point_Label").Hide()
 
 		self.soloEmotionSlot = self.GetChild("SoloEmotionSlot")
 		self.dualEmotionSlot = self.GetChild("DualEmotionSlot")
@@ -610,7 +574,7 @@ class CharacterWindow(ui.ScriptWindow):
 					"d:/ymir work/ui/game/quest/slot_button_01.sub",\
 					"d:/ymir work/ui/game/quest/slot_button_02.sub",\
 					"d:/ymir work/ui/game/quest/slot_button_03.sub",\
-					"d:/ymir work/ui/game/quest/slot_button_03.sub", True)
+					"d:/ymir work/ui/game/quest/slot_button_03.sub", TRUE)
 
 			self.questNameList = []
 			self.questLastTimeList = []
@@ -620,41 +584,132 @@ class CharacterWindow(ui.ScriptWindow):
 				self.questLastTimeList.append(self.GetChild("Quest_LastTime_0" + str(i)))
 				self.questLastCountList.append(self.GetChild("Quest_LastCount_0" + str(i)))
 
-		if app.ENABLE_DETAILS_UI:
-			self.MainBoard = self.GetChild("board")
-			self.ExpandBtn = ui.MakeButton(self.MainBoard, 240, 120, "", "d:/ymir work/ui/game/belt_inventory/", "btn_minimize_normal.tga", "btn_minimize_over.tga", "btn_minimize_down.tga")
-			self.ExpandBtn.SetEvent(ui.__mem_func__(self.__ClickExpandButton))
-			self.MinimizeBtn = ui.MakeButton(self.MainBoard, 240, 120, "", "d:/ymir work/ui/game/belt_inventory/", "btn_expand_normal.tga", "btn_expand_over.tga", "btn_expand_down.tga")
-			self.MinimizeBtn.SetEvent(ui.__mem_func__(self.__ClickMinimizeButton))
+		if app.ENABLE_RENEWAL_BONUS_BOARD:
+			self.statWindow = self.GetChild("Stats_Window")
+			self.bonusWindow = self.GetChild("Bonus_Window")
 
-	if app.ENABLE_DETAILS_UI:
-		def __InitCharacterDetailsUIButton(self):
-			self.ExpandBtn.Show()
-			self.MinimizeBtn.Hide()
+			self.scrollBar = ui.ScrollBar4()
+			self.scrollBar.SetParent(self.bonusWindow)
+			self.scrollBar.SetPosition((self.bonusWindow.GetWidth() - self.scrollBar.GetWidth()) - 22, 3)
+			self.scrollBar.SetScrollBarSize((self.bonusWindow.GetHeight() - 5) - 5)
+			self.scrollBar.SetScrollEvent(ui.__mem_func__(self.Refresh))
+			self.scrollBar.Show()
+			self.ElementDictionary["scrollBar"] = self.scrollBar
 
-		def __ClickExpandButton(self):
-			if not self.chDetailsWnd:
-				self.chDetailsWnd = uiCharacterDetails.CharacterDetailsUI(self)
-				self.chDetailsWnd.Show()
-			else:
-				self.chDetailsWnd.Show()
+			self.scrollBar2 = ui.ScrollBar4()
+			self.scrollBar2.SetParent(self.statWindow)
+			self.scrollBar2.SetPosition((self.statWindow.GetWidth() - self.scrollBar2.GetWidth()) - 18, 3)
+			self.scrollBar2.SetScrollBarSize((self.statWindow.GetHeight() - 5) - 5)
+			self.scrollBar2.SetScrollEvent(ui.__mem_func__(self.Refresh))
+			self.scrollBar2.Show()
+			self.ElementDictionary["scrollBar2"] = self.scrollBar2
 
-			self.ExpandBtn.Hide()
-			self.MinimizeBtn.Show()
+			for i in xrange(len(stat_list)):
+				background = ui.ImageBox()
+				background.SetParent(self.statWindow)
+				background.LoadImage("d:/ymir work/ui/game/windows/statistics.tga")
+				background.Show()
+				background.SetClippingMaskWindow(self.statWindow)
+				self.ElementDictionary["background"] = background
 
-		def __ClickMinimizeButton(self):
-			self.chDetailsWnd.Hide()
-			self.MinimizeBtn.Hide()
-			self.ExpandBtn.Show()
+				for j in xrange(len(stat_list)):
+					statName = ui.TextLine()
+					statName.SetParent(background)
+					statName.AddFlag("not_pick")
+					statName.SetPosition(70, 15+(j*40))
+					statName.SetFontName("Tahoma:13")
+					statName.SetHorizontalAlignCenter()
+					statName.SetText(stat_list[j][0])
+					statName.Show()
+					statName.SetClippingMaskWindow(self.statWindow)
+					self.ElementDictionary["%d_stat_name" % j] = statName
 
-		def OnMoveWindow(self, x, y):
-			if self.chDetailsWnd:
-				self.chDetailsWnd.AdjustPosition(x, y)
+					statValue = ui.TextLine()
+					statValue.AddFlag("not_pick")
+					statValue.SetParent(background)
+					statValue.SetPosition(180, 15+(j*40))
+					statValue.SetFontName("Tahoma:13")
+					statValue.SetHorizontalAlignCenter()
+					statValue.Show()
+					statValue.SetClippingMaskWindow(self.statWindow)
+					self.ElementDictionary["%d_stat" % j] = statValue
 
-			if app.ENABLE_RENEWAL_QUEST:
-				if self.questSlideWndNewKey-1 >= 0:
-					if self.questSlideWnd[self.questSlideWndNewKey-1] is not None:
-						self.questSlideWnd[self.questSlideWndNewKey-1].AdjustPositionAndSize()
+			for i in xrange(len(bonus_list)):
+				bonus_data = bonus_list[i][1]
+
+				category = ui.ExpandedImageBox()
+				category.SetParent(self.bonusWindow)
+				category.LoadImage("d:/ymir work/ui/game/windows/category_bar.tga")
+				category.buttonStatus = 0
+				category.SetEvent(ui.__mem_func__(self.SetBonusCategory), "mouse_click", i)
+				category.Show()
+				self.ElementDictionary["%d_category" % i] = category
+
+				categoryText = ui.TextLine()
+				categoryText.SetParent(category)
+				categoryText.SetHorizontalAlignLeft()
+				categoryText.SetPosition(8, 3)
+				categoryText.SetText("|Eemoji/key_plus|e " + bonus_list[i][0])
+				categoryText.Show()
+				self.ElementDictionary["%d_categoryText" % i] = categoryText
+
+				for j in xrange(len(bonus_data)):
+					bonusImage = ui.ExpandedImageBox()
+					bonusImage.SetParent(self.bonusWindow)
+					bonusImage.LoadImage("d:/ymir work/ui/game/windows/bonus_item.tga")
+					bonusImage.Show()
+					self.ElementDictionary["%d_%d_image" % (i, j)] = bonusImage
+
+					bonusTextValue = ItemToolTip.AFFECT_DICT[bonus_data[j][0]]
+					if callable(bonusTextValue):
+						bonusText = bonusTextValue(0)
+					else:
+						bonusText = str(bonusTextValue)
+
+					disabledStr = ["%","+"]
+					newText = ""
+					for x in bonusText:
+						if x in disabledStr:
+							continue
+						if x.isdigit():
+							continue
+						newText += x
+					bonusText = newText
+					bonusImage.SAFE_SetStringEvent("MOUSE_OVER_IN", self.OverInBonus, bonusText)
+					bonusImage.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.OverOutBonus)
+
+					bonusName = ui.TextLine()
+					bonusName.AddFlag("not_pick")
+					bonusName.SetParent(bonusImage)
+					bonusName.SetHorizontalAlignLeft()
+					bonusName.SetPosition(5, 3)
+					bonusName.SetFontName("Tahoma:13")
+					bonusName.SetText(bonusText)
+
+					newText = ""
+					if bonusName.GetTextSize()[0] > 130:
+						for o in xrange(100):
+							if bonusName.GetTextSize()[0] > 130:
+								newText = bonusName.GetText()[:len(bonusName.GetText()) - 2] + "..."
+								bonusName.SetText(bonusName.GetText()[:len(bonusName.GetText()) - 2])
+							else:
+								break
+
+					if newText != "":
+						bonusName.SetText(newText)
+
+					bonusName.Show()
+					self.ElementDictionary["%d_%d_name" % (i, j)] = bonusName
+
+					bonusValue = ui.TextLine()
+					bonusValue.AddFlag("not_pick")
+					bonusValue.SetParent(bonusImage)
+					bonusValue.SetHorizontalAlignCenter()
+					bonusValue.SetPosition(170, 3)
+					bonusValue.SetFontName("Tahoma:13")
+					bonusValue.SetText("0")
+					bonusValue.Show()
+					self.ElementDictionary["%d_%d_value" % (i, j)] = bonusValue
 
 	def __SetSkillSlotEvent(self):
 		for skillPageValue in self.skillPageDict.itervalues():
@@ -738,16 +793,13 @@ class CharacterWindow(ui.ScriptWindow):
 		mouseModule.mouseController.AttachObject(self, player.SLOT_TYPE_EMOTION, slotIndex, slotIndex)
 
 	def __ClickEmotionSlot(self, slotIndex):
-		print "click emotion"
 		if not slotIndex in emotion.EMOTION_DICT:
 			return
 
-		print "check acting"
 		if player.IsActingEmotion():
 			return
 
 		command = emotion.EMOTION_DICT[slotIndex]["command"]
-		print "command", command
 
 		if slotIndex > 50 and slotIndex <= 60:
 			vid = player.GetTargetVID()
@@ -769,6 +821,11 @@ class CharacterWindow(ui.ScriptWindow):
 			if not slotIndex in emotion.EMOTION_DICT:
 				return
 
+			# Bonus tooltip'i kapat
+			if app.ENABLE_RENEWAL_BONUS_BOARD:
+				if self.BonusToolTip and hasattr(self.BonusToolTip, 'HideToolTip'):
+					self.BonusToolTip.HideToolTip()
+
 			self.emotionToolTip.ClearToolTip()
 			self.emotionToolTip.SetTitle(emotion.EMOTION_DICT[slotIndex]["name"])
 			self.emotionToolTip.AlignHorizonalCenter()
@@ -776,11 +833,14 @@ class CharacterWindow(ui.ScriptWindow):
 
 	def __OverOutEmotion(self):
 		if self.emotionToolTip:
-			self.emotionToolTip.HideToolTip()
+			if hasattr(self.emotionToolTip, 'IsShow') and self.emotionToolTip.IsShow():
+				self.emotionToolTip.HideToolTip()
+			elif hasattr(self.emotionToolTip, 'HideToolTip'):
+				self.emotionToolTip.HideToolTip()
 
 	def __BindEvent(self):
 		for i in xrange(len(self.skillGroupButton)):
-			self.skillGroupButton[i].SetEvent(lambda arg=i: self.__SelectSkillGroup(arg))
+			self.skillGroupButton[i].SetEvent(ui.__mem_func__(self.__SelectSkillGroup),i)
 
 		self.RefreshQuest()
 		self.__HideJobToolTip()
@@ -788,30 +848,31 @@ class CharacterWindow(ui.ScriptWindow):
 		for (tabKey, tabButton) in self.tabButtonDict.items():
 			tabButton.SetEvent(ui.__mem_func__(self.__OnClickTabButton), tabKey)
 
-		if app.ENABLE_CONQUEROR_LEVEL:
-			for (tabKey, tabButton) in self.tabSungmaButtonDict.items():
-				tabButton.SetEvent(ui.__mem_func__(self.__OnClickTabSungmaButton), tabKey)
+		for (tabCharacterKey, tabCharacterButton) in self.tabCharacterPageDict.items():
+			tabCharacterButton.SetEvent(ui.__mem_func__(self.SetStatusPage), tabCharacterKey)
+			tabCharacterButton.ShowToolTip = lambda arg = tabCharacterKey: self.__OverInCharacterButton(arg)
+			tabCharacterButton.HideToolTip = lambda arg = tabCharacterKey: self.__OverOutCharacterButton()
 
-			for (statusPlusKey, statusPlusButton) in self.statusConquerorPlusButtonDict.items():
-				statusPlusButton.SAFE_SetEvent(self.__OnClickConquerorStatusPlusButton, statusPlusKey)
-				statusPlusButton.ShowToolTip = lambda arg = statusPlusKey: self.__OverInStatButton(arg)
-				statusPlusButton.HideToolTip = lambda arg = statusPlusKey: self.__OverOutStatButton()
+			if tabCharacterKey == 3:
+				tabCharacterButton.Hide()
 
 		for (statusPlusKey, statusPlusButton) in self.statusPlusButtonDict.items():
 			statusPlusButton.SAFE_SetEvent(self.__OnClickStatusPlusButton, statusPlusKey)
-			statusPlusButton.ShowToolTip = lambda arg=statusPlusKey: self.__OverInStatButton(arg)
-			statusPlusButton.HideToolTip = lambda arg=statusPlusKey: self.__OverOutStatButton()
+			statusPlusButton.ShowToolTip = lambda arg = statusPlusKey: self.__OverInStatButton(arg)
+			statusPlusButton.HideToolTip = lambda arg = statusPlusKey: self.__OverOutStatButton()
+
+		for (statusPlusKey2, statusPlusButton2) in self.statusPlusButtonDict2.items():
+			statusPlusButton2.SAFE_SetEvent(self.__OnClickStatusPlusButton2, statusPlusKey2)
+			statusPlusButton2.ShowToolTip = lambda arg = statusPlusKey2: self.__OverInStatButton2(arg)
+			statusPlusButton2.HideToolTip = lambda arg = statusPlusKey2: self.__OverOutStatButton()
 
 		for (statusMinusKey, statusMinusButton) in self.statusMinusButtonDict.items():
 			statusMinusButton.SAFE_SetEvent(self.__OnClickStatusMinusButton, statusMinusKey)
-			statusMinusButton.ShowToolTip = lambda arg=statusMinusKey: self.__OverInStatMinusButton(arg)
-			statusMinusButton.HideToolTip = lambda arg=statusMinusKey: self.__OverOutStatMinusButton()
+			statusMinusButton.ShowToolTip = lambda arg = statusMinusKey: self.__OverInStatMinusButton(arg)
+			statusMinusButton.HideToolTip = lambda arg = statusMinusKey: self.__OverOutStatMinusButton()
 
 		for titleBarValue in self.titleBarDict.itervalues():
-			if app.ENABLE_DETAILS_UI:
-				titleBarValue.SetCloseEvent(ui.__mem_func__(self.Close))
-			else:
-				titleBarValue.SetCloseEvent(ui.__mem_func__(self.Hide))
+			titleBarValue.SetCloseEvent(ui.__mem_func__(self.Close))
 
 		if app.ENABLE_RENEWAL_QUEST:
 			self.questTitleBar.SetCloseEvent(ui.__mem_func__(self.Close))
@@ -829,10 +890,7 @@ class CharacterWindow(ui.ScriptWindow):
 		self.isLoaded = 1
 
 		try:
-			if localeInfo.IsARABIC() or localeInfo.IsVIETNAM() or localeInfo.IsJAPAN():
-				self.__LoadScript(uiScriptLocale.LOCALE_UISCRIPT_PATH + "CharacterWindow.py")
-			else:
-				self.__LoadScript("UIScript/CharacterWindow.py")
+			self.__LoadScript("UIScript/CharacterWindow.py")
 
 			self.__BindObject()
 			self.__BindEvent()
@@ -840,32 +898,25 @@ class CharacterWindow(ui.ScriptWindow):
 			import exception
 			exception.Abort("CharacterWindow.__LoadWindow")
 
-		#self.tabButtonDict["EMOTICON"].Disable()
 		self.SetState("STATUS")
-		if app.ENABLE_CONQUEROR_LEVEL:
-			self.SetSubState("BASE")
+
 	def Destroy(self):
 		self.ClearDictionary()
-		if app.ENABLE_PASSIVE_SYSTEM:
-			if self.wndPassive:
-				self.wndPassive.Destroy()
-				self.wndPassive = 0
-		if app.ENABLE_TITLE_SYSTEM:
-			if self.wndTitleSystem:
-				self.wndTitleSystem.Destroy()
-				self.wndTitleSystem = None
+
 		self.__Initialize()
 
 	def Close(self):
-		if app.ENABLE_DETAILS_UI:
-			if self.chDetailsWnd and self.chDetailsWnd.IsShow():
-				self.chDetailsWnd.Hide()
+		# C tuþu ile kapatýldýðýnda tüm tooltip'leri kapat
+		from uiToolTip import ToolTip
+		for tooltip in ToolTip._allToolTips:
+			if tooltip and hasattr(tooltip, 'IsShow') and tooltip.IsShow():
+				if hasattr(tooltip, 'HideToolTip'):
+					tooltip.HideToolTip()
+				elif hasattr(tooltip, 'Hide'):
+					tooltip.Hide()
 
-		if app.ENABLE_TITLE_SYSTEM:
-			if self.wndTitleSystem and self.wndTitleSystem.IsShow():
-				self.wndTitleSystem.Hide()
-
-		self.Hide()
+		if self.toolTipSkill:
+			self.toolTipSkill.Hide()
 
 		if app.ENABLE_RENEWAL_QUEST:
 			if self.questSlideWndNewKey > 0:
@@ -876,26 +927,176 @@ class CharacterWindow(ui.ScriptWindow):
 			if self.skillColorWnd and self.skillColorWnd.IsShow():
 				self.skillColorWnd.Hide()
 
+		self.Hide()
+
+	if app.ENABLE_RENEWAL_BONUS_BOARD:
+		def SetBonusCategory(self, emptyArg, categoryIndex):
+			category = self.ElementDictionary["%d_category" % categoryIndex]
+			category.buttonStatus = not category.buttonStatus
+
+			if category.buttonStatus == 0:
+				self.ElementDictionary["%d_categoryText" % categoryIndex].SetText("|Eemoji/key_plus|e " + bonus_list[categoryIndex][0])
+			else:
+				self.ElementDictionary["%d_categoryText" % categoryIndex].SetText("|Eemoji/key_minus|e " + bonus_list[categoryIndex][0])
+
+			self.Refresh()
+
+		def Refresh(self):
+			(X_POS, Y_POS) = (3, 3)
+			CATEGORY_Y_RANGE = 25
+			CATEGORY_Y_FIRST_BONUS_RANGE = 29
+			BONUS_X = 8
+			STATS_X = 0
+			STATS_Y = 2.3
+
+			(basePos, windowHeight) = (0, self.bonusWindow.GetHeight() - 6)
+
+			maxHeight = 0
+			for i in xrange(len(bonus_list)):
+				bonus_data = bonus_list[i][1]
+				if self.ElementDictionary.has_key("%d_category" % i):
+					categoryBtn = self.ElementDictionary["%d_category" % i]
+					if categoryBtn.buttonStatus == 0:
+						maxHeight += CATEGORY_Y_RANGE
+					else:
+						maxHeight += CATEGORY_Y_FIRST_BONUS_RANGE
+						for j in xrange(len(bonus_data)):
+							maxHeight += CATEGORY_Y_FIRST_BONUS_RANGE
+
+			if maxHeight > windowHeight:
+				scrollLen = maxHeight - windowHeight
+				basePos = int(self.scrollBar.GetPos() * scrollLen)
+				stepSize = 1.0 / (scrollLen / 100.0)
+				self.scrollBar.SetScrollStep(stepSize)
+				self.scrollBar.SetMiddleBarSize(float(windowHeight - 5) / float(maxHeight))
+				self.scrollBar.Show()
+			else:
+				self.scrollBar.Hide()
+
+			textLines = []
+			images = []
+			_wy = self.bonusWindow.GetGlobalPosition()[1] + 3
+
+			for i in xrange(len(bonus_list)):
+				bonus_data = bonus_list[i][1]
+				if self.ElementDictionary.has_key("%d_category" % i):
+					categoryBtn = self.ElementDictionary["%d_category" % i]
+					categoryBtn.SetPosition(X_POS, Y_POS - basePos)
+					categoryBtn.Show()
+
+					images.append(categoryBtn)
+					textLines.append(self.ElementDictionary["%d_categoryText" % i])
+
+					if categoryBtn.buttonStatus == 0:
+						Y_POS += CATEGORY_Y_RANGE
+						for j in xrange(len(bonus_data)):
+							self.ElementDictionary["%d_%d_image" % (i, j)].Hide()
+					else:
+						Y_POS += CATEGORY_Y_FIRST_BONUS_RANGE
+						for j in xrange(len(bonus_data)):
+							self.ElementDictionary["%d_%d_image" % (i, j)].Show()
+							self.ElementDictionary["%d_%d_image" % (i, j)].SetPosition(BONUS_X, Y_POS - basePos)
+							self.ElementDictionary["%d_%d_value" % (i, j)].SetText(str(player.GetStatus(bonus_data[j][1])))
+
+							Y_POS += CATEGORY_Y_FIRST_BONUS_RANGE
+
+							images.append(self.ElementDictionary["%d_%d_image" % (i, j)])
+							textLines.append(self.ElementDictionary["%d_%d_name" % (i, j)])
+							textLines.append(self.ElementDictionary["%d_%d_value" % (i, j)])
+
+			for childItem in textLines:
+				(_x, _y) = childItem.GetGlobalPosition()
+
+				if _y < _wy:
+					if childItem.IsShow():
+						childItem.Hide()
+				elif _y > (_wy + windowHeight - 20):
+					if childItem.IsShow():
+						childItem.Hide()
+				else:
+					if not childItem.IsShow():
+						childItem.Show()
+
+			for childItem in images:
+				childHeight = childItem.GetHeight()
+				(_x, _y) = childItem.GetGlobalPosition()
+
+				if _y < _wy:
+					childItem.SetRenderingRect(0, ui.calculateRect(childHeight - abs(_y - _wy), childHeight), 0, 0)
+				elif _y + childHeight > (_wy+windowHeight - 4):
+					calculate = (_wy + windowHeight - 4) - (_y + childHeight)
+
+					if calculate == 0:
+						return
+
+					f = ui.calculateRect(childHeight - abs(calculate), childHeight)
+					childItem.SetRenderingRect(0, 0, 0, f)
+				else:
+					childItem.SetRenderingRect(0, 0, 0, 0)
+
+			(basePos2, windowHeight2) = (0, self.statWindow.GetHeight() - 6)
+
+			maxHeight2 = 0
+			for i in xrange(len(stat_list)):
+				if self.ElementDictionary.has_key("%d_stat" % i):
+					maxHeight2 += STATS_Y
+					for j in xrange(len(stat_list[i][0])):
+						maxHeight2 += STATS_Y
+
+			if maxHeight2 > windowHeight2:
+				scrollLen = maxHeight2 - windowHeight2
+				basePos2 = int(self.scrollBar2.GetPos() * scrollLen)
+				stepSize = 1.0 / (scrollLen / 100.0)
+				self.scrollBar2.SetScrollStep(stepSize)
+				self.scrollBar2.SetMiddleBarSize(float(windowHeight2 - 5) / float(maxHeight2))
+				self.scrollBar2.Show()
+
+			for i in xrange(len(stat_list)):
+				if self.ElementDictionary.has_key("%d_stat" % i):
+					self.ElementDictionary["background"].Show()
+					self.ElementDictionary["background"].SetPosition(STATS_X, STATS_Y - basePos2)
+					self.ElementDictionary["%d_stat" % i].SetText(localeInfo.NumberToDecimalString(player.GetStatus(stat_list[i][1])))
+
+					images.append(self.ElementDictionary["background"])
+					textLines.append(self.ElementDictionary["%d_stat_name" % i])
+					textLines.append(self.ElementDictionary["%d_stat" % i])
+
+		def OverOutBonus(self):
+			if self.BonusToolTip:
+				if hasattr(self.BonusToolTip, 'IsShow') and self.BonusToolTip.IsShow():
+					self.BonusToolTip.HideToolTip()
+				elif hasattr(self.BonusToolTip, 'HideToolTip'):
+					self.BonusToolTip.HideToolTip()
+
+		def OverInBonus(self, bonusName):
+			if self.BonusToolTip:
+				# Diðer tooltip'leri kapat
+				self.__HideStatToolTip()
+				if self.toolTipJob and hasattr(self.toolTipJob, 'HideToolTip'):
+					self.toolTipJob.HideToolTip()
+				if self.toolTipAlignment and hasattr(self.toolTipAlignment, 'HideToolTip'):
+					self.toolTipAlignment.HideToolTip()
+				if self.toolTipCharacterBoard and hasattr(self.toolTipCharacterBoard, 'HideToolTip'):
+					self.toolTipCharacterBoard.HideToolTip()
+				if self.emotionToolTip and hasattr(self.emotionToolTip, 'HideToolTip'):
+					self.emotionToolTip.HideToolTip()
+				
+				self.BonusToolTip.ClearToolTip()
+				self.BonusToolTip.AppendTextLine(bonusName)
+				self.BonusToolTip.ShowToolTip()
+
 	def SetSkillToolTip(self, toolTipSkill):
 		self.toolTipSkill = toolTipSkill
 
-	if app.ENABLE_CONQUEROR_LEVEL:
-		def __OnClickConquerorStatusPlusButton(self, statusKey):
-			try:
-				statusConquerorPlusCommand=self.statusConquerorPlusCommandDict[statusKey]
-				net.SendChatPacket(statusConquerorPlusCommand)
-			except KeyError, msg:
-				dbg.TraceError("CharacterWindow.__OnClickStatusPlusButton KeyError: %s", msg)
-
 	def __OnClickStatusPlusButton(self, statusKey):
-		try:
-			if app.ENABLE_STATUS_UP_RENEWAL and app.IsPressed(app.DIK_LCONTROL):
-				statusPlusCommand=self.faststatusPlusCommandDict[statusKey]
-			else:
-				statusPlusCommand=self.statusPlusCommandDict[statusKey]
-			net.SendChatPacket(statusPlusCommand)
-		except KeyError, msg:
-			dbg.TraceError("CharacterWindow.__OnClickStatusPlusButton KeyError: %s", msg)
+		cmd = self.statusPlusCommandDict[statusKey]
+		cmd = cmd + "1"
+		net.SendChatPacket(cmd)
+
+	def __OnClickStatusPlusButton2(self, statusKey):
+		cmd = self.statusPlusCommandDict[statusKey]
+		cmd = cmd + "10"
+		net.SendChatPacket(cmd)
 
 	def __OnClickStatusMinusButton(self, statusKey):
 		try:
@@ -904,31 +1105,18 @@ class CharacterWindow(ui.ScriptWindow):
 		except KeyError, msg:
 			dbg.TraceError("CharacterWindow.__OnClickStatusMinusButton KeyError: %s", msg)
 
-
 	def __OnClickTabButton(self, stateKey):
 		self.SetState(stateKey)
 
-	if app.ENABLE_TITLE_SYSTEM:
-		def __ToggleTitleSystemWindow(self):
-			if not (hasattr(app, "ENABLE_TITLE_SYSTEM") and app.ENABLE_TITLE_SYSTEM):
-				return
+	def SetStatusPage(self, statusPage):
+		if self.state != "STATUS":
+			return
 
-			if not self.wndTitleSystem:
-				self.wndTitleSystem = uicharactertitle.CharacterTitleWindow()
-				try:
-					self.wndTitleSystem.SetUnlockedTitleIDs(self.titleSystemUnlockedIDs)
-					self.wndTitleSystem.SetActiveTitleID(self.titleSystemActiveID)
-				except:
-					pass
+		for key, label in self.characterPageDict.items():
+			label.Show() if key == statusPage else label.Hide()
 
-			if self.wndTitleSystem.IsShow():
-				self.wndTitleSystem.Hide()
-			else:
-				self.wndTitleSystem.Open()
-
-	if app.ENABLE_CONQUEROR_LEVEL:
-		def __OnClickTabSungmaButton(self, stateKey):
-			self.SetSubState(stateKey)
+		for key_b, button in self.tabCharacterPageDict.items():
+			button.SetUp() if key_b != statusPage else button.Down()
 
 	def SetState(self, stateKey):
 		self.state = stateKey
@@ -962,99 +1150,60 @@ class CharacterWindow(ui.ScriptWindow):
 	def GetState(self):
 		return self.state
 
-	if app.ENABLE_CONQUEROR_LEVEL:
-		def SetSubState(self, stateSubKey):
-			
-			self.substate = stateSubKey
-
-			for (tabKey, tabButton) in self.tabSungmaButtonDict.items():
-				if stateSubKey!=tabKey:
-					tabButton.SetUp()
-
-			for pageValue in self.SungmaPageDict.itervalues():
-				pageValue.Hide()
-
-			self.__RefreshStatusPlusButtonList()
-			self.SungmaPageDict[stateSubKey].Show()
-			
-
-		def GetSubState(self):
-			return self.substate	
-
 	def __GetTotalAtkText(self):
-		minAtk=player.GetStatus(player.ATT_MIN)
-		maxAtk=player.GetStatus(player.ATT_MAX)
-		atkBonus=player.GetStatus(player.ATT_BONUS)
-		attackerBonus=player.GetStatus(player.ATTACKER_BONUS)
+		minAtk = player.GetStatus(player.ATT_MIN)
+		maxAtk = player.GetStatus(player.ATT_MAX)
+		atkBonus = player.GetStatus(player.ATT_BONUS)
+		attackerBonus = player.GetStatus(player.ATTACKER_BONUS)
 
 		if minAtk==maxAtk:
-			return "%d" % (minAtk+atkBonus+attackerBonus)
+			return "%s" % (localeInfo.NumberToDecimalString(minAtk+atkBonus+attackerBonus))
 		else:
-			return "%d-%d" % (minAtk+atkBonus+attackerBonus, maxAtk+atkBonus+attackerBonus)
+			return "%s-%s" % (localeInfo.NumberToDecimalString(minAtk+atkBonus+attackerBonus), localeInfo.NumberToDecimalString(maxAtk+atkBonus+attackerBonus))
 
 	def __GetTotalMagAtkText(self):
-		minMagAtk=player.GetStatus(player.MAG_ATT)+player.GetStatus(player.MIN_MAGIC_WEP)
-		maxMagAtk=player.GetStatus(player.MAG_ATT)+player.GetStatus(player.MAX_MAGIC_WEP)
+		minMagAtk = player.GetStatus(player.MAG_ATT)+player.GetStatus(player.MIN_MAGIC_WEP)
+		maxMagAtk = player.GetStatus(player.MAG_ATT)+player.GetStatus(player.MAX_MAGIC_WEP)
 
 		if minMagAtk==maxMagAtk:
-			return "%d" % (minMagAtk)
+			return "%s" % (localeInfo.NumberToDecimalString(minMagAtk))
 		else:
-			return "%d-%d" % (minMagAtk, maxMagAtk)
+			return "%s-%s" % (localeInfo.NumberToDecimalString(minMagAtk), localeInfo.NumberToDecimalString(maxMagAtk))
 
 	def __GetTotalDefText(self):
 		defValue=player.GetStatus(player.DEF_GRADE)
 		if constInfo.ADD_DEF_BONUS_ENABLE:
 			defValue+=player.GetStatus(player.DEF_BONUS)
-		return "%d" % (defValue)
+		return "%s" % (localeInfo.NumberToDecimalString(defValue))
 
 	def RefreshStatus(self):
-		if self.isLoaded==0:
+		if self.isLoaded == 0:
 			return
 
 		try:
-			if app.ENABLE_CONQUEROR_LEVEL:
-				if player.GetStatus(player.CONQUEROR_LEVEL) >= 1:
-					self.GetChild("Level_Value").SetText(str(player.GetStatus(player.CONQUEROR_LEVEL)))
-					self.GetChild("Exp_Value").SetText(str(unsigned32(player.GetConquerorEXP())))
-					self.GetChild("RestExp_Value").SetText(str(unsigned32(player.GetStatus(player.CONQUEROR_NEXT_EXP)) - unsigned32(player.GetStatus(player.CONQUEROR_EXP))))
-				else:
-					self.GetChild("Level_Value").SetText(str(player.GetStatus(player.LEVEL)))
-					self.GetChild("Exp_Value").SetText(str(unsigned32(player.GetEXP())))
-					self.GetChild("RestExp_Value").SetText(str(unsigned32(player.GetStatus(player.NEXT_EXP)) - unsigned32(player.GetStatus(player.EXP))))
-			else:
-				self.GetChild("Level_Value").SetText(str(player.GetStatus(player.LEVEL)))
-				self.GetChild("Exp_Value").SetText(str(unsigned32(player.GetEXP())))
-				self.GetChild("RestExp_Value").SetText(str(unsigned32(player.GetStatus(player.NEXT_EXP)) - unsigned32(player.GetStatus(player.EXP))))
-			self.GetChild("HP_Value").SetText(str(player.GetStatus(player.HP)) + '/' + str(player.GetStatus(player.MAX_HP)))
-			self.GetChild("SP_Value").SetText(str(player.GetStatus(player.SP)) + '/' + str(player.GetStatus(player.MAX_SP)))
+			self.GetChild("Level_Value").SetText(str(player.GetStatus(player.LEVEL)))
+			self.GetChild("Exp_Value").SetText(localeInfo.NumberToDecimalString(unsigned32(player.GetEXP())))
+			self.GetChild("RestExp_Value").SetText(localeInfo.NumberToDecimalString(unsigned32(player.GetStatus(player.NEXT_EXP)) - unsigned32(player.GetStatus(player.EXP))))
+			self.GetChild("HP_Value").SetText(localeInfo.NumberToDecimalString(player.GetStatus(player.HP)) + '/' + localeInfo.NumberToDecimalString(player.GetStatus(player.MAX_HP)))
+			self.GetChild("SP_Value").SetText(localeInfo.NumberToDecimalString(player.GetStatus(player.SP)) + '/' + localeInfo.NumberToDecimalString(player.GetStatus(player.MAX_SP)))
 
-			self.GetChild("STR_Value").SetText(str(player.GetStatus(player.ST)))
-			self.GetChild("DEX_Value").SetText(str(player.GetStatus(player.DX)))
-			self.GetChild("HTH_Value").SetText(str(player.GetStatus(player.HT)))
-			self.GetChild("INT_Value").SetText(str(player.GetStatus(player.IQ)))
-
-			if app.ENABLE_CONQUEROR_LEVEL:
-				self.GetChild("sungma_str_value").SetText(str(player.GetStatus(player.SUNGMA_STR)))
-				self.GetChild("sungma_hp_value").SetText(str(player.GetStatus(player.SUNGMA_HP)))
-				self.GetChild("sungma_move_value").SetText(str(player.GetStatus(player.SUNGMA_MOVE)))
-				self.GetChild("sungma_immune_value").SetText(str(player.GetStatus(player.SUNGMA_IMMUNE)))
+			self.GetChild("STR_Value").SetText(localeInfo.NumberToDecimalString(player.GetStatus(player.ST)))
+			self.GetChild("DEX_Value").SetText(localeInfo.NumberToDecimalString(player.GetStatus(player.DX)))
+			self.GetChild("HTH_Value").SetText(localeInfo.NumberToDecimalString(player.GetStatus(player.HT)))
+			self.GetChild("INT_Value").SetText(localeInfo.NumberToDecimalString(player.GetStatus(player.IQ)))
 
 			self.GetChild("ATT_Value").SetText(self.__GetTotalAtkText())
 			self.GetChild("DEF_Value").SetText(self.__GetTotalDefText())
 
 			self.GetChild("MATT_Value").SetText(self.__GetTotalMagAtkText())
-			#self.GetChild("MATT_Value").SetText(str(player.GetStatus(player.MAG_ATT)))
 
-			self.GetChild("MDEF_Value").SetText(str(player.GetStatus(player.MAG_DEF)))
-			self.GetChild("ASPD_Value").SetText(str(player.GetStatus(player.ATT_SPEED)))
-			self.GetChild("MSPD_Value").SetText(str(player.GetStatus(player.MOVING_SPEED)))
-			self.GetChild("CSPD_Value").SetText(str(player.GetStatus(player.CASTING_SPEED)))
-			self.GetChild("ER_Value").SetText(str(player.GetStatus(player.EVADE_RATE)))
+			self.GetChild("MDEF_Value").SetText(localeInfo.NumberToDecimalString(player.GetStatus(player.MAG_DEF)))
+			self.GetChild("ASPD_Value").SetText(localeInfo.NumberToDecimalString(player.GetStatus(player.ATT_SPEED)))
+			self.GetChild("MSPD_Value").SetText(localeInfo.NumberToDecimalString(player.GetStatus(player.MOVING_SPEED)))
+			self.GetChild("CSPD_Value").SetText(localeInfo.NumberToDecimalString(player.GetStatus(player.CASTING_SPEED)))
+			self.GetChild("ER_Value").SetText(localeInfo.NumberToDecimalString(player.GetStatus(player.EVADE_RATE)))
 
 		except:
-			#import exception
-			#exception.Abort("CharacterWindow.RefreshStatus.BindObject")
-			## Â°Ã”Ã€Ã“Ã€ÃŒ Ã†Â¨Â°Ãœ Â¹Ã¶Â¸Â²
 			pass
 
 		self.__RefreshStatusPlusButtonList()
@@ -1063,37 +1212,31 @@ class CharacterWindow(ui.ScriptWindow):
 
 		if self.refreshToolTip:
 			self.refreshToolTip()
-		if app.ENABLE_DETAILS_UI:
-			if self.chDetailsWnd and self.chDetailsWnd.IsShow():
-				self.chDetailsWnd.RefreshLabel()
+
 	def __RefreshStatusPlusButtonList(self):
 		if self.isLoaded==0:
 			return
 
-		if app.ENABLE_CONQUEROR_LEVEL:
-			if self.GetSubState() == "SUNGMA":
-				statusPlusPoint=player.GetStatus(player.CONQUEROR_POINT)
-			else:
-				statusPlusPoint=player.GetStatus(player.STAT)
-		else:
-			statusPlusPoint=player.GetStatus(player.STAT)
+		statusPlusPoint = player.GetStatus(player.STAT)
 
-		if statusPlusPoint>0:
+		if statusPlusPoint > 0:
 			self.statusPlusValue.SetText(str(statusPlusPoint))
 			self.statusPlusLabel.Show()
 			self.ShowStatusPlusButtonList()
+			self.ShowStatusPlusButtonList2()
 		else:
 			self.statusPlusValue.SetText(str(0))
 			self.statusPlusLabel.Hide()
 			self.HideStatusPlusButtonList()
+			self.HideStatusPlusButtonList2()
 
 	def __RefreshStatusMinusButtonList(self):
-		if self.isLoaded == 0:
+		if self.isLoaded==0:
 			return
 
 		statusMinusPoint=self.__GetStatMinusPoint()
 
-		if statusMinusPoint > 0:
+		if statusMinusPoint>0:
 			self.__ShowStatusMinusButtonList()
 		else:
 			self.__HideStatusMinusButtonList()
@@ -1137,48 +1280,21 @@ class CharacterWindow(ui.ScriptWindow):
 		for (statePlusKey, statusPlusButton) in self.statusPlusButtonDict.items():
 			statusPlusButton.Hide()
 
-	if app.ENABLE_CONQUEROR_LEVEL:
-		def ShowConquerorStatusPlusButtonList(self):
-			for (statePlusKey, statusPlusButton) in self.statusConquerorPlusButtonDict.items():
-				statusPlusButton.Show()
 
-		def HideConquerorStatusPlusButtonList(self):
-			for (statePlusKey, statusPlusButton) in self.statusConquerorPlusButtonDict.items():
-				statusPlusButton.Hide()
+	def ShowStatusPlusButtonList2(self):
+		for (statePlusKey2, statusPlusButton2) in self.statusPlusButtonDict2.items():
+			statusPlusButton2.Show()
+
+	def HideStatusPlusButtonList2(self):
+		for (statePlusKey2, statusPlusButton2) in self.statusPlusButtonDict2.items():
+			statusPlusButton2.Hide()
 
 	def SelectSkill(self, skillSlotIndex):
-
 		mouseController = mouseModule.mouseController
 
-		if False == mouseController.isAttached():
-
+		if FALSE == mouseController.isAttached():
 			srcSlotIndex = self.__RealSkillSlotToSourceSlot(skillSlotIndex)
 			selectedSkillIndex = player.GetSkillIndex(srcSlotIndex)
-			selectedSkillGrade = player.GetSkillGrade(srcSlotIndex)
-
-			if selectedSkillIndex == 121:
-				if selectedSkillGrade >= 3:
-					# Board'u aÃ§/kapa (toggle)
-					if self.boardLeader.IsShow():
-						# Board'u kapat
-						self.boardLeader.Hide()
-						# E?er leadership seÃ§ilmemi?se skill 121'i deaktive et
-						if self.selectedLeadership is None:
-							self.skillPageDict["SUPPORT"].DeactivateSlot(skillSlotIndex)
-						# E?er leadership seÃ§ilmi?se skill 121'i aktif tut (k?rm?z? renk ile)
-						else:
-							colorType = wndMgr.COLOR_TYPE_RED if hasattr(wndMgr, 'COLOR_TYPE_RED') else wndMgr.COLOR_TYPE_WHITE
-							self.skillPageDict["SUPPORT"].ActivateSlot(skillSlotIndex, colorType)
-					else:
-						# Board'u aÃ§
-						self.boardLeader.Show()
-						# ActivateSlot takes 2 arguments: slotNumber and colortype
-						# RGB (238, 11, 11) is red color, using COLOR_TYPE_RED if available, otherwise COLOR_TYPE_WHITE
-						colorType = wndMgr.COLOR_TYPE_RED if hasattr(wndMgr, 'COLOR_TYPE_RED') else wndMgr.COLOR_TYPE_WHITE
-						self.skillPageDict["SUPPORT"].ActivateSlot(skillSlotIndex, colorType)
-					return
-				else:
-					return
 
 			if skill.CanUseSkill(selectedSkillIndex):
 				if app.IsPressed(app.DIK_LCONTROL):
@@ -1216,12 +1332,16 @@ class CharacterWindow(ui.ScriptWindow):
 				self.toolTipSkill.SetSkillNew(srcSlotIndex, skillIndex, overInSkillGrade, skillLevel)
 			else:
 				self.toolTipSkill.SetSkillOnlyName(srcSlotIndex, skillIndex, overInSkillGrade)
+
 		else:
 			self.toolTipSkill.SetSkillNew(srcSlotIndex, skillIndex, skillGrade, skillLevel)
 
 	def OverOutItem(self):
 		if 0 != self.toolTipSkill:
-			self.toolTipSkill.HideToolTip()
+			if hasattr(self.toolTipSkill, 'IsShow') and self.toolTipSkill.IsShow():
+				self.toolTipSkill.HideToolTip()
+			elif hasattr(self.toolTipSkill, 'HideToolTip'):
+				self.toolTipSkill.HideToolTip()
 
 	## Quest
 	def __SelectQuest(self, slotIndex):
@@ -1290,6 +1410,17 @@ class CharacterWindow(ui.ScriptWindow):
 		else:
 			self.questScrollBar.OnDown()
 
+		if app.ENABLE_RENEWAL_BONUS_BOARD:
+			if self.ElementDictionary.has_key("scrollBar"):
+				self.scrollBar = self.ElementDictionary["scrollBar"]
+				if self.scrollBar.IsShow():
+					if nLen > 0:
+						self.scrollBar.OnUp()
+					else:
+						self.scrollBar.OnDown()
+					return TRUE
+			return FALSE
+
 	def __UpdateQuestClock(self):
 		if "QUEST" == self.state:
 			if app.ENABLE_RENEWAL_QUEST:
@@ -1318,9 +1449,7 @@ class CharacterWindow(ui.ScriptWindow):
 
 					clock.SetText(clockText)
 			else:
-				# QUEST_LIMIT_COUNT_BUG_FIX
 				for i in xrange(min(quest.GetQuestCount(), quest.QUEST_MAX_NUM)):
-				# END_OF_QUEST_LIMIT_COUNT_BUG_FIX
 					(lastName, lastTime) = quest.GetQuestLastTime(i + self.questShowingStartIndex)
 
 					clockText = localeInfo.QUEST_UNLIMITED_TIME
@@ -1360,33 +1489,67 @@ class CharacterWindow(ui.ScriptWindow):
 		self.__HideStatToolTip()
 		self.refreshToolTip = 0
 
+	def __OverInCharacterButton(self, stat):
+		# Bonus tooltip'i kapat
+		if app.ENABLE_RENEWAL_BONUS_BOARD:
+			if self.BonusToolTip and hasattr(self.BonusToolTip, 'HideToolTip'):
+				self.BonusToolTip.HideToolTip()
+		
+		m_text_tooltip = [localeInfo.STAT_TOOLTIP_STATUS, localeInfo.STAT_TOOLTIP_BONUS, localeInfo.STAT_TOOLTIP_STATS]
+		self.toolTip.ClearToolTip()
+		self.toolTip.AppendTextLine(m_text_tooltip[stat])
+		self.toolTip.Show()
+
+	def __OverOutCharacterButton(self):
+		self.__HideStatToolTip()
+
 	def __OverInStatButton(self, stat):
 		try:
-			if app.ENABLE_STATUS_UP_RENEWAL:
-				self.__ShowStatToolTip(localeInfo.FAST_STATUS_UP)
-			else:
-				self.__ShowStatToolTip(self.STAT_DESCRIPTION[stat])
+			self.__ShowStatToolTip(self.STAT_DESCRIPTION[stat], localeInfo.STAT_TOOLTIP_ADD, TRUE)
 		except KeyError:
 			pass
 
-	def __OverInStatButtonNew(self, stat):
+	def __OverInStatButton2(self, stat):
 		try:
-			self.__ShowStatToolTip(self.STAT_DESCRIPTION[stat])
+			self.__ShowStatToolTip(self.STAT_DESCRIPTION[stat], localeInfo.STAT_TOOLTIP_ADD_2, TRUE)
 		except KeyError:
 			pass
 
 	def __OverOutStatButton(self):
 		self.__HideStatToolTip()
 
-	def __ShowStatToolTip(self, statDesc):
+	def __ShowStatToolTip(self, statDesc, statDesc2 = FALSE, arg2 = FALSE):
+		# Bonus tooltip'i kapat
+		if app.ENABLE_RENEWAL_BONUS_BOARD:
+			if self.BonusToolTip and hasattr(self.BonusToolTip, 'HideToolTip'):
+				self.BonusToolTip.HideToolTip()
+		
 		self.toolTip.ClearToolTip()
 		self.toolTip.AppendTextLine(statDesc)
+
+		if arg2 == TRUE:
+			self.toolTip.AppendTextLine(statDesc2)
+
 		self.toolTip.Show()
 
 	def __HideStatToolTip(self):
 		self.toolTip.Hide()
+		# Bonus tooltip'i de kapat (eðer açýksa)
+		if app.ENABLE_RENEWAL_BONUS_BOARD:
+			if self.BonusToolTip and hasattr(self.BonusToolTip, 'IsShow') and self.BonusToolTip.IsShow():
+				if hasattr(self.BonusToolTip, 'HideToolTip'):
+					self.BonusToolTip.HideToolTip()
 
 	def OnPressEscapeKey(self):
+		# ESC ile kapatýldýðýnda tüm tooltip'leri kapat
+		from uiToolTip import ToolTip
+		for tooltip in ToolTip._allToolTips:
+			if tooltip and hasattr(tooltip, 'IsShow') and tooltip.IsShow():
+				if hasattr(tooltip, 'HideToolTip'):
+					tooltip.HideToolTip()
+				elif hasattr(tooltip, 'Hide'):
+					tooltip.Hide()
+
 		if app.ENABLE_RENEWAL_QUEST:
 			if self.questSlideWndNewKey > 0:
 				if self.questSlideWnd[self.questSlideWndNewKey-1] is not None:
@@ -1401,6 +1564,86 @@ class CharacterWindow(ui.ScriptWindow):
 		if app.ENABLE_SKILL_COLOR_SYSTEM:
 			if self.skillColorWnd:
 				self.__UpdateSkillColorPosition()
+
+		if app.ENABLE_RENEWAL_BONUS_BOARD:
+			self.Refresh()
+
+		# Tooltip'lerin mouse pozisyonunu takip etmesi ve tooltip alanýndan çýkýldýðýnda gizlenmesi
+		try:
+			import wndMgr
+			(x, y) = wndMgr.GetMousePosition()
+			
+			# Karakter penceresinin üzerinde mi kontrol et
+			onWindow = False
+			if self.IsShow():
+				try:
+					(wx, wy) = self.GetGlobalPosition()
+					ww, wh = self.GetWidth(), self.GetHeight()
+					if wx <= x <= wx + ww and wy <= y <= wy + wh:
+						onWindow = True
+				except:
+					pass
+			
+			# Tüm tooltip'leri kontrol et
+			tooltips_to_check = []
+			if self.toolTip:
+				tooltips_to_check.append(self.toolTip)
+			if self.toolTipJob:
+				tooltips_to_check.append(self.toolTipJob)
+			if self.toolTipAlignment:
+				tooltips_to_check.append(self.toolTipAlignment)
+			if self.toolTipCharacterBoard:
+				tooltips_to_check.append(self.toolTipCharacterBoard)
+			if self.emotionToolTip:
+				tooltips_to_check.append(self.emotionToolTip)
+			if app.ENABLE_RENEWAL_BONUS_BOARD:
+				if self.BonusToolTip:
+					tooltips_to_check.append(self.BonusToolTip)
+			
+			# Karakter penceresinin üzerinde mi kontrol et
+			onWindow = False
+			if self.IsShow():
+				try:
+					(wx, wy) = self.GetGlobalPosition()
+					ww, wh = self.GetWidth(), self.GetHeight()
+					if wx <= x <= wx + ww and wy <= y <= wy + wh:
+						onWindow = True
+				except:
+					pass
+			
+			# Her tooltip'i kontrol et
+			for tooltip in tooltips_to_check:
+				if tooltip and hasattr(tooltip, 'IsShow') and tooltip.IsShow():
+					try:
+						(tx, ty) = tooltip.GetGlobalPosition()
+						tw, th = tooltip.GetWidth(), tooltip.GetHeight()
+						onTooltip = (tx <= x <= tx + tw and ty <= y <= ty + th)
+						
+						# Ne tooltip'in üzerinde ne de karakter penceresinin üzerinde deðilse kapat
+						if not onTooltip and not onWindow:
+							if hasattr(tooltip, 'HideToolTip'):
+								tooltip.HideToolTip()
+							elif hasattr(tooltip, 'Hide'):
+								tooltip.Hide()
+					except:
+						pass
+			
+			# toolTipSkill kontrolü (harici tooltip)
+			if self.toolTipSkill and self.toolTipSkill != 0:
+				if hasattr(self.toolTipSkill, 'IsShow') and self.toolTipSkill.IsShow():
+					try:
+						(tx, ty) = self.toolTipSkill.GetGlobalPosition()
+						tw, th = self.toolTipSkill.GetWidth(), self.toolTipSkill.GetHeight()
+						onTooltip = (tx <= x <= tx + tw and ty <= y <= ty + th)
+						
+						# Ne tooltip'in üzerinde ne de karakter penceresinin üzerinde deðilse kapat
+						if not onTooltip and not onWindow:
+							if hasattr(self.toolTipSkill, 'HideToolTip'):
+								self.toolTipSkill.HideToolTip()
+					except:
+						pass
+		except:
+			pass
 
 	## Skill Process
 	def __RefreshSkillPage(self, name, slotCount):
@@ -1420,7 +1663,7 @@ class CharacterWindow(ui.ScriptWindow):
 		getSkillLevelUpPoint = skill.GetSkillLevelUpPoint
 		getSkillMaxLevel = skill.GetSkillMaxLevel
 
-		for i in xrange(slotCount + 1):
+		for i in xrange(slotCount+1):
 			slotIndex = i + startSlotIndex
 			skillIndex = getSkillIndex(slotIndex)
 
@@ -1474,16 +1717,7 @@ class CharacterWindow(ui.ScriptWindow):
 					if skill.CanUseSkill(skillIndex):
 						skillPage.SetCoverButton(realSlotIndex)
 
-					# Skill 121 (leadership skill) sadece leadership seÃ§ilmi?se aktif tutulacak
-					if skillIndex == 121:
-						# Board aÃ§?ksa veya leadership seÃ§ilmi?se aktif et
-						if self.boardLeader.IsShow() or self.selectedLeadership is not None:
-							# K?rm?z? renk ile aktif et (COLOR_TYPE_RED)
-							colorType = wndMgr.COLOR_TYPE_RED if hasattr(wndMgr, 'COLOR_TYPE_RED') else wndMgr.COLOR_TYPE_WHITE
-							skillPage.ActivateSlot(realSlotIndex, colorType)
-						else:
-							skillPage.DeactivateSlot(realSlotIndex)
-					elif player.IsSkillActive(slotIndex): # hotfix
+					if player.IsSkillActive(slotIndex): # hotfix
 						skillPage.ActivateSlot(realSlotIndex, wndMgr.COLOR_TYPE_WHITE)
 					else:
 						skillPage.DeactivateSlot(realSlotIndex)
@@ -1494,15 +1728,7 @@ class CharacterWindow(ui.ScriptWindow):
 
 		if app.ENABLE_SKILL_COLOR_SYSTEM:
 			if "ACTIVE" == name:
-				# Horse skill kategorisinde skill color button'lar? gÃ¶sterme
-				if self.curSelectedSkillGroup != self.PAGE_HORSE:
-					self.__CreateSkillColorButton(skillPage)
-				else:
-					# Horse skill kategorisinde mevcut skill color button'lar? gizle
-					if hasattr(self, 'skillColorButton') and self.skillColorButton:
-						for button in self.skillColorButton:
-							if button:
-								button.Hide()
+				self.__CreateSkillColorButton(skillPage)
 
 	def __RestoreSlotCoolTime(self, skillPage):
 		restoreType = skill.SKILL_TYPE_NONE
@@ -1521,42 +1747,23 @@ class CharacterWindow(ui.ScriptWindow):
 			self.RefreshCharacter()
 			return
 
-		# Horse grubu seÃ§iliyken (ayrÄ± sekme), support slot'unu gizle ve doldurma.
-		# Aksi halde horse skill'ler RegisterSkills sonrasÄ± support listesinde gÃ¶rÃ¼nebiliyor.
-		if self.PAGE_HORSE == self.curSelectedSkillGroup:
-			try:
-				self.skillPageDict["SUPPORT"].Hide()
-				self.GetChild("Skill_ETC_Title_Bar").Hide()
-				self.GetChild("Support_Skill_Point_Label").Hide()
-				self.GetChild("Support_Skill_ToolTip").Hide()
-			except:
-				pass
-		else:
-			try:
-				self.skillPageDict["SUPPORT"].Show()
-				self.GetChild("Skill_ETC_Title_Bar").Show()
-				self.GetChild("Support_Skill_ToolTip").Show()
-			except:
-				pass
-
 		global SHOW_ONLY_ACTIVE_SKILL
 		if SHOW_ONLY_ACTIVE_SKILL:
 			self.__RefreshSkillPage("ACTIVE", self.ACTIVE_PAGE_SLOT_COUNT)
 		else:
 			self.__RefreshSkillPage("ACTIVE", self.ACTIVE_PAGE_SLOT_COUNT)
-			if self.PAGE_HORSE != self.curSelectedSkillGroup:
-				self.__RefreshSkillPage("SUPPORT", self.SUPPORT_PAGE_SLOT_COUNT)
+			self.__RefreshSkillPage("SUPPORT", self.SUPPORT_PAGE_SLOT_COUNT)
 
 		self.RefreshSkillPlusButtonList()
 
 	def CanShowPlusButton(self, skillIndex, skillLevel, curStatPoint):
 		if 0 == skillIndex:
-			return False
+			return FALSE
 
 		if not skill.CanLevelUpSkill(skillIndex, skillLevel):
-			return False
+			return FALSE
 
-		return True
+		return TRUE
 
 	def __RefreshSkillPlusButton(self, name):
 		global HIDE_SUPPORT_SKILL_POINT
@@ -1566,6 +1773,7 @@ class CharacterWindow(ui.ScriptWindow):
 		slotWindow = self.skillPageDict[name]
 		slotWindow.HideAllSlotButton()
 
+		labelWindow = self.labelPageStatDict[name]
 		slotStatType = self.skillPageStatDict[name]
 		if 0 == slotStatType:
 			return
@@ -1599,6 +1807,8 @@ class CharacterWindow(ui.ScriptWindow):
 					else:
 						if self.CanShowPlusButton(skillIndex, skillLevel, statPoint):
 							slotWindow.ShowSlotButton(slotIndex)
+		else:
+			labelWindow.Hide()
 
 	if app.ENABLE_SKILL_COLOR_SYSTEM:
 		def __CreateSkillColorButton(self, parent):
@@ -1607,61 +1817,32 @@ class CharacterWindow(ui.ScriptWindow):
 			xPos, yPos = 0, 0
 			for idx in xrange(self.PAGE_SLOT_COUNT):
 				skillSlot = idx
-				if app.ENABLE_NINETH_SKILL:
-					if skillSlot < 10: # ACTIVE_PAGE_SLOT_COUNT
-						if skillSlot != 6 and skillSlot != 7: # we dont want include 7/8 passive 
-							if (skillSlot % 2) == 0:
-								xPos = 75
-								yPos = 4 + (skillSlot / 2 * 36)
-							else:
-								xPos = 187
-								yPos = 4 + (skillSlot / 2 * 36)
+				if skillSlot < 6:
+					if (skillSlot % 2) == 0:
+						xPos = 75
+						yPos = 4 + (skillSlot / 2 * 36)
+					else:
+						xPos = 187
+						yPos = 4 + (skillSlot / 2 * 36)
 
-						skillIndex = player.GetSkillIndex(skillSlot + 1)
-						skillMaxGrade = 3
+					skillIndex = player.GetSkillIndex(skillSlot + 1)
+					skillMaxGrade = 3
 
-						if len(self.skillColorButton) == skillSlot:
-							self.skillColorButton.append([])
-							self.skillColorButton[skillSlot] = ui.Button()
-							self.skillColorButton[skillSlot].SetParent(parent)
-							self.skillColorButton[skillSlot].SetUpVisual("d:/ymir work/ui/game/skill_color/skill_color_button_default.tga")
-							self.skillColorButton[skillSlot].SetOverVisual("d:/ymir work/ui/game/skill_color/skill_color_button_over.tga")
-							self.skillColorButton[skillSlot].SetDownVisual("d:/ymir work/ui/game/skill_color/skill_color_button_down.tga")
-							self.skillColorButton[skillSlot].SetPosition(xPos, yPos)
-							self.skillColorButton[skillSlot].SetEvent(lambda arg = skillSlot, arg2 = skillIndex: self.__OnPressSkillColorButton(arg, arg2))
-							if player.GetSkillGrade(skillSlot + 1) >= skillMaxGrade and chr.IsGameMaster(player.GetMainCharacterIndex()):
-								self.skillColorButton[skillSlot].Show()
-							else:
-								self.skillColorButton[skillSlot].Hide()
+					if len(self.skillColorButton) == skillSlot:
+						self.skillColorButton.append([])
+						self.skillColorButton[skillSlot] = ui.Button()
+						self.skillColorButton[skillSlot].SetParent(parent)
+						self.skillColorButton[skillSlot].SetUpVisual("d:/ymir work/ui/game/skill_color/skill_color_button_default.tga")
+						self.skillColorButton[skillSlot].SetOverVisual("d:/ymir work/ui/game/skill_color/skill_color_button_over.tga")
+						self.skillColorButton[skillSlot].SetDownVisual("d:/ymir work/ui/game/skill_color/skill_color_button_down.tga")
+						self.skillColorButton[skillSlot].SetPosition(xPos, yPos)
+						self.skillColorButton[skillSlot].SetEvent(lambda arg = skillSlot, arg2 = skillIndex: self.__OnPressSkillColorButton(arg, arg2))
+						if player.GetSkillGrade(skillSlot + 1) >= skillMaxGrade and (chr.IsPremium or chr.IsGameMaster):
+							self.skillColorButton[skillSlot].Show()
 						else:
-							self.skillColorButton[skillSlot].SetPosition(xPos, yPos)
-				else:
-					if skillSlot < 6:
-						if (skillSlot % 2) == 0:
-							xPos = 75
-							yPos = 4 + (skillSlot / 2 * 36)
-						else:
-							xPos = 187
-							yPos = 4 + (skillSlot / 2 * 36)
-
-						skillIndex = player.GetSkillIndex(skillSlot + 1)
-						skillMaxGrade = 3
-
-						if len(self.skillColorButton) == skillSlot:
-							self.skillColorButton.append([])
-							self.skillColorButton[skillSlot] = ui.Button()
-							self.skillColorButton[skillSlot].SetParent(parent)
-							self.skillColorButton[skillSlot].SetUpVisual("d:/ymir work/ui/game/skill_color/skill_color_button_default.tga")
-							self.skillColorButton[skillSlot].SetOverVisual("d:/ymir work/ui/game/skill_color/skill_color_button_over.tga")
-							self.skillColorButton[skillSlot].SetDownVisual("d:/ymir work/ui/game/skill_color/skill_color_button_down.tga")
-							self.skillColorButton[skillSlot].SetPosition(xPos, yPos)
-							self.skillColorButton[skillSlot].SetEvent(lambda arg = skillSlot, arg2 = skillIndex: self.__OnPressSkillColorButton(arg, arg2))
-							if player.GetSkillGrade(skillSlot + 1) >= skillMaxGrade and chr.IsGameMaster(player.GetMainCharacterIndex()):
-								self.skillColorButton[skillSlot].Show()
-							else:
-								self.skillColorButton[skillSlot].Hide()
-						else:
-							self.skillColorButton[skillSlot].SetPosition(xPos, yPos)
+							self.skillColorButton[skillSlot].Hide()
+					else:
+						self.skillColorButton[skillSlot].SetPosition(xPos, yPos)
 
 		def __UpdateSkillColorPosition(self):
 			x, y = self.GetGlobalPosition()
@@ -1669,15 +1850,9 @@ class CharacterWindow(ui.ScriptWindow):
 
 		def __OnPressSkillColorButton(self, skillSlot, skillIndex):
 			self.skillColorWnd = uiSkillColor.SkillColorWindow(skillSlot, skillIndex)
+
 			if self.skillColorWnd and not self.skillColorWnd.IsShow():
 				self.skillColorWnd.Show()
-
-				"""
-				if app.ENABLE_DETAILS_UI:
-					if self.chDetailsWnd and self.chDetailsWnd.IsShow():
-						self.chDetailsWnd.Hide()
-						self.__InitCharacterDetailsUIButton()
-				"""
 
 	def RefreshSkillPlusButtonList(self):
 		if self.isLoaded==0:
@@ -1694,8 +1869,7 @@ class CharacterWindow(ui.ScriptWindow):
 			else:
 				self.__RefreshSkillPlusButton("ACTIVE")
 
-			if self.PAGE_HORSE != self.curSelectedSkillGroup:
-				self.__RefreshSkillPlusButton("SUPPORT")
+			self.__RefreshSkillPlusButton("SUPPORT")
 
 		except:
 			import exception
@@ -1728,7 +1902,6 @@ class CharacterWindow(ui.ScriptWindow):
 
 	## Use Skill
 	def ClickSkillSlot(self, slotIndex):
-
 		srcSlotIndex = self.__RealSkillSlotToSourceSlot(slotIndex)
 		skillIndex = player.GetSkillIndex(srcSlotIndex)
 		skillType = skill.GetSkillType(skillIndex)
@@ -1746,7 +1919,6 @@ class CharacterWindow(ui.ScriptWindow):
 		mouseModule.mouseController.DeattachObject()
 
 	def OnUseSkill(self, slotIndex, coolTime):
-
 		skillIndex = player.GetSkillIndex(slotIndex)
 		skillType = skill.GetSkillType(skillIndex)
 
@@ -1774,14 +1946,9 @@ class CharacterWindow(ui.ScriptWindow):
 				slotWindow.ActivateSlot(slotIndex, wndMgr.COLOR_TYPE_WHITE)
 				return
 
+		self.RefreshSkill()
+
 	def OnDeactivateSkill(self, slotIndex):
-		# Skill 121 (leadership skill) sadece leadership seÃ§ilmemi?se deaktive edilebilir
-		skillIndex = player.GetSkillIndex(slotIndex)
-		if skillIndex == 121:
-			# Board aÃ§?ksa veya leadership seÃ§ilmi?se deaktive etme
-			if self.boardLeader.IsShow() or self.selectedLeadership is not None:
-				return
-			# Leadership seÃ§ilmemi?se deaktive et
 
 		skillGrade = player.GetSkillGrade(slotIndex)
 		slotIndex = self.__GetRealSkillSlot(skillGrade, slotIndex)
@@ -1793,268 +1960,250 @@ class CharacterWindow(ui.ScriptWindow):
 
 		self.RefreshSkill()
 
+	def __ShowJobToolTip(self):
+		# Bonus tooltip'i kapat
+		if app.ENABLE_RENEWAL_BONUS_BOARD:
+			if self.BonusToolTip and hasattr(self.BonusToolTip, 'HideToolTip'):
+				self.BonusToolTip.HideToolTip()
+		
+		self.toolTipJob.ShowToolTip()
+
 	def SkillClearCoolTime(self, slotIndex):
 		slotIndex = self.__GetRealSkillSlot(player.GetSkillGrade(slotIndex), slotIndex)
 		for slotWindow in self.skillPageDict.values():
 			if slotWindow.HasSlot(slotIndex):
 				slotWindow.SetSlotCoolTime(slotIndex, 0)
 
-	def __ShowJobToolTip(self):
-		self.toolTipJob.ShowToolTip()
-
 	def __HideJobToolTip(self):
 		self.toolTipJob.HideToolTip()
 
 	def __SetJobText(self, mainJob, subJob):
-		if player.GetStatus(player.LEVEL)<5:
-			subJob=0
-
-		if 949 == app.GetDefaultCodePage():
-			self.toolTipJob.ClearToolTip()
-
-			try:
-				jobInfoTitle=localeInfo.JOBINFO_TITLE[mainJob][subJob]
-				jobInfoData=localeInfo.JOBINFO_DATA_LIST[mainJob][subJob]
-			except IndexError:
-				print "uiCharacter.CharacterWindow.__SetJobText(mainJob=%d, subJob=%d)" % (mainJob, subJob)
-				return
-
-			self.toolTipJob.AutoAppendTextLine(jobInfoTitle)
-			self.toolTipJob.AppendSpace(5)
-
-			for jobInfoDataLine in jobInfoData:
-				self.toolTipJob.AutoAppendTextLine(jobInfoDataLine)
-
-			self.toolTipJob.AlignHorizonalCenter()
+		if player.GetStatus(player.LEVEL) <5:
+			subJob = 0
 
 	def __ShowAlignmentToolTip(self):
+		# Bonus tooltip'i kapat
+		if app.ENABLE_RENEWAL_BONUS_BOARD:
+			if self.BonusToolTip and hasattr(self.BonusToolTip, 'HideToolTip'):
+				self.BonusToolTip.HideToolTip()
+		
 		self.toolTipAlignment.ShowToolTip()
-
-	if app.ENABLE_PASSIVE_SYSTEM:
-		def __ShowPassiveButton(self):
-			print "Click Passive Button"
-			if self.wndPassive:
-				if self.wndPassive.IsShow(): 
-					self.wndPassive.Hide()
-				else:
-					self.wndPassive.Show()
-			else:
-				self.wndPassive = PassiveWindow(self)
-				self.wndPassive.Show()
-
-		def TryAttachPassiveMaterialFromInventory(self, inventorySlot):
-			if not self.wndPassive or not self.wndPassive.IsShow():
-				return FALSE
-
-			return self.wndPassive.TryAttachMaterialFromInventory(inventorySlot)
 
 	def __HideAlignmentToolTip(self):
 		self.toolTipAlignment.HideToolTip()
 
-	if app.ENABLE_CONQUEROR_LEVEL:
-		def __ShowHTHToolTip(self):
-			self.toolTipConquerorInfoButton.ClearToolTip()
-			self.toolTipConquerorInfoButton.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_IMG_CON)
-			self.toolTipConquerorInfoButton.AlignHorizonalCenter()
-			
-			self.toolTipConquerorInfoButton.ShowToolTip()
-
-		def __HideHTHToolTip(self):
-			self.toolTipConquerorInfoButton.HideToolTip()
-
-		def __ShowINTToolTip(self):
-			self.toolTipConquerorInfoButton.ClearToolTip()
-			self.toolTipConquerorInfoButton.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_IMG_INT)
-			self.toolTipConquerorInfoButton.AlignHorizonalCenter()
-			
-			self.toolTipConquerorInfoButton.ShowToolTip()
-
-		def __HideINTToolTip(self):
-			self.toolTipConquerorInfoButton.HideToolTip()
-
-		def __ShowSTRToolTip(self):
-			self.toolTipConquerorInfoButton.ClearToolTip()
-			self.toolTipConquerorInfoButton.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_IMG_STR)
-			self.toolTipConquerorInfoButton.AlignHorizonalCenter()
-			
-			self.toolTipConquerorInfoButton.ShowToolTip()
-
-		def __HideSTRToolTip(self):
-			self.toolTipConquerorInfoButton.HideToolTip()
-			
-		def __ShowDEXToolTip(self):
-			self.toolTipConquerorInfoButton.ClearToolTip()
-			self.toolTipConquerorInfoButton.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_IMG_DEX)
-			self.toolTipConquerorInfoButton.AlignHorizonalCenter()
-			
-			self.toolTipConquerorInfoButton.ShowToolTip()
-
-		def __HideDEXToolTip(self):
-			self.toolTipConquerorInfoButton.HideToolTip()
-
-		def __ShowBaseToolTip(self):
-			self.toolTipConquerorInfoButton.ClearToolTip()
-			self.toolTipConquerorInfoButton.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_BASE_LEVEL)
-			self.toolTipConquerorInfoButton.AlignHorizonalCenter()
-			
-			self.toolTipConquerorInfoButton.ShowToolTip()
-
-		def __HideBaseToolTip(self):
-			self.toolTipConquerorInfoButton.HideToolTip()
-
-		def __ShowSungmaToolTip(self):
-			self.toolTipConquerorInfoButton.ClearToolTip()
-			self.toolTipConquerorInfoButton.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_CONQUEROR_LEVEL)
-			self.toolTipConquerorInfoButton.AlignHorizonalCenter()
-			
-			self.toolTipConquerorInfoButton.ShowToolTip()
-
-		def __HideSungmaToolTip(self):
-			self.toolTipConquerorInfoButton.HideToolTip()
+	def __ShowHTHToolTip(self):
+		# Bonus tooltip'i kapat
+		if app.ENABLE_RENEWAL_BONUS_BOARD:
+			if self.BonusToolTip and hasattr(self.BonusToolTip, 'HideToolTip'):
+				self.BonusToolTip.HideToolTip()
 		
-		def __ShowMSPDToolTip(self):
-			self.toolTipConquerorInfoButton.ClearToolTip()
-			self.toolTipConquerorInfoButton.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_MOVE_SPEED)
-			self.toolTipConquerorInfoButton.AlignHorizonalCenter()
-			
-			self.toolTipConquerorInfoButton.ShowToolTip()
+		self.toolTipCharacterBoard.ClearToolTip()
+		self.toolTipCharacterBoard.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_IMG_CON)
+		self.toolTipCharacterBoard.AlignHorizonalCenter()
 
-		def __HideMSPDToolTip(self):
-			self.toolTipConquerorInfoButton.HideToolTip()
+		self.toolTipCharacterBoard.ShowToolTip()
 
-		def __ShowASPDToolTip(self):
-			self.toolTipConquerorInfoButton.ClearToolTip()
-			self.toolTipConquerorInfoButton.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_ATT_SPEED)
-			self.toolTipConquerorInfoButton.AlignHorizonalCenter()
-			
-			self.toolTipConquerorInfoButton.ShowToolTip()
+	def __HideHTHToolTip(self):
+		self.toolTipCharacterBoard.HideToolTip()
 
-		def __HideASPDToolTip(self):
-			self.toolTipConquerorInfoButton.HideToolTip()
+	def __ShowINTToolTip(self):
+		# Bonus tooltip'i kapat
+		if app.ENABLE_RENEWAL_BONUS_BOARD:
+			if self.BonusToolTip and hasattr(self.BonusToolTip, 'HideToolTip'):
+				self.BonusToolTip.HideToolTip()
+		
+		self.toolTipCharacterBoard.ClearToolTip()
+		self.toolTipCharacterBoard.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_IMG_INT)
+		self.toolTipCharacterBoard.AlignHorizonalCenter()
 
-		def __ShowCSPDToolTip(self):
-			self.toolTipConquerorInfoButton.ClearToolTip()
-			self.toolTipConquerorInfoButton.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_CAST_SPEED)
-			self.toolTipConquerorInfoButton.AlignHorizonalCenter()
-			
-			self.toolTipConquerorInfoButton.ShowToolTip()
+		self.toolTipCharacterBoard.ShowToolTip()
 
-		def __HideCSPDToolTip(self):
-			self.toolTipConquerorInfoButton.HideToolTip()
-			
-		def __ShowMATTToolTip(self):
-			self.toolTipConquerorInfoButton.ClearToolTip()
-			self.toolTipConquerorInfoButton.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_MAG_ATT)
-			self.toolTipConquerorInfoButton.AlignHorizonalCenter()
-			
-			self.toolTipConquerorInfoButton.ShowToolTip()
+	def __HideINTToolTip(self):
+		self.toolTipCharacterBoard.HideToolTip()
 
-		def __HideMATTToolTip(self):
-			self.toolTipConquerorInfoButton.HideToolTip()
-			
-		def __ShowMDEFToolTip(self):
-			self.toolTipConquerorInfoButton.ClearToolTip()
-			self.toolTipConquerorInfoButton.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_MAG_DEF)
-			self.toolTipConquerorInfoButton.AlignHorizonalCenter()
-			
-			self.toolTipConquerorInfoButton.ShowToolTip()
+	def __ShowSTRToolTip(self):
+		# Bonus tooltip'i kapat
+		if app.ENABLE_RENEWAL_BONUS_BOARD:
+			if self.BonusToolTip and hasattr(self.BonusToolTip, 'HideToolTip'):
+				self.BonusToolTip.HideToolTip()
+		
+		self.toolTipCharacterBoard.ClearToolTip()
+		self.toolTipCharacterBoard.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_IMG_STR)
+		self.toolTipCharacterBoard.AlignHorizonalCenter()
 
-		def __HideMDEFToolTip(self):
-			self.toolTipConquerorInfoButton.HideToolTip()
+		self.toolTipCharacterBoard.ShowToolTip()
 
-		def __ShowMERToolTip(self):
-			self.toolTipConquerorInfoButton.ClearToolTip()
-			self.toolTipConquerorInfoButton.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_PASSIVE)
-			self.toolTipConquerorInfoButton.AlignHorizonalCenter()
-			
-			self.toolTipConquerorInfoButton.ShowToolTip()
+	def __HideSTRToolTip(self):
+		self.toolTipCharacterBoard.HideToolTip()
 
-		def __HideMERToolTip(self):
-			self.toolTipConquerorInfoButton.HideToolTip()
+	def __ShowDEXToolTip(self):
+		# Bonus tooltip'i kapat
+		if app.ENABLE_RENEWAL_BONUS_BOARD:
+			if self.BonusToolTip and hasattr(self.BonusToolTip, 'HideToolTip'):
+				self.BonusToolTip.HideToolTip()
+		
+		self.toolTipCharacterBoard.ClearToolTip()
+		self.toolTipCharacterBoard.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_IMG_DEX)
+		self.toolTipCharacterBoard.AlignHorizonalCenter()
 
-		def __ShowSungmaStrToolTip(self):
-			self.toolTipConquerorInfoButton.ClearToolTip()
-			self.toolTipConquerorInfoButton.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_SUNGMA_STR)
-			self.toolTipConquerorInfoButton.AlignHorizonalCenter()
-			
-			self.toolTipConquerorInfoButton.ShowToolTip()
+		self.toolTipCharacterBoard.ShowToolTip()
 
-		def __HideSungmaStrToolTip(self):
-			self.toolTipConquerorInfoButton.HideToolTip()
+	def __HideDEXToolTip(self):
+		self.toolTipCharacterBoard.HideToolTip()
 
-		def __ShowSungmaHpToolTip(self):
-			self.toolTipConquerorInfoButton.ClearToolTip()
-			self.toolTipConquerorInfoButton.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_SUNGMA_HP)
-			self.toolTipConquerorInfoButton.AlignHorizonalCenter()
-			
-			self.toolTipConquerorInfoButton.ShowToolTip()
+	def __ShowHELToolTip(self):
+		# Bonus tooltip'i kapat
+		if app.ENABLE_RENEWAL_BONUS_BOARD:
+			if self.BonusToolTip and hasattr(self.BonusToolTip, 'HideToolTip'):
+				self.BonusToolTip.HideToolTip()
+		
+		self.toolTipCharacterBoard.ClearToolTip()
+		self.toolTipCharacterBoard.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_IMG_HEL)
+		self.toolTipCharacterBoard.AlignHorizonalCenter()
 
-		def __HideSungmaHpToolTip(self):
-			self.toolTipConquerorInfoButton.HideToolTip()
+		self.toolTipCharacterBoard.ShowToolTip()
 
-		def __ShowSunmaMoveToolTip(self):
-			self.toolTipConquerorInfoButton.ClearToolTip()
-			self.toolTipConquerorInfoButton.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_SUNGMA_MOVE)
-			self.toolTipConquerorInfoButton.AlignHorizonalCenter()
-			
-			self.toolTipConquerorInfoButton.ShowToolTip()
+	def __HideHELToolTip(self):
+		self.toolTipCharacterBoard.HideToolTip()
 
-		def __HideSunmaMoveToolTip(self):
-			self.toolTipConquerorInfoButton.HideToolTip()
+	def __ShowSPToolTip(self):
+		# Bonus tooltip'i kapat
+		if app.ENABLE_RENEWAL_BONUS_BOARD:
+			if self.BonusToolTip and hasattr(self.BonusToolTip, 'HideToolTip'):
+				self.BonusToolTip.HideToolTip()
+		
+		self.toolTipCharacterBoard.ClearToolTip()
+		self.toolTipCharacterBoard.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_IMG_SP)
+		self.toolTipCharacterBoard.AlignHorizonalCenter()
 
-		def __ShowSungmaImmuneToolTip(self):
-			self.toolTipConquerorInfoButton.ClearToolTip()
-			self.toolTipConquerorInfoButton.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_SUNGMA_IMMUNE)
-			self.toolTipConquerorInfoButton.AlignHorizonalCenter()
-			
-			self.toolTipConquerorInfoButton.ShowToolTip()
+		self.toolTipCharacterBoard.ShowToolTip()
 
-		def __HideSungmaImmuneToolTip(self):
-			self.toolTipConquerorInfoButton.HideToolTip()
+	def __HideSPToolTip(self):
+		self.toolTipCharacterBoard.HideToolTip()
 
-		def __ShowHELToolTip(self):
-			self.toolTipConquerorInfoButton.ClearToolTip()
-			self.toolTipConquerorInfoButton.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_HP)
-			self.toolTipConquerorInfoButton.AlignHorizonalCenter()
-			
-			self.toolTipConquerorInfoButton.ShowToolTip()
+	def __ShowATTToolTip(self):
+		# Bonus tooltip'i kapat
+		if app.ENABLE_RENEWAL_BONUS_BOARD:
+			if self.BonusToolTip and hasattr(self.BonusToolTip, 'HideToolTip'):
+				self.BonusToolTip.HideToolTip()
+		
+		self.toolTipCharacterBoard.ClearToolTip()
+		self.toolTipCharacterBoard.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_IMG_ATT)
+		self.toolTipCharacterBoard.AlignHorizonalCenter()
 
-		def __HideHELToolTip(self):
-			self.toolTipConquerorInfoButton.HideToolTip()
+		self.toolTipCharacterBoard.ShowToolTip()
 
-		def __ShowSPToolTip(self):
-			self.toolTipConquerorInfoButton.ClearToolTip()
-			self.toolTipConquerorInfoButton.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_SP)
-			self.toolTipConquerorInfoButton.AlignHorizonalCenter()
-			
-			self.toolTipConquerorInfoButton.ShowToolTip()
+	def __HideATTToolTip(self):
+		self.toolTipCharacterBoard.HideToolTip()
 
-		def __HideSPToolTip(self):
-			self.toolTipConquerorInfoButton.HideToolTip()
+	def __ShowDEFToolTip(self):
+		# Bonus tooltip'i kapat
+		if app.ENABLE_RENEWAL_BONUS_BOARD:
+			if self.BonusToolTip and hasattr(self.BonusToolTip, 'HideToolTip'):
+				self.BonusToolTip.HideToolTip()
+		
+		self.toolTipCharacterBoard.ClearToolTip()
+		self.toolTipCharacterBoard.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_IMG_DEF)
+		self.toolTipCharacterBoard.AlignHorizonalCenter()
 
-		def __ShowATTToolTip(self):
-			self.toolTipConquerorInfoButton.ClearToolTip()
-			self.toolTipConquerorInfoButton.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_ATT)
-			self.toolTipConquerorInfoButton.AlignHorizonalCenter()
-			
-			self.toolTipConquerorInfoButton.ShowToolTip()
+		self.toolTipCharacterBoard.ShowToolTip()
 
-		def __HideATTToolTip(self):
-			self.toolTipConquerorInfoButton.HideToolTip()
+	def __HideDEFToolTip(self):
+		self.toolTipCharacterBoard.HideToolTip()
 
-		def __ShowDEFolTip(self):
-			self.toolTipConquerorInfoButton.ClearToolTip()
-			self.toolTipConquerorInfoButton.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_DEF)
-			self.toolTipConquerorInfoButton.AlignHorizonalCenter()
-			
-			self.toolTipConquerorInfoButton.ShowToolTip()
+	def __ShowMSPDToolTip(self):
+		# Bonus tooltip'i kapat
+		if app.ENABLE_RENEWAL_BONUS_BOARD:
+			if self.BonusToolTip and hasattr(self.BonusToolTip, 'HideToolTip'):
+				self.BonusToolTip.HideToolTip()
+		
+		self.toolTipCharacterBoard.ClearToolTip()
+		self.toolTipCharacterBoard.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_MOVE_SPEED)
+		self.toolTipCharacterBoard.AlignHorizonalCenter()
 
-		def __HideDEFToolTip(self):
-			self.toolTipConquerorInfoButton.HideToolTip()
+		self.toolTipCharacterBoard.ShowToolTip()
+
+	def __HideMSPDToolTip(self):
+		self.toolTipCharacterBoard.HideToolTip()
+
+	def __ShowASPDToolTip(self):
+		# Bonus tooltip'i kapat
+		if app.ENABLE_RENEWAL_BONUS_BOARD:
+			if self.BonusToolTip and hasattr(self.BonusToolTip, 'HideToolTip'):
+				self.BonusToolTip.HideToolTip()
+		
+		self.toolTipCharacterBoard.ClearToolTip()
+		self.toolTipCharacterBoard.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_ATT_SPEED)
+		self.toolTipCharacterBoard.AlignHorizonalCenter()
+
+		self.toolTipCharacterBoard.ShowToolTip()
+
+	def __HideASPDToolTip(self):
+		self.toolTipCharacterBoard.HideToolTip()
+
+	def __ShowCSPDToolTip(self):
+		# Bonus tooltip'i kapat
+		if app.ENABLE_RENEWAL_BONUS_BOARD:
+			if self.BonusToolTip and hasattr(self.BonusToolTip, 'HideToolTip'):
+				self.BonusToolTip.HideToolTip()
+		
+		self.toolTipCharacterBoard.ClearToolTip()
+		self.toolTipCharacterBoard.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_CAST_SPEED)
+		self.toolTipCharacterBoard.AlignHorizonalCenter()
+
+		self.toolTipCharacterBoard.ShowToolTip()
+
+	def __HideCSPDToolTip(self):
+		self.toolTipCharacterBoard.HideToolTip()
+
+	def __ShowMATTToolTip(self):
+		# Bonus tooltip'i kapat
+		if app.ENABLE_RENEWAL_BONUS_BOARD:
+			if self.BonusToolTip and hasattr(self.BonusToolTip, 'HideToolTip'):
+				self.BonusToolTip.HideToolTip()
+		
+		self.toolTipCharacterBoard.ClearToolTip()
+		self.toolTipCharacterBoard.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_MAG_ATT)
+		self.toolTipCharacterBoard.AlignHorizonalCenter()
+
+		self.toolTipCharacterBoard.ShowToolTip()
+
+	def __HideMATTToolTip(self):
+		self.toolTipCharacterBoard.HideToolTip()
+
+	def __ShowMDEFToolTip(self):
+		# Bonus tooltip'i kapat
+		if app.ENABLE_RENEWAL_BONUS_BOARD:
+			if self.BonusToolTip and hasattr(self.BonusToolTip, 'HideToolTip'):
+				self.BonusToolTip.HideToolTip()
+		
+		self.toolTipCharacterBoard.ClearToolTip()
+		self.toolTipCharacterBoard.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_MAG_DEF)
+		self.toolTipCharacterBoard.AlignHorizonalCenter()
+
+		self.toolTipCharacterBoard.ShowToolTip()
+
+	def __HideMDEFToolTip(self):
+		self.toolTipCharacterBoard.HideToolTip()
+
+	def __ShowERToolTip(self):
+		# Bonus tooltip'i kapat
+		if app.ENABLE_RENEWAL_BONUS_BOARD:
+			if self.BonusToolTip and hasattr(self.BonusToolTip, 'HideToolTip'):
+				self.BonusToolTip.HideToolTip()
+		
+		self.toolTipCharacterBoard.ClearToolTip()
+		self.toolTipCharacterBoard.AutoAppendTextLine(localeInfo.STAT_TOOLTIP_MAG_ER)
+		self.toolTipCharacterBoard.AlignHorizonalCenter()
+
+		self.toolTipCharacterBoard.ShowToolTip()
+
+	def __HideERToolTip(self):
+		self.toolTipCharacterBoard.HideToolTip()
 
 	def RefreshCharacter(self):
-
-		if self.isLoaded==0:
+		if self.isLoaded == 0:
 			return
 
 		## Name
@@ -2064,19 +2213,12 @@ class CharacterWindow(ui.ScriptWindow):
 			self.characterNameValue.SetText(characterName)
 			self.guildNameValue.SetText(guildName)
 			if not guildName:
-				if localeInfo.IsARABIC():
-					self.characterNameSlot.SetPosition(190, 34)
-				else:
-					self.characterNameSlot.SetPosition(109, 34)
+				self.characterNameSlot.SetPosition(109, 34)
 
 				self.guildNameSlot.Hide()
 			else:
-				if localeInfo.IsJAPAN():
-					self.characterNameSlot.SetPosition(143, 34)
-				else:
-					self.characterNameSlot.SetPosition(153, 34)
+				self.characterNameSlot.SetPosition(153, 34)
 				self.guildNameSlot.Show()
-
 		except:
 			import exception
 			exception.Abort("CharacterWindow.RefreshCharacter.BindObject")
@@ -2115,70 +2257,6 @@ class CharacterWindow(ui.ScriptWindow):
 			if self.__CanUseHorseSkill():
 				self.__SelectSkillGroup(0)
 
-	def OverInLeaderBonus(self, index):
-		k = constInfo.LEADERSHIP_POWER
-		Bonus = 0
-		
-		if index == PARTY_AFFECT_ATTACKER:
-			Bonus = int(10 + 60 * k)
-		elif index == PARTY_AFFECT_TANKER:
-			Bonus = int(50 + 1450 * k)
-		elif index == PARTY_AFFECT_BUFFER:
-			Bonus = int(5 + 45 * k)
-		elif index == PARTY_AFFECT_SKILL_MASTER:
-			Bonus = int(25 + 600 * k)
-		elif index == PARTY_AFFECT_BERSERKER:
-			Bonus = int(1 + 5 * k)
-		elif index == PARTY_AFFECT_DEFENDER:
-			Bonus = int(5 + 30 * k)
-
-		AFFECT_STRING_DICT = {
-			PARTY_AFFECT_ATTACKER : localeInfo.PARTY_BONUS_ATTACKER,
-			PARTY_AFFECT_TANKER : localeInfo.PARTY_BONUS_TANKER,
-			PARTY_AFFECT_BUFFER : localeInfo.PARTY_BONUS_BUFFER,
-			PARTY_AFFECT_SKILL_MASTER : localeInfo.PARTY_BONUS_SKILL_MASTER,
-			PARTY_AFFECT_BERSERKER : localeInfo.PARTY_BONUS_BERSERKER,
-			PARTY_AFFECT_DEFENDER : localeInfo.PARTY_BONUS_DEFENDER,
-		}
-
-		AFFECT_TITLE_DICT = {
-			PARTY_AFFECT_ATTACKER : "Attacker",
-			PARTY_AFFECT_TANKER : "Tanker",
-			PARTY_AFFECT_BUFFER : "Buffer",
-			PARTY_AFFECT_SKILL_MASTER : "Skill Master",
-			PARTY_AFFECT_BERSERKER : "Berserker",
-			PARTY_AFFECT_DEFENDER : "Defender",
-		}
-
-		if not AFFECT_STRING_DICT.has_key(index):
-			return
-
-		self.toolTip.ClearToolTip()
-		self.toolTip.SetTitle(AFFECT_TITLE_DICT[index])
-		self.toolTip.AppendTextLine("Grants: " + AFFECT_STRING_DICT[index](Bonus))
-		self.toolTip.Show()
-
-	def OverOutLeaderBonus(self, index):
-		self.toolTip.Hide()
-
-	def SelectLeaderBonus(self, idx):
-		net.SendChatPacket("/leadership_bonus %d" % (idx))
-		# Leadership seÃ§ildi, flag'i gÃ¼ncelle
-		self.selectedLeadership = idx
-		# Board'u kapat
-		self.boardLeader.Hide()
-		# Skill 121'i aktif et (k?rm?z? renk ile)
-		skill121SlotIndex = player.GetSkillSlotIndex(121)
-		if skill121SlotIndex:
-			# Skill 121 bir SUPPORT skill oldu?u iÃ§in __GetETCSkillRealSlotIndex kullan?lmal?
-			realSlotIndex = self.__GetETCSkillRealSlotIndex(skill121SlotIndex)
-			# K?rm?z? renk ile aktif et (COLOR_TYPE_RED)
-			colorType = wndMgr.COLOR_TYPE_RED if hasattr(wndMgr, 'COLOR_TYPE_RED') else wndMgr.COLOR_TYPE_WHITE
-			if "SUPPORT" in self.skillPageDict:
-				slotWindow = self.skillPageDict["SUPPORT"]
-				if slotWindow.HasSlot(realSlotIndex):
-					slotWindow.ActivateSlot(realSlotIndex, colorType)
-
 	def __SetSkillGroupName(self, race, group):
 
 		job = chr.RaceToJob(race)
@@ -2194,23 +2272,20 @@ class CharacterWindow(ui.ScriptWindow):
 			self.skillGroupButton1.Show()
 			self.skillGroupButton2.Show()
 			self.activeSkillGroupName.Hide()
-
 		else:
-
 			if self.__CanUseHorseSkill():
-				self.activeSkillGroupName.Hide()
+				self.activeSkillGroupName.Show()	#orjinal Hide()
 				self.skillGroupButton1.SetText(nameList.get(group, "Noname"))
 				self.skillGroupButton2.SetText(localeInfo.SKILL_GROUP_HORSE)
-				self.skillGroupButton1.Show()
-				self.skillGroupButton2.Show()
-
+				self.skillGroupButton1.Hide()	#orjinal Show()
+				self.skillGroupButton2.Hide()	#orjinal Show()
 			else:
 				self.activeSkillGroupName.SetText(nameList.get(group, "Noname"))
 				self.activeSkillGroupName.Show()
 				self.skillGroupButton1.Hide()
 				self.skillGroupButton2.Hide()
 
-	def __SetSkillSlotData(self, race, group, empire = 0):
+	def __SetSkillSlotData(self, race, group, empire=0):
 		## SkillIndex
 		net.RegisterSkills(race, group, empire)
 
@@ -2241,7 +2316,6 @@ class CharacterWindow(ui.ScriptWindow):
 		return TRUE
 
 	def __CanUseHorseSkill(self):
-
 		slotIndex = player.GetSkillSlotIndex(player.SKILL_INDEX_RIDING)
 
 		if not slotIndex:
@@ -2599,484 +2673,6 @@ class CharacterWindow(ui.ScriptWindow):
 
 		def GetQuestCountInCategory(self, category):
 			return self.GetQuestsInCategory(category, TRUE)
-
-if app.ENABLE_PASSIVE_SYSTEM:
-	class PassiveWindow(ui.ScriptWindow):
-	
-		def __init__(self, wndInventory):
-			ui.ScriptWindow.__init__(self)
-	
-			self.isLoaded = 0
-			self.wndInventory = wndInventory
-			self.wndPassive = None
-			self.wndPassiveMaterial = None
-			self.wndPassiveJobDownSlot = None
-			self.chargeButton = None
-			self.addButton = None
-			self.activateButton = None
-			self.deckButton1 = None
-			self.deckButton2 = None
-			self.selectedDeckIndex = 0
-			self.toolTipItem = uiToolTip.ItemToolTip()
-			self.toolTipItem.SetFollow(TRUE)
-			self.toolTipItem.HideToolTip()
-			self.questionDialog = None
-			self.materialSlotDataByDeck = {
-				0 : self.__CreateDefaultMaterialSlotData(),
-				1 : self.__CreateDefaultMaterialSlotData(),
-			}
-			self.materialSlotData = self.materialSlotDataByDeck[self.selectedDeckIndex]
-	
-			self.__LoadWindow()
-	
-		def __del__(self):
-			ui.ScriptWindow.__del__(self)
-	
-		def Show(self):
-			self.__LoadWindow()
-			self.RefreshEquipSlotWindow()
-			self.SetCenterPosition()
-			self.SetTop()
-	
-			ui.ScriptWindow.Show(self)
-	
-		def Close(self):
-			if self.toolTipItem:
-				self.toolTipItem.HideToolTip()
-			self.__CloseQuestionDialog()
-			self.Hide()
-	
-		def __LoadWindow(self):
-			if self.isLoaded == 1:
-				return
-	
-			self.isLoaded = 1
-	
-			try:
-				pyScrLoader = ui.PythonScriptLoader()
-				pyScrLoader.LoadScriptFile(self, "uiscript/passiveattr.py")
-			except:
-				import exception
-				exception.Abort("PassiveWindow.LoadWindow.LoadObject")
-	
-			try:
-				wndPassive = self.GetChild("passive_attr_sub_slot")
-				wndPassiveMaterial = self.GetChild("passive_material_slot")
-				wndPassiveJobDownSlot = self.GetChild("passive_job_down_slot")
-				chargeButton = self.GetChild("ChargeButton")
-				addButton = self.GetChild("AddButton")
-				activateButton = self.GetChild("ActivateButton")
-				deckButton1 = self.GetChild("deck_button1")
-				deckButton2 = self.GetChild("deck_button2")
-				self.GetChild("TitleBar").SetCloseEvent(ui.__mem_func__(self.Close))
-				
-			except:
-				import exception
-				exception.Abort("PassiveWindow.LoadWindow.BindObject")
-	
-			self.wndPassive = wndPassive
-			self.wndPassiveMaterial = wndPassiveMaterial
-			self.wndPassiveJobDownSlot = wndPassiveJobDownSlot
-			self.chargeButton = chargeButton
-			self.addButton = addButton
-			self.activateButton = activateButton
-			self.deckButton1 = deckButton1
-			self.deckButton2 = deckButton2
-			self.wndPassive.SetSelectEmptySlotEvent(ui.__mem_func__(self.SelectEmptySlot))
-			self.wndPassive.SetSelectItemSlotEvent(ui.__mem_func__(self.SelectItemSlot))
-			self.wndPassive.SetUnselectItemSlotEvent(ui.__mem_func__(self.UseItemSlot))
-			self.wndPassive.SetUseSlotEvent(ui.__mem_func__(self.UseItemSlot))
-			self.wndPassive.SetOverInItemEvent(ui.__mem_func__(self.OverInItem))
-			self.wndPassive.SetOverOutItemEvent(ui.__mem_func__(self.OverOutItem))
-			self.wndPassive.Show()
-			self.wndPassiveMaterial.SetSelectEmptySlotEvent(ui.__mem_func__(self.SelectEmptyMaterialSlot))
-			self.wndPassiveMaterial.SetSelectItemSlotEvent(ui.__mem_func__(self.SelectMaterialItemSlot))
-			self.wndPassiveMaterial.SetUnselectItemSlotEvent(ui.__mem_func__(self.SelectMaterialItemSlot))
-			self.wndPassiveMaterial.SetUseSlotEvent(ui.__mem_func__(self.SelectMaterialItemSlot))
-			self.wndPassiveMaterial.SetOverInItemEvent(ui.__mem_func__(self.OverInMaterialItem))
-			self.wndPassiveMaterial.SetOverOutItemEvent(ui.__mem_func__(self.OverOutItem))
-			self.wndPassiveMaterial.Show()
-
-			if self.wndPassiveJobDownSlot:
-				self.wndPassiveJobDownSlot.Hide()
-
-			self.deckButton1.SetEvent(ui.__mem_func__(self.__SelectDeck), 0)
-			self.deckButton2.SetEvent(ui.__mem_func__(self.__SelectDeck), 1)
-			self.deckButton1.SetMouseLeftButtonDownEvent(ui.__mem_func__(self.__SelectDeck), 0)
-			self.deckButton2.SetMouseLeftButtonDownEvent(ui.__mem_func__(self.__SelectDeck), 1)
-			self.chargeButton.SetEvent(ui.__mem_func__(self.__OpenChargeQuestionDialog))
-			self.addButton.SetEvent(ui.__mem_func__(self.__AddRelicBonus))
-			self.activateButton.SetToggleDownEvent(ui.__mem_func__(self.__ToggleRelicActive))
-			self.activateButton.SetToggleUpEvent(ui.__mem_func__(self.__ToggleRelicActive))
-			self.__RefreshDeckButtonState()
-			self.__RefreshButtonState()
-
-		def OnPressEscapeKey(self):
-			self.Close()
-			return True
-
-		def __GetPassiveSlotIndex(self):
-			return item.EQUIPMENT_PASSIVE
-
-		def __GetMaterialSlotOrder(self):
-			return (1, 2, 3, 4)
-
-		def __CreateDefaultMaterialSlotData(self):
-			return {
-				1 : {"vnum" : 30255, "pos" : -1},
-				2 : {"vnum" : 30258, "pos" : -1},
-				3 : {"vnum" : 30256, "pos" : -1},
-				4 : {"vnum" : 30257, "pos" : -1},
-			}
-
-		def __RefreshDeckButtonState(self):
-			if not self.deckButton1 or not self.deckButton2:
-				return
-
-			if self.selectedDeckIndex == 0:
-				self.deckButton1.Down()
-				self.deckButton2.SetUp()
-			else:
-				self.deckButton1.SetUp()
-				self.deckButton2.Down()
-
-		def __SelectDeck(self, deckIndex):
-			if deckIndex == self.selectedDeckIndex:
-				self.__RefreshDeckButtonState()
-				self.__SendRelicCommand("sky" if deckIndex == 1 else "earth")
-				return
-
-			self.selectedDeckIndex = deckIndex
-			self.materialSlotData = self.materialSlotDataByDeck[self.selectedDeckIndex]
-			self.__RefreshDeckButtonState()
-			self.__RefreshMaterialSlots()
-			self.__SendRelicCommand("sky" if deckIndex == 1 else "earth")
-
-		def __SyncDeckSelectionFromButtons(self):
-			if not self.deckButton1 or not self.deckButton2:
-				return
-
-			if self.deckButton2.IsDown() and self.selectedDeckIndex != 1:
-				self.__SelectDeck(1)
-			elif self.deckButton1.IsDown() and self.selectedDeckIndex != 0:
-				self.__SelectDeck(0)
-
-		def __ValidateMaterialSlots(self):
-			for slotIndex in self.__GetMaterialSlotOrder():
-				itemData = self.materialSlotData[slotIndex]
-				slotPos = itemData["pos"]
-				if slotPos < 0:
-					continue
-
-				if player.GetItemIndex(slotPos) != itemData["vnum"]:
-					itemData["pos"] = -1
-
-		def __RefreshMaterialSlots(self):
-			self.__ValidateMaterialSlots()
-
-			for slotIndex in self.__GetMaterialSlotOrder():
-				itemData = self.materialSlotData[slotIndex]
-				slotPos = itemData["pos"]
-				if slotPos >= 0:
-					itemVNum = player.GetItemIndex(slotPos)
-					itemCount = player.GetItemCount(slotPos)
-					if itemCount <= 1:
-						itemCount = 0
-
-					self.wndPassiveMaterial.SetItemSlot(slotIndex, itemVNum, itemCount)
-					self.wndPassiveMaterial.ActivateSlot(slotIndex, wndMgr.COLOR_TYPE_WHITE)
-				else:
-					self.wndPassiveMaterial.ClearSlot(slotIndex)
-					self.wndPassiveMaterial.DeactivateSlot(slotIndex)
-
-			self.wndPassiveMaterial.RefreshSlot()
-
-		def __HasPassiveRelic(self):
-			return player.GetItemIndex(self.__GetPassiveSlotIndex()) != 0
-
-		def __IsPassiveRelicActive(self):
-			if not self.__HasPassiveRelic():
-				return FALSE
-
-			return player.GetItemMetinSocket(self.__GetPassiveSlotIndex(), 1) != 0
-
-		def __RefreshButtonState(self):
-			hasPassiveRelic = self.__HasPassiveRelic()
-			if hasPassiveRelic:
-				self.chargeButton.Enable()
-				self.addButton.Enable()
-				self.activateButton.Enable()
-			else:
-				self.chargeButton.Disable()
-				self.addButton.Disable()
-				self.activateButton.Disable()
-
-			if self.__IsPassiveRelicActive():
-				self.activateButton.Down()
-			else:
-				self.activateButton.SetUp()
-
-		def __GetMaterialArgumentString(self):
-			positions = []
-			for slotIndex in self.__GetMaterialSlotOrder():
-				slotPos = self.materialSlotData[slotIndex]["pos"]
-				if slotPos < 0:
-					return ""
-				positions.append(str(slotPos))
-
-			return " ".join(positions)
-
-		def __SendRelicCommand(self, command, useMaterials = FALSE):
-			chatCommand = "/passive_relic " + command
-			if useMaterials:
-				materialArgs = self.__GetMaterialArgumentString()
-				if not materialArgs:
-					chat.AppendChat(chat.CHAT_TYPE_INFO, "Tum ruh itemlerini yuvalara yerlestir.")
-					return
-
-				chatCommand += " " + materialArgs
-
-			net.SendChatPacket(chatCommand)
-
-		def __CloseQuestionDialog(self):
-			if not self.questionDialog:
-				return
-
-			self.questionDialog.Close()
-			self.questionDialog = None
-
-		def __OpenChargeQuestionDialog(self):
-			if not self.__HasPassiveRelic():
-				return
-
-			self.__CloseQuestionDialog()
-			questionDialog = uiCommon.QuestionDialog("thin")
-			questionDialog.SetText("Kutsal ruhu Ã¾arj ederken nesneler bu esnada kaybolur. Emin misin?")
-			questionDialog.SetAcceptEvent(ui.__mem_func__(self.__AcceptCharge))
-			questionDialog.SetCancelEvent(ui.__mem_func__(self.__CloseQuestionDialog))
-			questionDialog.Open()
-			self.questionDialog = questionDialog
-
-		def __AcceptCharge(self):
-			self.__CloseQuestionDialog()
-			self.__SendRelicCommand("charge", TRUE)
-
-		def __AddRelicBonus(self):
-			if not self.__HasPassiveRelic():
-				return
-
-			self.__SendRelicCommand("add", TRUE)
-
-		def __ToggleRelicActive(self):
-			if not self.__HasPassiveRelic():
-				return
-
-			self.__SendRelicCommand("activate")
-
-		def __SetToolTipPosition(self):
-			if not self.toolTipItem:
-				return
-
-			(anchorX, anchorY) = self.wndPassive.GetGlobalPosition()
-			anchorWidth = self.wndPassive.GetWidth()
-
-			if anchorWidth <= 0 or (anchorX == 0 and anchorY == 0):
-				(mouseX, mouseY) = wndMgr.GetMousePosition()
-				self.toolTipItem.SetToolTipPosition(int(mouseX), int(mouseY))
-				return
-
-			tooltipWidth = self.toolTipItem.GetWidth()
-			tooltipHeight = self.toolTipItem.GetHeight()
-			screenWidth = wndMgr.GetScreenWidth()
-			screenHeight = wndMgr.GetScreenHeight()
-
-			tooltipLeft = anchorX + anchorWidth + 8
-			if tooltipLeft + tooltipWidth > screenWidth:
-				tooltipLeft = max(0, anchorX - tooltipWidth - 8)
-
-			tooltipTop = max(0, min(anchorY, screenHeight - tooltipHeight - 10))
-			tooltipPosX = int(tooltipLeft + tooltipWidth / 2)
-			tooltipPosY = int(tooltipTop + tooltipHeight)
-			self.toolTipItem.SetToolTipPosition(tooltipPosX, tooltipPosY)
-
-		def __ShowToolTip(self):
-			if self.toolTipItem:
-				self.__SetToolTipPosition()
-				self.toolTipItem.SetInventoryItem(self.__GetPassiveSlotIndex(), player.EQUIPMENT)
-				self.__SetToolTipPosition()
-
-		def OverInItem(self, slotIndex):
-			if mouseModule.mouseController.isAttached():
-				return
-
-			if slotIndex != self.__GetPassiveSlotIndex():
-				return
-
-			if player.GetItemIndex(slotIndex) == 0:
-				return
-
-			self.__ShowToolTip()
-
-		def OverInMaterialItem(self, slotIndex):
-			if mouseModule.mouseController.isAttached():
-				return
-
-			if not slotIndex in self.materialSlotData:
-				return
-
-			slotPos = self.materialSlotData[slotIndex]["pos"]
-			if slotPos < 0:
-				return
-
-			self.__SetToolTipPosition()
-			self.toolTipItem.SetInventoryItem(slotPos)
-			self.__SetToolTipPosition()
-
-		def OverOutItem(self):
-			if self.toolTipItem:
-				self.toolTipItem.HideToolTip()
-
-		def SelectItemSlot(self, slotIndex):
-			if mouseModule.mouseController.isAttached():
-				attachedSlotType = mouseModule.mouseController.GetAttachedType()
-				attachedSlotPos = mouseModule.mouseController.GetAttachedSlotNumber()
-				attachedItemVNum = mouseModule.mouseController.GetAttachedItemIndex()
-
-				if attachedSlotType == player.SLOT_TYPE_INVENTORY and attachedItemVNum in (100100, 100101):
-					if player.GetItemIndex(self.__GetPassiveSlotIndex()) != 0:
-						mouseModule.mouseController.DeattachObject()
-						net.SendChatPacket("/passive_relic extract %d" % attachedSlotPos)
-						return
-
-			self.UseItemSlot(slotIndex)
-
-		def SelectEmptySlot(self, selectedSlotPos):
-			passiveSlotIndex = self.__GetPassiveSlotIndex()
-			if selectedSlotPos != passiveSlotIndex and selectedSlotPos != 0:
-				return
-
-			if not mouseModule.mouseController.isAttached():
-				return
-
-			attachedSlotType = mouseModule.mouseController.GetAttachedType()
-			attachedSlotPos = mouseModule.mouseController.GetAttachedSlotNumber()
-			attachedItemVNum = mouseModule.mouseController.GetAttachedItemIndex()
-			attachedWindow = player.SlotTypeToInvenType(attachedSlotType)
-
-			if player.RESERVED_WINDOW == attachedWindow:
-				return
-
-			mouseModule.mouseController.DeattachObject()
-
-			if attachedWindow == player.EQUIPMENT:
-				return
-
-			if attachedSlotType == player.SLOT_TYPE_INVENTORY and attachedItemVNum in (100100, 100101):
-				if player.GetItemIndex(passiveSlotIndex) != 0:
-					net.SendChatPacket("/passive_relic extract %d" % attachedSlotPos)
-				return
-
-			net.SendItemUsePacket(attachedSlotPos)
-
-		def SelectEmptyMaterialSlot(self, selectedSlotPos):
-			if not selectedSlotPos in self.materialSlotData:
-				return
-
-			if not mouseModule.mouseController.isAttached():
-				return
-
-			attachedSlotType = mouseModule.mouseController.GetAttachedType()
-			attachedSlotPos = mouseModule.mouseController.GetAttachedSlotNumber()
-			attachedItemVNum = mouseModule.mouseController.GetAttachedItemIndex()
-
-			if player.SLOT_TYPE_INVENTORY != attachedSlotType:
-				return
-
-			if attachedItemVNum != self.materialSlotData[selectedSlotPos]["vnum"]:
-				chat.AppendChat(chat.CHAT_TYPE_INFO, "Bu item bu yuvaya yerlestirilemez.")
-				return
-
-			self.materialSlotData[selectedSlotPos]["pos"] = attachedSlotPos
-			mouseModule.mouseController.DeattachObject()
-			self.__RefreshMaterialSlots()
-
-		def SelectMaterialItemSlot(self, selectedSlotPos):
-			if not selectedSlotPos in self.materialSlotData:
-				return
-
-			self.materialSlotData[selectedSlotPos]["pos"] = -1
-			self.__RefreshMaterialSlots()
-
-		def TryAttachMaterialFromInventory(self, inventorySlot):
-			if inventorySlot < 0:
-				return FALSE
-
-			itemVNum = player.GetItemIndex(inventorySlot)
-			if itemVNum == 0:
-				return FALSE
-
-			for slotIndex in self.__GetMaterialSlotOrder():
-				itemData = self.materialSlotData[slotIndex]
-				if itemData["vnum"] != itemVNum:
-					continue
-
-				currentPos = itemData["pos"]
-				if currentPos == inventorySlot:
-					return TRUE
-
-				if currentPos >= 0 and player.GetItemIndex(currentPos) == itemData["vnum"]:
-					continue
-
-				itemData["pos"] = inventorySlot
-				self.__RefreshMaterialSlots()
-				return TRUE
-
-			return FALSE
-
-		def __FindEmptyInventorySlot(self):
-			for slotPos in xrange(player.INVENTORY_PAGE_COUNT * player.INVENTORY_PAGE_SIZE):
-				if player.GetItemIndex(slotPos) == 0:
-					return slotPos
-			return -1
-
-		def UseItemSlot(self, slotIndex):
-			passiveSlotIndex = self.__GetPassiveSlotIndex()
-			if player.GetItemIndex(passiveSlotIndex) == 0:
-				return
-
-			emptyInventorySlot = self.__FindEmptyInventorySlot()
-			if emptyInventorySlot >= 0:
-				net.SendItemMovePacket(passiveSlotIndex, emptyInventorySlot, 1)
-
-			self.__SendRelicCommand("unequip")
-			net.SendItemUsePacket(passiveSlotIndex)
-
-		def RefreshEquipSlotWindow(self):
-			slotNumber = self.__GetPassiveSlotIndex()
-			itemVNum = player.GetItemIndex(slotNumber)
-			itemCount = player.GetItemCount(slotNumber)
-			if itemCount <= 1:
-				itemCount = 0
-
-			self.wndPassive.SetItemSlot(slotNumber, itemVNum, itemCount)
-			if itemVNum:
-				self.wndPassive.ActivateSlot(slotNumber, wndMgr.COLOR_TYPE_WHITE)
-			else:
-				self.wndPassive.DeactivateSlot(slotNumber)
-
-			self.wndPassive.RefreshSlot()
-			self.__RefreshMaterialSlots()
-			self.__RefreshDeckButtonState()
-			self.__RefreshButtonState()
-
-		def OnUpdate(self):
-			if self.IsShow():
-				self.__SyncDeckSelectionFromButtons()
-				self.RefreshEquipSlotWindow()
-				if self.toolTipItem and self.toolTipItem.IsShow():
-					self.__SetToolTipPosition()
-					if not self.wndPassive.IsIn() and not self.wndPassiveMaterial.IsIn():
-						self.toolTipItem.HideToolTip()
 
 	def OnMoveWindow(self, x, y):
 		pass

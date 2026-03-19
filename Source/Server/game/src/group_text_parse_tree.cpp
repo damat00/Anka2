@@ -70,7 +70,6 @@ bool CGroupTextParseTreeLoader::LoadGroup(CGroupNode * pGroupNode)
 		if ('}' == stTokenVector[0][0])
 			break;
 
-		// Group
 		if (0 == stTokenVector[0].compare("group"))
 		{
 			if (2 != stTokenVector.size())
@@ -93,7 +92,6 @@ bool CGroupTextParseTreeLoader::LoadGroup(CGroupNode * pGroupNode)
 
 			LoadGroup(pNewNode);
 		}
-		// Column Names
 		else if (0 == stTokenVector[0].compare("#--#"))
 		{
 			for (int i = 1; i < stTokenVector.size(); i++)
@@ -136,7 +134,7 @@ CGroupNode::CGroupNode()
 
 CGroupNode::~CGroupNode()
 {
-	for (TMapGroup::iterator it = m_mapChildNodes.begin(); it != m_mapChildNodes.end(); ++it)	//@fixme541
+	for (TMapGroup::iterator it = m_mapChildNodes.begin(); it != m_mapChildNodes.end(); it++)
 	{
 		delete it->second;
 	}
@@ -159,7 +157,7 @@ bool CGroupNode::SetChildNode(const char * c_szKey, CGroupNode* pChildGroup)
 		return false;
 
 	m_mapChildNodes.insert (TMapGroup::value_type (c_szKey, pChildGroup));
-
+	
 	return true;
 }
 

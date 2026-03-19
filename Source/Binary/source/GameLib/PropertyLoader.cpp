@@ -3,7 +3,7 @@
 #include "PropertyManager.h"
 #include "Property.h"
 
-bool CPropertyLoader::OnFolder(const char* c_szFilter, const char* c_szPathName, const char* c_szFileName)
+bool CPropertyLoader::OnFolder(const char *c_szFilter, const char *c_szPathName, const char *c_szFileName)
 {
 	std::string stPathName = "";
 	stPathName += c_szPathName;
@@ -15,13 +15,13 @@ bool CPropertyLoader::OnFolder(const char* c_szFilter, const char* c_szPathName,
 	return true;
 }
 
-bool CPropertyLoader::OnFile(const char* c_szPathName, const char* c_szFileName)
+bool CPropertyLoader::OnFile(const char *c_szPathName, const char *c_szFileName)
 {
 	RegisterFile(c_szPathName, c_szFileName);
 	return true;
 }
 
-DWORD CPropertyLoader::RegisterFile(const char * c_szPathName, const char * c_szFileName)
+DWORD CPropertyLoader::RegisterFile(const char *c_szPathName, const char *c_szFileName)
 {
 	std::string strFileName = "";
 	strFileName += c_szPathName;
@@ -33,8 +33,10 @@ DWORD CPropertyLoader::RegisterFile(const char * c_szPathName, const char * c_sz
 	stl_lowers(stExt);
 	stl_lowers(strFileName);
 
+	// �?스를 소문자로 만들고 \\ 는 / 로 바꾼다.
 	StringPath(strFileName);
 
+	// 예약된 CRC 처리 (지워진 CRC)
 	if (0 == strFileName.compare("property/reserve"))
 	{
 		m_pPropertyManager->LoadReservedCRC(strFileName.c_str());

@@ -60,8 +60,8 @@ bool CShopEx::AddGuest(LPCHARACTER ch,DWORD owner_vid, bool bOtherEmpire)
 
 	TPacketGCShop pack;
 
-	pack.header		= HEADER_GC_SHOP;
-	pack.subheader	= SHOP_SUBHEADER_GC_START_EX;
+	pack.header = HEADER_GC_SHOP;
+	pack.subheader = SHOP_SUBHEADER_GC_START_EX;
 
 	TPacketGCShopStartEx pack2;
 

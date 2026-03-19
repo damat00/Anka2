@@ -504,14 +504,12 @@ class WhisperDialog(ui.ScriptWindow):
 		textLength = len(text)
 
 		if textLength > 0:
-			if app.LINK_IN_CHAT:
-				link = self.GetLink(text)
-				if link != "":
-					import chr
-					if not chr.IsGameMaster():
-						text = text.replace(link, "|cFF00C0FC|h|Hweb:" + link.replace("://", "XxX") + "|h" + link + "|h|r")
-					else:
-						text = text.replace(link, "|cFF00C0FC|h|Hsysweb:" + link.replace("://", "XxX") + "|h" + link + "|h|r")
+			link = self.GetLink(text)
+			if link != "":
+				if not chr.IsGameMaster():
+					text = text.replace(link, "|cFF00C0FC|h|Hweb:" + link.replace("://", "XxX") + "|h" + link + "|h|r")
+				else:
+					text = text.replace(link, "|cFF00C0FC|h|Hsysweb:" + link.replace("://", "XxX") + "|h" + link + "|h|r")
 
 			if net.IsInsultIn(text):
 				chat.AppendChat(chat.CHAT_TYPE_INFO, localeInfo.CHAT_INSULT_STRING)
@@ -542,37 +540,12 @@ class WhisperDialog(ui.ScriptWindow):
 			else:
 				self.interface.MakeHyperlinkTooltip(hyperlink)
 
-	if app.LINK_IN_CHAT:
-		def GetLink(self, text):
-			link = ""
-			start = text.find("http://")
-			if start == -1:
-				start = text.find("https://")
-			if start == -1:
-				return ""
+	def GetLink(self, text):
+		link = ""
+		start = text.find("http://")
+		if start == -1:
+			start = text.find("https://")
+		if start == -1:
+			return ""
 
-			return text[start:len(text)].split(" ")[0]
-
-if "__main__" == __name__:
-	import uiTest
-
-	class TestApp(uiTest.App):
-		def OnInit(self):
-			wnd = WhisperDialog(self.OnMax, self.OnMin)
-			wnd.LoadDialog()
-			wnd.OpenWithoutTarget(self.OnNew)
-			wnd.SetPosition(0, 0)
-			wnd.Show()
-
-			self.wnd = wnd
-
-		def OnMax(self):
-			pass
-
-		def OnMin(self):
-			pass
-
-		def OnNew(self):
-			pass
-
-	TestApp().MainLoop()
+		return text[start:len(text)].split(" ")[0]

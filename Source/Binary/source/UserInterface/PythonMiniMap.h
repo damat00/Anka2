@@ -73,7 +73,7 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 		float GetAutoHuntRadius() { return m_fAutoHuntImageRadius;}
 #endif
 
-#ifdef ENABLE_ULTIMATE_REGEN
+#ifdef ENABLE_RENEWAL_REGEN
 		bool GetAtlasInfo(float fScreenX, float fScreenY, std::string & rReturnString, float * pReturnPosX, float * pReturnPosY, DWORD * pdwTextColor, DWORD * pdwGuildID, int * pdiRegenTime);
 #else
 		bool GetAtlasInfo(float fScreenX, float fScreenY, std::string & rReturnString, float * pReturnPosX, float * pReturnPosY, DWORD * pdwTextColor, DWORD * pdwGuildID);
@@ -99,7 +99,7 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 
 		// NPC List
 		void ClearAtlasMarkInfo();
-#ifdef ENABLE_ULTIMATE_REGEN
+#ifdef ENABLE_RENEWAL_REGEN
 		void RegisterAtlasMark(BYTE byType, DWORD mobVnum, const char* c_szName, long lx, long ly, int regenTime);
 #else
 		void RegisterAtlasMark(BYTE byType, const char *c_szName, long lx, long ly);
@@ -148,7 +148,7 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 			float m_fMiniMapY;
 			DWORD m_dwChrVID;
 			std::string m_strText;
-#ifdef ENABLE_ULTIMATE_REGEN
+#ifdef ENABLE_RENEWAL_REGEN
 			DWORD mobVnum;
 			int regenTime;
 #endif
@@ -223,11 +223,7 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 
 		float m_fMiniMapRadius;
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-		LPDIRECT3DTEXTURE9 m_lpMiniMapTexture[AROUND_AREA_NUM];
-#else
 		LPDIRECT3DTEXTURE8 m_lpMiniMapTexture[AROUND_AREA_NUM];
-#endif
 
 		CGraphicImageInstance m_MiniMapFilterGraphicImageInstance;
 		CGraphicExpandedImageInstance m_MiniMapCameraraphicImageInstance;
@@ -241,7 +237,7 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 
 		CGraphicExpandedImageInstance m_PlayerMark;
 		CGraphicImageInstance m_WhiteMark;
-#ifdef ENABLE_ULTIMATE_REGEN
+#ifdef ENABLE_RENEWAL_REGEN
 		CGraphicImageInstance m_BossMark;
 #endif
 
@@ -252,9 +248,6 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 		TInstanceMarkPositionVector m_WarpPositionVector;
 #ifdef ENABLE_METIN_STONES_MINIMAP
 		TInstanceMarkPositionVector m_MetinPositionVector;
-#endif
-#ifdef NAMECOLOR_BOSS_CLIENT
-		TInstanceMarkPositionVector m_BossPositionVector;
 #endif
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
 		TInstanceMarkPositionVector m_OfflineShopPositionVector;
@@ -299,7 +292,7 @@ class CPythonMiniMap : public CScreen, public CSingleton<CPythonMiniMap>
 		TAtlasMarkInfoVectorIterator m_AtlasMarkInfoVectorIterator;
 		TAtlasMarkInfoVector m_AtlasNPCInfoVector;
 		TAtlasMarkInfoVector m_AtlasWarpInfoVector;
-#ifdef ENABLE_ULTIMATE_REGEN
+#ifdef ENABLE_RENEWAL_REGEN
 		TAtlasMarkInfoVector m_AtlasBossInfoVector;
 #endif
 

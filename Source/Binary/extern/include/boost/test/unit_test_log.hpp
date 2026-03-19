@@ -22,6 +22,7 @@
 #include <boost/test/detail/fwd_decl.hpp>
 
 #include <boost/test/utils/wrap_stringstream.hpp>
+#include <boost/test/utils/trivial_singleton.hpp>
 #include <boost/test/utils/lazy_ostream.hpp>
 
 // Boost
@@ -108,7 +109,7 @@ private:
 /// @see
 /// - boost::unit_test::test_observer
 /// - boost::unit_test::unit_test_log_formatter
-class BOOST_TEST_DECL unit_test_log_t : public test_observer {
+class BOOST_TEST_DECL unit_test_log_t : public test_observer, public singleton<unit_test_log_t> {
 public:
     // test_observer interface implementation
     virtual void        test_start( counter_t test_cases_amount );
@@ -220,7 +221,6 @@ private:
     void                log_entry_context( log_level l );
     void                clear_entry_context();
 
-    // Singleton
     BOOST_TEST_SINGLETON_CONS( unit_test_log_t )
 }; // unit_test_log_t
 

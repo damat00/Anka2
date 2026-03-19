@@ -1,3 +1,12 @@
+/*********************************************************************
+ * date        : 2007.02.24
+ * file        : blend_item.cpp
+ * author      : mhh
+ * description : 
+ */
+
+#define _blend_item_cpp_
+
 #include "stdafx.h"
 #include "constants.h"
 #include "log.h"
@@ -7,6 +16,7 @@
 
 #define DO_ALL_BLEND_INFO(iter)	for (iter=s_blend_info.begin(); iter!=s_blend_info.end(); ++iter)
 
+
 struct BLEND_ITEM_INFO
 {
 	DWORD	item_vnum;
@@ -14,6 +24,7 @@ struct BLEND_ITEM_INFO
 	int		apply_value[MAX_BLEND_ITEM_VALUE];
 	int		apply_duration[MAX_BLEND_ITEM_VALUE];
 };
+
 
 typedef std::vector<BLEND_ITEM_INFO*>	T_BLEND_ITEM_INFO;
 T_BLEND_ITEM_INFO	s_blend_info;
@@ -145,16 +156,16 @@ static int FN_random_index()
 {
 	int	percent = number(1, 100);
 
-	if (percent <= 10)			// level 1 :10%
+	if (percent <= 10)
 		return 0;
-	else if (percent <= 30)		// level 2 : 20%
+	else if (percent <= 30)
 		return 1;
-	else if (percent <= 70)		// level 3 : 40%
+	else if (percent <= 70)
 		return 2;
-	else if (percent <= 90)		// level 4 : 20%
+	else if (percent <= 90)
 		return 3;
 	else
-		return 4;				// level 5 : 10%
+		return 4;
 
 	return 0;
 }
@@ -163,16 +174,16 @@ static int FN_ECS_random_index()
 {
 	int	percent = number(1, 100);
 
-	if (percent <= 5)			// level 1 : 5%
+	if (percent <= 5)
 		return 0;
-	else if (percent <= 15)		// level 2 : 10%
+	else if (percent <= 15)
 		return 1;
-	else if (percent <= 60)		// level 3 : 45%
+	else if (percent <= 60)
 		return 2;
-	else if (percent <= 85)		// level 4 : 25%
+	else if (percent <= 85)
 		return 3;
 	else
-		return 4;				// level 5 : 15%
+		return 4;
 
 	return 0;
 }
@@ -191,18 +202,18 @@ bool	Blend_Item_set_value(LPITEM item)
 			int	apply_type;
 			int	apply_value;
 			int	apply_duration;
-
+	
 			if (item->GetVnum() == 51002)
 			{
-				apply_type		= blend_info->apply_type;
-				apply_value		= blend_info->apply_value		[FN_ECS_random_index()];
-				apply_duration	= blend_info->apply_duration	[FN_ECS_random_index()];
+				apply_type = blend_info->apply_type;
+				apply_value = blend_info->apply_value [FN_ECS_random_index()];
+				apply_duration = blend_info->apply_duration [FN_ECS_random_index()];
 			}
 			else
 			{
-				apply_type		= blend_info->apply_type;
-				apply_value		= blend_info->apply_value		[FN_random_index()];
-				apply_duration	= blend_info->apply_duration	[FN_random_index()];
+				apply_type = blend_info->apply_type;
+				apply_value = blend_info->apply_value [FN_random_index()];
+				apply_duration = blend_info->apply_duration [FN_random_index()];
 			}
 			sys_log (0, "blend_item : type : %d, value : %d, du : %d", apply_type, apply_value, apply_duration);
 			item->SetSocket(0, apply_type);
@@ -210,11 +221,12 @@ bool	Blend_Item_set_value(LPITEM item)
 			item->SetSocket(2, apply_duration);
 			return true;
 		}
+
 	}
 	return false;
 }
 
-bool	Blend_Item_find(DWORD item_vnum)
+bool Blend_Item_find(DWORD item_vnum)
 {
 	BLEND_ITEM_INFO* blend_info;
 	T_BLEND_ITEM_INFO::iterator	iter;

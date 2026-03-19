@@ -131,11 +131,11 @@ bool CGuildMarkDownloader::__LoginState_Process()
 		{
 			if (!Recv(sizeof(header), &header))
 				return false;
-
+			
 			return true;
 		}
 	}
-
+	
 	UINT needPacketSize = __GetPacketSize(header);
 
 	if (!needPacketSize)

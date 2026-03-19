@@ -9,6 +9,7 @@
 #include "../../common/service.h"
 
 ACMD(do_free_regen);
+
 ACMD(do_user_horse_ride);
 ACMD(do_user_horse_back);
 ACMD(do_user_horse_feed);
@@ -53,13 +54,7 @@ ACMD(do_console);
 ACMD(do_restart);
 ACMD(do_advance);
 ACMD(do_stat);
-#ifdef ENABLE_CONQUEROR_LEVEL
-ACMD(do_clevel);
-ACMD(do_conqueror_plus_amount);
-ACMD(do_set_conqueror);
-ACMD(do_state_sungma);
-ACMD(do_conqueror_stat);
-#endif
+ACMD(do_stat_val);
 ACMD(do_respawn);
 ACMD(do_skillup);
 ACMD(do_guildskillup);
@@ -90,9 +85,6 @@ ACMD(do_nowar);
 ACMD(do_setskill);
 ACMD(do_setskillother);
 ACMD(do_level);
-#ifdef ENABLE_CONQUEROR_LEVEL
-ACMD(do_conqueror_stat);
-#endif
 ACMD(do_polymorph);
 ACMD(do_polymorph_item);
 ACMD(do_close_shop);
@@ -237,6 +229,16 @@ ACMD (do_clear_affect);
 	ACMD(do_restart_now);
 #endif
 
+#ifdef ENABLE_MINIGAME_OKEY_CARDS_SYSTEM
+	ACMD(do_cards);
+#endif
+
+#ifdef ENABLE_RENEWAL_BATTLE_PASS
+	ACMD(do_battlepass_get_info);
+	ACMD(do_battlepass_set_mission);
+	ACMD(do_battlepass_premium_activate);
+#endif
+
 #ifdef ENABLE_ANTI_EXP
 	ACMD(do_anti_exp);
 #endif
@@ -262,8 +264,12 @@ ACMD (do_clear_affect);
 	ACMD(do_renewal_skill_select);
 #endif
 
-#ifdef ENABLE_ITEMSHOP
+#ifdef ENABLE_RENEWAL_INGAME_ITEMSHOP
 	ACMD(do_ishop);
+#endif
+
+#ifdef ENABLE_FISH_GAME
+	ACMD(do_fish_game);
 #endif
 
 #ifdef ENABLE_GROWTH_PET_SYSTEM
@@ -280,13 +286,8 @@ ACMD (do_clear_affect);
 	ACMD(do_open_warping_window);
 #endif
 
-#ifdef ENABLE_TRACK_WINDOW
-ACMD(do_track_window);
-#endif
-
-#ifdef ENABLE_ZODIAC_MISSION
-ACMD(do_cz_reward);
-ACMD(do_cz_check_box);
+#ifdef ENABLE_DUNGEON_TRACKING_SYSTEM
+	ACMD(do_track_window);
 #endif
 
 #ifdef ENABLE_BOT_PLAYER
@@ -323,107 +324,6 @@ ACMD(do_autosell_info);
 ACMD(do_players_online);
 #endif
 
-#ifdef ENABLE_NPC_LOCATION_TRACE
-ACMD(do_find_npc);
-ACMD(do_find_near_npc);
-#endif
-
-#ifdef ENABLE_BIOLOGIST_SYSTEM
-ACMD (do_biyolog);
-#endif
-
-#ifdef ENABLE_DUNGEON_INFO
-ACMD(do_reset_time_dungeon);
-#endif
-
-#ifdef __DUNGEON_INFO__
-ACMD(do_dungeon_info);
-#endif
-
-#ifdef __LEADERSHIP__BONUS__
-ACMD(do_leadership_bonus);
-#endif
-
-#ifdef ENABLE_AFFECT_BUFF_REMOVE
-ACMD(do_remove_buff);
-#endif
-
-#ifdef ENABLE_PASSIVE_SYSTEM
-ACMD(do_passive_relic);
-#endif
-
-#ifdef ENABLE_TITLE_SYSTEM
-ACMD(do_title);
-#endif
-
-#ifdef ENABLE_REMOTE_SHOP_SYSTEM
-ACMD(do_open_range_npc);
-#endif
-
-#ifdef __SYSTEM_SEARCH_ITEM_MOB__
-ACMD(search_drop);
-#endif
-
-#ifdef ENABLE_COLLECT_WINDOW
-ACMD(do_choose_quest);
-ACMD(do_open_collect_window);
-#endif
-
-#ifdef __ENABLE_COLLECTIONS_SYSTEM__
-	ACMD(do_add_collect_item);
-#endif
-
-#ifdef ENABLE_EVENT_BANNER_FLAG
-ACMD(do_banner);
-#endif
-
-#ifdef ENABLE_ATTENDANCE_EVENT
-ACMD(do_attendance);
-ACMD(do_easter_event);
-#endif
-
-#ifdef ENABLE_MINI_GAME_CATCH_KING
-ACMD(do_catch_king_event);
-#endif
-
-#ifdef ENABLE_MINIGAME_RUMI_EVENT
-ACMD(do_cards);
-#endif
-
-#ifdef ENABLE_HALLOWEEN_EVENT_SYSTEM
-ACMD(do_increase_halloween);
-ACMD(take_reward_halloween);
-#endif
-
-#ifdef ENABLE_SOCCER_BALL_EVENT
-ACMD(do_top_ver);
-#endif
-
-#ifdef ENABLE_WORD_GAME_EVENT
-ACMD(do_word_game);
-#endif
-
-#ifdef ENABLE_GAYA_SHOP_SYSTEM
-ACMD(do_gem);
-#endif
-
-#ifdef ENABLE_GAYA_TICKET_SYSTEM
-ACMD(do_use_gem_ticket);
-#endif
-
-#ifdef ENABLE_BATTLE_PASS
-ACMD(final_reward_battlepass);
-ACMD(open_battlepass);
-ACMD(battlepass_bitirici);
-ACMD(final_reward_battlepass_premium);
-ACMD(open_battlepass_premium);
-ACMD(battlepass_bitirici_premium);
-#endif
-
-#ifdef ENABLE_RANKING
-ACMD(do_ranking_subcategory);
-#endif
-
 struct command_info cmd_info[] =
 {
 	{ "!RESERVED!",						NULL,							0,						POS_DEAD,			GM_IMPLEMENTOR	},
@@ -442,9 +342,6 @@ struct command_info cmd_info[] =
 	{ "transfer",						do_transfer,					0,						POS_DEAD,			GM_LOW_WIZARD	},
 	{ "goto",							do_goto,						0,						POS_DEAD,			GM_LOW_WIZARD	},
 	{ "level",							do_level,						0,						POS_DEAD,			GM_LOW_WIZARD	},
-#ifdef ENABLE_CONQUEROR_LEVEL
-	{ "conqueror_stat", 				do_conqueror_stat, 				0, 						POS_DEAD, 			GM_PLAYER 		},
-#endif
 	{ "eventflag",						do_event_flag,					0,						POS_DEAD,			GM_HIGH_WIZARD	},
 	{ "geteventflag",					do_get_event_flag,				0,						POS_DEAD,			GM_LOW_WIZARD	},
 
@@ -472,26 +369,10 @@ struct command_info cmd_info[] =
 	{ "shutdown",						do_shutdown,					0,						POS_DEAD,			GM_HIGH_WIZARD	},
 
 	{ "stat",							do_stat,						0,						POS_DEAD,			GM_PLAYER		},
+	{ "stat_val",						do_stat_val,					0,						POS_DEAD,			GM_PLAYER		},
 	{ "stat-",							do_stat_minus,					0,						POS_DEAD,			GM_PLAYER		},
 	{ "stat_reset",						do_stat_reset,					0,						POS_DEAD,			GM_LOW_WIZARD	},
 	{ "state",							do_state,						0,						POS_DEAD,			GM_LOW_WIZARD	},
-
-#ifdef ENABLE_CONQUEROR_LEVEL
-	{ "clevel",							do_clevel,						0,						POS_DEAD,			GM_LOW_WIZARD 	},
-
-	{ "ccon+",							do_conqueror_plus_amount,		POINT_SUNGMA_HP,		POS_DEAD,			GM_LOW_WIZARD	},
-	{ "cimu+",							do_conqueror_plus_amount,		POINT_SUNGMA_IMMUNE,	POS_DEAD,			GM_LOW_WIZARD	},
-	{ "cstr+",							do_conqueror_plus_amount,		POINT_SUNGMA_STR,		POS_DEAD,			GM_LOW_WIZARD	},
-	{ "cmov+",							do_conqueror_plus_amount,		POINT_SUNGMA_MOVE,		POS_DEAD,			GM_LOW_WIZARD	},
-
-	{ "tccon",							do_set_conqueror,				POINT_SUNGMA_HP,		POS_DEAD,			GM_LOW_WIZARD	},
-	{ "timu",							do_set_conqueror,				POINT_SUNGMA_IMMUNE,	POS_DEAD,			GM_LOW_WIZARD	},
-	{ "tcstr",							do_set_conqueror,				POINT_SUNGMA_STR,		POS_DEAD,			GM_LOW_WIZARD	},
-	{ "tcmov",							do_set_conqueror,				POINT_SUNGMA_MOVE,		POS_DEAD,			GM_LOW_WIZARD	},
-
-	{ "sungma_state",					do_state_sungma,				 0, 					POS_DEAD, 			GM_LOW_WIZARD 	},
-	{ "conqueror_stat",					do_conqueror_stat,				0,						POS_DEAD,			GM_PLAYER	},
-#endif
 
 	{ "stun",							do_stun,						0,						POS_DEAD,			GM_LOW_WIZARD	},
 	{ "slow",							do_slow,						0,						POS_DEAD,			GM_LOW_WIZARD	},
@@ -748,6 +629,16 @@ struct command_info cmd_info[] =
 	{ "restart_now",					do_restart_now,					0,						POS_DEAD,			GM_PLAYER,		},
 #endif
 
+#ifdef ENABLE_MINIGAME_OKEY_CARDS_SYSTEM
+	{ "cards",							do_cards,						0,						POS_DEAD,			GM_PLAYER		},
+#endif
+
+#ifdef ENABLE_RENEWAL_BATTLE_PASS
+	{ "battlepass_get_info",			do_battlepass_get_info,			0,						POS_DEAD,			GM_IMPLEMENTOR	},
+	{ "battlepass_set_mission",			do_battlepass_set_mission,		0,						POS_DEAD,			GM_IMPLEMENTOR	},
+	{ "battlepass_premium_activate",	do_battlepass_premium_activate,	0,						POS_DEAD,			GM_PLAYER		},
+#endif
+
 #ifdef ENABLE_ANTI_EXP
 	{ "anti_exp",						do_anti_exp,					0,						POS_DEAD,			GM_PLAYER		},
 #endif
@@ -773,8 +664,12 @@ struct command_info cmd_info[] =
 	{ "renewal_skill_select",			do_renewal_skill_select,		0,						POS_DEAD,			GM_PLAYER		},
 #endif
 
-#ifdef ENABLE_ITEMSHOP
+#ifdef ENABLE_RENEWAL_INGAME_ITEMSHOP
 	{ "ishop",							do_ishop,						0,						POS_DEAD,			GM_PLAYER		},
+#endif
+
+#ifdef ENABLE_FISH_GAME
+	{ "fish_game",						do_fish_game,					0,						POS_DEAD,			GM_PLAYER		},
 #endif
 
 #ifdef ENABLE_GROWTH_PET_SYSTEM
@@ -791,13 +686,8 @@ struct command_info cmd_info[] =
 	{ "open_warping_window",			do_open_warping_window,			0,						POS_DEAD,			GM_PLAYER		},
 #endif
 
-#ifdef ENABLE_TRACK_WINDOW
+#ifdef ENABLE_DUNGEON_TRACKING_SYSTEM
 	{ "track_window",					do_track_window,				0,						POS_DEAD,			GM_PLAYER		},
-#endif
-
-#ifdef ENABLE_ZODIAC_MISSION
-	{ "cz_reward", 						do_cz_reward, 					0, 						POS_DEAD, 			GM_PLAYER		},
-	{ "cz_check_box", 					do_cz_check_box, 				0, 						POS_DEAD, 			GM_PLAYER		},
 #endif
 
 #ifdef ENABLE_BOT_PLAYER
@@ -829,114 +719,8 @@ struct command_info cmd_info[] =
 	{ "autosell_remove_all",		do_autosell_remove_all,				0,						POS_DEAD,			GM_PLAYER 			},
 	{ "autosell_info",				do_autosell_info,					0,						POS_DEAD,			GM_PLAYER			},
 #endif
-
 #ifdef ENABLE_PLAYERS_ONLINE
 	{ "players_online",				do_players_online,					0,						POS_DEAD,			GM_PLAYER			},
-#endif
-
-#ifdef ENABLE_NPC_LOCATION_TRACE
-	{ "find_npc",					do_find_npc,						0,						POS_DEAD,			GM_IMPLEMENTOR		},
-	{ "find_near_npc",				do_find_near_npc,					0,						POS_DEAD,			GM_IMPLEMENTOR		},
-#endif
-
-#ifdef ENABLE_BIOLOGIST_SYSTEM
-	{ "biyolo",						do_inputall,						0,						POS_DEAD,			GM_PLAYER			},
-	{ "biyolog",					do_biyolog,							0,						POS_DEAD,			GM_PLAYER			},
-#endif
-#ifdef ENABLE_DUNGEON_INFO
-	{"reset_time_dr", 				do_reset_time_dungeon, 				0, 						POS_DEAD, 			GM_IMPLEMENTOR 		},
-#endif
-
-#ifdef __DUNGEON_INFO__
-	{ "dungeon_info",				do_dungeon_info,					0,						POS_DEAD,			GM_PLAYER 			},
-#endif
-
-#ifdef __LEADERSHIP__BONUS__
-	{ "leadership_bonus",			do_leadership_bonus,				0,						POS_DEAD,			GM_PLAYER			},
-#endif
-
-#ifdef ENABLE_AFFECT_BUFF_REMOVE
-	{	"remove_buff",				do_remove_buff,						0,						POS_DEAD,			GM_PLAYER			},
-#endif
-
-#ifdef ENABLE_PASSIVE_SYSTEM
-	{ "passive_relic",				do_passive_relic,					0,						POS_DEAD,			GM_PLAYER			},
-#endif
-
-#ifdef ENABLE_TITLE_SYSTEM
-	{ "title",						do_title,							0,						POS_DEAD,			GM_PLAYER			},
-#endif
-
-#ifdef ENABLE_REMOTE_SHOP_SYSTEM
-	{"open_range_npc", 				do_open_range_npc, 					0, 						POS_DEAD, 			GM_PLAYER			},
-#endif
-
-#ifdef __SYSTEM_SEARCH_ITEM_MOB__
-	{ "cauta_drop", 				search_drop,						0,						POS_DEAD,			GM_PLAYER			},
-#endif
-
-#ifdef ENABLE_COLLECT_WINDOW
-	{ "choose_quest",				do_choose_quest,					0,						POS_DEAD,			GM_PLAYER 			},
-	{ "collect_window",				do_open_collect_window,				0,						POS_DEAD,			GM_PLAYER 			},
-#endif
-
-#ifdef __ENABLE_COLLECTIONS_SYSTEM__
-	{ "do_add_collect_item", 		do_add_collect_item, 				0, 						POS_DEAD, 			GM_PLAYER 			},
-#endif
-
-#ifdef ENABLE_EVENT_BANNER_FLAG
-	{ "banner", 					do_banner, 							0, 						POS_DEAD, 			GM_IMPLEMENTOR 		},
-#endif
-
-#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
-	{ "xmas_soul",					do_xmas,							SCMD_XMAS_SOUL,			POS_DEAD,			GM_HIGH_WIZARD		},
-#endif
-
-#ifdef ENABLE_ATTENDANCE_EVENT
-	{ "attendance",					do_attendance,						0,						POS_DEAD,			GM_IMPLEMENTOR		},
-	{ "easter_event",				do_easter_event,					0,						POS_DEAD,			GM_IMPLEMENTOR		},
-#endif
-
-#ifdef ENABLE_MINI_GAME_CATCH_KING
-	{ "catch_king_event",			do_catch_king_event,				0,						POS_DEAD,			GM_IMPLEMENTOR		},
-#endif
-
-#ifdef ENABLE_MINIGAME_RUMI_EVENT
-	{ "cards",						do_cards,							0,						POS_DEAD,			GM_PLAYER			},
-#endif
-
-#ifdef ENABLE_HALLOWEEN_EVENT_SYSTEM
-	{ "increase_haloun", 			do_increase_halloween, 				0, 						POS_DEAD, 			GM_PLAYER 			},
-	{ "take_reward_haloun", 		take_reward_halloween, 				0, 						POS_DEAD, 			GM_PLAYER 			},
-#endif
-
-#ifdef ENABLE_SOCCER_BALL_EVENT
-	{ "topverirmisin",				do_top_ver,							0,						POS_DEAD,			GM_PLAYER			},
-#endif
-
-#ifdef ENABLE_WORD_GAME_EVENT
-	{ "wordgamestart",				do_word_game,						0,						POS_DEAD,			GM_PLAYER			},
-#endif
-
-#ifdef ENABLE_GAYA_SHOP_SYSTEM
-	{ "gem",						do_gem,								0,						POS_DEAD,			GM_PLAYER			},
-#endif
-
-#ifdef ENABLE_GAYA_TICKET_SYSTEM
-	{ "use_gem_ticket", 			do_use_gem_ticket, 					0, 						POS_DEAD, 			GM_PLAYER			},
-#endif
-
-#ifdef ENABLE_BATTLE_PASS
-	{ "open_battlepass",			open_battlepass, 0, POS_DEAD, GM_PLAYER },
-	{ "final_reward_battlepass", final_reward_battlepass, 0, POS_DEAD, GM_PLAYER },
-	{ "battlepass_bitirici", battlepass_bitirici, 0, POS_DEAD, GM_PLAYER },
-	{ "open_battlepass_premium",			open_battlepass_premium, 0, POS_DEAD, GM_PLAYER },
-	{ "final_reward_battlepass_premium", final_reward_battlepass_premium, 0, POS_DEAD, GM_PLAYER },
-	{ "battlepass_bitirici_premium", battlepass_bitirici_premium, 0, POS_DEAD, GM_PLAYER },
-#endif
-
-#ifdef ENABLE_RANKING
-	{"ranking_subcategory", do_ranking_subcategory, 0, POS_DEAD, GM_PLAYER },
 #endif
 
 	{ "\n",								NULL,							0,						POS_DEAD,			GM_IMPLEMENTOR		}
@@ -1082,3 +866,4 @@ void interpret_command(LPCHARACTER ch, const char * argument, size_t len)
 		}
 	}
 }
+

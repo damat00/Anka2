@@ -2,7 +2,6 @@
 
 #include "../EffectLib/EffectManager.h"
 #include "FlyingObjectManager.h"
-#include "../EterBase/Utils.h"
 
 namespace NMotionEvent
 {
@@ -105,7 +104,6 @@ namespace NMotionEvent
 			{
 				isFollowing = FALSE;
 			}
-			StringPath(strEffectFileName); // @fixme026
 			dwEffectIndex = GetCaseCRC32(strEffectFileName.c_str(), strEffectFileName.length());
 			CEffectManager::Instance().RegisterEffect(strEffectFileName.c_str());
 
@@ -148,9 +146,10 @@ namespace NMotionEvent
 			{
 				isFishingEffect = FALSE;
 			}
-			StringPath(strEffectFileName); // @fixme026
 			dwEffectIndex = GetCaseCRC32(strEffectFileName.c_str(), strEffectFileName.length());
-			CEffectManager::Instance().RegisterEffect(strEffectFileName.c_str()); // @fixme026 outside debug mode
+#ifndef _DEBUG
+			CEffectManager::Instance().RegisterEffect(strEffectFileName.c_str());
+#endif
 
 			return true;
 		}
@@ -187,12 +186,12 @@ namespace NMotionEvent
 				return false;
 			if (!rTextFileLoader.GetTokenPosition("flyposition", &v3FlyPosition))
 				return false;
-
-			StringPath(strFlyFileName); //@fixme030
 			dwFlyIndex = GetCaseCRC32(strFlyFileName.c_str(), strFlyFileName.length());
 
+#ifndef _DEBUG
 			// Register Fly
 			CFlyingManager::Instance().RegisterFlyingData(strFlyFileName.c_str());
+#endif
 
 			return true;
 		}

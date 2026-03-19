@@ -34,7 +34,7 @@
 #endif
 
 #include <boost/config.hpp>
-#include <boost/predef/other/endian.h>
+#include <boost/detail/endian.hpp>
 #define BOOST_MINIMAL_INTEGER_COVER_OPERATORS
 #define BOOST_NO_IO_COVER_OPERATORS
 #include <boost/spirit/home/support/detail/endian/cover_operators.hpp>
@@ -381,13 +381,13 @@ namespace boost { namespace spirit
         typedef T value_type;
 #   ifndef BOOST_ENDIAN_NO_CTORS
         endian() BOOST_ENDIAN_DEFAULT_CONSTRUCT
-#     if BOOST_ENDIAN_BIG_BYTE
+#     ifdef BOOST_BIG_ENDIAN
         explicit endian(T val)    { detail::store_big_endian<T, n_bits/8>(m_value, val); }
 #     else
         explicit endian(T val)    { detail::store_little_endian<T, n_bits/8>(m_value, val); }
 #     endif
 #   endif
-#   if BOOST_ENDIAN_BIG_BYTE
+#   ifdef BOOST_BIG_ENDIAN
         endian & operator=(T val) { detail::store_big_endian<T, n_bits/8>(m_value, val); return *this; }
         operator T() const        { return detail::load_big_endian<T, n_bits/8>(m_value); }
 #   else
@@ -412,13 +412,13 @@ namespace boost { namespace spirit
         typedef T value_type;
 #   ifndef BOOST_ENDIAN_NO_CTORS
         endian() BOOST_ENDIAN_DEFAULT_CONSTRUCT
-#     if BOOST_ENDIAN_BIG_BYTE
+#     ifdef BOOST_BIG_ENDIAN
         endian(T val) : m_value(val) { }
 #     else
         explicit endian(T val)    { detail::store_big_endian<T, sizeof(T)>(&m_value, val); }
 #     endif
 #   endif
-#   if BOOST_ENDIAN_BIG_BYTE
+#   ifdef BOOST_BIG_ENDIAN
         endian & operator=(T val) { m_value = val; return *this; }
         operator T() const        { return m_value; }
 #   else
@@ -440,13 +440,13 @@ namespace boost { namespace spirit
         typedef T value_type;
 #   ifndef BOOST_ENDIAN_NO_CTORS
         endian() BOOST_ENDIAN_DEFAULT_CONSTRUCT
-#     if BOOST_ENDIAN_LITTLE_BYTE
+#     ifdef BOOST_LITTLE_ENDIAN
         endian(T val) : m_value(val) { }
 #     else
         explicit endian(T val)    { detail::store_little_endian<T, sizeof(T)>(&m_value, val); }
 #     endif
 #   endif
-#   if BOOST_ENDIAN_LITTLE_BYTE
+#   ifdef BOOST_LITTLE_ENDIAN
         endian & operator=(T val) { m_value = val; return *this; }
         operator T() const        { return m_value; }
     #else

@@ -32,11 +32,7 @@ void CLightManager::Initialize()
 	m_LightPool.FreeAll();
 }
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-void CLightManager::RegisterLight(ELightType /*LightType*/, TLightID * poutLightID, D3DLIGHT9 & LightData)
-#else
 void CLightManager::RegisterLight(ELightType /*LightType*/, TLightID * poutLightID, D3DLIGHT8 & LightData)
-#endif
 {
 	CLight * pLight = m_LightPool.Alloc();
 	TLightID ID = NewLightID();
@@ -210,11 +206,7 @@ void CLight::SetDeviceLight(BOOL bActive)
 	}
 }
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-void CLight::SetParameter(TLightID id, const D3DLIGHT9 & c_rLight)
-#else
 void CLight::SetParameter(TLightID id, const D3DLIGHT8 & c_rLight)
-#endif
 {
 	m_LightID	= id;
 	m_d3dLight	= c_rLight;

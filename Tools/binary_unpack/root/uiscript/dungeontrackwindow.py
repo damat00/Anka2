@@ -100,7 +100,7 @@ window = {
 						},
 					),
 				},
-				{"name" : "listbox", "type" : "listbox3", "x" : 20, "y" : 75, "width" : 405, "height" : 452,},
+				{"name" : "listbox", "type" : "listbox4", "x" : 20, "y" : 75, "width" : 405, "height" : 452,},
 			),
 		},
 	),

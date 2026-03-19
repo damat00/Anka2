@@ -18,9 +18,6 @@ if app.ENABLE_CHANGE_CHANNEL:
 	import serverInfo
 	import ServerStateChecker
 
-if app.ENABLE_ADVANCED_GAME_OPTIONS:
-	import uiAdvancedGameOptions
-
 class SystemDialog(ui.ScriptWindow):
 
 	def __init__(self):
@@ -94,10 +91,7 @@ class SystemDialog(ui.ScriptWindow):
 		self.Close()
 
 		if not self.gameOptionDlg:
-			if app.ENABLE_ADVANCED_GAME_OPTIONS:
-				self.gameOptionDlg = uiAdvancedGameOptions.AdvancedGameOptionsWindow()
-			else:
-				self.gameOptionDlg = uiGameOption.OptionDialog()
+			self.gameOptionDlg = uiGameOption.OptionDialog()
 
 		self.gameOptionDlg.Show()
 
@@ -111,17 +105,10 @@ class SystemDialog(ui.ScriptWindow):
 
 	def __ClickInGameShopButton(self):
 		self.Close()
-		print "rampage_up"
-
-		if app.ENABLE_ITEMSHOP:
-			net.SendChatPacket("/in_game_mall")
+		if app.ENABLE_RENEWAL_INGAME_ITEMSHOP:
+			self.interface.OpenItemShopWindow()
 		else:
-			# net.SendChatPacket("/in_game_mall")
-			# gift icon hide when click mall icon
-			self.wndGiftBox.Hide()
-			import event
-			constInfo.ITEMSHOP["questCMD"] = 'LOAD#'+str(constInfo.ITEMSHOP['tableUpdate'])
-			event.QuestButtonClick(int(constInfo.ITEMSHOP["qid"]))
+			net.SendChatPacket("/in_game_mall")
 
 	def Close(self):
 		self.Hide()

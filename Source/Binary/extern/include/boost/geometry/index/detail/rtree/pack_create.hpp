@@ -11,8 +11,6 @@
 #ifndef BOOST_GEOMETRY_INDEX_DETAIL_RTREE_PACK_CREATE_HPP
 #define BOOST_GEOMETRY_INDEX_DETAIL_RTREE_PACK_CREATE_HPP
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <boost/geometry/algorithms/expand.hpp>
 #include <boost/geometry/index/detail/algorithms/bounds.hpp>
 #include <boost/geometry/index/detail/algorithms/nth_element.hpp>
@@ -385,7 +383,7 @@ private:
     inline static
     subtree_elements_counts calculate_subtree_elements_counts(std::size_t elements_count, parameters_type const& parameters, size_type & leafs_level)
     {
-        boost::ignore_unused(parameters);
+        boost::ignore_unused_variable_warning(parameters);
 
         subtree_elements_counts res(1, 1);
         leafs_level = 0;

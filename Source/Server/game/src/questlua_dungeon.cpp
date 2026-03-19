@@ -13,10 +13,6 @@
 #include "config.h"
 #include "../../common/service.h"
 
-#ifdef ENABLE_DUNGEON_INFO
-	#include "dungeon_info.h"
-#endif
-
 #undef sys_err
 #define sys_err(fmt, args...) quest::CQuestManager::instance().QuestError(__FUNCTION__, __LINE__, fmt, ##args)
 
@@ -150,90 +146,6 @@ namespace quest
 		}
 		return 1;
 	}
-#ifdef ENABLE_SUNG_MAHI_TOWER
-	int dungeon_spawn_mob_dir_nomove(lua_State* L)
-	{
-		if (!lua_isnumber(L, 1) || !lua_isnumber(L, 2) || !lua_isnumber(L, 3) || !lua_isnumber(L, 4))
-		{
-			sys_err("invalid argument");
-			return 0;
-		}
-
-		CQuestManager& q = CQuestManager::instance();
-		LPDUNGEON pDungeon = q.GetCurrentDungeon();
-
-		DWORD vid = 0;
-
-		if (pDungeon)
-		{
-			DWORD dwVnum = (DWORD) lua_tonumber(L, 1);
-			long x = (long) lua_tonumber(L, 2);
-			long y = (long) lua_tonumber(L, 3);
-			BYTE dir = (int) lua_tonumber(L, 4);
-			
-			LPCHARACTER ch = pDungeon->SpawnMob(dwVnum, x, y, dir, true);
-			if (ch && !vid)
-				vid = ch->GetVID();
-		}
-		
-		lua_pushnumber(L, vid);
-		return 1;
-	}
-	
-	int dungeon_set_unique_master(lua_State* L)
-	{
-		if (!lua_isstring(L, 1))
-		{
-			lua_pushnumber(L, 0);
-			return 1;
-		}
-
-		CQuestManager& q = CQuestManager::instance();
-		LPDUNGEON pDungeon = q.GetCurrentDungeon();
-
-		if (pDungeon)
-		{
-			pDungeon->SetUniqueMaster(lua_tostring(L, 1));
-			return 1;
-		}
-
-		lua_pushnumber(L, 0);
-		return 1;
-	}
-	
-	int dungeon_clear_dungeon_flags(lua_State* L)
-	{
-		CQuestManager& q = CQuestManager::instance();
-		LPDUNGEON pDungeon = q.GetCurrentDungeon();
-
-		if (pDungeon)
-		{
-			pDungeon->ClearDungeonFlags();
-			return 1;
-		}
-
-		lua_pushnumber(L, 0);
-		return 1;
-	}
-	
-	int dungeon_set_dungeon_difficulty(lua_State* L)
-	{
-		if (!lua_isnumber(L, 1))
-		{
-			lua_pushnumber(L, 0);
-			return 1;
-		}
-		
-		CQuestManager& q = CQuestManager::instance();
-		LPDUNGEON pDungeon = q.GetCurrentDungeon();
-
-		if (pDungeon)
-			pDungeon->SetDungeonDifficulty((BYTE) lua_tonumber(L, 1));
-
-		lua_pushnumber(L, 0);
-		return 1;
-	}
-#endif
 
 	int dungeon_get_map_index(lua_State* L)
 	{
@@ -335,7 +247,7 @@ namespace quest
 			return 0;
 		}
 
-		if (!lua_isnumber(L, 3))
+		if (!lua_isnumber(L, 3)) 
 		{
 			sys_err("wrong X");
 			return 0;
@@ -395,11 +307,6 @@ namespace quest
 
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 
-#ifdef ENABLE_DUNGEON_INFO
-		if (CDungeonInfoExtern::instance().CheckTimeDungeonRoom(ch,pDungeon->GetMapIndex()) == true){
-			CDungeonInfoExtern::instance().SetTimeDungeonRoom(ch,pDungeon->GetMapIndex());
-		}
-#endif
 		ch->WarpSet((int) lua_tonumber(L, 2), (int)lua_tonumber(L, 3), pDungeon->GetMapIndex());
 		return 0;
 	}
@@ -693,10 +600,7 @@ namespace quest
 		int x1, y1, x2, y2;
 		LPCHARACTER ExceptChar;
 
-		FPurgeArea(int a, int b, int c, int d, LPCHARACTER p)
-			: x1(a), y1(b), x2(c), y2(d),
-			ExceptChar(p)
-		{}
+		FPurgeArea(int a, int b, int c, int d, LPCHARACTER p): x1(a), y1(b), x2(c), y2(d), ExceptChar(p) {}
 
 		void operator () (LPENTITY ent)
 		{
@@ -1133,10 +1037,10 @@ namespace quest
 				{
 					struct ::packet_script packet_script;
 					TEMP_BUFFER buf;
-
-					for (CDungeon::ItemGroup::const_iterator it = item_group->begin(); it != item_group->end(); ++it)	//@fixme541
+					
+					for (CDungeon::ItemGroup::const_iterator it = item_group->begin(); it != item_group->end(); it++)
 					{
-						if (ch->CountSpecifyItem(it->first) >= it->second)
+						if(ch->CountSpecifyItem(it->first) >= it->second)
 						{
 							packet_script.header = HEADER_GC_SCRIPT;
 							packet_script.skin = quest::CQuestManager::QUEST_SKIN_NORMAL;
@@ -1525,26 +1429,34 @@ namespace quest
 		return 0;
 	}
 
-#ifdef ENABLE_NEW_DUNGEON_LIB
-	int dungeon_mission_notice(lua_State* L)
+#ifdef ENABLE_RENEWAL_BATTLE_PASS
+	int dungeon_battlepass_update_progress(lua_State* L)
 	{
-		if (!lua_isstring(L, 1))
+		CQuestManager & q = CQuestManager::instance();
+
+		FDungeonUpdateAllBattlepassProcess f;
+
+		if (!lua_isnumber(L, 1))
+		{
+			sys_err("arg1 must be number (dungeon_index)");
 			return 0;
-		CQuestManager& q = CQuestManager::instance();
-		LPDUNGEON pDungeon = q.GetCurrentDungeon();
-		if(!pDungeon || pDungeon == NULL)
-			return 0;
-		if (pDungeon){
-			pDungeon->MissionNotice(lua_isnumber(L, 1)?(int)lua_tonumber(L, 1):pDungeon->GetMapIndex(),lua_tostring(L, 2));
 		}
+
+		f.dungeon_index = (int)lua_tonumber(L, 1);
+
+		LPDUNGEON pDungeon = q.GetCurrentDungeon();
+
+		if (pDungeon)
+			pDungeon->ForEachMember(f);
 		return 0;
 	}
+#endif
+
+#ifdef ENABLE_NEW_DUNGEON_LIB
 	struct FGlobalWarpAllToBase
 	{
 		int GetX,GetY;
-		FGlobalWarpAllToBase(int x,int y)
-		: GetX(x),GetY(y)
-		{}
+		FGlobalWarpAllToBase(int x, int y) : GetX(x), GetY(y) {}
 		void operator()(LPENTITY ent)
 		{
 			if (ent->IsType(ENTITY_CHARACTER))
@@ -1563,11 +1475,7 @@ namespace quest
 		int x;
 		int y;
 		int MapIndex;
-
-		global_warp_all_to_base_event_info() : x(0), y(0), MapIndex(0)
-		{
-			
-		}
+		global_warp_all_to_base_event_info() : x(0), y(0), MapIndex(0) {}
 	};
 
 	EVENTFUNC(global_warp_all_to_base_event)
@@ -1585,28 +1493,20 @@ namespace quest
 			FGlobalWarpAllToBase func(info->x, info->y);
 			pSecMap->for_each(func);
 		}
-
 		return 0;
 	}
 
 	int dungeon_global_warp_all_to_base(lua_State* L)
 	{
-		if (!lua_isnumber(L, 1) || !lua_isnumber(L, 2)|| !lua_isnumber(L, 3)|| !lua_isnumber(L, 4))
-		{
-			sys_err("not enough arguments or invalid arguments given.");
-			return 0;
-		}
-
-		int x 			= static_cast<int>(lua_tonumber(L, 1));
-		int y			= static_cast<int>(lua_tonumber(L, 2));
-		int MapIndex	= static_cast<int>(lua_tonumber(L, 3));
-		long sec		= static_cast<int>(lua_tonumber(L, 4));
+		int x = static_cast<int>(lua_tonumber(L, 1));
+		int y = static_cast<int>(lua_tonumber(L, 2));
+		int MapIndex = static_cast<int>(lua_tonumber(L, 3));
+		long sec = static_cast<int>(lua_tonumber(L, 4));
 
 		global_warp_all_to_base_event_info* info = AllocEventInfo<global_warp_all_to_base_event_info>();
 		info->x = x;
 		info->y = y;
 		info->MapIndex = MapIndex;
-
 		event_create(global_warp_all_to_base_event, info, PASSES_PER_SEC(sec));
 		return 0;
 	}
@@ -1645,9 +1545,7 @@ namespace quest
 	struct FRemove_All
 	{
 		int item;
-		FRemove_All(int needitem)
-			: item(needitem)
-		{}
+		FRemove_All(int needitem) : item(needitem) {}
 		void operator () (LPENTITY ent)
 		{
 			if (ent->IsType(ENTITY_CHARACTER))
@@ -1760,7 +1658,7 @@ namespace quest
 	}
 #endif
 
-#ifdef ENABLE_DEFENSAWE_SHIP
+#ifdef ENABLE_SHIP_DEFENCE_DUNGEON
 	EVENTINFO(spawn_monster_get_hp_event_info)
 	{
 		int vid;
@@ -1771,9 +1669,8 @@ namespace quest
 	struct FGetMonsterHP
 	{
 		int GetVid,GetY;
-		FGetMonsterHP(int vid)
-		: GetVid(vid)
-		{}
+		FGetMonsterHP(int vid) : GetVid(vid) {}
+
 		void operator()(LPENTITY ent)
 		{
 			if (ent->IsType(ENTITY_CHARACTER))
@@ -1812,18 +1709,12 @@ namespace quest
 				warpinfo->x = 1108200;
 				warpinfo->y = 1782400;
 				warpinfo->MapIndex = info->MapIndex;
-
 				event_create(global_warp_all_to_base_event, warpinfo, PASSES_PER_SEC(15));
-
 				SendNoticeMap("15 Saniye sonra baseye gonderiliceksiniz.", info->MapIndex, false);
-
 				sys_log(0,"%d MapIndex defensawe ship unsuccess",info->MapIndex);
 
-				if (pDungeon != NULL)
-				{
-					pDungeon->SetFlag("Complete", 1);
-				}
-
+				if(pDungeon != NULL)
+					pDungeon->SetFlag("Complete",1);
 				return 0;
 			}
 			else
@@ -1902,11 +1793,12 @@ namespace quest
 	}
 #endif
 
-#ifdef ENABLE_TRACK_WINDOW
+#ifdef ENABLE_DUNGEON_TRACKING_SYSTEM
 	struct FUpdateTrackWindow
 	{
 		WORD bossVnum;
 		FUpdateTrackWindow(WORD __bossVnum) : bossVnum(__bossVnum) {}
+
 		void operator () (LPENTITY ent)
 		{
 			if (true == ent->IsType(ENTITY_CHARACTER))
@@ -1920,14 +1812,17 @@ namespace quest
 			}
 		}
 	};
+
 	int dungeon_track_update(lua_State* L)
 	{
 		if (!lua_isnumber(L, 1) || !lua_isnumber(L, 2))
 			return 0;
+
 		CQuestManager& q = CQuestManager::instance();
 		LPDUNGEON pDungeon = q.GetCurrentDungeon();
 		if (!pDungeon)
 			return 0;
+
 		LPSECTREE_MAP pSectree = SECTREE_MANAGER::instance().GetMap((DWORD)lua_tonumber(L, 1));
 		if (NULL != pSectree)
 		{
@@ -1938,111 +1833,9 @@ namespace quest
 	}
 #endif
 
-#ifdef __DUNGEON_INFO__
-	struct FDungeonInfoUpdate
+	void RegisterDungeonFunctionTable() 
 	{
-		void operator () (LPENTITY ent)
-		{
-			if (true == ent->IsType(ENTITY_CHARACTER))
-			{
-				LPCHARACTER pChar = static_cast<LPCHARACTER>(ent);
-				if (pChar->IsPC())
-					pChar->SendDungeonCooldown(0);
-			}
-		}
-	};
-	int dungeon_update_info(lua_State* L)
-	{
-		CQuestManager& q = CQuestManager::instance();
-		LPDUNGEON pDungeon = q.GetCurrentDungeon();
-		if (!pDungeon)
-			return 0;
-		LPSECTREE_MAP pSectree = SECTREE_MANAGER::instance().GetMap(pDungeon->GetMapIndex());
-		if (NULL != pSectree)
-		{
-			FDungeonInfoUpdate func;
-			pSectree->for_each(func);
-		}
-		return 0;
-	}
-	struct FDungeonInfoFlagCompleted
-	{
-		std::string flag;
-		int value;
-		FDungeonInfoFlagCompleted(const char* szFlag, int _value) : flag(szFlag), value(_value){}
-		void operator () (LPENTITY ent)
-		{
-			if (true == ent->IsType(ENTITY_CHARACTER))
-			{
-				LPCHARACTER pChar = static_cast<LPCHARACTER>(ent);
-				if (pChar->IsPC())
-					pChar->SetQuestFlag(flag.c_str(), pChar->GetQuestFlag(flag.c_str()) + value);
-			}
-		}
-	};
-	int dungeon_increase_completed(lua_State* L)
-	{
-		CQuestManager& q = CQuestManager::instance();
-		LPDUNGEON pDungeon = q.GetCurrentDungeon();
-		if (!pDungeon)
-			return 0;
-
-		if (!lua_isnumber(L, 1))
-			return 0;
-
-		char buf[124];
-		snprintf(buf, sizeof(buf), "dungeon.%u_completed", (int)lua_tonumber(L, 1));
-		LPSECTREE_MAP pSectree = SECTREE_MANAGER::instance().GetMap(pDungeon->GetMapIndex());
-		if (NULL != pSectree)
-		{
-			FDungeonInfoFlagCompleted func(buf, 1);
-			pSectree->for_each(func);
-		}
-		return 0;
-	}
-	struct FDungeonInfoFlagFastest
-	{
-		std::string flag;
-		int value;
-		FDungeonInfoFlagFastest(const char* szFlag, int _value) : flag(szFlag), value(_value) {}
-		void operator () (LPENTITY ent)
-		{
-			if (true == ent->IsType(ENTITY_CHARACTER))
-			{
-				LPCHARACTER pChar = static_cast<LPCHARACTER>(ent);
-				if (pChar->IsPC())
-				{
-					const int lastTime = pChar->GetQuestFlag(flag.c_str());
-					if (lastTime != 0 && lastTime < value)
-						return;
-					pChar->SetQuestFlag(flag.c_str(), value);
-				}
-			}
-		}
-	};
-	int dungeon_set_fastest(lua_State* L)
-	{
-		CQuestManager& q = CQuestManager::instance();
-		LPDUNGEON pDungeon = q.GetCurrentDungeon();
-		if (!pDungeon)
-			return 0;
-		if (!lua_isnumber(L, 1) || !lua_isnumber(L, 2))
-			return 0;
-		char buf[124];
-		snprintf(buf, sizeof(buf), "dungeon.%u_fastest", (int)lua_tonumber(L, 1));
-		LPSECTREE_MAP pSectree = SECTREE_MANAGER::instance().GetMap(pDungeon->GetMapIndex());
-		if (NULL != pSectree)
-		{
-			FDungeonInfoFlagFastest func(buf, (int)lua_tonumber(L, 2));
-			pSectree->for_each(func);
-		}
-		return 0;
-	}
-#endif
-
-	void RegisterDungeonFunctionTable()
-	{
-		luaL_reg dungeon_functions[] =
+		luaL_reg dungeon_functions[] = 
 		{
 			{ "join",									dungeon_join								},
 			{ "exit",									dungeon_exit								},
@@ -2055,12 +1848,6 @@ namespace quest
 			{ "kill_all",								dungeon_kill_all							},
 			{ "spawn",									dungeon_spawn								},
 			{ "spawn_mob",								dungeon_spawn_mob							},
-#ifdef ENABLE_SUNG_MAHI_TOWER
-			{ "spawn_mob_dir_nomove",					dungeon_spawn_mob_dir_nomove				},
-			{ "set_unique_master",						dungeon_set_unique_master					},
-			{ "clear_dungeon_flags",					dungeon_clear_dungeon_flags					},
-			{ "set_dungeon_difficulty",					dungeon_set_dungeon_difficulty				},
-#endif
 			{ "spawn_mob_dir",							dungeon_spawn_mob_dir						},
 			{ "spawn_mob_ac_dir",						dungeon_spawn_mob_ac_dir					},
 			{ "spawn_name_mob",							dungeon_spawn_name_mob						},
@@ -2110,8 +1897,12 @@ namespace quest
 			{ "all_near_to",							dungeon_all_near_to							},
 			{ "set_warp_location",						dungeon_set_warp_location					},
 			{ "setqf2",									dungeon_set_quest_flag2						},
+
+#ifdef ENABLE_RENEWAL_BATTLE_PASS
+			{ "battlepass_update_progress",				dungeon_battlepass_update_progress			},
+#endif
+
 #ifdef ENABLE_NEW_DUNGEON_LIB
-			{ "mission_notice", 						dungeon_mission_notice						},
 			{ "new_kill_all",							dungeon_new_kill_all						},
 			{ "command",								dungeon_command								},
 			{ "global_warp_all_to_base",				dungeon_global_warp_all_to_base				},
@@ -2119,18 +1910,14 @@ namespace quest
 			{ "kill_area",								dungeon_kill_area							},
 #endif
 
-#ifdef ENABLE_DEFENSAWE_SHIP
+#ifdef ENABLE_SHIP_DEFENCE_DUNGEON
 			{ "spawn_mob_new",							dungeon_spawn_mob_new						},
 #endif
 
-#ifdef ENABLE_TRACK_WINDOW
+#ifdef ENABLE_DUNGEON_TRACKING_SYSTEM
 			{ "track_update",							dungeon_track_update						},
 #endif
-#ifdef __DUNGEON_INFO__
-			{ "update_info",							dungeon_update_info							},
-			{ "increase_completed",						dungeon_increase_completed					},
-			{ "set_fastest",							dungeon_set_fastest							},
-#endif
+
 			{ NULL,										NULL										}
 		};
 

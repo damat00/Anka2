@@ -3,6 +3,8 @@
 
 #include "packet_info.h"
 
+#include "../../common/service.h"
+
 enum
 {
 	INPROC_CLOSE,
@@ -127,9 +129,6 @@ class CInputMain : public CInputProcessor
 		void QuickslotDelete(LPCHARACTER ch, const char * data);
 		void QuickslotSwap(LPCHARACTER ch, const char * data);
 		int Shop(LPCHARACTER ch, const char * data, size_t uiBytes);
-#ifdef ENABLE_FISH_EVENT
-		int FishEvent(LPCHARACTER ch, const char * data, size_t uiBytes);
-#endif
 		void OnClick(LPCHARACTER ch, const char * data);
 		void Exchange(LPCHARACTER ch, const char * data);
 		void Position(LPCHARACTER ch, const char * data);
@@ -150,7 +149,10 @@ class CInputMain : public CInputProcessor
 
 		void QuestInputString(LPCHARACTER ch, const void * pvData);
 		void QuestConfirm(LPCHARACTER ch, const void* pvData);
-
+#ifdef ENABLE_EVENT_MANAGER
+		void RequestEventQuest(LPCHARACTER ch, const void* pvData);
+		void RequestEventData(LPCHARACTER ch, const char* c_pData);
+#endif
 		void Target(LPCHARACTER ch, const char * pcData);
 		void Warp(LPCHARACTER ch, const char * pcData);
 		void SafeboxCheckin(LPCHARACTER ch, const char * c_pData);
@@ -166,7 +168,6 @@ class CInputMain : public CInputProcessor
 		void PartyParameter(LPCHARACTER ch, const char * c_pData);
 
 		int Guild(LPCHARACTER ch, const char * data, size_t uiBytes);
-		void AnswerMakeGuild(LPCHARACTER ch, const char* c_pData);
 
 		void Fishing(LPCHARACTER ch, const char* c_pData);
 		void ItemGive(LPCHARACTER ch, const char* c_pData);
@@ -174,9 +175,7 @@ class CInputMain : public CInputProcessor
 		int MyShop(LPCHARACTER ch, const char * c_pData, size_t uiBytes);
 
 		void Refine(LPCHARACTER ch, const char* c_pData);
-#ifdef ENABLE_RESP_SYSTEM
-		int Resp(LPCHARACTER ch, const char* c_pData, size_t uiBytes);
-#endif
+
 #ifdef ENABLE_STYLE_ATTRIBUTE_SYSTEM
 		void		ItemNewAttributes(LPCHARACTER ch, const char* pcData);
 #endif
@@ -205,12 +204,21 @@ class CInputMain : public CInputProcessor
 		void Acce(LPCHARACTER pkChar, const char* c_pData);
 #endif
 
+#ifdef ENABLE_BIOLOG_SYSTEM
+		int BiologManager(LPCHARACTER ch, const char* c_pData, size_t uiBytes);
+#endif
+
 #ifdef ENABLE_MOB_DROP_INFO
 		void TargetInfoLoad(LPCHARACTER ch, const char* c_pData);
 #endif
 
 #ifdef ENABLE_VIEW_CHEST_DROP
 		void ChestDropInfo(LPCHARACTER ch, const char * c_pData);
+#endif
+
+#ifdef ENABLE_RENEWAL_BATTLE_PASS
+		int ReciveExtBattlePassActions(LPCHARACTER ch, const char* data, size_t uiBytes);
+		int ReciveExtBattlePassPremiumItem(LPCHARACTER ch, const char* data, size_t uiBytes);
 #endif
 
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
@@ -258,15 +266,7 @@ class CInputMain : public CInputProcessor
 #endif
 
 #ifdef ENABLE_RIDING_EXTENDED
-		void MountUpGrade(LPCHARACTER ch, const char* c_pData);
-#endif
-
-#ifdef ENABLE_DUNGEON_INFO
-		void DungeonInfoSend(LPCHARACTER ch, const char * data);
-#endif
-
-#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
-		void SoulRoulette(LPCHARACTER ch, const char* data);
+	void MountUpGrade(LPCHARACTER ch, const char* c_pData);
 #endif
 };
 
@@ -383,11 +383,19 @@ class CInputDB : public CInputProcessor
 		void SkillColorLoad(LPDESC d, const char* c_pData);
 #endif
 
+#ifdef ENABLE_EVENT_MANAGER
+		void EventNotification(const char* c_pData);
+#endif
+
+#ifdef ENABLE_RENEWAL_BATTLE_PASS
+		void ExtBattlePassLoad(LPDESC d, const char* c_pData);
+#endif
+
 #ifdef ENABLE_OFFLINE_MESSAGE
 		void ReadOfflineMessages(LPDESC desc, const char* pcData);
 #endif
 
-#ifdef ENABLE_ITEMSHOP
+#ifdef ENABLE_RENEWAL_INGAME_ITEMSHOP
 		void ItemShop(LPDESC d, const char* c_pData);
 #endif
 
@@ -456,12 +464,13 @@ class CInputP2P : public CInputProcessor
 		void LoginPing(LPDESC d, const char * c_pData);
 		void BlockChat(const char * c_pData);
 		void IamAwake(LPDESC d, const char * c_pData);
-#ifdef ENABLE_EVENT_SYSTEM
-		void EventTime(const char* c_pData);
-#endif
 
 #ifdef ENABLE_RENEWAL_SWITCHBOT
 		void Switchbot(LPDESC d, const char* c_pData);
+#endif
+
+#ifdef ENABLE_EVENT_MANAGER
+		void Event(const char* c_pData);
 #endif
 
 #ifdef ENABLE_CROSS_CHANNEL_REQUESTS
@@ -472,12 +481,8 @@ class CInputP2P : public CInputProcessor
 		void MultiFarm(const char* c_pData);
 #endif
 
-#ifdef ENABLE_ULTIMATE_REGEN
+#ifdef ENABLE_RENEWAL_REGEN
 		void NewRegen(const char* c_pData);
-#endif
-
-#ifdef ENABLE_STONE_EVENT_SYSTEM
-		void StoneEvent(LPDESC d, const char * c_pData);
 #endif
 
 	protected:

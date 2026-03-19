@@ -24,10 +24,12 @@ namespace boost { namespace fusion
         struct value_at_key_impl<map_tag>
         {
             template <typename Sequence, typename Key>
-            struct apply : BOOST_FUSION_DECLTYPE_N3031((
+            struct apply
+            {
+                typedef typename BOOST_FUSION_IDENTIFIED_TYPE((
                     boost::declval<Sequence>().get_val(mpl::identity<Key>())
-                ))
-            {};
+                )) type;
+            };
         };
     }
 }}

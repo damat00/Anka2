@@ -20,18 +20,15 @@
 #include "regen.h"
 #include "cmd.h"
 #include "guild.h"
-#include "guild_manager.h"
+#include "guild_manager.h" 
 #include "sectree_manager.h"
 #include "../../common/service.h"
-#ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
-#include "desc.h"
+#ifdef ENABLE_EVENT_MANAGER
+	#include "event_manager.h"
 #endif
+
 #undef sys_err
 #define sys_err(fmt, args...) quest::CQuestManager::instance().QuestError(__FUNCTION__, __LINE__, fmt, ##args)
-
-#ifdef ENABLE_NEWSTUFF
-#include "db.h"
-#endif
 
 extern ACMD(do_block_chat);
 
@@ -41,8 +38,7 @@ namespace quest
 	{
 #ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
-		BYTE bLocale = (ch ? ch->GetDesc()->GetLanguage() : LOCALE_DEFAULT);
-		lua_pushstring(L, LC_LOCALE(bLocale));
+		lua_pushstring(L, ch ? get_locale(ch->GetLanguage()) : get_locale(LOCALE_DEFAULT));
 #else
 		lua_pushstring(L, g_stLocale.c_str());
 #endif
@@ -106,22 +102,6 @@ namespace quest
 		return 0;
 	}
 
-	int _big_notice(lua_State* L)
-	{
-		ostringstream s;
-		combine_lua_string(L, s);
-		CQuestManager::Instance().GetCurrentCharacterPtr()->ChatPacket(CHAT_TYPE_BIG_NOTICE, "%s", s.str().c_str());
-		return 0;
-	}
-
-	int _big_map_notice(lua_State* L)
-	{
-		ostringstream s;
-		combine_lua_string(L, s);
-		CQuestManager::Instance().GetCurrentCharacterPtr()->ChatPacket(CHAT_TYPE_BIG_NOTICE, "%s", s.str().c_str());
-		return 0;
-	}
-
 	int _left_image(lua_State* L)
 	{
 		if (lua_isstring(L, -1))
@@ -142,7 +122,7 @@ namespace quest
 		return 0;
 	}
 
-	int _set_skin(lua_State* L) // Quest UI style
+	int _set_skin(lua_State* L)
 	{
 		if (lua_isnumber(L, -1))
 		{
@@ -211,12 +191,7 @@ namespace quest
 		CQuestManager & q = CQuestManager::instance();
 		const char * name = lua_tostring(L, 1);
 		DWORD arg = (DWORD) lua_tonumber(L, 2);
-
-		if (name && arg)
-			q.ClearServerTimer(name, arg);
-		else
-			sys_err("LUA PREVENT: Wrong argument on ClearServerTimer!");
-
+		q.ClearServerTimer(name, arg);
 		return 0;
 	}
 
@@ -343,14 +318,10 @@ namespace quest
 		if (lua_isstring(L, 2)) how = lua_tostring(L, 2);
 		if (lua_tostring(L, 3)) hint = lua_tostring(L, 3);
 
-		if (ch)
-			LogManager::instance().CharLog(ch, what, how, hint);
-		else
-			sys_err("LUA PREVENT: !ch on _char_log!");
-
+		LogManager::instance().CharLog(ch, what, how, hint);
 		return 0;
 	}
-
+	
 	int _item_log(lua_State* L)
 	{
 		CQuestManager& q = CQuestManager::instance();
@@ -423,7 +394,6 @@ namespace quest
 		return 0;
 	}
 
-	// LUA_ADD_BGM_INFO
 	int _set_bgm_volume_enable(lua_State* L)
 	{
 		CHARACTER_SetBGMVolumeEnable();
@@ -448,9 +418,7 @@ namespace quest
 
 		return 0;
 	}
-	// END_OF_LUA_ADD_BGM_INFO
 
-	// LUA_ADD_GOTO_INFO
 	int _add_goto_info(lua_State* L)
 	{
 		const char* name = lua_tostring(L, 1);
@@ -466,9 +434,7 @@ namespace quest
 		CHARACTER_AddGotoInfo(name, empire, mapIndex, x, y);
 		return 0;
 	}
-	// END_OF_LUA_ADD_GOTO_INFO
 
-	// REFINE_PICK
 	int _refine_pick(lua_State* L)
 	{
 		BYTE bCell = (BYTE) lua_tonumber(L,-1);
@@ -483,7 +449,6 @@ namespace quest
 		lua_pushnumber(L, ret);
 		return 1;
 	}
-	// END_OF_REFINE_PICK
 
 	int _fish_real_refine_rod(lua_State* L)
 	{
@@ -532,7 +497,7 @@ namespace quest
 		}
 
 		if (ch)
-			sys_log(0, "_give_empire_privileage(empire=%d, type=%d, value=%d, time=%d), by quest, %s",
+			sys_log(0, "_give_empire_privileage(empire=%d, type=%d, value=%d, time=%d), by quest, %s", 
 					empire, type, value, time, ch->GetName());
 		else
 			sys_log(0, "_give_empire_privileage(empire=%d, type=%d, value=%d, time=%d), by quest, NULL",
@@ -555,7 +520,7 @@ namespace quest
 			return 0;
 		}
 
-		sys_log(0, "_give_guild_privileage(empire=%d, type=%d, value=%d, time=%d)",
+		sys_log(0, "_give_guild_privileage(empire=%d, type=%d, value=%d, time=%d)", 
 				guild_id, type, value, time);
 
 		CPrivManager::instance().RequestGiveGuildPriv(guild_id,type,value,time);
@@ -578,7 +543,7 @@ namespace quest
 				if (found)
 					os << ", ";
 
-				os << c_apszPrivNames[type] << " : " <<
+				os << c_apszPrivNames[type] << " : " << 
 					pkPrivEmpireData->m_value << "%" << " (" <<
 					((pkPrivEmpireData->m_end_time_sec-get_global_time())/3600.0f) << " hours)" << endl;
 				found = true;
@@ -668,31 +633,25 @@ namespace quest
 
 	int _item_name(lua_State* L)
 	{
-		if (lua_isnumber(L, 1))
+		if (lua_isnumber(L,1))
 		{
-			DWORD dwVnum = (DWORD)lua_tonumber(L, 1);
+			DWORD dwVnum = (DWORD)lua_tonumber(L,1);
 			TItemTable* pTable = ITEM_MANAGER::instance().GetTable(dwVnum);
 
 			if (pTable)
-#ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
 			{
+#ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
 				LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
-				BYTE bLocale = (ch && ch->GetDesc() ? ch->GetDesc()->GetLanguage() : LOCALE_DEFAULT);
-				const char* szLocaleName = LC_LOCALE_ITEM_TEXT(dwVnum, bLocale);
-				if (szLocaleName && strcmp(szLocaleName, "NoName") != 0)
-					lua_pushstring(L, szLocaleName);
-				else
-					lua_pushstring(L, pTable->szLocaleName);
-			}
+				lua_pushstring(L, LC_LOCALE_ITEM(dwVnum, ch ? ch->GetLanguage() : LOCALE_DEFAULT));
 #else
 				lua_pushstring(L, pTable->szLocaleName);
 #endif
+			}
 			else
-				lua_pushstring(L, "");
+				lua_pushstring(L,"");
 		}
 		else
-			lua_pushstring(L, "");
-
+			lua_pushstring(L,"");
 		return 1;
 	}
 
@@ -704,24 +663,19 @@ namespace quest
 			const CMob * pkMob = CMobManager::instance().Get(dwVnum);
 
 			if (pkMob)
-#ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
 			{
+#ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
 				LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
-				BYTE bLocale = (ch && ch->GetDesc() ? ch->GetDesc()->GetLanguage() : LOCALE_DEFAULT);
-				const char* szLocaleName = LC_LOCALE_MOB_TEXT(dwVnum, bLocale);
-				if (szLocaleName && strcmp(szLocaleName, "NoName") != 0)
-					lua_pushstring(L, szLocaleName);
-				else
-					lua_pushstring(L, pkMob->m_table.szLocaleName);
-			}
+				lua_pushstring(L, LC_LOCALE_MOB(dwVnum, ch ? ch->GetLanguage() : LOCALE_DEFAULT));
 #else
 				lua_pushstring(L, pkMob->m_table.szLocaleName);
 #endif
+			}
 			else
 				lua_pushstring(L, "");
 		}
 		else
-			lua_pushstring(L, "");
+			lua_pushstring(L,"");
 
 		return 1;
 	}
@@ -742,6 +696,23 @@ namespace quest
 
 		return 1;
 	}
+
+#ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
+	int _skill_name(lua_State* L)
+	{
+		if (lua_isnumber(L, 1))
+		{
+			DWORD dwVnum = (DWORD)lua_tonumber(L, 1);
+
+			LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
+			lua_pushstring(L, LC_LOCALE_SKILL(dwVnum, ch ? ch->GetLanguage() : LOCALE_DEFAULT));
+		}
+		else
+			lua_pushstring(L, "");
+
+		return 1;
+	}
+#endif
 
 	int _get_global_time(lua_State* L)
 	{
@@ -927,47 +898,14 @@ namespace quest
 
 	int _notice_all( lua_State* L )
 	{
-#ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
-		// Eðer 1 parametre gönderilmiþse (sadece string), direkt broadcast et
-		if (lua_gettop(L) == 1 && lua_isstring(L, 1))
-		{
-			const char* szNotice = lua_tostring(L, 1);
-			if (szNotice && *szNotice)
-			{
-				BroadcastNotice(szNotice);
-			}
-		}
-		// Eðer 2 parametre gönderilmiþse (number ve string), locale ID ile broadcast et
-		else if (lua_gettop(L) == 2 && lua_isnumber(L, 1) && lua_isstring(L, 2))
-		{
-			BroadcastLocaleNotice(CHAT_TYPE_NOTICE, 0, 0, (DWORD)lua_tonumber(L, 1), lua_tostring(L, 2));
-		}
-		else
-		{
-			sys_err("QUEST notice_all: invalid arguments. Expected 1 string or 2 arguments (number, string)");
+		if (!lua_isnumber(L, 1))
 			return 0;
-		}
-#else
-		// Eðer 1 parametre gönderilmiþse (sadece string), locale ID olmadan direkt broadcast et
-		if (lua_gettop(L) == 1 && lua_isstring(L, 1))
-		{
-			const char* szNotice = lua_tostring(L, 1);
-			if (szNotice && *szNotice)
-			{
-				BroadcastNotice(szNotice);
-			}
-		}
-		// Eðer 2 parametre gönderilmiþse (number ve string), locale ID ile broadcast et
-		else if (lua_gettop(L) == 2 && lua_isnumber(L, 1) && lua_isstring(L, 2))
-		{
+
+		if (!lua_isstring(L, 2))
+			return 0;
+
 		BroadcastLocaleNotice(CHAT_TYPE_NOTICE, 0, 0, (DWORD)lua_tonumber(L, 1), lua_tostring(L, 2));
-		}
-		else
-		{
-			sys_err("QUEST notice_all: invalid arguments. Expected 1 string or 2 arguments (number, string)");
-			return 0;
-		}
-#endif
+
 		return 1;
 	}
 
@@ -1092,7 +1030,7 @@ namespace quest
 				LPCHARACTER ch = (LPCHARACTER) ent;
 
 				if (!ch->IsPC() && !ch->IsPet()
-#ifdef ENABLE_DEFENSAWE_SHIP
+#ifdef ENABLE_SHIP_DEFENCE_DUNGEON
 					&& !ch->IsHydraNPC()
 #endif
 					)
@@ -1101,7 +1039,7 @@ namespace quest
 		}
 	};
 
-	int _kill_all_in_map(lua_State* L)
+	int _kill_all_in_map ( lua_State * L )
 	{
 		LPSECTREE_MAP pSecMap = SECTREE_MANAGER::instance().GetMap( lua_tonumber(L,1) );
 
@@ -1113,39 +1051,6 @@ namespace quest
 
 		return 0;
 	}
-	
-#ifdef ENABLE_DEFENSAWE_SHIP
-	struct FClearSectree
-	{
-		void operator () (LPENTITY ent)
-		{
-			if (ent->IsType(ENTITY_CHARACTER))
-			{
-				LPCHARACTER ch = (LPCHARACTER) ent;
-				if (!ch->IsPC() && !ch->IsPet()
-#ifdef ENABLE_MOUNT_SYSTEM
-					&& !ch->IsMount()
-#endif
-#ifdef ENABLE_DEFENSAWE_SHIP
-					&& !ch->IsHydraNPC()
-#endif
-					)
-					M2_DESTROY_CHARACTER(ch);
-			}
-		}
-	};
-	
-	int _clear_all_in_map(lua_State* L)
-	{
-		LPSECTREE_MAP pSecMap = SECTREE_MANAGER::instance().GetMap(lua_tonumber(L,1));
-		if (NULL != pSecMap)
-		{
-			FClearSectree f;
-			pSecMap->for_each( f );
-		}
-		return 0;
-	}
-#endif
 
 	int _regen_in_map( lua_State * L )
 	{
@@ -1230,37 +1135,6 @@ namespace quest
 		return 1;
 	}
 
-#ifdef ENABLE_NEWSTUFF
-	int _spawn_mob0(lua_State* L)
-	{
-		if (!lua_isnumber(L, 1) || !lua_isnumber(L, 2) || !lua_isnumber(L, 3) || !lua_isnumber(L, 4))
-		{
-			lua_pushnumber(L, -1);
-			return 1;
-		}
-		const DWORD dwVnum = static_cast<DWORD>(lua_tonumber(L, 1));
-		const long lMapIndex = static_cast<long>(lua_tonumber(L, 2));
-		const DWORD dwX = static_cast<DWORD>(lua_tonumber(L, 3));
-		const DWORD dwY = static_cast<DWORD>(lua_tonumber(L, 4));
-
-		const CMob* pMonster = CMobManager::instance().Get(dwVnum);
-		if (!pMonster)
-		{
-			lua_pushnumber(L, -2);
-			return 1;
-		}
-		LPSECTREE_MAP pkSectreeMap = SECTREE_MANAGER::instance().GetMap(lMapIndex);
-		if (!pkSectreeMap)
-		{
-			lua_pushnumber(L, -3);
-			return 1;
-		}
-		const LPCHARACTER ch = CHARACTER_MANAGER::instance().SpawnMob(dwVnum, lMapIndex, pkSectreeMap->m_setting.iBaseX+dwX*100, pkSectreeMap->m_setting.iBaseY+dwY*100, 0, false, -1);
-		lua_pushnumber(L, (ch)?ch->GetVID():0);
-		return 1;
-	}
-#endif
-
 	int _spawn_mob(lua_State* L)
 	{
 		if( false == lua_isnumber(L, 1) || false == lua_isnumber(L, 2) || false == lua_isboolean(L, 3) )
@@ -1306,71 +1180,19 @@ namespace quest
 		return 1;
 	}
 
-#ifdef ENABLE_NEWSTUFF
-	int _spawn_mob_in_map(lua_State* L)
-	{
-		if( false == lua_isnumber(L, 1) || false == lua_isnumber(L, 2) || false == lua_isboolean(L, 3) || false == lua_isnumber(L, 4) || false == lua_isnumber(L, 5) || false == lua_isnumber(L, 6) )
-		{
-			lua_pushnumber(L, 0);
-			return 1;
-		}
-
-		const DWORD dwVnum = static_cast<DWORD>(lua_tonumber(L, 1));
-		const size_t count = MINMAX(1, static_cast<size_t>(lua_tonumber(L, 2)), 10);
-		const bool isAggressive = static_cast<bool>(lua_toboolean(L, 3));
-		const int iMapIndex = static_cast<int>(lua_tonumber(L, 4));
-		const int iMapX = static_cast<int>(lua_tonumber(L, 5));
-		const int iMapY = static_cast<int>(lua_tonumber(L, 6));
-		size_t SpawnCount = 0;
-		sys_log(0, "QUEST _spawn_mob_in_map: VNUM(%u) COUNT(%u) isAggressive(%b) MapIndex(%d) MapX(%d) MapY(%d)", dwVnum, count, isAggressive, iMapIndex, iMapX, iMapY);
-
-		PIXEL_POSITION pos;
-		if (!SECTREE_MANAGER::instance().GetMapBasePositionByMapIndex(iMapIndex, pos))
-		{
-			sys_err("QUEST _spawn_mob_in_map: cannot find base position in this map %d", iMapIndex);
-			lua_pushnumber(L, 0);
-			return 1;
-		}
-
-		const CMob* pMonster = CMobManager::instance().Get( dwVnum );
-
-		if( NULL != pMonster )
-		{
-			for( size_t i=0 ; i < count ; ++i )
-			{
-				const LPCHARACTER pSpawnMonster = CHARACTER_MANAGER::instance().SpawnMobRange(dwVnum,
-						iMapIndex,
-						pos.x - number(200, 750) + (iMapX * 100),
-						pos.y - number(200, 750) + (iMapY * 100),
-						pos.x + number(200, 750) + (iMapX * 100),
-						pos.y + number(200, 750) + (iMapY * 100),
-						true,
-						pMonster->m_table.bType == CHAR_TYPE_STONE,
-						isAggressive
-				);
-
-				if( NULL != pSpawnMonster )
-				{
-					++SpawnCount;
-				}
-			}
-
-			sys_log(0, "QUEST Spawn Monster: VNUM(%u) COUNT(%u) isAggressive(%b)", dwVnum, SpawnCount, isAggressive);
-		}
-
-		lua_pushnumber(L, SpawnCount);
-
-		return 1;
-	}
-#endif
-
 	int _notice_in_map( lua_State* L )
 	{
 		const LPCHARACTER pChar = CQuestManager::instance().GetCurrentCharacterPtr();
 
 		if (NULL != pChar)
 		{
-			SendNoticeMap( lua_tostring(L,1), pChar->GetMapIndex(), lua_toboolean(L,2) );
+			if (!lua_isnumber(L, 1))
+				return 0;
+
+			if (!lua_isstring(L, 2))
+				return 0;
+
+			SendLocaleNotice(CHAT_TYPE_NOTICE, 0, pChar->GetMapIndex(), (DWORD)lua_tonumber(L, 1), lua_tostring(L, 2));
 		}
 
 		return 0;
@@ -1401,7 +1223,7 @@ namespace quest
 
 				if (pChar == ExceptChar)
 					return;
-
+					
 				if (!pChar->IsPet() && (true == pChar->IsMonster() || true == pChar->IsStone()))
 				{
 					if (x1 <= pChar->GetX() && pChar->GetX() <= x2 && y1 <= pChar->GetY() && pChar->GetY() <= y2)
@@ -1512,263 +1334,91 @@ namespace quest
 		}
 	}
 
-	int _get_special_item_group( lua_State* L )
+#ifdef ENABLE_EVENT_MANAGER
+	int _start_event(lua_State* L)
 	{
-		if (!lua_isnumber (L, 1))
+		if (false == lua_isnumber(L, 1))
 		{
-			sys_err("invalid argument");
-			return 0;
+			lua_pushnumber(L, 0);
+			return 1;
 		}
 
-		const CSpecialItemGroup* pItemGroup = ITEM_MANAGER::instance().GetSpecialItemGroup((DWORD)lua_tonumber(L, 1));
+		int eventIdx = lua_tonumber(L, 1);
 
-		if (!pItemGroup)
+		DWORD dwVnum = 0;
+		int iPercent = 0;
+		int iDropType = 0;
+
+		if (lua_isnumber(L, 2))
+			dwVnum = lua_tonumber(L, 2);
+
+		if (lua_isnumber(L, 3))
+			iPercent = lua_tonumber(L, 3);
+
+		if (lua_isnumber(L, 4))
+			iDropType = lua_tonumber(L, 4);
+
+		TEventTable table;
+		memset(&table, 0, sizeof(table));
+
+		std::string eventName = CEventManager::Instance().GetEventString(eventIdx);
+		strlcpy(table.szType, eventName.c_str(), sizeof(table.szType));
+		table.dwVnum = dwVnum;
+		table.iPercent = iPercent;
+		table.iDropType = iDropType;
+
+		CEventManager::Instance().SetEventState(&table, true);
+
+		return 0;
+	}
+
+	int _end_event(lua_State* L)
+	{
+		if (false == lua_isnumber(L, 1))
 		{
-			//sys_err("cannot find special item group %d", (DWORD)lua_tonumber(L, 1));
-			return 0;
+			lua_pushnumber(L, 0);
+			return 1;
 		}
 
-		int count = pItemGroup->GetGroupSize();
+		int eventIdx = lua_tonumber(L, 1);
 
-		for (int i = 0; i < count; i++)
-		{
-			lua_pushnumber(L, (int)pItemGroup->GetVnum(i));
-			lua_pushnumber(L, (int)pItemGroup->GetCount(i));
-		}
+		TEventTable table;
+		memset(&table, 0, sizeof(table));
 
-		return count*2;
-	}
+		std::string eventName = CEventManager::Instance().GetEventString(eventIdx);
+		strlcpy(table.szType, eventName.c_str(), sizeof(table.szType));
 
-#ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
-	int _skill_name(lua_State* L)
-	{
-		if (lua_isnumber(L, 1))
-		{
-			DWORD dwVnum = (DWORD)lua_tonumber(L, 1);
+		CEventManager::Instance().SetEventState(&table, false);
 
-			LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
-			BYTE bLocale = (ch && ch->GetDesc() ? ch->GetDesc()->GetLanguage() : LOCALE_DEFAULT);
-			lua_pushstring(L, LC_LOCALE_SKILL_TEXT(dwVnum, bLocale));
-		}
-		else
-			lua_pushstring(L, "");
-
-		return 1;
-	}
-#endif
-
-#ifdef ENABLE_NEWSTUFF
-	int _get_table_postfix(lua_State* L)
-	{
-		lua_pushstring(L, get_table_postfix());
-		return 1;
-	}
-
-#ifdef _MSC_VER
-#define INFINITY (DBL_MAX+DBL_MAX)
-#define NAN (INFINITY-INFINITY)
-#endif
-	int _mysql_direct_query(lua_State* L)
-	{
-		if (!lua_isstring(L, 1))
-			return 0;
-
-		int i=0, m=1;
-		MYSQL_ROW row;
-		MYSQL_FIELD * field;
-		MYSQL_RES * result;
-
-		std::unique_ptr<SQLMsg> pMsg(DBManager::instance().DirectQuery("%s", lua_tostring(L, 1)));
-		if (pMsg.get())
-		{
-			// ret1 (number of affected rows)
-			lua_pushnumber(L, pMsg->Get()->uiAffectedRows);
-			//-1 if error such as duplicate occurs (-2147483648 via lua)
-			//   if wrong syntax error occurs (4294967295 via lua)
-			// ret2 (table of affected rows)
-			lua_newtable(L);
-			if ((result = pMsg->Get()->pSQLResult) &&
-					!(pMsg->Get()->uiAffectedRows == 0 || pMsg->Get()->uiAffectedRows == (uint32_t)-1))
-			{
-
-				while((row = mysql_fetch_row(result)))
-				{
-					lua_pushnumber(L, m);
-					lua_newtable(L);
-					while((field = mysql_fetch_field(result)))
-					{
-						lua_pushstring(L, field->name);
-						if (!(field->flags & NOT_NULL_FLAG) && (row[i]==NULL))
-						{
-							// lua_pushstring(L, "NULL");
-							lua_pushnil(L);
-						}
-						else if (IS_NUM(field->type))
-						{
-							double val = NAN;
-							lua_pushnumber(L, (sscanf(row[i],"%lf",&val)==1)?val:NAN);
-						}
-						else if (field->type == MYSQL_TYPE_BLOB)
-						{
-							lua_newtable(L);
-							for (DWORD iBlob=0; iBlob < field->max_length; iBlob++)
-							{
-								lua_pushnumber(L, row[i][iBlob]);
-								lua_rawseti(L, -2, iBlob+1);
-							}
-						}
-						else
-							lua_pushstring(L, row[i]);
-
-						lua_rawset(L, -3);
-						i++;
-					}
-					mysql_field_seek(result, 0);
-					i=0;
-
-					lua_rawset(L, -3);
-					m++;
-				}
-			}
-		}
-		else {lua_pushnumber(L, 0); lua_newtable(L);}
-
-		return 2;
-	}
-
-	int _mysql_escape_string(lua_State* L)
-	{
-		char szQuery[1024] = {0};
-
-		if (!lua_isstring(L, 1))
-			return 0;
-
-		DBManager::instance().EscapeString(szQuery, sizeof(szQuery), lua_tostring(L, 1), strlen(lua_tostring(L, 1)));
-		lua_pushstring(L, szQuery);
-		return 1;
-	}
-#endif
-
-#ifdef ENABLE_OCHAO_TEMPLE_SYSTEM
-	int _add_restart_city_pos(lua_State* L)
-	{
-		int iMapIndex = (int)lua_tonumber(L, 1);
-		int iEmpire = (int)lua_tonumber(L, 2);
-		int iX = (int)lua_tonumber(L, 3);
-		int iY = (int)lua_tonumber(L, 4);
-		int iZ = (int)lua_tonumber(L, 5);
-		SECTREE_MANAGER::instance().AddRestartCityPos(iMapIndex, iEmpire, iX, iY, iZ);
 		return 0;
 	}
 #endif
 
-
-#ifdef ENABLE_DRAGON_LAIR
-	int _get_map_flag(lua_State* L)
+#ifdef ENABLE_SHIP_DEFENCE_DUNGEON
+	struct FClearSectree
 	{
-		if(!lua_isnumber(L,1) || !lua_isstring(L,2))
-			return 0;
-		LPSECTREE_MAP pSectree = SECTREE_MANAGER::instance().GetMap(lua_tonumber(L,1));
-		if (NULL != pSectree)
-		{
-			lua_pushnumber(L,pSectree->GetFlag(lua_tostring(L,2)));
-		}
-		return 1;
-	}
-
-	int _set_map_flag(lua_State* L)
-	{
-		if(!lua_isnumber(L,1) || !lua_isstring(L,2) || !lua_isnumber(L,3))
-			return 0;
-		LPSECTREE_MAP pSectree = SECTREE_MANAGER::instance().GetMap(lua_tonumber(L,1));
-		if (NULL != pSectree)
-		{
-			pSectree->SetFlag(lua_tostring(L,2), (int)lua_tonumber(L,3));
-		}
-		return 0;
-	}
-	
-	struct FCommandMap
-	{
-		std::string command;
-		FCommandMap(const char* c_str) {command = c_str;};
-		void operator()(LPENTITY ent)
+		void operator () (LPENTITY ent)
 		{
 			if (ent->IsType(ENTITY_CHARACTER))
 			{
 				LPCHARACTER ch = (LPCHARACTER) ent;
-				if (ch->IsPC())
-					ch->ChatPacket(CHAT_TYPE_COMMAND, command.c_str());
+				if (!ch->IsPC() && !ch->IsPet() && !ch->IsHydraNPC())
+					M2_DESTROY_CHARACTER(ch);
 			}
 		}
 	};
 
-	int _command_map(lua_State* L)
+	int _clear_all_in_map(lua_State* L)
 	{
-		if(!lua_isnumber(L,1) || !lua_isstring(L,2))
-			return 0;
-		LPSECTREE_MAP pSectree = SECTREE_MANAGER::instance().GetMap(lua_tonumber(L,1));
-		if (NULL != pSectree)
+		LPSECTREE_MAP pSecMap = SECTREE_MANAGER::instance().GetMap(lua_tonumber(L,1));
+		if (NULL != pSecMap)
 		{
-			FCommandMap f(lua_tostring(L,2));
-			pSectree->for_each( f );
-		}
-		return 0;
-	}
-	
-	struct FMissionNotice
-	{
-		std::string command;
-		FMissionNotice(const char* c_str) {command = c_str;};
-		void operator()(LPENTITY ent)
-		{
-			if (ent->IsType(ENTITY_CHARACTER))
-			{
-				LPCHARACTER ch = (LPCHARACTER) ent;
-				if (ch->IsPC())
-					ch->ChatPacket(CHAT_TYPE_MISSION, command.c_str());
-			}
-		}
-	};
-	int _mission_notice_in_map(lua_State* L)
-	{
-		if(!lua_isnumber(L,1) || !lua_isstring(L,2))
-			return 0;
-		LPSECTREE_MAP pSectree = SECTREE_MANAGER::instance().GetMap(lua_tonumber(L,1));
-		if (NULL != pSectree)
-		{
-			FMissionNotice f(lua_tostring(L,2));
-			pSectree->for_each( f );
+			FClearSectree f;
+			pSecMap->for_each( f );
 		}
 		return 0;
 	}
 #endif
-
-	int _time_str(lua_State* L)
-	{
-		char timeStr[40];
-		if (!lua_isnumber(L, 1))
-			snprintf(timeStr, sizeof(timeStr), "0h 0m 0s");
-		else
-		{
-			int timeCalc = (int)lua_tonumber(L, 1);
-			if (timeCalc <= 0)
-				snprintf(timeStr, sizeof(timeStr), "0h 0m 0s");
-			else
-			{
-				int second = int(timeCalc % 60);
-				int minute = int((timeCalc / 60) % 60);
-				int hour = int((timeCalc / 60) / 60) % 24;
-				int day = int(int((timeCalc / 60) / 60) / 24);
-				if (day > 0)
-					snprintf(timeStr, sizeof(timeStr), "%dd %02dh %02dm %02ds", day, hour, minute, second);
-				else
-					snprintf(timeStr, sizeof(timeStr), "%02dh %02dm %02ds", hour, minute, second);
-			}
-		}
-		lua_pushstring(L, timeStr);
-		return 1;
-	}
 
 	void RegisterGlobalFunctionTable(lua_State* L)
 	{
@@ -1832,49 +1482,36 @@ namespace quest
 			{	"get_quest_state",				_get_quest_state				},
 			{	"under_han",					_under_han						},
 			{	"notice",						_notice							},
-			{	"big_notice",					_big_notice						},
-			{	"big_map_notice",				_big_map_notice					},
 			{	"notice_all",					_notice_all						},
 			{	"notice_in_map",				_notice_in_map					},
 			{	"warp_all_to_village",			_warp_all_to_village			},
 			{	"warp_to_village",				_warp_to_village				},
 			{	"say_in_map",					_say_in_map						},
 			{	"kill_all_in_map",				_kill_all_in_map				},
-#ifdef ENABLE_DEFENSAWE_SHIP
-			{	"clear_all_in_map",				_clear_all_in_map				},
-#endif
 			{	"regen_in_map",					_regen_in_map					},
 			{	"block_chat",					_block_chat						},
 			{	"spawn_mob",					_spawn_mob						},
 			{	"get_locale_base_path",			_get_locale_base_path			},
 			{	"purge_area",					_purge_area						},
 			{	"warp_all_in_area_to_area",		_warp_all_in_area_to_area		},
-			{	"get_special_item_group",		_get_special_item_group			},
+
 #ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
 			{	"LC",							_get_locale						},
-			{ 	"LANG",							_get_locale						},
 			{	"skill_name",					_skill_name						},
 #endif
-#ifdef ENABLE_NEWSTUFF
-			{	"spawn_mob0",					_spawn_mob0						},
-			{	"spawn_mob_in_map",				_spawn_mob_in_map				},
-			{	"get_table_postfix",			_get_table_postfix				},	// get table postfix [return lua string]
-			{	"mysql_direct_query",			_mysql_direct_query				},	// get the number of the affected rows and a table containing 'em [return lua number, lua table]
-			{	"mysql_escape_string",			_mysql_escape_string			},	// escape <str> [return lua string]
+
+#ifdef ENABLE_EVENT_MANAGER
+			{	"start_event",					_start_event					},
+			{	"end_event",					_end_event						},
 #endif
-#ifdef ENABLE_OCHAO_TEMPLE_SYSTEM
-			{"add_restart_city_pos", _add_restart_city_pos},
-#endif
-#ifdef ENABLE_DRAGON_LAIR
-			{	"get_map_flag",					_get_map_flag					},
-			{	"set_map_flag",					_set_map_flag					},
-			{	"command_map",					_command_map					},
-			{	"mission_notice_in_map",		_mission_notice_in_map			},
+
+#ifdef ENABLE_SHIP_DEFENCE_DUNGEON
+			{	"clear_all_in_map",				_clear_all_in_map				},
 #endif
 
 			{	NULL,							NULL							}
 		};
-
+	
 		int i = 0;
 
 		while (global_functions[i].name != NULL)

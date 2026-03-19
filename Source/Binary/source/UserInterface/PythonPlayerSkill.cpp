@@ -1,6 +1,5 @@
 #include "StdAfx.h"
 #include "PythonPlayer.h"
-#include "PythonNonPlayer.h"
 #include "PythonTextTail.h"
 #include "PythonNetworkStream.h"
 #include "InstanceBase.h"
@@ -277,7 +276,6 @@ bool CPythonPlayer::__CheckSkillUsable(DWORD dwSlotIndex)
 		}
 	}
 
-	// Tracef("Weapon type is %d", pkInstMain->GetWeaponType()); // Debug mesajý kaldýrýldý
 	if (!pSkillData->CanUseWeaponType(pkInstMain->GetWeaponType()))
 	{
 		PyCallClassMemberFunc(m_ppyGameWindow, "OnCannotUseSkill", Py_BuildValue("(is)", GetMainCharacterIndex(), "NOT_MATCHABLE_WEAPON"));
@@ -440,6 +438,7 @@ bool CPythonPlayer::__ProcessEnemySkillTargetRange(CInstanceBase& rkInstMain, CI
 		}
 
 		__ReserveUseSkill(rkInstTarget.GetVirtualID(), dwSkillSlotIndex, dwSkillTargetRange);
+
 		return false;
 	}
 
@@ -464,17 +463,19 @@ bool CPythonPlayer::__CanUseSkill()
 
 	if (IsObserverMode())
 		return false;
-
 	// Fix me
-#if defined(ENABLE_CONQUEROR_LEVEL) && defined(ENABLE_STANDING_MOUNT)
-	// Standing mount üzerindeyken skill grade kontrolünü atla
-	if (pkInstMain->IsMountingHorse() && !pkInstMain->IsMountingHoverBoard() && (GetSkillGrade(107) < 1 && GetSkillLevel(107) < 20))
-#else
-	if (pkInstMain->IsMountingHorse() && (GetSkillGrade(109) < 1 && GetSkillLevel(109) < 20))
-#endif
+#ifdef ENABLE_STANDING_MOUNT
+	// Standing mount üzerindeyken skill kullanýlabilir, sadece normal at üzerindeyken engelle
+	if (pkInstMain->IsMountingHorse() && !pkInstMain->IsMountingHoverBoard())
 	{
 		return false;
 	}
+#else
+	if (pkInstMain->IsMountingHorse())
+	{
+		return false;
+	}
+#endif
 
 	return pkInstMain->CanUseSkill();
 }
@@ -545,18 +546,18 @@ bool CPythonPlayer::__UseSkill(DWORD dwSlotIndex)
 		pSkillData->IsAutoSearchTarget())
 	{
 		if (pSkillData->IsNeedCorpse())
-			pkInstTarget = __GetDeadTargetInstancePtr();
+			pkInstTarget=__GetDeadTargetInstancePtr();
 		else
-			pkInstTarget = __GetAliveTargetInstancePtr();
+			pkInstTarget=__GetAliveTargetInstancePtr();
 
 		if (!pkInstTarget)
 		{
 			__ChangeTargetToPickedInstance();
 
 			if (pSkillData->IsNeedCorpse())
-				pkInstTarget = __GetDeadTargetInstancePtr();
+				pkInstTarget=__GetDeadTargetInstancePtr();
 			else
-				pkInstTarget = __GetAliveTargetInstancePtr();
+				pkInstTarget=__GetAliveTargetInstancePtr();
 		}
 
 		if (pkInstTarget)
@@ -590,7 +591,7 @@ bool CPythonPlayer::__UseSkill(DWORD dwSlotIndex)
 					if (pSkillData->CanUseForMe())
 					{
 						pkInstTarget = pkInstMain;
-						Tracef(" [ALERT] Used on you, and the enemy target is changed to yourself\n");
+						Tracef(" [ALERT] µ¿·á¿¡°Ô »ç¿ëÇÏ´Â ±â¼úÀÓ¿¡µµ Àû¿¡°Ô Å¸°ÙÆÃ µÇ¾îÀÖ¾î¼­ ÀÚ½Å¿¡°Ô·Î Àç¼³Á¤\n");
 					}
 					else
 					{
@@ -674,13 +675,13 @@ bool CPythonPlayer::__UseSkill(DWORD dwSlotIndex)
 		DWORD dwPickedActorID;
 		TPixelPosition kPPosPickedGround;
 
-		if (pkInstTarget && pkInstTarget != pkInstMain)
+		if (pkInstTarget && pkInstTarget!=pkInstMain)
 		{
 			pkInstMain->NEW_LookAtDestInstance(*pkInstTarget);
 		}
 		else if (__GetPickedActorID(&dwPickedActorID))
 		{
-			CInstanceBase* pkInstVictim = NEW_FindActorPtr(dwPickedActorID);
+			CInstanceBase* pkInstVictim=NEW_FindActorPtr(dwPickedActorID);
 			if (pkInstVictim)
 				pkInstMain->NEW_LookAtDestInstance(*pkInstVictim);
 		}
@@ -690,15 +691,15 @@ bool CPythonPlayer::__UseSkill(DWORD dwSlotIndex)
 		}
 		else
 		{
-			Tracenf("CPythonPlayer::__UseSkill(%d) - The screen direction settings should be as standard", dwSlotIndex);
+			Tracenf("CPythonPlayer::__UseSkill(%d) - È­¸é ±âÁØ ¹æÇâ ¼³Á¤À» ÇØ¾ßÇÔ", dwSlotIndex);
 		}
 	}
 
 	DWORD dwTargetMaxCount = pSkillData->GetTargetCount(rkSkillInst.fcurEfficientPercentage);
 	DWORD dwRange = __GetSkillTargetRange(*pSkillData);
-	if (dwTargetMaxCount > 0 && pkInstTarget)
+	if (dwTargetMaxCount>0 && pkInstTarget)
 	{
-		DWORD dwTargetCount = 1;
+		DWORD dwTargetCount=1;
 		std::vector<CInstanceBase*> kVct_pkInstTarget;
 
 		if (pSkillData->IsFanRange())
@@ -706,14 +707,14 @@ bool CPythonPlayer::__UseSkill(DWORD dwSlotIndex)
 			if (pkInstMain->NEW_GetInstanceVectorInFanRange(float(dwRange), *pkInstTarget, &kVct_pkInstTarget))
 			{
 				std::vector<CInstanceBase*>::iterator i;
-				for (i = kVct_pkInstTarget.begin(); i != kVct_pkInstTarget.end(); ++i)
+				for (i=kVct_pkInstTarget.begin(); i!=kVct_pkInstTarget.end(); ++i)
 				{
-					if (dwTargetCount >= dwTargetMaxCount)
+					if (dwTargetCount>=dwTargetMaxCount)
 						break;
 
-					CInstanceBase* pkInstEach = *i;
+					CInstanceBase* pkInstEach=*i;
 
-					if (pkInstTarget != pkInstEach && !pkInstEach->IsDead())
+					if (pkInstTarget!=pkInstEach && !pkInstEach->IsDead())
 					{
 						pkInstMain->AddFlyTargetInstance(*pkInstEach);
 						CPythonNetworkStream::Instance().SendAddFlyTargetingPacket(pkInstEach->GetVirtualID(), pkInstEach->GetGraphicThingInstanceRef().OnGetFlyTargetPosition());
@@ -728,14 +729,14 @@ bool CPythonPlayer::__UseSkill(DWORD dwSlotIndex)
 			if (pkInstMain->NEW_GetInstanceVectorInCircleRange(float(dwRange), &kVct_pkInstTarget))
 			{
 				std::vector<CInstanceBase*>::iterator i;
-				for (i = kVct_pkInstTarget.begin(); i != kVct_pkInstTarget.end(); ++i)
+				for (i=kVct_pkInstTarget.begin(); i!=kVct_pkInstTarget.end(); ++i)
 				{
-					if (dwTargetCount >= dwTargetMaxCount)
+					if (dwTargetCount>=dwTargetMaxCount)
 						break;
 
-					CInstanceBase* pkInstEach = *i;
+					CInstanceBase* pkInstEach=*i;
 
-					if (pkInstTarget != pkInstEach && !pkInstEach->IsDead())
+					if (pkInstTarget!=pkInstEach && !pkInstEach->IsDead())
 					{
 						pkInstMain->AddFlyTargetInstance(*pkInstEach);
 						CPythonNetworkStream::Instance().SendAddFlyTargetingPacket(pkInstEach->GetVirtualID(), pkInstEach->GetGraphicThingInstanceRef().OnGetFlyTargetPosition());
@@ -746,15 +747,15 @@ bool CPythonPlayer::__UseSkill(DWORD dwSlotIndex)
 			}
 		}
 
-		if (dwTargetCount < dwTargetMaxCount)
+		if (dwTargetCount<dwTargetMaxCount)
 		{
-			while (dwTargetCount < dwTargetMaxCount)
+			while (dwTargetCount<dwTargetMaxCount)
 			{
 				TPixelPosition kPPosDst;
 				pkInstMain->NEW_GetRandomPositionInFanRange(*pkInstTarget, &kPPosDst);
 
-				kPPosDst.x = kPPosDst.x;
-				kPPosDst.y = -kPPosDst.y;
+				kPPosDst.x=kPPosDst.x;
+				kPPosDst.y=-kPPosDst.y;
 
 				pkInstMain->AddFlyTargetPosition(kPPosDst);
 				CPythonNetworkStream::Instance().SendAddFlyTargetingPacket(0, kPPosDst);
@@ -766,19 +767,29 @@ bool CPythonPlayer::__UseSkill(DWORD dwSlotIndex)
 
 	__ClearReservedAction();
 
-	// Animasyon göster (hem normal hem de at üzerindeyken)
-	if (!pSkillData->IsNoMotion())
+	if (pkInstMain->IsMountingHorse()
+#ifdef ENABLE_STANDING_MOUNT
+		 && !pkInstMain->IsMountingHoverBoard()  // Standing mount için animasyon göster!
+#endif
+		)
 	{
-		DWORD dwMotionIndex = pSkillData->GetSkillMotionIndex(rkSkillInst.iGrade);
-		DWORD dwLoopCount = pSkillData->GetMotionLoopCount(rkSkillInst.fcurEfficientPercentage);
-		if (!pkInstMain->NEW_UseSkill(rkSkillInst.dwIndex, dwMotionIndex, dwLoopCount, pSkillData->IsMovingSkill() ? true : false))
+		// Horse üzerindeyken skill kullanýmý için özel iþlemler
+	}
+	else
+	{
+		if (!pSkillData->IsNoMotion())
 		{
-			Tracenf("CPythonPlayer::__UseSkill(%d) - pkInstMain->NEW_UseSkill - ERROR", dwSlotIndex);
-			return false;
+			DWORD dwMotionIndex = pSkillData->GetSkillMotionIndex(rkSkillInst.iGrade);
+			DWORD dwLoopCount = pSkillData->GetMotionLoopCount(rkSkillInst.fcurEfficientPercentage);
+			if (!pkInstMain->NEW_UseSkill(rkSkillInst.dwIndex, dwMotionIndex, dwLoopCount, pSkillData->IsMovingSkill() ? true : false))
+			{
+				Tracenf("CPythonPlayer::__UseSkill(%d) - pkInstMain->NEW_UseSkill - ERROR", dwSlotIndex);
+				return false;
+			}
 		}
 	}
 
-	DWORD dwTargetVID = pkInstTarget ? pkInstTarget->GetVirtualID() : 0;
+	DWORD dwTargetVID=pkInstTarget ? pkInstTarget->GetVirtualID() : 0;
 
 	__SendUseSkill(dwSlotIndex, dwTargetVID);
 	return true;
@@ -786,9 +797,9 @@ bool CPythonPlayer::__UseSkill(DWORD dwSlotIndex)
 
 void CPythonPlayer::__SendUseSkill(DWORD dwSkillSlotIndex, DWORD dwTargetVID)
 {
-	TSkillInstance& rkSkillInst = m_playerStatus.aSkill[dwSkillSlotIndex];
+	TSkillInstance & rkSkillInst = m_playerStatus.aSkill[dwSkillSlotIndex];
 
-	CPythonNetworkStream& rkNetStream = CPythonNetworkStream::Instance();
+	CPythonNetworkStream& rkNetStream=CPythonNetworkStream::Instance();
 	rkNetStream.SendUseSkillPacket(rkSkillInst.dwIndex, dwTargetVID);
 
 	__RunCoolTime(dwSkillSlotIndex);
@@ -818,7 +829,7 @@ void CPythonPlayer::__RunCoolTime(DWORD dwSkillSlotIndex)
 		return;
 	}
 
-	CPythonSkill::TSkillData& rkSkillData = *pkSkillData;
+	CPythonSkill::TSkillData& rkSkillData=*pkSkillData;
 
 	rkSkillInst.fCoolTime = rkSkillData.GetSkillCoolTime(rkSkillInst.fcurEfficientPercentage);
 	rkSkillInst.fLastUsedTime = CTimer::Instance().GetCurrentSecond();

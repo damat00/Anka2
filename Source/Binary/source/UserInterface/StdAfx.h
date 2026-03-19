@@ -5,33 +5,16 @@
 #pragma warning(disable:4267)
 #pragma warning(disable:4305)
 #pragma warning(disable:4834)
-#pragma warning(disable:4702)
-#pragma warning(disable:4100)
-#pragma warning(disable:4201)
-#pragma warning(disable:4511)
-#pragma warning(disable:4663)
-#pragma warning(disable:4018)
-#pragma warning(disable:4245)
-#pragma warning(disable:5033)
-#pragma warning(disable:4838)
-#pragma warning(disable:4995)
-#pragma warning(disable:4474)
-#pragma warning(disable:4267)
-#pragma warning(disable:4267)
-#pragma warning(disable:4005)
-#pragma warning(disable:4101)
-#pragma warning(disable:4715)
 
 #if _MSC_VER >= 1400
-//if don't use below, time_t is 64bit
 	#define _USE_32BIT_TIME_T
 #endif
 
-#include "../EterLib/StdAfx.h"
-#include "../EterPythonLib/StdAfx.h"
-#include "../GameLib/StdAfx.h"
-#include "../ScriptLib/StdAfx.h"
-#include "../MilesLib/StdAfx.h"
+#include "../eterLib/StdAfx.h"
+#include "../eterPythonLib/StdAfx.h"
+#include "../gameLib/StdAfx.h"
+#include "../scriptLib/StdAfx.h"
+#include "../milesLib/StdAfx.h"
 #include "../EffectLib/StdAfx.h"
 #include "../PRTerrainLib/StdAfx.h"
 #include "../SpeedTreeLib/StdAfx.h"
@@ -109,10 +92,13 @@ void intcuberenewal();
 #ifdef ENABLE_ACCE_COSTUME_SYSTEM
 void initAcce();
 #endif
+#ifdef ENABLE_BIOLOG_SYSTEM
+void initBiologManager();
+#endif
 #ifdef ENABLE_RENDER_TARGET
 void initRenderTarget();
 #endif
-#ifdef ENABLE_WIKI_SYSTEM
+#ifdef ENABLE_INGAME_WIKI_SYSTEM
 void initWiki();
 #endif
 #ifdef ENABLE_OFFLINESHOP_SEARCH_SYSTEM
@@ -120,12 +106,6 @@ void initprivateShopSearch();
 #endif
 #ifdef ENABLE_RIDING_EXTENDED
 void initmountupgrade();
-#endif
-#ifdef ENABLE_DUNGEON_INFO
-void intdungeoninfo();
-#endif
-#ifdef ENABLE_EVENT_SYSTEM
-void initGameEvents();
 #endif
 #ifdef __AUTO_HUNT__
 extern float GetDistanceNew(const TPixelPosition& PixelPosition, const TPixelPosition& c_rPixelPosition);

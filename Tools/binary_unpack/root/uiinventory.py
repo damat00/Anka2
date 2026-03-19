@@ -194,6 +194,7 @@ class InventoryWindow(ui.ScriptWindow):
 		[item.EQUIPMENT_PENDANT, 109, 45, 32, 32, "Pendant"],
 		[item.EQUIPMENT_MOUNT, 9, 103, 32, 32, "Mount"],
 		[item.EQUIPMENT_PET, 59, 103, 32, 32, "Pet"],
+		[item.EQUIPMENT_TITLE, 109, 103, 32, 32, "Title"],
 	]
 
 	def __init__(self):
@@ -312,7 +313,6 @@ class InventoryWindow(ui.ScriptWindow):
 			import exception
 			exception.Abort("InventoryWindow.LoadWindow.BindObject")
 
-		## Item
 		wndItem.SetSelectEmptySlotEvent(ui.__mem_func__(self.SelectEmptySlot))
 		wndItem.SetSelectItemSlotEvent(ui.__mem_func__(self.SelectItemSlot))
 		wndItem.SetUnselectItemSlotEvent(ui.__mem_func__(self.UseItemSlot))
@@ -328,7 +328,6 @@ class InventoryWindow(ui.ScriptWindow):
 		for j in xrange(len(self.equip_info)):
 			wndEquip.AppendSlot(self.equip_info[j][0], self.equip_info[j][1], self.equip_info[j][2], self.equip_info[j][3], self.equip_info[j][4])
 
-		## Equipment
 		wndEquip.SetSelectEmptySlotEvent(ui.__mem_func__(self.SelectEmptySlot))
 		wndEquip.SetSelectItemSlotEvent(ui.__mem_func__(self.SelectItemSlot))
 		wndEquip.SetUnselectItemSlotEvent(ui.__mem_func__(self.UseItemSlot))
@@ -372,7 +371,6 @@ class InventoryWindow(ui.ScriptWindow):
 		wndRings.Show()
 		self.wndRings = wndRings
 
-		## PickMoneyDialog
 		dlgPickMoney = uiPickMoney.PickMoneyDialog()
 		dlgPickMoney.LoadDialog()
 		dlgPickMoney.Hide()
@@ -381,7 +379,6 @@ class InventoryWindow(ui.ScriptWindow):
 			if self.sortInventory:
 				self.sortInventory.SetEvent(ui.__mem_func__(self.ClickSortInventory))
 
-		## RefineDialog
 		self.refineDialog = uiRefine.RefineDialog()
 		self.refineDialog.Hide()
 
@@ -479,10 +476,13 @@ class InventoryWindow(ui.ScriptWindow):
 		self.wndRings = None
 
 		self.dlgPickMoney = 0
+		self.wndMoneySlot = 0
 		self.questionDialog = None
 		self.interface = None
 
 		self.dlgQuestion = None
+
+		self.wndExpandedMoneyBar = None
 
 		if app.ENABLE_SORT_INVENTORY:
 			self.sortInventory = None
@@ -530,6 +530,12 @@ class InventoryWindow(ui.ScriptWindow):
 
 	def Close(self):
 		self.Hide()
+
+	def SetExpandedMoneyBar(self, wndBar):
+		self.wndExpandedMoneyBar = wndBar
+		if self.wndExpandedMoneyBar:
+			self.wndMoney = self.wndExpandedMoneyBar.GetMoney()
+			self.wndMoneySlot = self.wndExpandedMoneyBar.GetMoneySlot()
 
 	def SetInventoryPage(self, page):
 		self.inventoryTab[self.inventoryPageIndex].SetUp()
@@ -685,7 +691,7 @@ class InventoryWindow(ui.ScriptWindow):
 			self.dlgPickMoney.SetTitleName(localeInfo.PICK_MONEY_TITLE)
 			self.dlgPickMoney.SetAcceptEvent(ui.__mem_func__(self.OnPickMoney))
 			self.dlgPickMoney.Open(curMoney)
-			self.dlgPickMoney.SetMax(9)
+			self.dlgPickMoney.SetMax(9) 
 
 	def OnPickMoney(self, money):
 		mouseModule.mouseController.AttachMoney(self, player.SLOT_TYPE_INVENTORY, money)
@@ -1041,6 +1047,9 @@ class InventoryWindow(ui.ScriptWindow):
 					net.SendMallCheckoutPacket(attachedSlotPos, selectedSlotPos)
 
 			mouseModule.mouseController.DeattachObject()
+			
+			# Ýksir slotlarýna item eklendiðinde refresh server'dan güncelleme geldiðinde yapýlacak
+			# RefreshItemSlot fonksiyonu zaten server'dan güncelleme geldiðinde çaðrýlýyor
 
 	def SelectItemSlot(self, itemSlotIndex):
 		if constInfo.GET_ITEM_QUESTION_DIALOG_STATUS() == 1:
@@ -1067,6 +1076,9 @@ class InventoryWindow(ui.ScriptWindow):
 					self.__DropSrcItemToDestItemInInventory(attachedItemVID, attachedSlotPos, itemSlotIndex)
 
 			mouseModule.mouseController.DeattachObject()
+			
+			# Ýksir slotlarýna item eklendiðinde refresh server'dan güncelleme geldiðinde yapýlacak
+			# RefreshItemSlot fonksiyonu zaten server'dan güncelleme geldiðinde çaðrýlýyor
 		else:
 			curCursorNum = app.GetCursor()
 			if app.SELL == curCursorNum:
@@ -1613,15 +1625,6 @@ class InventoryWindow(ui.ScriptWindow):
 
 		slotIndex = self.__InventoryLocalSlotPosToGlobalSlotPos(slotIndex)
 
-		if app.ENABLE_PASSIVE_SYSTEM:
-			if self.interface and hasattr(self.interface, "wndCharacter") and self.interface.wndCharacter:
-				itemVnum = player.GetItemIndex(slotIndex)
-				if itemVnum in (30255, 30256, 30257, 30258):
-					if self.interface.wndCharacter.TryAttachPassiveMaterialFromInventory(slotIndex):
-						mouseModule.mouseController.DeattachObject()
-						self.OverOutItem()
-						return
-
 		if app.ENABLE_ACCE_COSTUME_SYSTEM:
 			if self.isShowAcceWindow():
 				acce.Add(player.INVENTORY, slotIndex, 255)
@@ -1739,34 +1742,15 @@ class InventoryWindow(ui.ScriptWindow):
 			self.questionDialog.SetCancelEvent(ui.__mem_func__(self.__UseItemQuestionDialog_OnCancel))
 			self.questionDialog.Open()
 			self.questionDialog.slotIndex = slotIndex
-
 			constInfo.SET_ITEM_QUESTION_DIALOG_STATUS(1)
 
-		elif 70005 == ItemVNum or 70043 == ItemVNum or 79000 == ItemVNum or 79001 == ItemVNum or 79002 == ItemVNum or 79003 == ItemVNum or 79004 == ItemVNum or 79005 == ItemVNum or 79006 == ItemVNum or 79007 == ItemVNum or 79008 == ItemVNum:
-			self.questionDialog = uiCommon.QuestionDialog("thin")
-			self.questionDialog.SetText(localeInfo.INVENTORY_REALLY_USE_ITEM)
-			self.questionDialog.SetAcceptEvent(ui.__mem_func__(self.__UseItemQuestionDialog_OnAccept))
-			self.questionDialog.SetCancelEvent(ui.__mem_func__(self.__UseItemQuestionDialog_OnCancel))
-			self.questionDialog.Open()
-			self.questionDialog.slotIndex = slotIndex
+		elif item.GetItemType() == item.ITEM_TYPE_GIFTBOX and app.ENABLE_VIEW_CHEST_DROP:
+			if self.interface:
+				if self.interface.dlgChestDrop:
+					if not self.interface.dlgChestDrop.IsShow():
+						self.interface.dlgChestDrop.Open(slotIndex)
+						net.SendChestDropInfo(slotIndex)
 
-			constInfo.SET_ITEM_QUESTION_DIALOG_STATUS(1)
-
-		elif app.IsPressed(app.DIK_LSHIFT):
-			if player.GetItemTypeBySlot(slotIndex) == item.ITEM_TYPE_GACHA or\
-				player.GetItemTypeBySlot(slotIndex) == item.ITEM_TYPE_GIFTBOX and\
-				ItemVNum != 31374 and ItemVNum != 50255 and\
-				ItemVNum != 50187 and ItemVNum != 50197 and\
-				ItemVNum != 50188 and ItemVNum != 50189 and\
-				ItemVNum != 50190 and ItemVNum != 50191 and\
-				ItemVNum != 50192 and ItemVNum != 50193 and\
-				ItemVNum != 50194 and ItemVNum != 50195:
-				if app.ENABLE_VIEW_CHEST_DROP:
-					if self.interface:
-						if self.interface.dlgChestDrop:
-							if not self.interface.dlgChestDrop.IsShow():
-								self.interface.dlgChestDrop.Open(slotIndex)
-								net.SendChestDropInfo(slotIndex)
 		else:
 			self.__SendUseItemPacket(slotIndex)
 
@@ -1778,6 +1762,7 @@ class InventoryWindow(ui.ScriptWindow):
 		self.OnCloseQuestionDialog()
 
 	def __SendUseItemToItemPacket(self, srcSlotPos, dstSlotPos):
+
 		if uiPrivateShopBuilder.IsBuildingPrivateShop():
 			chat.AppendChat(chat.CHAT_TYPE_INFO, localeInfo.USE_ITEM_FAILURE_PRIVATE_SHOP)
 			return
@@ -1785,6 +1770,7 @@ class InventoryWindow(ui.ScriptWindow):
 		net.SendItemUseToItemPacket(srcSlotPos, dstSlotPos)
 
 	def __SendUseItemPacket(self, slotPos):
+
 		if uiPrivateShopBuilder.IsBuildingPrivateShop():
 			chat.AppendChat(chat.CHAT_TYPE_INFO, localeInfo.USE_ITEM_FAILURE_PRIVATE_SHOP)
 			return
@@ -1792,6 +1778,7 @@ class InventoryWindow(ui.ScriptWindow):
 		net.SendItemUsePacket(slotPos)
 
 	def __SendMoveItemPacket(self, srcSlotPos, dstSlotPos, srcItemCount):
+
 		if uiPrivateShopBuilder.IsBuildingPrivateShop():
 			chat.AppendChat(chat.CHAT_TYPE_INFO, localeInfo.MOVE_ITEM_FAILURE_PRIVATE_SHOP)
 			return
@@ -1815,9 +1802,6 @@ class InventoryWindow(ui.ScriptWindow):
 				return
 
 			net.SendItemSellPacket(itemVNum)
-
-	def BindWikiWindow(self, wndWiki):
-		self.wndWiki = wndWiki
 
 	if app.ENABLE_ACCE_COSTUME_SYSTEM:
 		def SetAcceWindow(self, wndAcceCombine, wndAcceAbsorption):

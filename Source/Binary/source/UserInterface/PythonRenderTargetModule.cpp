@@ -100,25 +100,6 @@ PyObject *renderTargetSetAcce(PyObject *poSelf, PyObject *poArgs)
 }
 #endif
 
-#ifdef ENABLE_AURA_COSTUME_SYSTEM
-PyObject *renderTargetSetAura(PyObject *poSelf, PyObject *poArgs)
-{
-	int iIndex;
-	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
-		return Py_BadArgument();
-	int iItemVnum;
-	if (!PyTuple_GetInteger(poArgs, 1, &iItemVnum))
-		return Py_BadArgument();
-	const std::shared_ptr<CRenderTarget> target = CRenderTargetManager::Instance().GetRenderTarget(iIndex);
-	if (target)
-	{
-		if (target->IsReady())
-			target->GetModel()->SetAura(iItemVnum);
-	}
-	return Py_BuildNone();
-}
-#endif
-
 PyObject *renderTargetSetMount(PyObject *poSelf, PyObject *poArgs)
 {
 	int iIndex;
@@ -409,7 +390,6 @@ void initRenderTarget()
 		{"SetHair", renderTargetSetHair, METH_VARARGS},
 		{"SetRotation", renderTargetSetRotation, METH_VARARGS},
 		{"SetAcce", renderTargetSetAcce, METH_VARARGS},
-		{"SetAura", renderTargetSetAura, METH_VARARGS},
 		{"SetMount", renderTargetSetMount, METH_VARARGS},
 		{"ResetModel", renderTargetResetModel, METH_VARARGS},
 		{"Destroy", renderTargetDestroy, METH_VARARGS},

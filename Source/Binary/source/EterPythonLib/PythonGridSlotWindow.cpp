@@ -9,9 +9,6 @@ void CGridSlotWindow::OnRenderPickingSlot()
 	if (!UI::CWindowManager::Instance().IsAttaching())
 		return;
 
-	if (!GetPickedAreaRender())
-		return;
-
 	BYTE byWidth, byHeight;
 	UI::CWindowManager::Instance().GetAttachingIconSize(&byWidth, &byHeight);
 
@@ -60,26 +57,7 @@ void CGridSlotWindow::OnRenderPickingSlot()
 			}
 		}
 
-	#ifdef ENABLE_FISH_EVENT_SYSTEM
-		DWORD dwAttachedType = UI::CWindowManager::Instance().GetAttachingType();
-		DWORD dwAttachedIndex = UI::CWindowManager::Instance().GetAttachingIndex();
-
-		if (GetPickedAreaRender())
-		{
-			std::list<TSlot*> SlotListForCheck = SlotList;
-
-			if (dwAttachedType == 17 && (dwAttachedIndex == 3 || dwAttachedIndex == 4 || dwAttachedIndex == 6))
-			{
-				int pos = 0;
-				for (auto it = SlotListForCheck.begin(); it != SlotListForCheck.end(); ++it, ++pos)
-				{
-					if ((dwAttachedIndex == 6 && (pos == 1 || pos == 3)) || (dwAttachedIndex == 3 && pos == 2) || (dwAttachedIndex == 4 && pos == 1))
-						it = SlotListForCheck.erase(it);
-				}
-			}
-		}
-#endif
-
+		// 아니면 그냥 옮기기
 		if (CheckMoving(dwRealSlotNumber, dwItemIndex, SlotList))
 			CPythonGraphic::Instance().SetDiffuseColor(1.0f, 1.0f, 1.0f, 0.5f);
 		else
@@ -91,40 +69,6 @@ void CGridSlotWindow::OnRenderPickingSlot()
 		Rect.right = 0;
 		Rect.bottom = 0;
 
-#ifdef ENABLE_FISH_EVENT_SYSTEM
-		TSlot * pSlotFish = *SlotList.begin();
-
-		RECT SecondRect; SecondRect.left = m_rect.right; SecondRect.top = m_rect.bottom; SecondRect.right = 0; SecondRect.bottom = 0;
-
-		if (dwAttachedType == 13 && (dwAttachedIndex == 3 || dwAttachedIndex == 5 || dwAttachedIndex == 6))
-		{
-			Rect.left = min(Rect.left, m_rect.left + pSlotFish->ixPosition);
-			Rect.top = min(Rect.top, m_rect.top + pSlotFish->iyPosition);
-			Rect.right = max(Rect.right, m_rect.left + pSlotFish->ixPosition + (dwAttachedIndex == 3 ? 32 : 64));
-			Rect.bottom = max(Rect.bottom, m_rect.top + pSlotFish->iyPosition + 32);
-
-			SecondRect.left = min(SecondRect.left, m_rect.left + pSlotFish->ixPosition + (dwAttachedIndex == 3 ? 0 : 32));
-			SecondRect.top = min(SecondRect.top, m_rect.top + pSlotFish->iyPosition + 32);
-			SecondRect.right = max(SecondRect.right, m_rect.left + pSlotFish->ixPosition + (dwAttachedIndex == 6 ? 96 : 64));
-			SecondRect.bottom = max(SecondRect.bottom, m_rect.top + pSlotFish->iyPosition + 64);
-
-			CPythonGraphic::Instance().RenderBar2d(Rect.left, Rect.top, Rect.right, Rect.bottom);
-			CPythonGraphic::Instance().RenderBar2d(SecondRect.left, SecondRect.top, SecondRect.right, SecondRect.bottom);
-		}
-		else
-		{
-			for (std::list<TSlot*>::iterator itor = SlotList.begin(); itor != SlotList.end(); ++itor)
-			{
-				TSlot * pSlot = *itor;
-				Rect.left = min(Rect.left, m_rect.left + pSlot->ixPosition);
-				Rect.top = min(Rect.top, m_rect.top + pSlot->iyPosition);
-				Rect.right = max(Rect.right, m_rect.left + pSlot->ixPosition + pSlot->byxPlacedItemSize*ITEM_WIDTH);
-				Rect.bottom = max(Rect.bottom, m_rect.top + pSlot->iyPosition + pSlot->byxPlacedItemSize*ITEM_HEIGHT);
-			}
-
-			CPythonGraphic::Instance().RenderBar2d(Rect.left, Rect.top, Rect.right, Rect.bottom);
-		}
-#else
 		for (std::list<TSlot*>::iterator itor = SlotList.begin(); itor != SlotList.end(); ++itor)
 		{
 			TSlot * pSlot = *itor;
@@ -135,7 +79,6 @@ void CGridSlotWindow::OnRenderPickingSlot()
 		}
 
 		CPythonGraphic::Instance().RenderBar2d(Rect.left, Rect.top, Rect.right, Rect.bottom);
-#endif
 	}
 }
 
@@ -150,21 +93,6 @@ BOOL CGridSlotWindow::GetPickedSlotPointer(TSlot ** ppSlot)
 	std::list<TSlot*> SlotList;
 	if (!GetPickedSlotList(byWidth, byHeight, &SlotList))
 		return FALSE;
-
-#ifdef ENABLE_FISH_EVENT_SYSTEM
-	DWORD dwAttachedType = UI::CWindowManager::Instance().GetAttachingType();
-	DWORD dwAttachedIndex = UI::CWindowManager::Instance().GetAttachingIndex();
-	
-	if (dwAttachedType == 13 && (dwAttachedIndex == 3 || dwAttachedIndex == 5 || dwAttachedIndex == 6))
-	{
-		int pos = 0;
-		for (auto it = SlotList.begin(); it != SlotList.end(); ++it, ++pos)
-		{
-			if ((dwAttachedIndex == 6 && (pos == 1 || pos == 3)) || (dwAttachedIndex == 3 && pos == 2) || (dwAttachedIndex == 5 && pos == 1))
-				it = SlotList.erase(it);
-		}
-	}
-#endif
 
 	TSlot * pMinSlot = nullptr;
 	//DWORD dwSlotNumber = UI::CWindowManager::Instance().GetAttachingSlotNumber();
@@ -282,21 +210,7 @@ BOOL CGridSlotWindow::GetPickedSlotList(int iWidth, int iHeight, std::list<TSlot
 			iyStart = iy - 1;
 			iyEnd = iy + 1;
 		}
-		if (1 == iWidth)
-		{
-			ixStart = ix;
-			ixEnd = ix;
-		}
-		else if (2 == iWidth)
-		{
-			ixStart = ix;
-			ixEnd = ix + 1;
-		}
-		else if (3 == iWidth)
-		{
-			ixStart = ix - 1;
-			ixEnd = ix + 1;
-		}
+
 		if (ixStart < 0)
 		{
 			ixEnd += -ixStart;
@@ -496,9 +410,6 @@ void CGridSlotWindow::__Initialize()
 {
 	m_dwxCount = 0;
 	m_dwyCount = 0;
-#ifdef ENABLE_FISH_EVENT_SYSTEM
-	bPickedAreaRender = true;
-#endif
 }
 
 DWORD CGridSlotWindow::Type()

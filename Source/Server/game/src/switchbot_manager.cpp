@@ -395,9 +395,6 @@ void CSwitchbot::SwitchItems()
 				LPITEM pkItemChanger = pkOwner->FindSpecifyItem(switchItemUsed);
 				if (pkItemChanger)
 					pkItemChanger->SetCount(pkItemChanger->GetCount() - SWITCHBOT_PRICE_AMOUNT);
-#ifndef ENABLE_RANKING
-					pkOwner->SetRankPoints(12, pkOwner->GetRankPoints(12) + 1);
-#endif
 				else
 					Stop();
 			}
@@ -573,9 +570,7 @@ void CSwitchbotManager::Start(DWORD player_id, BYTE slot, std::vector<TSwitchbot
 	pkSwitchbot->SetAttributes(slot, vec_alternatives);
 
 	if (pkSwitchbot->HasActiveSlots() && !pkSwitchbot->IsSwitching())
-	{
 		pkSwitchbot->Start();
-	}
 	else
 	{
 		SendSwitchbotUpdate(player_id);

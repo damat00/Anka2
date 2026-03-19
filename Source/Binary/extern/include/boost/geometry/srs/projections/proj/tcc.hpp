@@ -48,6 +48,12 @@
 namespace boost { namespace geometry
 {
 
+namespace srs { namespace par4
+{
+    struct tcc {}; // Transverse Central Cylindrical
+
+}} //namespace srs::par4
+
 namespace projections
 {
     #ifndef DOXYGEN_NO_DETAIL
@@ -67,7 +73,7 @@ namespace projections
 
                 // FORWARD(s_forward)  spheroid
                 // Project coordinates from geographic (lon, lat) to cartesian (x, y)
-                inline void fwd(T const& lp_lon, T const& lp_lat, T& xy_x, T& xy_y) const
+                inline void fwd(T& lp_lon, T& lp_lat, T& xy_x, T& xy_y) const
                 {
                     T b, bt;
 
@@ -112,9 +118,7 @@ namespace projections
     template <typename T, typename Parameters>
     struct tcc_spheroid : public detail::tcc::base_tcc_spheroid<T, Parameters>
     {
-        template <typename Params>
-        inline tcc_spheroid(Params const& , Parameters const& par)
-            : detail::tcc::base_tcc_spheroid<T, Parameters>(par)
+        inline tcc_spheroid(const Parameters& par) : detail::tcc::base_tcc_spheroid<T, Parameters>(par)
         {
             detail::tcc::setup_tcc(this->m_par);
         }
@@ -125,14 +129,23 @@ namespace projections
     {
 
         // Static projection
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_STATIC_PROJECTION(srs::spar::proj_tcc, tcc_spheroid, tcc_spheroid)
+        BOOST_GEOMETRY_PROJECTIONS_DETAIL_STATIC_PROJECTION(srs::par4::tcc, tcc_spheroid, tcc_spheroid)
 
         // Factory entry(s)
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_ENTRY_F(tcc_entry, tcc_spheroid)
-        
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_INIT_BEGIN(tcc_init)
+        template <typename T, typename Parameters>
+        class tcc_entry : public detail::factory_entry<T, Parameters>
         {
-            BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_INIT_ENTRY(tcc, tcc_entry)
+            public :
+                virtual base_v<T, Parameters>* create_new(const Parameters& par) const
+                {
+                    return new base_v_f<tcc_spheroid<T, Parameters>, T, Parameters>(par);
+                }
+        };
+
+        template <typename T, typename Parameters>
+        inline void tcc_init(detail::base_factory<T, Parameters>& factory)
+        {
+            factory.add_to_factory("tcc", new tcc_entry<T, Parameters>);
         }
 
     } // namespace detail

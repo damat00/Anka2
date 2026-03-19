@@ -135,7 +135,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\pc\warrior\effect\b_stars_mall.dds"
+            "D:\YMIR WORK\pc\warrior\effect\b_stars_mall.jpg"
         }
     }
 }
@@ -273,7 +273,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\pc\warrior\effect\b_stars_mall.dds"
+            "D:\YMIR WORK\pc\warrior\effect\b_stars_mall.jpg"
         }
     }
 }

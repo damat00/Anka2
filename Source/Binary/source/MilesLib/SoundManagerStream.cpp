@@ -6,13 +6,13 @@ CSoundManagerStream::CSoundManagerStream()
 }
 
 CSoundManagerStream::~CSoundManagerStream()
-{
+{	
 }
 
 bool CSoundManagerStream::Initialize()
 {
 	CSoundBase::Initialize();
-
+	
 	if (ms_DIGDriver)
 		return true;
 
@@ -25,14 +25,14 @@ bool CSoundManagerStream::Initialize()
 }
 
 void CSoundManagerStream::Destroy()
-{
+{	
 	for (int i=0; i<MUSIC_INSTANCE_MAX_NUM; ++i)
 		m_Instances[i].Stop();
 
 	CSoundBase::Destroy();
 }
 
-bool CSoundManagerStream::SetInstance(DWORD dwIndex, const char* filename)
+bool CSoundManagerStream::SetInstance(DWORD dwIndex, const char *filename)
 {
 	if (!CheckInstanceIndex(dwIndex))
 		return false;

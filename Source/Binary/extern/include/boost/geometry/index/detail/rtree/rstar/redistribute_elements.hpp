@@ -11,8 +11,6 @@
 #ifndef BOOST_GEOMETRY_INDEX_DETAIL_RTREE_RSTAR_REDISTRIBUTE_ELEMENTS_HPP
 #define BOOST_GEOMETRY_INDEX_DETAIL_RTREE_RSTAR_REDISTRIBUTE_ELEMENTS_HPP
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <boost/geometry/index/detail/algorithms/intersection_content.hpp>
 #include <boost/geometry/index/detail/algorithms/margin.hpp>
 #include <boost/geometry/index/detail/algorithms/nth_element.hpp>
@@ -160,7 +158,7 @@ struct choose_split_axis_and_index_for_corner
             }
         }
 
-        ::boost::ignore_unused(parameters);
+        ::boost::ignore_unused_variable_warning(parameters);
     }
 };
 

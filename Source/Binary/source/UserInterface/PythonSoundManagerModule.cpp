@@ -116,6 +116,7 @@ PyObject *sndSetSoundVolumef(PyObject *poSelf, PyObject *poArgs)
 	return Py_BuildNone();
 }
 
+
 PyObject *sndSetSoundVolume(PyObject *poSelf, PyObject *poArgs)
 {
 	int iVolume;

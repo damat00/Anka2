@@ -55,7 +55,7 @@ bool CNetworkAddress::Set(const char *c_szAddr, int port)
 
 void CNetworkAddress::SetLocalIP()
 {
-	SetIP(INADDR_ANY);
+	SetIP(INADDR_ANY);	
 }
 
 void CNetworkAddress::SetIP(DWORD ip)
@@ -98,7 +98,7 @@ void CNetworkAddress::GetIP(char *szIP, int len)
 
 	_snprintf(szIP, len, "%d.%d.%d.%d", IPs[0], IPs[1], IPs[2], IPs[3]);
 }
-
+			
 int CNetworkAddress::GetPort()
 {
 	return ntohs(m_sockAddrIn.sin_port);

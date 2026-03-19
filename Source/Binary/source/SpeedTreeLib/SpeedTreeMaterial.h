@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////  
 //	CSpeedTreeMaterial Class
 //
 //	(c) 2003 IDV, Inc.
@@ -30,20 +30,14 @@
 #pragma once
 
 
-///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////  
 //	Include Files
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-#include <d3d9.h>
-#include <d3d9types.h>
-#include <d3dx9.h>
-#else
 #include <d3d8.h>
 #include <d3d8types.h>
 #include <d3dx8.h>
-#endif
 
-///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////  
 //	class CSpeedTreeMaterial declaration/definiton
 
 class CSpeedTreeMaterial
@@ -57,7 +51,7 @@ class CSpeedTreeMaterial
 			m_cMaterial.Ambient.a = m_cMaterial.Diffuse.a = m_cMaterial.Specular.a = m_cMaterial.Emissive.a = 1.0f;
 			m_cMaterial.Power = 5.0f;
 		}
-
+		
 		void Set(const float * pMaterialArray)
 		{
 			memcpy(&m_cMaterial.Diffuse, pMaterialArray, 3 * sizeof(float));
@@ -65,29 +59,21 @@ class CSpeedTreeMaterial
 
 			memcpy(&m_cMaterial.Ambient, pMaterialArray + 3, 3 * sizeof(float));
 			m_cMaterial.Ambient.a = 1.0f;
-
+			
 			memcpy(&m_cMaterial.Specular, pMaterialArray + 6, 3 * sizeof(float));
 			m_cMaterial.Specular.a = 1.0f;
-
+			
 			memcpy(&m_cMaterial.Emissive, pMaterialArray + 9, 3 * sizeof(float));
 			m_cMaterial.Emissive.a = 1.0f;
 
 			m_cMaterial.Power = pMaterialArray[12];
 		}
-
-#ifdef ENABLE_DIRECTX9_UPDATE
-        D3DMATERIAL9* Get()
-#else
-        D3DMATERIAL8* Get()
-#endif
-        {
-            return &m_cMaterial;
-        }
-
+		
+		D3DMATERIAL8 * Get()
+		{
+			return &m_cMaterial;
+		}
+		
 	private:
-#ifdef ENABLE_DIRECTX9_UPDATE
-        D3DMATERIAL9 m_cMaterial;   // the material object
-#else
-        D3DMATERIAL8 m_cMaterial;   // the material object
-#endif
+		D3DMATERIAL8 m_cMaterial;	// the material object
 };

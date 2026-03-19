@@ -258,7 +258,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\pc\assassin\effect\half_ring_rainbow_line.dds"
+            "half_ring_rainbow_line.dds"
         }
     }
 }

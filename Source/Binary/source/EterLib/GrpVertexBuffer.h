@@ -25,20 +25,12 @@ class CGraphicVertexBuffer : public CGraphicBase
 		bool	Unlock();
 
 		void	SetStream(int stride, int layer=0) const;
-
+			
 		int		GetVertexCount() const;
 		int		GetVertexStride() const;
 		DWORD	GetFlexibleVertexFormat() const;
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-        inline LPDIRECT3DVERTEXBUFFER9 GetD3DVertexBuffer() const
-#else
-        inline LPDIRECT3DVERTEXBUFFER8 GetD3DVertexBuffer() const
-#endif
-        {
-             return m_lpd3dVB;
-        }
-
+		inline	LPDIRECT3DVERTEXBUFFER8 GetD3DVertexBuffer() const	{ return m_lpd3dVB; }
 		inline	DWORD GetBufferSize() const	{ return m_dwBufferSize; }
 
 		bool	IsEmpty() const;
@@ -47,11 +39,7 @@ class CGraphicVertexBuffer : public CGraphicBase
 		void	Initialize();
 
 	protected:
-#ifdef ENABLE_DIRECTX9_UPDATE
-        LPDIRECT3DVERTEXBUFFER9 m_lpd3dVB;
-#else
-        LPDIRECT3DVERTEXBUFFER8 m_lpd3dVB;
-#endif
+		LPDIRECT3DVERTEXBUFFER8 m_lpd3dVB;
 
 		DWORD					m_dwBufferSize;
 		DWORD					m_dwFVF;

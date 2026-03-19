@@ -284,6 +284,8 @@ DWORD CTransmutation::GetPrice() const
 		if (IsTypeMount())
 			return static_cast<DWORD>(ETRANSMUTATIONSETTINGS::TRANSMUTATION_MOUNT_PRICE);
 	}
+
 	return 0;
 }
+
 #endif

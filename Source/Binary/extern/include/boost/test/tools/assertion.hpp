@@ -277,7 +277,7 @@ public:
     }
     void                        report( std::ostream& ostr ) const
     {
-        ostr << tt_detail::print_helper( value() );
+        ostr << tt_detail::print_helper( m_value );
     }
 
     // Mutating operators
@@ -309,11 +309,8 @@ public:
 
 private:
     template<typename U>
-    static void format_message( wrap_stringstream& ostr, U const& v )
-    {
-        ostr << "['" << tt_detail::print_helper(v) << "' evaluates to false]";
-    }
-    static void format_message( wrap_stringstream& /*ostr*/, bool /*v*/ ) {}
+    static void format_message( wrap_stringstream& ostr, U const& v )   { ostr << "[(bool)" << v << " is false]"; }
+    static void format_message( wrap_stringstream& /*ostr*/, bool /*v*/ )       {}
     static void format_message( wrap_stringstream& /*ostr*/, assertion_result const& /*v*/ ) {}
 
     // Data members

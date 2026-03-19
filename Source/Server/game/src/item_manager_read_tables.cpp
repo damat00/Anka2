@@ -175,8 +175,8 @@ bool ITEM_MANAGER::ReadSpecialDropItemFile(const char * c_pszFileName, bool isRe
 
 		if ("attr" == stType)
 		{
-			CSpecialAttrGroup* pkGroup = M2_NEW CSpecialAttrGroup(iVnum);
-			for (int k = 1; k < 1024; ++k) // @fixme148 256 -> 1024
+			CSpecialAttrGroup * pkGroup = M2_NEW CSpecialAttrGroup(iVnum);
+			for (int k = 1; k < 256; ++k)
 			{
 				char buf[4];
 				snprintf(buf, sizeof(buf), "%d", k);
@@ -222,8 +222,8 @@ bool ITEM_MANAGER::ReadSpecialDropItemFile(const char * c_pszFileName, bool isRe
 		}
 		else
 		{
-			CSpecialItemGroup* pkGroup = M2_NEW CSpecialItemGroup(iVnum, type);
-			for (int k = 1; k < 1024; ++k) // @fixme148 256 -> 1024
+			CSpecialItemGroup * pkGroup = M2_NEW CSpecialItemGroup(iVnum, type);
+			for (int k = 1; k < 256; ++k)
 			{
 				char buf[4];
 				snprintf(buf, sizeof(buf), "%d", k);
@@ -283,15 +283,13 @@ bool ITEM_MANAGER::ReadSpecialDropItemFile(const char * c_pszFileName, bool isRe
 						str_to_number(iRarePct, pTok->at(3).c_str());
 					}
 
-					sys_log(0," name %s count %d prob %d rare %d", name.c_str(), iCount, iProb, iRarePct);
+					sys_log(0,"        name %s count %d prob %d rare %d", name.c_str(), iCount, iProb, iRarePct);
 					pkGroup->AddItem(dwVnum, iCount, iProb, iRarePct);
 
-					// CHECK_UNIQUE_GROUP
 					if (iVnum < 30000)
 					{
 						m_ItemToSpecialGroup[dwVnum] = iVnum;
 					}
-					// END_OF_CHECK_UNIQUE_GROUP
 
 					continue;
 				}
@@ -342,6 +340,7 @@ bool ITEM_MANAGER::ReadSpecialDropItemFile(const char * c_pszFileName, bool isRe
 	return true;
 }
 
+
 bool ITEM_MANAGER::ConvSpecialDropItemFile()
 {
 	char szSpecialItemGroupFileName[256];
@@ -387,15 +386,9 @@ bool ITEM_MANAGER::ConvSpecialDropItemFile()
 		{
 			stl_lowers(str);
 			if (str == "pct")
+			{
 				type = 1;
-			// @fixme148 BEGIN
-			else if (str == "quest")
-				type = 2;
-			else if (str == "special")
-				type = 3;
-			else if (str == "attr")
-				type = 4;
-			// @fixme148 END
+			}
 		}
 
 		TTokenVector * pTok;
@@ -403,31 +396,22 @@ bool ITEM_MANAGER::ConvSpecialDropItemFile()
 		fprintf(fp, "Group	%s\n", stName.c_str());
 		fprintf(fp, "{\n");
 		fprintf(fp, "	Vnum	%i\n", iVnum);
-		if (type==1)
-			fprintf(fp, "	Type	Pct\n");
-			// @fixme148 BEGIN
-		else if (type==2)
-			fprintf(fp, "	Type	Quest\n");
-		else if (type==3)
-			fprintf(fp, "	Type	special\n");
-		else if (type==4)
-			fprintf(fp, "	Type	ATTR\n");
-			// @fixme148 END
+		if (type)
+			fprintf(fp, "	Type	Pct");
 
-		for (int k = 1; k < 1024; ++k) // @fixme148 256 -> 1024
+		for (int k = 1; k < 256; ++k)
 		{
 			char buf[4];
 			snprintf(buf, sizeof(buf), "%d", k);
 
 			if (loader.GetTokenVector(buf, &pTok))
 			{
-				std::string& name = pTok->at(0);
+				const std::string& name = pTok->at(0);
 				DWORD dwVnum = 0;
 
 				if (!GetVnumByOriginalName(name.c_str(), dwVnum))
 				{
-					if (
-						name == "exp" ||
+					if (	name == "경험치" ||
 						name == "mob" ||
 						name == "slow" ||
 						name == "drain_hp" ||
@@ -436,17 +420,10 @@ bool ITEM_MANAGER::ConvSpecialDropItemFile()
 					{
 						dwVnum = 0;
 					}
-					// @fixme148 BEGIN
-					else if (name == "경험치")
-					{
-						dwVnum = 0;
-						name = "exp";
-					}
-					// @fixme148 END
 					else
 					{
 						str_to_number(dwVnum, name.c_str());
-						if (!ITEM_MANAGER::instance().GetTable(dwVnum) && type!=4)
+						if (!ITEM_MANAGER::instance().GetTable(dwVnum))
 						{
 							sys_err("ReadSpecialDropItemFile : there is no item %s : node %s", name.c_str(), stName.c_str());
 							fclose(fp);
@@ -459,35 +436,24 @@ bool ITEM_MANAGER::ConvSpecialDropItemFile()
 				int iCount = 0;
 				str_to_number(iCount, pTok->at(1).c_str());
 				int iProb = 0;
-				// @fixme148 BEGIN
-				if (pTok->size() > 2)
-					str_to_number(iProb, pTok->at(2).c_str());
-				// @fixme148 END
+				str_to_number(iProb, pTok->at(2).c_str());
 
 				int iRarePct = 0;
 				if (pTok->size() > 3)
-					str_to_number(iRarePct, pTok->at(3).c_str());
-
-				// @fixme148 BEGIN
-				if (type == 4)
-					fprintf(fp, "	%d	%u	%d\n", k, dwVnum, iCount);
-				// @fixme148 END
-				else
 				{
-					if (0 == dwVnum)
-						fprintf(fp, "	%d	%s	%d	%d\n", k, name.c_str(), iCount, iProb);
-					else
-						fprintf(fp, "	%d	%u	%d	%d\n", k, dwVnum, iCount, iProb);
+					str_to_number(iRarePct, pTok->at(3).c_str());
 				}
+
+				if (0 == dwVnum)
+					fprintf(fp, "	%d	%s	%d	%d\n", k, name.c_str(), iCount, iProb);
+				else
+					fprintf(fp, "	%d	%u	%d	%d\n", k, dwVnum, iCount, iProb);
 
 				continue;
 			}
 
 			break;
 		}
-		std::string effect;
-		if (loader.GetTokenString("effect", &effect))
-			fprintf(fp, "	effect	\"%s\"\n", effect.c_str());
 		fprintf(fp, "}\n");
 		fprintf(fp, "\n");
 
@@ -616,7 +582,12 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName, bool isR
 
 		int iMobVnum = 0;
 		int iKillDrop = 0;
+#ifdef ENABLE_DROP_LEVEL_LIMIT_RANGE
+		int iLevelLimitStart = 0;
+		int iLevelLimitEnd = 0;
+#else
 		int iLevelLimit = 0;
+#endif
 
 		std::string strType("");
 
@@ -648,6 +619,29 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName, bool isR
 			iKillDrop = 1;
 		}
 
+#ifdef ENABLE_DROP_LEVEL_LIMIT_RANGE
+		if (strType == "limit")
+		{
+			if (!loader.GetTokenInteger("level_limit_start", &iLevelLimitStart))
+			{
+				sys_err("ReadmonsterDropItemGroup : Syntax error %s : no level_limit_start, node %s", c_pszFileName, stName.c_str());
+				loader.SetParentNode();
+				return false;
+			}
+
+			if (!loader.GetTokenInteger("level_limit_end", &iLevelLimitEnd))
+			{
+				sys_err("ReadmonsterDropItemGroup : Syntax error %s : no level_limit_end, node %s", c_pszFileName, stName.c_str());
+				loader.SetParentNode();
+				return false;
+			}
+		}
+		else
+		{
+			iLevelLimitStart = 0;
+			iLevelLimitEnd = 0;
+		}
+#else
 		if ( strType == "limit" )
 		{
 			if ( !loader.GetTokenInteger("level_limit", &iLevelLimit) )
@@ -661,6 +655,7 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName, bool isR
 		{
 			iLevelLimit = 0;
 		}
+#endif
 
 		sys_log(0,"MOB_ITEM_GROUP %s [%s] %d %d", stName.c_str(), strType.c_str(), iMobVnum, iKillDrop);
 
@@ -683,7 +678,6 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName, bool isR
 
 				if (loader.GetTokenVector(buf, &pTok))
 				{
-					//sys_log(1, "               %s %s", pTok->at(0).c_str(), pTok->at(1).c_str());
 					std::string& name = pTok->at(0);
 					DWORD dwVnum = 0;
 
@@ -700,7 +694,7 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName, bool isR
 					int iCount = 0;
 					str_to_number(iCount, pTok->at(1).c_str());
 
-					if (iCount < 1)
+					if (iCount<1)
 					{
 						sys_err("ReadMonsterDropItemGroup : there is no count for item %s : node %s : vnum %d, count %d", name.c_str(), stName.c_str(), dwVnum, iCount);
 						return false;
@@ -719,7 +713,7 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName, bool isR
 					str_to_number(iRarePct, pTok->at(3).c_str());
 					iRarePct = MINMAX(0, iRarePct, 100);
 
-					sys_log(0," %s count %d rare %d", name.c_str(), iCount, iRarePct);
+					sys_log(0,"        %s count %d rare %d", name.c_str(), iCount, iRarePct);
 					pkGroup->AddItem(dwVnum, iCount, iPartPct, iRarePct);
 
 					continue;
@@ -801,17 +795,10 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName, bool isR
 
 					float fPercent = atof(pTok->at(2).c_str());
 
-#ifdef __SYSTEM_SEARCH_ITEM_MOB__
-					int iPercent = atoi(pTok->at(2).c_str());
-#endif
 					DWORD dwPct = (DWORD)(10000.0f * fPercent);
 
-					sys_log(0," name %s pct %d count %d", name.c_str(), dwPct, iCount);
-#ifdef __SYSTEM_SEARCH_ITEM_MOB__
-					pkGroup->AddItem(dwVnum, dwPct, iPercent, iCount);			
-#else
+					sys_log(0,"        name %s pct %d count %d", name.c_str(), dwPct, iCount);
 					pkGroup->AddItem(dwVnum, dwPct, iCount);
-#endif
 
 					continue;
 				}
@@ -830,7 +817,11 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName, bool isR
 		}
 		else if ( strType == "limit" )
 		{
+#ifdef ENABLE_DROP_LEVEL_LIMIT_RANGE
+			CLevelItemGroup* pkLevelItemGroup = M2_NEW CLevelItemGroup(iLevelLimitStart, iLevelLimitEnd);
+#else
 			CLevelItemGroup* pkLevelItemGroup = M2_NEW CLevelItemGroup(iLevelLimit);
+#endif
 
 			for ( int k=1; k < 256; k++ )
 			{
@@ -847,7 +838,6 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName, bool isR
 						str_to_number(dwItemVnum, name.c_str());
 						if ( !ITEM_MANAGER::instance().GetTable(dwItemVnum) )
 						{
-							sys_err("ReadDropItemGroup : there is no item %s : node %s", name.c_str(), stName.c_str());
 							M2_DELETE(pkLevelItemGroup);
 							return false;
 						}
@@ -858,7 +848,6 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName, bool isR
 
 					if (iCount < 1)
 					{
-						sys_err("ReadMonsterDropItemGroup : there is no count for item %s : node %s", name.c_str(), stName.c_str());
 						M2_DELETE(pkLevelItemGroup);
 						return false;
 					}
@@ -866,7 +855,6 @@ bool ITEM_MANAGER::ReadMonsterDropItemGroup(const char * c_pszFileName, bool isR
 					float fPct = atof(pTok->at(2).c_str());
 					DWORD dwPct = (DWORD)(10000.0f * fPct);
 
-					sys_log(0, "        name %s pct %d count %d", name.c_str(), dwPct, iCount);
 					pkLevelItemGroup->AddItem(dwItemVnum, dwPct, iCount);
 
 					continue;
@@ -1055,9 +1043,6 @@ bool ITEM_MANAGER::ReadDropItemGroup(const char * c_pszFileName)
 
 				float fPercent = atof(pTok->at(1).c_str());
 
-#ifdef __SYSTEM_SEARCH_ITEM_MOB__
-				int iPercent = atoi(pTok->at(1).c_str());
-#endif
 				DWORD dwPct = (DWORD)(10000.0f * fPercent);
 
 				int iCount = 1;
@@ -1075,11 +1060,7 @@ bool ITEM_MANAGER::ReadDropItemGroup(const char * c_pszFileName)
 				}
 
 				sys_log(0,"        %s %d %d", name.c_str(), dwPct, iCount);
-#ifdef __SYSTEM_SEARCH_ITEM_MOB__
-				pkGroup->AddItem(dwVnum, dwPct, iPercent, iCount);
-#else
 				pkGroup->AddItem(dwVnum, dwPct, iCount);
-#endif
 				continue;
 			}
 

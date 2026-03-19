@@ -154,13 +154,11 @@ BOOL CEffectMesh::__LoadData_Ver002(int iSize, const BYTE * c_pbBuf)
 
 			memcpy(&v3VertexVector[0], c_pbBuf, rFrameData.dwVertexCount*sizeof(D3DXVECTOR3));
 			c_pbBuf += rFrameData.dwVertexCount*sizeof(D3DXVECTOR3);
-			if (rFrameData.dwIndexCount) // @fixme027
-				memcpy(&iIndexVector[0], c_pbBuf, rFrameData.dwIndexCount*sizeof(int));
+			memcpy(&iIndexVector[0], c_pbBuf, rFrameData.dwIndexCount*sizeof(int));
 			c_pbBuf += rFrameData.dwIndexCount*sizeof(int);
 			memcpy(&v3TextureVertexVector[0], c_pbBuf, rFrameData.dwTextureVertexCount*sizeof(D3DXVECTOR2));
 			c_pbBuf += rFrameData.dwTextureVertexCount*sizeof(D3DXVECTOR2);
-			if (rFrameData.dwIndexCount) // @fixme027
-				memcpy(&iTextureIndexVector[0], c_pbBuf, rFrameData.dwIndexCount*sizeof(int));
+			memcpy(&iTextureIndexVector[0], c_pbBuf, rFrameData.dwIndexCount*sizeof(int));
 			c_pbBuf += rFrameData.dwIndexCount*sizeof(int);
 
 			///////////////////////////////
@@ -262,6 +260,8 @@ BOOL CEffectMesh::__LoadData_Ver001(int iSize, const BYTE * c_pbBuf)
 		memcpy(pMeshData->szDiffuseMapFileName, c_pbBuf, 128);
 		c_pbBuf += 128;
 
+		//
+
 		DWORD dwVertexCount;
 		DWORD dwIndexCount;
 		DWORD dwTextureVertexCount;
@@ -299,13 +299,11 @@ BOOL CEffectMesh::__LoadData_Ver001(int iSize, const BYTE * c_pbBuf)
 			c_pbBuf += sizeof(float);
 			memcpy(&v3VertexVector[0], c_pbBuf, rFrameData.dwVertexCount*sizeof(D3DXVECTOR3));
 			c_pbBuf += rFrameData.dwVertexCount*sizeof(D3DXVECTOR3);
-			if (rFrameData.dwIndexCount) // @fixme027
-				memcpy(&iIndexVector[0], c_pbBuf, rFrameData.dwIndexCount*sizeof(int));
+			memcpy(&iIndexVector[0], c_pbBuf, rFrameData.dwIndexCount*sizeof(int));
 			c_pbBuf += rFrameData.dwIndexCount*sizeof(int);
 			memcpy(&v3TextureVertexVector[0], c_pbBuf, rFrameData.dwTextureVertexCount*sizeof(D3DXVECTOR2));
 			c_pbBuf += rFrameData.dwTextureVertexCount*sizeof(D3DXVECTOR2);
-			if (rFrameData.dwIndexCount) // @fixme027
-				memcpy(&iTextureIndexVector[0], c_pbBuf, rFrameData.dwIndexCount*sizeof(int));
+			memcpy(&iTextureIndexVector[0], c_pbBuf, rFrameData.dwIndexCount*sizeof(int));
 			c_pbBuf += rFrameData.dwIndexCount*sizeof(int);
 
 			///////////////////////////////
@@ -565,6 +563,7 @@ BOOL CEffectMeshScript::GetTimeTableAlphaPointer(DWORD dwMeshIndex, TTimeEventTa
 
 	return TRUE;
 }
+
 
 BOOL CEffectMeshScript::isMeshAnimationLoop()
 {

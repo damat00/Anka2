@@ -47,7 +47,7 @@ struct CameraCollisionChecker
 	std::vector<D3DXVECTOR3>* m_pkVct_v3Position;
 	CDynamicSphereInstance * m_pdsi;
 
-	CameraCollisionChecker(CDynamicSphereInstance * pdsi, std::vector<D3DXVECTOR3>* pkVct_v3Position) : m_pdsi(pdsi), m_pkVct_v3Position(pkVct_v3Position), m_isBlocked(false)
+	CameraCollisionChecker(CDynamicSphereInstance * pdsi, std::vector<D3DXVECTOR3>* pkVct_v3Position) : m_pdsi(pdsi), m_pkVct_v3Position(pkVct_v3Position), m_isBlocked(false) 
 	{
 	}
 	void operator () (CGraphicObjectInstance* pOpponent)
@@ -239,7 +239,7 @@ void CCamera::Update()
 
 	float fNewDistance=fMAX(CAMERA_MIN_DISTANCE, fMIN( CAMERA_MAX_DISTANCE, GetDistance() - m_v3AngularVelocity.y ) );
 	SetDistance(fNewDistance);
-
+	
 	if (m_bProcessTerrainCollision)
  		ProcessTerrainCollision();
 

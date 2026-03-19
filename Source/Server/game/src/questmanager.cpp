@@ -18,23 +18,12 @@
 #include "locale_service.h"
 #include "dungeon.h"
 #include "questevent.h"
-#ifdef ENABLE_SUNG_MAHI_TOWER
-#include "db.h"
-#endif
+
 #ifdef ENABLE_RENEWAL_QUEST
 	#include <vector>
 	#include <iostream>
 	#include <sstream>
 #endif
-
-#ifdef ENABLE_ATTENDANCE_EVENT
-	#include "minigame.h"
-#endif
-
-#ifdef ENABLE_EVENT_SYSTEM
-	#include "auto_event_list.h"
-#endif
-
 
 DWORD g_GoldDropTimeLimitValue = 0;
 extern bool DropEvent_CharStone_SetValue(const std::string& name, int value);
@@ -45,8 +34,7 @@ namespace quest
 	using namespace std;
 
 	CQuestManager::CQuestManager()
-		: m_pSelectedDungeon(NULL),
-		m_dwServerTimerArg(0), m_iRunningEventIndex(0), L(NULL), m_bNoSend (false),
+		: m_pSelectedDungeon(NULL), m_dwServerTimerArg(0), m_iRunningEventIndex(0), L(NULL), m_bNoSend (false),
 		m_CurrentRunningState(NULL), m_pCurrentCharacter(NULL), m_pCurrentNPCCharacter(NULL), m_pCurrentPartyMember(NULL),
 		m_pCurrentPC(NULL),  m_iCurrentSkin(0), m_bError(false), m_pOtherPCBlockRootPC(NULL)
 	{
@@ -64,64 +52,7 @@ namespace quest
 			lua_close(L);
 			L = NULL;
 		}
-#ifdef ENABLE_SUNG_MAHI_TOWER
-		if (m_sung_mahi_reward_event)
-		{
-			event_cancel(&m_sung_mahi_reward_event);
-			m_sung_mahi_reward_event = NULL;
-		}
-#endif
-	}
-#ifdef ENABLE_SUNG_MAHI_TOWER
-	EVENTINFO(SungMahiMonthlyRewardInfo)
-	{
-		int iLastMonth;
-	};
-	
-	EVENTFUNC(SungMahiMonthRewardTimer)
-	{
-		SungMahiMonthlyRewardInfo* info = dynamic_cast<SungMahiMonthlyRewardInfo*>( event->info );
-		if ( info == NULL )
-		{
-			sys_err( "SungMahiMonthRewardTimer> <Factor> Null pointer" );
-			return 0;
-		}
-		
-		time_t cur_Time = time(NULL);
-		struct tm vKey = *localtime(&cur_Time);
-		int currentMonth = vKey.tm_mon;
-		
-		if (quest::CQuestManager::instance().GetEventFlag("sungMahiLastMonth") != currentMonth)
-		{
-			// for (auto index = 1; index <= SUNG_MAHI_MAX_LEVEL; index++)
-			// {
-				// std::unique_ptr<SQLMsg> pMsg((DBManager::instance().DirectQuery("SELECT player_login FROM `sung_mahi_ranking` WHERE tower_level = %d ORDER BY tower_time ASC LIMIT 1", index));
-				// if (pMsg->Get()->uiNumRows == 0)
-					// continue;
-				
-				// MYSQL_ROW row = mysql_fetch_row(pMsg->Get()->pSQLResult);
-				// bool isElementStage = (index % 10 < 1);
-				// int iCount = (isElementStage ? (5 * (index / 10)) : (1 + (index / 10)));
-				
-				// DBManager::instance().Query("INSERT INTO item_award (login, vnum, count, given_time, why, mall) VALUES ('%s', %d, %d, now(), '%s', 1);", row[0], 50249, iCount, "month_sung_mahi_reward");
-			// }
-			
-			DBManager::instance().Query("TRUNCATE TABLE `sung_mahi_ranking`;");
-			quest::CQuestManager::instance().RequestSetEventFlag("sungMahiLastMonth", currentMonth);
-			
-			// dofile to clear the set
-			{
-				char questDungeonInformation[256];
-				snprintf(questDungeonInformation, sizeof(questDungeonInformation), "%s/dungeonLibrary/dungeonInfoLibrary.lua", LocaleService_GetQuestPath().c_str());
-				lua_dofile(quest::CQuestManager::instance().GetLuaState(), questDungeonInformation);
-			}
-			
-			BroadcastNotice(LC_TEXT("Sungma Tower Ranking Season has ended!"));
-		}
-		
-		return PASSES_PER_SEC(60);
-	}
-#endif
+	}	
 
 	bool CQuestManager::Initialize()
 	{
@@ -133,17 +64,13 @@ namespace quest
 
 		m_pSelectedDungeon = NULL;
 
-		m_mapEventName.insert(TEventNameMap::value_type("click", QUEST_CLICK_EVENT)); // NPC
-		m_mapEventName.insert(TEventNameMap::value_type("kill", QUEST_KILL_EVENT)); // Mob
+		m_mapEventName.insert(TEventNameMap::value_type("click", QUEST_CLICK_EVENT));
+		m_mapEventName.insert(TEventNameMap::value_type("kill", QUEST_KILL_EVENT));
 		m_mapEventName.insert(TEventNameMap::value_type("timer", QUEST_TIMER_EVENT));
 		m_mapEventName.insert(TEventNameMap::value_type("levelup", QUEST_LEVELUP_EVENT));
 		m_mapEventName.insert(TEventNameMap::value_type("login", QUEST_LOGIN_EVENT));
 		m_mapEventName.insert(TEventNameMap::value_type("logout", QUEST_LOGOUT_EVENT));
 		m_mapEventName.insert(TEventNameMap::value_type("button", QUEST_BUTTON_EVENT));
-#ifdef ENABLE_COLLECT_WINDOW
-		m_mapEventName.insert(TEventNameMap::value_type("button2", QUEST_BUTTON_EVENT2));
-		m_mapEventName.insert(TEventNameMap::value_type("openwindow", QUEST_OPEN_WINDOW));
-#endif
 		m_mapEventName.insert(TEventNameMap::value_type("info", QUEST_INFO_EVENT));
 		m_mapEventName.insert(TEventNameMap::value_type("chat", QUEST_CHAT_EVENT));
 		m_mapEventName.insert(TEventNameMap::value_type("in", QUEST_ATTR_IN_EVENT));
@@ -158,10 +85,11 @@ namespace quest
 		m_mapEventName.insert(TEventNameMap::value_type("party_kill", QUEST_PARTY_KILL_EVENT));
 		m_mapEventName.insert(TEventNameMap::value_type("unmount", QUEST_UNMOUNT_EVENT));
 		m_mapEventName.insert(TEventNameMap::value_type("pick", QUEST_ITEM_PICK_EVENT));
-		m_mapEventName.insert(TEventNameMap::value_type("sig_use", QUEST_SIG_USE_EVENT)); // Special item group
+		m_mapEventName.insert(TEventNameMap::value_type("sig_use", QUEST_SIG_USE_EVENT));
 		m_mapEventName.insert(TEventNameMap::value_type("item_informer", QUEST_ITEM_INFORMER_EVENT));
-#ifdef ENABLE_MELEY_LAIR_DUNGEON
-		m_mapEventName.insert(TEventNameMap::value_type("attack", QUEST_ATTACK_EVENT));
+#ifdef ENABLE_EVENT_MANAGER
+		m_mapEventName.insert(TEventNameMap::value_type("event_begin", QUEST_GAME_EVENT_BEGIN));
+		m_mapEventName.insert(TEventNameMap::value_type("event_end", QUEST_GAME_EVENT_END));
 #endif
 
 		m_bNoSend = false;
@@ -173,9 +101,9 @@ namespace quest
 			int line = 0;
 
 			if (!inf.is_open())
-				sys_err("QUEST Cannot open 'questnpc.txt'");
+				sys_err( "QUEST Cannot open 'questnpc.txt'");
 			else
-				sys_log(0, "QUEST can open 'questnpc.txt' (%s)", g_stQuestDir.c_str());
+				sys_log(0, "QUEST can open 'questnpc.txt' (%s)", g_stQuestDir.c_str() );
 
 			while (1)
 			{
@@ -190,46 +118,34 @@ namespace quest
 
 				string s;
 				getline(inf, s);
-				unsigned int li = 0, ri = s.size() - 1;
+				unsigned int li = 0, ri = s.size()-1;
 				while (li < s.size() && isspace(s[li])) li++;
 				while (ri > 0 && isspace(s[ri])) ri--;
 
-				if (ri < li)
+				if (ri < li) 
 				{
-					sys_err("QUEST questnpc.txt:%d:npc name error", line);
+					sys_err("QUEST questnpc.txt:%d:npc name error",line);
 					continue;
 				}
 
-				s = s.substr(li, ri - li + 1);
+				s = s.substr(li, ri-li+1);
 
-				int n = 0;
+				int	n = 0;
 				str_to_number(n, s.c_str());
 				if (n)
 					continue;
 
-				//cout << '-' << s << '-' << endl;
 				if ( test_server )
 					sys_log(0, "QUEST reading script of %s(%d)", s.c_str(), vnum);
 				m_mapNPC[vnum].Set(vnum, s);
 				m_mapNPCNameID[s] = vnum;
 			}
 
-			// notarget quest
 			m_mapNPC[0].Set(0, "notarget");
 		}
 
 		SetEventFlag("guild_withdraw_delay", 1);
 		SetEventFlag("guild_disband_delay", 1);
-
-#ifdef ENABLE_SUNG_MAHI_TOWER
-		if (strcmp(g_stHostname.c_str(), "channels-channel1-core1") == 0)
-		{
-			SungMahiMonthlyRewardInfo* info = AllocEventInfo<SungMahiMonthlyRewardInfo>();
-			info->iLastMonth = 0;
-			m_sung_mahi_reward_event = event_create(SungMahiMonthRewardTimer, info, PASSES_PER_SEC(60));
-		}
-#endif
-
 #ifdef ENABLE_RENEWAL_QUEST
 		ReadQuestCategoryToDict();
 #endif
@@ -248,8 +164,8 @@ namespace quest
 		if (pPC && pPC->IsRunning() && pPC->GetRunningQuestState()->suspend_state == SUSPEND_STATE_SELECT_ITEM)
 		{
 			pPC->SetSendDoneFlag();
-			pPC->GetRunningQuestState()->args = 1;
-			lua_pushnumber(pPC->GetRunningQuestState()->co, selection);
+			pPC->GetRunningQuestState()->args=1;
+			lua_pushnumber(pPC->GetRunningQuestState()->co,selection);
 
 			if (!RunState(*pPC->GetRunningQuestState()))
 			{
@@ -285,7 +201,7 @@ namespace quest
 
 		pPC->SetSendDoneFlag();
 
-		pPC->GetRunningQuestState()->args = 1;
+		pPC->GetRunningQuestState()->args=1;
 		lua_pushnumber(pPC->GetRunningQuestState()->co, confirm);
 
 		AddScript("[END_CONFIRM_WAIT]");
@@ -297,6 +213,7 @@ namespace quest
 			CloseState(*pPC->GetRunningQuestState());
 			pPC->EndRunning();
 		}
+
 	}
 
 #ifdef ENABLE_RENEWAL_QUEST
@@ -327,22 +244,16 @@ namespace quest
 			if (lineFromFile.empty())
 				continue;
 
-		std::stringstream strstr(lineFromFile);
-		std::istream_iterator<std::string> it(strstr);
-		std::istream_iterator<std::string> end;
-		std::vector<std::string> data(it, end);
+			std::stringstream strstr(lineFromFile);
+			std::istream_iterator<std::string> it(strstr);
+			std::istream_iterator<std::string> end;
+			std::vector<std::string> data(it, end);
 
-		if (data.size() < 2)
-		{
-			sys_err("QUEST Invalid questcategory.txt line (expected at least 2 fields): %s", lineFromFile.c_str());
-			continue;
-		}
+			std::ostream_iterator<std::string> oit(std::cout);
+			std::copy(data.begin(), data.end(), oit);
 
-		std::ostream_iterator<std::string> oit(std::cout);
-		std::copy(data.begin(), data.end(), oit);
-
-		int category_num = atoi(data[0].c_str());
-		string quest_name = data[1];
+			int category_num = atoi(data[0].c_str());
+			string quest_name = data[1];
 
 			unsigned int quest_index = CQuestManager::Instance().GetQuestIndexByName(quest_name);
 
@@ -352,7 +263,7 @@ namespace quest
 			if (quest_index != 0)
 				QuestCategoryIndexMap[quest_index] = category_num;
 			else
-				sys_log(0, "QUEST: Could not find QuestIndex for name Quest: %s(%d) - quest may not exist or is not loaded", quest_name.c_str(), category_num);
+				sys_err("QUEST coult not find QuestIndex for name Quest: %s(%d)", quest_name.c_str(), category_num);
 		}
 	}
 #endif
@@ -362,7 +273,7 @@ namespace quest
 		PC* pPC = GetPC(pc);
 		if (!pPC)
 		{
-			sys_err("no pc! : %u", pc);
+			sys_err("no pc! : %u",pc);
 			return;
 		}
 
@@ -380,8 +291,8 @@ namespace quest
 
 		pPC->SetSendDoneFlag();
 
-		pPC->GetRunningQuestState()->args = 1;
-		lua_pushstring(pPC->GetRunningQuestState()->co, msg);
+		pPC->GetRunningQuestState()->args=1;
+		lua_pushstring(pPC->GetRunningQuestState()->co,msg);
 
 		if (!RunState(*pPC->GetRunningQuestState()))
 		{
@@ -394,7 +305,7 @@ namespace quest
 	{
 		PC* pPC;
 
-		if ((pPC = GetPC(pc)) && pPC->IsRunning() && pPC->GetRunningQuestState()->suspend_state == SUSPEND_STATE_SELECT)
+		if ((pPC = GetPC(pc)) && pPC->IsRunning() && pPC->GetRunningQuestState()->suspend_state==SUSPEND_STATE_SELECT)
 		{
 			pPC->SetSendDoneFlag();
 
@@ -417,9 +328,8 @@ namespace quest
 			}
 			else
 			{
-				// on default
-				pPC->GetRunningQuestState()->args = 1;
-				lua_pushnumber(pPC->GetRunningQuestState()->co, selection + 1);
+				pPC->GetRunningQuestState()->args=1;
+				lua_pushnumber(pPC->GetRunningQuestState()->co,selection+1);
 
 				if (!RunState(*pPC->GetRunningQuestState()))
 				{
@@ -430,7 +340,7 @@ namespace quest
 		}
 		else
 		{
-			sys_err("wrong QUEST_SELECT request! : %d", pc);
+			sys_err("wrong QUEST_SELECT request! : %d",pc);
 		}
 	}
 
@@ -451,11 +361,6 @@ namespace quest
 		}
 		else
 		{
-			//cerr << pPC << endl;
-			//cerr << pPC->IsRunning() << endl;
-			//cerr << pPC->GetRunningQuestState()->suspend_state;
-			//cerr << SUSPEND_STATE_WAIT << endl;
-			//cerr << "wrong QUEST_WAIT request! : " << pc << endl;
 			sys_err("wrong QUEST_WAIT request! : %d",pc);
 		}
 	}
@@ -521,11 +426,6 @@ namespace quest
 		}
 	}
 
-	///////////////////////////////////////////////////////////////////////////////////////////
-	//
-	// Quest Event
-	//
-	///////////////////////////////////////////////////////////////////////////////////////////
 	void CQuestManager::Login(unsigned int pc, const char * c_pszQuest)
 	{
 		PC * pPC;
@@ -560,7 +460,6 @@ namespace quest
 
 	void CQuestManager::Kill(unsigned int pc, unsigned int npc)
 	{
-		// m_CurrentNPCRace = npc;
 		PC * pPC;
 
 		sys_log(0, "CQuestManager::Kill QUEST_KILL_EVENT (pc=%d, npc=%d)", pc, npc);
@@ -570,10 +469,10 @@ namespace quest
 			if (!CheckQuestLoaded(pPC))
 				return;
 
-			// kill call script
-			if (npc >= MAIN_RACE_MAX_NUM) //@fixme109
-				m_mapNPC[npc].OnKill(*pPC); //@warme004
-			m_mapNPC[QUEST_NO_NPC].OnKill(*pPC);
+			if(npc > 0) // Fix
+			{
+				m_mapNPC[npc].OnKill(*pPC);
+			}
 
 			LPCHARACTER ch = GetCurrentCharacterPtr();
 			LPPARTY pParty = ch->GetParty();
@@ -582,9 +481,9 @@ namespace quest
 			if (leader)
 			{
 				m_pCurrentPartyMember = ch;
-				if (npc >= MAIN_RACE_MAX_NUM) //@fixme109
-					m_mapNPC[npc].OnPartyKill(*GetPC(leader->GetPlayerID())); //@warme004
-				m_mapNPC[QUEST_NO_NPC].OnPartyKill(*GetPC(leader->GetPlayerID()));
+
+				if (m_mapNPC[npc].OnPartyKill(*GetPC(leader->GetPlayerID())))
+					return;
 
 				pPC = GetPC(pc);
 			}
@@ -622,16 +521,14 @@ namespace quest
 			{
 				return false;
 			}
-			// call script
+
 			return m_mapNPC[npc].OnTimer(*pPC);
 		}
 		else
 		{
-			//cout << "no such pc id : " << pc;
 			sys_err("QUEST TIMER_EVENT no such pc id : %d", pc);
 			return false;
 		}
-		//cerr << "QUEST TIMER" << endl;
 	}
 
 	void CQuestManager::LevelUp(unsigned int pc)
@@ -660,12 +557,10 @@ namespace quest
 			if (!CheckQuestLoaded(pPC))
 				return;
 
-			// call script
-			m_mapNPC[attr + QUEST_ATTR_NPC_START].OnAttrIn(*pPC);
+			m_mapNPC[attr+QUEST_ATTR_NPC_START].OnAttrIn(*pPC);
 		}
 		else
 		{
-			//cout << "no such pc id : " << pc;
 			sys_err("QUEST no such pc id : %d", pc);
 		}
 	}
@@ -675,22 +570,19 @@ namespace quest
 		PC* pPC;
 		if ((pPC = GetPC(pc)))
 		{
-			//m_pCurrentCharacter = ch;
 			m_pCurrentPartyMember = ch;
 			if (!CheckQuestLoaded(pPC))
 				return;
 
-			// call script
-			m_mapNPC[attr + QUEST_ATTR_NPC_START].OnAttrOut(*pPC);
+			m_mapNPC[attr+QUEST_ATTR_NPC_START].OnAttrOut(*pPC);
 		}
 		else
 		{
-			//cout << "no such pc id : " << pc;
 			sys_err("QUEST no such pc id : %d", pc);
 		}
 	}
 
-	bool CQuestManager::Target(unsigned int pc, DWORD dwQuestIndex, const char* c_pszTargetName, const char* c_pszVerb)
+	bool CQuestManager::Target(unsigned int pc, DWORD dwQuestIndex, const char * c_pszTargetName, const char * c_pszVerb)
 	{
 		PC * pPC;
 
@@ -728,45 +620,34 @@ namespace quest
 		}
 		else
 		{
-			//cout << "no such pc id : " << pc;
 			sys_err("QUEST INFO_EVENT no such pc id : %d", pc);
 		}
 	}
 
-#ifdef ENABLE_COLLECT_WINDOW
-	void CQuestManager::QuestButton(unsigned int pc, unsigned int quest_index, BYTE buttonIndex)
-#else
 	void CQuestManager::QuestButton(unsigned int pc, unsigned int quest_index)
-#endif
 	{
 		PC* pPC;
 		if ((pPC = GetPC(pc)))
 		{
-			// call script
 			if (!CheckQuestLoaded(pPC))
 			{
 				LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(pc);
+
 				if (ch)
 					ch->LocaleChatPacket(CHAT_TYPE_INFO, 118, "");
 
 				return;
 			}
-#ifdef ENABLE_COLLECT_WINDOW
-			m_mapNPC[QUEST_NO_NPC].OnButton(*pPC, quest_index, buttonIndex);
-#else
 			m_mapNPC[QUEST_NO_NPC].OnButton(*pPC, quest_index);
-#endif
 		}
 		else
 		{
-			//cout << "no such pc id : " << pc;
 			sys_err("QUEST CLICK_EVENT no such pc id : %d", pc);
 		}
 	}
 
 	bool CQuestManager::TakeItem(unsigned int pc, unsigned int npc, LPITEM item)
 	{
-		//m_CurrentNPCRace = npc;
 		PC* pPC;
 
 		if ((pPC = GetPC(pc)))
@@ -780,13 +661,12 @@ namespace quest
 
 				return false;
 			}
-			// call script
+
 			SetCurrentItem(item);
 			return m_mapNPC[npc].OnTakeItem(*pPC);
 		}
 		else
 		{
-			//cout << "no such pc id : " << pc;
 			sys_err("QUEST USE_ITEM_EVENT no such pc id : %d", pc);
 			return false;
 		}
@@ -808,20 +688,18 @@ namespace quest
 
 				return false;
 			}
-			// call script
+
 			SetCurrentItem(item);
 
 			return m_mapNPC[item->GetVnum()].OnUseItem(*pPC, bReceiveAll);
 		}
 		else
 		{
-			//cout << "no such pc id : " << pc;
 			sys_err("QUEST USE_ITEM_EVENT no such pc id : %d", pc);
 			return false;
 		}
 	}
 
-	// Speical Item Group Group Use
 	bool CQuestManager::SIGUse(unsigned int pc, DWORD sig_vnum, LPITEM item, bool bReceiveAll)
 	{
 		if (test_server)
@@ -838,14 +716,13 @@ namespace quest
 
 				return false;
 			}
-			// call script
+
 			SetCurrentItem(item);
 
 			return m_mapNPC[sig_vnum].OnSIGUse(*pPC, bReceiveAll);
 		}
 		else
 		{
-			//cout << "no such pc id : " << pc;
 			sys_err("QUEST USE_ITEM_EVENT no such pc id : %d", pc);
 			return false;
 		}
@@ -915,16 +792,14 @@ namespace quest
 				if (it == m_mapNPC.end())
 				{
 					sys_log(0, "CQuestManager::Click(pid=%d, target_npc_name=%s) - NOT EXIST NPC RACE VNUM[%d]",
-							pc,
-							pkChrTarget->GetName(),
-							dwCurrentNPCRace); // @warme012
+						pc,
+						pkChrTarget->GetName(),
+						dwCurrentNPCRace); // @warme012
 					return false;
 				}
 
-				// call script
 				if (it->second.HasChat())
 				{
-					// if have chat, give chat
 					if (test_server)
 						sys_log(0, "CQuestManager::Click->OnChat");
 
@@ -940,7 +815,6 @@ namespace quest
 				}
 				else
 				{
-					// else click
 					return it->second.OnClick(*pPC);
 				}
 			}
@@ -948,16 +822,14 @@ namespace quest
 		}
 		else
 		{
-			//cout << "no such pc id : " << pc;
 			sys_err("QUEST CLICK_EVENT no such pc id : %d", pc);
 			return false;
 		}
-		//cerr << "QUEST CLICk" << endl;
 	}
 
 	void CQuestManager::Unmount(unsigned int pc)
 	{
-		PC* pPC;
+		PC * pPC;
 
 		if ((pPC = GetPC(pc)))
 		{
@@ -1054,13 +926,13 @@ namespace quest
 		}
 	}
 
-	PC* CQuestManager::GetPCForce(unsigned int pc)
+	PC * CQuestManager::GetPCForce(unsigned int pc)
 	{
 		PCMap::iterator it;
 
 		if ((it = m_mapPC.find(pc)) == m_mapPC.end())
 		{
-			PC* pPC = &m_mapPC[pc];
+			PC * pPC = &m_mapPC[pc];
 			pPC->SetID(pc);
 			return pPC;
 		}
@@ -1068,7 +940,7 @@ namespace quest
 		return &it->second;
 	}
 
-	PC* CQuestManager::GetPC(unsigned int pc)
+	PC * CQuestManager::GetPC(unsigned int pc)
 	{
 		PCMap::iterator it;
 
@@ -1091,7 +963,7 @@ namespace quest
 
 	void CQuestManager::AddScript(const string& str)
 	{
-		m_strScript += str;
+		m_strScript+=str;
 	}
 
 	void CQuestManager::SendScript()
@@ -1103,9 +975,9 @@ namespace quest
 			return;
 		}
 
-		if (m_strScript == "[DONE]" || m_strScript == "[NEXT]")
+		if (m_strScript=="[DONE]" || m_strScript == "[NEXT]")
 		{
-			if (m_pCurrentPC && !m_pCurrentPC->GetAndResetDoneFlag() && m_strScript == "[DONE]" && m_iCurrentSkin == QUEST_SKIN_NORMAL && !IsError())
+			if (m_pCurrentPC && !m_pCurrentPC->GetAndResetDoneFlag() && m_strScript=="[DONE]" && m_iCurrentSkin == QUEST_SKIN_NORMAL && !IsError())
 			{
 				ClearScript();
 				return;
@@ -1113,8 +985,6 @@ namespace quest
 			m_iCurrentSkin = QUEST_SKIN_NOWINDOW;
 		}
 
-		// sys_log(0, "Send Quest Script to %s", GetCurrentCharacterPtr()->GetName());
-		// send -_-!
 		struct ::packet_script packet_script;
 
 		packet_script.header = HEADER_GC_SCRIPT;
@@ -1126,31 +996,23 @@ namespace quest
 		buf.write(&packet_script, sizeof(struct packet_script));
 		buf.write(&m_strScript[0], m_strScript.size());
 
-		LPCHARACTER ch = GetCurrentCharacterPtr();
-		LPDESC desc = ch ? ch->GetDesc() : NULL;
-
-		if (!ch || !desc)
-		{
-			ClearScript();
-			return;
-		}
-
-		desc->Packet(buf.read_peek(), buf.size());
+		GetCurrentCharacterPtr()->GetDesc()->Packet(buf.read_peek(), buf.size());
 
 		if (test_server)
 			sys_log(0, "m_strScript %s size %d", m_strScript.c_str(), buf.size());
 
 		ClearScript();
+		m_bQuestInfoFlag = 0;
 	}
 
 	const char* CQuestManager::GetQuestStateName(const string& quest_name, const int state_index)
 	{
 		int x = lua_gettop(L);
 		lua_getglobal(L, quest_name.c_str());
-		if (lua_isnil(L, -1))
+		if (lua_isnil(L,-1))
 		{
 			sys_err("QUEST wrong quest state file %s.%d", quest_name.c_str(), state_index);
-			lua_settop(L, x);
+			lua_settop(L,x);
 			return "";
 		}
 		lua_pushnumber(L, state_index);
@@ -1158,6 +1020,10 @@ namespace quest
 
 		const char* str = lua_tostring(L, -1);
 		lua_settop(L, x);
+		if (str == NULL)
+		{
+			return "";
+		}
 		return str;
 	}
 
@@ -1165,25 +1031,25 @@ namespace quest
 	{
 		int x = lua_gettop(L);
 		lua_getglobal(L, quest_name.c_str());
-		if (lua_isnil(L, -1))
+		if (lua_isnil(L,-1))
 		{
-			sys_err("QUEST wrong quest state file %s.%s", quest_name.c_str(), state_name.c_str());
-			lua_settop(L, x);
+			sys_err("QUEST wrong quest state file %s.%s",quest_name.c_str(),state_name.c_str()  );
+			lua_settop(L,x);
 			return 0;
 		}
 		lua_pushstring(L, state_name.c_str());
 		lua_gettable(L, -2);
 
-		int v = (int)rint(lua_tonumber(L, -1));
+		int v = (int)rint(lua_tonumber(L,-1));
 		lua_settop(L, x);
-		if (test_server)
-			sys_log(0, "[QUESTMANAGER] GetQuestStateIndex x(%d) v(%d) %s %s", v, x, quest_name.c_str(), state_name.c_str());
+		if ( test_server )
+			sys_log( 0,"[QUESTMANAGER] GetQuestStateIndex x(%d) v(%d) %s %s", v,x, quest_name.c_str(), state_name.c_str() );
 		return v;
 	}
 
 	void CQuestManager::SetSkinStyle(int iStyle)
 	{
-		if (iStyle < 0 || iStyle >= QUEST_SKIN_COUNT)
+		if (iStyle<0 || iStyle >= QUEST_SKIN_COUNT)
 		{
 			m_iCurrentSkin = QUEST_SKIN_NORMAL;
 		}
@@ -1216,7 +1082,7 @@ namespace quest
 
 	LPITEM CQuestManager::GetCurrentItem()
 	{
-		return GetCurrentCharacterPtr() ? GetCurrentCharacterPtr()->GetQuestItemPtr() : NULL;
+		return GetCurrentCharacterPtr() ? GetCurrentCharacterPtr()->GetQuestItemPtr() : NULL; 
 	}
 
 	void CQuestManager::ClearCurrentItem()
@@ -1230,34 +1096,10 @@ namespace quest
 		if (GetCurrentCharacterPtr())
 			GetCurrentCharacterPtr()->SetQuestItemPtr(item);
 	}
-#ifdef ENABLE_MELEY_LAIR_DUNGEON
-	LPCHARACTER CQuestManager::GetCurrentNPCAttackCharacterPtr()
-	{ 
-		return GetCurrentCharacterPtr() ? GetCurrentCharacterPtr()->GetQuestNPCAttack() : NULL; 
-	}
-	void CQuestManager::Attack(unsigned int pc, unsigned int npc)
-	{
-		PC * pPC;
-		LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(pc);
-		if(!ch || ch == NULL)
-		{
-			return;
-		}
-		if ((pPC = GetPC(pc)))
-		{
-			if (!CheckQuestLoaded(pPC))
-				return;
-			m_mapNPC[npc].OnAttack(*pPC);
-		}
-		else
-		{
-			sys_err("QUEST: no such pc id : %d", pc);
-		}
-	}
-#endif
+
 	LPCHARACTER CQuestManager::GetCurrentNPCCharacterPtr()
-	{
-		return GetCurrentCharacterPtr() ? GetCurrentCharacterPtr()->GetQuestNPC() : NULL;
+	{ 
+		return GetCurrentCharacterPtr() ? GetCurrentCharacterPtr()->GetQuestNPC() : NULL; 
 	}
 
 	const string & CQuestManager::GetCurrentQuestName()
@@ -1300,7 +1142,7 @@ namespace quest
 		THashMapQuestName::iterator it = m_hmQuestName.find(name);
 
 		if (it == m_hmQuestName.end())
-			return 0; // RESERVED
+			return 0;
 
 		return it->second;
 	}
@@ -1436,8 +1278,8 @@ namespace quest
 			{
 				mode = "light";
 			}
-
-			const DESC_MANAGER::DESC_SET& c_ref_set = DESC_MANAGER::instance().GetClientSet();
+			
+			const DESC_MANAGER::DESC_SET & c_ref_set = DESC_MANAGER::instance().GetClientSet();
 
 			for (itertype(c_ref_set) it = c_ref_set.begin(); it != c_ref_set.end(); ++it)
 			{
@@ -1450,7 +1292,7 @@ namespace quest
 		}
 		else if (name == "day")
 		{
-			const DESC_MANAGER::DESC_SET& c_ref_set = DESC_MANAGER::instance().GetClientSet();
+			const DESC_MANAGER::DESC_SET & c_ref_set = DESC_MANAGER::instance().GetClientSet();
 
 			for (itertype(c_ref_set) it = c_ref_set.begin(); it != c_ref_set.end(); ++it)
 			{
@@ -1510,14 +1352,13 @@ namespace quest
 				{
 					CharacterVectorInteractor::iterator it = i.begin();
 
-					while (it != i.end())
-					{
+					while (it != i.end()) {
 						M2_DESTROY_CHARACTER(*it++);
 					}
 				}
 			}
 		}
-		else if (name == "pre_event_hc" && true == LC_IsEurope())
+		else if (name == "pre_event_hc")
 		{
 			const DWORD EventNPC = 20090;
 
@@ -1579,11 +1420,11 @@ namespace quest
 				}
 			}
 		}
-		else if (name.compare(0, DROPEVENT_CHARTONE_NAME_LEN, DROPEVENT_CHARTONE_NAME) == 0)
+		else if (name.compare(0, DROPEVENT_CHARTONE_NAME_LEN, DROPEVENT_CHARTONE_NAME)== 0)
 		{
 			DropEvent_CharStone_SetValue(name, value);
 		}
-		else if (name.compare(0, strlen("refine_box"), "refine_box") == 0)
+		else if (name.compare(0, strlen("refine_box"), "refine_box")== 0)
 		{
 			DropEvent_RefineBox_SetValue(name, value);
 		}
@@ -1591,32 +1432,6 @@ namespace quest
 		{
 			g_GoldDropTimeLimitValue = value * 1000;
 		}
-#ifdef ENABLE_MINI_GAME_CATCH_KING
-		else if (name == "enable_catch_king_event")
-		{
-			CMiniGame::instance().InitializeMiniGameCatchKing(value);
-		}
-		else if (name == "catch_king_event_end_day")
-		{
-			CMiniGame::instance().InitializeMiniGameCatchKingEndTime(value);
-		}
-#endif
-#ifdef ENABLE_ATTENDANCE_EVENT
-		else if (name == "enable_attendance_event")
-		{
-			CMiniGame::instance().InitializeAttendance(value);
-		}
-		else if (name == "enable_easter_event")
-		{
-			CMiniGame::instance().InitializeEasterEvent(value);
-		}
-#endif
-#ifdef ENABLE_EVENT_BANNER_FLAG
-		else if (name == "banner")
-		{
-			CHARACTER_MANAGER::instance().InitializeBanners();
-		}
-#endif
 		else if (name == "new_xmas_event")
 		{
 			static DWORD new_santa = 20126;
@@ -1671,47 +1486,17 @@ namespace quest
 				CharacterVectorInteractor i;
 				CHARACTER_MANAGER::instance().GetCharactersByRaceNum(new_santa, i);
 
-				for (CharacterVectorInteractor::iterator it = i.begin(); it != i.end(); ++it)
+				for (CharacterVectorInteractor::iterator it = i.begin(); it != i.end(); it++)
 				{
 					M2_DESTROY_CHARACTER(*it);
 				}
 			}
 		}
-#ifdef ENABLE_EVENT_SYSTEM
-		else if (name == "football_event")
-			CGameEventsManager::instance().SetActivateEvent(EVENT_FOOTBALL, value != 0 ? true : false);
-		else if (name == "ayisigi_event")
-			CGameEventsManager::instance().SetActivateEvent(EVENT_AYISIGI, value != 0 ? true : false);
-		else if (name == "okeycard_event")
-			CGameEventsManager::instance().SetActivateEvent(EVENT_OKEYCARD, value != 0 ? true : false);
-		else if (name == "enable_fish_event")
-			CGameEventsManager::instance().SetActivateEvent(EVENT_FISH, value != 0 ? true : false);
-		else if (name == "ex_enable_attendance_event")
-			CGameEventsManager::instance().SetActivateEvent(EVENT_ATTENDANCE, value != 0 ? true : false);
-		else if (name == "ex_enable_catch_king_event")
-			CGameEventsManager::instance().SetActivateEvent(EVENT_CATCHKING, value != 0 ? true : false);
-		else if (name == "word_event")
-			CGameEventsManager::instance().SetActivateEvent(EVENT_WORD, value != 0 ? true : false);
-		else if (name == "halloween_event")
-			CGameEventsManager::instance().SetActivateEvent(EVENT_HALLOWEEN, value != 0 ? true : false);
-		else if (name == "ex_ritualsoul")
-			CGameEventsManager::instance().SetActivateEvent(EVENT_RITUELSOUL, value != 0 ? true : false);
-		else if (name == "ex_enable_easter_event")
-			CGameEventsManager::instance().SetActivateEvent(EVENT_EASTER, value != 0 ? true : false);
-		else if (name == "stone_kill_event")
-			CGameEventsManager::instance().SetActivateEvent(EVENT_STONEKILL, value != 0 ? true : false);
-		else if (name == "ex_xmas_drop")
-			CGameEventsManager::instance().SetActivateEvent(EVENT_XMAS, value != 0 ? true : false);
-		else if (name == "ex_ramadan_drop")
-			CGameEventsManager::instance().SetActivateEvent(EVENT_RAMADAN, value != 0 ? true : false);
-		else if (name == "2019_cheque_desk_event")
-			CGameEventsManager::instance().SetActivateEvent(EVENT_CHEQUEDESK, value != 0 ? true : false);
-#endif
 	}
 
-	int CQuestManager::GetEventFlag(const string& name)
+	int	CQuestManager::GetEventFlag(const string& name)
 	{
-		map<string, int>::iterator it = m_mapEventFlag.find(name);
+		map<string,int>::iterator it = m_mapEventFlag.find(name);
 
 		if (it == m_mapEventFlag.end())
 			return 0;
@@ -1748,43 +1533,25 @@ namespace quest
 			ch->ChatPacket(CHAT_TYPE_COMMAND, "newyear_boom %d", iEventFlagValue);
 		}
 
-		if ((iEventFlagValue = quest::CQuestManager::instance().GetEventFlag("eclipse")))
+		if ( (iEventFlagValue = quest::CQuestManager::instance().GetEventFlag("eclipse")) )
 		{
 			std::string mode;
 
-			if (iEventFlagValue == 1) mode = "dark";
+			if ( iEventFlagValue == 1 ) mode = "dark";
 			else mode = "light";
 
 			ch->ChatPacket(CHAT_TYPE_COMMAND, "DayMode %s", mode.c_str());
 		}
-
-#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
-		if ((iEventFlagValue = quest::CQuestManager::instance().GetEventFlag("xmas_soul")))
-		{
-			ch->ChatPacket(CHAT_TYPE_COMMAND, "xmas_soul %d", iEventFlagValue);
-		}
-#endif
-
 	}
 
 	void CQuestManager::Reload()
 	{
 		StopAllRunningQuests();
-
 		lua_close(L);
 		m_mapNPC.clear();
-		//m_mapNPCNameID.clear();
+		// m_mapNPCNameID.clear();
 		m_hmQuestName.clear();
 		m_mapTimerID.clear();
-
-		itertype(m_mapServerTimer) it = m_mapServerTimer.begin();
-		for (; it != m_mapServerTimer.end(); )
-		{
-			LPEVENT event = it->second;
-			event_cancel(&event);
-			m_mapServerTimer.erase(it++);
-		}
-
 		m_hmQuestStartScript.clear();
 		m_mapEventName.clear();
 		L = NULL;
@@ -1810,6 +1577,7 @@ namespace quest
 		if (pChatScripts)
 			qs.chat_scripts.swap(*pChatScripts);
 
+		int load_result = 0;
 		if (bUseCache)
 		{
 			lua_getglobal(qs.co, "__codecache");
@@ -1820,33 +1588,37 @@ namespace quest
 			// stack : __codecache (compiled-code)
 			if (lua_isnil(qs.co, -1))
 			{
-				// cache miss
-
-				// load code to lua,
-				// save it to cache
-				// and only function remain in stack
 				lua_pop(qs.co, 1);
-				// stack : __codecache
-				luaL_loadbuffer(qs.co, code, code_size, quest_name.c_str());
-				// stack : __codecache (compiled-code)
-				lua_pushnumber(qs.co, (long)code);
-				// stack : __codecache (compiled-code) (codeptr)
-				lua_pushvalue(qs.co, -2);
-				// stack : __codecache (compiled-code) (codeptr) (compiled_code)
-				lua_rawset(qs.co, -4);
-				// stack : __codecache (compiled-code)
-				lua_remove(qs.co, -2);
-				// stack : (compiled-code)
+				load_result = luaL_loadbuffer(qs.co, code, code_size, quest_name.c_str());
+				if (load_result == 0)
+				{
+					lua_pushnumber(qs.co, (long)code);
+					lua_pushvalue(qs.co, -2);
+					lua_rawset(qs.co, -4);
+					lua_remove(qs.co, -2);
+				}
+				else
+				{
+					lua_remove(qs.co, -2);
+				}
 			}
 			else
 			{
-				// cache hit
 				lua_remove(qs.co, -2);
-				// stack : (compiled-code)
 			}
 		}
 		else
-			luaL_loadbuffer(qs.co, code, code_size, quest_name.c_str());
+		{
+			load_result = luaL_loadbuffer(qs.co, code, code_size, quest_name.c_str());
+		}
+
+		if (load_result != 0)
+		{
+			const char* err_str = lua_tostring(qs.co, -1);
+			sys_err("LUA_ERROR: Failed to load quest script %s: %s", quest_name.c_str(), err_str ? err_str : "unknown error");
+			lua_pop(qs.co, 1);
+			return false;
+		}
 
 		pc.SetQuest(quest_name, qs);
 
@@ -1868,7 +1640,7 @@ namespace quest
 		m_registeredNPCVnum.insert(dwVnum);
 
 		char buf[256];
-		DIR* dir = NULL;
+		DIR* dir;
 
 		for (itertype(g_setQuestObjectDir) it = g_setQuestObjectDir.begin(); it != g_setQuestObjectDir.end(); ++it)
 		{
@@ -1890,9 +1662,12 @@ namespace quest
 	void CQuestManager::WriteRunningStateToSyserr()
 	{
 		const char * state_name = GetQuestStateName(GetCurrentQuestName(), GetCurrentState()->st);
+		if (state_name == NULL || strlen(state_name) == 0)
+		{
+			state_name = "unknown";
+		}
 
 		string event_index_name = "";
-
 		for (itertype(m_mapEventName) it = m_mapEventName.begin(); it != m_mapEventName.end(); ++it)
 		{
 			if (it->second == m_iRunningEventIndex)
@@ -1955,25 +1730,20 @@ namespace quest
 		}
 	}
 
-	// Core crash when cancelling server timers
+	// Fix
 	void CQuestManager::CancelServerTimers(DWORD arg)
 	{
-		vector<pair<string, DWORD>> ServerTimersToDelete;
-
-		for (const auto& kv : m_mapServerTimer) {
-			if (kv.first.second == arg) {
-				LPEVENT event = kv.second;
-				event_cancel(&event);
-				ServerTimersToDelete.push_back(kv.first);
+		auto it = m_mapServerTimer.begin();
+		while (it != m_mapServerTimer.end())
+		{
+			if (it->first.second == arg)
+			{
+				event_cancel(&it->second);
+				it = m_mapServerTimer.erase(it);
+				continue;
 			}
+			++it;
 		}
-
-		// Delete all the required server timers
-		for (const auto &timer : ServerTimersToDelete)
-			m_mapServerTimer.erase(timer);
-
-		// Clean up
-		ServerTimersToDelete.clear();
 	}
 
 	void CQuestManager::SetServerTimerArg(DWORD dwArg)
@@ -1990,11 +1760,11 @@ namespace quest
 	{
 		m_pSelectedDungeon = pDungeon;
 	}
-
+	
 	bool CQuestManager::PickupItem(unsigned int pc, LPITEM item)
 	{
 		if (test_server)
-			sys_log(0, "questmanager::PickupItem Start : itemVnum : %d PC : %d", item->GetOriginalVnum(), pc);
+			sys_log( 0, "questmanager::PickupItem Start : itemVnum : %d PC : %d", item->GetOriginalVnum(), pc);
 
 		PC* pPC;
 		if ((pPC = GetPC(pc)))
@@ -2002,12 +1772,13 @@ namespace quest
 			if (!CheckQuestLoaded(pPC))
 			{
 				LPCHARACTER ch = CHARACTER_MANAGER::instance().FindByPID(pc);
+
 				if (ch)
 					ch->LocaleChatPacket(CHAT_TYPE_INFO, 118, "");
 
 				return false;
 			}
-			// call script
+
 			SetCurrentItem(item);
 
 			return m_mapNPC[item->GetVnum()].OnPickupItem(*pPC);
@@ -2018,7 +1789,6 @@ namespace quest
 			return false;
 		}
 	}
-
 	void CQuestManager::BeginOtherPCBlock(DWORD pid)
 	{
 		LPCHARACTER ch = GetCurrentCharacterPtr();
@@ -2027,16 +1797,7 @@ namespace quest
 			sys_err("NULL?");
 			return;
 		}
-		/*
-		# 1. current pid = pid0 <- It will be m_pOtherPCBlockRootPC.
-		begin_other_pc_block(pid1)
-			# 2. current pid = pid1
-			begin_other_pc_block(pid2)
-				# 3. current_pid = pid2
-			end_other_pc_block()
-		end_other_pc_block()
-		*/
-		// when begin_other_pc_block(pid1)
+
 		if (m_vecPCStack.empty())
 		{
 			m_pOtherPCBlockRootPC = GetCurrentPC();
@@ -2052,7 +1813,6 @@ namespace quest
 			sys_err("m_vecPCStack is alread empty. CurrentQuest{Name(%s), State(%s)}", GetCurrentQuestName().c_str(), GetCurrentState()->_title.c_str());
 			return;
 		}
-
 		DWORD pc = m_vecPCStack.back();
 		m_vecPCStack.pop_back();
 		GetPC(pc);
@@ -2068,9 +1828,47 @@ namespace quest
 		return !m_vecPCStack.empty();
 	}
 
-	PC* CQuestManager::GetOtherPCBlockRootPC()
+	PC*	CQuestManager::GetOtherPCBlockRootPC()
 	{
 		return m_pOtherPCBlockRootPC;
 	}
+
+#ifdef ENABLE_EVENT_MANAGER
+	void CQuestManager::EventBegin(unsigned int pc)
+	{
+		PC* pPC;
+		if ((pPC = GetPC(pc)))
+		{
+			if (!CheckQuestLoaded(pPC))
+				return;
+			m_mapNPC[QUEST_NO_NPC].OnEventBegin(*pPC);
+		}
+		else
+			sys_err("QUEST no such pc id : %d", pc);
+	}
+
+	void CQuestManager::EventEnd(unsigned int pc)
+	{
+		PC* pPC;
+		if ((pPC = GetPC(pc)))
+		{
+			if (!CheckQuestLoaded(pPC))
+				return;
+			m_mapNPC[QUEST_NO_NPC].OnEventEnd(*pPC);
+		}
+		else
+			sys_err("QUEST no such pc id : %d", pc);
+	}
+
+	void CQuestManager::RequestEventQuest(const std::string& quest_name, unsigned int pc)
+	{
+		if (GetPCForce(pc)->IsRunning())
+			return;
+
+		const int questIdx = GetQuestIndexByName(quest_name);
+		if (questIdx)
+			QuestButton(pc, questIdx);
+	}
+#endif
 }
 

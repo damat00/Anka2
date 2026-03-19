@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-class CMonsterAreaInfo
+class CMonsterAreaInfo  
 {
 public:
 	enum EMonsterAreaInfoType
@@ -39,12 +39,13 @@ public:
 
 	void			Clear();
 
+	//
 	void			SetOrigin(long lOriginX, long lOriginY);
 	void			GetOrigin(long * plOriginX, long * plOriginY);
-
+	
 	void			SetSize(long lSizeX, long lSizeY);
 	void			GetSize(long * plSizeX, long * plSizeY);
-
+	
 	long			GetLeft()											{ return m_lLeft; }
 	long			GetTop()											{ return m_lTop; }
 	long			GetRight()											{ return m_lRight; }
@@ -88,14 +89,17 @@ protected:
 protected:
 	EMonsterAreaInfoType	m_eMonsterAreaInfoType;
 
+	// Group Type 정보
 	DWORD			m_dwGroupID;
 	std::string		m_strGroupName;
 	std::string		m_strLeaderName;
 	DWORD			m_dwFollowerCount;
 
+	// Monster Type 정보
 	DWORD			m_dwVID;
 	std::string		m_strMonsterName;
 
+	// 공통 정보
 	DWORD			m_dwMonsterCount;
 	EMonsterDir		m_eMonsterDir;
 	D3DXVECTOR2		m_v2Monsterdirection;
@@ -107,7 +111,7 @@ protected:
 	long			m_lSizeX;
 	long			m_lSizeY;
 
-	long			m_lLeft;
+	long			m_lLeft;			
 	long			m_lRight;
 	long			m_lTop;
 	long			m_lBottom;

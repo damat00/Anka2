@@ -27,9 +27,9 @@ bool CBattleArena::IsRunning()
 
 bool CBattleArena::IsBattleArenaMap(int nMapIndex)
 {
-	if (nMapIndex == nBATTLE_ARENA_MAP[1] ||
+	if ( nMapIndex == nBATTLE_ARENA_MAP[1] ||
 		nMapIndex == nBATTLE_ARENA_MAP[2] ||
-		nMapIndex == nBATTLE_ARENA_MAP[3])
+		nMapIndex == nBATTLE_ARENA_MAP[3] )
 	{
 		return true;
 	}
@@ -41,15 +41,15 @@ struct FWarpToHome
 {
 	void operator() (LPENTITY ent)
 	{
-		if (ent->IsType(ENTITY_CHARACTER) == true)
+		if ( ent->IsType(ENTITY_CHARACTER) == true )
 		{
 			LPCHARACTER lpChar = (LPCHARACTER)ent;
 
-			if (lpChar->IsPC() == true)
+			if ( lpChar->IsPC() == true )
 			{
-				if (!test_server)
+				if ( !test_server ) 
 				{
-					if (lpChar->GetGMLevel() != GM_PLAYER) return;
+					if ( lpChar->GetGMLevel() != GM_PLAYER ) return;
 				}
 
 				int nEmpire, nMapIndex, x, y;
@@ -78,21 +78,21 @@ EVENTINFO(SBattleArenaInfo)
 	int wait_count;
 
 	SBattleArenaInfo()
-		: nEmpire(0)
-		, nMapIndex(0)
-		, state(0)
-		, wait_count(0)
+	: nEmpire( 0 )
+	, nMapIndex( 0 )
+	, state( 0 )
+	, wait_count( 0 )
 	{
 	}
 };
 
 EVENTFUNC(battle_arena_event)
 {
-	SBattleArenaInfo* pInfo = dynamic_cast<SBattleArenaInfo*>(event->info);
+	SBattleArenaInfo * pInfo = dynamic_cast<SBattleArenaInfo *>(event->info );
 
-	if (pInfo == NULL)
+	if ( pInfo == NULL )
 	{
-		return 0; // cancel immediately
+		return 0;
 	}
 
 	if (pInfo != NULL)
@@ -230,14 +230,14 @@ EVENTFUNC(battle_arena_event)
 				return test_server ? PASSES_PER_SEC(60) : PASSES_PER_SEC(60*5);
 		}
 	}
-
+	
 	return 0;
 }
 
 bool CBattleArena::Start(int nEmpire)
 {
-	if (m_status != STATUS_CLOSE) return false;
-	if (nEmpire < 1 || nEmpire > 3) return false;
+	if ( m_status != STATUS_CLOSE ) return false;
+	if ( nEmpire < 1 || nEmpire > 3 ) return false;
 
 	m_nMapIndex = nBATTLE_ARENA_MAP[nEmpire];
 	m_nEmpire = nEmpire;
@@ -259,7 +259,7 @@ bool CBattleArena::Start(int nEmpire)
 	info->state = 0;
 	info->wait_count = 0;
 
-	m_pEvent = event_create(battle_arena_event, info, test_server ? PASSES_PER_SEC(60) : PASSES_PER_SEC(5 * 60));
+	m_pEvent = event_create(battle_arena_event, info, test_server ? PASSES_PER_SEC(60) : PASSES_PER_SEC(5*60));
 
 	SetStatus(STATUS_BATTLE);
 
@@ -270,8 +270,7 @@ bool CBattleArena::Start(int nEmpire)
 
 void CBattleArena::End()
 {
-	if (m_pEvent != NULL)
-	{
+	if (m_pEvent != NULL) {
 		event_cancel(&m_pEvent);
 	}
 	m_bForceEnd = false;
@@ -284,12 +283,11 @@ void CBattleArena::End()
 
 void CBattleArena::ForceEnd()
 {
-	if (m_bForceEnd == true) return;
+	if ( m_bForceEnd == true ) return;
 
 	m_bForceEnd = true;
 
-	if (m_pEvent != NULL)
-	{
+	if (m_pEvent != NULL) {
 		event_cancel(&m_pEvent);
 	}
 
@@ -307,19 +305,18 @@ void CBattleArena::SpawnRandomStone()
 	static const DWORD vnum[7] = { 8012, 8013, 8014, 8024, 8025, 8026, 8027 };
 
 	static const int region_info[3][4] = {
-		{ 688900, 247600, 692700, 250000 },
-		{ 740200, 251000, 744200, 247700 },
-		{ 791400, 250900, 795900, 250400 }
-	};
+	   	{688900, 247600, 692700, 250000},
+	   	{740200, 251000, 744200, 247700},
+	   	{791400, 250900, 795900, 250400} };
 
 	int idx = m_nMapIndex - 190;
-	if (idx < 0 || idx >= 3) return;
+	if ( idx < 0 || idx >= 3 ) return;
 
 	CHARACTER_MANAGER::instance().SpawnMobRange(
-		vnum[number(0, 6)],
-		m_nMapIndex,
-		region_info[idx][0], region_info[idx][1], region_info[idx][2], region_info[idx][3],
-		false, true);
+		   	vnum[number(0, 6)],
+		   	m_nMapIndex,
+			region_info[idx][0], region_info[idx][1], region_info[idx][2], region_info[idx][3],
+			false, true);
 }
 
 void CBattleArena::SpawnLastBoss()
@@ -329,11 +326,11 @@ void CBattleArena::SpawnLastBoss()
 	static const int position[3][2] = {
 		{ 691000, 248900 },
 		{ 742300, 249000 },
-		{ 793600, 249300 }
-	};
+		{ 793600, 249300 } };
 
 	int idx = m_nMapIndex - 190;
-	if (idx < 0 || idx >= 3) return;
+	if ( idx < 0 || idx >= 3 ) return;
 
 	CHARACTER_MANAGER::instance().SpawnMob(vnum, m_nMapIndex, position[idx][0], position[idx][1], 0);
 }
+

@@ -1,6 +1,8 @@
 #include "stdafx.h"
+
 #include "../../common/service.h"
 #include "../../common/tables.h"
+
 #include "constants.h"
 #include "config.h"
 #include "utils.h"
@@ -30,10 +32,12 @@
 #include "wedding.h"
 #include "login_data.h"
 #include "unique_item.h"
+
 #include "affect.h"
 #include "motion.h"
 
 #include "log.h"
+
 #include "buffer_manager.h"
 #include "horsename_manager.h"
 #include "gm.h"
@@ -42,20 +46,24 @@
 
 #include "DragonSoul.h"
 
-#ifdef ENABLE_REAL_TIME_REGEN
-	#include "RealTimeRegen.hpp"
+#ifdef ENABLE_BIOLOG_SYSTEM
+	#include "biolog_manager.h"
+#endif
+
+#ifdef ENABLE_EVENT_MANAGER
+	#include "event_manager.h"
+#endif
+
+#ifdef ENABLE_RENEWAL_BATTLE_PASS
+	#include "battlepass_manager.h"
 #endif
 
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
 	#include "offlineshop_manager.h"
 #endif
 
-#ifdef ENABLE_ULTIMATE_REGEN
-	#include "new_mob_timer.h"
-#endif
-
-#ifdef ENABLE_ATTENDANCE_EVENT
-	#include "minigame.h"
+#ifdef ENABLE_RENEWAL_REGEN
+	#include "mob_timer_manager.h"
 #endif
 
 extern BYTE g_bAuthServer;
@@ -372,7 +380,6 @@ void CInputDB::PlayerLoad(LPDESC d, const char * data)
 	d->BindCharacter(ch);
 
 	{
-		// P2P Login
 		TPacketGGLogin p;
 
 		p.bHeader = HEADER_GG_LOGIN;
@@ -395,9 +402,6 @@ void CInputDB::PlayerLoad(LPDESC d, const char * data)
 #else
 			"%d"
 #endif
-#ifdef ENABLE_GAYA_SYSTEM
-			"%d"
-#endif
 			"%d %ld %d"
 			, inet_ntoa(ch->GetDesc()->GetAddr().sin_addr), ch->GetGold(), g_bChannel, ch->GetMapIndex(), ch->GetAlignment()
 		);
@@ -410,10 +414,9 @@ void CInputDB::PlayerLoad(LPDESC d, const char * data)
 
 	long lPublicMapIndex = lMapIndex >= 10000 ? lMapIndex / 10000 : lMapIndex;
 
-	//if (!map_allow_find(lMapIndex >= 10000 ? lMapIndex / 10000 : lMapIndex) || !CheckEmpire(ch, lMapIndex))
 	if (!map_allow_find(lPublicMapIndex))
 	{
-		sys_err("InputDB::PlayerLoad : entering %d map is not allowed here (name: %s, empire %u)",
+		sys_err("InputDB::PlayerLoad : entering %d map is not allowed here (name: %s, empire %u)", 
 				lMapIndex, pTab->name, d->GetEmpire());
 
 		ch->SetWarpLocation(EMPIRE_START_MAP(d->GetEmpire()),
@@ -433,7 +436,7 @@ void CInputDB::PlayerLoad(LPDESC d, const char * data)
 	ch->SkillLevelPacket();
 
 	sys_log(0, "InputDB: player_load %s %dx%dx%d LEVEL %d MOV_SPEED %d JOB %d ATG %d DFG %d GMLv %d",
-			pTab->name,
+			pTab->name, 
 			ch->GetX(), ch->GetY(), ch->GetZ(),
 			ch->GetLevel(),
 			ch->GetPoint(POINT_MOV_SPEED),
@@ -468,28 +471,29 @@ void CInputDB::Boot(const char* data)
 	sys_log(0, "sizeof(TShopTable) = %d", sizeof(TShopTable));
 	sys_log(0, "sizeof(TSkillTable) = %d", sizeof(TSkillTable));
 	sys_log(0, "sizeof(TRefineTable) = %d", sizeof(TRefineTable));
-
 	sys_log(0, "sizeof(TItemAttrTable) = %d", sizeof(TItemAttrTable));
 	sys_log(0, "sizeof(TItemRareTable) = %d", sizeof(TItemAttrTable));
 	sys_log(0, "sizeof(TBanwordTable) = %d", sizeof(TBanwordTable));
 	sys_log(0, "sizeof(TLand) = %d", sizeof(building::TLand));
 	sys_log(0, "sizeof(TObjectProto) = %d", sizeof(building::TObjectProto));
 	sys_log(0, "sizeof(TObject) = %d", sizeof(building::TObject));
+#ifdef ENABLE_EVENT_MANAGER
+	sys_log(0, "sizeof(TEventTable) = %d", sizeof(TEventTable));
+#endif
 #ifdef ENABLE_GROWTH_PET_SYSTEM
 	sys_log(0, "sizeof(TGrowthPetSkillTable) = %d", sizeof(TGrowthPetSkillTable));
 #endif
+#ifdef ENABLE_BIOLOG_SYSTEM
+	sys_log(0, "sizeof(TBiologMissionsProto) = %d", sizeof(TBiologMissionsProto));
+	sys_log(0, "sizeof(TBiologRewardsProto) = %d", sizeof(TBiologRewardsProto));
+	sys_log(0, "sizeof(TBiologMonstersProto) = %d", sizeof(TBiologMonstersProto));
+#endif
+	sys_log(0, "sizeof(TAdminManager) = %d", sizeof (TAdminInfo));
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
 	sys_log(0, "sizeof(TOfflineShop) = %d", sizeof(TOfflineShop));
 #endif
-	//ADMIN_MANAGER
-	sys_log(0, "sizeof(TAdminManager) = %d", sizeof (TAdminInfo) );
-	//END_ADMIN_MANAGER
 
 	WORD size;
-
-	/*
-	 * MOB
-	 */
 
 	if (decode_2bytes(data)!=sizeof(TMobTable))
 	{
@@ -509,10 +513,6 @@ void CInputDB::Boot(const char* data)
 		data += size * sizeof(TMobTable);
 	}
 
-	/*
-	 * ITEM
-	 */
-
 	if (decode_2bytes(data) != sizeof(TItemTable))
 	{
 		sys_err("item table size error");
@@ -531,10 +531,6 @@ void CInputDB::Boot(const char* data)
 		ITEM_MANAGER::instance().Initialize((TItemTable *) data, size);
 		data += size * sizeof(TItemTable);
 	}
-
-	/*
-	 * SHOP
-	 */
 
 	if (decode_2bytes(data) != sizeof(TShopTable))
 	{
@@ -584,10 +580,6 @@ void CInputDB::Boot(const char* data)
 	}
 #endif
 
-	/*
-	 * SKILL
-	 */
-
 	if (decode_2bytes(data) != sizeof(TSkillTable))
 	{
 		sys_err("skill table size error");
@@ -611,9 +603,7 @@ void CInputDB::Boot(const char* data)
 
 		data += size * sizeof(TSkillTable);
 	}
-	/*
-	 * REFINE RECIPE
-	 */
+
 	if (decode_2bytes(data) != sizeof(TRefineTable))
 	{
 		sys_err("refine table size error");
@@ -632,9 +622,6 @@ void CInputDB::Boot(const char* data)
 		data += size * sizeof(TRefineTable);
 	}
 
-	/*
-	 * ITEM ATTR
-	 */
 	if (decode_2bytes(data) != sizeof(TItemAttrTable))
 	{
 		sys_err("item attr table size error");
@@ -663,10 +650,6 @@ void CInputDB::Boot(const char* data)
 
 	data += size * sizeof(TItemAttrTable);
 
-
-	/*
-     * ITEM RARE
-     */
 	if (decode_2bytes(data) != sizeof(TItemAttrTable))
 	{
 		sys_err("item rare table size error");
@@ -712,10 +695,6 @@ void CInputDB::Boot(const char* data)
 	{
 		using namespace building;
 
-		/*
-		 * LANDS
-		 */
-
 		if (decode_2bytes(data) != sizeof(TLand))
 		{
 			sys_err("land table size error");
@@ -733,10 +712,6 @@ void CInputDB::Boot(const char* data)
 		for (WORD i = 0; i < size; ++i, ++kLand)
 			CManager::instance().LoadLand(kLand);
 
-		/*
-		 * OBJECT PROTO
-		 */
-
 		if (decode_2bytes(data) != sizeof(TObjectProto))
 		{
 			sys_err("object proto table size error");
@@ -751,9 +726,6 @@ void CInputDB::Boot(const char* data)
 		CManager::instance().LoadObjectProto((TObjectProto *) data, size);
 		data += size * sizeof(TObjectProto);
 
-		/*
-		 * OBJECT
-		 */
 		if (decode_2bytes(data) != sizeof(TObject))
 		{
 			sys_err("object table size error");
@@ -771,6 +743,26 @@ void CInputDB::Boot(const char* data)
 		for (WORD i = 0; i < size; ++i, ++kObj)
 			CManager::instance().LoadObject(kObj, true);
 	}
+
+#ifdef ENABLE_EVENT_MANAGER
+	if (decode_2bytes(data) != sizeof(TEventTable))
+	{
+		sys_err("event table size error");
+		thecore_shutdown();
+		return;
+	}
+	data += 2;
+
+	size = decode_2bytes(data);
+	data += 2;
+	sys_log(0, "BOOT: EVENT: %d", size);
+
+	if (size)
+	{
+		CEventManager::instance().Initialize((TEventTable*)data, size);
+		data += size * sizeof(TEventTable);
+	}
+#endif
 
 #ifdef ENABLE_GROWTH_PET_SYSTEM
 	if (decode_2bytes(data) != sizeof(TGrowthPetSkillTable))
@@ -790,6 +782,50 @@ void CInputDB::Boot(const char* data)
 		CGrowthPetManager::instance().InitializeSkill((TGrowthPetSkillTable*)data, size);
 		data += size * sizeof(TGrowthPetSkillTable);
 	}
+#endif
+
+#ifdef ENABLE_BIOLOG_SYSTEM
+	if (decode_2bytes(data) != sizeof(TBiologMissionsProto))
+	{
+		sys_err("TBiologMissionsProto table size error");
+		thecore_shutdown();
+		return;
+	}
+	data += 2;
+
+	size = decode_2bytes(data);
+	data += 2;
+
+	CBiologSystemManager::instance().InitializeMissions((TBiologMissionsProto*)data, size);
+	data += size * sizeof(TBiologMissionsProto);
+
+	if (decode_2bytes(data) != sizeof(TBiologRewardsProto))
+	{
+		sys_err("TBiologRewardsProto table size error");
+		thecore_shutdown();
+		return;
+	}
+	data += 2;
+
+	size = decode_2bytes(data);
+	data += 2;
+
+	CBiologSystemManager::instance().InitializeRewards((TBiologRewardsProto*)data, size);
+	data += size * sizeof(TBiologRewardsProto);
+
+	if (decode_2bytes(data) != sizeof(TBiologMonstersProto))
+	{
+		sys_err("TBiologRewardsProto table size error");
+		thecore_shutdown();
+		return;
+	}
+	data += 2;
+
+	size = decode_2bytes(data);
+	data += 2;
+
+	CBiologSystemManager::instance().InitializeMonsters((TBiologMonstersProto*)data, size);
+	data += size * sizeof(TBiologMonstersProto);
 #endif
 
 	set_global_time(*(time_t *) data);
@@ -812,7 +848,6 @@ void CInputDB::Boot(const char* data)
 	TItemIDRangeTable* rangespare = (TItemIDRangeTable*) data;
 	data += size * sizeof(TItemIDRangeTable);
 
-	//ADMIN_MANAGER
 	int ChunkSize = decode_2bytes(data );
 	data += 2;
 	int HostSize = decode_2bytes(data );
@@ -821,7 +856,7 @@ void CInputDB::Boot(const char* data)
 	for (int n = 0; n < HostSize; ++n )
 	{
 		gm_new_host_inert(data );
-		//sys_log(0, "GM HOST : IP[%s] ", data );
+		sys_log(0, "GM HOST : IP[%s] ", data );
 		data += ChunkSize;
 	}
 
@@ -834,11 +869,8 @@ void CInputDB::Boot(const char* data)
 		tAdminInfo& rAdminInfo = *(tAdminInfo*)data;
 
 		gm_new_insert(rAdminInfo );
-
 		data += sizeof(rAdminInfo );
 	}
-
-	//END_ADMIN_MANAGER
 
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
 	if (decode_2bytes(data) != sizeof(TOfflineShop))
@@ -887,7 +919,6 @@ void CInputDB::Boot(const char* data)
 		return;
 	}
 
-	// LOCALE_SERVICE
 	const int FILE_NAME_LEN = 256;
 	char szCommonDropItemFileName[FILE_NAME_LEN];
 	char szETCDropItemFileName[FILE_NAME_LEN];
@@ -898,10 +929,6 @@ void CInputDB::Boot(const char* data)
 	char szItemVnumMaskTableFileName[FILE_NAME_LEN];
 	char szDragonSoulTableFileName[FILE_NAME_LEN];
 
-#ifdef ENABLE_ATTENDANCE_EVENT
-	char szAttendanceRewardFileName[FILE_NAME_LEN];
-#endif
-
 	snprintf(szCommonDropItemFileName, sizeof(szCommonDropItemFileName), "%s/common_drop_item.txt", LocaleService_GetBasePath().c_str());
 	snprintf(szETCDropItemFileName, sizeof(szETCDropItemFileName), "%s/etc_drop_item.txt", LocaleService_GetBasePath().c_str());
 	snprintf(szMOBDropItemFileName, sizeof(szMOBDropItemFileName), "%s/mob_drop_item.txt", LocaleService_GetBasePath().c_str());
@@ -910,10 +937,6 @@ void CInputDB::Boot(const char* data)
 	snprintf(szMapIndexFileName, sizeof(szMapIndexFileName), "%s/index", LocaleService_GetMapPath().c_str());
 	snprintf(szItemVnumMaskTableFileName, sizeof(szItemVnumMaskTableFileName), "%s/ori_to_new_table.txt", LocaleService_GetBasePath().c_str());
 	snprintf(szDragonSoulTableFileName, sizeof(szDragonSoulTableFileName), "%s/dragon_soul_table.txt", LocaleService_GetBasePath().c_str());
-#ifdef ENABLE_ATTENDANCE_EVENT
-	snprintf(szAttendanceRewardFileName, sizeof(szAttendanceRewardFileName),
-			"%s/attendance_reward.txt", LocaleService_GetBasePath().c_str());
-#endif
 
 	sys_log(0, "Initializing Informations of Cube System");
 	if (!Cube_InformationInitialize())
@@ -938,16 +961,6 @@ void CInputDB::Boot(const char* data)
 		thecore_shutdown();
 		return;
 	}
-
-#ifdef ENABLE_ATTENDANCE_EVENT
-	sys_log(0, "LoadLocaleFile: AddendanceRewardList: %s", szAttendanceRewardFileName);
-	if (!CMiniGame::instance().ReadRewardItemFile(szAttendanceRewardFileName))
-	{
-		sys_err("Cannot load AddendanceRewardList: %s", szAttendanceRewardFileName);
-		thecore_shutdown();
-		return;
-	}
-#endif
 
 	sys_log(0, "LoadLocaleFile: DropItemGroup: %s", szDropItemGroupFileName);
 	if (!ITEM_MANAGER::instance().ReadDropItemGroup(szDropItemGroupFileName))
@@ -991,10 +1004,12 @@ void CInputDB::Boot(const char* data)
 	if (!DSManager::instance().ReadDragonSoulTableFile(szDragonSoulTableFileName))
 	{
 		sys_err("cannot load DragonSoulTable: %s", szDragonSoulTableFileName);
-		//thecore_shutdown();
-		//return;
 	}
-	// END_OF_LOCALE_SERVICE
+
+#ifdef ENABLE_RENEWAL_BATTLE_PASS
+	if (!CBattlePassManager::instance().InitializeBattlePass())
+		sys_err("Failure to Initialize Extended BattlePass!");
+#endif
 
 	building::CManager::instance().FinalizeBoot();
 
@@ -1008,29 +1023,22 @@ void CInputDB::Boot(const char* data)
 
 	signal_timer_enable(30);
 
-#ifdef ENABLE_ULTIMATE_REGEN
+#ifdef ENABLE_RENEWAL_REGEN
 	char buf[250];
 	snprintf(buf, sizeof(buf), "%s/newregen.txt", LocaleService_GetBasePath().c_str());
-	CNewMobTimer::Instance().LoadFile(buf);
+	CMobTimerManager::Instance().LoadFile(buf);
 #endif
 
 	if (test_server)
 	{
 		CMobManager::instance().DumpRegenCount("mob_count");
 	}
-#ifdef ENABLE_REAL_TIME_REGEN
-	CRealTimeRegen::Instance().Initialize(); 
-#endif
 }
 
 EVENTINFO(quest_login_event_info)
 {
 	DWORD dwPID;
-
-	quest_login_event_info()
-	: dwPID( 0 )
-	{
-	}
+	quest_login_event_info() : dwPID( 0 ) {}
 };
 
 EVENTFUNC(quest_login_event)
@@ -1055,11 +1063,7 @@ EVENTFUNC(quest_login_event)
 	if (!d)
 		return 0;
 
-	if (d->IsPhase(PHASE_HANDSHAKE) ||
-		d->IsPhase(PHASE_LOGIN) ||
-		d->IsPhase(PHASE_SELECT) ||
-		d->IsPhase(PHASE_DEAD) ||
-		d->IsPhase(PHASE_LOADING))
+	if (d->IsPhase(PHASE_HANDSHAKE) || d->IsPhase(PHASE_LOGIN) || d->IsPhase(PHASE_SELECT) || d->IsPhase(PHASE_DEAD) || d->IsPhase(PHASE_LOADING))
 	{
 		return PASSES_PER_SEC(1);
 	}
@@ -1144,7 +1148,7 @@ void CInputDB::QuestLoad(LPDESC d, const char * c_pData)
 
 			event_create(quest_login_event, info, PASSES_PER_SEC(1));
 		}
-	}
+	}	
 }
 
 void CInputDB::SafeboxLoad(LPDESC d, const char * c_pData)
@@ -1272,7 +1276,6 @@ void CInputDB::LoginAlready(LPDESC d, const char * c_pData)
 	if (!d)
 		return;
 
-	// INTERNATIONAL_VERSION
 	{
 		TPacketDGLoginAlready * p = (TPacketDGLoginAlready *) c_pData;
 
@@ -1290,7 +1293,6 @@ void CInputDB::LoginAlready(LPDESC d, const char * c_pData)
 			P2P_MANAGER::instance().Send(&pgg, sizeof(TPacketGGDisconnect));
 		}
 	}
-	// END_OF_INTERNATIONAL_VERSION
 
 	LoginFailure(d, "ALREADY");
 }
@@ -1310,7 +1312,7 @@ void CInputDB::EmpireSelect(LPDESC d, const char * c_pData)
 	pe.bEmpire = rTable.bEmpire;
 	d->Packet(&pe, sizeof(pe));
 
-	for (int i = 0; i < PLAYER_PER_ACCOUNT; ++i)
+	for (int i = 0; i < PLAYER_PER_ACCOUNT; ++i) 
 		if (rTable.players[i].dwID)
 		{
 			rTable.players[i].x = EMPIRE_START_X(rTable.bEmpire);
@@ -1551,8 +1553,7 @@ void CInputDB::ItemLoad(LPDESC d, const char * c_pData)
 		item->SetTransmutationVnum(p->dwTransmutationVnum);
 #endif
 
-		if ((p->window == INVENTORY && ch->GetInventoryItem(p->pos)) ||
-				(p->window == EQUIPMENT && ch->GetWear(p->pos)))
+		if ((p->window == INVENTORY && ch->GetInventoryItem(p->pos)) || (p->window == EQUIPMENT && ch->GetWear(p->pos)))
 		{
 			sys_log(0, "ITEM_RESTORE: %s %s", ch->GetName(), item->GetName());
 			v.push_back(item);
@@ -1734,26 +1735,18 @@ void CInputDB::ReloadProto(const char * c_pData)
 {
 	WORD wSize;
 
-	/*
-	 * Skill
-	 */
 	wSize = decode_2bytes(c_pData);
 	c_pData += sizeof(WORD);
 	if (wSize) CSkillManager::instance().Initialize((TSkillTable *) c_pData, wSize);
 	c_pData += sizeof(TSkillTable) * wSize;
 
-	/*
-	 * Banwords
-	 */
 
 	wSize = decode_2bytes(c_pData);
 	c_pData += sizeof(WORD);
 	CBanwordManager::instance().Initialize((TBanwordTable *) c_pData, wSize);
 	c_pData += sizeof(TBanwordTable) * wSize;
 
-	/*
-	 * ITEM
-	 */
+
 	wSize = decode_2bytes(c_pData);
 	c_pData += 2;
 	sys_log(0, "RELOAD: ITEM: %d", wSize);
@@ -1764,9 +1757,7 @@ void CInputDB::ReloadProto(const char * c_pData)
 		c_pData += wSize * sizeof(TItemTable);
 	}
 
-	/*
-	 * MONSTER
-	 */
+
 	wSize = decode_2bytes(c_pData);
 	c_pData += 2;
 	sys_log(0, "RELOAD: MOB: %d", wSize);
@@ -1776,6 +1767,18 @@ void CInputDB::ReloadProto(const char * c_pData)
 		CMobManager::instance().Initialize((TMobTable *) c_pData, wSize);
 		c_pData += wSize * sizeof(TMobTable);
 	}
+
+#ifdef ENABLE_EVENT_MANAGER
+	wSize = decode_2bytes(c_pData);
+	c_pData += 2;
+	sys_log(0, "RELOAD: Event: %d", wSize);
+
+	if (wSize)
+	{
+		CEventManager::instance().Initialize((TEventTable*)c_pData, wSize, true);
+		c_pData += wSize * sizeof(TEventTable);
+	}
+#endif
 
 #ifdef ENABLE_GROWTH_PET_SYSTEM
 	wSize = decode_2bytes(c_pData);
@@ -1788,10 +1791,6 @@ void CInputDB::ReloadProto(const char * c_pData)
 		c_pData += wSize * sizeof(TGrowthPetSkillTable);
 	}
 #endif
-
-	/*
-	* SHOP
-	*/
 
 	wSize = decode_2bytes(c_pData);
 	c_pData += sizeof(WORD);
@@ -1815,9 +1814,6 @@ void CInputDB::ReloadProto(const char * c_pData)
 	}
 #endif
 
-	/*
-	* REFINE
-	*/
 	wSize = decode_2bytes(c_pData);
 	c_pData += 2;
 	sys_log(0, "RELOAD: REFINE: %d", wSize);
@@ -1828,9 +1824,7 @@ void CInputDB::ReloadProto(const char * c_pData)
 		c_pData += wSize * sizeof(TRefineTable);
 	}
 
-	/*
-	* ATTR
-	*/
+
 	wSize = decode_2bytes(c_pData);
 	c_pData += 2;
 	sys_log(0, "RELOAD: ItemAtt: %d", wSize);
@@ -1850,9 +1844,7 @@ void CInputDB::ReloadProto(const char * c_pData)
 		c_pData += wSize*sizeof(TItemAttrTable);
 	}
 
-	/*
-	* ATTR_RARE
-	*/
+
 	wSize = decode_2bytes(c_pData);
 	c_pData += 2;
 	sys_log(0, "RELOAD: ItemRareAtt: %d", wSize);
@@ -1914,19 +1906,13 @@ void CInputDB::AuthLogin(LPDESC d, const char * c_pData)
 void CInputDB::ChangeEmpirePriv(const char* c_pData)
 {
 	TPacketDGChangeEmpirePriv* p = (TPacketDGChangeEmpirePriv*) c_pData;
-
-	// ADD_EMPIRE_PRIV_TIME
 	CPrivManager::instance().GiveEmpirePriv(p->empire, p->type, p->value, p->bLog, p->end_time_sec);
-	// END_OF_ADD_EMPIRE_PRIV_TIME
 }
 
 void CInputDB::ChangeGuildPriv(const char* c_pData)
 {
 	TPacketDGChangeGuildPriv* p = (TPacketDGChangeGuildPriv*) c_pData;
-
-	// ADD_GUILD_PRIV_TIME
 	CPrivManager::instance().GiveGuildPriv(p->guild_id, p->type, p->value, p->bLog, p->end_time_sec);
-	// END_OF_ADD_GUILD_PRIV_TIME
 }
 
 void CInputDB::ChangeCharacterPriv(const char* c_pData)
@@ -1939,7 +1925,7 @@ void CInputDB::MoneyLog(const char* c_pData)
 {
 	TPacketMoneyLog * p = (TPacketMoneyLog *) c_pData;
 
-	if (p->type == 4) // QUEST_MONEY_LOG_SKIP
+	if (p->type == 4)
 		return;
 
 	if (g_bAuthServer ==true )
@@ -2061,7 +2047,6 @@ void CInputDB::WeddingEnd(TPacketWeddingEnd* p)
 	sys_log(0, "WeddingEnd %u %u", p->dwPID1, p->dwPID2);
 	marriage::CManager::instance().WeddingEnd(p->dwPID1, p->dwPID2);
 }
-//RELOAD_ADMIN
 
 void CInputDB::MyshopPricelistRes(LPDESC d, const TPacketMyshopPricelistHeader* p )
 {
@@ -2082,13 +2067,12 @@ void CInputDB::ReloadAdmin(const char * c_pData )
 	c_pData += 2;
 	int HostSize = decode_2bytes(c_pData );
 	c_pData += 2;
-
+	
 	for (int n = 0; n < HostSize; ++n )
 	{
 		gm_new_host_inert(c_pData );
 		c_pData += ChunkSize;
 	}
-
 
 	c_pData += 2;
 	int size = 	decode_2bytes(c_pData );
@@ -2101,7 +2085,7 @@ void CInputDB::ReloadAdmin(const char * c_pData )
 		gm_new_insert(rAdminInfo );
 
 		c_pData += sizeof (tAdminInfo );
-
+	
 		LPCHARACTER pChar = CHARACTER_MANAGER::instance().FindPC(rAdminInfo.m_szName );
 		if (pChar )
 		{
@@ -2414,6 +2398,21 @@ int CInputDB::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 			RespondChannelStatus(DESC_MANAGER::instance().FindByHandle(m_dwHandle), c_pData);
 			break;
 
+#ifdef ENABLE_EVENT_MANAGER
+		case HEADER_DG_UPDATE_EVENT_STATUS:
+			CEventManager::Instance().UpdateEventStatus((DWORD)c_pData);
+
+		case HEADER_DG_EVENT_NOTIFICATION:
+			EventNotification(c_pData);
+			break;
+#endif
+
+#ifdef ENABLE_RENEWAL_BATTLE_PASS
+		case HEADER_DG_EXT_BATTLE_PASS_LOAD:
+			ExtBattlePassLoad(DESC_MANAGER::instance().FindByHandle(m_dwHandle), c_pData);
+			break;
+#endif
+
 #ifdef ENABLE_SKILL_COLOR_SYSTEM
 		case HEADER_DG_SKILL_COLOR_LOAD:
 			SkillColorLoad(DESC_MANAGER::instance().FindByHandle(m_dwHandle), c_pData);
@@ -2432,12 +2431,10 @@ int CInputDB::Analyze(LPDESC d, BYTE bHeader, const char * c_pData)
 			break;
 #endif
 
-#ifdef ENABLE_ITEMSHOP
+#ifdef ENABLE_RENEWAL_INGAME_ITEMSHOP
 		case HEADER_DG_ITEMSHOP:
-		{
-			ItemShop(DESC_MANAGER::instance().FindByHandle(m_dwHandle), c_pData);
+			ItemShop(DESC_MANAGER::instance().FindByHandle(m_dwHandle),c_pData);
 			break;
-		}
 #endif
 
 #ifdef ENABLE_GROWTH_PET_SYSTEM
@@ -2550,6 +2547,42 @@ void CInputDB::RespondChannelStatus(LPDESC desc, const char* pcData)
 	desc->SetChannelStatusRequested(false);
 }
 
+#ifdef ENABLE_EVENT_MANAGER
+void CInputDB::EventNotification(const char* c_pData)
+{
+	const TPacketSetEventFlag* p = (TPacketSetEventFlag*)c_pData;
+	quest::CQuestManager::instance().SetEventFlag(p->szFlagName, p->lValue);
+
+	if (p->lValue)
+		SendEventBeginNotification();
+	else
+		SendEventEndNotification();
+}
+#endif
+
+#ifdef ENABLE_RENEWAL_BATTLE_PASS
+void CInputDB::ExtBattlePassLoad(LPDESC d, const char* c_pData)
+{
+	if (!d || !d->GetCharacter())
+		return;
+
+	LPCHARACTER ch = d->GetCharacter();
+	if (!ch)
+		return;
+
+	DWORD dwPID = decode_4bytes(c_pData);
+	c_pData += sizeof(DWORD);
+
+	DWORD dwCount = decode_4bytes(c_pData);
+	c_pData += sizeof(DWORD);
+
+	if (ch->GetPlayerID() != dwPID)
+		return;
+
+	ch->LoadExtBattlePass(dwCount, (TPlayerExtBattlePassMission*)c_pData);
+}
+#endif
+
 #ifdef ENABLE_OFFLINE_MESSAGE
 void CInputDB::ReadOfflineMessages(LPDESC desc, const char* pcData)
 {
@@ -2575,49 +2608,29 @@ void CInputDB::ReadOfflineMessages(LPDESC desc, const char* pcData)
 }
 #endif
 
-#ifdef ENABLE_ITEMSHOP
+#ifdef ENABLE_RENEWAL_INGAME_ITEMSHOP
 void CInputDB::ItemShop(LPDESC d, const char* c_pData)
 {
 	const BYTE subIndex = *(BYTE*)c_pData;
 	c_pData += sizeof(BYTE);
 
-	switch (subIndex)
+	if (subIndex == ITEMSHOP_LOAD)
+		CHARACTER_MANAGER::Instance().LoadItemShopData(c_pData);
+	else if (subIndex == ITEMSHOP_LOG)
 	{
-		case ITEMSHOP_LOAD:
-		{
-			CHARACTER_MANAGER::Instance().LoadItemShopData(c_pData);
-			break;
-		}
-		case ITEMSHOP_LOG:
-		{
-			if (!d)
-			{
-				return;
-			}
-
-			CHARACTER_MANAGER::Instance().LoadItemShopLogReal(d->GetCharacter(), c_pData);
-			break;
-		}
-		case ITEMSHOP_BUY:
-		{
-			if (!d)
-			{
-				return;
-			}
-
-			CHARACTER_MANAGER::Instance().LoadItemShopBuyReal(d->GetCharacter(), c_pData);
-			break;
-		}
-		case ITEMSHOP_UPDATE_ITEM:
-		{
-			CHARACTER_MANAGER::Instance().UpdateItemShopItem(c_pData);
-			break;
-		}
-		default:
-		{
-			sys_err("unknown subIndex %u", subIndex);
+		if (!d)
 			return;
-		}
+		CHARACTER_MANAGER::Instance().LoadItemShopLogReal(d->GetCharacter(), c_pData);
+	}
+	else if (subIndex == ITEMSHOP_BUY)
+	{
+		if (!d)
+			return;
+		CHARACTER_MANAGER::Instance().LoadItemShopBuyReal(d->GetCharacter(), c_pData);
+	}
+	else if (subIndex == ITEMSHOP_UPDATE_ITEM)
+	{
+		CHARACTER_MANAGER::Instance().UpdateItemShopItem(c_pData);
 	}
 }
 #endif

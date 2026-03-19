@@ -7,12 +7,12 @@
 bool CSoundData::ms_isSoundFile[SOUND_FILE_MAX_NUM];
 CMappedFile CSoundData::ms_SoundFile[SOUND_FILE_MAX_NUM];
 
-const char * CSoundData::GetFileName()
+const char *CSoundData::GetFileName()
 {
 	return m_filename;
 }
 
-void CSoundData::Assign(const char* filename)
+void CSoundData::Assign(const char *filename)
 {
 	assert(m_assigned == false);
 
@@ -23,7 +23,7 @@ void CSoundData::Assign(const char* filename)
 LPVOID CSoundData::Get()
 {
 	++m_iRefCount;
-	m_dwAccessTime = ELTimer_GetMSec();
+	m_dwAccessTime = ELTimer_GetMSec(); 
 
 	if (!m_data)
 		ReadFromDisk();
@@ -33,7 +33,7 @@ LPVOID CSoundData::Get()
 	else
 		return (m_data);
 }
-
+ 
 ULONG CSoundData::GetSize()
 {
 	return m_size;
@@ -75,7 +75,7 @@ bool CSoundData::ReadFromDisk()
 
 	S32 type = AIL_file_type(s + 1, s[0]);
 	AILSOUNDINFO info;
-
+	
 	switch (type)
 	{
 		case AILFILETYPE_PCM_WAV:
@@ -86,7 +86,7 @@ bool CSoundData::ReadFromDisk()
 			}
 			break;
 
-		case AILFILETYPE_ADPCM_WAV:
+		case AILFILETYPE_ADPCM_WAV:	// 3D 사운드는 decompress 해야 함.
 			{
 				AIL_WAV_info(s + 1, &info);
 				AIL_decompress_ADPCM(&info, &m_data, &m_size);
@@ -140,12 +140,12 @@ U32 AILCALLBACK CSoundData::open_callback(char const * filename, U32 *file_handl
 		return 0;
 
 	LPCVOID	pMap;
-
+	
 	if (!CEterPackManager::Instance().Get(ms_SoundFile[iIndex], filename, &pMap))
 		return 0;
 
 	ms_isSoundFile[iIndex] = true;
-
+	
 	*file_handle = iIndex;
 	return 1;
 }
@@ -195,7 +195,7 @@ void CSoundData::Destroy()
 	}
 }
 
-CSoundData::CSoundData() :
+CSoundData::CSoundData() : 
 m_assigned(false),
 m_iRefCount(0),
 m_dwPlayTime(0),

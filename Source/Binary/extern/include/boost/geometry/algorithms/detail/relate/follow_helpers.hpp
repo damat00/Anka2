@@ -14,8 +14,6 @@
 #ifndef BOOST_GEOMETRY_ALGORITHMS_DETAIL_RELATE_FOLLOW_HELPERS_HPP
 #define BOOST_GEOMETRY_ALGORITHMS_DETAIL_RELATE_FOLLOW_HELPERS_HPP
 
-#include <boost/core/ignore_unused.hpp>
-
 #include <boost/geometry/core/assert.hpp>
 
 #include <boost/geometry/util/condition.hpp>
@@ -96,7 +94,7 @@ struct for_each_disjoint_geometry_if<OpId, Geometry, Tag, true>
         BOOST_GEOMETRY_ASSERT(first != last);
 
         const std::size_t count = boost::size(geometry);
-        boost::ignore_unused(count);
+        boost::ignore_unused_variable_warning(count);
 
         // O(I)
         // gather info about turns generated for contained geometries
@@ -375,7 +373,7 @@ static inline bool is_ip_on_boundary(IntersectionPoint const& ip,
                                      BoundaryChecker & boundary_checker,
                                      segment_identifier const& seg_id)
 {
-    boost::ignore_unused(seg_id);
+    boost::ignore_unused_variable_warning(seg_id);
 
     bool res = false;
 

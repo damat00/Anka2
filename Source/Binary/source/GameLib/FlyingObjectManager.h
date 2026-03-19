@@ -39,10 +39,6 @@ public:
 		FLY_CHAIN_LIGHTNING,
 		FLY_HP_SMALL,
 		FLY_SKILL_MUYEONG,
-#ifdef ENABLE_CONQUEROR_LEVEL
-		FLY_CONQUEROR_EXP,
-#endif
-
 	};
 
 public:
@@ -69,12 +65,12 @@ public:
 	CMapManager * GetMapManagerPtr() { return m_pMapManager; }
 
 public: // Controlled by Server
-	bool RegisterIndexedFlyData(DWORD dwIndex, BYTE byType, const char * c_szFileName);
+	bool RegisterIndexedFlyData(DWORD dwIndex, BYTE byType, const char *c_szFileName);
 	void CreateIndexedFly(DWORD dwIndex, CActorInstance * pStartActor, CActorInstance * pEndActor);
 
 private:
 	void __DestroyFlyingInstanceList();
-	void __DestroyFlyingDataMap();
+	void __DestroyFlyingDataMap();		
 
 	typedef std::map<DWORD, CFlyingData *> TFlyingDataMap;
 	typedef std::list<CFlyingInstance *> TFlyingInstanceList;

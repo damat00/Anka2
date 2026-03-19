@@ -144,12 +144,7 @@ float CLightData::GetDuration()
 {
 	return m_fDuration;
 }
-
-#ifdef ENABLE_DIRECTX9_UPDATE
-void CLightData::InitializeLight(D3DLIGHT9& light)
-#else
 void CLightData::InitializeLight(D3DLIGHT8& light)
-#endif
 {
 	light.Type = D3DLIGHT_POINT;
 
@@ -158,6 +153,7 @@ void CLightData::InitializeLight(D3DLIGHT8& light)
 	light.Attenuation0 = m_fAttenuation0;
 	light.Attenuation1 = m_fAttenuation1;
 	light.Attenuation2 = m_fAttenuation2;
+
 
 	D3DXVECTOR3 position;
 	GetPosition( 0.0f, position);

@@ -25,7 +25,7 @@ class CPythonCharacterManager : public CSingleton<CPythonCharacterManager>, publ
 		bool IsDeadVID(DWORD dwVID);
 		bool IsCacheMode();
 
-#ifdef ENABLE_ULTIMATE_REGEN
+#ifdef ENABLE_RENEWAL_REGEN
 		void GetMobWithVnum(DWORD bossVnum, std::vector<CInstanceBase*>& m_Data);
 #endif
 
@@ -39,6 +39,7 @@ class CPythonCharacterManager : public CSingleton<CPythonCharacterManager>, publ
 		CInstanceBase* FindVictim(CInstanceBase* pkInstMain, float fMaxDistance, TPixelPosition* startPoint, const bool m_bAutoHuntMob, const bool m_bAutoHuntStone);
 		bool CanAttackToTarget(CInstanceBase* pkInstMain, CInstanceBase* pkInstInstance);
 #endif
+
 
 		void InsertPVPKey(DWORD dwVIDSrc, DWORD dwVIDDst);
 		void RemovePVPKey(DWORD dwVIDSrc, DWORD dwVIDDst);

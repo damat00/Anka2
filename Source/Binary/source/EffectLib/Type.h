@@ -15,6 +15,7 @@ typedef	struct	_FVF_POINT
 #define	D3DFVF_POINT (D3DFVF_XYZ)
 #endif
 
+
 typedef	struct	_FVF_PT
 {
 	float	x, y, z;
@@ -51,6 +52,8 @@ enum EEffectType
 	EFFECT_TYPE_SIMPLE_LIGHT		= 4,
 };
 
+
+
 enum EMeshBillBoardType
 {
 	MESH_BILLBOARD_TYPE_NONE,
@@ -72,6 +75,8 @@ enum EBillBoardType
 
 	BILLBOARD_TYPE_2FACE, //     / and \.
 	BILLBOARD_TYPE_3FACE, //     / and \ and -
+
+
 };
 
 enum EMovingType
@@ -91,6 +96,7 @@ typedef struct SEffectPosition
 	// For Bezier Curve
 	int m_iMovingType;
 	D3DXVECTOR3 m_vecControlPoint;
+
 } TEffectPosition;
 
 inline bool operator < (const SEffectPosition & lhs, const SEffectPosition & rhs)
@@ -212,6 +218,8 @@ typedef std::vector<TTimeEventTypeColor>		TTimeEventTableColor;
 typedef std::vector<TTimeEventTypeVector2>		TTimeEventTableVector2;
 typedef std::vector<TTimeEventTypeVector3>		TTimeEventTableVector3;
 
+
+
 template <typename T>
 __forceinline void GetTimeEventBlendValue(float fElapsedTime, std::vector<CTimeEvent<T> >& rVector, T * pReturnValue)
 {
@@ -251,6 +259,7 @@ __forceinline void GetTimeEventBlendValue(float fElapsedTime, std::vector<CTimeE
 		float Head = (result.second->m_fTime - fElapsedTime) / (result.second->m_fTime - result.first->m_fTime);
 		*pReturnValue = T((result.first->m_Value-result.second->m_Value)*Head+(result.second->m_Value));
 	}
+
 }
 
 extern BOOL GetTokenTimeEventFloat(CTextFileLoader & rTextFileLoader, const char * c_szKey, TTimeEventTableFloat * pTimeEventTableFloat);

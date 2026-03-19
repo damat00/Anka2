@@ -1,16 +1,15 @@
 #include "stdafx.h"
+
 #include "../../common/VnumHelper.h"
 #include "../../common/service.h"
+
 #include "config.h"
 #include "char.h"
 #include "char_manager.h"
 #include "regen.h"
 #include "mob_manager.h"
 #include "dungeon.h"
-#ifdef ENABLE_RESP_SYSTEM
-	#include "resp_manager.h"
-size_t m_regenId = 0;
-#endif
+
 LPREGEN	regen_list = NULL;
 LPREGEN_EXCEPTION regen_exception_list = NULL;
 
@@ -39,7 +38,7 @@ enum ERegenModes
 	MODE_VNUM
 };
 
-static bool get_word(FILE *fp, char *buf) // received in word units.
+static bool get_word(FILE *fp, char *buf)
 {
 	int i = 0;
 	int c;
@@ -123,11 +122,12 @@ static bool read_line(FILE *fp, LPREGEN regen)
 				if (szTmp[0] == 'm')
 					regen->type = REGEN_TYPE_MOB;
 				else if (szTmp[0] == 'g')
+				{
 					regen->type = REGEN_TYPE_GROUP;
-#ifdef STONE_REGEN_FIX
-				else if (szTmp[0] == 'a')
-					regen->type = REGEN_TYPE_STONE;
-#endif
+
+					if (szTmp[1] == 'a')
+						regen->is_aggressive = true;
+				}
 				else if (szTmp[0] == 'e')
 					regen->type = REGEN_TYPE_EXCEPTION;
 				else if (szTmp[0] == 'r')
@@ -139,9 +139,6 @@ static bool read_line(FILE *fp, LPREGEN regen)
 					sys_err("read_line: unknown regen type %c", szTmp[0]);
 					exit(1);
 				}
-
-				if (szTmp[1] == 'a') //@fixme195
-					regen->is_aggressive = true;
 
 				++mode;
 				break;
@@ -246,9 +243,6 @@ static bool read_line(FILE *fp, LPREGEN regen)
 
 			case MODE_VNUM:
 				str_to_number(regen->vnum, szTmp);
-#ifdef ENABLE_RESP_SYSTEM
-				regen->id = m_regenId++;
-#endif
 				++mode;
 				return true;
 		}
@@ -337,14 +331,6 @@ static void regen_spawn_dungeon(LPREGEN regen, LPDUNGEON pDungeon, bool bOnce)
 
 		if (ch && !bOnce)
 			ch->SetRegen(regen);
-		
-#ifdef ENABLE_SUNG_MAHI_TOWER
-		if (ch && pDungeon)
-		{
-			BYTE bDungeonLevel = pDungeon->GetDungeonDifficulty();
-			ch->SetDungeonMultipliers(bDungeonLevel);
-		}
-#endif
 	}
 }
 
@@ -355,11 +341,6 @@ static void regen_spawn(LPREGEN regen, bool bOnce)
 
 	num = (regen->max_count - regen->count);
 
-#ifdef __YMIR_REGEN_FIX__
-	if(regen->event)
-		regen->event->skip_event = true;
-#endif
-
 	if (!num)
 		return;
 
@@ -367,20 +348,7 @@ static void regen_spawn(LPREGEN regen, bool bOnce)
 	{
 		LPCHARACTER ch = NULL;
 
-#ifdef STONE_REGEN_FIX
-		if (regen->type == REGEN_TYPE_STONE)
-		{
-			ch = CHARACTER_MANAGER::Instance().SpawnMobRangeStone(regen->vnum, regen->lMapIndex, regen->sx, regen->sy, regen->ex, regen->ey, true, regen->is_aggressive, regen->is_aggressive);
-			if (ch) {
-				++regen->count;
-				ch->SetRegen(regen);
-				continue;
-			}
-		}
-		else if (regen->type == REGEN_TYPE_ANYWHERE)
-#else
 		if (regen->type == REGEN_TYPE_ANYWHERE)
-#endif
 		{
 			ch = CHARACTER_MANAGER::instance().SpawnMobRandomPosition(regen->vnum, regen->lMapIndex);
 
@@ -402,11 +370,7 @@ static void regen_spawn(LPREGEN regen, bool bOnce)
 		}
 		else
 		{
-#ifdef STONE_REGEN_FIX
-			if (regen->type == REGEN_TYPE_MOB || regen->type == REGEN_TYPE_STONE)
-#else
 			if (regen->type == REGEN_TYPE_MOB)
-#endif
 			{
 				ch = CHARACTER_MANAGER::Instance().SpawnMobRange(regen->vnum, regen->lMapIndex, regen->sx, regen->sy, regen->ex, regen->ey, true, regen->is_aggressive, regen->is_aggressive );
 
@@ -483,9 +447,6 @@ bool regen_do(const char* filename, long lMapIndex, int base_x, int base_y, LPDU
 
 		if (tmp.type == REGEN_TYPE_MOB ||
 			tmp.type == REGEN_TYPE_GROUP ||
-#ifdef STONE_REGEN_FIX
-			tmp.type == REGEN_TYPE_STONE ||
-#endif
 			tmp.type == REGEN_TYPE_GROUP_GROUP ||
 			tmp.type == REGEN_TYPE_ANYWHERE)
 		{
@@ -529,7 +490,7 @@ bool regen_do(const char* filename, long lMapIndex, int base_x, int base_y, LPDU
 
 				if (!p)
 				{
-					sys_err("In %s, No mob data by vnum %u", filename, regen->vnum);
+					sys_err("No mob data by vnum %u", regen->vnum);
 					if (!bOnce) {
 						M2_DELETE(regen);
 					}
@@ -547,11 +508,8 @@ bool regen_do(const char* filename, long lMapIndex, int base_x, int base_y, LPDU
 				regen->event = event_create(dungeon_regen_event, info, PASSES_PER_SEC(number(0, 16)) + PASSES_PER_SEC(regen->time));
 
 				pDungeon->AddRegen(regen);
-				// regen_id should be determined at this point,
-				// before the call to CHARACTER::SetRegen()
 			}
 
-			// At first, it regenerates unconditionally.
 			regen_spawn_dungeon(regen, pDungeon, bOnce);
 
 		}
@@ -622,12 +580,11 @@ bool regen_load_in_file(const char* filename, long lMapIndex, int base_x, int ba
 
 				if (!p)
 				{
-					sys_err("In %s, No mob data by vnum %u", filename, regen->vnum);
+					sys_err("No mob data by vnum %u", regen->vnum);
 					continue;
 				}
 			}
 
-			// At first, it regenerates unconditionally.
 			regen_spawn(regen, true);
 		}
 	}
@@ -648,41 +605,14 @@ EVENTFUNC(regen_event)
 
 	LPREGEN	regen = info->regen;
 
-#ifdef ENABLE_REGEN_RENEWAL
-	if (!regen)
-		return 0;
-#endif
-
 	if (!is_valid_regen(regen))
 		return 0;
 
-#ifndef __YMIR_REGEN_FIX__
 	if (regen->time == 0)
 		regen->event = NULL;
-#endif
 
-#ifdef ENABLE_REGEN_RENEWAL
-	if (regen->nextRespawn)
-	{
-		if (regen->nextRespawn <= time(0))
-			regen_spawn(regen, false);
-	}
-	else
-		regen_spawn(regen, false);
-
-#ifdef __YMIR_REGEN_FIX__
-	return PASSES_PER_SEC(60 * 60 * 24);
-#else
-	return PASSES_PER_SEC(1);
-#endif
-#else
 	regen_spawn(regen, false);
-#ifdef __YMIR_REGEN_FIX__
-	return PASSES_PER_SEC(60 * 60 * 24);
-#else
 	return PASSES_PER_SEC(regen->time);
-#endif
-#endif
 }
 
 bool regen_load(const char* filename, long lMapIndex, int base_x, int base_y)
@@ -711,9 +641,6 @@ bool regen_load(const char* filename, long lMapIndex, int base_x, int base_y)
 		if (tmp.type == REGEN_TYPE_MOB ||
 			tmp.type == REGEN_TYPE_GROUP ||
 			tmp.type == REGEN_TYPE_GROUP_GROUP ||
-#ifdef STONE_REGEN_FIX
-			tmp.type == REGEN_TYPE_STONE ||
-#endif
 			tmp.type == REGEN_TYPE_ANYWHERE)
 		{
 			if (test_server)
@@ -754,44 +681,36 @@ bool regen_load(const char* filename, long lMapIndex, int base_x, int base_y)
 
 				if (!p)
 				{
-					sys_err("In %s, No mob data by vnum %u", filename, regen->vnum);
+					sys_err("No mob data by vnum %u", regen->vnum);
 				}
 				else if (CMobVnumHelper::IsNPCType(p->m_table.bType) || p->m_table.bType == CHAR_TYPE_WARP || p->m_table.bType == CHAR_TYPE_GOTO)
 				{
 					SECTREE_MANAGER::instance().InsertNPCPosition(lMapIndex,
 							p->m_table.bType,
-#ifdef ENABLE_ULTIMATE_REGEN
+#ifdef ENABLE_RENEWAL_REGEN
 							regen->vnum,
 #else
 							p->m_table.szLocaleName,
 #endif
 							(regen->sx+regen->ex) / 2 - base_x,
 							(regen->sy+regen->ey) / 2 - base_y
-#ifdef ENABLE_ULTIMATE_REGEN
+#ifdef ENABLE_RENEWAL_REGEN
 								, regen->time
 #endif
 							);
 				}
 			}
 
-			//NO_REGEN
-			// When setting the regen time to 0 in Desc: regen.txt (other regen related texts)
-			// Do not regenerate.
 			if (regen->time != 0)
 			{
-				// At first, it regenerates unconditionally.
 				regen_spawn(regen, false);
 
 				regen_event_info* info = AllocEventInfo<regen_event_info>();
 
 				info->regen = regen;
-#ifdef ENABLE_REGEN_RENEWAL
-				regen->event = event_create(regen_event, info, PASSES_PER_SEC(1));
-#else
-				regen->event = event_create(regen_event, info, PASSES_PER_SEC(number(0, 16)) + PASSES_PER_SEC(regen->time));
-#endif
+
+				regen->event = event_create(regen_event, info, PASSES_PER_SEC(number(0, 16)) + PASSES_PER_SEC(regen->time)); 
 			}
-			//END_NO_REGEN
 		}
 		else if (tmp.type == REGEN_TYPE_EXCEPTION)
 		{
@@ -812,21 +731,6 @@ bool regen_load(const char* filename, long lMapIndex, int base_x, int base_y)
 	fclose(fp);
 	return true;
 }
-
-#ifdef STONE_REGEN_FIX
-void regen_event_create(LPREGEN regen)
-{
-	if (!regen)
-		return;
-
-	if (regen->time != 0 && regen->type == REGEN_TYPE_STONE)
-	{
-		regen_event_info* info = AllocEventInfo<regen_event_info>();
-		info->regen = regen;
-		regen->event = event_create(regen_event, info, PASSES_PER_SEC(regen->time));
-	}
-}
-#endif
 
 void regen_free(void)
 {
@@ -862,14 +766,12 @@ void regen_reset(int x, int y)
 		if (!regen->event)
 			continue;
 
-		// If there are coordinates, only the regen list within the coordinates is regenerated.
 		if (x != 0 || y != 0)
 		{
 			if (x >= regen->sx && x <= regen->ex)
 				if (y >= regen->sy && y <= regen->ey)
 					event_reset_time(regen->event, 1);
 		}
-		// If not, all regen
 		else
 			event_reset_time(regen->event, 1);
 	}
@@ -907,7 +809,7 @@ void regen_reload(long lMapIndex)
 		return;
 
 	char szFilename[256];
-
+	
 	snprintf(szFilename, sizeof(szFilename), "%sregen.txt", mbMapDataContainer[lMapIndex]->szBaseName);
 	regen_load(szFilename, lMapIndex, mbMapDataContainer[lMapIndex]->base_x, mbMapDataContainer[lMapIndex]->base_y);
 

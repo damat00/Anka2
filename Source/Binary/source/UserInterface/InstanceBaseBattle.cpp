@@ -122,7 +122,7 @@ float CInstanceBase::NEW_GetRotationFromDestInstance(CInstanceBase& rkInstDst)
 
 void CInstanceBase::NEW_GetRandomPositionInFanRange(CInstanceBase& rkInstTarget, TPixelPosition* pkPPosDst)
 {
-	float fDstDirRot=NEW_GetRotationFromDestInstance(rkInstTarget);
+	float fDstDirRot=NEW_GetRotationFromDestInstance(rkInstTarget);	
 
 	float fRot=frandom(fDstDirRot-10.0f, fDstDirRot+10.0f);
 
@@ -377,7 +377,7 @@ void CInstanceBase::NEW_Attack(float fDirRot)
 
 	if (IsUsingSkill())
 		return;
-
+	
 	if (IsWalking())
 		EndWalking();
 
@@ -404,7 +404,7 @@ void CInstanceBase::NEW_Attack(float fDirRot)
 void CInstanceBase::NEW_AttackToDestPixelPositionDirection(const TPixelPosition& c_rkPPosDst)
 {
 	float fDirRot=NEW_GetRotationFromDestPixelPosition(c_rkPPosDst);
-
+	
 	NEW_Attack(fDirRot);
 }
 
@@ -426,7 +426,7 @@ void CInstanceBase::AttackProcess()
 {
 	if (!m_GraphicThingInstance.CanCheckAttacking())
 		return;
-
+   
 	CInstanceBase * pkInstLast = nullptr;
 	CPythonCharacterManager& rkChrMgr = CPythonCharacterManager::Instance();
 	CPythonCharacterManager::CharacterIterator i = rkChrMgr.CharacterInstanceBegin();

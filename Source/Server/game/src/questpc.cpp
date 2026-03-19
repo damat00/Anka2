@@ -114,8 +114,7 @@ namespace quest
 			it->second = value;
 	}
 
-	// only from lua call
-	void PC::SetCurrentQuestStateName(const string& state_name)
+	void PC::SetCurrentQuestStateName(const string& state_name) 
 	{
 		SetFlag(m_stCurQuest + ".__status", CQuestManager::Instance().GetQuestStateIndex(m_stCurQuest,state_name));
 	}
@@ -246,7 +245,7 @@ namespace quest
 		if (m_iSendToClient & QUEST_SEND_ISBEGIN)
 		{
 			BYTE temp = m_RunningQuestState->bStart?1:0;
-			buf.write(&temp,1);
+			buf.write(&temp,1);		
 			qi.size+=1;
 
 			sys_log(1, "QUEST BeginFlag %d", (int)temp);
@@ -306,7 +305,6 @@ namespace quest
 
 	void PC::EndRunning()
 	{
-		// unlocked locked npc
 		{
 			LPCHARACTER npc = CQuestManager::instance().GetCurrentNPCCharacterPtr();
 			LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
@@ -414,7 +412,6 @@ namespace quest
 
 	void PC::CancelRunning()
 	{
-		// cancel data
 		m_RunningQuestState = 0;
 		m_iSendToClient = 0;
 		m_bShouldSendDone = false;
@@ -454,7 +451,6 @@ namespace quest
 
 	void PC::SetQuestTitle(const string& quest, const string& title)
 	{
-		//SetSendFlag(QUEST_SEND_TITLE);
 		QuestInfo::iterator it = m_QuestInfo.find(CQuestManager::instance().GetQuestIndexByName(quest));
 
 		if (it != m_QuestInfo.end())
@@ -712,3 +708,4 @@ namespace quest
 		}
 	}
 }
+

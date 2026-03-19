@@ -10,7 +10,8 @@
 
 #include <boost/mp11/detail/mp_list.hpp>
 #include <boost/mp11/utility.hpp>
-#include <boost/mp11/detail/config.hpp>
+#include <boost/config.hpp>
+#include <boost/config/workaround.hpp>
 
 namespace boost
 {
@@ -24,7 +25,7 @@ namespace detail
 
 template<class... L> struct mp_append_impl;
 
-#if BOOST_MP11_WORKAROUND( BOOST_MP11_MSVC, <= 1800 )
+#if BOOST_WORKAROUND( BOOST_MSVC, <= 1800 )
 
 template<> struct mp_append_impl<>
 {
@@ -132,7 +133,7 @@ template<
     using type = typename mp_append_impl<prefix, Lr...>::type;
 };
 
-#if BOOST_MP11_WORKAROUND( BOOST_MP11_CUDA, >= 9000000 && BOOST_MP11_CUDA < 10000000 )
+#if BOOST_WORKAROUND( BOOST_CUDA_VERSION, >= 9000000 && BOOST_CUDA_VERSION < 10000000 )
 
 template<class... L>
 struct mp_append_impl_cuda_workaround

@@ -79,7 +79,7 @@ void CNetDatagramReceiver::SetRecvBufferSize(int recvBufSize)
 
 void CNetDatagramReceiver::Clear()
 {
-
+	
 	m_isBind = FALSE;
 
 	m_dwPortIndex = 1000;
@@ -88,7 +88,7 @@ void CNetDatagramReceiver::Clear()
 	memset(&m_SockAddr, 0, sizeof(SOCKADDR_IN));
 
 	m_recvBufCurrentPos = 0;
-	m_recvBufCurrentSize = 0;
+	m_recvBufCurrentSize = 0;	
 }
 
 CNetDatagramReceiver::CNetDatagramReceiver()

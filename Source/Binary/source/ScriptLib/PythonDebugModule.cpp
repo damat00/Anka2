@@ -2,10 +2,10 @@
 
 extern IPythonExceptionSender * g_pkExceptionSender;
 
-PyObject* dbgLogBox(PyObject* poSelf, PyObject* poArgs)
-{
-	char* szMsg;
-	char* szCaption;
+PyObject *dbgLogBox(PyObject *poSelf, PyObject *poArgs)
+{	
+	char *szMsg;
+	char *szCaption;
 	if (!PyTuple_GetString(poArgs, 0, &szMsg))
 		return Py_BuildException();
 	if (!PyTuple_GetString(poArgs, 1, &szCaption))
@@ -16,12 +16,12 @@ PyObject* dbgLogBox(PyObject* poSelf, PyObject* poArgs)
 	{
 		LogBox(szMsg,szCaption);
 	}
-	return Py_BuildNone();
+	return Py_BuildNone();	
 }
 
-PyObject* dbgTrace(PyObject* poSelf, PyObject* poArgs)
+PyObject *dbgTrace(PyObject *poSelf, PyObject *poArgs)
 {
-	char* szMsg;
+	char *szMsg;
 	if (!PyTuple_GetString(poArgs, 0, &szMsg))
 		return Py_BuildException();
 
@@ -29,30 +29,30 @@ PyObject* dbgTrace(PyObject* poSelf, PyObject* poArgs)
 	return Py_BuildNone();
 }
 
-PyObject* dbgTracen(PyObject* poSelf, PyObject* poArgs)
+PyObject *dbgTracen(PyObject *poSelf, PyObject *poArgs)
 {
-	char* szMsg;
-	if (!PyTuple_GetString(poArgs, 0, &szMsg))
+	char *szMsg;
+	if (!PyTuple_GetString(poArgs, 0, &szMsg)) 
 		return Py_BuildException();
 
 	Tracen(szMsg);
 	return Py_BuildNone();
 }
 
-PyObject* dbgTraceError(PyObject* poSelf, PyObject* poArgs)
+PyObject *dbgTraceError(PyObject *poSelf, PyObject *poArgs)
 {
-	char* szMsg;
-	if (!PyTuple_GetString(poArgs, 0, &szMsg))
+	char *szMsg;
+	if (!PyTuple_GetString(poArgs, 0, &szMsg)) 
 		return Py_BuildException();
 
 	TraceError( "%s", szMsg );
 	return Py_BuildNone();
 }
 
-PyObject* dbgRegisterExceptionString(PyObject* poSelf, PyObject* poArgs)
+PyObject *dbgRegisterExceptionString(PyObject *poSelf, PyObject *poArgs)
 {
-	char* szMsg;
-	if (!PyTuple_GetString(poArgs, 0, &szMsg))
+	char *szMsg;
+	if (!PyTuple_GetString(poArgs, 0, &szMsg)) 
 		return Py_BuildException();
 
 	if (g_pkExceptionSender)
@@ -71,7 +71,7 @@ void initdbg()
 		{ "TraceError",					dbgTraceError,				METH_VARARGS },
 		{ "RegisterExceptionString",	dbgRegisterExceptionString,	METH_VARARGS },
 		{ nullptr, NULL},
-	};
+	};	
 
 	Py_InitModule("dbg", s_methods);
 }

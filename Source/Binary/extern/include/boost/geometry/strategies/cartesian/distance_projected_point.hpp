@@ -21,7 +21,6 @@
 
 
 #include <boost/concept_check.hpp>
-#include <boost/core/ignore_unused.hpp>
 #include <boost/mpl/if.hpp>
 #include <boost/type_traits/is_void.hpp>
 
@@ -136,7 +135,7 @@ public :
         subtract_point(w, projected);
 
         Strategy strategy;
-        boost::ignore_unused(strategy);
+        boost::ignore_unused_variable_warning(strategy);
 
         calculation_type const zero = calculation_type();
         calculation_type const c1 = dot_product(w, v);

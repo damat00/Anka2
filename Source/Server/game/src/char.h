@@ -5,6 +5,7 @@
 #include "../../common/service.h"
 #include "../../common/tables.h"
 #include "../../common/stl.h"
+
 #include "entity.h"
 #include "FSM.h"
 #include "horse_rider.h"
@@ -24,6 +25,10 @@
 	#include <vector>
 #endif
 
+#ifdef ENABLE_BIOLOG_SYSTEM
+	#include "biolog_manager.h"
+#endif
+
 #ifdef ENABLE_GROWTH_PET_SYSTEM
 	#include "growth_pet.h"
 #endif
@@ -32,16 +37,9 @@
 	#include "changelook.h"
 #endif
 
-#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
-	#include "soulroulette.h"
-#endif
-
 enum eMountType { MOUNT_TYPE_NONE = 0, MOUNT_TYPE_NORMAL = 1, MOUNT_TYPE_COMBAT = 2, MOUNT_TYPE_MILITARY = 3 };
 eMountType GetMountLevelByVnum(DWORD dwMountVnum, bool IsNew);
 const DWORD GetRandomSkillVnum(BYTE bJob = JOB_MAX_NUM);
-#ifdef ENABLE_NINETH_SKILL
-const uint32_t GetRandomForgetSkillVnum(uint8_t bJob = JOB_MAX_NUM);
-#endif
 
 class CBuffOnAttributes;
 class CPetSystem;
@@ -53,20 +51,20 @@ class COfflineShop;
 typedef class COfflineShop* LPOFFLINESHOP;
 #endif
 
-#define INSTANT_FLAG_DEATH_PENALTY		(1 << 0)
-#define INSTANT_FLAG_SHOP				(1 << 1)
-#define INSTANT_FLAG_EXCHANGE			(1 << 2)
-#define INSTANT_FLAG_STUN				(1 << 3)
-#define INSTANT_FLAG_NO_REWARD			(1 << 4)
+#define INSTANT_FLAG_DEATH_PENALTY (1 << 0)
+#define INSTANT_FLAG_SHOP (1 << 1)
+#define INSTANT_FLAG_EXCHANGE (1 << 2)
+#define INSTANT_FLAG_STUN (1 << 3)
+#define INSTANT_FLAG_NO_REWARD (1 << 4)
 
-#define AI_FLAG_NPC				(1 << 0)
-#define AI_FLAG_AGGRESSIVE			(1 << 1)
-#define AI_FLAG_HELPER				(1 << 2)
-#define AI_FLAG_STAYZONE			(1 << 3)
+#define AI_FLAG_NPC (1 << 0)
+#define AI_FLAG_AGGRESSIVE (1 << 1)
+#define AI_FLAG_HELPER (1 << 2)
+#define AI_FLAG_STAYZONE (1 << 3)
 
-#ifdef ENABLE_MINIGAME_RUMI_EVENT
-	#define MAX_CARDS_IN_HAND	5
-	#define MAX_CARDS_IN_FIELD	3
+#ifdef ENABLE_MINIGAME_OKEY_CARDS_SYSTEM
+	#define MAX_CARDS_IN_HAND 5
+	#define MAX_CARDS_IN_FIELD 3
 #endif
 
 extern int g_nPortalLimitTime;
@@ -114,9 +112,6 @@ enum
 	FLY_CHAIN_LIGHTNING = 14,
 	FLY_HP_SMALL = 15,
 	FLY_SKILL_MUYEONG = 16,
-#ifdef ENABLE_CONQUEROR_LEVEL
-	FLY_CONQUEROR_EXP = 17,
-#endif
 };
 
 enum EDamageType
@@ -134,271 +129,244 @@ enum EDamageType
 	DAMAGE_TYPE_SPECIAL = 10,
 };
 
-enum DamageFlag
-{
-	DAMAGE_NORMAL	= (1 << 0),
-	DAMAGE_POISON	= (1 << 1),
-	DAMAGE_DODGE	= (1 << 2),
-	DAMAGE_BLOCK	= (1 << 3),
-	DAMAGE_PENETRATE= (1 << 4),
-	DAMAGE_CRITICAL = (1 << 5),
-};
-
 enum EPointTypes
 {
-	POINT_NONE,                 	// 0
-	POINT_LEVEL,                	// 1
-	POINT_VOICE,                	// 2
-	POINT_EXP,                  	// 3
-	POINT_NEXT_EXP,             	// 4
-	POINT_HP,                   	// 5
-	POINT_MAX_HP,               	// 6
-	POINT_SP,                   	// 7
-	POINT_MAX_SP,               	// 8
-	POINT_STAMINA,              	// 9
-	POINT_MAX_STAMINA,          	// 10
-	POINT_GOLD,                 	// 11
-	POINT_ST,                   	// 12
-	POINT_HT,                   	// 13
-	POINT_DX,                   	// 14
-	POINT_IQ,                   	// 15
-	POINT_DEF_GRADE,				// 16
-	POINT_ATT_SPEED,            	// 17
-	POINT_ATT_GRADE,				// 18
-	POINT_MOV_SPEED,            	// 19
-	POINT_CLIENT_DEF_GRADE,			// 20
-	POINT_CASTING_SPEED,        	// 21
-	POINT_MAGIC_ATT_GRADE,      	// 22
-	POINT_MAGIC_DEF_GRADE,      	// 23
-	POINT_EMPIRE_POINT,         	// 24
-	POINT_LEVEL_STEP,           	// 25
-	POINT_STAT,                 	// 26
-	POINT_SUB_SKILL,				// 27
-	POINT_SKILL,					// 28
-	POINT_WEAPON_MIN,				// 29
-	POINT_WEAPON_MAX,				// 30
-	POINT_PLAYTIME,             	// 31
-	POINT_HP_REGEN,             	// 32
-	POINT_SP_REGEN,             	// 33
-	POINT_BOW_DISTANCE,         	// 34
-	POINT_HP_RECOVERY,          	// 35
-	POINT_SP_RECOVERY,          	// 36
-	POINT_POISON_PCT,           	// 37
-	POINT_STUN_PCT,             	// 38
-	POINT_SLOW_PCT,             	// 39
-	POINT_CRITICAL_PCT,         	// 40
-	POINT_PENETRATE_PCT,        	// 41
-	POINT_CURSE_PCT,            	// 42
-	POINT_ATTBONUS_HUMAN,       	// 43
-	POINT_ATTBONUS_ANIMAL,      	// 44
-	POINT_ATTBONUS_ORC,         	// 45
-	POINT_ATTBONUS_MILGYO,      	// 46
-	POINT_ATTBONUS_UNDEAD,      	// 47
-	POINT_ATTBONUS_DEVIL,       	// 48
-	POINT_ATTBONUS_INSECT,      	// 49
-	POINT_ATTBONUS_FIRE,        	// 50
-	POINT_ATTBONUS_ICE,         	// 51
-	POINT_ATTBONUS_DESERT,      	// 52
-	POINT_ATTBONUS_MONSTER,     	// 53
-	POINT_ATTBONUS_WARRIOR,     	// 54
-	POINT_ATTBONUS_ASSASSIN,		// 55
-	POINT_ATTBONUS_SURA,			// 56
-	POINT_ATTBONUS_SHAMAN,			// 57
-	POINT_ATTBONUS_TREE,     		// 58
-	POINT_RESIST_WARRIOR,			// 59
-	POINT_RESIST_ASSASSIN,			// 60
-	POINT_RESIST_SURA,				// 61
-	POINT_RESIST_SHAMAN,			// 62
-	POINT_STEAL_HP,             	// 63
-	POINT_STEAL_SP,             	// 64
-	POINT_MANA_BURN_PCT,        	// 65
-	POINT_DAMAGE_SP_RECOVER,    	// 66
-	POINT_BLOCK,                	// 67
-	POINT_DODGE,                	// 68
-	POINT_RESIST_SWORD,         	// 69
-	POINT_RESIST_TWOHAND,       	// 70
-	POINT_RESIST_DAGGER,        	// 71
-	POINT_RESIST_BELL,          	// 72
-	POINT_RESIST_FAN,           	// 73
-	POINT_RESIST_BOW,           	// 74
-	POINT_RESIST_FIRE,          	// 75
-	POINT_RESIST_ELEC,          	// 76
-	POINT_RESIST_MAGIC,         	// 77
-	POINT_RESIST_WIND,          	// 78
-	POINT_REFLECT_MELEE,        	// 79
-	POINT_REFLECT_CURSE,			// 80
-	POINT_POISON_REDUCE,			// 81
-	POINT_KILL_SP_RECOVER,			// 82
-	POINT_EXP_DOUBLE_BONUS,			// 83
-	POINT_GOLD_DOUBLE_BONUS,		// 84
-	POINT_ITEM_DROP_BONUS,			// 85
-	POINT_POTION_BONUS,				// 86
-	POINT_KILL_HP_RECOVERY,			// 87
-	POINT_IMMUNE_STUN,				// 88
-	POINT_IMMUNE_SLOW,				// 89
-	POINT_IMMUNE_FALL,				// 90
-	POINT_PARTY_ATTACKER_BONUS,		// 91
-	POINT_PARTY_TANKER_BONUS,		// 92
-	POINT_ATT_BONUS,				// 93
-	POINT_DEF_BONUS,				// 94
-	POINT_ATT_GRADE_BONUS,			// 95
-	POINT_DEF_GRADE_BONUS,			// 96
-	POINT_MAGIC_ATT_GRADE_BONUS,	// 97
-	POINT_MAGIC_DEF_GRADE_BONUS,	// 98
-	POINT_RESIST_NORMAL_DAMAGE,		// 99
-	POINT_HIT_HP_RECOVERY,			// 100
-	POINT_HIT_SP_RECOVERY, 			// 101
-	POINT_MANASHIELD,				// 102
-	POINT_PARTY_BUFFER_BONUS,		// 103
-	POINT_PARTY_SKILL_MASTER_BONUS,	// 104
-	POINT_HP_RECOVER_CONTINUE,		// 105
-	POINT_SP_RECOVER_CONTINUE,		// 106
-	POINT_STEAL_GOLD,				// 107
-	POINT_POLYMORPH,				// 108
-	POINT_MOUNT,					// 109
-	POINT_PARTY_HASTE_BONUS,		// 110
-	POINT_PARTY_DEFENDER_BONUS,		// 111
-	POINT_STAT_RESET_COUNT,			// 112
-	POINT_HORSE_SKILL,				// 113
-	POINT_MALL_ATTBONUS,			// 114
-	POINT_MALL_DEFBONUS,			// 115
-	POINT_MALL_EXPBONUS,			// 116
-	POINT_MALL_ITEMBONUS,			// 117
-	POINT_MALL_GOLDBONUS,			// 118
-	POINT_MAX_HP_PCT,				// 119
-	POINT_MAX_SP_PCT,				// 120
-	POINT_SKILL_DAMAGE_BONUS,		// 121
-	POINT_NORMAL_HIT_DAMAGE_BONUS,	// 122
-	POINT_SKILL_DEFEND_BONUS,		// 123
-	POINT_NORMAL_HIT_DEFEND_BONUS,	// 124
-	POINT_PC_BANG_EXP_BONUS,		// 125
-	POINT_PC_BANG_DROP_BONUS,		// 126
-	POINT_RAMADAN_CANDY_BONUS_EXP,	// 127
-	POINT_ENERGY 					= 128,
-	POINT_ENERGY_END_TIME 			= 129,
-	POINT_COSTUME_ATTR_BONUS 		= 130,
-	POINT_MAGIC_ATT_BONUS_PER 		= 131,
-	POINT_MELEE_MAGIC_ATT_BONUS_PER = 132,
-	POINT_RESIST_ICE 				= 133,
-	POINT_RESIST_EARTH 				= 134,
-	POINT_RESIST_DARK 				= 135,
-	POINT_RESIST_CRITICAL 			= 136,
-	POINT_RESIST_PENETRATE 			= 137,
+	POINT_NONE						= 0,
+	POINT_LEVEL						= 1,
+	POINT_VOICE						= 2,
+	POINT_EXP						= 3,
+	POINT_NEXT_EXP					= 4,
+	POINT_HP						= 5,
+	POINT_MAX_HP					= 6,
+	POINT_SP						= 7,
+	POINT_MAX_SP					= 8,
+	POINT_STAMINA					= 9,
+	POINT_MAX_STAMINA				= 10,
+	POINT_GOLD						= 11,
+	POINT_ST						= 12,
+	POINT_HT						= 13,
+	POINT_DX						= 14,
+	POINT_IQ						= 15,
+	POINT_DEF_GRADE					= 16,
+	POINT_ATT_SPEED					= 17,
+	POINT_ATT_GRADE					= 18,
+	POINT_MOV_SPEED					= 19,
+	POINT_CLIENT_DEF_GRADE			= 20,
+	POINT_CASTING_SPEED				= 21,
+	POINT_MAGIC_ATT_GRADE			= 22,
+	POINT_MAGIC_DEF_GRADE			= 23,
+	POINT_EMPIRE_POINT				= 24,
+	POINT_LEVEL_STEP				= 25,
+	POINT_STAT						= 26,
+	POINT_SUB_SKILL					= 27,
+	POINT_SKILL						= 28,
+	POINT_WEAPON_MIN				= 29,
+	POINT_WEAPON_MAX				= 30,
+	POINT_PLAYTIME					= 31,
+	POINT_HP_REGEN					= 32,
+	POINT_SP_REGEN					= 33,
+	POINT_BOW_DISTANCE				= 34,
+	POINT_HP_RECOVERY				= 35,
+	POINT_SP_RECOVERY				= 36,
+	POINT_POISON_PCT				= 37,
+	POINT_STUN_PCT					= 38,
+	POINT_SLOW_PCT					= 39,
+	POINT_CRITICAL_PCT				= 40,
+	POINT_PENETRATE_PCT				= 41,
+	POINT_CURSE_PCT					= 42,
+	POINT_ATTBONUS_HUMAN			= 43,
+	POINT_ATTBONUS_ANIMAL			= 44,
+	POINT_ATTBONUS_ORC				= 45,
+	POINT_ATTBONUS_MILGYO			= 46,
+	POINT_ATTBONUS_UNDEAD			= 47,
+	POINT_ATTBONUS_DEVIL			= 48,
+	POINT_ATTBONUS_INSECT			= 49,
+	POINT_ATTBONUS_FIRE				= 50,
+	POINT_ATTBONUS_ICE				= 51,
+	POINT_ATTBONUS_DESERT			= 52,
+	POINT_ATTBONUS_MONSTER			= 53,
+	POINT_ATTBONUS_WARRIOR			= 54,
+	POINT_ATTBONUS_ASSASSIN			= 55,
+	POINT_ATTBONUS_SURA				= 56,
+	POINT_ATTBONUS_SHAMAN			= 57,
+	POINT_ATTBONUS_TREE				= 58,
+	POINT_RESIST_WARRIOR			= 59,
+	POINT_RESIST_ASSASSIN			= 60,
+	POINT_RESIST_SURA				= 61,
+	POINT_RESIST_SHAMAN				= 62,
+	POINT_STEAL_HP					= 63,
+	POINT_STEAL_SP					= 64,
+	POINT_MANA_BURN_PCT				= 65,
+	POINT_DAMAGE_SP_RECOVER			= 66,
+	POINT_BLOCK						= 67,
+	POINT_DODGE						= 68,
+	POINT_RESIST_SWORD				= 69,
+	POINT_RESIST_TWOHAND			= 70,
+	POINT_RESIST_DAGGER				= 71,
+	POINT_RESIST_BELL				= 72,
+	POINT_RESIST_FAN				= 73,
+	POINT_RESIST_BOW				= 74,
+	POINT_RESIST_FIRE				= 75,
+	POINT_RESIST_ELEC				= 76,
+	POINT_RESIST_MAGIC				= 77,
+	POINT_RESIST_WIND				= 78,
+	POINT_REFLECT_MELEE				= 79,
+	POINT_REFLECT_CURSE				= 80,
+	POINT_POISON_REDUCE				= 81,
+	POINT_KILL_SP_RECOVER			= 82,
+	POINT_EXP_DOUBLE_BONUS			= 83,
+	POINT_GOLD_DOUBLE_BONUS			= 84,
+	POINT_ITEM_DROP_BONUS			= 85,
+	POINT_POTION_BONUS				= 86,
+	POINT_KILL_HP_RECOVERY			= 87,
+	POINT_IMMUNE_STUN				= 88,
+	POINT_IMMUNE_SLOW				= 89,
+	POINT_IMMUNE_FALL				= 90,
+	POINT_PARTY_ATTACKER_BONUS		= 91,
+	POINT_PARTY_TANKER_BONUS		= 92,
+	POINT_ATT_BONUS					= 93,
+	POINT_DEF_BONUS					= 94,
+	POINT_ATT_GRADE_BONUS			= 95,
+	POINT_DEF_GRADE_BONUS			= 96,
+	POINT_MAGIC_ATT_GRADE_BONUS		= 97,
+	POINT_MAGIC_DEF_GRADE_BONUS		= 98,
+	POINT_RESIST_NORMAL_DAMAGE		= 99,
+	POINT_HIT_HP_RECOVERY			= 100,
+	POINT_HIT_SP_RECOVERY			= 101,
+	POINT_MANASHIELD				= 102,
+	POINT_PARTY_BUFFER_BONUS		= 103,
+	POINT_PARTY_SKILL_MASTER_BONUS	= 104,
+	POINT_HP_RECOVER_CONTINUE		= 105,
+	POINT_SP_RECOVER_CONTINUE		= 106,
+	POINT_STEAL_GOLD				= 107,
+	POINT_POLYMORPH					= 108,
+	POINT_MOUNT						= 109,
+	POINT_PARTY_HASTE_BONUS			= 110,
+	POINT_PARTY_DEFENDER_BONUS		= 111,
+	POINT_STAT_RESET_COUNT			= 112,
+	POINT_HORSE_SKILL				= 113,
+	POINT_MALL_ATTBONUS				= 114,
+	POINT_MALL_DEFBONUS				= 115,
+	POINT_MALL_EXPBONUS				= 116,
+	POINT_MALL_ITEMBONUS			= 117,
+	POINT_MALL_GOLDBONUS			= 118,
+	POINT_MAX_HP_PCT				= 119,
+	POINT_MAX_SP_PCT				= 120,
+	POINT_SKILL_DAMAGE_BONUS		= 121,
+	POINT_NORMAL_HIT_DAMAGE_BONUS	= 122,
+	POINT_SKILL_DEFEND_BONUS		= 123,
+	POINT_NORMAL_HIT_DEFEND_BONUS	= 124,
+	POINT_RAMADAN_CANDY_BONUS_EXP	= 125,
+	POINT_ENERGY					= 126,
+	POINT_ENERGY_END_TIME			= 127,
+	POINT_COSTUME_ATTR_BONUS		= 128,
+	POINT_MAGIC_ATT_BONUS_PER		= 129,
+	POINT_MELEE_MAGIC_ATT_BONUS_PER	= 130,
+	POINT_RESIST_ICE				= 131,
+	POINT_RESIST_EARTH				= 132,
+	POINT_RESIST_DARK				= 133,
+	POINT_RESIST_CRITICAL			= 134,
+	POINT_RESIST_PENETRATE			= 135,
+
+#ifdef ENABLE_PENDANT_SYSTEM
+	POINT_ATTBONUS_ELEC				= 136,
+	POINT_ATTBONUS_WIND				= 137,
+	POINT_ATTBONUS_EARTH			= 138,
+	POINT_ATTBONUS_DARK				= 139,
+#endif
 
 #ifdef ENABLE_ACCE_COSTUME_SYSTEM
-	POINT_ACCEDRAIN_RATE 			= 138,
+	POINT_ACCEDRAIN_RATE			= 140,
 #endif
 
-#ifdef ENABLE_MAGIC_REDUCTION_SYSTEM
-	POINT_RESIST_MAGIC_REDUCTION 	= 139,
+#ifdef ENABLE_ATTBONUS_METIN
+	POINT_ATTBONUS_METIN			= 141,
 #endif
-
-	POINT_RESIST_MOUNT_FALL 		= 140, //unk
-	POINT_RESIST_HUMAN 				= 141,
-
-	POINT_ENCHANT_ELECT 			= 142,
-	POINT_ENCHANT_FIRE 				= 143,
-	POINT_ENCHANT_ICE 				= 144,
-	POINT_ENCHANT_WIND 				= 145,
-	POINT_ENCHANT_EARTH 			= 146,
-	POINT_ENCHANT_DARK 				= 147,
-
-	POINT_ATTBONUS_CZ 				= 148,
-	POINT_ATTBONUS_SWORD 			= 149,
-	POINT_ATTBONUS_TWOHAND 			= 150,
-	POINT_ATTBONUS_DAGGER 			= 151,
-	POINT_ATTBONUS_BELL 			= 152,
-	POINT_ATTBONUS_FAN 				= 153,
-	POINT_ATTBONUS_BOW 				= 154,
-
-#ifdef ENABLE_NEW_BONUS_SYSTEM
-	POINT_ATTBONUS_STONE 			= 155,
-	POINT_ATTBONUS_BOSS 			= 156,
-	POINT_ATTBONUS_ELEMENTS			= 157,
-	POINT_ENCHANT_ELEMENTS 			= 158,
-	POINT_ATTBONUS_CHARACTERS 		= 159,
-	POINT_ENCHANT_CHARACTERS 		= 160,
-	POINT_RESIST_MONSTER 			= 161,
-#endif
-
-#ifdef ENABLE_AVG_PVM
-	POINT_ATTBONUS_MEDI_PVM 		= 162,
-#endif
-
-#ifdef ENABLE_CONQUEROR_LEVEL
-	POINT_CONQUEROR_LEVEL 			= 163,
-	POINT_CONQUEROR_LEVEL_STEP 		= 164,
-	POINT_SUNGMA_STR 				= 165,
-	POINT_SUNGMA_HP					= 166,
-	POINT_SUNGMA_MOVE 				= 167,
-	POINT_SUNGMA_IMMUNE 			= 168,
-	POINT_CONQUEROR_POINT 			= 169,
-	POINT_CONQUEROR_EXP 			= 170,
-	POINT_CONQUEROR_NEXT_EXP 		= 171,
-#endif
-
-	POINT_ATTBONUS_PVM_STR 			= 172,
-	POINT_ATTBONUS_PVM_BERSERKER	= 173,
 
 #ifdef ENABLE_COINS_INVENTORY
-	POINT_COINS 					= 174,
+	POINT_COINS						= 142,
 #endif
 
-#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
-	POINT_SOUL 						= 175,
-	POINT_SOUL_RE 					= 176,
+#ifdef ENABLE_TITLE_SYSTEM
+	POINT_TITLE						= 143,
+	POINT_TITLE_1					= 144,
+	POINT_TITLE_2					= 145,
+	POINT_TITLE_3					= 146,
+	POINT_TITLE_4					= 147,
+	POINT_TITLE_5					= 148,
+	POINT_TITLE_6					= 149,
+	POINT_TITLE_7					= 150,
+	POINT_TITLE_8					= 151,
+	POINT_TITLE_9					= 152,
+	POINT_TITLE_10					= 153,
+	POINT_TITLE_11					= 154,
+	POINT_TITLE_12					= 155,
+	POINT_TITLE_13					= 156,
+	POINT_TITLE_14					= 157,
+	POINT_TITLE_15					= 158,
+	POINT_TITLE_16					= 159,
+	POINT_TITLE_17					= 160,
+	POINT_TITLE_18					= 161,
+	POINT_TITLE_19					= 162,
+	POINT_TITLE_20					= 163,
 #endif
 
-#ifdef ENABLE_HALLOWEEN_EVENT_SYSTEM
-	POINT_HALOUNLV 					= 177,
-	POINT_HALOUN 					= 178,
-	POINT_RHALOUN 					= 179,
+#ifdef ENABLE_ATTBONUS_BOSS
+	POINT_ATTBONUS_BOSS				= 164,
 #endif
 
-#ifdef ENABLE_GAYA_SYSTEM
-	POINT_GEM 						= 180,
+#ifdef ENABLE_RENEWAL_BATTLE_PASS
+	POINT_BATTLE_PASS_PREMIUM_ID	= 165,
 #endif
 
-	//POINT_MAX_NUM = 129	common/length.h
+#ifdef ENABLE_RENEWAL_BONUS_BOARD
+	POINT_BLUE_PLAYER_KILLED		= 166,
+	POINT_YELLOW_PLAYER_KILLED		= 167,
+	POINT_RED_PLAYER_KILLED			= 168,
+	POINT_ALL_PLAYER_KILLED			= 169,
+	POINT_KILL_DUELWON				= 170,
+	POINT_KILL_DUELLOST				= 171,
+	POINT_MONSTER_KILLED			= 172,
+	POINT_STONE_KILLED				= 173,
+	POINT_BOSS_KILLED				= 174,
+#endif
 };
 
 enum EPKModes
 {
-	PK_MODE_PEACE 	= 0,
+	PK_MODE_PEACE = 0,
 	PK_MODE_REVENGE = 1,
-	PK_MODE_FREE 	= 2,
+	PK_MODE_FREE = 2,
 	PK_MODE_PROTECT = 3,
-	PK_MODE_GUILD 	= 4,
+	PK_MODE_GUILD = 4,
 	PK_MODE_MAX_NUM = 5,
 };
 
 enum EPositions
 {
-	POS_DEAD 		= 0,
-	POS_SLEEPING 	= 1,
-	POS_RESTING 	= 2,
-	POS_SITTING 	= 3,
-	POS_FISHING 	= 4,
-	POS_FIGHTING 	= 5,
-	POS_MOUNTING 	= 6,
-	POS_STANDING 	= 7,
+	POS_DEAD = 0,
+	POS_SLEEPING = 1,
+	POS_RESTING = 2,
+	POS_SITTING = 3,
+	POS_FISHING = 4,
+	POS_FIGHTING = 5,
+	POS_MOUNTING = 6,
+	POS_STANDING = 7,
 };
 
 enum EBlockAction
 {
-	BLOCK_EXCHANGE			= (1 << 0),
-	BLOCK_PARTY_INVITE		= (1 << 1),
-	BLOCK_GUILD_INVITE		= (1 << 2),
-	BLOCK_WHISPER			= (1 << 3),
-	BLOCK_MESSENGER_INVITE	= (1 << 4),
-	BLOCK_PARTY_REQUEST		= (1 << 5),
+	BLOCK_EXCHANGE = (1 << 0),
+	BLOCK_PARTY_INVITE = (1 << 1),
+	BLOCK_GUILD_INVITE = (1 << 2),
+	BLOCK_WHISPER = (1 << 3),
+	BLOCK_MESSENGER_INVITE = (1 << 4),
+	BLOCK_PARTY_REQUEST = (1 << 5),
 #ifdef ENABLE_TELEPORT_TO_A_FRIEND
-	BLOCK_WARP_REQUEST 		= (1 << 6),
+	BLOCK_WARP_REQUEST = (1 << 6),
 #endif
 };
 
-// <Factor> Dynamically evaluated CHARACTER* equivalent.
-// Referring to SCharDeadEventInfo.
 #ifdef ENABLE_AUTOMATIC_PICK_UP_SYSTEM
 enum EAutomaticPickUP
 {
@@ -422,25 +390,22 @@ struct DynamicCharacterPtr
 {
 	DynamicCharacterPtr() : is_pc(false), id(0) {}
 	DynamicCharacterPtr(const DynamicCharacterPtr& o) : is_pc(o.is_pc), id(o.id) {}
-	// Returns the LPCHARACTER found in CHARACTER_MANAGER.
 	LPCHARACTER Get() const;
-	// Clears the current settings.
+
 	void Reset()
 	{
 		is_pc = false;
 		id = 0;
 	}
 
-	// Basic assignment operator.
 	DynamicCharacterPtr& operator=(const DynamicCharacterPtr& rhs)
 	{
 		is_pc = rhs.is_pc;
 		id = rhs.id;
 		return *this;
 	}
-	// Supports assignment with LPCHARACTER type.
+
 	DynamicCharacterPtr& operator=(LPCHARACTER character);
-	// Supports type casting to LPCHARACTER.
 	operator LPCHARACTER() const
 	{
 		return Get();
@@ -449,23 +414,6 @@ struct DynamicCharacterPtr
 	bool is_pc;
 	uint32_t id;
 };
-
-#ifdef ENABLE_KILL_STATISTICS
-typedef struct character_kill_statistics
-{
-	int		iJinnoKills;
-	int		iShinsooKills;
-	int		iChunjoKills;
-	int		iTotalKills;
-	int		iTotalDeaths;
-	int		iDuelsWon;
-	int		iDuelsLost;
-	int		iBossesKills;
-	int		iStonesKills;
-	int		iMobsKills;
-	int		top_damage;
-} CHARACTER_KILL_STATISTICS;
-#endif
 
 typedef struct character_point
 {
@@ -483,27 +431,12 @@ typedef struct character_point
 #else
 	BYTE level;
 #endif
-#ifdef ENABLE_CONQUEROR_LEVEL
-	BYTE conquerorlevel;
-	DWORD conqueror_exp;
-#endif
+
 	DWORD exp;
 #ifdef ENABLE_GOLD_LIMIT
 	long long gold;
 #else
 	long gold;
-#endif
-#ifdef ENABLE_GAYA_SYSTEM
-	int gem;
-#endif
-#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
-	int soul;
-	int soulre;
-#endif
-#ifdef ENABLE_HALLOWEEN_EVENT_SYSTEM
-	int halounlv;
-	long long phaloun;
-	int rhaloun;
 #endif
 
 	int hp;
@@ -515,6 +448,14 @@ typedef struct character_point
 	int stamina;
 
 	BYTE skill_group;
+
+#ifdef ENABLE_RENEWAL_BATTLE_PASS
+	int battle_pass_premium_id;
+#endif
+
+#ifdef ENABLE_RENEWAL_BONUS_BOARD
+	long long llMonsterKilled, llStoneKilled, llBossKilled, llBluePlayerKilled, llYellowPlayerKilled, llRedPlayerKilled, llAllPlayerKilled, llDuelWon, llDuelLost;
+#endif
 } CHARACTER_POINT;
 
 typedef struct character_point_instant
@@ -610,17 +551,6 @@ EVENTINFO(char_event_info)
 	DynamicCharacterPtr ch;
 };
 
-#ifdef ENABLE_NINETH_SKILL
-EVENTINFO(cheonun_event_info)
-{
-	DynamicCharacterPtr ch;
-	uint8_t bShieldChance;
-	uint8_t bShieldDur;
-};
-#endif
-
-
-typedef std::map<VID, size_t> target_map;
 struct TSkillUseInfo
 {
 	int iHitCount;
@@ -631,12 +561,8 @@ struct TSkillUseInfo
 	bool bUsed;
 	DWORD dwVID;
 	bool isGrandMaster;
-#ifdef ENABLE_SKILL_COOLDOWN_CHECK
-	bool cooldown{ false };
-	int	 skillCount{ 0 };
-#endif
 
-	target_map TargetVIDMap;
+	std::unordered_map<DWORD, size_t> TargetVIDMap;
 
 	TSkillUseInfo() : iHitCount(0), iMaxHitCount(0), iSplashCount(0), dwNextSkillUsableTime(0), iRange(0), bUsed(false), dwVID(0), isGrandMaster(false) {}
 
@@ -646,9 +572,6 @@ struct TSkillUseInfo
 	DWORD GetMainTargetVID() const { return dwVID; }
 	void SetMainTargetVID(DWORD vid) { dwVID=vid; }
 	void ResetHitCount() { if (iSplashCount) { iHitCount = iMaxHitCount; iSplashCount--; } }
-#ifdef ENABLE_SKILL_COOLDOWN_CHECK
-	bool IsOnCooldown(int vnum);
-#endif
 };
 
 typedef struct packet_party_update TPacketGCPartyUpdate;
@@ -662,15 +585,13 @@ class CGuild;
 class CSafebox;
 class CArena;
 class CShop;
-typedef class CShop* LPSHOP;
+typedef class CShop * LPSHOP;
 
 class CMob;
 class CMobInstance;
 typedef struct SMobSkillInfo TMobSkillInfo;
 
-//SKILL_POWER_BY_LEVEL
 extern int GetSkillPowerByLevelFromType(int job, int skillgroup, int skilllevel);
-//END_SKILL_POWER_BY_LEVEL
 
 namespace marriage
 {
@@ -751,54 +672,6 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 
 		void RestartAtSamePos();
 
-#ifdef ENABLE_KILL_STATISTICS
-		void			SendKillStatisticsPacket();
-
-		void			AddToJinnoKills() { m_killstatistics.iJinnoKills += 1; }
-		int				GetJinnoKills() const { return m_killstatistics.iJinnoKills; }
-
-		void			AddToShinsooKills() { m_killstatistics.iShinsooKills += 1; }
-		int				GetShinsooKills() const { return m_killstatistics.iShinsooKills; }
-
-		void			AddToChunjoKills() { m_killstatistics.iChunjoKills += 1; }
-		int				GetChunjoKills() const { return m_killstatistics.iChunjoKills; }
-
-		void			AddToTotalKills() { m_killstatistics.iTotalKills += 1; }
-		int				GetTotalKills() const { return m_killstatistics.iTotalKills; }
-
-		void			AddToTotalDeaths() { m_killstatistics.iTotalDeaths += 1; }
-		int				GetTotalDeaths() const { return m_killstatistics.iTotalDeaths; }
-
-		void			AddToDuelsWon() { m_killstatistics.iDuelsWon += 1; }
-		int				GetDuelsWon() const { return m_killstatistics.iDuelsWon; }
-
-		void			AddToDuelsLost() { m_killstatistics.iDuelsLost += 1; }
-		int				GetDuelsLost() const { return m_killstatistics.iDuelsLost; }
-
-		void			AddToBossesKills() { m_killstatistics.iBossesKills += 1; }
-		int				GetBossesKills() const { return m_killstatistics.iBossesKills; }
-
-		void			AddToStonesKills() { m_killstatistics.iStonesKills += 1; }
-		int				GetStonesKills() const { return m_killstatistics.iStonesKills; }
-
-		void			AddToMobsKills() { m_killstatistics.iMobsKills += 1; }
-		int				GetMobsKills() const { return m_killstatistics.iMobsKills; }
-
-		void			SetTopDamage(int val) { m_killstatistics.top_damage = val; }
-		int				GetTopDamage() const { return m_killstatistics.top_damage; }
-#endif
-
-#ifdef ENABLE_SUNG_MAHI_TOWER
-		void SetNomove();
-		void RemoveNomove();
-		bool IsNomove() const;
-		
-		void SetNoattack();
-		void RemoveNoattack();
-		bool IsNoattack() const;
-#endif
-		bool IsNearWater() const;
-
 	protected:
 		DWORD m_dwStateDuration;
 
@@ -870,8 +743,13 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		bool IsBuilding() const { return m_bCharType == CHAR_TYPE_BUILDING;  }
 		bool IsWarp() const { return m_bCharType == CHAR_TYPE_WARP; }
 		bool IsGoto() const { return m_bCharType == CHAR_TYPE_GOTO; }
-		bool IsPvM() const { return (m_bCharType == CHAR_TYPE_MONSTER) || (m_bCharType == CHAR_TYPE_STONE) || GetMobRank() >= MOB_RANK_BOSS; }
-		bool IsBoss() const { return m_bCharType == CHAR_TYPE_MONSTER && GetMobRank() == MOB_RANK_BOSS; }
+
+#ifdef ENABLE_SHIP_DEFENCE_DUNGEON
+		bool IsHydraMob() const;
+		bool IsHydraMobLP(LPCHARACTER ch) const;
+		bool IsHydraNPC() const;
+		bool IsHydra() const;
+#endif
 
 		DWORD GetLastShoutPulse() const { return m_pointsInstant.dwLastShoutPulse; }
 		void SetLastShoutPulse(DWORD pulse) { m_pointsInstant.dwLastShoutPulse = pulse; }
@@ -883,16 +761,6 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void SetLevel(BYTE level);
 #endif
 
-#ifdef ENABLE_CONQUEROR_LEVEL
-		int GetConquerorLevel() const { return m_points.conquerorlevel; }
-		void SetConquerorLevel(BYTE level);
-
-		DWORD GetConquerorExp() const { return m_points.conqueror_exp; }
-		void SetConquerorExp(DWORD exp) { m_points.conqueror_exp = exp; }
-		DWORD			GetConquerorNextExp() const;
-		void ResetConquerorPoint(int iLv);
-#endif
-
 		BYTE GetGMLevel() const;
 		BOOL IsGM() const;
 		void SetGMLevel();
@@ -900,14 +768,9 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		DWORD GetExp() const { return m_points.exp; }
 		void SetExp(DWORD exp) { m_points.exp = exp; }
 		DWORD GetNextExp() const;
-		bool block_exp;
 		LPCHARACTER DistributeExp();
 		void DistributeHP(LPCHARACTER pkKiller);
 		void DistributeSP(LPCHARACTER pkKiller, int iMethod=0);
-
-#ifdef ENABLE_KILL_EVENT_FIX
-		LPCHARACTER		GetMostAttacked();
-#endif
 
 		void SetPosition(int pos);
 		bool IsPosition(int pos) const { return m_pointsInstant.position == pos ? true : false; }
@@ -966,7 +829,6 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		WORD GetMobAttackRange() const;
 		DWORD GetMobDropItemVnum() const;
 		float GetMobDamageMultiply() const;
-		float GetMonsterHitRange() const;
 
 		bool IsBerserker() const;
 		bool IsBerserk() const;
@@ -1003,7 +865,6 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void PointChange(BYTE type, int amount, bool bAmount = false, bool bBroadcast = false);
 #endif
 		void PointsPacket();
-		void UpdatePointsPacket(BYTE type, long long val, long long amount = 0, bool bAmount = false, bool bBroadcast = false);
 		void ApplyPoint(BYTE bApplyType, int iVal);
 		void CheckMaximumPoints();
 
@@ -1043,16 +904,12 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		DWORD GetPolymorphVnum() const { return m_dwPolymorphRace; }
 		int GetPolymorphPower() const;
 
-		// FISING
 		void fishing();
 		void fishing_take();
-		// END_OF_FISHING
 
-		// MINING
 		void mining(LPCHARACTER chLoad);
 		void mining_cancel();
 		void mining_take();
-		// END_OF_MINING
 
 		void ResetPlayTime(DWORD dwTimeRemain = 0);
 
@@ -1068,9 +925,16 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		BYTE GetMountCounter() const;
 #endif
 
+#ifdef ENABLE_TITLE_SYSTEM
+		void EquipTitle(LPITEM item);
+		void UnequipTitle(LPITEM item);
+#endif
+
 #ifdef ENABLE_RENEWAL_SPECIAL_CHAT
 		void SendPickupItemPacket(int item_vnum);
 #endif
+
+		LPCHARACTER GetNewNearestVictim(LPCHARACTER pkChr, LPCHARACTER pkVictimOld);
 
 	protected:
 		DWORD m_dwPolymorphRace;
@@ -1083,15 +947,11 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 
 		CHARACTER_POINT m_points;
 		CHARACTER_POINT_INSTANT m_pointsInstant;
-#ifdef ENABLE_KILL_STATISTICS
-		CHARACTER_KILL_STATISTICS	m_killstatistics;
-#endif
 
 		int m_iMoveCount;
 		DWORD m_dwPlayStartTime;
 		BYTE m_bAddChrState;
 		bool m_bSkipSave;
-		bool m_bGrantingLevelStepFromExp;
 		BYTE m_bChatCounter;
 #ifdef ENABLE_MOUNT_SYSTEM
 		BYTE m_bMountCounter;
@@ -1100,13 +960,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 	public:
 		bool IsStateMove() const { return IsState((CState&)m_stateMove); }
 		bool IsStateIdle() const { return IsState((CState&)m_stateIdle); }
-		bool IsWalking() const {
-#ifdef ENABLE_BOT_PLAYER
-			return m_bNowWalking || (GetStamina() <= 0 && !IsBotCharacter()); // Botlar ST'ye bagli yurume moduna gecmez
-#else
-			return m_bNowWalking || GetStamina()<=0;
-#endif
-		}
+		bool IsWalking() const { return m_bNowWalking || GetStamina()<=0; }
 		void SetWalking(bool bWalkFlag) { m_bWalking=bWalkFlag; }
 		void SetNowWalking(bool bWalkFlag);
 		void ResetWalking() { SetNowWalking(m_bWalking); }
@@ -1131,6 +985,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		DWORD GetLastAttackTime() const { return m_dwLastAttackTime; }
 
 		void SetLastAttacked(DWORD time);
+
 		DWORD GetLastAttackedTime() const	{ return m_dwLastAttackedTime;}
 
 		bool SetSyncOwner(LPCHARACTER ch, bool bRemoveFromList = true);
@@ -1167,11 +1022,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 	protected:
 		void ClearSync();
 
-#ifdef ENABLE_FLY_FIX
-		DWORD m_fSyncTime;
-#else
 		float m_fSyncTime;
-#endif
 		LPCHARACTER m_pkChrSyncOwner;
 		CHARACTER_LIST m_kLst_pkChrSyncOwned;
 
@@ -1206,19 +1057,12 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 
 	protected:
 		TQuickslot m_quickslot[QUICKSLOT_MAX_NUM];
-#ifdef ENABLE_FISH_EVENT
-		TPlayerFishEventSlot*	m_fishSlots;
-#endif
 
 	public:
 		void StartAffectEvent();
-		void ClearAffect(bool bSave=false, bool bSomeAffect = false);
+		void ClearAffect(bool bSave=false);
 		void ComputeAffect(CAffect * pkAff, bool bAdd, bool bTemp = false);
-		bool AddAffect(DWORD dwType, BYTE bApplyOn, long lApplyValue, DWORD dwFlag, long lDuration, long lSPCost, bool bOverride, bool IsCube = false
-#ifdef ENABLE_NINETH_SKILL
-			, uint8_t bShieldDuration = 0
-#endif
-		); //@fixme532
+		bool AddAffect(DWORD dwType, BYTE bApplyOn, long lApplyValue, DWORD dwFlag, long lDuration, long lSPCost, bool bOverride, bool IsCube = false);
 		void RefreshAffect();
 		bool RemoveAffect(DWORD dwType);
 		bool IsAffectFlag(DWORD dwAff) const;
@@ -1375,25 +1219,9 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void EffectPacket(int enumEffectType);
 		void SpecificEffectPacket(const char filename[128]);
 
-		bool DoRefine(LPITEM item, bool bMoneyOnly = false
-#ifdef ENABLE_PITTY_REFINE
-, bool bUseSealOfGod = false
-#endif
-		);
+		bool DoRefine(LPITEM item, bool bMoneyOnly = false);
 
-		bool DoRefineWithScroll(LPITEM item
-#ifdef ENABLE_PITTY_REFINE
-, bool bUseSealOfGod = false
-#endif
-		);
-
-#ifdef ENABLE_QUEEN_NETHIS
-		bool DoRefineSerpent(LPITEM item
-#ifdef ENABLE_PITTY_REFINE
-, bool bUseSealOfGod = false
-#endif
-		);
-#endif
+		bool DoRefineWithScroll(LPITEM item);
 		bool RefineInformation(BYTE bCell, BYTE bType, int iAdditionalCell = -1);
 
 		void SetRefineMode(int iAdditionalCell = -1);
@@ -1475,10 +1303,6 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void SendEquipment(LPCHARACTER ch);
 		bool IsUnderRefine() { return m_bUnderRefine; }
 
-#ifdef ENABLE_ATTENDANCE_EVENT
-		std::vector<THitCountInfo> m_hitCount;
-#endif
-
 	protected:
 #ifdef ENABLE_GOLD_LIMIT
 		void SendMyShopPriceListCmd(DWORD dwItemVnum, long long dwItemPrice);
@@ -1507,27 +1331,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		INT GetAllowedGold() const;
 		void GiveGold(INT iAmount);
 #endif
-#ifdef ENABLE_GAYA_SYSTEM
-		INT GetGem() const			{ return m_points.gem; }
-		void SetGem(INT gem)			{ m_points.gem = gem; }
-		void GiveGem(INT iAmount);
-#endif
-#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
-		INT GetSoulPoint() const		{ return m_points.soul;	}
-		void SetSoulPoint(INT soul)	{ m_points.soul = soul;	}
-		INT GetSoulRePoint() const		{ return m_points.soulre;	}
-		void SetSoulRePoint(INT soulre)	{ m_points.soulre = soulre;	}
-#endif
-#ifdef ENABLE_HALLOWEEN_EVENT_SYSTEM
-		int GetHalounLv() const		{ return m_points.halounlv;	}
-		void SetHaloun1(int halounlv)	{ m_points.halounlv = halounlv;	}
 
-		long long GetHalounPoints() const		{ return m_points.phaloun;	}
-		void SetHaloun2(long long phaloun)	{ m_points.phaloun = phaloun;	}
-
-		int GetRewardHaloun() const		{ return m_points.rhaloun;	}
-		void SetHaloun3(int rhaloun)	{ m_points.rhaloun = rhaloun;	}
-#endif
 #ifdef ENABLE_SORT_INVENTORY
 		void SetNextSortInventoryPulse(int pulse) { m_sortInventoryPulse = pulse; }
 		int GetSortInventoryPulse() { return m_sortInventoryPulse; }
@@ -1582,25 +1386,8 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void SetExchange(CExchange * pkExchange);
 		CExchange * GetExchange() const	{ return m_pkExchange;	}
 
-#ifdef ENABLE_FISH_EVENT
-		void 			FishEventGeneralInfo();
-		void			FishEventUseBox(TItemPos itemPos);
-		bool 			FishEventIsValidPosition(BYTE shapePos, BYTE shapeType);
-		void 			FishEventPlaceShape(BYTE shapePos, BYTE shapeType);
-		void 			FishEventAddShape(BYTE shapePos);
-		void 			FishEventCheckEnd();
-#endif
-
 	protected:
 		CExchange * m_pkExchange;
-
-#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
-	public:
-		void SetSoulRoulette(CSoulRoulette* pt);
-		CSoulRoulette* GetSoulRoulette() const { return pSoulRoulette; }
-	private:
-		CSoulRoulette* pSoulRoulette;
-#endif
 
 	public:
 		struct TBattleInfo
@@ -1641,20 +1428,14 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void Reward(bool bItemDrop);
 		void RewardGold(LPCHARACTER pkAttacker);
 
-#ifdef ENABLE_ATTENDANCE_EVENT
-		void RewardAttendance();
-#endif
-
 		bool Shoot(BYTE bType);
 		void FlyTarget(DWORD dwTargetVID, long x, long y, BYTE bHeader);
 
-		void ForgetMyAttacker();
+		void ForgetMyAttacker(bool bIsEunhyung = false);
 		void AggregateMonster();
 		void AttractRanger();
 		void PullMonster();
-#ifdef ENABLE_SUNG_MAHI_TOWER
-		void AggregateMonsterByMaster();
-#endif
+
 		int GetArrowAndBow(LPITEM * ppkBow, LPITEM * ppkArrow, int iArrowCount = 1);
 		void UseArrow(LPITEM pkArrow, DWORD dwArrowCount);
 
@@ -1725,12 +1506,7 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 
 	public:
 		void SetStone(LPCHARACTER pkChrStone);
-#ifdef ENABLE_FIX_EXP_DROP_STONES
-		void ClearStone(LPCHARACTER pkKiller = nullptr);
-#else
 		void ClearStone();
-#endif
-		void DetermineDropMetinStone();
 		DWORD GetDropMetinStoneVnum() const { return m_dwDropMetinStone; }
 		BYTE GetDropMetinStonePct() const { return m_bDropMetinStonePct; }
 
@@ -1750,11 +1526,6 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		};
 
 		void SkillLevelPacket();
-#ifdef ENABLE_NINETH_SKILL
-		bool NineSkillCanUp(uint32_t dwVnum);
-		bool IsNineSkill(uint32_t dwSkillVnum);
-		bool LearnNineSkillByBook(uint32_t dwSkillVnum, uint8_t bSkillGroup);
-#endif
 		void SkillLevelUp(DWORD dwVnum, BYTE bMethod = SKILL_UP_BY_POINT);
 		bool SkillLevelDown(DWORD dwVnum);
 
@@ -1762,7 +1533,6 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void ResetSkill();
 		void ResetSkillCoolTimes();
 		void SetSkillLevel(DWORD dwVnum, BYTE bLev);
-		void EnsureSkillLevels();
 		int GetUsedSkillMasterType(DWORD dwVnum);
 
 		bool IsLearnableSkill(DWORD dwSkillVnum) const;
@@ -1780,9 +1550,6 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 
 		void ComputePassiveSkill(DWORD dwVnum);
 		int ComputeSkill(DWORD dwVnum, LPCHARACTER pkVictim, BYTE bSkillLevel = 0);
-#ifdef ENABLE_PVP_BALANCE
-		int ComputeGyeongGongSkill(DWORD dwVnum, LPCHARACTER pkVictim, BYTE bSkillLevel = 0);
-#endif
 		int ComputeSkillAtPosition(DWORD dwVnum, const PIXEL_POSITION& posTarget, BYTE bSkillLevel = 0);
 #ifdef ENABLE_PARTY_BUFF_SYSTEM
 		int ComputeSkillParty(DWORD dwVnum, LPCHARACTER pkVictim, BYTE bSkillLevel);
@@ -1799,10 +1566,6 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void DisableCooltime();
 		bool LearnSkillByBook(DWORD dwSkillVnum, BYTE bProb = 0);
 		bool LearnGrandMasterSkill(DWORD dwSkillVnum);
-#ifdef ENABLE_SKILL_COOLDOWN_CHECK
-		bool SkillIsOnCooldown(int vnum) { return m_SkillUseInfo[vnum].IsOnCooldown(vnum); }
-#endif
-
 
 	private:
 		bool m_bDisableCooltime;
@@ -1818,32 +1581,14 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 
 	protected:
 		DWORD m_adwMobSkillCooltime[MOB_SKILL_MAX_NUM];
-		// END_OF_MOB_SKILL
 
-		// for SKILL_MUYEONG
 	public:
 		void StartMuyeongEvent();
 		void StopMuyeongEvent();
 
-#ifdef ENABLE_PVP_BALANCE
-		void StartGyeongGongEvent();
-		void StopGyeongGongEvent();
-#endif
-#ifdef ENABLE_NINETH_SKILL
-		void StartCheonunEvent(uint8_t bShieldChance, uint8_t bShieldDuration);
-		void StopCheonunEvent();
-#endif
-
 	private:
 		LPEVENT m_pkMuyeongEvent;
-#ifdef ENABLE_PVP_BALANCE
-		LPEVENT m_pkGyeongGongEvent;
-#endif
-#ifdef ENABLE_NINETH_SKILL
-		LPEVENT m_pkCheonunEvent;
-#endif
 
-		// for SKILL_CHAIN lighting
 	public:
 		int GetChainLightningIndex() const { return m_iChainLightingIndex; }
 		void IncChainLightningIndex() { ++m_iChainLightingIndex; }
@@ -1856,7 +1601,6 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		int m_iChainLightingIndex;
 		CHARACTER_SET m_setExceptChainLighting;
 
-		// for SKILL_EUNHYUNG
 	public:
 		void SetAffectedEunhyung();
 		void ClearAffectedEunhyung() { m_dwAffectedEunhyungLevel = 0; }
@@ -1883,12 +1627,6 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		bool IsChangeAttackPosition(LPCHARACTER target) const;
 		void ResetChangeAttackPositionTime() { m_dwLastChangeAttackPositionTime = get_dword_time() - AI_CHANGE_ATTACK_POISITION_TIME_NEAR;}
 		void SetChangeAttackPositionTime() { m_dwLastChangeAttackPositionTime = get_dword_time();}
-#ifdef ENABLE_DEFENSAWE_SHIP
-		bool IsHydraMob() const;
-		bool IsHydraMobLP(LPCHARACTER ch) const;
-		bool IsHydraNPC() const;
-		bool IsHydra() const;
-#endif
 
 		bool OnIdle();
 
@@ -1897,19 +1635,9 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 
 		VID m_kVIDVictim;
 
-#ifdef ENABLE_MOB_FOLLOW_SYSTEM
-		void			AddEnemyNPC(DWORD dwNPCVID);
-		void			RemoveEnemyNPC(DWORD dwNPCVID);
-		void			ClearEnemyNPCs();
-		void			NotifyEnemyNPCs();
-#endif
-
 	protected:
 		DWORD m_dwLastChangeAttackPositionTime;
 		CTrigger m_triggerOnClick;
-#ifdef ENABLE_MOB_FOLLOW_SYSTEM
-		std::set<DWORD>	m_set_dwEnemyNPCVID;
-#endif
 
 	protected:
 		LPCHARACTER m_pkChrTarget;
@@ -2242,38 +1970,18 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 	private:
 		int m_aiPremiumTimes[PREMIUM_MAX_NUM];
 
-		// CHANGE_ITEM_ATTRIBUTES
 		static const DWORD msc_dwDefaultChangeItemAttrCycle;
 		static const char msc_szLastChangeItemAttrFlag[];
 		static const char msc_szChangeItemAttrCycleFlag[];
-		// END_OF_CHANGE_ITEM_ATTRIBUTES
 
-		// NEW_HAIR_STYLE_ADD
 	public:
 		bool ItemProcess_Hair(LPITEM item, int iDestCell);
-		// END_NEW_HAIR_STYLE_ADD
 
 	public:
 		void ClearSkill();
 		void ClearSubSkill();
 
-		// RESET_ONE_SKILL
 		bool ResetOneSkill(DWORD dwVnum);
-		// END_RESET_ONE_SKILL
-
-#ifdef ENABLE_PITTY_REFINE
-	public:
-		int					GetPittyRefineLevel(DWORD dwItemVnum, int iRefineLevel);
-		void				SetPittyRefineLevel(DWORD dwItemVnum, int iRefineLevel, int iValue);
-
-		void				SendPittyInfoClient(DWORD dwItemVnum, int iRefineLevel);
-		
-		void				SaveRefineFlags();
-		void				LoadRefineFlags();
-
-	protected:
-		std::map<std::pair<int, int>, int> m_mapRefineFlags;
-#endif
 
 	private:
 		void SendDamagePacket(LPCHARACTER pAttacker, int Damage, BYTE DamageFlag);
@@ -2384,25 +2092,10 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 	public :
 		DWORD GetLogOffInterval() const { return m_dwLogOffInterval; }
 
-#ifdef ENABLE_FISH_EVENT
-	private:
-		DWORD m_dwFishUseCount;
-		BYTE m_bFishAttachedShape;
-	public:
-		DWORD GetFishEventUseCount() const { return m_dwFishUseCount; }
-		void FishEventIncreaseUseCount() { m_dwFishUseCount++; }
-		
-		BYTE GetFishAttachedShape() const { return m_bFishAttachedShape; }
-		void SetFishAttachedShape(BYTE bShape) { m_bFishAttachedShape = bShape; }
-#endif
-
 	public:
 		bool UnEquipSpecialRideUniqueItem ();
 
 		bool CanWarp () const;
-
-	protected:
-		int LastCampFireUse; //@fixme502
 
 	private:
 		DWORD m_dwLastGoldDropTime;
@@ -2469,13 +2162,6 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 
 		void SetItemAward_vnum(unsigned int vnum) { itemAward_vnum = vnum; }
 		void SetItemAward_cmd(char* cmd) { strcpy(itemAward_cmd,cmd); }
-
-		//@fixme503
-		int waitHackCounter;
-		void ClearWaitHackCounter(void) { waitHackCounter = 0; }
-		void SetWaitHackCounter(void) { waitHackCounter = 1; }
-		int GetWaitHackCounter(void) const { return waitHackCounter; }
-		//@end_fixme503
 
 	public:
 		void DragonSoul_Initialize();
@@ -2559,26 +2245,6 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		bool CheckCanAddPendantBonus(LPITEM pkItem);
 #endif
 
-#ifdef ENABLE_REAL_TIME_REGEN
-	public:
-		void		SetRealTimeRegenNum(WORD num)	{ m_wRealTimeRegenNum = num; };
-		WORD		GetRealTimeRegenNum() 			{ return m_wRealTimeRegenNum; };
-
-#ifdef STONE_REGEN_FIX
-		LPREGEN		GetRegen();
-#endif
-
-	private:
-		WORD		m_wRealTimeRegenNum;
-#endif
-
-#ifdef ENABLE_RESP_SYSTEM
-	public:
-		PIXEL_POSITION GetRegenPos() { return m_posRegen; }
-
-		bool	CanActRespManager() { return g_setRespAllowedMap.find(GetMapIndex()) != g_setRespAllowedMap.end(); }
-#endif
-
 #ifdef ENABLE_HIDE_COSTUME_SYSTEM
 	public:
 		void SetHideCostumePulse(int iPulse) { m_HideCostumePulse = iPulse; }
@@ -2648,146 +2314,83 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void RefineAcceMaterials();
 #endif
 
-#ifdef ENABLE_MINI_GAME_CATCH_KING
-	public:
-		void			MiniGameCatchKingSetFieldCards(std::vector<TCatchKingCard> vec) { m_vecCatchKingFieldCards = vec; }
-		
-		DWORD			MiniGameCatchKingGetScore() const { return dwCatchKingTotalScore; }
-		void			MiniGameCatchKingSetScore(DWORD dwScore) { dwCatchKingTotalScore = dwScore; }
-		
-		DWORD			MiniGameCatchKingGetBetNumber() const { return bCatchKingBetSetNumber; }
-		void			MiniGameCatchKingSetBetNumber(BYTE bSetNr) { bCatchKingBetSetNumber = bSetNr; }
-		
-		BYTE			MiniGameCatchKingGetHandCard() const { return bCatchKingHandCard; }
-		void			MiniGameCatchKingSetHandCard(BYTE bKingCard) { bCatchKingHandCard = bKingCard; }
-		
-		BYTE			MiniGameCatchKingGetHandCardLeft() const { return bCatchKingHandCardLeft; }
-		void			MiniGameCatchKingSetHandCardLeft(BYTE bHandCard) { bCatchKingHandCardLeft = bHandCard; }
-		
-		bool			MiniGameCatchKingGetGameStatus() const { return dwCatchKingGameStatus; }
-		void			MiniGameCatchKingSetGameStatus(bool bStatus) { dwCatchKingGameStatus = bStatus; }
-		
-		std::vector<TCatchKingCard> m_vecCatchKingFieldCards;
+#ifdef ENABLE_BIOLOG_SYSTEM
 	protected:
-		BYTE bCatchKingHandCard;
-		BYTE bCatchKingHandCardLeft;
-		bool dwCatchKingGameStatus;
-		
-		BYTE bCatchKingBetSetNumber;
-		DWORD dwCatchKingTotalScore;
-#endif
+		BYTE m_BiologActualMission;
+		WORD m_BiologCollectedItems;
+		BYTE m_BiologCooldownReminder;
+		long m_BiologCooldown;
 
-
-#ifdef ENABLE_GAYA_SHOP_SYSTEM
 	public:
-		struct Gem_Shop_Values
-		{
-			int		value_1;
-			int		value_2;
-			int		value_3;
-			int		value_4;
-			int		value_5;
-			int		value_6;
-			bool operator == (const Gem_Shop_Values& b)
-			{
-				return (this->value_1 == b.value_1) && (this->value_2 == b.value_2) &&
-					(this->value_3 == b.value_3) && (this->value_4 == b.value_4) &&
-					(this->value_5 == b.value_5) && (this->value_6 == b.value_6);
-			}
-		};
-	
-		struct Gem_Load_Values
-		{
-			DWORD	items;
-			DWORD	gem;
-			DWORD	count;
-			DWORD	glimmerstone;
-			DWORD	gem_expansion;
-			DWORD	gem_refresh;
-			DWORD	glimmerstone_count;
-			DWORD	gem_expansion_count;
-			DWORD	gem_refresh_count;
-			DWORD	grade_stone;
-			DWORD	give_gem;
-			DWORD	prob_gem;
-			DWORD	cost_gem_yang;
-		};
-	
-		bool CheckItemsFull();
-		void UpdateItemsGemMarker0();
-		void UpdateItemsGemMarker();
-		void InfoGemMarker();
-		void ClearGemMarket();
-		bool CheckSlotGemMarket(int slot);
-		void UpdateSlotGemMarket(int slot);
-		void BuyItemsGemMarket(int slot);
-		void RefreshItemsGemMarket();
-		void CraftGemItems(int slot);
-		void MarketGemItems(int slot);
-		void RefreshGemItems();
-		void LoadGemSystem();
-		int GetGemState(const std::string& state) const;
-		void SetGemState(const std::string& state, int szValue);
-		void StartCheckTimeMarket();
-		void StartCheckTimeMarketLogin();
-	
+		CBiologSystem* GetBiologManager() const { return m_pkBiologManager; }
+
+		BYTE GetBiologMissions() const { return m_BiologActualMission; }
+		WORD GetBiologCollectedItems() const { return m_BiologCollectedItems; }
+		BYTE GetBiologCooldownReminder() const { return m_BiologCooldownReminder; }
+		long GetBiologCooldown() const { return m_BiologCooldown; }
+
+		void SetBiologMissions(BYTE value) { m_BiologActualMission = value; }
+		void SetBiologCollectedItems(WORD value) { m_BiologCollectedItems = value; }
+		void SetBiologCooldownReminder(BYTE value) { m_BiologCooldownReminder = value; }
+		void SetBiologCooldown(long value) { m_BiologCooldown = value; }
+
 	private:
-		std::vector<Gem_Shop_Values> info_items;
-		std::vector<Gem_Shop_Values> info_slots;
-		std::vector<Gem_Load_Values> load_gem_items;
-		Gem_Load_Values load_gem_values;
-		LPEVENT GemUpdateTime;
+		CBiologSystem* m_pkBiologManager;
 #endif
 
-#ifdef ENABLE_MINIGAME_RUMI_EVENT
+#ifdef ENABLE_MINIGAME_OKEY_CARDS_SYSTEM
 	public:
 		struct S_CARD
 		{
-			DWORD	type;
-			DWORD	value;
+			DWORD type;
+			DWORD value;
 		};
 
 		struct CARDS_INFO
 		{
-			S_CARD	cards_in_hand[MAX_CARDS_IN_HAND];
-			S_CARD	cards_in_field[MAX_CARDS_IN_FIELD];
-			DWORD	cards_left;
-			DWORD	field_points;
-			DWORD	points;
+			S_CARD cards_in_hand[MAX_CARDS_IN_HAND];
+			S_CARD cards_in_field[MAX_CARDS_IN_FIELD];
+			DWORD cards_left;
+			DWORD field_points;
+			DWORD points;
 		};
-		
-		void			Cards_open(DWORD safemode);
-		void			Cards_clean_list();
-		DWORD			GetEmptySpaceInHand();
-		void			Cards_pullout();
-		void			RandomizeCards();
-		bool			CardWasRandomized(DWORD type, DWORD value);
-		void			SendUpdatedInformations();
-		void			SendReward();
-		void			CardsDestroy(DWORD reject_index);
-		void			CardsAccept(DWORD accept_index);
-		void			CardsRestore(DWORD restore_index);
-		DWORD			GetEmptySpaceInField();
-		DWORD			GetAllCardsCount();
-		bool			TypesAreSame();
-		bool			ValuesAreSame();
-		bool			CardsMatch();
-		DWORD			GetLowestCard();
-		bool			CheckReward();
-		void			CheckCards();
-		void			RestoreField();
-		void			ResetField();
-		void			CardsEnd();
-		void			GetGlobalRank(char * buffer, size_t buflen);
-		void			GetRundRank(char * buffer, size_t buflen);
-#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
-		void			GetGlobalRankRoulette(char * buffer, size_t buflen);
-#endif
-	protected:
-		CARDS_INFO	character_cards;
-		S_CARD		randomized_cards[24];
-#endif
 
+		void Cards_open(DWORD safemode);
+		void Cards_clean_list();
+
+		DWORD GetEmptySpaceInHand();
+
+		void Cards_pullout();
+		void RandomizeCards();
+		bool CardWasRandomized(DWORD type, DWORD value);
+		void SendUpdatedInformations();
+		void SendReward();
+		void CardsDestroy(DWORD reject_index);
+		void CardsAccept(DWORD accept_index);
+		void CardsRestore(DWORD restore_index);
+
+		DWORD GetEmptySpaceInField();
+		DWORD GetAllCardsCount();
+
+		bool TypesAreSame();
+		bool ValuesAreSame();
+		bool CardsMatch();
+
+		DWORD GetLowestCard();
+
+		bool CheckReward();
+
+		void CheckCards();
+		void RestoreField();
+		void ResetField();
+		void CardsEnd();
+		void GetGlobalRank(char * buffer, size_t buflen);
+		void GetRundRank(char * buffer, size_t buflen);
+
+	protected:
+		CARDS_INFO character_cards;
+		S_CARD randomized_cards[24];
+#endif
 
 #ifdef ENABLE_BOT_PLAYER
 	public:
@@ -2804,6 +2407,34 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		uint32_t m_botVictimID;
 #endif
 
+#ifdef ENABLE_RENEWAL_BATTLE_PASS
+	typedef std::list<TPlayerExtBattlePassMission*> ListExtBattlePassMap;
+	public:
+		void LoadExtBattlePass(DWORD dwCount, TPlayerExtBattlePassMission* data);
+		DWORD GetExtBattlePassMissionProgress(DWORD dwBattlePassType, BYTE bMissionIndex, BYTE bMissionType);
+		bool IsExtBattlePassCompletedMission(DWORD dwBattlePassType, BYTE bMissionIndex, BYTE bMissionType);
+		bool IsExtBattlePassRegistered(BYTE bBattlePassType, DWORD dwBattlePassID);
+		void UpdateExtBattlePassMissionProgress(DWORD dwMissionID, DWORD dwUpdateValue, DWORD dwCondition, bool isOverride = false);
+		void SetExtBattlePassMissionProgress(BYTE bBattlePassType, DWORD dwMissionIndex, DWORD dwMissionType, DWORD dwUpdateValue);
+
+		bool IsLoadedExtBattlePass() const { return m_bIsLoadedExtBattlePass; }
+		int GetExtBattlePassPremiumID()	const { return m_points.battle_pass_premium_id;	}
+		void SetExtBattlePassPremiumID(int battle_pass_premium_id) { m_points.battle_pass_premium_id = battle_pass_premium_id;}
+
+		void SetLastReciveExtBattlePassInfoTime(DWORD time);
+		DWORD GetLastReciveExtBattlePassInfoTime() const { return m_dwLastReciveExtBattlePassInfoTime; }
+		void SetLastReciveExtBattlePassOpenRanking(DWORD time);
+		DWORD GetLastReciveExtBattlePassOpenRanking() const { return m_dwLastExtBattlePassOpenRankingTime; }
+
+	protected:
+		DWORD m_dwLastReciveExtBattlePassInfoTime;
+		DWORD m_dwLastExtBattlePassOpenRankingTime;
+
+	private:
+		bool m_bIsLoadedExtBattlePass;
+		ListExtBattlePassMap m_listExtBattlePass;
+#endif
+
 #ifdef ENABLE_RENEWAL_AFFECT
 	public:
 		int GetAffectType(LPITEM item);
@@ -2816,6 +2447,23 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 
 	protected:
 		bool m_bmultiFarmStatus;
+#endif
+
+#ifdef ENABLE_RENEWAL_PREMIUM_SYSTEM
+	public:
+		bool ActivatePremium(int seconds);
+
+		void LoadPremium();
+		void CheckPremium();
+
+		bool IsPremium() const;
+		int GetPremiumTime() const { return iPremiumTime; }
+		void SetPremiumTime(int time) { iPremiumTime = time; }
+		void SetRegistrationTime(int time) { iRegistrationTime = time; }
+
+	private:
+		int iPremiumTime;
+		int iRegistrationTime;
 #endif
 
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
@@ -2923,11 +2571,6 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void AuraRefineWindowClose();
 #endif
 
-#ifdef ENABLE_CONQUEROR_LEVEL
-	public:
-		bool IsConquerorMap(int iMapIndex);
-#endif
-
 #ifdef ENABLE_INVENTORY_EXPANSION_SYSTEM
 	public:
 		DWORD GetUnlockSlotsW(DWORD type = 0) const { return inventory_unlock[type];}
@@ -2942,68 +2585,10 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		void StartWarpOn(BYTE map_index);
 #endif
 
-#ifdef ENABLE_QUEEN_NETHIS
+#ifdef ENABLE_DUNGEON_TRACKING_SYSTEM
 	public:
-		int ComputeSnakeSkill(uint32_t dwVnum, LPCHARACTER pkVictim, uint8_t bSkillLevel);
-	private:
-		LPEVENT m_pkSnakeSkillEvent;
-#endif
-
-#ifdef ENABLE_COLLECT_WINDOW
-	public:
-		void SendCollectPacket(const BYTE windowType, const DWORD time, const DWORD count, const DWORD itemVnum, const DWORD countTotal, const BYTE chance, const DWORD bRenderTargetID, const DWORD bQuestIndex, const DWORD reqLevel);
-#endif
-
-#ifdef ENABLE_SUNG_MAHI_TOWER
-	protected:
-		bool m_bIsUniqueMaster;
-		
-	public:
-		void SetUniqueMaster(bool bInfo) { m_bIsUniqueMaster = bInfo; }
-		bool GetUniqueMaster() const { return m_bIsUniqueMaster; }
-		void SetDungeonMultipliers(BYTE dungeonLevel);
-		bool IsSungMahiDungeon(int mapIdx) const;
-#endif
-
-#ifdef ENABLE_ZODIAC_MISSION
-	public:
-		void				BeadCount(LPCHARACTER ch);
-#endif
-
-#ifdef ENABLE_MELEY_LAIR_DUNGEON
-	public:
-		bool			IsMeley();
-		void			SetQuestNPCIDAttack(DWORD vid){ m_dwQuestNPCVIDAttack = vid;}
-		DWORD			GetQuestNPCIDAttack() const { return m_dwQuestNPCVIDAttack; }
-		LPCHARACTER		GetQuestNPCAttack() const;
-	private:
-		DWORD			m_dwQuestNPCVIDAttack;
-#endif
-
-#ifdef ENABLE_TRACK_WINDOW
-	public:
-		void	GetDungeonCooldown(WORD bossIndex);
-		void	GetDungeonCooldownTest(WORD bossIndex, int value, bool isCooldown);
-#endif
-
-#ifdef ENABLE_DUNGEON_INFO
-	public:
-		void 	SetDamageDoneDungeonInfo(int dam){damage_done_dungeon_info = dam;}
-		int 	GetDamageDoneDungeonInfo(){return damage_done_dungeon_info;}
-
-
-		void 	SetDamageReceivedDungeonInfo(int dam){damage_received_dungeon_info = dam;}
-		int 	GetDamageReceivedDungeonInfo(){return damage_received_dungeon_info;}
-
-	private:
-		int damage_done_dungeon_info;
-		int damage_received_dungeon_info;
-#endif
-
-#ifdef __DUNGEON_INFO__
-	public:
-		void			SendDungeonCooldown(DWORD bossIdx);
-		int				GetQuestFlagSpecial(const char* szQuestFlag, ...);
+		void GetDungeonCooldown(WORD bossIndex);
+		void GetDungeonCooldownTest(WORD bossIndex, int value, bool isCooldown);
 #endif
 
 #ifdef ENABLE_ANTI_EQUIP_FLOOD
@@ -3056,6 +2641,29 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		int GetRandomExp(DWORD missionLevel);
 #endif
 
+#ifdef ENABLE_RENEWAL_BONUS_BOARD
+	public:
+		long long GetMonsterKilled() const {return m_points.llMonsterKilled; }
+		long long GetStoneKilled() const {return m_points.llStoneKilled; }
+		long long GetBossKilled() const {return m_points.llBossKilled; }
+		long long GetBluePlayerKilled() const {return m_points.llBluePlayerKilled; }
+		long long GetYellowPlayerKilled() const {return m_points.llYellowPlayerKilled; }
+		long long GetRedPlayerKilled() const {return m_points.llRedPlayerKilled; }
+		long long GetAllPlayerKilled() const {return m_points.llAllPlayerKilled; }
+		long long GetDuelWon() const {return m_points.llDuelWon; }
+		long long GetDuelLose() const {return m_points.llDuelLost; }
+
+		void SetMonsterKilled(long long value) { m_points.llMonsterKilled = value; }
+		void SetStoneKilled(long long value) { m_points.llStoneKilled = value; }
+		void SetBossKilled(long long value) { m_points.llBossKilled = value; }
+		void SetBluePlayerKilled(long long value) { m_points.llBluePlayerKilled = value; }
+		void SetYellowPlayerKilled(long long value) { m_points.llYellowPlayerKilled = value; }
+		void SetRedPlayerKilled(long long value) { m_points.llRedPlayerKilled = value; }
+		void SetAllPlayerKilled(long long value) { m_points.llAllPlayerKilled = value; }
+		void SetDuelWon(long long value) { m_points.llDuelWon = value; }
+		void SetDuelLose(long long value) { m_points.llDuelLost = value; }
+#endif
+
 #ifdef ENABLE_RIDING_EXTENDED
 	public:
 		void SetMountUpGradeExp(uint32_t exp) { m_mount_up_grade_exp = exp; }
@@ -3102,126 +2710,14 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		DWORD m_dwHorseCheckerFlag;
 #endif
 
-#ifdef ENABLE_ITEMSHOP
-	private:
-		bool m_bAccountMoneyLoaded;
-
-		long long m_lldAccountCoins;
-#ifdef USE_ITEMSHOP_RENEWED
-		long long m_lldAccountJCoins;
-#endif
-
+#ifdef ENABLE_CAMPFIRE_BUG_FIX
 	public:
-#ifdef USE_ITEMSHOP_RENEWED
-		void GetAccountMoney(long long& lldCoins, long long& lldJCoins, bool bReloadForced = false);
-		void SetAccountMoney(long long lldCoins, long long lldJCoins, bool bPlus);
-#else
-		void GetAccountMoney(long long& lldCoins, bool bReloadForced = false);
-		void SetAccountMoney(long long lldCoins, bool bPlus);
-#endif
-		void RefreshAccountMoney();
-#endif
+		// Performans optimizasyonu: GetQuestFlag yerine direkt member variable
+		DWORD GetCampfireFlag() const { return m_dwCampfireFlag; }
+		void SetCampfireFlag(DWORD value) { m_dwCampfireFlag = value; }
 
-#ifdef ENABLE_ITEM_DUPE_FIX
-	public:
-		int	iWarpTime;
-		int	itemPushTime;
-#endif
-
-#ifdef ENABLE_HALLOWEEN_EVENT_SYSTEM
-	public:
-		void	OpenHalloween();
-		void	IncreaseNivel();
-#endif
-
-#ifdef ENABLE_BATTLE_PASS
-	public:
-#ifdef ENABLE_BATTLE_PASS_MOUNTH_CLOSE
-		int iMonthBattlePass;
-#endif
-		struct Struct_BattlePass { DWORD	count;	DWORD	status; };
-		void	Load_BattlePass();
-		void	ExternBattlePass();
-		void	DoMission(int index, long long count);
-		void	SendInfosBattlePass(int index);
-		void	SendDoneBattlePass(int index);
-		void	FinalRewardBattlePass();
-	
-		struct Infos_BattlePass
-		{
-			DWORD	vnum1;	DWORD	count1;	DWORD	vnum2;
-			DWORD	count2;	DWORD	vnum3;	DWORD	count3;
-			char	name[4096];
-		};
-	
-		struct Infos_MissionsBP { DWORD	type;	DWORD	vnum;	DWORD	count; DWORD	ep; };
-	
-		struct Infos_FinalBP
-		{
-			DWORD	f_vnum1;	DWORD	f_count1;	DWORD	f_vnum2;
-			DWORD	f_count2;	DWORD	f_vnum3;	DWORD	f_count3;
-		};
-	
-		struct Infos_Bonus_BattlePass
-		{
-			DWORD	vnum1;	DWORD	count1;	DWORD	vnum2;
-			DWORD	count2;	DWORD	vnum3;	DWORD	count3;
-		};
-	
-		std::vector<Struct_BattlePass> v_counts;
-		std::vector<Infos_BattlePass> rewards_bp;
-		std::vector<Infos_MissionsBP> missions_bp;
-		std::vector<Infos_FinalBP> final_rewards;
-		std::vector<Infos_Bonus_BattlePass> rewards_bonus_bp;
-	
-	public:
-#ifdef ENABLE_BATTLE_PASS_MOUNTH_CLOSE
-		int iMonthBattlePassPremium;
-#endif
-		struct Struct_BattlePassPremium { DWORD	count;	DWORD	status; };
-		void	Load_BattlePassPremium();
-		void	ExternBattlePassPremium();
-		void	DoMissionPremium(int index, long long count);
-		void	SendInfosBattlePassPremium(int index);
-		void	SendDoneBattlePassPremium(int index);
-		void	FinalRewardBattlePassPremium();
-	
-		struct Infos_BattlePassPremium
-		{
-			DWORD	vnum1;	DWORD	count1;	DWORD	vnum2;
-			DWORD	count2;	DWORD	vnum3;	DWORD	count3;
-			char	name[4096];
-		};
-	
-		struct Infos_MissionsBPPremium { DWORD	type;	DWORD	vnum;	DWORD	count; DWORD	ep; };
-	
-		struct Infos_FinalBPPremium
-		{
-			DWORD	f_vnum1;	DWORD	f_count1;	DWORD	f_vnum2;
-			DWORD	f_count2;	DWORD	f_vnum3;	DWORD	f_count3;
-		};
-	
-		struct Infos_Bonus_BattlePassPremium
-		{
-			DWORD	vnum1;	DWORD	count1;	DWORD	vnum2;
-			DWORD	count2;	DWORD	vnum3;	DWORD	count3;
-		};
-	
-		std::vector<Struct_BattlePassPremium> v_counts_premium;
-		std::vector<Infos_BattlePassPremium> rewards_bp_premium;
-		std::vector<Infos_MissionsBPPremium> missions_bp_premium;
-		std::vector<Infos_FinalBPPremium> final_rewards_premium;
-		std::vector<Infos_Bonus_BattlePassPremium> rewards_bonus_bp_premium;
-#endif
-
-#ifdef ENABLE_RANKING
 	protected:
-		long long m_lRankPoints[RANKING_MAX_CATEGORIES];
-
-	public:
-		long long GetRankPoints(int iArg);
-		void SetRankPoints(int iArg, long long lPoint);
-		void RankingSubcategory(int iArg);
+		DWORD m_dwCampfireFlag;
 #endif
 };
 

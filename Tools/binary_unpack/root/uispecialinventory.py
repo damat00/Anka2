@@ -105,9 +105,6 @@ class SpecialInventoryWindow(ui.ScriptWindow):
 
 	def BindInterfaceClass(self, interface):
 		self.interface = interface
-		if app.ENABLE_SLOT_MARKING_SYSTEM:
-			if hasattr(self, 'attachMetinDialog') and self.attachMetinDialog:
-				self.attachMetinDialog.BindInterface(interface)
 
 	def BindSafeboxAndMallClass(self, safebox, mall):
 		self.safebox = proxy(safebox)
@@ -203,8 +200,6 @@ class SpecialInventoryWindow(ui.ScriptWindow):
 		dlgPickMoney.Hide()
 
 		self.attachMetinDialog = uiAttachMetin.AttachMetinDialog()
-		if app.ENABLE_SLOT_MARKING_SYSTEM:
-			self.attachMetinDialog.SetInven(self)
 		self.attachMetinDialog.Hide()
 
 		self.ScrollBar.SetScrollEvent(ui.__mem_func__(self.OnScroll))
@@ -1119,26 +1114,14 @@ class SpecialInventoryWindow(ui.ScriptWindow):
 
 			constInfo.SET_ITEM_QUESTION_DIALOG_STATUS(1)
 
-		elif app.IsPressed(app.DIK_LSHIFT):
-			if player.GetItemTypeBySlot(slotIndex) == item.ITEM_TYPE_GACHA or\
-				player.GetItemTypeBySlot(slotIndex) == item.ITEM_TYPE_GIFTBOX and\
-				ItemVNum != 31374 and ItemVNum != 50255 and\
-				ItemVNum != 50187 and ItemVNum != 50197 and\
-				ItemVNum != 50188 and ItemVNum != 50189 and\
-				ItemVNum != 50190 and ItemVNum != 50191 and\
-				ItemVNum != 50192 and ItemVNum != 50193 and\
-				ItemVNum != 50194 and ItemVNum != 50195:
-				if app.ENABLE_VIEW_CHEST_DROP:
-					if self.interface:
-						if self.interface.dlgChestDrop:
-							if not self.interface.dlgChestDrop.IsShow():
-								self.interface.dlgChestDrop.Open(slotIndex)
-								net.SendChestDropInfo(slotIndex)
+		elif item.GetItemType() == item.ITEM_TYPE_GIFTBOX and app.ENABLE_VIEW_CHEST_DROP:
+			if self.interface:
+				if self.interface.dlgChestDrop:
+					if not self.interface.dlgChestDrop.IsShow():
+						self.interface.dlgChestDrop.Open(slotIndex)
+						net.SendChestDropInfo(slotIndex)
 		else:
 			self.__SendUseItemPacket(slotIndex)
-
-	def BindWikiWindow(self, wndWiki):
-		self.wndWiki = wndWiki
 
 	def __UseItemQuestionDialog_OnCancel(self):
 		self.OnCloseQuestionDialog()

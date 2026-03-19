@@ -1,27 +1,38 @@
-//
-// Copyright 2007-2012 Christian Henning, Andreas Pokorny
-//
-// Distributed under the Boost Software License, Version 1.0
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
-//
+/*
+    Copyright 2007-2012 Andreas Pokorny, Christian Henning
+    Use, modification and distribution are subject to the Boost Software License,
+    Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+    http://www.boost.org/LICENSE_1_0.txt).
+*/
+
+/*************************************************************************************************/
+
 #ifndef BOOST_GIL_IO_DEVICE_HPP
 #define BOOST_GIL_IO_DEVICE_HPP
 
-#include <boost/gil/io/base.hpp>
-
-#include <boost/core/ignore_unused.hpp>
-#include <boost/utility/enable_if.hpp>
+////////////////////////////////////////////////////////////////////////////////////////
+/// \file
+/// \brief
+/// \author Andreas Pokorny, Christian Henning \n
+///
+/// \date   2007-2012 \n
+///
+////////////////////////////////////////////////////////////////////////////////////////
 
 #include <cstdio>
+
+#include <boost/utility/enable_if.hpp>
+#include <boost/gil/io/base.hpp>
+
 #include <memory>
 
 namespace boost { namespace gil {
 
-#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400)
-#pragma warning(push)
-#pragma warning(disable:4512) //assignment operator could not be generated
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(push) 
+#pragma warning(disable:4512) //assignment operator could not be generated 
 #endif
+
 
 namespace detail {
 
@@ -34,6 +45,7 @@ template <> struct buff_item< void >
 {
     static const unsigned int size = 1;
 };
+
 
 /*!
  * Implements the IODevice concept c.f. to \ref IODevice required by Image libraries like
@@ -294,7 +306,7 @@ public:
                    );
 
         return pos;
-    }
+    } 
 
     void flush()
     {
@@ -311,7 +323,6 @@ public:
                                          );
 
         assert( num_elements == line.size() );
-        boost::ignore_unused(num_elements);
     }
 
     int error()
@@ -327,7 +338,7 @@ private:
         {
             fclose( file );
         }
-    }
+    }    
 
 private:
 
@@ -731,9 +742,9 @@ struct is_dynamic_image_writer< dynamic_image_writer< Device
 
 } // namespace detail
 
-#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400)
-#pragma warning(pop)
-#endif
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(pop) 
+#endif 
 
 } // namespace gil
 } // namespace boost

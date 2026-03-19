@@ -2238,7 +2238,7 @@ class deque : protected deque_base<Allocator>
    #endif   //#ifndef BOOST_CONTAINER_DOXYGEN_INVOKED
 };
 
-#ifndef BOOST_CONTAINER_NO_CXX17_CTAD
+#if __cplusplus >= 201703L
 template <typename InputIterator>
 deque(InputIterator, InputIterator) -> deque<typename iterator_traits<InputIterator>::value_type>;
 template <typename InputIterator, typename Allocator>

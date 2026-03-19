@@ -73,20 +73,7 @@ public:
     bool
     operator==(const_iterator const& other) const
     {
-        return
-            (b_ == nullptr) ?
-            (
-                other.b_ == nullptr ||
-                other.it_ == other.b_->end_
-            ):(
-                (other.b_ == nullptr) ?
-                (
-                    it_ == b_->end_
-                ): (
-                    b_ == other.b_ &&
-                    it_ == other.it_
-                )
-            );
+        return b_ == other.b_ && it_ == other.it_;
     }
 
     bool
@@ -151,8 +138,6 @@ private:
     {
     }
 };
-
-//------------------------------------------------------------------------------
 
 template<class BufferSequence>
 void

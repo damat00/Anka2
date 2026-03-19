@@ -123,7 +123,7 @@ PyObject *nonplayerMonsterHasRaceFlag(PyObject *poSelf, PyObject *poArgs)
 }
 #endif
 
-#ifdef ENABLE_WIKI_SYSTEM
+#ifdef ENABLE_INGAME_WIKI_SYSTEM
 PyObject *nonPlayerGetMobsByName(PyObject *poSelf, PyObject *poArgs)
 {
 	char *szItemName;
@@ -307,7 +307,7 @@ void initNonPlayer()
 		{ "MonsterHasRaceFlag",			nonplayerMonsterHasRaceFlag,		METH_VARARGS },
 #endif
 
-#ifdef ENABLE_WIKI_SYSTEM
+#ifdef ENABLE_INGAME_WIKI_SYSTEM
 		{ "GetMonsterPrice",			nonplayerGetMonsterPrice,			METH_VARARGS },
 		{ "GetMobsByName",				nonPlayerGetMobsByName,				METH_VARARGS },
 		{ "GetMonsterLevel",			nonplayerGetMonsterLevel,			METH_VARARGS },
@@ -343,7 +343,7 @@ void initNonPlayer()
 	PyModule_AddIntConstant(poModule, "BOSS", 4);
 	PyModule_AddIntConstant(poModule, "KING", 5);
 
-#ifdef ENABLE_WIKI_SYSTEM
+#ifdef ENABLE_INGAME_WIKI_SYSTEM
 	PyModule_AddIntConstant(poModule, "MOB_RESIST_SWORD", CPythonNonPlayer::MOB_RESIST_SWORD);
 	PyModule_AddIntConstant(poModule, "MOB_RESIST_TWOHAND", CPythonNonPlayer::MOB_RESIST_TWOHAND);
 	PyModule_AddIntConstant(poModule, "MOB_RESIST_DAGGER", CPythonNonPlayer::MOB_RESIST_DAGGER);

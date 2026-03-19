@@ -13,7 +13,7 @@ Group MotionEventData
         
         AttachingEnable      1
         AttachingBoneName    "equip_left"
-        FlyFileName       "d:/ymir work/monster2/ch_bowman/arrow.msf"
+        FlyFileName       "season2/monster/ch_bowman/arrow.msf"
         FlyPosition       0.000000 0.000000 0.000000
     }
 }

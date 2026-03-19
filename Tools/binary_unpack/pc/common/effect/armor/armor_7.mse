@@ -130,7 +130,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\pc\sura\effect\gwi_geom_spark copy.dds"
+            "gwi_geom_spark copy.jpg"
         }
     }
 }

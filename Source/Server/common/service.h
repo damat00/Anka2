@@ -1,26 +1,5 @@
-/************************************************************
-*                ANKA2 SYSTEM INFO GAME                     *
-*-----------------------------------------------------------*
-*   File Name : ../../common/service.h                      *
-*   Author    : BestStudio                                  *
-*   Version   : 3.1.0                                       *
-*   Date      : 03-11-2025                                  *
-*   Update    : 04-12-2025                                  *
-*-----------------------------------------------------------*
-*           Anka2Project Configuration Definition           *
-************************************************************/
-
 #ifndef __INC_SERVICE_H__
 #define __INC_SERVICE_H__
-#pragma once
-
-enum eCommonDefines {
-	//DEFINES						//VALUE				//AÇIKLAMA											// VARSAYILAN
-	CONQUEROR_MAX_LEVEL				= 30,				// Maksimum þampiyon seviyesi							// 30		[ENABLE_YOHARA_SYSTEM]
-	DROPABLE_GOLD_LIMIT				= 100000,			// Düþürülebilir altýn limiti						// 1000
-	SB_NEED_EXP						= 20000,			// Becerikitabý için gereken deneyim				// 20000
-	SB_C_NEED_EXP					= 20000,			// 9. beceriler için gereken deneyim				// 20000
-};
 
 #define CLIENT_VERSION		"ext_180923"			// Client sürüm etiketidir; sunucu–client uyumluluðunu kontrol eder.
 
@@ -34,12 +13,14 @@ enum eCommonDefines {
 #define ENABLE_RENEWAL_CUBE							// Yenileme küp sistemini etkinleþtir;
 #define ENABLE_MOUNT_SYSTEM							// Binek sistemi etkinleþtir;
 #define ENABLE_MOUNT_PET_SKIN						// Binek ve pet için skin etkinleþtir;
+#define ENABLE_BIOLOG_SYSTEM						// Biolog sistemini etkinleþtir;
 #define ENABLE_MOB_DROP_INFO						// Mob ve taþ düþürme penceresini etkinleþtir;
 #define ENABLE_SHOW_MOB_INFO						// Mob seviyesi ve saldýrganlýk bilgisini etkinleþtir;
 #define ENABLE_RENEWAL_QUEST						// Resmi sunucularla ayný yeni görev sayfasý;
 #define ENABLE_CHANGE_CHANNEL						// Kanal deðiþtirme seçeneðini etkinleþtir;
 #define ENABLE_MESSENGER_TEAM						// Mesajlaþmada takým listesini etkinleþtir;
 #define ENABLE_PENDANT_SYSTEM						// Resmi pendant sistemini etkinleþtir;
+#define ENABLE_ATTBONUS_METIN						// Attbonus metin etkinleþtir;
 #define ENABLE_DESTROY_DIALOG						// Eþyalarý düþürdüðünüzde yok etme seçeneðini etkinleþtir;
 #define ENABLE_SORT_INVENTORY						// Envanter ve özel envanterdeki eþyalar sýralanabilir;
 #define ENABLE_PARTY_POSITION						// Parti üyeleri haritada görülebilir;
@@ -72,16 +53,9 @@ enum eCommonDefines {
 #define ENABLE_EXTENDED_WHISPER_DETAILS				// Geniþletilmiþ fýsýldama hedef bilgisi çoklu dil ülke bayraðý;
 #define ENABLE_EXTEND_TIME_COSTUME_SYSTEM			// Kostüm sistemi için süre uzatmayý etkinleþtir;
 #define ENABLE_IMPROVED_HANDSHAKE_PROCESS			// Owsap tarafýndan geliþtirilmiþ el sýkýþma sürecini etkinleþtir.
-#define ENABLE_NEW_BONUS_SYSTEM						// Patronlara karþý bonusu etkinleþtir;
-#define ENABLE_AVG_PVM								// Yüksek ortalama zarar bonusu etkinleþtir;
-	#ifdef ENABLE_AVG_PVM
-		#define ENABLE_AVG_PVM_DISABLE				// Yüksek ortalama zarar bonusu etkinleþtir;
-	#endif
-#define ENABLE_MAGIC_REDUCTION_SYSTEM				// Büyü direnci & bozma bonusu etkinleþtir;
-	#ifdef ENABLE_MAGIC_REDUCTION_SYSTEM
-		//#define USE_MAGIC_REDUCTION_STONES			// Büyü bozma taþlarýný etkinleþtir;
-	#endif
-#define ENABLE_HUMAN_RESIST_PVP						// Yarý insanlara karþý bonusu etkinleþtir;
+#define ENABLE_TITLE_SYSTEM							// Eþyada baþlýk sistemini etkinleþtir;
+#define ENABLE_ATTBONUS_BOSS						// Attbonus boss etkinleþtir;
+#define ENABLE_EVENT_MANAGER						// Etkinlik yöneticisini etkinleþtir (otomatik etkinlikler);
 #define ENABLE_RENEWAL_AFFECT						// Yenileme etkisini etkinleþtir (1 yeni alt tip + etki simgesi);
 #define ENABLE_OFFLINE_MESSAGE						// Oyuncu baðlý deðilse çevrimdýþý mesaj býrakma seçeneðini etkinleþtir;
 #define ENABLE_RESTART_INSTANT						// 500.000 Yang için anýnda yeniden baþlatmayý etkinleþtir;
@@ -89,13 +63,11 @@ enum eCommonDefines {
 #define ENABLE_RENEWAL_OX_EVENT						// Resmi gibi yenileme ox etkinliðini etkinleþtir;
 #define ENABLE_MULTI_FARM_BLOCK						// 2'den fazla istemci için çoklu farm'ý imkansýz hale getir;
 #define ENABLE_SPECIAL_INVENTORY					// Kitaplar, yükseltme vb. için özel envanter;
-#define ENABLE_EXTEND_ITEM_AWARD                	// Geniþletilmiþ eþya ödül sistemini etkinleþtir (çoðunlukla Item Shop ödülleri için)
-	#ifdef ENABLE_EXTEND_ITEM_AWARD
-		#define USE_ITEM_AWARD_CHECK_ATTRIBUTES    // Ödül verilirken eþyalarýn attribute/özellik kontrolünü kullan
-	#endif
+#define ENABLE_EXTEND_ITEM_AWARD					// Geniþletilmiþ eþya ödülünü etkinleþtir (çoðunlukla ishop için kullanýlýr);
 #define ENABLE_MAINTENANCE_SYSTEM					// Oyunda bakým bilgisini etkinleþtir;
 #define ENABLE_SKILL_COLOR_SYSTEM					// Yetenek renk sistemini etkinleþtir;
 #define ENABLE_PICKUP_ITEM_EFFECT					// Envanter / özel envanterde alýnan eþyalar için efekti etkinleþtir;
+#define ENABLE_RENEWAL_BATTLE_PASS					// Yenileme savaþ geçiþ sistemini etkinleþtir;
 #define ENABLE_RENEWAL_OFFLINESHOP					// Yeni offlineshop sistemini etkinleþtir;
 #define ENABLE_RENEWAL_TEAM_AFFECT					// Yenileme takým etkisini etkinleþtir (logo);
 #define ENABLE_SLOT_MARKING_SYSTEM					// Resmi gibi slot iþaretleme sistemini etkinleþtir;
@@ -105,158 +77,60 @@ enum eCommonDefines {
 #define ENABLE_CLIENT_LOCALE_STRING					// Ýstemciden yerel dize yüklemesini etkinleþtir;
 #define ENABLE_BONUS_COSTUME_SYSTEM					// Kostümlerde bonus ekleme ve deðiþtirmeyi etkinleþtir;
 #define ENABLE_GUILD_LEADER_TEXTAIL					// [Lider] ile lonca generali için metni etkinleþtir;
+#define ENABLE_RENEWAL_PREMIUM_SYSTEM				// Premium sistemini etkinleþtir (oyuncu, hesap);
 #define ENABLE_CROSS_CHANNEL_REQUESTS				// Kanal arasý istekleri etkinleþtir (gelecekte geniþletilecek);
+#define ENABLE_DROP_LEVEL_LIMIT_RANGE				// Tip limitinde level_limit_start ve level_limit_end gibi düþüþ için seviye limit aralýðýný etkinleþtir;
+#define ENABLE_RENEWAL_INGAME_ITEMSHOP				// Oyunda nesne market etkinleþtir;
 #define ENABLE_AUTOMATIC_PICK_UP_SYSTEM				// Otomatik toplama sistemini etkinleþtir;
 #define ENABLE_OFFLINESHOP_SEARCH_SYSTEM			// Yenileme offlineshop için arama sistemini etkinleþtir;
+#define ENABLE_MINIGAME_OKEY_CARDS_SYSTEM			// Minigame okey kartlarý sistemini etkinleþtir.
+#ifdef ENABLE_EXTEND_ITEM_AWARD	
+	#define USE_ITEM_AWARD_CHECK_ATTRIBUTES	
+#endif	
+#define ENABLE_FISH_GAME							// Resmi yeni balýk tutma oyununu etkinleþtir;
+#define ENABLE_RENEWAL_REGEN						// Yeni bir regen türünü etkinleþtir;
+#define ENABLE_HUNTING_SYSTEM						// Benzersiz görevlerle avcýlýk sistemini etkinleþtir;
 #define ENABLE_EMOTICONS_SYSTEM						// Sohbet ve fýsýldamada emoji sistemi;
 #define ENABLE_ANTI_EQUIP_FLOOD						// Ekipman için hýzlý kontrolü etkinleþtir;
+#define ENABLE_GUILD_TOKEN_AUTH						// MartySama tarafýndan lonca için yama etkinleþtir;
 #define ENABLE_HANDSHAKE_SESSION					// El sýkýþma oturumu düzeltmesini etkinleþtir;
 #define ENABLE_GROWTH_PET_SYSTEM					// Resmi evcil pet sistemini etkinleþtir;
 #define ENABLE_CHANGE_LOOK_SYSTEM					// Görünüm deðiþtirme sistemini etkinleþtir;
-#define ENABLE_KILL_STATISTICS						// Resmi ile neredeyse ayný yeni bonus panosu;
+#define ENABLE_RENEWAL_BONUS_BOARD					// Resmi ile neredeyse ayný yeni bonus panosu;
 #define ENABLE_AURA_COSTUME_SYSTEM					// Aura kostüm sistemini etkinleþtir;
+#define ENABLE_SHIP_DEFENCE_DUNGEON					// Resmi Zindan Gemi Savunmasýný etkinleþtir;
+#define ENABLE_DUNGEON_TRACKING_SYSTEM				// Yeni zindan bilgisini etkinleþtir;
 #define ENABLE_RENEWAL_TELEPORT_SYSTEM				// Yeni ýþýnlanma sistemini etkinleþtir;
 #define ENABLE_INVENTORY_EXPANSION_SYSTEM			// Resmi gibi envanter geniþletme sistemini etkinleþtir;
 #define ENABLE_GM_INV_EFFECT         				// Resmi GM /inv efekt güncellemesi
 #define ENABLE_RIDING_EXTENDED         				// Resmi At seviyesi geniþletildi
-#define ENABLE_BOT_PLAYER							// Sahte oyuncu sistemi
-#define ENABLE_STANDING_MOUNT						// Ayakta kullanýlan binek sistemini etkinleþtir	
-	#ifdef ENABLE_STANDING_MOUNT	
-		#define STANDING_MOUNT_VNUM_1 40003 			// Turbo Sörf Tahtasý
-		#define STANDING_MOUNT_VNUM_2 40004 			// Wukong'un Fýrtýnasý
-		#define STANDING_MOUNT_VNUM_3 40005 			// Wukong'un Gürlemesi
-		#define SURFBOARD STANDING_MOUNT_VNUM_1 		// Eski sistemlerle uyumluluk için alias
-		#define IS_STANDING_MOUNT_VNUM(v) ((v)==STANDING_MOUNT_VNUM_1 || (v)==STANDING_MOUNT_VNUM_2 || (v)==STANDING_MOUNT_VNUM_3)
-	#endif
-#define ENABLE_HUNTING_SYSTEM						// Avcýlýk görev sistemini etkinleþtir;
-	#ifdef ENABLE_HUNTING_SYSTEM
-		#define HUNTING_MISSION_COUNT 90        	// Ayný anda aktif olabilecek av görevi sayýsý
-		#define HUNTING_MONEY_TABLE_SIZE 9     		// Her görev seviyesi için yang ödül tablosu giriþi sayýsý
-		#define HUNTING_EXP_TABLE_SIZE 9       		// Her görev seviyesi için EXP tablosu giriþi sayýsý
-	#endif
+#define ENABLE_BOT_PLAYER							// Bot oyuncu sistemi
+#define ENABLE_STANDING_MOUNT	
+#ifdef ENABLE_STANDING_MOUNT	
+	#define STANDING_MOUNT_VNUM_1 40003 			// Turbo Sörf Tahtasý
+	#define STANDING_MOUNT_VNUM_2 40004 			// Wukong'un Fýrtýnasý
+	#define STANDING_MOUNT_VNUM_3 40005 			// Wukong'un Gürlemesi
+	#define SURFBOARD STANDING_MOUNT_VNUM_1 		// Geriye uyumluluk için
+	#define IS_STANDING_MOUNT_VNUM(v) ((v)==STANDING_MOUNT_VNUM_1 || (v)==STANDING_MOUNT_VNUM_2 || (v)==STANDING_MOUNT_VNUM_3)
+#endif
+#ifdef ENABLE_HUNTING_SYSTEM 						// Avcýlýk görev sistemini etkinleþtir;
+	#define HUNTING_MISSION_COUNT 90        		// Ayný anda aktif olabilecek av görevi sayýsý
+	#define HUNTING_MONEY_TABLE_SIZE 9     			// Her görev seviyesi için yang ödül tablosu giriþi sayýsý
+	#define HUNTING_EXP_TABLE_SIZE 9       			// Her görev seviyesi için EXP tablosu giriþi sayýsý
+#endif
 #define ENABLE_SKILL_BOOK_READING					// Beceri Kitabý Okuma sistemi
 #define ENABLE_SPIRIT_STONE_READING					// Ruh Taþý Okuma sistemi
 #define __AUTO_HUNT__								// Otomatik Av sistemi
 #define ENABLE_AUTO_SELL_SYSTEM						// Otomatik item satmayý sistemini etkinleþtir;
 	#ifdef ENABLE_AUTO_SELL_SYSTEM
-		#define MAX_AUTO_SELL_ITEMS 100				// Listeye eklenecek maksimum item sayýsý
-	#endif
+	#define MAX_AUTO_SELL_ITEMS 100					// Listeye eklenecek maksimum item sayýsý
+#endif
 #define ENABLE_PLAYERS_ONLINE                  		// Çevrimiçi oyuncu /players_online komutunu  etkinleþtir;
 #define ENABLE_STYLE_ATTRIBUTE_SYSTEM      			// Seçmeli özel kadim efsunu sistemini  etkinleþtir;
 #define ENABLE_ITEM_MODIFIER_AVG_SKILL				// Ortalama ve Beceri efsun nesnesi sistemini etkinleþtir;
 #define ENABLE_RANDOM_STATUS_PER_LEVEL 				// Seviye atladýkça karaktere rastgele ek statüler kazandýrýr
-#define ENABLE_PITTY_REFINE                    		// Yeni nesil yükseltme sistemi
-#define ENABLE_NPC_LOCATION_TRACE  					// Belirtilen NPC veya mob'un harita üzerindeki konumunu tespit eder ve oyuncuya yönlendirme saðlar
-#define ENABLE_ITEMSHOP								// Oyunda nesne market'i etkinleþtir;		
-	#ifdef ENABLE_ITEMSHOP	  
-		#define USE_ITEMSHOP_RENEWED			   	// Oyunda nesne market yenilemeyi etkinleþtir;
-	#endif
-#define ENABLE_BATTLE_PASS                      	// Yenileme savaþ bileti sistemini etkinleþtir;
-	#ifdef ENABLE_BATTLE_PASS                      	// Yenileme savaþ bileti sistemini etkinleþtir;
-		//#define ENABLE_BATTLE_PASS_MOUNTH_CLOSE
-	#endif
-#define ENABLE_BIOLOGIST_SYSTEM						// Biyolog sistemini etkinleþtir
-#define ENABLE_AFFECT_BUFF_REMOVE              		// Buff Etkilerini Kaldýrma
-#define RENEWAL_HWID_BLOCK    						// Geliþtirilmiþ HWID doðrulama ve engelleme sistemini etkinleþtirir
-#define __LEADERSHIP__BONUS__                  		// Liderlik Bonusu
-#define ENABLE_NEWSTUFF    							// Yeni eklenen sistemleri, özellikleri veya geliþtirmeleri toplu olarak aktif etmek için kullanýlan genel kontrol bayraðý
-#define ENABLE_DUNGEON_RENEWAL_SYSTEM      			// Zindan sistemini tümüyle etkinleþtirir
-	#ifdef ENABLE_DUNGEON_RENEWAL_SYSTEM
-		#define ENABLE_DUNGEON_INFO           		// Zindanla ilgili detaylý bilgi (harita, süre, ödüller) gösterim desteðini saðlar
-		#define __DUNGEON_INFO__             		// Yeni tip zindan bilgisi patron mekaniklerini aktif eder
-		#define ENABLE_NEW_DUNGEON_LIB       		// Zindan iþlevleri için yeni kütüphane/alt sistem kullanýmýna geçirir
-		#define ENABLE_TRACK_WINDOW          		// Zindan takibi için özel UI/pencere (track window) desteðini etkinleþtirir
-		#define ENABLE_ULTIMATE_REGEN        		// Geliþmiþ/alternatif "ultimate" regen algoritmasýný devreye alýr
-	#endif
-#define ENABLE_YOHARA_SYSTEM          				// Yohara kýtasý ve SungMa tabanlý sistemleri etkinleþtirir
-	#ifdef ENABLE_YOHARA_SYSTEM
-		#define ENABLE_CONQUEROR_LEVEL				// Þampiyon seviyesi sistemini etkinleþtir;
-		#define ENABLE_CONQUEROR_LEVEL_UPDATE		// Þampiyon seviyesi anýnda yenilemeyi etkinleþtir;
-		#define ENABLE_PASSIVE_SYSTEM				// Resmi Kalýntý Bonusu sistemi etkinleþtirir;
-		#define ENABLE_NINETH_SKILL					// 9. becerileri etkinleþtir
-		#define ENABLE_PVP_BALANCE					// Yeni skill animasyonlarý, resmi oyun gibi
-	#endif
-#define ENABLE_DUNGEON_MAPS_SYSTEM        			// Tüm yeni/yenilenmiþ zindan ve harita altyapýsýný etkinleþtirir
-	#ifdef ENABLE_DUNGEON_MAPS_SYSTEM
-		// Yohara Zindanlarý Start
-		#define ENABLE_SUNG_MAHI_TOWER    			// SungMa Ýstilasý zindaný
-		#define ENABLE_WHITE_DRAGON       			// Alastor (Kuzey Rüzgarý Derinlikleri)
-			#ifdef ENABLE_WHITE_DRAGON
-				//#define ENABLE_WHITE_DRAGON_EX 	// Alastor canavar / event uzantýlarý
-			#endif
-		#define ENABLE_QUEEN_NETHIS       			// Yýlan Tapýnaðý (Queen Nethis)
-		// Yohara Zindanlarý End
 
-		#define ENABLE_MELEY_LAIR_DUNGEON     			// Meley'in Ýni haritasýný etkinleþtir
-		#define ENABLE_ZODIAC_MISSION     				// Zodyak Tapýnaðý görev sistemi
-		#define ENABLE_DRAGON_LAIR            			// Mavi Ejderha Odasý'ný etkinleþtir
-		#define ENABLE_DEFENSAWE_SHIP         			// Resmi sürümdeki Gemi Savunma Zindaný’ný etkinleþtir
-		#define ENABLE_OCHAO_TEMPLE_SYSTEM              // Ochao Tapýnaðý ve Büyülü Orman zindanýný etkinleþtirir
-			#ifdef ENABLE_OCHAO_TEMPLE_SYSTEM		
-				#define OCHAO_HEALING_SKILL_VNUM 265    // 1.62 sürümü için Ochao heal skill vnum tanýmý
-			#endif
-	#endif
-#define __DOJANG_SRC_FUNCTIONS__      				// Turnuva (PvE/PvP arena) kaynak fonksiyonlarýný açar
-	#ifdef __DOJANG_SRC_FUNCTIONS__
-		#define DOJANG_MAPINDEX 92        			// Turnuva harita index deðeri
-	#endif
-#define ENABLE_REMOTE_SHOP_SYSTEM                   // Uzaktan Market sistemini etkinleþtirir;
-#define __SYSTEM_SEARCH_ITEM_MOB__  				// Mob kodu girildiðinde o mobdan düþen item’leri panel üzerinden listelemeyi saðlar.
-#define ENABLE_REFINE_SUCCESS_NOTICE				// Ýtem son refine seviyesine (+9) ulaþtýðýnda global duyuru gönderir.
-	#ifdef ENABLE_REFINE_SUCCESS_NOTICE
-		#define REFINE_SUCCESS_NOTICE_LEVEL 9		// Global duyuru gönderilecek minimum refine seviyesi.
-	#endif
-#define ENABLE_EQUIPMENT_HAND_EFFECT				// Karakterin sað ve sol eline takýlan ekipmanlar için özel efekt desteði saðlar.
-#define ENABLE_RESP_SYSTEM							// Patron ve Metin ýþýnlanma sistemini etkinleþtirir
-#define ENABLE_REAL_TIME_REGEN						// Karakterlerin HP/SP yenilenmesinin gerçek zamanlý (online) olarak çalýþmasýný saðlar
-#define ENABLE_COLLECT_WINDOW                 		// Koleksiyon sistemine ait GUI (pencere) arayüzünü aktif eder
-#define __ENABLE_COLLECTIONS_SYSTEM__         		// Koleksiyon (Collections) sisteminin tamamýný aktif eder
-#define ENABLE_NEW_ITEM_TYPE_GACHA          		// Gacha sistemi için yeni sandýk / item tipini aktif eder
-#define ENABLE_RANKING          					// Rank sýralama sistemi
-#define ENABLE_MOB_FOLLOW_SYSTEM          			// Canavar (Mob) takip sistemi
-#define ENABLE_ITEM_UPGRADE_NOTICE          		// Belirlenen seviye ve üzerindeki eþya geliþtirmelerini global olarak duyurur.
-	#ifdef ENABLE_ITEM_UPGRADE_NOTICE
-		#define ITEM_UPGRADE_NOTICE_MIN_LEVEL 9 	// Duyuru yapýlacak minimum geliþtirme seviyesi (örn: +9 ve üzeri).
-	#endif
-#define ENABLE_GAYA_SYSTEM                         	// Gaya sistemini (Gaya para birimi, NPC ve takas mekanikleri) aktif eder
-	#ifdef ENABLE_GAYA_SYSTEM
-		#define ENABLE_GAYA_SHOP_SYSTEM             // Gaya para birimi ile çalýþan market / alýþveriþ sistemini aktif eder
-		#define ENABLE_GAYA_TICKET_SYSTEM           // Gaya sistemi için kupon (bilet) kullanýmý ve dönüþüm mekanizmasýný aktif eder
-	#endif
-#define ENABLE_EVENT_SYSTEM                         // Etkinlik yöneticisini (otomatik ve zamanlý etkinlikler) aktif eder
-	#ifdef ENABLE_EVENT_SYSTEM
-		#define ENABLE_EVENT_BANNER_FLAG            // Etkinlikler için oyun içi banner / bayrak gösterim sistemini aktif eder
-		#define ENABLE_SOUL_ROULETTE_SYSTEM         // Kan Ritüeli (Soul Roulette) mini oyun / etkinlik sistemini aktif eder
-		#define ENABLE_ATTENDANCE_EVENT             // Canavar Avý (Attendance) etkinliðini ve ödül mekanizmasýný aktif eder
-		#define ENABLE_FISH_EVENT                   // Resmi yeni balýk tutma mini oyununu aktif eder
-		#define ENABLE_MINI_GAME_CATCH_KING         // Kralý Yakala (Catch the King) kart mini oyununu aktif eder
-		#define ENABLE_MINIGAME_RUMI_EVENT          // Rumi (Okey kartlarý) mini oyun sistemini aktif eder
-		#define ENABLE_HALLOWEEN_EVENT_SYSTEM       // Cadýlar Bayramý (Halloween) etkinlik sistemini aktif eder
-		#define ENABLE_STONE_EVENT_SYSTEM           // Metin Taþý kesme / sýralama etkinlik sistemini aktif eder
-		#define ENABLE_SOCCER_BALL_EVENT            // Futbol Topu etkinliðini ve ilgili oyun mekaniklerini aktif eder
-		#define ENABLE_WORD_GAME_EVENT              // Kelime oyunu etkinliðini aktif eder
-		#define ENABLE_EVENT_DROPS                  // Etkinliklere özel item düþürme (drop) ayarlarýný aktif eder
-	#endif
-#define ENABLE_DROP_GOLD							// Yang düþürme sistemi
-#define ENABLE_GOLD_MULTIPLIER						// Yang çarpan sistemi
-#define ENABLE_GOLD10_PCT							// Yang %10 çarpaný
-#define ENABLE_STATUS_UP_RENEWAL					// Hýzlý statü sistemi etkinleþtir;
-#define ENABLE_TITLE_SYSTEM							// Resmi Ünvan Sistemi etkinleþtirir;
-
-/*** KRÝTÝK HATA, ÇÖKME VE AÇIK DÜZELTMELERÝ (CRASH / CORE / BUG / EXPLOIT / LEAK) ***/
-#define DISABLE_STOP_RIDING_WHEN_DIE				// Karakter öldüðünde binek ve sürüþ durumunu temizler.
-#define ENABLE_STONES_STACKFIX   					// Taþ itemlerinde stack (birikme) iþlemlerindeki hatalarý düzeltmek için özel split ve ekleme mantýðýný aktif eder.
-#define ENABLE_TELEPORT_SKILL						// Her ýþýnlanmada becerilerin tekrar sönme sorununu giderir.
-#define ENABLE_BOSS_METIN_POISON_DISABLE    		// Boss ve Metin taþlarýna karþý zehir etkisini devre dýþý býrakýr.
-#define DISABLE_STAMINA    							// Stamina (ST) sistemini devre dýþý býrakýr; karakter yorulmaz ve ST tüketimi gerçekleþmez.
-#define ENABLE_FIX_SWAP_ITEM						// Slot uyuþmazlýðý nedeniyle ekipman deðiþtirilememesi sorununu giderir.
-#define ENABLE_RELOAD_COMMAND_ALL_CORES  			// Reload komutunun tüm core’lara P2P üzerinden senkron þekilde iletilmesini saðlar.
-#define ENABLE_ITEM_DUPE_FIX 						// Eþya iþlemlerinde oluþan senkronizasyon ve zamanlama hatalarýndan kaynaklý çoðaltma açýklarýný düzeltir.
-#define ENABLE_FIX_EXP_DROP_STONES 					// Metin (Stone) yaratýklarýndan EXP düþme hesaplamalarýnda oluþan hatalarý giderir.
-#define ENABLE_MULTI_AFFIX_APPLY_SYSTEM 			// Tek iþlemde birden fazla efsun (bonus) eklenmesini saðlar.
-#define ENABLE_REGEN_RENEWAL 						// Regen event’lerinin baþlatýlma zamanýný sabitleyerek rastgele gecikmeleri ortadan kaldýrýr ve daha tutarlý spawn döngüsü saðlar.
-#define STONE_REGEN_FIX 							// Metin (Stone) yaratýklarýnýn yeniden doðma sýrasýnda oluþan animasyon, konum ve stabilite problemlerini giderir.
-#define __YMIR_REGEN_FIX__ 							// Regen event’lerinin duraksama veya kilitlenme sorunlarýný gidererek yeniden doðru zamanlama ile çalýþmasýný saðlar.
+/*** DÜZELTMELER ***/
 #define FIX_SyncPosition                       		// Pozisyon senkronizasyon sorunlarýný düzeltir
 #define ENABLE_PROXY_IP								// Proxy/VPN tespiti ve reverse-proxy arkasýndaki gerçek istemci IP'sinin doðru okunmasýný saðlayarak IP algýlama hatalarýný düzeltir
 #define ENABLE_UDP_BLOCK							// UDP port engellemeyi etkinleþtir;
@@ -267,6 +141,7 @@ enum eCommonDefines {
 #define ENABLE_LOCALHOST_IP_FIX						// Localhost / 127.0.0.1 IP kullanýmýndan kaynaklý baðlantý sorunlarýný düzeltir
 #define ENABLE_INTERNAL_IP_FIX						// Dahili (internal) IP algýlama / yönlendirme ile ilgili sorunlarý düzeltir
 #define ENABLE_POINT_EXP_FIX						// EXP ve karakter puaný hesaplama hatalarýný düzeltir
+#define ENABLE_END_PVP_WHEN_DISCONNECT				// Baðlantý kesildiðinde aktif PvP durumunu otomatik sonlandýrýr
 #define ENABLE_MINING_DISTANCE_FIX					// Kazý (mining) mesafe kontrol hatalarýný düzeltir
 #define ENABLE_STOP_FUNCTION_FIX					// Hareket/aksiyon durdurma fonksiyonundaki buglarý giderir
 #define ENABLE_STR_NEW_NAME_FIX						// Yeni isimlendirme (string) hatalarýný düzeltir
@@ -298,6 +173,7 @@ enum eCommonDefines {
 #define ENABLE_SOCKET_STONE_MASS_DELETE_FIX			// Ýstiflenmiþ taþlarýn tek seferde yanlýþlýkla toplu silinmesini engeller
 #define ENABLE_WARP_HP_LOSS_FIX						// Iþýnlanýnca (warp) HP düþmesi / can kaybý yaþanmasý sorununu düzeltir
 #define ENABLE_ITEM_SWAP_FIX						// Ýki item arasýnda slot deðiþtirirken oluþan item swap bug’ýný düzeltir
+#define ENABLE_CAMPFIRE_BUG_FIX						// Kamp ateþi sistemindeki görsel/etki kaynaklý bug’larý düzeltir
 #define ENABLE_CHARACTER_NAME_HACK_FIX				// Karakter ismi üzerinden yapýlan hile / exploit giriþimlerini engeller
 #define ENABLE_COSTUME_GENDER_CHANGE_FIX			// Kostüm giyiliyken cinsiyet deðiþtirme ile oluþan görünüm/slot bug’ýný giderir
 #define ENABLE_GUILD_EMPIRE_BUG_FIX             	// Lonca-Ýmparatorluk (empire/ownership) devretme / miras hatasýný düzeltir
@@ -312,25 +188,9 @@ enum eCommonDefines {
 #define ENABLE_WAR_CRASHER_PROTECTION_FIX       	// Savaþ (war) sýrasýnda crash/exploit korumalarý ekler
 #define HORSE_FIX									// At/binek sistemindeki spawn, hareket, saldýrý ve pozisyon hatalarýný giderir; exploit risklerini azaltýr
 #define SYS_ERR_SOURCE_TRACKING    					// Hata tetiklendiðinde log çýktýsýna kaynak dosya ve satýr bilgisi ekler
+#define ENABLE_SKILL_YONGBI_PROCESSING_FIX   		// SKILL_YONGBI (Ejderha Atýþý) için hasar iþlemesini düzelten fix (movement-only case kaldýrýlýp normal skill-case grubuna eklenir)
 #define ENABLE_SKILL_PAERYONG_PROCESSING   			// SKILL_PAERYONG (Ejderha Kükresi) için ComputeSkill çaðrýsýný ekleyerek hasar/efekt iþlenmesini saðlar
-#define ENABLE_HORSE_SKILL_DAMAGE					// At üzerinde Sura beceri vurma düzeltmesini etkinleþtirir
-#define ENABLE_ANALYZE_CLOSE_FIX 					// Analiz/inceleme arayüzünün beklenmedik þekilde kapanmasýna neden olan hatalarý düzeltir.
-#define ENABLE_CRASH_CORE_ARROW_FIX 				// Okçu sýnýfýnýn Core (çekirdek) kaynaklý çökme (crash) hatasýný giderir.
-#define ENABLE_DUNGEON_MUSIC_FIX  					// Zindanlarda müziðin çalmamasý veya hatalý çalmasý sorununu düzeltir.
-#define ENABLE_FLY_FIX 								// Fly senkronizasyonunu milisaniye bazlý kontrol ederek exploit ve desync riskini azaltýr.
-#define ENABLE_CHANGE_SKILL_VISUAL_BUG_FIX  		// Skill deðiþiminde oluþan görsel buff/efekt hatalarýný düzeltir.
-#define ENABLE_CHANGE_SEX_WITHOUT_RELOG_FIX  		// Karakter cinsiyeti deðiþtirildiðinde relog gerektiren senkronizasyon hatasýný düzeltir.
-#define ENABLE_CH_CRASH_CORE_FIX  					// Quest fonksiyonlarýnda geçersiz karakter pointer’ý nedeniyle oluþan crash hatasýný önler.
-#define ENABLE_KILL_EVENT_FIX  						// Öldürme etkinlik'lerinde hasara göre doðru oyuncunun seçilmesini saðlar.
-#define ENABLE_CUBE_RELOAD_FIX  					// Craft tariflerinin server restart olmadan güvenli þekilde yeniden yüklenmesini saðlar.
-#define ENABLE_EXP_GROUP_FIX  						// Grup EXP daðýtýmýnýn yalnýzca parti lideri tarafýndan yapýlmasýný saðlar.
-#define ENABLE_FISHING_TIME_INC  					// Balýkçýlýk bekleme süresini düþürerek daha hýzlý balýk tutmayý saðlar.
-#define ENABLE_DISABLE_EMPIRE_DAMAGE_BONUS			// Baþka bir imparatorluktan geliyorsanýz, hasar %10 azalýr.
-#define ENABLE_STONES_STACKFIX  					// Ýstiflenen taþlarýn refine sýrasýnda yanlýþ silinmesini ve dupe oluþmasýný önler.
-#define ENABLE_ITEM_AWARD_FIX  						// Ödül öðesi iþlemlerinde veri kalýntýlarýndan kaynaklý hatalarý önler.
-#define ENABLE_SKILL_COOLDOWN_CHECK  				// Skill kullanýmýnda server-side cooldown ve spam kontrolü saðlar.
-#define ENABLE_SAFE_LEVEL_CHANGE_FIX  				// Seviye deðiþiminde PointChange senkronizasyon hatalarýný ve exploit riskini önler.
-/*** KRÝTÝK HATA, ÇÖKME VE AÇIK DÜZELTMELERÝ (CRASH / CORE / BUG / EXPLOIT / LEAK) ***/
+/*** DÜZELTMELER ***/
 
 /*** TAMAMLANMAMIÞ SÝSTEMLER (YAKINDA) ***/
 #define ENABLE_GUILDRENEWAL_SYSTEM					// Geliþmiþ resmi gibi lonca altyapýsý için çekirdek yenileme sistemi
@@ -354,44 +214,6 @@ enum eCommonDefines {
 
 /*
 #@GENEL
-
-#@common
-@fixme301: tables.h üzerinde; TPlayerTable hp/mp int16_t'den int'e deðiþtirildi (hp/mp >32767 olmalý)
-
-#@db/src
-@fixme201: ProtoReader.cpp üzerinde; 'SAMLL' 'SMALL' olarak deðiþtirildi
-@fixme202: ClientManagerGuild.cpp üzerinde; eðer oyuncu çevrimdýþý ise lonca üyesi çýkarma zamaný sorunu düzeltildi 
-			(withdraw_time -> new_withdraw_time)
-@fixme203: ClientManagerPlayer.cpp üzerinde; "command" için boþta kalan gösterici (dangling pointer)
-@fixme203: ClientManagerPlayer.cpp üzerinde; "command" için boþta kalan gösterici (dangling pointer)
-@fixme204: Cache.cpp üzerinde; kiþisel dükkanda ayný vnum’a sahip çok fazla eþya varsa, myshop_pricelist birincil anahtar çoðaltma hatasý
-
-#@game/src
-@fixme102: cmd_general.cpp üzerinde ACMD(do_war) içinde unsigned hatasý düzeltildi.
-@fixme103: config, input_login, input_main.cpp dosyalarýnda clientcheckversion (sürüm > tarih) ifadesi (sürüm != tarih) ve gecikme süresi 10’dan 0’a olarak deðiþtirildi.
-@fixme104: char.cpp, questlua_pc.cpp dosyalarýnda lv90'dan sonra statü puaný alma düzeltildi; 90 deðeri gPlayerMaxLevel ile deðiþtirildi.
-@fixme106: input_main.cpp dosyasýnda, yüksek hýzdaki bir oyuncu binekteyken (örneðin, aslan) mesafe sýnýrý nedeniyle geri getirilecektir.
-@fixme108: char.cpp dosyasýnda, mevcut binek 0 deðilken bineði deðiþtirdiðinizde, yalnýzca oyuncunun ekranýndaki tüm nesneler (npc vb.) kaybolur.
-@fixme109: questmanager.cpp dosyasýnda, bir oyuncu öldürüldüðünde (savaþ m), `when kill begin` iki kez tetiklenir.
-@fixme110: char_affect.cpp dosyasýnda, yarý saydamken (yeniden canlanmýþ, ninja yeteneði veya beyaz bayrak) saldýrý yaptýðýnýzda hala yarý saydam kalýrsýnýz.
-@fixme112: char_item.cpp dosyasýnda, tekrar giriþ yapýlana kadar ekipman üzerindeki bonuslar deðiþtirilebilir.
-@fixme113: char_item.cpp dosyasýnda taþlarý çýkarýrken, bonus kaybý olmadan çýkarýlabilir.
-@fixme114: char_item.cpp dosyasýnda, #111, #112 ve diðer birkaç hata bir araya getirildi.
-@fixme115: char_item.cpp dosyasýnda, partideyseniz ve eþyalarýn sahibi siz deðilse, yerdeki tüm eþyalar alýnabilir.
-@fixme116: char_skill.cpp dosyasýnda, normal at binme yetenekleri hasar veremez.
-@fixme117: char_item.cpp dosyasýnda, envanter doluyken ekipman deðiþtirilemez ve boþ olmadýðýnda gereksiz kemer deðiþimleri engellenir.
-@fixme118: char.cpp dosyasýnda ComputePoints çaðrýldýðýnda, ekipman bonuslarý kadar hp/mp kazanýrsýnýz.
-@fixme119: input_main.cpp dosyasýnda, kasadaki/alýþveriþ merkezindeki eþyalar kemer envanterine tür kontrolü olmadan yerleþtirilebilir.
-@fixme423: char_battle.cpp dosyasýnda, silahsýzken bufflar devre dýþý býrakýldý (VZK, AURA).
 @fixme433: char_affect.cpp dosyasýnda, Bedensel Savaþçý'nýn Hamle becerisi kullandýðýnda HP düþmesi, Büyülü Silah Sura’nýn Çözme ve Ýyileþtirici Þaman’ýn þifa gecikmesi hatasý düzeltildi.
-@fixme435: char_battle.cpp dosyasýnda, zehir canavarlarý artýk agresifleþtirmeyecek.
-@fixme463: input_main.cpp dosyasýnda, 40. seviyenin altýnda lonca kurulamýyor.
-@fixme469: char_battle.cpp dosyasýnda, arena haritasýnda hiçbir þey býrakýlamaz.
-@fixme499: battle.cpp dosyasýnda saldýrý mesafesi düzeltildi.
-@fixme502: char_item.cpp dosyasýnda kamp ateþi düzeltmesi.
-@fixme503: battle.cpp ve pvp.cpp dosyalarýnda bekleme hack düzeltmesi.
-@fixme504: char_battle.cpp dosyasýnda düzeltme yapýldý.
-@fixme522: char_battle.cpp ve char_item.cpp dosyalarýnda farklý haritalarda Grup Exp/Yang/Düþüþ Paylaþýmý düzeltildi.
-@fixme541: Performans düzenlemesi [Önek ++/-- operatörleri, ilkel olmayan türler için tercih edilmelidir.]
 */
 #endif

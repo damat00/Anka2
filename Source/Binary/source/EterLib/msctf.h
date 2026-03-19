@@ -5,10 +5,10 @@
 
  /* File created by MIDL compiler version 7.00.0555 */
 /* Compiler settings for msctf.idl:
-    Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 7.00.0555
+    Oicf, W1, Zp8, env=Win32 (32b run), target_arch=X86 7.00.0555 
     protocol : dce , ms_ext, c_ext, robust
-    error checks: allocation ref bounds_check enum stub_data
-    VC __declspec() decoration level:
+    error checks: allocation ref bounds_check enum stub_data 
+    VC __declspec() decoration level: 
          __declspec(uuid()), __declspec(selectany), __declspec(novtable)
          DECLSPEC_UUID(), MIDL_INTERFACE()
 */
@@ -46,7 +46,7 @@
 #pragma once
 #endif
 
-/* Forward Declarations */
+/* Forward Declarations */ 
 
 #ifndef __ITfThreadMgr_FWD_DEFINED__
 #define __ITfThreadMgr_FWD_DEFINED__
@@ -596,11 +596,11 @@ typedef interface ITfReverseConversionMgr ITfReverseConversionMgr;
 
 #ifdef __cplusplus
 extern "C"{
-#endif
+#endif 
 
 
 /* interface __MIDL_itf_msctf_0000_0000 */
-/* [local] */
+/* [local] */ 
 
 //=--------------------------------------------------------------------------=
 // msctf.h

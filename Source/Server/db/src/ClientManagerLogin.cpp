@@ -1,4 +1,5 @@
 #include "stdafx.h"
+
 #include "../../common/service.h"
 
 #include "ClientManager.h"
@@ -186,27 +187,8 @@ void CClientManager::RESULT_LOGIN_BY_KEY(CPeer * peer, SQLMsg * msg)
 	str_to_number(info->pAccountTable->bEmpire, row[col++]);
 	info->account_index = 1;
 
-	snprintf(szQuery, sizeof(szQuery), "SELECT "
-			"id, "
-			"name, "
-			"job, "
-			"level, "
-#ifdef ENABLE_CONQUEROR_LEVEL
-			"conquerorlevel, "
-#endif
-			"playtime, "
-			"st, "
-			"ht, "
-			"dx, "
-			"iq, "
-#ifdef ENABLE_CONQUEROR_LEVEL
-		  "sungma_str, "
-		  "sungma_hp, "
-		  "sungma_move, "
-		  "sungma_immune, "
-#endif
-			"part_main, "
-			"part_hair, "
+	snprintf(szQuery, sizeof(szQuery),
+			"SELECT id, name, job, level, playtime, st, ht, dx, iq, part_main, part_hair, "
 #ifdef ENABLE_ACCE_COSTUME_SYSTEM
 			"part_acce, "
 #endif
@@ -219,7 +201,6 @@ void CClientManager::RESULT_LOGIN_BY_KEY(CPeer * peer, SQLMsg * msg)
 	CDBManager::instance().ReturnQuery(szQuery, QID_LOGIN, peer->GetHandle(), info);
 }
 
-// PLAYER_INDEX_CREATE_BUG_FIX
 void CClientManager::RESULT_PLAYER_INDEX_CREATE(CPeer * pkPeer, SQLMsg * msg)
 {
 	CQueryInfo * qi = (CQueryInfo *) msg->pvUserData;
@@ -229,7 +210,6 @@ void CClientManager::RESULT_PLAYER_INDEX_CREATE(CPeer * pkPeer, SQLMsg * msg)
 	snprintf(szQuery, sizeof(szQuery), "SELECT pid1, pid2, pid3, pid4, pid5, empire FROM player_index%s WHERE id=%u", GetTablePostfix(), info->pAccountTable->id);
 	CDBManager::instance().ReturnQuery(szQuery, QID_LOGIN_BY_KEY, pkPeer->GetHandle(), info);
 }
-// END_PLAYER_INDEX_CREATE_BUG_FIX
 
 TAccountTable * CreateAccountTableFromRes(MYSQL_RES * res)
 {
@@ -315,20 +295,11 @@ void CreateAccountPlayerDataFromRes(MYSQL_RES * pRes, TAccountTable * pkTab)
 
 					pkTab->players[j].byJob			= pt->job;
 					pkTab->players[j].byLevel		= pt->level;
-#ifdef ENABLE_CONQUEROR_LEVEL
-					pkTab->players[j].byConquerorLevel	= pt->conquerorlevel;
-#endif
 					pkTab->players[j].dwPlayMinutes	= pt->playtime;
 					pkTab->players[j].byST			= pt->st;
 					pkTab->players[j].byHT			= pt->ht;
 					pkTab->players[j].byDX			= pt->dx;
 					pkTab->players[j].byIQ			= pt->iq;
-#ifdef ENABLE_CONQUEROR_LEVEL
-					pkTab->players[j].bySungmaST			= pt->sungma_str;
-					pkTab->players[j].bySungmaHP			= pt->sungma_hp;
-					pkTab->players[j].bySungmaMV			= pt->sungma_move;
-					pkTab->players[j].bySungmaINM			= pt->sungma_immune;
-#endif
 					pkTab->players[j].wMainPart		= pt->parts[PART_MAIN];
 					pkTab->players[j].wHairPart		= pt->parts[PART_HAIR];
 #ifdef ENABLE_ACCE_COSTUME_SYSTEM
@@ -353,20 +324,11 @@ void CreateAccountPlayerDataFromRes(MYSQL_RES * pRes, TAccountTable * pkTab)
 
 					pkTab->players[j].byJob			= 0;
 					pkTab->players[j].byLevel		= 0;
-#ifdef ENABLE_CONQUEROR_LEVEL
-					pkTab->players[j].byConquerorLevel = 0;
-#endif
 					pkTab->players[j].dwPlayMinutes	= 0;
 					pkTab->players[j].byST			= 0;
 					pkTab->players[j].byHT			= 0;
 					pkTab->players[j].byDX			= 0;
 					pkTab->players[j].byIQ			= 0;
-#ifdef ENABLE_CONQUEROR_LEVEL
-					pkTab->players[j].bySungmaST			= 0;
-					pkTab->players[j].bySungmaHP			= 0;
-					pkTab->players[j].bySungmaMV			= 0;
-					pkTab->players[j].bySungmaINM			= 0;
-#endif
 					pkTab->players[j].wMainPart		= 0;
 					pkTab->players[j].wHairPart		= 0;
 #ifdef ENABLE_ACCE_COSTUME_SYSTEM
@@ -384,20 +346,11 @@ void CreateAccountPlayerDataFromRes(MYSQL_RES * pRes, TAccountTable * pkTab)
 
 					str_to_number(pkTab->players[j].byJob, row[col++]);
 					str_to_number(pkTab->players[j].byLevel, row[col++]);
-#ifdef ENABLE_CONQUEROR_LEVEL
-					str_to_number(pkTab->players[j].byConquerorLevel, row[col++]);
-#endif
 					str_to_number(pkTab->players[j].dwPlayMinutes, row[col++]);
 					str_to_number(pkTab->players[j].byST, row[col++]);
 					str_to_number(pkTab->players[j].byHT, row[col++]);
 					str_to_number(pkTab->players[j].byDX, row[col++]);
 					str_to_number(pkTab->players[j].byIQ, row[col++]);
-#ifdef ENABLE_CONQUEROR_LEVEL
-					str_to_number(pkTab->players[j].bySungmaST, row[col++]);
-					str_to_number(pkTab->players[j].bySungmaHP, row[col++]);
-					str_to_number(pkTab->players[j].bySungmaMV, row[col++]);
-					str_to_number(pkTab->players[j].bySungmaINM, row[col++]);
-#endif
 					str_to_number(pkTab->players[j].wMainPart, row[col++]);
 					str_to_number(pkTab->players[j].wHairPart, row[col++]);
 #ifdef ENABLE_ACCE_COSTUME_SYSTEM
@@ -450,27 +403,8 @@ void CClientManager::RESULT_LOGIN(CPeer * peer, SQLMsg * msg)
 			++info->account_index;
 
 			char queryStr[512];
-			snprintf(queryStr, sizeof(queryStr), "SELECT "
-					"id, "
-					"name, "
-					"job, "
-					"level, "
-#ifdef ENABLE_CONQUEROR_LEVEL
-					"conquerorlevel, "
-#endif
-					"playtime, "
-					"st, "
-					"ht, "
-					"dx, "
-					"iq, "
-#ifdef ENABLE_CONQUEROR_LEVEL
-					"sungma_str, "
-					"sungma_hp, "
-					"sungma_move, "
-					"sungma_immune, "
-#endif
-					"part_main, "
-					"part_hair, "
+			snprintf(queryStr, sizeof(queryStr),
+					"SELECT id, name, job, level, playtime, st, ht, dx, iq, part_main, part_hair, "
 #ifdef ENABLE_ACCE_COSTUME_SYSTEM
 					"part_acce, "
 #endif
@@ -510,11 +444,9 @@ void CClientManager::RESULT_LOGIN(CPeer * peer, SQLMsg * msg)
 			if (msg->Get()->uiNumRows > 0)
 				CreateAccountPlayerDataFromRes(msg->Get()->pSQLResult, info->pAccountTable);
 
-			//PREVENT_COPY_ITEM
 			CLoginData * p = GetLoginDataByLogin(info->pAccountTable->login);
 			memcpy(&p->GetAccountRef(), info->pAccountTable, sizeof(TAccountTable));
 
-			//END_PREVENT_COPY_ITEM
 			peer->EncodeHeader(HEADER_DG_LOGIN_SUCCESS, info->dwHandle, sizeof(TAccountTable));
 			peer->Encode(info->pAccountTable, sizeof(TAccountTable));
 
@@ -548,7 +480,7 @@ void CClientManager::QUERY_LOGOUT(CPeer * peer, DWORD dwHandle,const char * data
 				sys_log(0, "LOGOUT %s %d", packet->login, pLoginData->GetAccountRef().players[n].dwID);
 			continue;
 		}
-
+		
 		pid[n] = pLoginData->GetAccountRef().players[n].dwID;
 
 		if (g_log)
@@ -556,7 +488,7 @@ void CClientManager::QUERY_LOGOUT(CPeer * peer, DWORD dwHandle,const char * data
 
 		InsertLogoutPlayer(pid[n]);
 	}
-
+	
 	if (DeleteLogonAccount(packet->login, peer->GetHandle()))
 	{
 		if (g_log)
@@ -585,7 +517,7 @@ void CClientManager::QUERY_CHANGE_NAME(CPeer * peer, DWORD dwHandle, TPacketGDCh
 			peer->EncodeHeader(HEADER_DG_PLAYER_CREATE_ALREADY, dwHandle, 0);
 			return;
 		}
-	}
+	}   
 	else
 	{
 		peer->EncodeHeader(HEADER_DG_PLAYER_CREATE_FAILED, dwHandle, 0);

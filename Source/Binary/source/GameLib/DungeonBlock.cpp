@@ -14,13 +14,8 @@ class CDungeonModelInstance : public CGrannyModelInstance
 			if (IsEmpty())
 				return;
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-			STATEMANAGER.SetVertexDeclaration(ms_pnt2VS);
-			LPDIRECT3DVERTEXBUFFER9 lpd3dRigidPNTVtxBuf = m_pModel->GetPNTD3DVertexBuffer();
-#else
 			STATEMANAGER.SetVertexShader(ms_pnt2VS);
 			LPDIRECT3DVERTEXBUFFER8 lpd3dRigidPNTVtxBuf = m_pModel->GetPNTD3DVertexBuffer();
-#endif
 			if (lpd3dRigidPNTVtxBuf)
 			{
 				STATEMANAGER.SetStreamSource(0, lpd3dRigidPNTVtxBuf, sizeof(TPNT2Vertex));
@@ -41,13 +36,8 @@ class CDungeonModelInstance : public CGrannyModelInstance
 			STATEMANAGER.SaveRenderState(D3DRS_SRCBLEND, D3DBLEND_ZERO);
 			STATEMANAGER.SaveRenderState(D3DRS_DESTBLEND, D3DBLEND_SRCCOLOR);
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-			STATEMANAGER.SetVertexDeclaration(ms_pnt2VS);
-			LPDIRECT3DVERTEXBUFFER9 lpd3dRigidPNTVtxBuf = m_pModel->GetPNTD3DVertexBuffer();
-#else
 			STATEMANAGER.SetVertexShader(ms_pnt2VS);
 			LPDIRECT3DVERTEXBUFFER8 lpd3dRigidPNTVtxBuf = m_pModel->GetPNTD3DVertexBuffer();
-#endif
 			if (lpd3dRigidPNTVtxBuf)
 			{
 				STATEMANAGER.SetStreamSource(0, lpd3dRigidPNTVtxBuf, sizeof(TPNT2Vertex));

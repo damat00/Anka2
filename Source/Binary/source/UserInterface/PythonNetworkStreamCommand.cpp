@@ -63,7 +63,7 @@ char *OneArgument(char *argument, char *first_arg)
 	return (argument);
 }
 
-void AppendMonsterList(const CPythonNonPlayer::TMobTableList & c_rMobTableList, const char * c_szHeader, int iType)
+void AppendMonsterList(const CPythonNonPlayer::TMobTableList & c_rMobTableList, const char *c_szHeader, int iType)
 {
 	DWORD dwMonsterCount = 0;
 	std::string strMonsterList = c_szHeader;
@@ -88,12 +88,12 @@ void AppendMonsterList(const CPythonNonPlayer::TMobTableList & c_rMobTableList, 
 	}
 }
 
-bool CPythonNetworkStream::ClientCommand(const char * c_szCommand)
+bool CPythonNetworkStream::ClientCommand(const char *c_szCommand)
 {
 	return false;
 }
 
-bool SplitToken(const char * c_szLine, CTokenVector * pstTokenVector, const char * c_szDelimeter = " ")
+bool SplitToken(const char *c_szLine, CTokenVector * pstTokenVector, const char *c_szDelimeter = " ")
 {
 	pstTokenVector->reserve(10);
 	pstTokenVector->clear();
@@ -118,7 +118,7 @@ bool SplitToken(const char * c_szLine, CTokenVector * pstTokenVector, const char
 
 			if (endPos < 0)
 				return false;
-
+			
 			basePos = endPos + 1;
 		}
 		else
@@ -129,6 +129,7 @@ bool SplitToken(const char * c_szLine, CTokenVector * pstTokenVector, const char
 
 		pstTokenVector->push_back(strLine.substr(beginPos, endPos - beginPos));
 
+		// 추가 코드. 맨뒤에 탭이 있는 경우를 체크한다. - [levites]
 		if (int(strLine.find_first_not_of(c_szDelimeter, basePos)) < 0)
 			break;
 	} while (basePos < strLine.length());
@@ -136,16 +137,17 @@ bool SplitToken(const char * c_szLine, CTokenVector * pstTokenVector, const char
 	return true;
 }
 
-void CPythonNetworkStream::ServerCommand(char * c_szCommand)
+void CPythonNetworkStream::ServerCommand(char *c_szCommand)
 {
+	// #0000811: [M2EU] 콘솔창 기능 차단 
 	if (strcmpi(c_szCommand, "ConsoleEnable") == 0)
 		return;
 
 	if (m_apoPhaseWnd[PHASE_WINDOW_GAME])
 	{
 		bool isTrue;
-		if (PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME],
-			"BINARY_ServerCommand_Run",
+		if (PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], 
+			"BINARY_ServerCommand_Run", 
 			Py_BuildValue("(s)", c_szCommand),
 			&isTrue
 		))
@@ -157,8 +159,8 @@ void CPythonNetworkStream::ServerCommand(char * c_szCommand)
 	else if (m_poSerCommandParserWnd)
 	{
 		bool isTrue;
-		if (PyCallClassMemberFunc(m_poSerCommandParserWnd,
-			"BINARY_ServerCommand_Run",
+		if (PyCallClassMemberFunc(m_poSerCommandParserWnd, 
+			"BINARY_ServerCommand_Run", 
 			Py_BuildValue("(s)", c_szCommand),
 			&isTrue
 		))
@@ -174,8 +176,8 @@ void CPythonNetworkStream::ServerCommand(char * c_szCommand)
 	if (TokenVector.empty())
 		return;
 
-	const char * szCmd = TokenVector[0].c_str();
-
+	const char *szCmd = TokenVector[0].c_str();
+	
 	if (!strcmpi(szCmd, "quit"))
 	{
 		PostQuitMessage(0);
@@ -193,7 +195,6 @@ void CPythonNetworkStream::ServerCommand(char * c_szCommand)
 		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "Gift_Show", Py_BuildValue("()")); 	
 	}
 
-	// CUBE
 #ifdef __AUTO_HUNT__
 	else if (!strcmpi(szCmd, "auto_hunt"))
 	{
@@ -269,7 +270,6 @@ void CPythonNetworkStream::ServerCommand(char * c_szCommand)
 		else if ("m_info" == TokenVector[1])
 		{
 			// material list (/cube m_info requestStartIndex resultCount MaterialText)
-
 			if (5 != TokenVector.size())
 			{
 				TraceError("CPythonNetworkStream::ServerCommand(c_szCommand=%s) - Strange Parameter Count : %d", c_szCommand, 5);
@@ -293,9 +293,7 @@ void CPythonNetworkStream::ServerCommand(char * c_szCommand)
 
 		UINT uObserverCount= atoi(TokenVector[1].c_str());
 
-		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME],
-			"BINARY_BettingGuildWar_UpdateObserverCount",
-			Py_BuildValue("(i)", uObserverCount)
+		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_BettingGuildWar_UpdateObserverCount", Py_BuildValue("(i)", uObserverCount)
 		);
 	}
 	else if (!strcmpi(szCmd, "ObserverMode"))
@@ -311,8 +309,8 @@ void CPythonNetworkStream::ServerCommand(char * c_szCommand)
 		IAbstractPlayer & rkPlayer = IAbstractPlayer::GetSingleton();
 		rkPlayer.SetObserverMode(uMode ? true : false);
 
-		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME],
-			"BINARY_BettingGuildWar_SetObserverMode",
+		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], 
+			"BINARY_BettingGuildWar_SetObserverMode", 
 			Py_BuildValue("(i)", uMode)
 		);
 	}
@@ -324,23 +322,10 @@ void CPythonNetworkStream::ServerCommand(char * c_szCommand)
 		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "RefreshOfflineShop", Py_BuildValue("()"));
 	}
 #endif
-#ifdef ENABLE_ITEMSHOP
-	else if (!strcmpi(szCmd, "open_ishop"))
-	{
-		if (m_apoPhaseWnd[PHASE_WINDOW_GAME])
-		{
-			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_OpenItemShop", Py_BuildValue("()"));
-		}
-		else
-		{
-			TraceError("CPythonNetworkStream::ServerCommand(c_szCommand=%s) - Game phase window missing for open_ishop", c_szCommand);
-		}
-	}
-#endif
 	else if (!strcmpi(szCmd, "ObserverTeamInfo"))
 	{
 	}
-#ifdef ENABLE_MINI_GAME_OKEY
+#ifdef ENABLE_MINIGAME_OKEY_CARDS_SYSTEM
 	else if (!strcmpi(szCmd, "cards"))
 	{
 		if (TokenVector.size() < 2)
@@ -425,63 +410,6 @@ void CPythonNetworkStream::ServerCommand(char * c_szCommand)
 		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_OpenWarpWindow", Py_BuildValue("()"));
 	}
 #endif
-#ifdef ENABLE_ZODIAC_MISSION
-	else if (!strcmpi(szCmd, "ZodiacDayorNight"))
-	{
-		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ZodiacDayorNight", Py_BuildValue("()"));
-	}
-	else if (!strcmpi(szCmd, "ZodiacJumpButtonClose"))
-	{
-		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ZodiacJumpButtonClose", Py_BuildValue("()"));
-	}
-	else if (!strcmpi(szCmd, "ZodiacJumpButtonShow"))
-	{
-		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "ZodiacJumpButtonShow", Py_BuildValue("()"));
-	}
-	else if (!strcmpi(szCmd, "ZodiacInfo"))
-	{
-		BYTE time = atoi(TokenVector[1].c_str());
-		BYTE floor = atoi(TokenVector[2].c_str());
-		BYTE nextfloor = atoi(TokenVector[3].c_str());
-		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "Refresh12ziTimer", Py_BuildValue("(iii)",time,floor,nextfloor));
-	}
-	else if (!strcmpi(szCmd, "OpenUI12zi"))
-	{
-		DWORD yellowmark = atoi(TokenVector[1].c_str());
-		DWORD greenmark = atoi(TokenVector[2].c_str());
-		DWORD yellowreward = atoi(TokenVector[3].c_str());
-		DWORD greenreward = atoi(TokenVector[4].c_str());
-		//DWORD goldreward = atoi(TokenVector[5].c_str());
-		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "OpenUI12zi", Py_BuildValue("(iiii)", yellowmark, greenmark, yellowreward, greenreward));
-	}
-	else if (!strcmpi(szCmd, "OpenReviveDialog"))
-	{
-		int count = atoi(TokenVector[1].c_str());
-		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME] , "OpenReviveDialog", Py_BuildValue("(i)", count));
-	}
-
-	else if (!strcmpi(szCmd, "OpenReviveDialog_me"))
-	{
-		int count = atoi(TokenVector[1].c_str());
-		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "OpenReviveDialog_me", Py_BuildValue("(i)", count));
-	}
-	else if (!strcmpi(szCmd, "SetBeadCount"))
-	{
-		int count = atoi(TokenVector[1].c_str());
-		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "SetBeadCount", Py_BuildValue("(i)", count));
-	}
-	else if (!strcmpi(szCmd, "NextBeadUpdateTime"))
-	{
-		int value = atoi(TokenVector[1].c_str());
-		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "NextBeadUpdateTime", Py_BuildValue("(i)", value));
-	}
-	else if (!strcmpi(szCmd, "GetMissionInformation"))
-	{
-		DWORD floor = atoi(TokenVector[1].c_str());
-		DWORD time = atoi(TokenVector[2].c_str());
-		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "GetMissionInformation", Py_BuildValue("(ii)", floor,time));
-	}
-#endif
 	else if (!strcmpi(szCmd, "StoneDetect"))
 	{
 		if (4 != TokenVector.size())
@@ -554,7 +482,7 @@ void CPythonNetworkStream::ServerCommand(char * c_szCommand)
 		IAbstractPlayer& rPlayer=IAbstractPlayer::GetSingleton();
 		rPlayer.StartStaminaConsume(dwConsumePerSec, dwCurrentStamina);
 	}
-
+	
 	else if (!strcmpi(szCmd, "StopStaminaConsume"))
 	{
 		if (2 != TokenVector.size())
@@ -585,7 +513,6 @@ void CPythonNetworkStream::ServerCommand(char * c_szCommand)
 		int iFlag = atoi(TokenVector[1].c_str());
 		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "OnBlockMode", Py_BuildValue("(i)", iFlag));
 	}
-	// Emotion Start
 	else if (!strcmpi(szCmd, "french_kiss"))
 	{
 		int iVID1 = atoi(TokenVector[1].c_str());

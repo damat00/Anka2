@@ -152,7 +152,7 @@ void CArenaMap::SendArenaMapListTo(LPCHARACTER pChar, DWORD mapIdx)
 
 	for (; iter != m_listArena.end(); iter++)
 	{
-		pChar->ChatPacket(CHAT_TYPE_INFO, "ArenaMapInfo Map: %d stA(%d, %d) stB(%d, %d)", mapIdx,
+		pChar->ChatPacket(CHAT_TYPE_INFO, "ArenaMapInfo Map: %d stA(%d, %d) stB(%d, %d)", mapIdx, 
 				(CArena*)(*iter)->GetStartPointA().x, (CArena*)(*iter)->GetStartPointA().y,
 				(CArena*)(*iter)->GetStartPointB().x, (CArena*)(*iter)->GetStartPointB().y);
 	}
@@ -197,11 +197,7 @@ EVENTINFO(TArenaEventInfo)
 	CArena *pArena;
 	BYTE state;
 
-	TArenaEventInfo()
-	: pArena(0)
-	, state(0)
-	{
-	}
+	TArenaEventInfo() : pArena(0), state(0) {}
 };
 
 EVENTFUNC(ready_to_start_event)
@@ -460,7 +456,7 @@ EVENTFUNC(duel_time_out)
 		}
 	}
 
-	return 0;
+	return 0; 
 }
 
 bool CArena::StartDuel(LPCHARACTER pCharFrom, LPCHARACTER pCharTo, int nSetPoint, int nMinute)
@@ -758,8 +754,7 @@ bool CArena::OnDead(DWORD dwPIDA, DWORD dwPIDB)
 				pCharB->LocaleChatPacket(CHAT_TYPE_NOTICE, 12, "%s", pCharA->GetName());
 				SendChatPacketToObserver(CHAT_TYPE_NOTICE, 12, "%s", pCharA->GetName());
 
-				sys_log(0, "ARENA: Duel is end. Winner %s(%d) Loser %s(%d)",
-						pCharA->GetName(), GetPlayerAPID(), pCharB->GetName(), GetPlayerBPID());
+				sys_log(0, "ARENA: Duel is end. Winner %s(%d) Loser %s(%d)", pCharA->GetName(), GetPlayerAPID(), pCharB->GetName(), GetPlayerBPID());
 			}
 			else
 			{
@@ -1092,25 +1087,25 @@ bool CArenaManager::IsLimitedItem( long lMapIndex, DWORD dwVnum )
 	{
 		switch ( dwVnum )
 		{
-			case 50020: // Bean Cake
-			case 50021: // Sugar Cake
-			case 50022: // Fruit Cake
-			case 50801: // Peach Blossom Juice
-			case 50802: // Bellflower Juice
-			case 50813: // Sim Water
-			case 50814: // Dok Water
-			case 50817: // Zin Water
-			case 50818: // SamBo Water
-			case 50819: // Mong Water
-			case 50820: // Hwal Water
-			case 50821: // Red Dew
-			case 50822: // Pink Dew
-			case 50823: // Yellow Dew
-			case 50824: // Green Dew
-			case 50825: // Blue Dew
-			case 50826: // White Dew
-			case 71044: // Critical Strike
-			case 71055: // Tincture of the Name
+			case 50020:
+			case 50021:
+			case 50022:
+			case 50801:
+			case 50802:
+			case 50813:
+			case 50814:
+			case 50817:
+			case 50818:
+			case 50819:
+			case 50820:
+			case 50821:
+			case 50822:
+			case 50823:
+			case 50824:
+			case 50825:
+			case 50826:
+			case 71044:
+			case 71055:
 				return true;
 		}
 	}

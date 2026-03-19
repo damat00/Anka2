@@ -22,9 +22,5 @@ class CBlockTexture : public CGraphicBase
 		BOOL m_bClipEnable;
 		DWORD m_dwWidth;
 		DWORD m_dwHeight;
-#ifdef ENABLE_DIRECTX9_UPDATE
-        LPDIRECT3DTEXTURE9 m_lpd3dTexture;
-#else
-        LPDIRECT3DTEXTURE8 m_lpd3dTexture;
-#endif
+		LPDIRECT3DTEXTURE8 m_lpd3dTexture;
 };

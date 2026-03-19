@@ -21,7 +21,6 @@
 #include <boost/detail/workaround.hpp>
 #include <boost/utility/string_view_fwd.hpp>
 #include <boost/throw_exception.hpp>
-#include <boost/container_hash/hash_fwd.hpp>
 
 #include <cstddef>
 #include <stdexcept>
@@ -691,10 +690,6 @@ namespace boost {
         }
 #endif
 
-    template <class charT, class traits>
-    std::size_t hash_value(basic_string_view<charT, traits> s) {
-        return boost::hash_range(s.begin(), s.end());
-        }
 }
 
 #if 0

@@ -20,7 +20,6 @@
 #include <boost/core/ref.hpp>
 
 #include <algorithm>
-#include <memory>
 
 #include <boost/test/detail/suppress_warnings.hpp>
 

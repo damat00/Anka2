@@ -1,4 +1,0 @@
-<ScriptFile>
-	<CreateEterPackXml Input="../binary_unpack/maps/:" ArchivePath="../../Client/pack/maps" XmlPath="xml/maps_create.xml">
-	</CreateEterPackXml>
-</ScriptFile>

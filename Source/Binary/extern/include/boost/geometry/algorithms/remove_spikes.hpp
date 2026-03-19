@@ -42,7 +42,6 @@
 #include <boost/geometry/strategies/default_strategy.hpp>
 
 #include <boost/geometry/util/condition.hpp>
-#include <boost/geometry/util/range.hpp>
 
 
 /*
@@ -92,10 +91,10 @@ struct range_remove_spikes
             cleaned.push_back(*it);
 
             while(cleaned.size() >= 3
-                  && detail::is_spike_or_equal(range::at(cleaned, cleaned.size() - 3),
-                                               range::at(cleaned, cleaned.size() - 2),
-                                               range::back(cleaned),
-                                               strategy))
+               && detail::point_is_spike_or_equal(cleaned.back(),
+                                                  *(cleaned.end() - 3),
+                                                  *(cleaned.end() - 2),
+                                                  strategy))
             {
                 // Remove pen-ultimate point causing the spike (or which was equal)
                 cleaned.erase(cleaned.end() - 2);
@@ -115,20 +114,20 @@ struct range_remove_spikes
             // Check for spike in first point
             int const penultimate = 2;
             while(cleaned.size() >= 3
-                  && detail::is_spike_or_equal(range::at(cleaned, cleaned.size() - penultimate),
-                                               range::back(cleaned),
-                                               range::front(cleaned),
-                                               strategy))
+               && detail::point_is_spike_or_equal(cleaned.front(),
+                                                  *(cleaned.end() - penultimate),
+                                                  cleaned.back(),
+                                                  strategy))
             {
                 cleaned.pop_back();
                 found = true;
             }
             // Check for spike in second point
             while(cleaned.size() >= 3
-                  && detail::is_spike_or_equal(range::back(cleaned),
-                                               range::front(cleaned),
-                                               range::at(cleaned, 1),
-                                               strategy))
+               && detail::point_is_spike_or_equal(*(cleaned.begin() + 1),
+                                                  cleaned.back(),
+                                                  cleaned.front(),
+                                                  strategy))
             {
                 cleaned.pop_front();
                 found = true;

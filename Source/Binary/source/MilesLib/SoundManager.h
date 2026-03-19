@@ -35,19 +35,19 @@ public:
 	float GetMusicVolume();
 
 	// Sound
-	void PlaySound2D(const char * c_szFileName);
-	void PlaySound3D(float fx, float fy, float fz, const char * c_szFileName, int iPlayCount = 1);
+	void PlaySound2D(const char *c_szFileName);
+	void PlaySound3D(float fx, float fy, float fz, const char *c_szFileName, int iPlayCount = 1);
 	void StopSound3D(int iIndex);
-	int  PlayAmbienceSound3D(float fx, float fy, float fz, const char * c_szFileName, int iPlayCount = 1);
-	void PlayCharacterSound3D(float fx, float fy, float fz, const char * c_szFileName, BOOL bCheckFrequency = FALSE);
+	int  PlayAmbienceSound3D(float fx, float fy, float fz, const char *c_szFileName, int iPlayCount = 1);
+	void PlayCharacterSound3D(float fx, float fy, float fz, const char *c_szFileName, BOOL bCheckFrequency = FALSE);
 	void SetSoundVolume3D(int iIndex, float fVolume);
 	void StopAllSound3D();
 
 	// Music
-	void PlayMusic(const char * c_szFileName);
-	void FadeInMusic(const char * c_szFileName, float fVolumeSpeed = 0.016f);
-	void FadeOutMusic(const char * c_szFileName, float fVolumeSpeed = 0.016f);
-	void FadeLimitOutMusic(const char * c_szFileName, float fLimitVolume, float fVolumeSpeed = 0.016f);
+	void PlayMusic(const char *c_szFileName);
+	void FadeInMusic(const char *c_szFileName, float fVolumeSpeed = 0.016f);
+	void FadeOutMusic(const char *c_szFileName, float fVolumeSpeed = 0.016f);
+	void FadeLimitOutMusic(const char *c_szFileName, float fLimitVolume, float fVolumeSpeed = 0.016f);
 	void FadeOutAllMusic();
 	void FadeAll();
 
@@ -75,16 +75,16 @@ protected:
 		float fVolumeSpeed;
 	} TMusicInstance;
 
-	void PlayMusic(DWORD dwIndex, const char * c_szFileName, float fVolume, float fVolumeSpeed);
+	void PlayMusic(DWORD dwIndex, const char *c_szFileName, float fVolume, float fVolumeSpeed);
 	void StopMusic(DWORD dwIndex);
-	BOOL GetMusicIndex(const char * c_szFileName, DWORD * pdwIndex);
+	BOOL GetMusicIndex(const char *c_szFileName, DWORD * pdwIndex);
 
 protected:
 	float __ConvertGradeVolumeToApplyVolume(int nVolumeGrade);
 	float __ConvertRatioVolumeToApplyVolume(float fVolumeRatio);
 	void __SetMusicVolume(float fVolume);
-	BOOL GetSoundInstance2D(const char * c_szSoundFileName, ISoundInstance ** ppInstance);
-	BOOL GetSoundInstance3D(const char * c_szFileName, ISoundInstance ** ppInstance);
+	BOOL GetSoundInstance2D(const char *c_szSoundFileName, ISoundInstance ** ppInstance);
+	BOOL GetSoundInstance3D(const char *c_szFileName, ISoundInstance ** ppInstance);
 
 protected:
 	BOOL							m_bInitialized;

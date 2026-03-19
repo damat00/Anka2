@@ -218,7 +218,7 @@ using bsc::merge_half;
 //
 //-----------------------------------------------------------------------------
 //  function : parallel_stable_sort
-/// @brief : parallel stable sort with 2 parameters
+/// @brief : parallel stable sort algorithm.
 ///
 /// @param first : iterator to the first element of the range to sort
 /// @param last : iterator after the last element to the range to sort
@@ -232,8 +232,7 @@ void parallel_stable_sort(Iter_t first, Iter_t last)
 //
 //-----------------------------------------------------------------------------
 //  function : parallel_stable_sort
-/// @brief parallel stable sort with 3 parameters. The third is the number 
-///        of threads
+/// @brief parallel stable sort.
 ///
 /// @param first : iterator to the first element of the range to sort
 /// @param last : iterator after the last element to the range to sort
@@ -249,8 +248,7 @@ void parallel_stable_sort(Iter_t first, Iter_t last, uint32_t nthread)
 //
 //-----------------------------------------------------------------------------
 //  function : parallel_stable_sort
-/// @brief : parallel stable sort with 3 parameters. The thisrd is the 
-///          comparison object
+/// @brief : parallel stable sort.
 ///
 /// @param first : iterator to the first element of the range to sort
 /// @param last : iterator after the last element to the range to sort
@@ -263,26 +261,6 @@ void parallel_stable_sort(Iter_t first, Iter_t last, Compare comp)
 {
     stable_detail::parallel_stable_sort<Iter_t, Compare>(first, last, comp);
 };
-
-//
-//-----------------------------------------------------------------------------
-//  function : parallel_stable_sort
-/// @brief : parallel stable sort with 3 parameters. 
-///
-/// @param first : iterator to the first element of the range to sort
-/// @param last : iterator after the last element to the range to sort
-/// @param comp : object for to compare two elements pointed by Iter_t
-///               iterators
-/// @param nthread : Number of threads to use in the process. When this value
-///                  is lower than 2, the sorting is done with 1 thread
-//-----------------------------------------------------------------------------
-template<class Iter_t, class Compare>
-void parallel_stable_sort (Iter_t first, Iter_t last, Compare comp,
-                          uint32_t nthread)
-{
-    stable_detail::parallel_stable_sort<Iter_t, Compare>
-                                                (first, last, comp, nthread);
-}
 //
 //****************************************************************************
 };//    End namespace sort

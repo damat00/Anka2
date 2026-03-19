@@ -62,13 +62,7 @@ class LogManager : public singleton<LogManager>
 #ifdef ENABLE_ACCE_COSTUME_SYSTEM
 		void AcceLog(DWORD dwPID, DWORD x, DWORD y, DWORD item_vnum, DWORD item_uid, int item_count, int abs_chance, bool success);
 #endif
-#ifdef ENABLE_ITEMSHOP
-		void WheelOfFortuneLog(DWORD id, DWORD pid, long mapindex, long x, long y, long long price);
-#endif
-#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
-		void SoulRouletteLog(const char* table, const char* Name, const int vnum, const int count, const bool state);
-#endif
-#ifdef ENABLE_MINIGAME_RUMI_EVENT
+#ifdef ENABLE_MINIGAME_OKEY_CARDS_SYSTEM
 		void OkayEventLog(int dwPID, const char * c_pszText, int points);
 #endif
 

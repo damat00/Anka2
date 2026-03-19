@@ -14,7 +14,7 @@
 class CTerrain;
 class CArea;
 
-class TEMP_CAreaLoaderThread
+class TEMP_CAreaLoaderThread  
 {
 public:
 	TEMP_CAreaLoaderThread();
@@ -28,39 +28,39 @@ public:
 	bool						Fetch(CTerrain ** ppTerrian);
 
 	void						Request(CArea * pArea);
-
+	
 	bool						Fetch(CArea ** ppArea);
 
 protected:
 	static UINT CALLBACK		EntryPoint(void * pThis);
 	UINT						Run(void * arg);
-
+	
 	void *						Arg() const		{ return m_pArg; }
 	void						Arg(void * arg) { m_pArg = arg; }
-
+	
 	HANDLE						m_hThread;
-
+	
 private:
 	void *						m_pArg;
 	unsigned					m_uThreadID;
-
+	
 protected:
 	UINT						Setup();
 	UINT						Execute(void * pvArg);
 	void						Destroy();
 	void						ProcessTerrain();
 	void						ProcessArea();
-
+	
 private:
 	std::deque<CTerrain *>		m_pTerrainRequestDeque;
 	Mutex						m_TerrainRequestMutex;
-
+	
 	std::deque<CTerrain *>		m_pTerrainCompleteDeque;
 	Mutex						m_TerrainCompleteMutex;
-
+	
 	std::deque<CArea *>			m_pAreaRequestDeque;
 	Mutex						m_AreaRequestMutex;
-
+	
 	std::deque<CArea *>			m_pAreaCompleteDeque;
 	Mutex						m_AreaCompleteMutex;
 

@@ -1,26 +1,38 @@
-//
-// Copyright 2010-2012 Kenneth Riddile, Christian Henning
-//
-// Distributed under the Boost Software License, Version 1.0
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
-//
+/*
+    Copyright 2010-2012 Kenneth Riddile, Christian Henning
+    Use, modification and distribution are subject to the Boost Software License,
+    Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+    http://www.boost.org/LICENSE_1_0.txt).
+*/
+
+/*************************************************************************************************/
+
 #ifndef BOOST_GIL_EXTENSION_IO_TARGA_DETAIL_WRITE_HPP
 #define BOOST_GIL_EXTENSION_IO_TARGA_DETAIL_WRITE_HPP
 
-#include <boost/gil/extension/io/targa/tags.hpp>
-#include <boost/gil/extension/io/targa/detail/writer_backend.hpp>
+////////////////////////////////////////////////////////////////////////////////////////
+/// \file
+/// \brief
+/// \author Kenneth Riddile, Christian Henning \n
+///
+/// \date 2010-2012 \n
+///
+////////////////////////////////////////////////////////////////////////////////////////
+
+#include <vector>
 
 #include <boost/gil/io/base.hpp>
 #include <boost/gil/io/device.hpp>
 
-#include <vector>
+#include <boost/gil/extension/io/targa/tags.hpp>
+
+#include <boost/gil/extension/io/targa/detail/writer_backend.hpp>
 
 namespace boost { namespace gil {
 
-#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400)
-#pragma warning(push)
-#pragma warning(disable:4512) //assignment operator could not be generated
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(push) 
+#pragma warning(disable:4512) //assignment operator could not be generated 
 #endif
 
 namespace detail {
@@ -175,9 +187,9 @@ public:
     }
 };
 
-#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400)
-#pragma warning(pop)
-#endif
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(pop) 
+#endif 
 
 } // gil
 } // boost

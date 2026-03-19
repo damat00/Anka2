@@ -23,7 +23,8 @@ float SPixelPosition_CalculateDistanceSq3d(const TPixelPosition& c_rkPPosLeft, c
 
 namespace prt
 {
-DWORD GetPropertyType(const char * c_szTypeName)
+
+DWORD GetPropertyType(const char *c_szTypeName)
 {
 	for (DWORD i = 0; i < PROPERTY_TYPE_MAX_NUM; ++i)
 	{
@@ -34,7 +35,7 @@ DWORD GetPropertyType(const char * c_szTypeName)
 	return PROPERTY_TYPE_NONE;
 }
 
-const char * GetPropertyExtension(DWORD dwType)
+const char *GetPropertyExtension(DWORD dwType)
 {
 	if (dwType >= PROPERTY_TYPE_MAX_NUM)
 		return c_szPropertyExtension[0];
@@ -42,14 +43,14 @@ const char * GetPropertyExtension(DWORD dwType)
 	return c_szPropertyExtension[dwType];
 }
 
-const char * IntegerNumberToString(int iNumber)
+const char *IntegerNumberToString(int iNumber)
 {
 	static char szString[16+1];
 	_snprintf(szString, sizeof(szString), "%d", iNumber);
 	return szString;
 }
 
-const char * FloatNumberToString(float fNumber)
+const char *FloatNumberToString(float fNumber)
 {
 	static char szString[16+1];
 	_snprintf(szString, sizeof(szString), "%f", fNumber);
@@ -71,12 +72,12 @@ bool PropertyTreeDataToString(TPropertyTree * pData, CProperty * pProperty)
 
 bool PropertyTreeStringToData(CProperty * pProperty, TPropertyTree * pData)
 {
-	const char * c_pszPropertyType;
-	const char * c_pszPropertyName;
+	const char *c_pszPropertyType;
+	const char *c_pszPropertyName;
 
 	if (!pProperty->GetString("PropertyType", &c_pszPropertyType))
 		return false;
-
+	
 	if (!pProperty->GetString("PropertyName", &c_pszPropertyName))
 		return false;
 
@@ -87,9 +88,9 @@ bool PropertyTreeStringToData(CProperty * pProperty, TPropertyTree * pData)
 
 	///////////////////////////////////////////////////////////////////////////////////
 
-	const char * c_pszTreeName;
-	const char * c_pszTreeSize;
-	const char * c_pszTreeVariance;
+	const char *c_pszTreeName;
+	const char *c_pszTreeSize;
+	const char *c_pszTreeVariance;
 	if (!pProperty->GetString("TreeFile", &c_pszTreeName))
 		return false;
 	if (!pProperty->GetString("TreeSize", &c_pszTreeSize))
@@ -117,8 +118,8 @@ bool PropertyBuildingDataToString(TPropertyBuilding * pData, CProperty * pProper
 
 bool PropertyBuildingStringToData(CProperty * pProperty, TPropertyBuilding * pData)
 {
-	const char * c_pszPropertyType;
-	const char * c_pszPropertyName;
+	const char *c_pszPropertyType;
+	const char *c_pszPropertyName;
 
 	if (!pProperty->GetString("PropertyType", &c_pszPropertyType))
 		return false;
@@ -133,14 +134,14 @@ bool PropertyBuildingStringToData(CProperty * pProperty, TPropertyBuilding * pDa
 
 	///////////////////////////////////////////////////////////////////////////////////
 
-	const char * c_pszBuildingName;
+	const char *c_pszBuildingName;
 	if (!pProperty->GetString("BuildingFile", &c_pszBuildingName))
 		return false;
 
 	pData->strFileName = c_pszBuildingName;
 	pData->strAttributeDataFileName = CFileNameHelper::NoExtension(pData->strFileName) + ".mdatr";
 
-	const char * c_pszShadowFlag;
+	const char *c_pszShadowFlag;
 	if (!pProperty->GetString("ShadowFlag", &c_pszShadowFlag))
 	{
 		pData->isShadowFlag = FALSE;
@@ -152,6 +153,7 @@ bool PropertyBuildingStringToData(CProperty * pProperty, TPropertyBuilding * pDa
 
 	return true;
 }
+
 
 bool PropertyEffectDataToString(TPropertyEffect * pData, CProperty * pProperty)
 {
@@ -165,8 +167,8 @@ bool PropertyEffectDataToString(TPropertyEffect * pData, CProperty * pProperty)
 
 bool PropertyEffectStringToData(CProperty * pProperty, TPropertyEffect * pData)
 {
-	const char * c_pszPropertyType;
-	const char * c_pszPropertyName;
+	const char *c_pszPropertyType;
+	const char *c_pszPropertyName;
 
 	if (!pProperty->GetString("PropertyType", &c_pszPropertyType))
 		return false;
@@ -181,7 +183,7 @@ bool PropertyEffectStringToData(CProperty * pProperty, TPropertyEffect * pData)
 
 	///////////////////////////////////////////////////////////////////////////////////
 
-	const char * c_pszEffectName;
+	const char *c_pszEffectName;
 	if (!pProperty->GetString("EffectFile", &c_pszEffectName))
 		return false;
 
@@ -213,8 +215,8 @@ bool PropertyAmbienceDataToString(TPropertyAmbience * pData, CProperty * pProper
 
 bool PropertyAmbienceStringToData(CProperty * pProperty, TPropertyAmbience * pData)
 {
-	const char * c_pszPropertyType;
-	const char * c_pszPropertyName;
+	const char *c_pszPropertyType;
+	const char *c_pszPropertyName;
 
 	if (!pProperty->GetString("PropertyType", &c_pszPropertyType))
 		return false;
@@ -229,10 +231,10 @@ bool PropertyAmbienceStringToData(CProperty * pProperty, TPropertyAmbience * pDa
 
 	///////////////////////////////////////////////////////////////////////////////////
 
-	const char * c_pszPlayType;
-	const char * c_pszPlayInterval;
-	const char * c_pszPlayIntervalVariation;
-	const char * c_pszMaxVolumeAreaPercentage = nullptr;
+	const char *c_pszPlayType;
+	const char *c_pszPlayInterval;
+	const char *c_pszPlayIntervalVariation;
+	const char *c_pszMaxVolumeAreaPercentage = nullptr;
 	CTokenVector AmbienceSoundVector;
 	if (!pProperty->GetString("PlayType", &c_pszPlayType))
 		return false;
@@ -268,8 +270,8 @@ bool PropertyDungeonBlockDataToString(TPropertyDungeonBlock * pData, CProperty *
 }
 bool PropertyDungeonBlockStringToData(CProperty * pProperty, TPropertyDungeonBlock * pData)
 {
-	const char * c_pszPropertyType;
-	const char * c_pszPropertyName;
+	const char *c_pszPropertyType;
+	const char *c_pszPropertyName;
 
 	if (!pProperty->GetString("PropertyType", &c_pszPropertyType))
 		return false;
@@ -284,7 +286,7 @@ bool PropertyDungeonBlockStringToData(CProperty * pProperty, TPropertyDungeonBlo
 
 	///////////////////////////////////////////////////////////////////////////////////
 
-	const char * c_pszDungeonBlockFileName = nullptr;
+	const char *c_pszDungeonBlockFileName = nullptr;
 	if (!pProperty->GetString("dungeonblockfile", &c_pszDungeonBlockFileName))
 		return false;
 

@@ -41,7 +41,6 @@ class CPacketInfoCG : public CPacketInfo
 		virtual ~CPacketInfoCG();
 };
 
-// PacketInfo P2P 
 class CPacketInfoGG : public CPacketInfo
 {
 	public:
@@ -49,7 +48,6 @@ class CPacketInfoGG : public CPacketInfo
 		virtual ~CPacketInfoGG();
 };
 
-/// Implemented in input_udp.cpp
 class CPacketInfoUDP : public CPacketInfo
 {
 	public:

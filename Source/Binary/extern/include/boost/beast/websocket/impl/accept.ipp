@@ -18,7 +18,6 @@
 #include <boost/beast/http/write.hpp>
 #include <boost/beast/core/buffers_prefix.hpp>
 #include <boost/beast/core/handler_ptr.hpp>
-#include <boost/beast/core/detail/buffer.hpp>
 #include <boost/beast/core/detail/type_traits.hpp>
 #include <boost/asio/coroutine.hpp>
 #include <boost/asio/associated_allocator.hpp>
@@ -245,12 +244,20 @@ run(Buffers const& buffers)
     using boost::asio::buffer_size;
     auto& d = *d_;
     error_code ec;
-    auto const mb = beast::detail::dynamic_buffer_prepare(
-        d.ws.rd_buf_, buffer_size(buffers), ec,
-            error::buffer_overflow);
-    if(ec)
+    boost::optional<typename
+        static_buffer_base::mutable_buffers_type> mb;
+    auto const len = buffer_size(buffers);
+    try
+    {
+        mb.emplace(d.ws.rd_buf_.prepare(len));
+    }
+    catch(std::length_error const&)
+    {
+        ec = error::buffer_overflow;
         return (*this)(ec);
-    d.ws.rd_buf_.commit(buffer_copy(*mb, buffers));
+    }
+    d.ws.rd_buf_.commit(
+        buffer_copy(*mb, buffers));
     (*this)(ec);
 }
 
@@ -425,12 +432,20 @@ accept(
     using boost::asio::buffer_copy;
     using boost::asio::buffer_size;
     reset();
-    auto const mb = beast::detail::dynamic_buffer_prepare(
-        rd_buf_, buffer_size(buffers), ec,
-            error::buffer_overflow);
-    if(ec)
+    boost::optional<typename
+        static_buffer_base::mutable_buffers_type> mb;
+    try
+    {
+        mb.emplace(rd_buf_.prepare(
+            buffer_size(buffers)));
+    }
+    catch(std::length_error const&)
+    {
+        ec = error::buffer_overflow;
         return;
-    rd_buf_.commit(buffer_copy(*mb, buffers));
+    }
+    rd_buf_.commit(
+        buffer_copy(*mb, buffers));
     do_accept(&default_decorate_res, ec);
 }
 
@@ -457,11 +472,18 @@ accept_ex(
     using boost::asio::buffer_copy;
     using boost::asio::buffer_size;
     reset();
-    auto const mb = beast::detail::dynamic_buffer_prepare(
-        rd_buf_, buffer_size(buffers), ec,
-            error::buffer_overflow);
-    if(ec)
+    boost::optional<typename
+        static_buffer_base::mutable_buffers_type> mb;
+    try
+    {
+        mb.emplace(rd_buf_.prepare(
+            buffer_size(buffers)));
+    }
+    catch(std::length_error const&)
+    {
+        ec = error::buffer_overflow;
         return;
+    }
     rd_buf_.commit(buffer_copy(*mb, buffers));
     do_accept(decorator, ec);
 }

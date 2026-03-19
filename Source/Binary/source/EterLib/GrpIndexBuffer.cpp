@@ -3,11 +3,7 @@
 #include "GrpIndexBuffer.h"
 #include "StateManager.h"
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-LPDIRECT3DINDEXBUFFER9 CGraphicIndexBuffer::GetD3DIndexBuffer() const
-#else
 LPDIRECT3DINDEXBUFFER8 CGraphicIndexBuffer::GetD3DIndexBuffer() const
-#endif
 {
 	assert(m_lpd3dIdxBuf!=nullptr);
 	return m_lpd3dIdxBuf;
@@ -16,7 +12,7 @@ LPDIRECT3DINDEXBUFFER8 CGraphicIndexBuffer::GetD3DIndexBuffer() const
 void CGraphicIndexBuffer::SetIndices(int startIndex) const
 {
 	assert(ms_lpd3dDevice!=nullptr);
-	STATEMANAGER.SetIndices(m_lpd3dIdxBuf, startIndex);
+	STATEMANAGER.SetIndices(m_lpd3dIdxBuf, startIndex);	
 }
 
 
@@ -24,14 +20,8 @@ bool CGraphicIndexBuffer::Lock(void** pretIndices) const
 {
 	assert(m_lpd3dIdxBuf!=nullptr);
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-	if (FAILED(m_lpd3dIdxBuf->Lock(0, 0, pretIndices, 0)))
-#else
 	if (FAILED(m_lpd3dIdxBuf->Lock(0, 0, (BYTE**)pretIndices, 0)))
-#endif
-    {
-        return false;
-    }
+		return false;
 
 	return true;
 }
@@ -47,14 +37,8 @@ bool CGraphicIndexBuffer::Lock(void** pretIndices)
 {
 	assert(m_lpd3dIdxBuf!=nullptr);
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-	if (FAILED(m_lpd3dIdxBuf->Lock(0, 0, pretIndices, 0)))
-#else
 	if (FAILED(m_lpd3dIdxBuf->Lock(0, 0, (BYTE**)pretIndices, 0)))
-#endif
-    {
-        return false;
-    }
+		return false;
 
 	return true;
 }
@@ -71,14 +55,8 @@ bool CGraphicIndexBuffer::Copy(int bufSize, const void* srcIndices)
 	assert(m_lpd3dIdxBuf!=nullptr);
 
 	BYTE* dstIndices;
-#ifdef ENABLE_DIRECTX9_UPDATE
-	if (FAILED(m_lpd3dIdxBuf->Lock(0, 0, (void**)&dstIndices, 0)))
-#else
 	if (FAILED(m_lpd3dIdxBuf->Lock(0, 0, &dstIndices, 0)))
-#endif
-    {
-        return false;
-    }
+		return false;
 
 	memcpy(dstIndices, srcIndices, bufSize);
 
@@ -95,14 +73,8 @@ bool CGraphicIndexBuffer::Create(int faceCount, TFace* faces)
 		return false;
 
 	WORD* dstIndices;
-#ifdef ENABLE_DIRECTX9_UPDATE
-	if (FAILED(m_lpd3dIdxBuf->Lock(0, 0, (void**)&dstIndices, 0)))
-#else
 	if (FAILED(m_lpd3dIdxBuf->Lock(0, 0, (BYTE**)&dstIndices, 0)))
-#endif
-    {
-        return false;
-    }
+		return false;
 
 	for (int i = 0; i<faceCount; ++i, dstIndices+=3)
 	{
@@ -118,23 +90,14 @@ bool CGraphicIndexBuffer::Create(int faceCount, TFace* faces)
 
 bool CGraphicIndexBuffer::CreateDeviceObjects()
 {
-#ifdef ENABLE_DIRECTX9_UPDATE
-    if (FAILED(ms_lpd3dDevice->CreateIndexBuffer(m_dwBufferSize
-                                                    , D3DUSAGE_WRITEONLY
-                                                    , m_d3dFmt
-                                                    , D3DPOOL_MANAGED
-                                                    , &m_lpd3dIdxBuf
-                                                    , nullptr)))
-#else
-    if (FAILED(ms_lpd3dDevice->CreateIndexBuffer(m_dwBufferSize
-                                                    , D3DUSAGE_WRITEONLY
-                                                    , m_d3dFmt
-                                                    , D3DPOOL_MANAGED
-                                                    , &m_lpd3dIdxBuf)))
-#endif
-    {
-        return false;
-    }
+	if (FAILED(ms_lpd3dDevice->CreateIndexBuffer(
+		m_dwBufferSize, 
+		D3DUSAGE_WRITEONLY, 
+		m_d3dFmt,
+		D3DPOOL_MANAGED, 
+		&m_lpd3dIdxBuf)
+		))
+		return false;
 
 	return true;
 }

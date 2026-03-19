@@ -30,8 +30,7 @@ enum
 	ATTR_OBJECT = (1 << 7),
 };
 
-struct FCollectEntity
-{
+struct FCollectEntity {
 	void operator()(LPENTITY entity)
 	{
 		result.push_back(entity);
@@ -40,14 +39,14 @@ struct FCollectEntity
 	void ForEach(F& f)
 	{
 		std::vector<LPENTITY>::iterator it = result.begin();
-		for (; it != result.end(); ++it)
+		for ( ; it != result.end(); ++it)
 		{
 			LPENTITY entity = *it;
 			f(entity);
 		}
 	}
 	typedef std::vector<LPENTITY> ListType;
-	ListType result; // list collected
+	ListType result;
 };
 
 class CAttribute;
@@ -82,7 +81,6 @@ class SECTREE
 
 		template <class _Func> void ForEachAround(_Func & func)
 		{
-			// <Factor> Using snapshot copy to avoid side-effects
 			FCollectEntity collector;
 			LPSECTREE_LIST::iterator it = m_neighbor_list.begin();
 			for ( ; it != m_neighbor_list.end(); ++it)
@@ -114,6 +112,7 @@ class SECTREE
 			}
 			return false;
 		}
+		
 
 	public:
 		SECTREE();

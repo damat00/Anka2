@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef ENABLE_WIKI_SYSTEM
+#ifdef ENABLE_INGAME_WIKI_SYSTEM
 #include "../gamelib/ItemManager.h"
 #include "../gamelib/ItemData.h"
 #include "PythonNonPlayer.h"

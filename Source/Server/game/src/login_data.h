@@ -46,6 +46,8 @@ class CLoginData
 		std::string	m_stLogin;
 		int		m_aiPremiumTimes[PREMIUM_MAX_NUM];
 
+		
+		
 };
 
 #endif

@@ -13,9 +13,6 @@
 
 namespace quest
 {
-	//
-	// "npc" lua functions
-	//
 	int npc_open_shop(lua_State * L)
 	{
 		int iShopVnum = 0;
@@ -268,6 +265,13 @@ namespace quest
 		LPCHARACTER npc = q.GetCurrentNPCCharacterPtr();
 
 		LPPARTY party = npc->GetParty();
+
+		if (!party)
+		{
+			sys_err("npc_get_leader_vid: Function triggered without party");
+			return 1;
+		}
+
 		LPCHARACTER leader = party->GetLeader();
 
 		if (leader)
@@ -283,7 +287,7 @@ namespace quest
 	{
 		CQuestManager& q = CQuestManager::instance();
 		LPCHARACTER npc = q.GetCurrentNPCCharacterPtr();
-
+		
 		lua_pushnumber(L, npc->GetVID());
 
 
@@ -305,7 +309,7 @@ namespace quest
 
 		return 1;
 	}
-
+	
 	int npc_set_vid_attack_mul(lua_State* L)
 	{
 		CQuestManager& q = CQuestManager::instance();
@@ -336,7 +340,7 @@ namespace quest
 
 		return 1;
 	}
-
+	
 	int npc_set_vid_damage_mul(lua_State* L)
 	{
 		CQuestManager& q = CQuestManager::instance();
@@ -351,7 +355,7 @@ namespace quest
 
 		return 0;
 	}
-
+	
 	int npc_get_level(lua_State * L){
 		CQuestManager& q = CQuestManager::instance();
 		LPCHARACTER npc = q.GetCurrentNPCCharacterPtr();
@@ -359,398 +363,6 @@ namespace quest
 			lua_pushnumber(L, npc->GetLevel());
 		else
 			lua_pushnumber(L, 0);
-		return 1;
-	}
-
-#ifdef ENABLE_ZODIAC_MISSION
-	int npc_is_king(lua_State* L)
-    {
-		if (CQuestManager::instance().GetCurrentNPCCharacterPtr() != NULL)
-			lua_pushboolean(L, CQuestManager::instance().GetCurrentNPCCharacterPtr()->GetMobRank() == MOB_RANK_KING);
-		return 1;
-	}
-
-	int npc_is_boss(lua_State* L)
-	{
-		if (CQuestManager::instance().GetCurrentNPCCharacterPtr() != NULL)
-			lua_pushboolean(L, CQuestManager::instance().GetCurrentNPCCharacterPtr()->GetMobRank() == MOB_RANK_BOSS);
-		return 1;
-	}
-#endif
-
-#ifdef ENABLE_MELEY_LAIR_DUNGEON
-	int npc_get_protect_time(lua_State* L)
-	{
-		CQuestManager& q = CQuestManager::Instance();
-		if (!lua_isnumber(L,1) || !lua_isstring(L,2))
-		{
-			sys_err("QUEST wrong get flag");
-			return 0;
-		}
-		else
-		{
-			LPCHARACTER ch = 0;
-			int a = lua_isnumber(L,1);
-			const char* sz = lua_tostring(L, 2);
-			if(a==1)
-			{
-				ch = q.GetCurrentNPCAttackCharacterPtr();
-			}
-			else if(a == 2)
-			{
-				ch = q.GetCurrentNPCCharacterPtr();
-			}
-			if(ch)
-				lua_pushnumber(L,ch->GetProtectTime(string(sz)));
-			else
-				lua_pushnumber(L,0);
-			return 1;
-		}
-		return 0;
-	}
-
-	int npc_set_protect_time(lua_State* L)
-	{
-		CQuestManager& q = CQuestManager::Instance();
-		if (!lua_isnumber(L,1) || !lua_isstring(L,2) || !lua_isnumber(L,3))
-		{
-			sys_err("QUEST wrong set flag");
-		}
-		else
-		{
-			LPCHARACTER ch = 0;
-			int a = lua_isnumber(L,1);
-			const char* sz = lua_tostring(L,2);
-			if(a==1)
-			{
-				ch = q.GetCurrentNPCAttackCharacterPtr();
-			}
-			else if(a==2)
-			{
-				ch = q.GetCurrentNPCCharacterPtr();
-			}
-			if(ch!=0)
-				ch->SetProtectTime(sz, int(rint(lua_tonumber(L,3))));
-		}
-		return 0;
-	}
-
-	int npc_set_statu_affect(lua_State* L)
-	{
-		CQuestManager& q = CQuestManager::Instance();
-		if (!lua_isnumber(L,1) || !lua_isnumber(L,2))
-		{
-			sys_err("QUEST wrong set flag");
-		}
-		else
-		{
-			LPCHARACTER ch = 0;
-			int a = lua_isnumber(L,1);
-			int sz = lua_tonumber(L,2);
-
-			if(a==1)
-			{
-				ch = q.GetCurrentNPCAttackCharacterPtr();
-			}
-			else if(a==2)
-			{
-				ch = q.GetCurrentNPCCharacterPtr();
-			}
-			if(ch==0)
-				return 0;
-
-			if(sz==1)
-			{
-				if(!ch->FindAffect(AFFECT_STATUE))
-					ch->AddAffect(AFFECT_STATUE, POINT_NONE, 0, AFF_STATUE1, 3600, 0, true);
-			}
-			else if(sz==2)
-			{
-				if(!ch->FindAffect(AFFECT_STATUE))
-					ch->AddAffect(AFFECT_STATUE, POINT_NONE, 0, AFF_STATUE2, 3600, 0, true);
-			}
-			else if(sz==3)
-			{
-				if(!ch->FindAffect(AFFECT_STATUE))
-					ch->AddAffect(AFFECT_STATUE, POINT_NONE, 0, AFF_STATUE3, 3600, 0, true);
-			}
-			else if(sz==4)
-			{
-				if(!ch->FindAffect(AFFECT_STATUE))
-					ch->AddAffect(AFFECT_STATUE, POINT_NONE, 0, AFF_STATUE4, 3600, 0, true);
-			}
-		}
-		return 0;
-	}
-
-	struct RemoveStatuEffect
-	{
-		RemoveStatuEffect() {};
-		void operator()(LPENTITY ent)
-		{
-			if (ent->IsType(ENTITY_CHARACTER))
-			{
-				LPCHARACTER ch = (LPCHARACTER) ent;
-				if (ch->IsStone() || ch->IsMonster())
-				{
-					if(ch->FindAffect(AFFECT_STATUE))
-					{
-						ch->RemoveAffect(AFFECT_STATUE);
-					}
-				}
-			}
-		}
-	};
-
-	int npc_set_statu_affect_all(lua_State* L)
-	{
-		LPSECTREE_MAP pSecMap = SECTREE_MANAGER::instance().GetMap(lua_tonumber(L,1));
-		if (NULL != pSecMap)
-		{
-			RemoveStatuEffect f;
-			pSecMap->for_each(f);
-		}
-		return 0;
-	}
-
-	struct MobDead
-	{
-		DWORD race;
-		MobDead(DWORD a)
-		{
-			race = a;
-		};
-		void operator()(LPENTITY ent)
-		{
-			if (ent->IsType(ENTITY_CHARACTER))
-			{
-				LPCHARACTER ch = (LPCHARACTER) ent;
-				if (ch->GetRaceNum() == race)
-				{
-					ch->Dead();
-				}
-			}
-		}
-	};
-
-	int npc_dead_by_vnum(lua_State* L)
-	{
-		LPSECTREE_MAP pSecMap = SECTREE_MANAGER::instance().GetMap(lua_tonumber(L,1));
-		if (NULL != pSecMap)
-		{
-			DWORD vnum = lua_tonumber(L,2);
-			MobDead f(vnum);
-			pSecMap->for_each(f);
-		}
-		return 0;
-	}
-
-	struct ShowStatuEffect
-	{
-		ShowStatuEffect() {};
-		void operator()(LPENTITY ent)
-		{
-			if (ent->IsType(ENTITY_CHARACTER))
-			{
-				LPCHARACTER ch = (LPCHARACTER) ent;
-				if (ch->IsStone() || ch->IsMonster())
-				{
-					ch->Show(ch->GetMapIndex(), ch->GetX(), ch->GetY(), ch->GetZ(), true);
-				}
-			}
-		}
-	};
-
-	int npc_show_statu(lua_State * L)
-	{
-		LPSECTREE_MAP pSecMap = SECTREE_MANAGER::instance().GetMap(lua_tonumber(L,1));
-		if (NULL != pSecMap)
-		{
-			ShowStatuEffect f;
-			pSecMap->for_each(f);
-		}
-		return 0;
-	}
-
-	struct SetMeleyHP
-	{
-		DWORD race;
-		long v;
-		SetMeleyHP(DWORD vnum, long value)
-		{
-			race = vnum;
-			v = value;
-		};
-		void operator()(LPENTITY ent)
-		{
-			if (ent->IsType(ENTITY_CHARACTER))
-			{
-				LPCHARACTER ch = (LPCHARACTER) ent;
-				if (ch->GetRaceNum() == race)
-				{
-					ch->SetHP(v);
-				}
-			}
-		}
-	};
-
-	int npc_set_meley_hp(lua_State * L)
-	{
-		LPSECTREE_MAP pSecMap = SECTREE_MANAGER::instance().GetMap(lua_tonumber(L,1));
-		DWORD vnum = lua_tonumber(L,2);
-		long value = lua_tonumber(L,3);
-		if (NULL != pSecMap)
-		{
-			SetMeleyHP f(vnum,value);
-			pSecMap->for_each(f);
-		}
-		return 0;
-	}
-	
-	struct ShowEndEffect
-	{
-		ShowEndEffect() {};
-		void operator()(LPENTITY ent)
-		{
-			if (ent->IsType(ENTITY_CHARACTER))
-			{
-				LPCHARACTER ch = (LPCHARACTER) ent;
-				if (ch->IsStone() || ch->IsMonster())
-				{
-					if(ch->FindAffect(AFFECT_STATUE))
-					{
-						ch->RemoveAffect(AFFECT_STATUE);
-						ch->AddAffect(AFFECT_STATUE, POINT_NONE, 0, AFF_STATUE3, 3600, 0, true);
-					}
-					else
-					{
-						ch->AddAffect(AFFECT_STATUE, POINT_NONE, 0, AFF_STATUE3, 3600, 0, true);
-					}
-				}
-			}
-		}
-	};
-
-	int npc_show_end_statu(lua_State*L)
-	{
-		LPSECTREE_MAP pSecMap = SECTREE_MANAGER::instance().GetMap(lua_tonumber(L,1));
-		if (NULL != pSecMap)
-		{
-			ShowEndEffect f;
-			pSecMap->for_each(f);
-		}
-		return 0;
-	}
-
-	struct SetProtectFlag
-	{
-		const char* flag;
-		int value;
-		SetProtectFlag(const char* a, int v)
-		{
-			flag = a;
-			value = v;
-		};
-		void operator()(LPENTITY ent)
-		{
-			if (ent->IsType(ENTITY_CHARACTER))
-			{
-				LPCHARACTER ch = (LPCHARACTER) ent;
-				if (ch->IsStone() || ch->IsMonster())
-				{
-					ch->SetProtectTime(flag,value);
-				}
-			}
-		}
-	};
-
-	int npc_set_protect_flag2(lua_State* L)
-	{
-		if (!lua_isnumber(L, 1) || !lua_isstring(L, 2) || !lua_isnumber(L, 3))
-		{
-			sys_err("Invalid Argument");
-			return 0;
-		}
-		LPSECTREE_MAP pSecMap = SECTREE_MANAGER::instance().GetMap(lua_tonumber(L,1));
-		const char* flag = lua_tostring(L, 2);
-		int value = lua_tonumber(L, 3);
-		if (pSecMap == NULL || !pSecMap)
-			return 0;
-		if (pSecMap)
-		{
-			SetProtectFlag f(flag,value);
-			pSecMap->for_each(f);
-		}
-
-		return 0;
-	}
-	
-	int npc_get_hp(lua_State* L)
-	{
-		CQuestManager& q = CQuestManager::instance();
-		DWORD vid=0;
-		LPCHARACTER targetChar=0;
-		int p = lua_tonumber(L, 1);
-		if(p==1)
-		{
-			targetChar = q.GetCurrentNPCAttackCharacterPtr();
-		}
-		else if(p==2)
-		{
-			vid = (DWORD) lua_tonumber(L, 2);
-			targetChar = CHARACTER_MANAGER::instance().Find(vid);
-		}
-
-		if(!targetChar || targetChar == NULL)
-			return 0;
-		if (targetChar)
-		{
-			lua_pushnumber(L, targetChar->GetHP());
-		}
-		else
-		{
-			lua_pushnumber(L, 0);
-		}
-		return 1;
-	}
-	
-	int npc_set_hp(lua_State* L)
-	{
-		CQuestManager& q = CQuestManager::instance();
-		DWORD vid=0;
-		LPCHARACTER targetChar=0;
-
-		int p = lua_tonumber(L, 1);
-		int hp = lua_tonumber(L, 3);
-		if(p==1)
-		{
-			targetChar = q.GetCurrentNPCAttackCharacterPtr();
-		}
-		else if(p==2)
-		{
-			vid = (DWORD) lua_tonumber(L, 2);
-			targetChar = CHARACTER_MANAGER::instance().Find(vid);
-		}
-
-		if(!targetChar || targetChar == NULL)
-			return 0;
-
-		if (targetChar)
-		{
-			targetChar->SetHP(hp);
-		}
-		return 0;
-	}
-#endif
-
-	int npc_is_stone(lua_State* L)
-	{
-		CQuestManager& q = CQuestManager::instance();
-		LPCHARACTER npc = q.GetCurrentNPCCharacterPtr();
-		if (npc && npc->IsStone())
-			lua_pushboolean(L, 1);
-		else
-			lua_pushboolean(L, 0);
 		return 1;
 	}
 
@@ -784,24 +396,6 @@ namespace quest
 			{ "dec_remain_skill_book_count",	npc_dec_remain_skill_book_count },
 			{ "get_remain_hairdye_count",	npc_get_remain_hairdye_count	},
 			{ "dec_remain_hairdye_count",	npc_dec_remain_hairdye_count	},
-#ifdef ENABLE_ZODIAC_MISSION
-			{ "is_boss",	npc_is_boss	},
-			{ "is_king",	npc_is_king	},
-#endif
-#ifdef ENABLE_MELEY_LAIR_DUNGEON
-			{ "get_protect_time", npc_get_protect_time},
-			{ "set_protect_time", npc_set_protect_time},
-			{ "set_statu_affect", npc_set_statu_affect},
-			{ "set_statu_clear_aff", npc_set_statu_affect_all},
-			{ "show_statu", npc_show_statu},
-			{ "set_meley_hp", npc_set_meley_hp},
-			{ "show_end_statu", npc_show_end_statu},
-			{ "set_protect_flag2", npc_set_protect_flag2},
-			{ "dead_by_vnum", npc_dead_by_vnum},
-			{ "set_hp", npc_set_hp},
-			{ "get_hp", npc_get_hp},
-#endif
-			{ "is_stone", npc_is_stone },
 			{ NULL,				NULL			    	}
 		};
 

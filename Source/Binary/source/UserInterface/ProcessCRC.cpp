@@ -21,8 +21,8 @@ const char *stristr(const char *big, const char *little)
 bool GetProcessInformation(std::string & exeFileName, LPCVOID * ppvAddress)
 {
 	HANDLE hModuleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, GetCurrentProcessId());
-	if (hModuleSnap != INVALID_HANDLE_VALUE)
-	{
+	if (hModuleSnap != INVALID_HANDLE_VALUE) 
+	{		
 		std::string filename;
 
 		GetExcutedFileName(filename);
@@ -33,7 +33,7 @@ bool GetProcessInformation(std::string & exeFileName, LPCVOID * ppvAddress)
 
 		BOOL bRet = Module32First(hModuleSnap, &me32);
 
-		while (bRet)
+		while (bRet) 
 		{
 			if (stristr(me32.szExePath, filename.c_str()))
 			{

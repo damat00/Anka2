@@ -29,7 +29,7 @@ Group AttackingData
 
 Group MotionEventData
 {
-    MotionEventDataCount     5
+    MotionEventDataCount     4
     Group Event00
     {
         MotionEventType      1
@@ -87,14 +87,5 @@ Group MotionEventData
             Radius           130.000000
             Position         0.000000 -50.000000 100.000000
         }
-    }
-    Group Event04
-    {
-        MotionEventType      2
-        StartingTime         0.412003
-        
-        DuringTime           0.200000
-        Power                100
-        AffectingRange       200
     }
 }

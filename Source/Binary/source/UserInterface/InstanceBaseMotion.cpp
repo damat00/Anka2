@@ -54,10 +54,10 @@ void CInstanceBase::StartFishing(float frot)
 	float fRot = m_GraphicThingInstance.GetTargetRotation();
 
 	TPixelPosition kPPosFishing;
-	ELPlainCoord_GetRotatedPixelPosition(c_rkPPosCur.x, c_rkPPosCur.y, c_fFishingDistance, fRot, &kPPosFishing.x, &kPPosFishing.y);
+	ELPlainCoord_GetRotatedPixelPosition(c_rkPPosCur.x, c_rkPPosCur.y, c_fFishingDistance, fRot, &kPPosFishing.x, &kPPosFishing.y);	
 	if (!__Background_GetWaterHeight(kPPosFishing, &kPPosFishing.z))
 		kPPosFishing.z=c_rkPPosCur.z;
-
+	
 	D3DXVECTOR3 v3Fishing;
 	PixelPositionToD3DXVECTOR3(kPPosFishing, &v3Fishing);
 	m_GraphicThingInstance.SetFishingPosition(v3Fishing);
@@ -102,7 +102,7 @@ BOOL CInstanceBase::GetFishingRot(int * pirot)
 		}
 
 		TPixelPosition kPPosFishingLeft;
-		ELPlainCoord_GetRotatedPixelPosition(c_rkPPosCur.x, c_rkPPosCur.y, c_fFishingDistance, fCharacterRot-fRot, &kPPosFishingLeft.x, &kPPosFishingLeft.y);
+		ELPlainCoord_GetRotatedPixelPosition(c_rkPPosCur.x, c_rkPPosCur.y, c_fFishingDistance, fCharacterRot-fRot, &kPPosFishingLeft.x, &kPPosFishingLeft.y);	
 		if (__Background_IsWaterPixelPosition(kPPosFishingLeft))
 		{
 			*pirot = fCharacterRot-fRot;

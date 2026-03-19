@@ -9,6 +9,18 @@ Group MotionEventData
     MotionEventDataCount     3
     Group Event00
     {
+        MotionEventType      1
+        StartingTime         0.559611
+        
+        IndependentFlag      0
+        AttachingEnable      0
+        AttachingBoneName    "Bip01 Head"
+        FollowingEnable      0
+        EffectFileName       "d:/ymir work/pc/shaman/effect/paeryong_3.mse"
+        EffectPosition       0.000000 0.000000 0.000000
+    }
+    Group Event01
+    {
         MotionEventType      4
         StartingTime         0.567721
         DuringTime           0.200000
@@ -29,7 +41,7 @@ Group MotionEventData
             Position         0.000000 0.000000 100.000000
         }
     }
-    Group Event01
+    Group Event02
     {
         MotionEventType      2
         StartingTime         0.551500
@@ -37,16 +49,5 @@ Group MotionEventData
         DuringTime           0.200000
         Power                100
         AffectingRange       200
-    }
-    Group Event02
-    {
-        MotionEventType      10
-        StartingTime         0.567721
-        
-        EffectFileName       "d:/ymir work/pc/shaman/effect/paeryong_3.mse"
-        EffectPosition       0.000000 0.000000 0.000000
-        FollowingEnable      0
-        FishingEffectFlag    0
-	IsTerrainAttach      1
     }
 }

@@ -12,7 +12,6 @@
 
 #include <boost/beast/core/detail/config.hpp>
 #include <boost/beast/core/type_traits.hpp>
-#include <boost/beast/core/detail/buffer.hpp>
 #include <boost/beast/http/error.hpp>
 #include <boost/beast/http/message.hpp>
 #include <boost/optional.hpp>
@@ -96,15 +95,21 @@ struct basic_dynamic_body
                 ec = error::buffer_overflow;
                 return 0;
             }
-            auto const mb =
-                beast::detail::dynamic_buffer_prepare(
-                    body_, (std::min)(n,
-                        body_.max_size() - body_.size()),
-                            ec, error::buffer_overflow);
-            if(ec)
+            boost::optional<typename
+                DynamicBuffer::mutable_buffers_type> b;
+            try
+            {
+                b.emplace(body_.prepare((std::min)(n,
+                    body_.max_size() - body_.size())));
+            }
+            catch(std::length_error const&)
+            {
+                ec = error::buffer_overflow;
                 return 0;
+            }
+            ec.assign(0, ec.category());
             auto const bytes_transferred =
-                buffer_copy(*mb, buffers);
+                buffer_copy(*b, buffers);
             body_.commit(bytes_transferred);
             return bytes_transferred;
         }

@@ -22,7 +22,7 @@ void CAffectFlagContainer::CopyInstance(const CAffectFlagContainer& c_rkAffectCo
 
 void CAffectFlagContainer::CopyData(UINT uPos, UINT uByteSize, const void* c_pvData)
 {
-	const BYTE* c_pbData=(const BYTE*)c_pvData;
+	const BYTE* c_pbData=(const BYTE*)c_pvData; 
 	Element bMask=0x01;
 
 	UINT uBitEnd=uPos+uByteSize*8;

@@ -378,12 +378,9 @@ class CActorInstance : public IActorInstance, public IFlyTargetableObject
 
 		void PreAttack();
 
-		// Battle
-		// Input
-		void		InputNormalAttackCommand(float fDirRot);	// Process input - Only used by player's character
-		bool		InputComboAttackCommand(float fDirRot);	// Process input - Only used by player's character
+		void		InputNormalAttackCommand(float fDirRot);
+		bool		InputComboAttackCommand(float fDirRot);
 
-		// Command
 		BOOL		isAttacking();
 		BOOL		isNormalAttacking();
 		BOOL		isComboAttacking();
@@ -423,10 +420,10 @@ class CActorInstance : public IActorInstance, public IFlyTargetableObject
 
 		MOTION_KEY	GetNormalAttackIndex();
 
-		// Position
 		const D3DXVECTOR3&	GetMovementVectorRef();
 		const D3DXVECTOR3&	GetPositionVectorRef();
-#if defined(ENABLE_WIKI_SYSTEM) || defined(INSIDE_RENDER)
+
+#ifdef ENABLE_INGAME_WIKI_SYSTEM
 		std::vector<CGrannyLODController*>& GetLODController() { return m_LODControllerVector; }
 #endif
 
@@ -525,9 +522,7 @@ class CActorInstance : public IActorInstance, public IFlyTargetableObject
 		void		SetWeaponTraceTexture(const char * szTextureName);
 		void		UseTextureWeaponTrace();
 		void		UseAlphaWeaponTrace();
-#if defined(ENABLE_WIKI_SYSTEM) || defined(INSIDE_RENDER)
-		void		RenderAllAttachingEffectWiki();
-#endif
+
 		// ETC
 		void		UpdateAttribute();
 		bool		IntersectDefendingSphere();
@@ -548,6 +543,10 @@ class CActorInstance : public IActorInstance, public IFlyTargetableObject
 
 #ifdef ENABLE_RENDER_TARGET
 		void		RenderAllAttachingEffect();
+#endif
+
+#ifdef ENABLE_INGAME_WIKI_SYSTEM
+		void		RenderAllAttachingEffectWiki();
 #endif
 
 	// Flying Methods
@@ -635,7 +634,7 @@ class CActorInstance : public IActorInstance, public IFlyTargetableObject
 		void ProcessMotionEventWarp(const CRaceMotionData::TMotionEventData * c_pData);
 
 		void AddMovement(float fx, float fy, float fz);
-
+		
 		bool __IsLeftHandWeapon(DWORD type);
 		bool __IsRightHandWeapon(DWORD type);
 		bool __IsWeaponTrace(DWORD weaponType);

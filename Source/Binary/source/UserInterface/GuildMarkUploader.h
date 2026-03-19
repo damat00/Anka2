@@ -27,8 +27,16 @@ class CGuildMarkUploader : public CNetworkStream, public CSingleton<CGuildMarkUp
 		virtual ~CGuildMarkUploader();
 
 		void Disconnect();
-		bool Connect(const CNetworkAddress& c_rkNetAddr, DWORD dwHandle, DWORD dwRandomKey, DWORD dwGuildID, const char* c_szFileName, UINT* peError);
-		bool ConnectToSendSymbol(const CNetworkAddress& c_rkNetAddr, DWORD dwHandle, DWORD dwRandomKey, DWORD dwGuildID, const char* c_szFileName, UINT* peError);
+		bool Connect(const CNetworkAddress& c_rkNetAddr, DWORD dwHandle, DWORD dwRandomKey, DWORD dwGuildID, DWORD markPass, const char *c_szFileName, UINT* peError
+#ifdef ENABLE_GUILD_TOKEN_AUTH
+			, uint64_t dwGuildToken
+#endif
+		);
+		bool ConnectToSendSymbol(const CNetworkAddress& c_rkNetAddr, DWORD dwHandle, DWORD dwRandomKey, DWORD dwGuildID, DWORD markPass, const char *c_szFileName, UINT* peError
+#ifdef ENABLE_GUILD_TOKEN_AUTH
+			, uint64_t dwGuildToken
+#endif
+		);
 		bool IsCompleteUploading();
 
 		void Process();
@@ -76,6 +84,10 @@ class CGuildMarkUploader : public CNetworkStream, public CSingleton<CGuildMarkUp
 		DWORD m_dwHandle;
 		DWORD m_dwRandomKey;
 		DWORD m_dwGuildID;
+#ifdef ENABLE_GUILD_TOKEN_AUTH
+		uint64_t m_dwGuildToken{};
+#endif
+		DWORD m_dwGuildMarkPass;
 
 		SGuildMark m_kMark;
 

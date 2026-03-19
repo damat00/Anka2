@@ -1,10 +1,6 @@
 #pragma once
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-#include <d3dx9.h>
-#else
 #include <d3dx8.h>
-#endif
 
 #include "../eterLib/TextFileLoader.h"
 
@@ -28,12 +24,7 @@ class CLightData : public CEffectElementBase
 		{
 			return m_iLoopCount;
 		}
-
-#ifdef ENABLE_DIRECTX9_UPDATE
-		void InitializeLight(D3DLIGHT9& light);
-#else
 		void InitializeLight(D3DLIGHT8& light);
-#endif
 
 	protected:
 		void OnClear();

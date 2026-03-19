@@ -2,10 +2,10 @@
 #include "ActorInstance.h"
 
 const TPixelPosition& CActorInstance::NEW_GetLastPixelPositionRef()
-{
+{	
 	GetBlendingPosition(&m_kPPosLast);
 	m_kPPosLast.y=-m_kPPosLast.y;
-
+	
 	return m_kPPosLast;
 }
 
@@ -76,7 +76,7 @@ const TPixelPosition& CActorInstance::NEW_GetCurPixelPositionRef()
 	m_kPPosCur.x=+m_x;
 	m_kPPosCur.y=-m_y;
 	m_kPPosCur.z=+m_z;
-
+	
 	return m_kPPosCur;
 }
 
@@ -96,7 +96,7 @@ void CActorInstance::SetPixelPosition(const TPixelPosition& c_rPixelPos)
 
 	if (m_pkHorse)
 		m_pkHorse->SetPixelPosition(c_rPixelPos);
-
+	
 	m_x = c_rPixelPos.x;
 	m_y = c_rPixelPos.y;
 	m_z = c_rPixelPos.z;

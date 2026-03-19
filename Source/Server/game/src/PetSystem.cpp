@@ -408,7 +408,7 @@ bool CPetSystem::Update(DWORD deltaTime)
 			}
 		}
 	}
-	for (std::vector<CPetActor*>::iterator it = v_garbageActor.begin(); it != v_garbageActor.end(); ++it)	//@fixme541
+	for (std::vector<CPetActor*>::iterator it = v_garbageActor.begin(); it != v_garbageActor.end(); it++)
 		DeletePet(*it);
 
 	m_dwLastUpdateTime = currentTime;
@@ -467,7 +467,7 @@ void CPetSystem::Unsummon(DWORD vnum, bool bDeleteFromList)
 		this->DeletePet(actor);
 
 	bool bActive = false;
-	for (TPetActorMap::iterator it = m_petActorMap.begin(); it != m_petActorMap.end(); ++it)	//@fixme541
+	for (TPetActorMap::iterator it = m_petActorMap.begin(); it != m_petActorMap.end(); it++)
 	{
 		bActive |= it->second->IsSummoned();
 	}

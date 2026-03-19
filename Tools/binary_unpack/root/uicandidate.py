@@ -95,7 +95,7 @@ class VerticalCandidateBoard(ui.Board):
 
 		self.candidateListBox.SelectIndex(ime.GetCandidateSelection())
 
-class KORCandidateWindow(ui.ScriptWindow):
+class KORCandidateWindow(ui.ScriptWindow):	
 
 	def __init__(self):
 		ui.Window.__init__(self, "CURTAIN")

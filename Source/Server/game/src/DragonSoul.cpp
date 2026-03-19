@@ -36,7 +36,6 @@ int Gamble(std::vector<float>& vec_probs)
 	return -1;
 }
 
-// Receive the weight table (prob_lst), select random_set.size() indexes and return random_set
 bool MakeDistinctRandomNumberSet(std::list <float> prob_lst, OUT std::vector<int>& random_set)
 {
 	int size = prob_lst.size();
@@ -48,14 +47,14 @@ bool MakeDistinctRandomNumberSet(std::list <float> prob_lst, OUT std::vector<int
 	for (int i = 0; i < n; i++)
 	{
 		float range = 0.f;
-		for (std::list <float>::iterator it = prob_lst.begin(); it != prob_lst.end(); ++it)	//@fixme541
+		for (std::list <float>::iterator it = prob_lst.begin(); it != prob_lst.end(); it++)
 		{
 			range += *it;
 		}
 		float r = fnumber (0.f, range);
 		float sum = 0.f;
 		int idx = 0;
-		for (std::list <float>::iterator it = prob_lst.begin(); it != prob_lst.end(); ++it)	//@fixme541
+		for (std::list <float>::iterator it = prob_lst.begin(); it != prob_lst.end(); it++)
 		{
 			while (select_bit[idx++]);
 

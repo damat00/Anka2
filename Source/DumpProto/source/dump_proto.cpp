@@ -3,12 +3,6 @@
 #include <map>
 #include <set>
 #include <algorithm>
-#include <stdarg.h>
-#include <time.h>
-#if defined(_MSC_VER)
-#include <direct.h>
-#include <windows.h>
-#endif
 
 #include "lzo.h"
 
@@ -24,114 +18,6 @@
 typedef unsigned char BYTE;
 typedef unsigned short WORD;
 typedef unsigned long DWORD;
-
-#if defined(_MSC_VER)
-static FILE* g_fpDumpProtoLog = NULL;
-static const char* g_ctxPhase = "?";
-static const char* g_ctxLang = "?";
-static int g_ctxRow = 0;
-static DWORD g_ctxVnum = 0;
-
-static void EnsureLogDir()
-{
-	_mkdir("logs");
-}
-
-#if defined(_MSC_VER)
-static void EnsureBuildLangDir(const char* cLang)
-{
-	_mkdir("build");
-	char dirPath[256];
-	snprintf(dirPath, sizeof(dirPath), "build/%s", cLang);
-	_mkdir(dirPath);
-}
-#else
-static void EnsureBuildLangDir(const char* cLang) { (void)cLang; }
-#endif
-
-static void OpenLogFile()
-{
-	if (g_fpDumpProtoLog)
-		return;
-
-	EnsureLogDir();
-
-	time_t t = time(NULL);
-	struct tm tmv;
-	localtime_s(&tmv, &t);
-
-	char path[256];
-	snprintf(path, sizeof(path), "logs/dump_proto_%04d%02d%02d_%02d%02d%02d.log",
-		tmv.tm_year + 1900, tmv.tm_mon + 1, tmv.tm_mday,
-		tmv.tm_hour, tmv.tm_min, tmv.tm_sec);
-
-	g_fpDumpProtoLog = fopen(path, "a");
-	if (g_fpDumpProtoLog)
-	{
-		fprintf(g_fpDumpProtoLog, "dump_proto log start\n");
-		fflush(g_fpDumpProtoLog);
-	}
-}
-
-static void LogProtoError(const char* fmt, ...)
-{
-	OpenLogFile();
-
-	va_list ap;
-	va_start(ap, fmt);
-	vfprintf(stderr, fmt, ap);
-	fprintf(stderr, "\n");
-	va_end(ap);
-
-	if (!g_fpDumpProtoLog)
-		return;
-
-	va_start(ap, fmt);
-	vfprintf(g_fpDumpProtoLog, fmt, ap);
-	fprintf(g_fpDumpProtoLog, "\n");
-	va_end(ap);
-	fflush(g_fpDumpProtoLog);
-}
-
-static void CloseLogFile()
-{
-	if (!g_fpDumpProtoLog)
-		return;
-
-	fprintf(g_fpDumpProtoLog, "dump_proto log end\n");
-	fclose(g_fpDumpProtoLog);
-	g_fpDumpProtoLog = NULL;
-}
-
-static LONG WINAPI DumpProtoUnhandledExceptionFilter(EXCEPTION_POINTERS* p)
-{
-	OpenLogFile();
-	if (g_fpDumpProtoLog && p && p->ExceptionRecord)
-	{
-		fprintf(g_fpDumpProtoLog, "FATAL: unhandled exception code=0x%08X addr=%p\n",
-			(unsigned)p->ExceptionRecord->ExceptionCode,
-			p->ExceptionRecord->ExceptionAddress);
-		fprintf(g_fpDumpProtoLog, "CTX: phase=%s lang=%s row=%d vnum=%u\n",
-			g_ctxPhase ? g_ctxPhase : "?", g_ctxLang ? g_ctxLang : "?", g_ctxRow, (unsigned)g_ctxVnum);
-		fflush(g_fpDumpProtoLog);
-	}
-	return EXCEPTION_EXECUTE_HANDLER;
-}
-#else
-static void LogProtoError(const char* fmt, ...) { (void)fmt; }
-#endif
-
-#if defined(_MSC_VER)
-static void SetCtx(const char* phase, const char* lang, int row, DWORD vnum)
-{
-	g_ctxPhase = phase ? phase : "?";
-	g_ctxLang = lang ? lang : "?";
-	g_ctxRow = row;
-	g_ctxVnum = vnum;
-}
-#else
-static void SetCtx(const char* phase, const char* lang, int row, DWORD vnum) { (void)phase; (void)lang; (void)row; (void)vnum; }
-#endif
 
 #ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
 static std::string MLanguage[] =
@@ -212,7 +98,6 @@ typedef struct SMobTable
 
 	short sAttackSpeed;
 	short sMovingSpeed;
-
 	BYTE bAggresiveHPPct;
 	WORD wAggressiveSight;
 	WORD wAttackRange;
@@ -243,8 +128,6 @@ typedef struct SMobTable
 	BYTE bGodSpeedPoint;
 	BYTE bDeathBlowPoint;
 	BYTE bRevivePoint;
-
-	float fHitRange;
 } TMobTable;
 #pragma pack()
 
@@ -253,22 +136,23 @@ using namespace std;
 TMobTable * m_pMobTable = NULL;
 int m_iMobTableSize = 0;
 
+
 enum EItemMisc
 {
-	ITEM_NAME_MAX_LEN			= 48,
-	ITEM_VALUES_MAX_NUM			= 6,
-	ITEM_SMALL_DESCR_MAX_LEN	= 256,
-	ITEM_LIMIT_MAX_NUM			= 2,
-	ITEM_APPLY_MAX_NUM			= 3,
-	ITEM_SOCKET_MAX_NUM			= 3,
-	ITEM_MAX_COUNT				= 200,
-	ITEM_ATTRIBUTE_MAX_NUM		= 7,
-	ITEM_ATTRIBUTE_MAX_LEVEL	= 5,
-	ITEM_AWARD_WHY_MAX_LEN		= 50,
+	ITEM_NAME_MAX_LEN = 48,
+	ITEM_VALUES_MAX_NUM = 6,
+	ITEM_SMALL_DESCR_MAX_LEN = 256,
+	ITEM_LIMIT_MAX_NUM = 2,
+	ITEM_APPLY_MAX_NUM = 3,
+	ITEM_SOCKET_MAX_NUM = 3,
+	ITEM_MAX_COUNT = 200,
+	ITEM_ATTRIBUTE_MAX_NUM = 7,
+	ITEM_ATTRIBUTE_MAX_LEVEL = 5,
+	ITEM_AWARD_WHY_MAX_LEN = 50,
 
-	REFINE_MATERIAL_MAX_NUM		= 5,
+	REFINE_MATERIAL_MAX_NUM = 5,
 
-	ITEM_ELK_VNUM				= 50026,
+	ITEM_ELK_VNUM = 50026,
 };
 #pragma pack(1)
 typedef struct SItemLimit
@@ -287,7 +171,7 @@ typedef struct SItemApply
 #pragma pack()
 
 #pragma pack(1)
-typedef struct
+typedef struct 
 {
 	DWORD dwVnum;
 	DWORD dwVnumRange;
@@ -334,6 +218,7 @@ bool Set_Proto_Mob_Table(TMobTable *mobTable, cCsvTable &csvTable, std::map<int,
 
 	mobTable->dwVnum = atoi(csvTable.AsStringByIndex(col++));
 	strncpy(mobTable->szName, csvTable.AsStringByIndex(col++), CHARACTER_NAME_MAX_LEN);
+
 	map<int,const char*>::iterator it;
 	it = nameMap.find(mobTable->dwVnum);
 	if (it != nameMap.end())
@@ -345,13 +230,13 @@ bool Set_Proto_Mob_Table(TMobTable *mobTable, cCsvTable &csvTable, std::map<int,
 	{
 		strncpy(mobTable->szLocaleName, mobTable->szName, sizeof (mobTable->szLocaleName));
 	}
-	// 4. RANK
+
 	int rankValue = get_Mob_Rank_Value(csvTable.AsStringByIndex(col++));
 	mobTable->bRank = rankValue;
-	// 5. TYPE
+
 	int typeValue = get_Mob_Type_Value(csvTable.AsStringByIndex(col++));
 	mobTable->bType = typeValue;
-	// 6. BATTLE_TYPE
+
 	int battleTypeValue = get_Mob_BattleType_Value(csvTable.AsStringByIndex(col++));
 	mobTable->bBattleType = battleTypeValue;
 
@@ -359,21 +244,21 @@ bool Set_Proto_Mob_Table(TMobTable *mobTable, cCsvTable &csvTable, std::map<int,
 
 	int sizeValue = get_Mob_Size_Value(csvTable.AsStringByIndex(col++));
 	mobTable->bSize = sizeValue;
-	// 9. AI_FLAG
+
 	int aiFlagValue = get_Mob_AIFlag_Value(csvTable.AsStringByIndex(col++));
 	mobTable->dwAIFlag = aiFlagValue;
-	col++; // mount_capacity;
-	// 10. RACE_FLAG
+	col++;
+
 	int raceFlagValue = get_Mob_RaceFlag_Value(csvTable.AsStringByIndex(col++));
 	mobTable->dwRaceFlag = raceFlagValue;
-	// 11. IMMUNE_FLAG
+
 	int immuneFlagValue = get_Mob_ImmuneFlag_Value(csvTable.AsStringByIndex(col++));
 	mobTable->dwImmuneFlag = immuneFlagValue;
 
 	mobTable->bEmpire = atoi(csvTable.AsStringByIndex(col++));
 
-	// FOLDER
 	strncpy(mobTable->szFolder, csvTable.AsStringByIndex(col++), sizeof(mobTable->szFolder));
+
 
 	mobTable->bOnClickType = atoi(csvTable.AsStringByIndex(col++));
 
@@ -411,15 +296,12 @@ bool Set_Proto_Mob_Table(TMobTable *mobTable, cCsvTable &csvTable, std::map<int,
 	mobTable->dwDrainSP = atoi(csvTable.AsStringByIndex(col++));
 	mobTable->dwMobColor = atoi(csvTable.AsStringByIndex(col++));
 
-	mobTable->fHitRange = atof(csvTable.AsStringByIndex(col++));
-
 	return true;
 }
 
 static bool BuildMobTable(const char * cLang)
 {
 	fprintf(stderr, "sizeof(TMobTable): %u\n", sizeof(TMobTable));
-	SetCtx("BuildMobTable", cLang, 0, 0);
 
 	bool isNameFile = true;
 	map<int,const char*> localMap;
@@ -455,7 +337,7 @@ static bool BuildMobTable(const char * cLang)
 
 	if (m_pMobTable)
 	{
-		delete[] m_pMobTable;
+		delete m_pMobTable;
 		m_pMobTable = NULL;
 	}
 
@@ -487,59 +369,55 @@ static bool BuildMobTable(const char * cLang)
 	}
 	data.Next();
 
-	int rowIndex = 0;
 	while (data.Next())
 	{
-		++rowIndex;
 		int col = 0;
-		DWORD vnum = (DWORD)atoi(data.AsStringByIndex(col));
-		SetCtx("BuildMobTable:row", cLang, rowIndex, vnum);
 
 		std::map<DWORD, TMobTable *>::iterator it_map_mobTable;
-		it_map_mobTable = map_mobTableByVnum.find((DWORD)atoi(data.AsStringByIndex(col)));
+		it_map_mobTable = map_mobTableByVnum.find(atoi(data.AsStringByIndex(col)));
 
 		if(it_map_mobTable == map_mobTableByVnum.end())
 		{
 			if (!Set_Proto_Mob_Table(mob_table, data, localMap))
 			{
-				LogProtoError("[MOB][%s] row=%d vnum=%u Failed to set mob proto table.", cLang ? cLang : "?", rowIndex, (unsigned)vnum);
+				fprintf(stderr, "Failed to set mob proto table.\n");
 			}
 		}
 		else
 		{
 			TMobTable *tempTable = it_map_mobTable->second;
 
-			mob_table->dwVnum               = tempTable->dwVnum;
+			mob_table->dwVnum = tempTable->dwVnum;
 			strncpy(mob_table->szName, tempTable->szName, CHARACTER_NAME_MAX_LEN);
 			strncpy(mob_table->szLocaleName, tempTable->szLocaleName, CHARACTER_NAME_MAX_LEN);
-			mob_table->bRank                = tempTable->bRank;
-			mob_table->bType                = tempTable->bType;
-			mob_table->bBattleType          = tempTable->bBattleType;
-			mob_table->bLevel				= tempTable->bLevel;
-			mob_table->bSize				= tempTable->bSize;
-			mob_table->dwAIFlag				= tempTable->dwAIFlag;
-			mob_table->dwRaceFlag				= tempTable->dwRaceFlag;
-			mob_table->dwImmuneFlag				= tempTable->dwImmuneFlag;
-			mob_table->bEmpire				= tempTable->bEmpire;
+			mob_table->bRank = tempTable->bRank;
+			mob_table->bType = tempTable->bType;
+			mob_table->bBattleType = tempTable->bBattleType;
+			mob_table->bLevel = tempTable->bLevel;
+			mob_table->bSize = tempTable->bSize;
+			mob_table->dwAIFlag = tempTable->dwAIFlag;
+			mob_table->dwRaceFlag = tempTable->dwRaceFlag;
+			mob_table->dwImmuneFlag = tempTable->dwImmuneFlag;
+			mob_table->bEmpire = tempTable->bEmpire;
 			strncpy(mob_table->szFolder, tempTable->szFolder, CHARACTER_NAME_MAX_LEN);
-			mob_table->bOnClickType         = tempTable->bOnClickType;
-			mob_table->bStr                 = tempTable->bStr;
-			mob_table->bDex                 = tempTable->bDex;
-			mob_table->bCon                 = tempTable->bCon;
-			mob_table->bInt                 = tempTable->bInt;
-			mob_table->dwDamageRange[0]     = tempTable->dwDamageRange[0];
-			mob_table->dwDamageRange[1]     = tempTable->dwDamageRange[1];
-			mob_table->dwMaxHP              = tempTable->dwMaxHP;
-			mob_table->bRegenCycle          = tempTable->bRegenCycle;
-			mob_table->bRegenPercent        = tempTable->bRegenPercent;
-			mob_table->dwExp                = tempTable->dwExp;
-			mob_table->wDef                 = tempTable->wDef;
-			mob_table->sAttackSpeed         = tempTable->sAttackSpeed;
-			mob_table->sMovingSpeed         = tempTable->sMovingSpeed;
-			mob_table->bAggresiveHPPct      = tempTable->bAggresiveHPPct;
-			mob_table->wAggressiveSight	= tempTable->wAggressiveSight;
-			mob_table->wAttackRange		= tempTable->wAttackRange;
-			mob_table->dwDropItemVnum	= tempTable->dwDropItemVnum;
+			mob_table->bOnClickType = tempTable->bOnClickType;
+			mob_table->bStr = tempTable->bStr;
+			mob_table->bDex = tempTable->bDex;
+			mob_table->bCon = tempTable->bCon;
+			mob_table->bInt = tempTable->bInt;
+			mob_table->dwDamageRange[0] = tempTable->dwDamageRange[0];
+			mob_table->dwDamageRange[1] = tempTable->dwDamageRange[1];
+			mob_table->dwMaxHP = tempTable->dwMaxHP;
+			mob_table->bRegenCycle = tempTable->bRegenCycle;
+			mob_table->bRegenPercent = tempTable->bRegenPercent;
+			mob_table->dwExp = tempTable->dwExp;
+			mob_table->wDef = tempTable->wDef;
+			mob_table->sAttackSpeed = tempTable->sAttackSpeed;
+			mob_table->sMovingSpeed = tempTable->sMovingSpeed;
+			mob_table->bAggresiveHPPct = tempTable->bAggresiveHPPct;
+			mob_table->wAggressiveSight = tempTable->wAggressiveSight;
+			mob_table->wAttackRange = tempTable->wAttackRange;
+			mob_table->dwDropItemVnum = tempTable->dwDropItemVnum;
 
 			for (int i = 0; i < MOB_ENCHANTS_MAX_NUM; ++i)
 				mob_table->cEnchants[i] = tempTable->cEnchants[i];
@@ -551,7 +429,6 @@ static bool BuildMobTable(const char * cLang)
 			mob_table->dwSummonVnum = tempTable->dwSummonVnum;
 			mob_table->dwDrainSP = tempTable->dwDrainSP;
 			mob_table->dwMobColor = tempTable->dwMobColor;
-			mob_table->fHitRange = tempTable->fHitRange;
 		}
 
 		fprintf(stdout, "MOB #%-5d %-16s %-16s sight: %u color %u[%s]\n", mob_table->dwVnum, mob_table->szName, mob_table->szLocaleName, mob_table->wAggressiveSight, mob_table->dwMobColor, 0);
@@ -573,15 +450,6 @@ DWORD g_adwMobProtoKey[4] =
 
 static void SaveMobProto(const char * cLang)
 {
-	SetCtx("SaveMobProto", cLang, 0, 0);
-
-	if (!m_pMobTable || m_iMobTableSize == 0)
-	{
-		LogProtoError("SaveMobProto skip: m_pMobTable=%p m_iMobTableSize=%d", (void*)m_pMobTable, (int)m_iMobTableSize);
-		return;
-	}
-
-	EnsureBuildLangDir(cLang);
 	char fileName[256];
 	snprintf(fileName, sizeof(fileName), "build/%s/mob_proto", cLang);
 
@@ -590,7 +458,7 @@ static void SaveMobProto(const char * cLang)
 
 	if (!fp)
 	{
-		LogProtoError("cannot open %s for writing", fileName);
+		printf("cannot open %s for writing\n", fileName);
 		return;
 	}
 
@@ -604,23 +472,16 @@ static void SaveMobProto(const char * cLang)
 
 	printf("sizeof(TMobTable) %d\n", sizeof(TMobTable));
 
-	if (!CLZO::instance().GetWorkMemory())
+	if (!CLZO::instance().CompressEncryptedMemory(zObj, m_pMobTable, sizeof(TMobTable) * m_iMobTableSize, g_adwMobProtoKey))  
 	{
-		LogProtoError("SaveMobProto: LZO work memory not initialized");
-		fclose(fp);
-		return;
-	}
-	if (!CLZO::instance().CompressEncryptedMemory(zObj, m_pMobTable, sizeof(TMobTable) * m_iMobTableSize, g_adwMobProtoKey))
-	{
-		LogProtoError("SaveMobProto: compress failed");
+		printf("cannot compress\n");
 		fclose(fp);
 		return;
 	}
 
 	const CLZObject::THeader & r = zObj.GetHeader();
 
-	printf("MobProto count %u\n%u --Compress--> %u --Encrypt--> %u, GetSize %u\n",
-			m_iMobTableSize, r.dwRealSize, r.dwCompressedSize, r.dwEncryptSize, zObj.GetSize());
+	printf("MobProto count %u\n%u --Compress--> %u --Encrypt--> %u, GetSize %u\n", m_iMobTableSize, r.dwRealSize, r.dwCompressedSize, r.dwEncryptSize, zObj.GetSize());
 
 	DWORD dwDataSize = zObj.GetSize();
 	fwrite(&dwDataSize, sizeof(DWORD), 1, fp);
@@ -664,25 +525,8 @@ void LoadMobProto()
 	fclose(fp);
 }
 
-static bool EnsureItemCols(cCsvTable& csvTable, const char* vnumStr, const char* lang, int rowIndex)
+bool Set_Proto_Item_Table(TClientItemTable *itemTable, cCsvTable &csvTable, std::map<int,const char*> &nameMap)
 {
-	// Required columns up to: bGainSocketPct + AddonType (skipped)
-	// vnum(0) + 32 fields (1..32) => ColCount must be >= 33.
-	const size_t required = 33;
-	const size_t have = csvTable.ColCount();
-	if (have < required)
-	{
-		LogProtoError("[ITEM][%s] row=%d vnum=%s colcount=%u required=%u (row too short)",
-			lang ? lang : "?", rowIndex, vnumStr ? vnumStr : "?", (unsigned)have, (unsigned)required);
-		return false;
-	}
-	return true;
-}
-
-bool Set_Proto_Item_Table(TClientItemTable *itemTable, cCsvTable &csvTable, std::map<int,const char*> &nameMap, const char* cLang, int rowIndex)
-{
-	try
-	{
 	{
 		std::string s(csvTable.AsStringByIndex(0));
 		int pos = s.find("~");
@@ -714,12 +558,10 @@ bool Set_Proto_Item_Table(TClientItemTable *itemTable, cCsvTable &csvTable, std:
 		}
 	}
 
-	if (!EnsureItemCols(csvTable, csvTable.AsStringByIndex(0), cLang, rowIndex))
-		return false;
-
 	int col = 1;
 
 	strncpy(itemTable->szName, csvTable.AsStringByIndex(col++), ITEM_NAME_MAX_LEN);
+
 	map<int,const char*>::iterator it;
 	it = nameMap.find(itemTable->dwVnum);
 	if (it != nameMap.end())
@@ -763,19 +605,11 @@ bool Set_Proto_Item_Table(TClientItemTable *itemTable, cCsvTable &csvTable, std:
 
 	itemTable->bSpecular = atoi(csvTable.AsStringByIndex(col++));
 	itemTable->bGainSocketPct = atoi(csvTable.AsStringByIndex(col++));
-	col++; // AddonType
+	col++;
 
 	itemTable->bWeight = 0;
 
 	return true;
-	}
-	catch (...)
-	{
-		const char* vnumStr = "?";
-		try { vnumStr = csvTable.AsStringByIndex(0); } catch (...) {}
-		LogProtoError("[ITEM][%s] row=%d vnum=%s (exception during parse)", cLang ? cLang : "?", rowIndex, vnumStr);
-		return false;
-	}
 }
 
 static bool BuildItemTable(const char * cLang)
@@ -816,7 +650,7 @@ static bool BuildItemTable(const char * cLang)
 
 	if (m_pItemTable)
 	{
-		delete[] m_pItemTable;
+		free(m_pItemTable);
 		m_pItemTable = NULL;
 	}
 
@@ -841,16 +675,14 @@ static bool BuildItemTable(const char * cLang)
 	}
 	data.Next();
 
-	m_iItemTableSize = data.m_File.GetRowCount() - 1 + addNumber;
+	m_iItemTableSize = data.m_File.GetRowCount()-1+addNumber;
 	m_pItemTable = new TClientItemTable[m_iItemTableSize];
 	memset(m_pItemTable, 0, sizeof(TClientItemTable) * m_iItemTableSize);
 
 	TClientItemTable * item_table = m_pItemTable;
 
-	int rowIndex = 0;
 	while (data.Next())
 	{
-		++rowIndex;
 		int col = 0;
 
 		std::map<DWORD, TClientItemTable *>::iterator it_map_itemTable;
@@ -858,12 +690,9 @@ static bool BuildItemTable(const char * cLang)
 
 		if(it_map_itemTable == map_itemTableByVnum.end())
 		{
-			if (!Set_Proto_Item_Table(item_table, data, localMap, cLang, rowIndex))
+			if (!Set_Proto_Item_Table(item_table, data, localMap))
 			{
-				const char* vnumStr = "?";
-				if (data.ColCount() > 0)
-					vnumStr = data.AsStringByIndex(0);
-				LogProtoError("[ITEM][%s] row=%d vnum=%s skipped (Failed to set item proto table)", cLang ? cLang : "?", rowIndex, vnumStr);
+				fprintf(stderr, "Failed to set item proto table.\n");
 			}
 		}
 		else
@@ -904,7 +733,6 @@ static bool BuildItemTable(const char * cLang)
 
 			item_table->bSpecular = tempTable->bSpecular;
 			item_table->bGainSocketPct = tempTable->bGainSocketPct;
-
 			item_table->bWeight = tempTable->bWeight;
 
 		}
@@ -941,15 +769,6 @@ DWORD g_adwItemProtoKey[4] =
 
 static void SaveItemProto(const char * cLang)
 {
-	SetCtx("SaveItemProto", cLang, 0, 0);
-
-	if (!m_pItemTable || m_iItemTableSize == 0)
-	{
-		LogProtoError("SaveItemProto skip: m_pItemTable=%p m_iItemTableSize=%d", (void*)m_pItemTable, (int)m_iItemTableSize);
-		return;
-	}
-
-	EnsureBuildLangDir(cLang);
 	char fileName[256];
 	snprintf(fileName, sizeof(fileName), "build/%s/item_proto", cLang);
 
@@ -958,7 +777,7 @@ static void SaveItemProto(const char * cLang)
 
 	if (!fp)
 	{
-		LogProtoError("cannot open %s for writing", fileName);
+		printf("cannot open %s for writing\n", fileName);
 		return;
 	}
 
@@ -975,29 +794,19 @@ static void SaveItemProto(const char * cLang)
 	fwrite(&dwElements, sizeof(DWORD), 1, fp);
 
 	CLZObject zObj;
-	sort(&m_pItemTable[0], &m_pItemTable[0] + m_iItemTableSize);
+	std::vector <TClientItemTable> vec_item_table (&m_pItemTable[0], &m_pItemTable[m_iItemTableSize - 1]);
+	sort (&m_pItemTable[0], &m_pItemTable[0] + m_iItemTableSize);
 
-	if (!CLZO::instance().GetWorkMemory())
+	if (!CLZO::instance().CompressEncryptedMemory(zObj, m_pItemTable, sizeof(TClientItemTable) * m_iItemTableSize, g_adwItemProtoKey)) 
 	{
-		LogProtoError("SaveItemProto: LZO work memory not initialized");
-		fclose(fp);
-		return;
-	}
-	if (!CLZO::instance().CompressEncryptedMemory(zObj, m_pItemTable, sizeof(TClientItemTable) * m_iItemTableSize, g_adwItemProtoKey))
-	{
-		LogProtoError("SaveItemProto: compress failed");
+		printf("cannot compress\n");
 		fclose(fp);
 		return;
 	}
 
 	const CLZObject::THeader & r = zObj.GetHeader();
 
-	printf("Elements %d\n%u --Compress--> %u --Encrypt--> %u, GetSize %u\n",
-			m_iItemTableSize,
-			r.dwRealSize,
-			r.dwCompressedSize,
-			r.dwEncryptSize,
-			zObj.GetSize());
+	printf("Elements %d\n%u --Compress--> %u --Encrypt--> %u, GetSize %u\n", m_iItemTableSize, r.dwRealSize, r.dwCompressedSize, r.dwEncryptSize, zObj.GetSize());
 
 	DWORD dwDataSize = zObj.GetSize();
 	fwrite(&dwDataSize, sizeof(DWORD), 1, fp);
@@ -1005,33 +814,23 @@ static void SaveItemProto(const char * cLang)
 
 	fclose(fp);
 
-	// Optional sanity-check: re-open the file we just wrote.
-	fp = fopen(fileName, "rb");
-	if (fp)
+	fp = fopen("item_proto", "rb");
+
+	if (!fp)
 	{
-		DWORD readFourcc = 0;
-		DWORD readVersion = 0;
-		DWORD readStride = 0;
-		DWORD readElements = 0;
-
-		fread(&readFourcc, sizeof(DWORD), 1, fp);
-		fread(&readVersion, sizeof(DWORD), 1, fp);
-		fread(&readStride, sizeof(DWORD), 1, fp);
-		fread(&readElements, sizeof(DWORD), 1, fp);
-
-		printf("Elements Check %u fourcc match %d\n", readElements, readFourcc == MAKEFOURCC('M', 'I', 'P', 'X'));
-		fclose(fp);
+		printf("Error!!\n");
+		return;
 	}
+
+	fread(&fourcc, sizeof(DWORD), 1, fp);
+	fread(&dwElements, sizeof(DWORD), 1, fp);
+
+	printf("Elements Check %u fourcc match %d\n", dwElements, fourcc == MAKEFOURCC('M', 'I', 'P', 'T'));
+	fclose(fp);
 }
 
 int main(int argc, char ** argv)
 {
-#if defined(_MSC_VER)
-	OpenLogFile();
-	SetUnhandledExceptionFilter(DumpProtoUnhandledExceptionFilter);
-	atexit(CloseLogFile);
-#endif
-
 	bool bXPhase = false;
 
 	if (bXPhase)
@@ -1040,43 +839,15 @@ int main(int argc, char ** argv)
 	{
 		for (int i = 0; i < 11; i++)
 		{
-			const char* lang = MLanguage[i].c_str();
-			SetCtx("MobPhase", lang, 0, 0);
-#if defined(_MSC_VER)
-			__try
-			{
-				if (BuildMobTable(lang))
-					SaveMobProto(lang);
-			}
-			__except (DumpProtoUnhandledExceptionFilter(GetExceptionInformation()))
-			{
-				LogProtoError("[MOB][%s] FATAL: crash in mob phase (continuing)", lang ? lang : "?");
-			}
-#else
-			if (BuildMobTable(lang))
-				SaveMobProto(lang);
-#endif
+			if (BuildMobTable(MLanguage[i].c_str()))
+				SaveMobProto(MLanguage[i].c_str());
 		}
 	}
 
 	for (int i = 0; i < 11; i++)
 	{
-		const char* lang = MLanguage[i].c_str();
-		SetCtx("ItemPhase", lang, 0, 0);
-#if defined(_MSC_VER)
-		__try
-		{
-			if (BuildItemTable(lang))
-				SaveItemProto(lang);
-		}
-		__except (DumpProtoUnhandledExceptionFilter(GetExceptionInformation()))
-		{
-			LogProtoError("[ITEM][%s] FATAL: crash in item phase (continuing)", lang ? lang : "?");
-		}
-#else
-		if (BuildItemTable(lang))
-			SaveItemProto(lang);
-#endif
+		if (BuildItemTable(MLanguage[i].c_str()))
+			SaveItemProto(MLanguage[i].c_str());
 	}
 
 	return 0;

@@ -131,7 +131,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\pc\assassin\effect\wind.dds"
+            "wind.dds"
         }
     }
 }
@@ -267,7 +267,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\pc\assassin\effect\2-star.dds"
+            "bottom.dds"
         }
     }
 }
@@ -426,7 +426,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\pc\assassin\effect\2-star.dds"
+            "bottom.dds"
         }
     }
 }
@@ -678,7 +678,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\pc\assassin\effect\2-star.dds"
+            "bottom.dds"
         }
     }
 }

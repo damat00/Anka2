@@ -18,9 +18,6 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include <boost/geometry/srs/projections/dpar.hpp>
-#include <boost/geometry/srs/projections/factory_key.hpp>
-#include <boost/geometry/srs/projections/proj4.hpp>
 #include <boost/geometry/srs/projections/impl/factory_entry.hpp>
 #include <boost/geometry/srs/projections/proj/aea.hpp>
 #include <boost/geometry/srs/projections/proj/aeqd.hpp>
@@ -127,23 +124,24 @@ namespace boost { namespace geometry { namespace projections
 namespace detail
 {
 
-template <typename Params, typename CT, typename ProjParams>
-class factory
+template <typename CT, typename Parameters>
+class factory : public detail::base_factory<CT, Parameters>
 {
 private:
-    typedef detail::factory_entry
+
+    typedef std::map
         <
-            Params,
-            CT,
-            ProjParams
-        > entry_base;
-
-    typedef typename factory_key_util<Params>::type key_type;
-    typedef boost::shared_ptr<entry_base> entry_ptr;
-
-    typedef std::map<key_type, entry_ptr> entries_map;
-
-    entries_map m_entries;
+            std::string,
+            boost::shared_ptr
+                <
+                    detail::factory_entry
+                        <
+                            CT,
+                            Parameters
+                        >
+                >
+        > prj_registry;
+    prj_registry m_registry;
 
 public:
 
@@ -249,44 +247,33 @@ public:
         detail::wink2_init(*this);
     }
 
-    void add_to_factory(key_type const& key, entry_base* entry)
+    virtual ~factory() {}
+
+    virtual void add_to_factory(std::string const& name,
+                    detail::factory_entry<CT, Parameters>* sub)
     {
-        // The pointer has to be owned before std::map::operator[] in case it thrown an exception.
-        entry_ptr ptr(entry);
-        m_entries[key] = ptr;
+        m_registry[name].reset(sub);
     }
 
-    detail::base_v<CT, ProjParams>* create_new(Params const& params, ProjParams const& proj_par) const
+    inline detail::base_v<CT, Parameters>* create_new(Parameters const& parameters) const
     {
-        typename factory_key_util<Params>::type key = factory_key_util<Params>::get(proj_par);
-        typename entries_map::const_iterator it = m_entries.find(key);
-        if (it != m_entries.end())
+        typename prj_registry::const_iterator it = m_registry.find(parameters.name);
+        if (it != m_registry.end())
         {
-            return it->second->create_new(params, proj_par);
+            return it->second->create_new(parameters);
         }
 
         return 0;
     }
 };
 
-template <typename T>
-inline detail::base_v<T, projections::parameters<T> >*
-    create_new(srs::detail::proj4_parameters const& params,
-               projections::parameters<T> const& parameters)
+template <typename CT>
+inline detail::base_v<CT, projections::parameters<CT> >*
+    create_new(projections::parameters<CT> const& parameters)
 {
-    static factory<srs::detail::proj4_parameters, T, projections::parameters<T> > const fac;
-    return fac.create_new(params, parameters);
+    static factory<CT, projections::parameters<CT> > fac;
+    return fac.create_new(parameters);
 }
-
-template <typename T>
-inline detail::base_v<T, projections::parameters<T> >*
-    create_new(srs::dpar::parameters<T> const& params,
-               projections::parameters<T> const& parameters)
-{
-    static factory<srs::dpar::parameters<T>, T, projections::parameters<T> > const fac;
-    return fac.create_new(params, parameters);
-}
-
 
 } // namespace detail
 

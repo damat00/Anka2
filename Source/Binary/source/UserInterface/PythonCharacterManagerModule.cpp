@@ -2,6 +2,7 @@
 #include "PythonCharacterManager.h"
 #include "PythonBackground.h"
 #include "InstanceBase.h"
+
 #include "../gamelib/RaceManager.h"
 
 #ifdef ENABLE_PYTHON_DYNAMIC_MODULE_NAME
@@ -71,6 +72,44 @@ PyObject * chrmgrRegisterTitleColor(PyObject * poSelf, PyObject * poArgs)
 	CInstanceBase::RegisterTitleColor(iIndex, ir, ig, ib);
 	return Py_BuildNone();
 }
+
+#ifdef ENABLE_TITLE_SYSTEM
+PyObject *chrmgrRegisterTitleSystemName(PyObject *poSelf, PyObject *poArgs)
+{
+	int	iIndex;
+	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
+		return Py_BadArgument();
+
+	char *szTitleName;
+	if (!PyTuple_GetString(poArgs, 1, &szTitleName))
+		return Py_BadArgument();
+
+	CInstanceBase::RegisterTitleSystemName(iIndex, szTitleName);
+	return Py_BuildNone();
+}
+
+PyObject *chrmgrRegisterTitleSystemColor(PyObject *poSelf, PyObject *poArgs)
+{
+	int	iIndex;
+	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
+		return Py_BadArgument();
+
+	int ir;
+	if (!PyTuple_GetInteger(poArgs, 1, &ir))
+		return Py_BadArgument();
+
+	int ig;
+	if (!PyTuple_GetInteger(poArgs, 2, &ig))
+		return Py_BadArgument();
+
+	int ib;
+	if (!PyTuple_GetInteger(poArgs, 3, &ib))
+		return Py_BadArgument();
+
+	CInstanceBase::RegisterTitleSystemColor(iIndex, ir, ig, ib);
+	return Py_BuildNone();
+}
+#endif
 
 PyObject * chrmgrGetPickedVID(PyObject * poSelf, PyObject * poArgs)
 {
@@ -746,6 +785,11 @@ void initchrmgr()
 
 		{ "SetRaceHeight",				chrmgrSetRaceHeight,					METH_VARARGS },
 
+#ifdef ENABLE_TITLE_SYSTEM
+		{ "RegisterTitleSystemName",	chrmgrRegisterTitleSystemName,			METH_VARARGS},
+		{ "RegisterTitleSystemColor",	chrmgrRegisterTitleSystemColor,			METH_VARARGS},
+#endif
+
 		{ nullptr, nullptr },
 	};
 
@@ -767,19 +811,14 @@ void initchrmgr()
 	PyModule_AddIntConstant(poModule, "NAMECOLOR_PARTY", CInstanceBase::NAMECOLOR_PARTY);
 	PyModule_AddIntConstant(poModule, "NAMECOLOR_WARP", CInstanceBase::NAMECOLOR_WARP);
 	PyModule_AddIntConstant(poModule, "NAMECOLOR_WAYPOINT", CInstanceBase::NAMECOLOR_WAYPOINT);
-	PyModule_AddIntConstant(poModule, "NAMECOLOR_EXTRA", CInstanceBase::NAMECOLOR_EXTRA);
-#ifdef ENABLE_CONQUEROR_LEVEL
-	PyModule_AddIntConstant(poModule, "NAMECOLOR_CONQUEROR", CInstanceBase::NAMECOLOR_CONQUEROR);
-#endif
 #ifdef ENABLE_METIN_STONES_MINIMAP
 	PyModule_AddIntConstant(poModule, "NAMECOLOR_METIN", CInstanceBase::NAMECOLOR_METIN);
 #endif
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
 	PyModule_AddIntConstant(poModule, "NAMECOLOR_SHOP", CInstanceBase::NAMECOLOR_SHOP);
 #endif
-#ifdef NAMECOLOR_BOSS_CLIENT
-	PyModule_AddIntConstant(poModule, "NAMECOLOR_BOSS", CInstanceBase::NAMECOLOR_BOSS);
-#endif
+	PyModule_AddIntConstant(poModule, "NAMECOLOR_EXTRA", CInstanceBase::NAMECOLOR_EXTRA);
+
 	PyModule_AddIntConstant(poModule, "EFFECT_SPAWN_DISAPPEAR", CInstanceBase::EFFECT_SPAWN_DISAPPEAR);
 	PyModule_AddIntConstant(poModule, "EFFECT_SPAWN_APPEAR", CInstanceBase::EFFECT_SPAWN_APPEAR);
 	PyModule_AddIntConstant(poModule, "EFFECT_DUST", CInstanceBase::EFFECT_DUST);
@@ -850,35 +889,14 @@ void initchrmgr()
 	PyModule_AddIntConstant(poModule, "EFFECT_BOSS", CInstanceBase::EFFECT_BOSS);
 #endif
 
-#ifdef ENABLE_PASSIVE_SYSTEM
-	PyModule_AddIntConstant(poModule, "EFFECT_PASSIVE",		CInstanceBase::EFFECT_PASSIVE);
+#ifdef ENABLE_RENEWAL_BATTLE_PASS
+	PyModule_AddIntConstant(poModule, "EFFECT_BP_NORMAL_MISSION_COMPLETED", CInstanceBase::EFFECT_BP_NORMAL_MISSION_COMPLETED);
+	PyModule_AddIntConstant(poModule, "EFFECT_BP_PREMIUM_MISSION_COMPLETED", CInstanceBase::EFFECT_BP_PREMIUM_MISSION_COMPLETED);
+	PyModule_AddIntConstant(poModule, "EFFECT_BP_NORMAL_BATTLEPASS_COMPLETED", CInstanceBase::EFFECT_BP_NORMAL_BATTLEPASS_COMPLETED);
+	PyModule_AddIntConstant(poModule, "EFFECT_BP_PREMIUM_BATTLEPASS_COMPLETED", CInstanceBase::EFFECT_BP_PREMIUM_BATTLEPASS_COMPLETED);
 #endif
 
-#if defined(ENABLE_GROWTH_PET_SYSTEM) && defined(ENABLE_PVP_BALANCE)
-	PyModule_AddIntConstant(poModule, "EFFECT_FEATHER_WALK", CInstanceBase::EFFECT_FEATHER_WALK);
+#ifdef ENABLE_GROWTH_PET_SYSTEM
 	PyModule_AddIntConstant(poModule, "EFFECT_GYEONGGONG_BOOM", CInstanceBase::EFFECT_GYEONGGONG_BOOM);
-#endif
-
-#ifdef ENABLE_OCHAO_TEMPLE_SYSTEM
-	PyModule_AddIntConstant(poModule, "EFFECT_HEALER", CInstanceBase::EFFECT_HEALER);
-#endif
-
-#ifdef ENABLE_ZODIAC_MISSION
-	PyModule_AddIntConstant(poModule, "EFFECT_SKILL_DAMAGE_ZONE", CInstanceBase::EFFECT_SKILL_DAMAGE_ZONE);
-	PyModule_AddIntConstant(poModule, "EFFECT_SKILL_DAMAGE_ZONE_BUYUK", CInstanceBase::EFFECT_SKILL_DAMAGE_ZONE_BUYUK);
-	PyModule_AddIntConstant(poModule, "EFFECT_SKILL_DAMAGE_ZONE_ORTA", CInstanceBase::EFFECT_SKILL_DAMAGE_ZONE_ORTA);
-	PyModule_AddIntConstant(poModule, "EFFECT_SKILL_DAMAGE_ZONE_KUCUK", CInstanceBase::EFFECT_SKILL_DAMAGE_ZONE_KUCUK);
-	PyModule_AddIntConstant(poModule, "EFFECT_SKILL_SAFE_ZONE", CInstanceBase::EFFECT_SKILL_SAFE_ZONE);
-	PyModule_AddIntConstant(poModule, "EFFECT_SKILL_SAFE_ZONE_BUYUK", CInstanceBase::EFFECT_SKILL_SAFE_ZONE_BUYUK);
-	PyModule_AddIntConstant(poModule, "EFFECT_SKILL_SAFE_ZONE_KUCUK", CInstanceBase::EFFECT_SKILL_SAFE_ZONE_KUCUK);
-	PyModule_AddIntConstant(poModule, "EFFECT_SKILL_SAFE_ZONE_ORTA", CInstanceBase::EFFECT_SKILL_SAFE_ZONE_ORTA);
-
-	PyModule_AddIntConstant(poModule, "EFFECT_METEOR", CInstanceBase::EFFECT_METEOR);
-	PyModule_AddIntConstant(poModule, "EFFECT_BEAD_RAIN", CInstanceBase::EFFECT_BEAD_RAIN);
-	PyModule_AddIntConstant(poModule, "EFFECT_FALL_ROCK", CInstanceBase::EFFECT_FALL_ROCK);
-	PyModule_AddIntConstant(poModule, "EFFECT_ARROW_RAIN", CInstanceBase::EFFECT_ARROW_RAIN);
-	PyModule_AddIntConstant(poModule, "EFFECT_HORSE_DROP", CInstanceBase::EFFECT_HORSE_DROP);
-	PyModule_AddIntConstant(poModule, "EFFECT_EGG_DROP", CInstanceBase::EFFECT_EGG_DROP);
-	PyModule_AddIntConstant(poModule, "EFFECT_DEAPO_BOOM", CInstanceBase::EFFECT_DEAPO_BOOM);
 #endif
 }

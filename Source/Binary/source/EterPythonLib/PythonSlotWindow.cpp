@@ -278,23 +278,6 @@ void CSlotWindow::DisableCoverButton(DWORD dwIndex)
 	pSlot->pCoverButton->Disable();
 }
 
-#ifdef ENABLE_FISH_EVENT_SYSTEM
-void CSlotWindow::DeleteCoverButton(DWORD dwIndex)
-{
-	TSlot * pSlot;
-	if (!GetSlotPointer(dwIndex, &pSlot))
-		return;
-
-	CCoverButton *& rpCoverButton = pSlot->pCoverButton;
-	if (!rpCoverButton)
-		return;
-
-	rpCoverButton->Hide();
-	rpCoverButton->Disable();
-	rpCoverButton->DestroyHandle();
-}
-#endif
-
 void CSlotWindow::SetAlwaysRenderCoverButton(DWORD dwIndex, bool bAlwaysRender)
 {
 	TSlot * pSlot;
@@ -432,25 +415,25 @@ void CSlotWindow::SetSlot(DWORD dwIndex, DWORD dwVirtualNumber, BYTE byWidth, BY
 	}
 }
 
-#ifdef ENABLE_MINI_GAME
-void CSlotWindow::SetCardSlot(DWORD dwIndex, DWORD dwVirtualNumber, BYTE byWidth, BYTE byHeight, const char* c_szFileName, D3DXCOLOR& diffuseColor)
+#ifdef ENABLE_MINIGAME_OKEY_CARDS_SYSTEM
+void CSlotWindow::SetCardSlot(DWORD dwIndex, DWORD dwVirtualNumber, BYTE byWidth, BYTE byHeight, const char *c_szFileName, D3DXCOLOR& diffuseColor)
 {
-	CGraphicImage* pImage = (CGraphicImage*)CResourceManager::Instance().GetResourcePointer(c_szFileName);
-	TSlot* pSlot;
+	CGraphicImage * pImage = (CGraphicImage *)CResourceManager::Instance().GetResourcePointer(c_szFileName);
+	TSlot * pSlot;
 	if (!GetSlotPointer(dwIndex, &pSlot))
 		return;
 
 	if (pSlot->isItem)
-		if (pSlot->dwItemIndex == dwVirtualNumber)
+	if (pSlot->dwItemIndex == dwVirtualNumber)
+	{
+		pSlot->dwState = 0;
+		pSlot->isItem = TRUE;
+		if (pImage && pSlot->pInstance)
 		{
-			pSlot->dwState = 0;
-			pSlot->isItem = TRUE;
-			if (pImage && pSlot->pInstance)
-			{
-				pSlot->pInstance->SetImagePointer(pImage);
-			}
-			return;
+			pSlot->pInstance->SetImagePointer(pImage);
 		}
+		return;
+	}
 
 	ClearSlot(pSlot);
 	pSlot->dwState = 0;

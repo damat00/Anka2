@@ -3,7 +3,7 @@
 
 #include <assert.h>
 
-template <typename T> class singleton
+template <typename T> class singleton 
 {
 	public:
 		static T* ms_singleton;

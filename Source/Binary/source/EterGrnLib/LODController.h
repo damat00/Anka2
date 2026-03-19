@@ -185,10 +185,10 @@ class CGrannyLODController : public CGraphicBase
 
 		struct FSetMotionPointer
 		{
-			const CGrannyMotion *	m_pMotion;
-			float					m_speedRatio;
-			float					m_blendTime;
-			int						m_loopCount;
+			const CGrannyMotion * m_pMotion;
+			float m_speedRatio;
+			float m_blendTime;
+			int m_loopCount;
 
 			void operator() (CGrannyLODController * pController)
 			{
@@ -199,9 +199,9 @@ class CGrannyLODController : public CGraphicBase
 
 		struct FChangeMotionPointer
 		{
-			const CGrannyMotion *	m_pMotion;
-			float					m_speedRatio;
-			int						m_loopCount;
+			const CGrannyMotion * m_pMotion;
+			float m_speedRatio;
+			int m_loopCount;
 
 			void operator() (CGrannyLODController * pController)
 			{
@@ -212,7 +212,7 @@ class CGrannyLODController : public CGraphicBase
 
 		struct FEndStopMotionPointer
 		{
-			const CGrannyMotion *	m_pMotion;
+			const CGrannyMotion * m_pMotion;
 
 			void operator () (CGrannyLODController * pController)
 			{

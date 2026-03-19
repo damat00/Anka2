@@ -199,8 +199,7 @@ public:
   }
 
 #if !defined(BOOST_ASIO_NO_DEPRECATED)
-  /// (Deprecated: Use overload with separate host and service parameters.)
-  /// Perform forward resolution of a query to a list of entries.
+  /// (Deprecated.) Perform forward resolution of a query to a list of entries.
   /**
    * This function is used to resolve a query into a list of endpoint entries.
    *
@@ -221,8 +220,7 @@ public:
     return r;
   }
 
-  /// (Deprecated: Use overload with separate host and service parameters.)
-  /// Perform forward resolution of a query to a list of entries.
+  /// (Deprecated.) Perform forward resolution of a query to a list of entries.
   /**
    * This function is used to resolve a query into a list of endpoint entries.
    *
@@ -603,8 +601,8 @@ public:
   }
 
 #if !defined(BOOST_ASIO_NO_DEPRECATED)
-  /// (Deprecated: Use overload with separate host and service parameters.)
-  /// Asynchronously perform forward resolution of a query to a list of entries.
+  /// (Deprecated.) Asynchronously perform forward resolution of a query to a
+  /// list of entries.
   /**
    * This function is used to asynchronously resolve a query into a list of
    * endpoint entries.

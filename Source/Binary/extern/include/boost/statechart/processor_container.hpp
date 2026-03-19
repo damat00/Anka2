@@ -60,7 +60,7 @@ namespace detail
 template<
   class Scheduler,
   class WorkItem,
-  class Allocator = std::allocator< none > >
+  class Allocator = std::allocator< void > >
 class processor_container : noncopyable
 {
   typedef event_processor< Scheduler > processor_base_type;

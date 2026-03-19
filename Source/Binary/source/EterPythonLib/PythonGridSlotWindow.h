@@ -16,10 +16,6 @@ namespace UI
 			void Destroy();
 
 			void ArrangeGridSlot(DWORD dwStartIndex, DWORD dwxCount, DWORD dwyCount, int ixSlotSize, int iySlotSize, int ixTemporarySize, int iyTemporarySize);
-#ifdef ENABLE_FISH_EVENT_SYSTEM
-			void SetPickedAreaRender(bool bFlag) { bPickedAreaRender = bFlag; }
-			bool GetPickedAreaRender() { return bPickedAreaRender; }
-#endif
 
 		protected:
 			void __Initialize();
@@ -38,9 +34,6 @@ namespace UI
 		protected:
 			DWORD m_dwxCount;
 			DWORD m_dwyCount;
-#ifdef ENABLE_FISH_EVENT_SYSTEM
-			bool bPickedAreaRender;
-#endif
 
 			std::vector<TSlot *> m_SlotVector;
 	};

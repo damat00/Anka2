@@ -1,5 +1,5 @@
 /* Simple.c
-
+ 
 This is a Win32 C application (ie, no MFC, WTL, nor even any C++ -- just plain C) that demonstrates
 how to embed a browser "control" (actually, an OLE object) in your own window (in order to display a
 web page, or an HTML file on disk).
@@ -612,7 +612,7 @@ HRESULT STDMETHODCALLTYPE Site_QueryInterface(IOleClientSite FAR* This, REFIID r
 	// _IOleClientSiteEx is an embedded IOleClientSite, so the browser doesn't mind. We want the browser
 	// to continue passing our _IOleClientSiteEx pointer wherever it would normally pass a IOleClientSite
 	// pointer.
-	//
+	// 
 	// The IUnknown interface uses the same VTable as the first object in our _IOleClientSiteEx
 	// struct (which happens to be an IOleClientSite). So if the browser is asking us to match
 	// IID_IUnknown, then we'll also return a pointer to our _IOleClientSiteEx.
@@ -1029,7 +1029,7 @@ void UnEmbedBrowserObject(HWND hwnd)
  */
 
 void DoPageAction(HWND hwnd, DWORD action)
-{
+{	
 	IWebBrowser2	*webBrowser2;
 	IOleObject		*browserObject;
 
@@ -1118,7 +1118,7 @@ void DoPageAction(HWND hwnd, DWORD action)
  */
 
 long DisplayHTMLStr(HWND hwnd, LPCTSTR string)
-{
+{	
 	IWebBrowser2	*webBrowser2;
 	LPDISPATCH		lpDispatch;
 	IHTMLDocument2	*htmlDoc2;
@@ -1197,7 +1197,7 @@ long DisplayHTMLStr(HWND hwnd, LPCTSTR string)
 							// Close the document. If we don't do this, subsequent calls to DisplayHTMLStr
 							// would append to the current contents of the page
 							htmlDoc2->lpVtbl->close(htmlDoc2);
-
+							
 							// Normally, we'd need to free our BSTR, but SafeArrayDestroy() does it for us
 //							SysFreeString(bstr);
 						}
@@ -1448,7 +1448,7 @@ long EmbedBrowserObject(HWND hwnd)
 
 	// Get a pointer to the browser object and lock it down (so it doesn't "disappear" while we're using
 	// it in this program). We do this by calling the OS function CoGetClassObject().
-	//
+	//	
 	// NOTE: We need this pointer to interact with and control the browser. With normal WIN32 controls such as a
 	// Static, Edit, Combobox, etc, you obtain an HWND and send messages to it with SendMessage(). Not so with
 	// the browser object. You need to get a pointer to its "base structure" (as returned by CoGetClassObject()). This
@@ -1471,11 +1471,11 @@ long EmbedBrowserObject(HWND hwnd)
 	// this extended struct passed to our IOleClientSite functions.
 
 	// Get a pointer to the browser object's IClassFactory object via CoGetClassObject()
-
+	
 	pClassFactory = 0;
-	hr =
+	hr =  
 		CoGetClassObject(
-		&CLSID_WebBrowser,
+		&CLSID_WebBrowser, 
 		CLSCTX_INPROC_SERVER | CLSCTX_INPROC_HANDLER, NULL, &IID_IClassFactory, (void **)&pClassFactory) && pClassFactory;
 
 	if (!hr||!pClassFactory)
@@ -1501,7 +1501,7 @@ long EmbedBrowserObject(HWND hwnd)
 				// application's name and the name of the document in which we're embedding the browser. (Since we have no
 				// document name, we'll pass a 0 for the latter). When the browser object is opened for editing, it displays
 				// these names in its titlebar.
-				//
+				//	
 				// We are passing 3 args to SetHostNames. You'll note that the first arg to SetHostNames is the base
 				// address of our browser control. This is something that you always have to remember when working in C
 				// (as opposed to C++). When calling a VTable function, the first arg to that function must always be the
@@ -1609,7 +1609,7 @@ LRESULT CALLBACK WebBrowser_WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPAR
 			// once. Note that the browser object will start calling some of our
 			// IOleInPlaceFrame and IOleClientSite functions as soon as we start
 			// calling browser object functions in EmbedBrowserObject().
-			if (EmbedBrowserObject(hwnd))
+			if (EmbedBrowserObject(hwnd)) 
 				return(-1);
 
 			// Another window created with an embedded browser object
@@ -1631,13 +1631,13 @@ LRESULT CALLBACK WebBrowser_WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPAR
 	return(DefWindowProc(hwnd, uMsg, wParam, lParam));
 }
 
-static const char* WEBBROWSER_CLASSNAME = "WEBBROWSER";
+static const char *WEBBROWSER_CLASSNAME = "WEBBROWSER";
 static HINSTANCE gs_hInstance = NULL;
 static HWND gs_hWndWebBrowser = NULL;
 static HWND gs_hWndParent = NULL;
 
 
-int WebBrowser_Show(HWND hParent, const char* addr, const RECT* rc)
+int WebBrowser_Show(HWND hParent, const char *addr, const RECT* rc)
 {
 	if (gs_hWndWebBrowser)
 		return 0;
@@ -1689,7 +1689,7 @@ void WebBrowser_Destroy()
 }
 
 int WebBrowser_Startup(HINSTANCE hInstance)
-{
+{	
 	if (OleInitialize(NULL) != S_OK)
 	{
 		return 0;

@@ -1,10 +1,12 @@
 #include "StdAfx.h"
-#include "../EterPack/EterPackManager.h"
-#include "PythonNonPlayer.h"
+
+#include "../eterPack/EterPackManager.h"
+
+#include "pythonnonplayer.h"
 #include "InstanceBase.h"
 #include "PythonCharacterManager.h"
 
-#ifdef ENABLE_WIKI_SYSTEM
+#ifdef ENABLE_INGAME_WIKI_SYSTEM
 	#include "PythonWiki.h"
 #endif
 
@@ -61,7 +63,7 @@ bool CPythonNonPlayer::LoadNonPlayerData(const char *c_szFileName)
 		return false;
 	}
 
-#ifdef ENABLE_WIKI_SYSTEM
+#ifdef ENABLE_INGAME_WIKI_SYSTEM
 	CPythonWiki::Instance().ClearData();
 #endif
 
@@ -71,14 +73,14 @@ bool CPythonNonPlayer::LoadNonPlayerData(const char *c_szFileName)
 		TMobTable * pNonPlayerData = new TMobTable;
 		memcpy(pNonPlayerData, pTable, sizeof(TMobTable));
 
-#ifdef ENABLE_WIKI_SYSTEM
+#ifdef ENABLE_INGAME_WIKI_SYSTEM
 		CPythonWiki::Instance().LoadMonster(pNonPlayerData);
 #endif
 
 		m_NonPlayerDataMap.insert(TNonPlayerDataMap::value_type(pNonPlayerData->dwVnum, pNonPlayerData));
 	}
 
-#ifdef ENABLE_WIKI_SYSTEM
+#ifdef ENABLE_INGAME_WIKI_SYSTEM
 	CPythonWiki::Instance().ListReverse();
 #endif
 
@@ -316,7 +318,7 @@ bool CPythonNonPlayer::GetScale(DWORD dwVnum, float& fx, float& fy, float& fz)
 }
 #endif
 
-#ifdef ENABLE_WIKI_SYSTEM
+#ifdef ENABLE_INGAME_WIKI_SYSTEM
 DWORD CPythonNonPlayer::GetMonsterPrice1(DWORD dwVnum)
 {
 	const CPythonNonPlayer::TMobTable* c_pTable = GetTable(dwVnum);
@@ -535,18 +537,6 @@ int CPythonNonPlayer::GetNPCWear(const int raceIndex, const BYTE wearIndex)
 	return -1;
 }
 #endif
-
-float CPythonNonPlayer::GetMonsterHitRange(DWORD dwVnum)
-{
-	const CPythonNonPlayer::TMobTable* c_pTable = GetTable(dwVnum);
-	if (!c_pTable)
-		return 70.0f;
-
-	if (c_pTable->fHitRange)
-		return c_pTable->fHitRange;
-
-	return 100.0f;
-}
 
 void CPythonNonPlayer::Clear()
 {

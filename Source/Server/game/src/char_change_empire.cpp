@@ -4,11 +4,9 @@
 #include "char.h"
 #include "char_manager.h"
 #include "db.h"
+#include "desc.h"
 #include "guild_manager.h"
 #include "marriage.h"
-#include "../../common/service.h"
-#include "desc.h"
-
 
 int CHARACTER::ChangeEmpire(BYTE empire)
 {

@@ -4,8 +4,8 @@
 
 #include <unordered_map>
 
-#define POLYMORPH_SKILL_ID	129
-#define POLYMORPH_BOOK_ID	50322
+#define POLYMORPH_SKILL_ID 129
+#define POLYMORPH_BOOK_ID 50322
 
 enum POLYMORPH_BONUS_TYPE
 {

@@ -78,7 +78,6 @@
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalOptions>/ignore:4075 /ignore:4098 /ignore:4099 %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -128,7 +127,6 @@
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <AssemblyDebug>true</AssemblyDebug>
       <AdditionalDependencies>../../extern/library/lz4;../../extern/library/xxhash;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalOptions>/ignore:4075 /ignore:4098 /ignore:4099 %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -145,9 +143,7 @@
     <ClInclude Include="..\..\source\UserInterface\AbstractSingleton.h" />
     <ClInclude Include="..\..\source\UserInterface\AccountConnector.h" />
     <ClInclude Include="..\..\source\UserInterface\AffectFlagContainer.h" />
-    <ClInclude Include="..\..\source\UserInterface\AlphaAddSpecular.h" />
     <ClInclude Include="..\..\source\UserInterface\Discord.h" />
-    <ClInclude Include="..\..\source\UserInterface\dx8todx9.h" />
     <ClInclude Include="..\..\source\UserInterface\GameType.h" />
     <ClInclude Include="..\..\source\UserInterface\GuildMarkDownloader.h" />
     <ClInclude Include="..\..\source\UserInterface\GuildMarkUploader.h" />
@@ -168,13 +164,11 @@
     <ClInclude Include="..\..\source\UserInterface\PythonChat.h" />
     <ClInclude Include="..\..\source\UserInterface\PythonConfig.h" />
     <ClInclude Include="..\..\source\UserInterface\PythonCubeRenewal.h" />
-    <ClInclude Include="..\..\source\UserInterface\PythonDungeonInfo.h" />
     <ClInclude Include="..\..\source\UserInterface\PythonDynamicModuleNames.h" />
     <ClInclude Include="..\..\source\UserInterface\PythonEventManager.h" />
     <ClInclude Include="..\..\source\UserInterface\PythonExceptionSender.h" />
     <ClInclude Include="..\..\source\UserInterface\PythonExchange.h" />
     <ClInclude Include="..\..\source\UserInterface\PythonGameEventManager.h" />
-    <ClInclude Include="..\..\source\UserInterface\PythonGameEvents.h" />
     <ClInclude Include="..\..\source\UserInterface\PythonGuild.h" />
     <ClInclude Include="..\..\source\UserInterface\PythonGuildRanking.h" />
     <ClInclude Include="..\..\source\UserInterface\PythonIME.h" />
@@ -246,7 +240,6 @@
     <ClCompile Include="..\..\source\UserInterface\PythonConfig.cpp" />
     <ClCompile Include="..\..\source\UserInterface\PythonConfigModule.cpp" />
     <ClCompile Include="..\..\source\UserInterface\PythonCubeRenewal.cpp" />
-    <ClCompile Include="..\..\source\UserInterface\PythonDungeonInfo.cpp" />
     <ClCompile Include="..\..\source\UserInterface\PythonDynamicModuleNames.cpp" />
     <ClCompile Include="..\..\source\UserInterface\PythonEffectModule.cpp" />
     <ClCompile Include="..\..\source\UserInterface\PythonEventManager.cpp" />
@@ -257,7 +250,6 @@
     <ClCompile Include="..\..\source\UserInterface\PythonFlyModule.cpp" />
     <ClCompile Include="..\..\source\UserInterface\PythonGameEventManager.cpp" />
     <ClCompile Include="..\..\source\UserInterface\PythonGameEventManagerModule.cpp" />
-    <ClCompile Include="..\..\source\UserInterface\PythonGameEvents.cpp" />
     <ClCompile Include="..\..\source\UserInterface\PythonGuild.cpp" />
     <ClCompile Include="..\..\source\UserInterface\PythonGuildRanking.cpp" />
     <ClCompile Include="..\..\source\UserInterface\PythonIME.cpp" />

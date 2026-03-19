@@ -97,10 +97,10 @@ class CPythonPlayer : public CSingleton<CPythonPlayer>, public IAbstractPlayer
 	public:
 		enum
 		{
-			CATEGORY_NONE		= 0,
-			CATEGORY_ACTIVE		= 1,
-			CATEGORY_PASSIVE	= 2,
-			CATEGORY_MAX_NUM	= 3,
+			CATEGORY_NONE = 0,
+			CATEGORY_ACTIVE = 1,
+			CATEGORY_PASSIVE = 2,
+			CATEGORY_MAX_NUM = 3,
 
 			STATUS_INDEX_ST = 1,
 			STATUS_INDEX_DX = 2,
@@ -192,7 +192,7 @@ class CPythonPlayer : public CSingleton<CPythonPlayer>, public IAbstractPlayer
 		};
 
 		typedef struct SPlayerStatus
-		{
+		{		    
 			TItemData			aItem[c_Inventory_Count];
 			TItemData			aDSItem[c_DragonSoul_Inventory_Count];
 #ifdef ENABLE_RENEWAL_SWITCHBOT
@@ -361,7 +361,7 @@ class CPythonPlayer : public CSingleton<CPythonPlayer>, public IAbstractPlayer
 		// Player Status
 		const char *	GetName();
 		void	SetName(const char *name);
-
+		
 		void	SetRace(DWORD dwRace);
 		DWORD	GetRace();
 
@@ -399,14 +399,6 @@ class CPythonPlayer : public CSingleton<CPythonPlayer>, public IAbstractPlayer
 		DWORD	GetItemMetinSocket(TItemPos Cell, DWORD dwMetinSocketIndex);
 		void	GetItemAttribute(TItemPos Cell, DWORD dwAttrSlotIndex, BYTE * pbyType, short * psValue);
 		void	SendClickItemPacket(DWORD dwIID);
-
-#ifdef ENABLE_ATTENDANCE_EVENT
-		void	SetHitCountInfo(DWORD dwVid, DWORD dwCount);
-		DWORD 	GetHitCountInfo(DWORD dwVid);
-		
-		void 	SetRewardItem(BYTE bDay, DWORD dwVnum, DWORD dwCount);
-		std::vector<TRewardItem>& GetRewardVec() { return m_rewardItems; }
-#endif
 
 #ifdef ENABLE_AUTOMATIC_PICK_UP_SYSTEM
 		void	SendPickUPItemPacket(std::vector<DWORD> itemVidList);
@@ -566,6 +558,7 @@ class CPythonPlayer : public CSingleton<CPythonPlayer>, public IAbstractPlayer
 		void	StartEmotionProcess();
 		void	EndEmotionProcess();
 
+
 		// Function Only For Console System
 		BOOL	__ToggleCoolTime();
 		BOOL	__ToggleLevelLimit();
@@ -574,7 +567,7 @@ class CPythonPlayer : public CSingleton<CPythonPlayer>, public IAbstractPlayer
 		__inline		SAutoPotionInfo& GetAutoPotionInfo(int type)		{ return m_kAutoPotionInfo[type]; }
 		__inline void					 SetAutoPotionInfo(int type, const SAutoPotionInfo& info)	{ m_kAutoPotionInfo[type] = info; }
 
-#ifdef ENABLE_ULTIMATE_REGEN
+#ifdef ENABLE_RENEWAL_REGEN
 		bool	LoadNewRegen();
 		bool	CheckBossSafeRange();
 #endif
@@ -797,7 +790,7 @@ class CPythonPlayer : public CSingleton<CPythonPlayer>, public IAbstractPlayer
 		DWORD m_dwTargetEndTime;
 		DWORD m_dwPlayTime;
 
-#ifdef ENABLE_ULTIMATE_REGEN
+#ifdef ENABLE_RENEWAL_REGEN
 		std::vector<TNewRegen> m_eventData;
 #endif
 
@@ -1009,11 +1002,6 @@ class CPythonPlayer : public CSingleton<CPythonPlayer>, public IAbstractPlayer
 
 		TPetDataMap m_PetDataMap;
 		DWORD m_dwActivePetID;
-#endif
-
-#ifdef ENABLE_ATTENDANCE_EVENT
-		std::vector<THitCountInfo> m_hitCount;
-		std::vector<TRewardItem> m_rewardItems;
 #endif
 };
 

@@ -185,9 +185,7 @@ void CPythonCharacterManager::ShowPointEffect(DWORD ePoint, DWORD dwVID)
 	CInstanceBase * pkInstSel = (dwVID == 0xffffffff) ? GetMainInstancePtr() : GetInstancePtr(dwVID);
 
 	if (!pkInstSel)
-	{
 		return;
-	}
 
 	switch (ePoint)
 	{
@@ -197,23 +195,13 @@ void CPythonCharacterManager::ShowPointEffect(DWORD ePoint, DWORD dwVID)
 		case POINT_LEVEL_STEP:
 			pkInstSel->SkillUp();
 			break;
-#ifdef ENABLE_CONQUEROR_LEVEL
-		case POINT_CONQUEROR_LEVEL:
-			pkInstSel->LevelUp();
-			break;
-		case POINT_CONQUEROR_LEVEL_STEP:
-			pkInstSel->SkillUp();
-			break;
-#endif
 	}
 }
 
 bool CPythonCharacterManager::RegisterPointEffect(DWORD ePoint, const char *c_szFileName)
 {
 	if (ePoint>=POINT_MAX_NUM)
-	{
 		return false;
-	}
 
 	CEffectManager& rkEftMgr=CEffectManager::Instance();
 	rkEftMgr.RegisterEffect2(c_szFileName, &m_adwPointEffect[ePoint]);
@@ -295,7 +283,7 @@ bool CPythonCharacterManager::OLD_GetPickedInstanceVID(DWORD* pdwPickedActorID)
 {
 	if (!m_pkInstPick)
 		return false;
-
+		
 	*pdwPickedActorID=m_pkInstPick->GetVirtualID();
 	return true;
 }
@@ -523,7 +511,7 @@ void CPythonCharacterManager::DeleteInstance(DWORD dwDelVID)
 void CPythonCharacterManager::__DeleteBlendOutInstance(CInstanceBase* pkInstDel)
 {
 	pkInstDel->DeleteBlendOut();
-	m_kDeadInstList.push_back(pkInstDel);
+	m_kDeadInstList.push_back(pkInstDel);	
 
 	IAbstractPlayer& rkPlayer=IAbstractPlayer::GetSingleton();
 	rkPlayer.NotifyCharacterDead(pkInstDel->GetVirtualID());
@@ -537,7 +525,7 @@ void CPythonCharacterManager::DeleteInstanceByFade(DWORD dwVID)
 		return;
 	}
 	__DeleteBlendOutInstance(f->second);
-	m_kAliveInstMap.erase(f);
+	m_kAliveInstMap.erase(f);	
 }
 
 void CPythonCharacterManager::SelectInstance(DWORD VirtualID)
@@ -871,6 +859,19 @@ CPythonCharacterManager::~CPythonCharacterManager()
 	Destroy();
 }
 
+#ifdef ENABLE_RENEWAL_REGEN
+void CPythonCharacterManager::GetMobWithVnum(DWORD bossVnum, std::vector<CInstanceBase*>& m_Data)
+{
+	m_Data.clear();
+	for (auto& it : m_kAliveInstMap)
+	{
+		CInstanceBase* pInstance = it.second;
+		if (pInstance->GetRace() == bossVnum)
+			m_Data.emplace_back(pInstance);
+	}
+}
+#endif
+
 #ifdef __AUTO_HUNT__
 #include "PythonPlayer.h"
 bool FindLowerDistance(const std::pair<CInstanceBase*, float>& i, const std::pair<CInstanceBase*, float>& j){return i.second < j.second;}
@@ -930,44 +931,38 @@ CInstanceBase* CPythonCharacterManager::FindVictim(CInstanceBase* pkInstMain, fl
 			}
 			v3Movement += inc;
 		}
-		// Engelleme kontrolü - eðer engel varsa ve saldýrý menzilinde deðilse atla
-		// Ama saldýrý menzilindeyse engel olsa bile hedefi kabul et
-		if (hasPhysicalBlock && !CanAttackToTarget(pkInstMain, pkVictim))
+		if (hasPhysicalBlock || CanAttackToTarget(pkInstMain, pkVictim))
 			continue;
-
+		
 		// StartPoint'e göre mesafe (maksimum menzil kontrolü)
 		const float fDistanceFromStart = GetDistanceNew(*startPoint, targetPos);
 		if (fDistanceFromStart >= fMaxDistance)
 			continue;
-
+		
 		// Oyuncuya göre mesafe (öncelik - en yakýn hedef seçilecek)
 		TPixelPosition mainPos;
 		pkInstMain->NEW_GetPixelPosition(&mainPos);
 		const float fDistanceFromPlayer = GetDistanceNew(mainPos, targetPos);
-
+		
 		// Oyuncuya göre mesafeyi öncelik olarak kullan
 		m_vecVictimList.emplace_back(pkVictim, fDistanceFromPlayer);
 	}
 	if (m_vecVictimList.size())
 	{
-		// En yakýn hedefi seç (oyuncuya göre mesafe) - rastgele seçimi kaldýrdýk
-		// Böylece her zaman en yakýn hedefe saldýrýr, ilk slota vurmadan diðerine geçmez
+		// En yakýn hedefi seç (oyuncuya göre mesafe)
+		if (m_vecVictimList.size() > 1)
+		{
 			std::sort(m_vecVictimList.begin(), m_vecVictimList.end(), FindLowerDistance);
+			
+			// Birden fazla hedef varsa, en yakýn 3 hedef arasýndan rastgele seç
+			// Böylece farklý oyuncular farklý hedeflere yönlenir
+			const int maxRandomTargets = 3;
+			const int randomCount = (m_vecVictimList.size() < maxRandomTargets) ? (int)m_vecVictimList.size() : maxRandomTargets;
+			const int randomIndex = (std::rand() % randomCount);
+			return m_vecVictimList[randomIndex].first;
+		}
 		return m_vecVictimList[0].first;
 	}
 	return NULL;
-}
-#endif
-
-#ifdef ENABLE_ULTIMATE_REGEN
-void CPythonCharacterManager::GetMobWithVnum(DWORD bossVnum, std::vector<CInstanceBase*>& m_Data)
-{
-	m_Data.clear();
-	for (auto& it : m_kAliveInstMap)
-	{
-		CInstanceBase* pInstance = it.second;
-		if (pInstance->GetRace() == bossVnum)
-			m_Data.emplace_back(pInstance);
-	}
 }
 #endif

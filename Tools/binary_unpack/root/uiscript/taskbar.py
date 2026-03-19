@@ -5,7 +5,6 @@ app = __import__(pyapi.GetModuleName("app"))
 
 import uiScriptLocale
 
-ROOT = "d:/ymir work/ui/game/"
 GAME_PATH = "d:/ymir work/ui/game/"
 PATTERN_PATH = "d:/ymir work/ui/pattern/"
 
@@ -111,7 +110,6 @@ window = {
 					)
 				},
 				{
-					## Tooltip popup for
 					"name" : "HPGauge_Board",
 					"type" : "window",
 
@@ -156,7 +154,6 @@ window = {
 					),
 				},
 				{
-					## Tooltip popup for
 					"name" : "SPGauge_Board",
 					"type" : "window",
 
@@ -201,7 +198,6 @@ window = {
 					),
 				},
 				{
-					## Tooltip popup for
 					"name" : "STGauge_Board",
 					"type" : "window",
 
@@ -314,18 +310,6 @@ window = {
 
 		## Button
 		{
-			"name" : "ExpandMoneyButton",
-			"type" : "button",
-
-			"x" : SCREEN_WIDTH - 178,
-			"y" : 3 + Y_ADD_POSITION,
-			"tooltip_text" : "			" + uiScriptLocale.TASKBAR_MONEY_EXPAND,
-
-			"default_image" : GAME_PATH + "TaskBar/Ex_gemshop_button_01.tga",
-			"over_image" : GAME_PATH + "TaskBar/Ex_gemshop_button_02.tga",
-			"down_image" : GAME_PATH + "TaskBar/Ex_gemshop_button_03.tga",
-		},
-		{
 			"name" : "CharacterButton",
 			"type" : "button",
 
@@ -400,6 +384,7 @@ window = {
 					"x" : 128,
 					"y" : 1,
 					"tooltip_text" : uiScriptLocale.TASKBAR_EXPAND,
+
 
 					"default_image" : GAME_PATH + "TaskBar/Chat_Button_01.sub",
 					"over_image" : GAME_PATH + "TaskBar/Chat_Button_02.sub",
@@ -528,42 +513,3 @@ if app.ENABLE_ANTI_EXP:
 						"over_image" : GAME_PATH + "TaskBar/antiexp_button_05.tga",
 						"down_image" : GAME_PATH + "TaskBar/antiexp_button_06.tga",
 					},)
-
-if app.ENABLE_CONQUEROR_LEVEL:
-	window["children"][2]["children"] = window["children"][2]["children"] + (
-	{
-		"name" : "NewExpGauge_01",
-		"type" : "expanded_image",
-
-		"x" : 5,
-		"y" : 9,
-
-		"image" : ROOT + "TaskBar/new_exp_gauge_point.sub",
-	},
-	{
-		"name" : "NewExpGauge_02",
-		"type" : "expanded_image",
-
-		"x" : 30,
-		"y" : 9,
-
-		"image" : ROOT + "TaskBar/new_exp_gauge_point.sub",
-	},
-	{
-		"name" : "NewExpGauge_03",
-		"type" : "expanded_image",
-
-		"x" : 55,
-		"y" : 9,
-
-		"image" : ROOT + "TaskBar/new_exp_gauge_point.sub",
-	},
-	{
-		"name" : "NewExpGauge_04",
-		"type" : "expanded_image",
-
-		"x" : 80,
-		"y" : 9,
-
-		"image" : ROOT + "TaskBar/new_exp_gauge_point.sub",
-	},)

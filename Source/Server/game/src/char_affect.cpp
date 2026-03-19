@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#include "../../common/service.h"
+
 #include "config.h"
 #include "char.h"
 #include "char_manager.h"
@@ -16,28 +18,18 @@
 #include "horsename_manager.h"
 #include "item.h"
 #include "DragonSoul.h"
-#include "../../common/service.h"
 
 #define IS_NO_SAVE_AFFECT(type) \
 	((type) == AFFECT_WAR_FLAG || \
 	 (type) == AFFECT_REVIVE_INVISIBLE || \
 	 ((type) >= AFFECT_PREMIUM_START && (type) <= AFFECT_PREMIUM_END) || \
-	 (type) == AFFECT_AUTO_HUNT_AFFECT \
-	 || (type) == AFFECT_PASSIVE_RELIC_STONE_DEF \
-	 || (type) == AFFECT_PASSIVE_RELIC_DISMOUNT_SPEED \
-	)
+	 (type) == AFFECT_AUTO_HUNT_AFFECT)
 
 #define IS_NO_CLEAR_ON_DEATH_AFFECT(type) \
 	((type) == AFFECT_BLOCK_CHAT || \
 	 ((type) >= 500 && (type) < 600) || \
-	 ((type) >= AFFECT_COLLECTIONS0 && (type) <= AFFECT_COLLECT_KOLEKCJONER_EXTRA) || \
-	 (type) == AFFECT_AUTO_HUNT || \
-	 (type) == AFFECT_DBONE_BRONZE || \
-	 (type) == AFFECT_DBONE_SILVER || \
-	 (type) == AFFECT_DBONE_GOLD || \
-	 (type) == AFFECT_DBONE_DIAMOND || \
-	 (type) == AFFECT_DBONE_PLATIN || \
-	 (type) == AFFECT_DBONE_EMERALD)
+	 (type) == AFFECT_AUTO_HUNT)
+
 
 #ifdef ENABLE_AUTOMATIC_PICK_UP_SYSTEM
 bool IsRealTimeAffect(DWORD affectIndex)
@@ -57,10 +49,6 @@ bool IsRealTimeAffect(DWORD affectIndex)
 
 void SendAffectRemovePacket(LPDESC d, DWORD pid, DWORD type, BYTE point)
 {
-#ifdef ENABLE_ANALYZE_CLOSE_FIX
-	if (!d)
-		return;
-#endif
 	TPacketGCAffectRemove ptoc;
 	ptoc.bHeader = HEADER_GC_AFFECT_REMOVE;
 	ptoc.dwType = type;
@@ -68,19 +56,14 @@ void SendAffectRemovePacket(LPDESC d, DWORD pid, DWORD type, BYTE point)
 	d->Packet(&ptoc, sizeof(TPacketGCAffectRemove));
 
 	TPacketGDRemoveAffect ptod;
-	ptod.dwPID		= pid;
-	ptod.dwType		= type;
-	ptod.bApplyOn	= point;
-
+	ptod.dwPID = pid;
+	ptod.dwType = type;
+	ptod.bApplyOn = point;
 	db_clientdesc->DBPacket(HEADER_GD_REMOVE_AFFECT, 0, &ptod, sizeof(ptod));
 }
 
 void SendAffectAddPacket(LPDESC d, CAffect * pkAff)
 {
-#ifdef ENABLE_ANALYZE_CLOSE_FIX
-	if (!d)
-		return;
-#endif
 	TPacketGCAffectAdd ptoc;
 	ptoc.bHeader = HEADER_GC_AFFECT_ADD;
 	ptoc.elem.dwType = pkAff->dwType;
@@ -96,7 +79,6 @@ void SendAffectAddPacket(LPDESC d, CAffect * pkAff)
 	d->Packet(&ptoc, sizeof(TPacketGCAffectAdd));
 }
 
-// Affect
 CAffect * CHARACTER::FindAffect(DWORD dwType, BYTE bApply) const
 {
 	itertype(m_list_pkAffect) it = m_list_pkAffect.begin();
@@ -118,7 +100,7 @@ EVENTFUNC(affect_event)
 
 	if ( info == NULL )
 	{
-		sys_err( "affect_event> <Factor> NULL pointer" );
+		sys_err( "affect_event> <Factor> Null pointer" );
 		return 0;
 	}
 
@@ -137,6 +119,10 @@ EVENTFUNC(affect_event)
 
 bool CHARACTER::UpdateAffect()
 {
+#ifdef ENABLE_RENEWAL_PREMIUM_SYSTEM
+	CheckPremium();
+#endif
+
 #ifdef ENABLE_MAGIC_WEAPON_BUG_FIX
 	if (IsAffectFlag(AFF_GWIGUM) && !GetWear(WEAR_WEAPON))
 		RemoveAffect(SKILL_GWIGEOM);
@@ -154,7 +140,6 @@ bool CHARACTER::UpdateAffect()
 		else
 		{
 			int iVal = MIN(GetPoint(POINT_HP_RECOVERY), GetMaxHP() * 7 / 100);
-
 			PointChange(POINT_HP, iVal);
 			PointChange(POINT_HP_RECOVERY, -iVal);
 		}
@@ -164,10 +149,9 @@ bool CHARACTER::UpdateAffect()
 	{
 		if (GetMaxSP() <= GetSP())
 			PointChange(POINT_SP_RECOVERY, -GetPoint(POINT_SP_RECOVERY));
-		else
+		else 
 		{
-			int iVal = MIN(GetPoint(POINT_SP_RECOVERY), GetMaxSP() * 7 / 100);
-
+			int iVal = MIN (GetPoint (POINT_SP_RECOVERY), GetMaxSP() * 7 / 100);
 			PointChange(POINT_SP, iVal);
 			PointChange(POINT_SP_RECOVERY, -iVal);
 		}
@@ -185,13 +169,6 @@ bool CHARACTER::UpdateAffect()
 
 	AutoRecoveryItemProcess( AFFECT_AUTO_HP_RECOVERY );
 	AutoRecoveryItemProcess( AFFECT_AUTO_SP_RECOVERY );
-
-#ifdef __LEADERSHIP__BONUS__
-	if (GetParty())
-	{
-		RemoveAffect(AFF_LEADERSHIP);
-	}
-#endif
 
 	if (GetMaxStamina() > GetStamina())
 	{
@@ -221,7 +198,7 @@ void CHARACTER::StartAffectEvent()
 	sys_log(1, "StartAffectEvent %s %p %p", GetName(), this, get_pointer(m_pkAffectEvent));
 }
 
-void CHARACTER::ClearAffect(bool bSave, bool bSomeAffect)
+void CHARACTER::ClearAffect(bool bSave)
 {
 	TAffectFlag afOld = m_afAffectFlag;
 	WORD wMovSpd = GetPoint(POINT_MOV_SPEED);
@@ -235,15 +212,22 @@ void CHARACTER::ClearAffect(bool bSave, bool bSomeAffect)
 
 		if (bSave)
 		{
-
-			if ( IS_NO_CLEAR_ON_DEATH_AFFECT(pkAff->dwType) || IS_NO_SAVE_AFFECT(pkAff->dwType) )
+			if (IS_NO_CLEAR_ON_DEATH_AFFECT(pkAff->dwType) || IS_NO_SAVE_AFFECT(pkAff->dwType))
 			{
 				++it;
 				continue;
 			}
 
+#ifdef ENABLE_BIOLOG_SYSTEM
+			if (pkAff->dwType == AFFECT_BIOLOG)
+			{
+				++it;
+				continue;
+			}
+#endif
+
 #ifdef ENABLE_MULTI_FARM_BLOCK
-			if(pkAff->dwType == AFFECT_MULTI_FARM_PREMIUM)
+			if (pkAff->dwType == AFFECT_MULTI_FARM_PREMIUM)
 			{
 				++it;
 				continue;
@@ -258,70 +242,6 @@ void CHARACTER::ClearAffect(bool bSave, bool bSomeAffect)
 			}
 #endif
 
-#ifdef __LEADERSHIP__BONUS__
-			if (pkAff->dwType == AFF_LEADERSHIP)
-			{
-				++it;
-				continue;
-			}
-#endif
-
-#ifdef ENABLE_BATTLE_PASS
-			if (pkAff->dwType == AFFECT_BATTLE_BONUS1 || pkAff->dwType == AFFECT_BATTLE_BONUS2 || pkAff->dwType == AFFECT_BATTLE_BONUS3)
-			{
-				++it;
-				continue;
-			}
-#endif
-
-#ifdef ENABLE_EQUIPMENT_HAND_EFFECT
-			if (pkAff->dwType == AFFECT_DBONE_BRONZE || pkAff->dwType == AFFECT_DBONE_SILVER || pkAff->dwType == AFFECT_DBONE_GOLD || pkAff->dwType == AFFECT_DBONE_DIAMOND || pkAff->dwType == AFFECT_DBONE_PLATIN || pkAff->dwType == AFFECT_DBONE_EMERALD)
-			{
-				++it;
-				continue;
-			}
-#endif
-
-#ifdef __ENABLE_COLLECTIONS_SYSTEM__
-			if (pkAff->dwType == AFFECT_COLLECTIONS0 || pkAff->dwType == AFFECT_COLLECTIONS1 || pkAff->dwType == AFFECT_COLLECTIONS2 || pkAff->dwType == AFFECT_COLLECTIONS3 || pkAff->dwType == AFFECT_COLLECTIONS4 || pkAff->dwType == AFFECT_COLLECTIONS5 || pkAff->dwType == AFFECT_COLLECTIONS6 || pkAff->dwType == AFFECT_COLLECT_POLOWANIE)
-			{
-				++it;
-				continue;
-			}
-#endif
-
-#ifdef ENABLE_NINETH_SKILL
-			if (pkAff->dwType == SKILL_CHEONUN)
-			{
-				++it;
-				continue;
-			}
-#endif
-
-			if (bSomeAffect)
-			{
-				switch (pkAff->dwType)
-				{
-					case (SKILL_JEONGWI):
-					case (SKILL_GEOMKYUNG):
-					case (SKILL_CHUNKEON):
-					case (SKILL_GWIGEOM):
-					case (SKILL_TERROR):
-					case (SKILL_JUMAGAP):
-					case (SKILL_HOSIN):
-					case (SKILL_REFLECT):
-					case (SKILL_GICHEON):
-					case (SKILL_KWAESOK):
-					case (SKILL_JEUNGRYEOK):
-					//case (SKILL_JEOKRANG):
-					//case (SKILL_CHEONGRANG):
-					{
-						++it;
-						continue;
-					}
-				}
-			}
-
 			if (IsPC())
 			{
 				SendAffectRemovePacket(GetDesc(), GetPlayerID(), pkAff->dwType, pkAff->bApplyOn);
@@ -334,9 +254,7 @@ void CHARACTER::ClearAffect(bool bSave, bool bSomeAffect)
 		CAffect::Release(pkAff);
 	}
 
-	if (afOld != m_afAffectFlag ||
-		wMovSpd != GetPoint(POINT_MOV_SPEED) ||
-		wAttSpd != GetPoint(POINT_ATT_SPEED))
+	if (afOld != m_afAffectFlag || wMovSpd != GetPoint(POINT_MOV_SPEED) || wAttSpd != GetPoint(POINT_ATT_SPEED))
 		UpdatePacket();
 
 	CheckMaximumPoints();
@@ -347,8 +265,8 @@ void CHARACTER::ClearAffect(bool bSave, bool bSomeAffect)
 
 int CHARACTER::ProcessAffect()
 {
-	bool	bDiff	= false;
-	CAffect	*pkAff	= NULL;
+	bool bDiff = false;
+	CAffect* pkAff = NULL;
 
 	for (int i = 0; i <= PREMIUM_MAX_NUM; ++i)
 	{
@@ -370,25 +288,19 @@ int CHARACTER::ProcessAffect()
 			pkAff->lDuration = remain + 1;
 	}
 
-	////////// HAIR_AFFECT
 	pkAff = FindAffect(AFFECT_HAIR);
 	if (pkAff)
 	{
-		// IF HAIR_LIMIT_TIME() < CURRENT_TIME()
 		if ( this->GetQuestFlag("hair.limit_time") < get_global_time())
 		{
-			// SET HAIR NORMAL
 			this->SetPart(PART_HAIR, 0);
-			// REMOVE HAIR AFFECT
 			RemoveAffect(AFFECT_HAIR);
 		}
 		else
 		{
-			// INCREASE AFFECT DURATION
 			++(pkAff->lDuration);
 		}
 	}
-	////////// HAIR_AFFECT
 
 	CHorseNameManager::instance().Validate(this);
 
@@ -457,9 +369,7 @@ int CHARACTER::ProcessAffect()
 
 	if (bDiff)
 	{
-		if (afOld != m_afAffectFlag ||
-			lMovSpd != GetPoint(POINT_MOV_SPEED) ||
-			lAttSpd != GetPoint(POINT_ATT_SPEED))
+		if (afOld != m_afAffectFlag || lMovSpd != GetPoint(POINT_MOV_SPEED) || lAttSpd != GetPoint(POINT_ATT_SPEED))
 		{
 			UpdatePacket();
 		}
@@ -486,21 +396,15 @@ void CHARACTER::SaveAffect()
 		if (IS_NO_SAVE_AFFECT(pkAff->dwType))
 			continue;
 
-#ifdef ENABLE_NINETH_SKILL
-		if (pkAff->dwType == SKILL_CHEONUN)
-			continue;
-#endif
+		sys_log(1, "AFFECT_SAVE: %u %u %d %d", pkAff->dwType, pkAff->bApplyOn, pkAff->lApplyValue, pkAff->lDuration);
 
-		// sys_log(1, "AFFECT_SAVE: %u %u %d %d", pkAff->dwType, pkAff->bApplyOn, pkAff->lApplyValue, pkAff->lDuration);
-
-		p.dwPID				= GetPlayerID();
+		p.dwPID			= GetPlayerID();
 		p.elem.dwType		= pkAff->dwType;
 		p.elem.bApplyOn		= pkAff->bApplyOn;
 		p.elem.lApplyValue	= pkAff->lApplyValue;
 		p.elem.dwFlag		= pkAff->dwFlag;
 		p.elem.lDuration	= pkAff->lDuration;
 		p.elem.lSPCost		= pkAff->lSPCost;
-
 		db_clientdesc->DBPacket(HEADER_GD_ADD_AFFECT, 0, &p, sizeof(p));
 	}
 }
@@ -525,7 +429,7 @@ EVENTFUNC(load_affect_login_event)
 
 	if ( info == NULL )
 	{
-		sys_err( "load_affect_login_event_info> <Factor> NULL pointer" );
+		sys_err( "load_affect_login_event_info> <Factor> Null pointer" );
 		return 0;
 	}
 
@@ -547,10 +451,10 @@ EVENTFUNC(load_affect_login_event)
 	}
 
 	if (d->IsPhase(PHASE_HANDSHAKE) ||
-		d->IsPhase(PHASE_LOGIN) ||
-		d->IsPhase(PHASE_SELECT) ||
-		d->IsPhase(PHASE_DEAD) ||
-		d->IsPhase(PHASE_LOADING))
+			d->IsPhase(PHASE_LOGIN) ||
+			d->IsPhase(PHASE_SELECT) ||
+			d->IsPhase(PHASE_DEAD) ||
+			d->IsPhase(PHASE_LOADING))
 	{
 		return PASSES_PER_SEC(1);
 	}
@@ -617,39 +521,36 @@ void CHARACTER::LoadAffect(DWORD dwCount, TPacketAffectElement * pElements)
 		if (pElements->dwType == SKILL_MUYEONG)
 			continue;
 
-#ifdef ENABLE_NINETH_SKILL
-		if (pElements->dwType == SKILL_CHEONUN)
-			continue;
-#endif
-
 		if (AFFECT_AUTO_HP_RECOVERY == pElements->dwType || AFFECT_AUTO_SP_RECOVERY == pElements->dwType)
 		{
-			LPITEM item = FindItemByID(pElements->dwFlag);
-			if (!item)
-			{
+			LPITEM item = FindItemByID( pElements->dwFlag );
+
+			if (NULL == item)
 				continue;
-			}
 
 			item->Lock(true);
 		}
 
 		if (pElements->bApplyOn >= POINT_MAX_NUM)
 		{
-			sys_err("invalid affect data %s ApplyOn %u ApplyValue %d",
-				GetName(), pElements->bApplyOn, pElements->lApplyValue);
+			sys_err("invalid affect data %s ApplyOn %u ApplyValue %d", GetName(), pElements->bApplyOn, pElements->lApplyValue);
 			continue;
 		}
 
+		if (test_server)
+		{
+			sys_log(0, "Load Affect : Affect %s %d %d", GetName(), pElements->dwType, pElements->bApplyOn );
+		}
 
 		CAffect* pkAff = CAffect::Acquire();
 		m_list_pkAffect.push_back(pkAff);
 
-		pkAff->dwType		= pElements->dwType;
-		pkAff->bApplyOn		= pElements->bApplyOn;
-		pkAff->lApplyValue	= pElements->lApplyValue;
-		pkAff->dwFlag		= pElements->dwFlag;
-		pkAff->lDuration	= pElements->lDuration;
-		pkAff->lSPCost		= pElements->lSPCost;
+		pkAff->dwType = pElements->dwType;
+		pkAff->bApplyOn = pElements->bApplyOn;
+		pkAff->lApplyValue = pElements->lApplyValue;
+		pkAff->dwFlag = pElements->dwFlag;
+		pkAff->lDuration = pElements->lDuration;
+		pkAff->lSPCost = pElements->lSPCost;
 
 		SendAffectAddPacket(GetDesc(), pkAff);
 
@@ -661,30 +562,10 @@ void CHARACTER::LoadAffect(DWORD dwCount, TPacketAffectElement * pElements)
 	RemoveAffect(AFFECT_MOUNT_BONUS);
 #endif
 
-	if ( CArenaManager::instance().IsArenaMap(GetMapIndex()) == true )
+	if (CArenaManager::instance().IsArenaMap(GetMapIndex()) == true)
 	{
 		RemoveGoodAffect();
 	}
-
-#ifdef __DOJANG_SRC_FUNCTIONS__
-	if (GetMapIndex() == DOJANG_MAPINDEX)
-	{
-		RemoveAffect(SKILL_JEONGWI);
-		RemoveAffect(SKILL_GEOMKYUNG);
-		RemoveAffect(SKILL_CHUNKEON);
-		RemoveAffect(SKILL_EUNHYUNG);
-		RemoveAffect(SKILL_GYEONGGONG);
-		RemoveAffect(SKILL_GWIGEOM);
-		RemoveAffect(SKILL_TERROR);
-		RemoveAffect(SKILL_JUMAGAP);
-		RemoveAffect(SKILL_MANASHILED);
-		RemoveAffect(SKILL_HOSIN);
-		RemoveAffect(SKILL_REFLECT);
-		RemoveAffect(SKILL_KWAESOK);
-		RemoveAffect(SKILL_JEUNGRYEOK);
-		RemoveAffect(SKILL_GICHEON);
-	}
-#endif
 
 	if (afOld != m_afAffectFlag || lMovSpd != GetPoint(POINT_MOV_SPEED) || lAttSpd != GetPoint(POINT_ATT_SPEED))
 	{
@@ -695,9 +576,6 @@ void CHARACTER::LoadAffect(DWORD dwCount, TPacketAffectElement * pElements)
 
 	m_bIsLoadedAffect = true;
 
-	ComputePoints(); // @fixme156
-
-	// Loading and resetting Dragon Soul Stone settings
 	DragonSoul_Initialize();
 
 	// @fixme118 (regain affect hp/mp)
@@ -708,19 +586,10 @@ void CHARACTER::LoadAffect(DWORD dwCount, TPacketAffectElement * pElements)
 	}
 }
 
-bool CHARACTER::AddAffect(DWORD dwType, BYTE bApplyOn, long lApplyValue, DWORD dwFlag, long lDuration, long lSPCost, bool bOverride, bool IsCube
-#ifdef ENABLE_NINETH_SKILL
-	, uint8_t bShieldDuration
-#endif
-)	//@fixme532
+bool CHARACTER::AddAffect(DWORD dwType, BYTE bApplyOn, long lApplyValue, DWORD dwFlag, long lDuration, long lSPCost, bool bOverride, bool IsCube )
 {
-	// CHAT_BLOCK
 	if (dwType == AFFECT_BLOCK_CHAT && lDuration > 1)
 		LocaleChatPacket(CHAT_TYPE_INFO, 82, "");
-	// END_OF_CHAT_BLOCK
-
-	if (IsDead())	//@fixme000
-		return false;
 
 	if (lDuration == 0)
 	{
@@ -728,20 +597,14 @@ bool CHARACTER::AddAffect(DWORD dwType, BYTE bApplyOn, long lApplyValue, DWORD d
 		lDuration = 1;
 	}
 
-	switch (dwType)	//@fixme406
+	switch (dwType)
 	{
-		case SKILL_HOSIN:		// Segen
-		case SKILL_REFLECT:		// Reflektieren
-		case SKILL_GICHEON:		// Hilfe des Drachen
-		case SKILL_JEONGEOP:	// Kurieren
-		case SKILL_KWAESOK:		// Schnelligkeit
-		case SKILL_JEUNGRYEOK:	// Angriff+
-#ifdef ENABLE_WOLFMAN_CHARACTER
-		case SKILL_CHEONGRANG:	// Indigowolfseele
-#endif
-#ifdef ENABLE_NINETH_SKILL
-		case SKILL_CHEONUN:		// Ätherschild
-#endif
+		case SKILL_HOSIN:
+		case SKILL_REFLECT:
+		case SKILL_GICHEON:
+		case SKILL_JEONGEOP:
+		case SKILL_KWAESOK:
+		case SKILL_JEUNGRYEOK:
 		{
 			const CAffect * pkAffect = FindAffect(dwType);
 			if (!pkAffect)
@@ -757,7 +620,7 @@ bool CHARACTER::AddAffect(DWORD dwType, BYTE bApplyOn, long lApplyValue, DWORD d
 
 		default:
 			break;
-	}	//@END_fixme406
+	}
 
 #ifdef ENABLE_IGNORE_LOW_POWER_BUFF
 	switch (dwType)
@@ -775,7 +638,7 @@ bool CHARACTER::AddAffect(DWORD dwType, BYTE bApplyOn, long lApplyValue, DWORD d
 
 		if (lApplyValue < pkAffect->lApplyValue)
 		{
-			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("(%s) Becerisi engellendi. (%ld%%) deðeri kullanmýþ olduðunuz (%ld%%) deðerden daha düþük."), CSkillManager::instance().Get(dwType)->szName, lApplyValue, pkAffect->lApplyValue);
+			ChatPacket(CHAT_TYPE_INFO, LC_TEXT("<AddAffect> has blocked receiving skill (%s) because power is (%ld%%) smaller than current one (%ld%%)."), CSkillManager::instance().Get(dwType)->szName, lApplyValue, pkAffect->lApplyValue);
 			return false;
 		}
 	}
@@ -786,16 +649,12 @@ bool CHARACTER::AddAffect(DWORD dwType, BYTE bApplyOn, long lApplyValue, DWORD d
 	}
 #endif
 
-	CAffect* pkAff = NULL;
+	CAffect * pkAff = NULL;
 
 	if (IsCube)
-	{
-		pkAff = FindAffect(dwType, bApplyOn);
-	}
+		pkAff = FindAffect(dwType,bApplyOn);
 	else
-	{
 		pkAff = FindAffect(dwType);
-	}
 
 	if (dwFlag == AFF_STUN)
 	{
@@ -809,18 +668,15 @@ bool CHARACTER::AddAffect(DWORD dwType, BYTE bApplyOn, long lApplyValue, DWORD d
 		}
 	}
 
-	// Overwriting of effects that already exist
 	if (pkAff && bOverride)
 	{
-		ComputeAffect(pkAff, false); // Once the effect is removed
+		ComputeAffect(pkAff, false, true);
 
 		if (GetDesc())
 			SendAffectRemovePacket(GetDesc(), GetPlayerID(), pkAff->dwType, pkAff->bApplyOn);
 	}
 	else
 	{
-		// Add new effect
-		// NOTE: Therefore, multiple effects can be attached to the same type.
 		pkAff = CAffect::Acquire();
 		m_list_pkAffect.push_back(pkAff);
 	}
@@ -828,19 +684,16 @@ bool CHARACTER::AddAffect(DWORD dwType, BYTE bApplyOn, long lApplyValue, DWORD d
 	sys_log(1, "AddAffect %s type %d apply %d %d flag %u duration %d", GetName(), dwType, bApplyOn, lApplyValue, dwFlag, lDuration);
 	sys_log(0, "AddAffect %s type %d apply %d %d flag %u duration %d", GetName(), dwType, bApplyOn, lApplyValue, dwFlag, lDuration);
 
-	pkAff->dwType		= dwType;
-	pkAff->bApplyOn		= bApplyOn;
-	pkAff->lApplyValue	= lApplyValue;
-	pkAff->dwFlag		= dwFlag;
+	pkAff->dwType = dwType;
+	pkAff->bApplyOn = bApplyOn;
+	pkAff->lApplyValue = lApplyValue;
+	pkAff->dwFlag = dwFlag;
 #ifdef ENABLE_AUTOMATIC_PICK_UP_SYSTEM
 	pkAff->lDuration = IsRealTimeAffect(dwType) ? lDuration + time(0) : lDuration;
 #else
-	pkAff->lDuration	= lDuration;
+	pkAff->lDuration = lDuration;
 #endif
-	pkAff->lSPCost		= lSPCost;
-#ifdef ENABLE_NINETH_SKILL
-	pkAff->bShieldDuration = bShieldDuration;
-#endif
+	pkAff->lSPCost = lSPCost;
 
 	WORD wMovSpd = GetPoint(POINT_MOV_SPEED);
 	WORD wAttSpd = GetPoint(POINT_ATT_SPEED);
@@ -848,9 +701,7 @@ bool CHARACTER::AddAffect(DWORD dwType, BYTE bApplyOn, long lApplyValue, DWORD d
 	ComputeAffect(pkAff, true);
 
 	if (pkAff->dwFlag || wMovSpd != GetPoint(POINT_MOV_SPEED) || wAttSpd != GetPoint(POINT_ATT_SPEED))
-	{
 		UpdatePacket();
-	}
 
 	StartAffectEvent();
 
@@ -861,20 +712,14 @@ bool CHARACTER::AddAffect(DWORD dwType, BYTE bApplyOn, long lApplyValue, DWORD d
 		if (IS_NO_SAVE_AFFECT(pkAff->dwType))
 			return true;
 
-#ifdef ENABLE_NINETH_SKILL
-		if (pkAff->dwType == SKILL_CHEONUN)
-			return true;
-#endif
-
 		TPacketGDAddAffect p;
-		p.dwPID			= GetPlayerID();
-		p.elem.dwType		= pkAff->dwType;
-		p.elem.bApplyOn		= pkAff->bApplyOn;
-		p.elem.lApplyValue	= pkAff->lApplyValue;
-		p.elem.dwFlag		= pkAff->dwFlag;
-		p.elem.lDuration	= pkAff->lDuration;
-		p.elem.lSPCost		= pkAff->lSPCost;
-
+		p.dwPID = GetPlayerID();
+		p.elem.dwType = pkAff->dwType;
+		p.elem.bApplyOn = pkAff->bApplyOn;
+		p.elem.lApplyValue = pkAff->lApplyValue;
+		p.elem.dwFlag = pkAff->dwFlag;
+		p.elem.lDuration = pkAff->lDuration;
+		p.elem.lSPCost = pkAff->lSPCost;
 		db_clientdesc->DBPacket(HEADER_GD_ADD_AFFECT, 0, &p, sizeof(p));
 	}
 
@@ -901,55 +746,15 @@ void CHARACTER::ComputeAffect(CAffect * pkAff, bool bAdd, bool bTemp)
 
 		if (!GetGuild()->UnderAnyWar())
 			return;
-
-		if (!GetWarMap()) // @fixme231
-			return;
 	}
 
 	if (pkAff->dwFlag)
 	{
-		if (!bAdd)
-		{
+		if (!bAdd && !bTemp)
 			m_afAffectFlag.Reset(pkAff->dwFlag);
-		}
-		else
-		{
+		else if (bAdd)
 			m_afAffectFlag.Set(pkAff->dwFlag);
-		}
 	}
-
-#ifdef __LEADERSHIP__BONUS__
-	if (pkAff->dwType == AFF_LEADERSHIP)
-	{
-		if (!bAdd)
-		{
-			PointChange(POINT_PARTY_ATTACKER_BONUS, -GetPoint(POINT_PARTY_ATTACKER_BONUS));
-			PointChange(POINT_PARTY_TANKER_BONUS, -GetPoint(POINT_PARTY_TANKER_BONUS));
-			PointChange(POINT_PARTY_BUFFER_BONUS, -GetPoint(POINT_PARTY_BUFFER_BONUS));
-			PointChange(POINT_PARTY_SKILL_MASTER_BONUS, -GetPoint(POINT_PARTY_SKILL_MASTER_BONUS));
-			PointChange(POINT_PARTY_DEFENDER_BONUS, -GetPoint(POINT_PARTY_DEFENDER_BONUS));
-			PointChange(POINT_PARTY_HASTE_BONUS, -GetPoint(POINT_PARTY_HASTE_BONUS));
-
-			ComputeBattlePoints();
-			
-			SetPoint(POINT_PARTY_ATTACKER_BONUS, 0);
-			SetPoint(POINT_PARTY_TANKER_BONUS, 0);
-			SetPoint(POINT_PARTY_BUFFER_BONUS, 0);
-			SetPoint(POINT_PARTY_SKILL_MASTER_BONUS, 0);
-			SetPoint(POINT_PARTY_DEFENDER_BONUS, 0);
-			SetPoint(POINT_PARTY_HASTE_BONUS, 0);
-		
-			ComputePoints();
-		}
-		else
-		{
-			if (GetPoint(pkAff->bApplyOn) <= 0)
-				PointChange(pkAff->bApplyOn, pkAff->lApplyValue);
-		}
-		
-		return;
-	}
-#endif
 
 	if (bAdd)
 		PointChange(pkAff->bApplyOn, pkAff->lApplyValue);
@@ -963,34 +768,12 @@ void CHARACTER::ComputeAffect(CAffect * pkAff, bool bAdd, bool bTemp)
 		else
 			StopMuyeongEvent();
 	}
-
-#ifdef ENABLE_PVP_BALANCE
-	if (pkAff->dwType == SKILL_GYEONGGONG)
-	{
-		if (bAdd)
-			StartGyeongGongEvent();
-		else
-			StopGyeongGongEvent();
-	}
-#endif
-
-#ifdef ENABLE_NINETH_SKILL
-	if (pkAff->dwType == SKILL_CHEONUN)
-	{
-		if (bAdd)
-			StartCheonunEvent(static_cast<uint8_t>(pkAff->lApplyValue), pkAff->bShieldDuration);
-		else
-			StopCheonunEvent();
-	}
-#endif
 }
 
 bool CHARACTER::RemoveAffect(CAffect* pkAff, bool single)	//@fixme433
 {
 	if (!pkAff)
-	{
 		return false;
-	}
 
 	// AFFECT_BUF_FIX
 	m_list_pkAffect.remove(pkAff);
@@ -1019,9 +802,7 @@ bool CHARACTER::RemoveAffect(CAffect* pkAff, bool single)	//@fixme433
 	CheckMaximumPoints();
 
 	if (test_server)
-	{
 		sys_log(0, "AFFECT_REMOVE: %s (flag %u apply: %u)", GetName(), pkAff->dwFlag, pkAff->bApplyOn);
-	}
 
 	if (IsPC())
 	{
@@ -1083,9 +864,6 @@ void CHARACTER::RemoveGoodAffect()
 	RemoveAffect(SKILL_KWAESOK);
 	RemoveAffect(SKILL_JEUNGRYEOK);
 	RemoveAffect(SKILL_GICHEON);
-#ifdef ENABLE_NINETH_SKILL
-	RemoveAffect(SKILL_CHEONUN);
-#endif
 }
 
 bool CHARACTER::IsGoodAffect(BYTE bAffectType) const
@@ -1114,13 +892,6 @@ bool CHARACTER::IsGoodAffect(BYTE bAffectType) const
 		case (SKILL_KWAESOK):
 		case (SKILL_JEUNGRYEOK):
 		case (SKILL_GICHEON):
-#ifdef ENABLE_WOLFMAN_CHARACTER
-		case (SKILL_JEOKRANG):
-		case (SKILL_CHEONGRANG):
-#endif
-#ifdef ENABLE_NINETH_SKILL
-		case (SKILL_CHEONUN):
-#endif
 			return true;
 	}
 	return false;
@@ -1130,20 +901,9 @@ void CHARACTER::RemoveBadAffect()
 {
 	sys_log(0, "RemoveBadAffect %s", GetName());
 	RemovePoison();
-#ifdef ENABLE_WOLFMAN_CHARACTER
-	RemoveBleeding();
-#endif
 	RemoveFire();
 
 	RemoveAffect(AFFECT_STUN);
 	RemoveAffect(AFFECT_SLOW);
 	RemoveAffect(SKILL_TUSOK);
-	//RemoveAffect(SKILL_CURSE);
-	//RemoveAffect(SKILL_PABUP);
-	//RemoveAffect(AFFECT_FAINT);
-	//RemoveAffect(AFFECT_WEB);
-	//RemoveAffect(AFFECT_SLEEP);
-	//RemoveAffect(AFFECT_CURSE);
-	//RemoveAffect(AFFECT_PARALYZE);
-	//RemoveAffect(SKILL_BUDONG);
 }

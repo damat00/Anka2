@@ -1,9 +1,9 @@
-CXX	= clang++
+CXX	= clang++-devel
 BIN_DIR = ../lib
 BIN = $(BIN_DIR)/libgame.a
 
 CFLAGS  = -m32 -Wall -w -O2 -pipe -fno-exceptions -I../include
-CFLAGS += -std=c++14
+CFLAGS += -std=c++2a
 
 LIBS =
 
@@ -30,3 +30,4 @@ $(OBJFILES):
 	$(CXX) $(CFLAGS) -c $<
 
 include Depend
+

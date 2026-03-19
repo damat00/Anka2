@@ -51,6 +51,12 @@
 namespace boost { namespace geometry
 {
 
+namespace srs { namespace par4
+{
+    struct somerc {}; // Swiss. Obl. Mercator
+
+}} //namespace srs::par4
+
 namespace projections
 {
     #ifndef DOXYGEN_NO_DETAIL
@@ -78,7 +84,7 @@ namespace projections
 
                 // FORWARD(e_forward)
                 // Project coordinates from geographic (lon, lat) to cartesian (x, y)
-                inline void fwd(T const& lp_lon, T const& lp_lat, T& xy_x, T& xy_y) const
+                inline void fwd(T& lp_lon, T& lp_lat, T& xy_x, T& xy_y) const
                 {
                     static const T fourth_pi = detail::fourth_pi<T>();
                     static const T half_pi = detail::half_pi<T>();
@@ -99,7 +105,7 @@ namespace projections
 
                 // INVERSE(e_inverse)  ellipsoid & spheroid
                 // Project coordinates from cartesian (x, y) to geographic (lon, lat)
-                inline void inv(T const& xy_x, T const& xy_y, T& lp_lon, T& lp_lat) const
+                inline void inv(T& xy_x, T& xy_y, T& lp_lon, T& lp_lat) const
                 {
                     static const T fourth_pi = detail::fourth_pi<T>();
 
@@ -176,9 +182,7 @@ namespace projections
     template <typename T, typename Parameters>
     struct somerc_ellipsoid : public detail::somerc::base_somerc_ellipsoid<T, Parameters>
     {
-        template <typename Params>
-        inline somerc_ellipsoid(Params const& , Parameters const& par)
-            : detail::somerc::base_somerc_ellipsoid<T, Parameters>(par)
+        inline somerc_ellipsoid(const Parameters& par) : detail::somerc::base_somerc_ellipsoid<T, Parameters>(par)
         {
             detail::somerc::setup_somerc(this->m_par, this->m_proj_parm);
         }
@@ -189,14 +193,23 @@ namespace projections
     {
 
         // Static projection
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_STATIC_PROJECTION(srs::spar::proj_somerc, somerc_ellipsoid, somerc_ellipsoid)
+        BOOST_GEOMETRY_PROJECTIONS_DETAIL_STATIC_PROJECTION(srs::par4::somerc, somerc_ellipsoid, somerc_ellipsoid)
     
         // Factory entry(s)
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_ENTRY_FI(somerc_entry, somerc_ellipsoid)
-        
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_INIT_BEGIN(somerc_init)
+        template <typename T, typename Parameters>
+        class somerc_entry : public detail::factory_entry<T, Parameters>
         {
-            BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_INIT_ENTRY(somerc, somerc_entry)
+            public :
+                virtual base_v<T, Parameters>* create_new(const Parameters& par) const
+                {
+                    return new base_v_fi<somerc_ellipsoid<T, Parameters>, T, Parameters>(par);
+                }
+        };
+
+        template <typename T, typename Parameters>
+        inline void somerc_init(detail::base_factory<T, Parameters>& factory)
+        {
+            factory.add_to_factory("somerc", new somerc_entry<T, Parameters>);
         }
 
     } // namespace detail

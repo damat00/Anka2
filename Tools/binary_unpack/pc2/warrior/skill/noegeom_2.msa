@@ -10,7 +10,7 @@ Group MotionEventData
     Group Event00
     {
         MotionEventType      1
-        StartingTime         1.114355
+        StartingTime         1.107692
         
         IndependentFlag      0
         AttachingEnable      1
@@ -34,32 +34,32 @@ Group MotionEventData
     Group Event02
     {
         MotionEventType      4
-        StartingTime         1.055961
+        StartingTime         1.167883
         DuringTime           0.200000
-        EnableHitProcess     1
+        EnableHitProcess     0
         
         AttackType           0
         HittingType          1
         StiffenTime          0.000000
-        InvisibleTime        0.200000
+        InvisibleTime        2.000000
         ExternalForce        0.000000
-        HitLimitCount        10
+        HitLimitCount        18
         CollisionType        4
         
         SphereDataCount      1
         Group SphereData00
         {
-            Radius           250.000000
+            Radius           400.000000
             Position         0.000000 0.000000 0.000000
         }
     }
     Group Event03
     {
         MotionEventType      2
-        StartingTime         1.090024
+        StartingTime         1.080292
         
-        DuringTime           0.100000
-        Power                100
-        AffectingRange       100
+        DuringTime           0.200000
+        Power                200
+        AffectingRange       200
     }
 }

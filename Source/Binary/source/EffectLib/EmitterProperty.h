@@ -48,6 +48,7 @@ class CEmitterProperty
 			return m_iLoopCount;
 		}
 
+
 		BYTE GetEmitterShape();
 		BYTE GetEmitterAdvancedType();
 		BOOL isEmitFromEdge();

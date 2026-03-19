@@ -3,6 +3,7 @@
 
 bool CStaticVertexBuffer::Create(int vtxCount, DWORD fvf, bool /*isManaged*/)
 {
+	// ¹«Á¶°Ç MANAGED ¸?µå
 	return CGraphicVertexBuffer::Create(vtxCount, fvf, D3DUSAGE_WRITEONLY, D3DPOOL_MANAGED);
 }
 

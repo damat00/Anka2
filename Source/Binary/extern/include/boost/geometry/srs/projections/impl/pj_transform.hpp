@@ -743,7 +743,8 @@ inline bool pj_compare_datums( Par & srcdefn, Par & dstdefn )
     }
     else if( srcdefn.datum_type == datum_gridshift )
     {
-        return srcdefn.nadgrids == dstdefn.nadgrids;
+        return pj_get_param_s(srcdefn.params,"nadgrids")
+            == pj_get_param_s(dstdefn.params,"nadgrids");
     }
     else
         return true;
@@ -887,14 +888,10 @@ inline bool pj_datum_transform(Par const& srcdefn,
                                Grids const& dstgrids)
 
 {
+    static const double wgs84_a = 6378137.0;
+    static const double wgs84_es = 0.0066943799901413165;
+
     typedef typename Par::type calc_t;
-
-    // This has to be consistent with default spheroid and pj_ellps
-    // TODO: Define in one place
-    static const calc_t wgs84_a = 6378137.0;
-    static const calc_t wgs84_b = 6356752.3142451793;
-    static const calc_t wgs84_es = 1. - (wgs84_b * wgs84_b) / (wgs84_a * wgs84_a);
-
     bool result = true;
 
     calc_t      src_a, src_es, dst_a, dst_es;

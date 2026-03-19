@@ -117,10 +117,7 @@ class ChestDropWindow(ui.ScriptWindow):
 		self.tooltipItem = tooltip
 
 	def OnChangeOpenAmount(self):
-		if player.GetItemTypeBySlot(self.invItemPos) == item.ITEM_TYPE_GACHA:
-			openTemp = int(self.openCountController.GetSliderPos() * 50)
-		else:
-			openTemp = int(self.openCountController.GetSliderPos() * 10)
+		openTemp = int(self.openCountController.GetSliderPos() * 50)
 
 		if openTemp == 0:
 			self.openAmount = 1
@@ -148,10 +145,6 @@ class ChestDropWindow(ui.ScriptWindow):
 			return
 
 		itemCount = player.GetItemCount(self.invItemPos)
-	
-		if player.GetItemTypeBySlot(self.invItemPos) == item.ITEM_TYPE_GACHA:
-			itemCount = player.GetItemMetinSocket(player.INVENTORY, self.invItemPos, 0)
-	
 		if itemCount >= self.openAmount:
 			for i in xrange(self.openAmount):
 				if itemCount == 1:

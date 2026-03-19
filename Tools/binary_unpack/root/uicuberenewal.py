@@ -14,55 +14,29 @@ import cube_renewal
 import mouseModule
 import uiCommon
 
-if app.ENABLE_GAYA_SYSTEM:
-	def FReturnInfo(func,index):
-		(vnum_reward,count_reward,item_reward_stackable,vnum_material_1,count_material_1,vnum_material_2,count_material_2,vnum_material_3,count_material_3,vnum_material_4,count_material_4,vnum_material_5,count_material_5,gold,gem,percent,allowCopyAttr,category) = cube_renewal.GetDates(index)
-		info = {
-				"vnum_reward" : vnum_reward,
-				"count_reward" : count_reward,
-				"item_reward_stackable" : item_reward_stackable,
-				"vnum_material_1" : vnum_material_1,
-				"count_material_1" : count_material_1,
-				"vnum_material_2" : vnum_material_2,
-				"count_material_2" : count_material_2,
-				"vnum_material_3" : vnum_material_3,
-				"count_material_3" : count_material_3,
-				"vnum_material_4" : vnum_material_4,
-				"count_material_4" : count_material_4,
-				"vnum_material_5" : vnum_material_5,
-				"count_material_5" : count_material_5,
-				"gold" : gold,
-				"gem" : gem,
-				"percent" : percent,
-				"allowCopyAttr" : allowCopyAttr,
-				"category" : category
-		}
+def FReturnInfo(func,index):
+	(vnum_reward,count_reward,item_reward_stackable,vnum_material_1,count_material_1,vnum_material_2,count_material_2,vnum_material_3,count_material_3,vnum_material_4,count_material_4,vnum_material_5,count_material_5,gold,percent,allowCopyAttr,category) = cube_renewal.GetDates(index)
+	info = {
+			"vnum_reward" : vnum_reward,
+			"count_reward" : count_reward,
+			"item_reward_stackable" : item_reward_stackable,
+			"vnum_material_1" : vnum_material_1,
+			"count_material_1" : count_material_1,
+			"vnum_material_2" : vnum_material_2,
+			"count_material_2" : count_material_2,
+			"vnum_material_3" : vnum_material_3,
+			"count_material_3" : count_material_3,
+			"vnum_material_4" : vnum_material_4,
+			"count_material_4" : count_material_4,
+			"vnum_material_5" : vnum_material_5,
+			"count_material_5" : count_material_5,
+			"gold" : gold,
+			"percent" : percent,
+			"allowCopyAttr" : allowCopyAttr,
+			"category" : category
+	}
 
-		return info[func]
-else:
-	def FReturnInfo(func,index):
-		(vnum_reward,count_reward,item_reward_stackable,vnum_material_1,count_material_1,vnum_material_2,count_material_2,vnum_material_3,count_material_3,vnum_material_4,count_material_4,vnum_material_5,count_material_5,gold,percent,allowCopyAttr,category) = cube_renewal.GetDates(index)
-		info = {
-				"vnum_reward" : vnum_reward,
-				"count_reward" : count_reward,
-				"item_reward_stackable" : item_reward_stackable,
-				"vnum_material_1" : vnum_material_1,
-				"count_material_1" : count_material_1,
-				"vnum_material_2" : vnum_material_2,
-				"count_material_2" : count_material_2,
-				"vnum_material_3" : vnum_material_3,
-				"count_material_3" : count_material_3,
-				"vnum_material_4" : vnum_material_4,
-				"count_material_4" : count_material_4,
-				"vnum_material_5" : vnum_material_5,
-				"count_material_5" : count_material_5,
-				"gold" : gold,
-				"percent" : percent,
-				"allowCopyAttr" : allowCopyAttr,
-				"category" : category
-		}
-
-		return info[func]
+	return info[func]
 
 class CubeRenewalItem(ui.Window):
 
@@ -157,10 +131,6 @@ class CubeRenewalItem(ui.Window):
 
 	def GetGold(self):
 		return self.GetDates("gold")
-
-	if app.ENABLE_GAYA_SYSTEM:
-		def GetGem(self):
-			return self.GetDates("gem")
 
 	def AllowCopyAttr(self):
 		return self.GetDates("allowCopyAttr")
@@ -324,7 +294,6 @@ class CubeRenewalSubCategoriaObjects(CubeRenewalItem):
 				if player.GetItemCountByVnum(self.GetVnumMaterial(i)) >= self.GetCountMaterial(i):
 					number = player.GetItemCountByVnum(self.GetVnumMaterial(i)) / (self.GetCountMaterial(i))
 					count_items.append(number)
-						
 				count_all_items += 1
 
 		if len(count_items) >= count_all_items:
@@ -386,8 +355,6 @@ class CubeRenewalWindows(ui.ScriptWindow):
 		self.popup = None
 		self.count_item_reward = 0
 
-		toolTipGemTitle = None
-
 		self.toolTip = uiToolTip.ItemToolTip()
 
 		self.LoadWindow()
@@ -409,8 +376,6 @@ class CubeRenewalWindows(ui.ScriptWindow):
 			self.item_slot = self.GetChild("item_slot")
 			self.cube_list_scroll_bar = self.GetChild("cube_list_scroll_bar")
 			self.yang_text = self.GetChild("yang_text")
-			if app.ENABLE_GAYA_SYSTEM:
-				self.gem_text = self.GetChild("gem_text")
 			self.result_qty = self.GetChild("result_qty")
 			self.button_ok = self.GetChild("button_ok")
 			self.button_cancel = self.GetChild("button_cancel")
@@ -419,10 +384,6 @@ class CubeRenewalWindows(ui.ScriptWindow):
 			self.qty_add_button = self.GetChild("qty_add_button")
 
 			self.GetChild("board").SetCloseEvent(ui.__mem_func__(self.Close))
-
-			self.wndGemSlotIcon = self.GetChild("Gem_Icon")
-			self.wndGemSlotIcon.SAFE_SetStringEvent("MOUSE_OVER_IN", self.__ShowGemTitleToolTip)
-			self.wndGemSlotIcon.SAFE_SetStringEvent("MOUSE_OVER_OUT", self.__HideGemTitleToolTip)
 
 			for i in xrange(1,6):
 				self.cube_elements["count_elements_%d"%i] = self.GetChild("material_qty_text_%d"%i)
@@ -484,8 +445,6 @@ class CubeRenewalWindows(ui.ScriptWindow):
 				self.cube_elements["count_elements_%d"%i].Hide()
 
 		self.yang_text.Hide()
-		if app.ENABLE_GAYA_SYSTEM:
-			self.gem_text.Hide()
 		self.result_qty.Hide()
 
 		self.categoria_list = []
@@ -659,9 +618,6 @@ class CubeRenewalWindows(ui.ScriptWindow):
 
 		self.yang_text.SetText(localeInfo.NumberToMoneyString(self.selectedItem.GetGold()*count))
 		self.yang_text.Show()
-		if app.ENABLE_GAYA_SYSTEM:
-			self.gem_text.SetText(localeInfo.NumberToString(self.selectedItem.GetGem()*count))
-			self.gem_text.Show()
 
 	def ConvertInputResult(self):
 		edit = int(self.result_qty.GetText())
@@ -781,9 +737,3 @@ class CubeRenewalWindows(ui.ScriptWindow):
 	def OnPressEscapeKey(self):
 		self.Close()
 		return TRUE
-
-	def __ShowGemTitleToolTip(self):
-		self.toolTipGemTitle.ShowToolTip()
-
-	def __HideGemTitleToolTip(self):
-		self.toolTipGemTitle.HideToolTip()

@@ -4,7 +4,7 @@
 #include "sectree_manager.h"
 #include "target.h"
 
-namespace quest
+namespace quest 
 {
 	int target_pos(lua_State* L)
 	{
@@ -25,18 +25,18 @@ namespace quest
 			return 0;
 		}
 
-		int x = pos.x + (int)lua_tonumber(L, 2) * 100;
-		int y = pos.y + (int)lua_tonumber(L, 3) * 100;
+		int x = pos.x + (int) lua_tonumber(L, 2) * 100;
+		int y = pos.y + (int) lua_tonumber(L, 3) * 100;
 
 		CTargetManager::instance().CreateTarget(ch->GetPlayerID(),
-			iQuestIndex,
-			lua_tostring(L, 1),
-			TARGET_TYPE_POS,
-			x,
-			y,
-			(int)lua_tonumber(L, 4),
-			lua_isstring(L, 5) ? lua_tostring(L, 5) : NULL,
-			lua_isnumber(L, 6) ? (int)lua_tonumber(L, 6) : 1);
+				iQuestIndex,
+				lua_tostring(L, 1),
+				TARGET_TYPE_POS,
+				x,
+				y,
+				(int) lua_tonumber(L, 4),
+				lua_isstring(L, 5) ? lua_tostring(L, 5) : NULL,
+				lua_isnumber(L, 6) ? (int)lua_tonumber(L, 6): 1);
 
 		return 0;
 	}
@@ -52,15 +52,16 @@ namespace quest
 			return 0;
 		}
 
+
 		CTargetManager::instance().CreateTarget(ch->GetPlayerID(),
-			iQuestIndex,
-			lua_tostring(L, 1),
-			TARGET_TYPE_VID,
-			(int)lua_tonumber(L, 2),
-			0,
-			ch->GetMapIndex(),
-			lua_isstring(L, 3) ? lua_tostring(L, 3) : NULL,
-			lua_isnumber(L, 4) ? (int)lua_tonumber(L, 4) : 1);
+				iQuestIndex,
+				lua_tostring(L, 1),
+				TARGET_TYPE_VID,
+				(int) lua_tonumber(L, 2),
+				0,
+				ch->GetMapIndex(),
+				lua_isstring(L, 3) ? lua_tostring(L, 3) : NULL,
+				lua_isnumber(L, 4) ? (int)lua_tonumber(L, 4): 1);
 
 		return 0;
 	}
@@ -133,8 +134,8 @@ namespace quest
 		{
 			{ "pos",			target_pos		},
 			{ "vid",			target_vid		},
-			{ "npc",			target_vid		}, // TODO: delete this
-			{ "pc",			target_vid		}, // TODO: delete this
+			{ "npc",			target_vid		},
+			{ "pc",			target_vid		},
 			{ "delete",			target_delete		},
 			{ "clear",			target_clear		},
 			{ "id",			target_id		},
@@ -144,3 +145,4 @@ namespace quest
 		CQuestManager::instance().AddLuaFunctionTable("target", target_functions);
 	}
 };
+

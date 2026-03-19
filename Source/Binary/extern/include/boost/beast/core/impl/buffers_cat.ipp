@@ -34,8 +34,6 @@ class buffers_cat_view<Bn...>::const_iterator
 
     struct past_end
     {
-        char unused = 0; // make g++8 happy
-
         operator bool() const noexcept
         {
             return true;
@@ -283,20 +281,9 @@ buffers_cat_view<Bn...>::
 const_iterator::
 operator==(const_iterator const& other) const
 {
-    return
-        (bn_ == nullptr) ?
-        (
-            other.bn_ == nullptr ||
-            other.it_.index() == sizeof...(Bn)
-        ):(
-            (other.bn_ == nullptr) ?
-            (
-                it_.index() == sizeof...(Bn)
-            ): (
-                bn_ == other.bn_ &&
-                it_ == other.it_
-            )
-        );
+    if(bn_ != other.bn_)
+        return false;
+    return it_ == other.it_;
 }
 
 template<class... Bn>

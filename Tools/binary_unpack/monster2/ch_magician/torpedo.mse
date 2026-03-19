@@ -119,12 +119,12 @@ Group Particle
         }
         List TextureFiles
         {
-            "0001.dds"
-            "0002.dds"
-            "0003.dds"
-            "0004.dds"
-            "0005.dds"
-            "0006.dds"
+            "0001.tga"
+            "0002.tga"
+            "0003.tga"
+            "0004.tga"
+            "0005.tga"
+            "0006.tga"
         }
     }
 }

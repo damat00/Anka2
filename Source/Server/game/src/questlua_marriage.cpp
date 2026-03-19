@@ -320,7 +320,7 @@ namespace quest
 
 	void RegisterMarriageFunctionTable()
 	{
-		luaL_reg marriage_functions[] =
+		luaL_reg marriage_functions[] = 
 		{
 			{ "engage_to",		marriage_engage_to	    },
 			{ "remove",			marriage_remove		    },

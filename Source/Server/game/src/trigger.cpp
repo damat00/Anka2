@@ -20,8 +20,8 @@ typedef struct STriggerFunction
 
 TTriggerFunction OnClickTriggers[ON_CLICK_MAX_NUM] =
 {
-	{ NULL,          	},	// ON_CLICK_NONE,
-	{ OnClickShop,	},	// ON_CLICK_SHOP,
+	{ NULL, },
+	{ OnClickShop, },
 };
 
 void CHARACTER::AssignTriggers(const TMobTable * table)
@@ -36,9 +36,6 @@ void CHARACTER::AssignTriggers(const TMobTable * table)
 	m_triggerOnClick.pFunc = OnClickTriggers[table->bOnClickType].func;
 }
 
-/*
- * ON_CLICK
- */
 int OnClickShop(TRIGGERPARAM)
 {
 	CShopManager::instance().StartShopping(causer, ch);
@@ -53,7 +50,7 @@ int OnIdleDefault(TRIGGERPARAM)
 	return PASSES_PER_SEC(1);
 }
 
-#ifdef ENABLE_DEFENSAWE_SHIP
+#ifdef ENABLE_SHIP_DEFENCE_DUNGEON
 class FuncFindMobHydraVictim
 {
 	public:
@@ -61,12 +58,8 @@ class FuncFindMobHydraVictim
 			m_pkChr(pkChr),
 			m_iMinDistance(~(1L << 31)),
 			m_iMaxDistance(iMaxDistance),
-			m_lx(pkChr->GetX()),
-			m_ly(pkChr->GetY()),
-			m_pkChrVictim(NULL),
-			m_pkChrBuilding(NULL)
-	{
-	};
+			m_lx(pkChr->GetX()), m_ly(pkChr->GetY()),
+			m_pkChrVictim(NULL), m_pkChrBuilding(NULL) {};
 
 		bool operator () (LPENTITY ent)
 		{
@@ -75,10 +68,8 @@ class FuncFindMobHydraVictim
 
 			LPCHARACTER pkChr = (LPCHARACTER) ent;
 
-			if (pkChr->IsBuilding() && 
-				(pkChr->IsAffectFlag(AFF_BUILDING_CONSTRUCTION_SMALL) ||
-				 pkChr->IsAffectFlag(AFF_BUILDING_CONSTRUCTION_LARGE) ||
-				 pkChr->IsAffectFlag(AFF_BUILDING_UPGRADE)))
+			if (pkChr->IsBuilding() &&  (pkChr->IsAffectFlag(AFF_BUILDING_CONSTRUCTION_SMALL) ||
+				 pkChr->IsAffectFlag(AFF_BUILDING_CONSTRUCTION_LARGE) || pkChr->IsAffectFlag(AFF_BUILDING_UPGRADE)))
 			{
 				m_pkChrBuilding = pkChr;
 			}
@@ -91,16 +82,14 @@ class FuncFindMobHydraVictim
 
 			if (pkChr->IsNPC() && !pkChr->IsHydraNPC())
 			{
-				if ( !pkChr->IsMonster() || !m_pkChr->IsAttackMob() || m_pkChr->IsAggressive()  )
+				if (!pkChr->IsMonster() || !m_pkChr->IsAttackMob() || m_pkChr->IsAggressive())
 					return false;
 			}
 
-			if (pkChr->IsAffectFlag(AFF_EUNHYUNG) || 
-					pkChr->IsAffectFlag(AFF_INVISIBILITY) ||
-					pkChr->IsAffectFlag(AFF_REVIVE_INVISIBLE))
+			if (pkChr->IsAffectFlag(AFF_EUNHYUNG) || pkChr->IsAffectFlag(AFF_INVISIBILITY) || pkChr->IsAffectFlag(AFF_REVIVE_INVISIBLE))
 				return false;
 
-			if (pkChr->IsAffectFlag(AFF_TERROR) && m_pkChr->IsImmune(IMMUNE_TERROR) == false )	// ?? ??
+			if (pkChr->IsAffectFlag(AFF_TERROR) && m_pkChr->IsImmune(IMMUNE_TERROR) == false )
 			{
 				if ( pkChr->GetLevel() >= m_pkChr->GetLevel() )
 					return false;
@@ -129,18 +118,20 @@ class FuncFindMobHydraVictim
 	private:
 		LPCHARACTER	m_pkChr;
 
-		int		m_iMinDistance;
-		int		m_iMaxDistance;
-		long		m_lx;
-		long		m_ly;
+		int m_iMinDistance;
+		int m_iMaxDistance;
+		long m_lx;
+		long m_ly;
 
-		LPCHARACTER	m_pkChrVictim;
-		LPCHARACTER	m_pkChrBuilding;
+		LPCHARACTER m_pkChrVictim;
+		LPCHARACTER m_pkChrBuilding;
 };
+
 LPCHARACTER FindVictimHydra(LPCHARACTER pkChr, int iMaxDistance)
 {
 	FuncFindMobHydraVictim f(pkChr, iMaxDistance);
-	if (pkChr->GetSectree() != NULL) {
+	if (pkChr->GetSectree() != NULL)
+	{
 		pkChr->GetSectree()->ForEachAround(f);
 	}
 	return f.GetVictim();
@@ -154,12 +145,8 @@ class FuncFindMobVictim
 			m_pkChr(pkChr),
 			m_iMinDistance(~(1L << 31)),
 			m_iMaxDistance(iMaxDistance),
-			m_lx(pkChr->GetX()),
-			m_ly(pkChr->GetY()),
-			m_pkChrVictim(NULL),
-			m_pkChrBuilding(NULL)
-	{
-	};
+			m_lx(pkChr->GetX()), m_ly(pkChr->GetY()),
+			m_pkChrVictim(NULL), m_pkChrBuilding(NULL) {};
 
 		bool operator () (LPENTITY ent)
 		{
@@ -168,47 +155,42 @@ class FuncFindMobVictim
 
 			LPCHARACTER pkChr = (LPCHARACTER) ent;
 
-			if (pkChr->IsBuilding() &&
-				(pkChr->IsAffectFlag(AFF_BUILDING_CONSTRUCTION_SMALL) ||
-				 pkChr->IsAffectFlag(AFF_BUILDING_CONSTRUCTION_LARGE) ||
-				 pkChr->IsAffectFlag(AFF_BUILDING_UPGRADE)))
+			if (pkChr->IsBuilding() && (pkChr->IsAffectFlag(AFF_BUILDING_CONSTRUCTION_SMALL) || pkChr->IsAffectFlag(AFF_BUILDING_CONSTRUCTION_LARGE) || pkChr->IsAffectFlag(AFF_BUILDING_UPGRADE)))
 			{
 				m_pkChrBuilding = pkChr;
 			}
 
 			if (pkChr->IsNPC())
 			{
-				if ( !pkChr->IsMonster() || !m_pkChr->IsAttackMob() || m_pkChr->IsAggressive()  )
+				if (!pkChr->IsMonster() || !m_pkChr->IsAttackMob() || m_pkChr->IsAggressive())
 					return false;
 			}
 
 			if (pkChr->IsDead())
 				return false;
 
-			if (pkChr->IsAffectFlag(AFF_EUNHYUNG) ||
-					pkChr->IsAffectFlag(AFF_INVISIBILITY) ||
-					pkChr->IsAffectFlag(AFF_REVIVE_INVISIBLE))
+			if (pkChr->IsAffectFlag(AFF_EUNHYUNG) || pkChr->IsAffectFlag(AFF_INVISIBILITY) || pkChr->IsAffectFlag(AFF_REVIVE_INVISIBLE))
 				return false;
 
-			if (pkChr->IsAffectFlag(AFF_TERROR) && m_pkChr->IsImmune(IMMUNE_TERROR) == false )	// 공포 처리
+			if (pkChr->IsAffectFlag(AFF_TERROR) && m_pkChr->IsImmune(IMMUNE_TERROR) == false)
 			{
-				if ( pkChr->GetLevel() >= m_pkChr->GetLevel() )
+				if (pkChr->GetLevel() >= m_pkChr->GetLevel())
 					return false;
 			}
 
-		 	if ( m_pkChr->IsNoAttackShinsu() )
+		 	if (m_pkChr->IsNoAttackShinsu())
 			{
 				if ( pkChr->GetEmpire() == 1 )
 					return false;
 			}
 
-			if ( m_pkChr->IsNoAttackChunjo() )
+			if (m_pkChr->IsNoAttackChunjo())
 			{
-				if ( pkChr->GetEmpire() == 2 )
+				if (pkChr->GetEmpire() == 2)
 					return false;
 			}
 
-			if ( m_pkChr->IsNoAttackJinno() )
+			if (m_pkChr->IsNoAttackJinno())
 			{
 				if ( pkChr->GetEmpire() == 3 )
 					return false;
@@ -226,7 +208,7 @@ class FuncFindMobVictim
 
 		LPCHARACTER GetVictim()
 		{
-			if ((m_pkChrBuilding && ((m_pkChr->GetHP() * 2) > m_pkChr->GetMaxHP())) || !m_pkChrVictim)
+			if (m_pkChrBuilding && m_pkChr->GetHP() * 2 > m_pkChr->GetMaxHP() || !m_pkChrVictim)
 			{
 				return m_pkChrBuilding;
 			}
@@ -237,19 +219,20 @@ class FuncFindMobVictim
 	private:
 		LPCHARACTER	m_pkChr;
 
-		int		m_iMinDistance;
-		int		m_iMaxDistance;
-		long		m_lx;
-		long		m_ly;
+		int m_iMinDistance;
+		int m_iMaxDistance;
+		long m_lx;
+		long m_ly;
 
-		LPCHARACTER	m_pkChrVictim;
-		LPCHARACTER	m_pkChrBuilding;
+		LPCHARACTER m_pkChrVictim;
+		LPCHARACTER m_pkChrBuilding;
 };
 
 LPCHARACTER FindVictim(LPCHARACTER pkChr, int iMaxDistance)
 {
 	FuncFindMobVictim f(pkChr, iMaxDistance);
-	if (pkChr->GetSectree() != NULL) {
+	if (pkChr->GetSectree() != NULL)
+	{
 		pkChr->GetSectree()->ForEachAround(f);
 	}
 	return f.GetVictim();

@@ -1,19 +1,15 @@
 #pragma once
 
-#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
+#define WIN32_LEAN_AND_MEAN
+
 #ifndef _CRT_SECURE_NO_WARNINGS
 	#define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#pragma warning(disable: 4100 4127 4189 4231 4505 4512 4706) // cryptopp
-#pragma warning(disable:4995)	// pragma deprecated
-
-#pragma warning(disable:4710)	// not inlined
+#pragma warning(disable:4710)
 #pragma warning(disable:4786)
-#pragma warning(disable:4244)	// type conversion possible lose of data
+#pragma warning(disable:4244)
 
-
-#include "../UserInterface/Locale_inc.h"
 #include <windows.h>
 #include <assert.h>
 #include <stdio.h>
@@ -55,3 +51,5 @@
 
 #include "vk.h"
 #include "filename.h"
+
+#include "../UserInterface/Locale_inc.h"

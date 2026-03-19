@@ -36,17 +36,17 @@ struct FGetObjectHeight
 };
 
 struct FGetPickingPoint
-{
+{	
 	D3DXVECTOR3 m_v3Start;
 	D3DXVECTOR3 m_v3Dir;
 	D3DXVECTOR3 m_v3PickingPoint;
-	bool		m_bPicked;
+	bool		m_bPicked; 
 
 	FGetPickingPoint(D3DXVECTOR3 & v3Start, D3DXVECTOR3 & v3Dir) : m_v3Start(v3Start), m_v3Dir(v3Dir), m_bPicked(false) {}
 	void operator() (CGraphicObjectInstance * pInstance)
 	{
 		if( pInstance && pInstance->GetType() == CGraphicThingInstance::ID )
-		{
+		{			
 			CGraphicThingInstance * pThing = (CGraphicThingInstance *)pInstance;
 			if (!pThing->IsObjectHeight())
 				return;
@@ -60,8 +60,8 @@ struct FGetPickingPoint
 					m_v3PickingPoint.y = fY;
 					m_v3PickingPoint.z = fZ;
 					m_bPicked = true;
-				}
-			}
+				}				
+			}			
 		}
 	}
 };
@@ -101,8 +101,8 @@ bool CMapOutdoor::Initialize()
 
 	m_pTerrainPatchProxyList = nullptr;
 
-	m_lViewRadius	= 0L;
-	m_fHeightScale	= 0.0f;
+	m_lViewRadius = 0L;
+	m_fHeightScale = 0.0f;
 
 	m_sTerrainCountX = m_sTerrainCountY = 0;
 
@@ -116,18 +116,14 @@ bool CMapOutdoor::Initialize()
 	m_lCenterX = m_lCenterY = 0;
 	m_lOldReadX = m_lOldReadY = -1;
 
-#ifdef WORLD_EDITOR
-	m_pwIndices = nullptr;
-#else
 	memset(m_pwaIndices, 0, sizeof(m_pwaIndices));
 	for (i = 0; i < TERRAINPATCH_LODMAX; ++i)
 		m_IndexBuffer[i].Destroy();
-#endif
 
 	m_bSettingTerrainVisible = false;
-	m_bDrawWireFrame	= false;
-	m_bDrawShadow		= false;
-	m_bDrawChrShadow	= false;
+	m_bDrawWireFrame = false;
+	m_bDrawShadow = false;
+	m_bDrawChrShadow = false;
 
 	m_iSplatLimit = 50000;
 
@@ -135,7 +131,6 @@ bool CMapOutdoor::Initialize()
 
 	m_pRootNode = nullptr;
 
-	//////////////////////////////////////////////////////////////////////////
 	// Character Shadow
 	m_lpCharacterShadowMapTexture = nullptr;
 	m_lpCharacterShadowMapRenderTargetSurface = nullptr;
@@ -144,15 +139,12 @@ bool CMapOutdoor::Initialize()
 	m_lpBackupRenderTargetSurface = nullptr;
 	m_lpBackupDepthSurface = nullptr;
 	// Character Shadow
-	//////////////////////////////////////////////////////////////////////////
 
 	m_iRenderedPatchNum = 0;
 	m_iRenderedSplatNum = 0;
 
-	//////////////////////////////////////////////////////////////////////////
 	m_fOpaqueWaterDepth = 400.0f;
 
-	//////////////////////////////////////////////////////////////////////////
 	m_TerrainVector.clear();
 #ifndef ENABLE_CLIENT_PERFORMANCE
 	m_TerrainDeleteVector.clear();
@@ -226,15 +218,15 @@ bool CMapOutdoor::Destroy()
 void CMapOutdoor::Clear()
 {
 	UnloadWaterTexture();
-	Destroy();
-	Initialize();
+	Destroy();		// 해제
+	Initialize();	// 초기화
 }
 
 bool CMapOutdoor::SetTerrainCount(short sTerrainCountX, short sTerrainCountY)
 {
 	if (0 == sTerrainCountX || MAX_MAPSIZE < sTerrainCountX)
 		return false;
-
+	
 	if (0 == sTerrainCountY || MAX_MAPSIZE < sTerrainCountY)
 		return false;
 
@@ -250,21 +242,16 @@ void CMapOutdoor::OnBeginEnvironment()
 
 	CSpeedTreeForestDirectX8& rkForest=CSpeedTreeForestDirectX8::Instance();
 	rkForest.SetFog(
-		mc_pEnvironmentData->GetFogNearDistance(),
+		mc_pEnvironmentData->GetFogNearDistance(), 
 		mc_pEnvironmentData->GetFogFarDistance()
 	);
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-    const D3DLIGHT9& c_rkLight = mc_pEnvironmentData->DirLights[ENV_DIRLIGHT_CHARACTER];
-#else
-    const D3DLIGHT8& c_rkLight = mc_pEnvironmentData->DirLights[ENV_DIRLIGHT_CHARACTER];
-#endif
-
+	const D3DLIGHT8& c_rkLight = mc_pEnvironmentData->DirLights[ENV_DIRLIGHT_CHARACTER];
 	rkForest.SetLight(
 		(const float *)&c_rkLight.Direction,
-		(const float *)&c_rkLight.Ambient,
+		(const float *)&c_rkLight.Ambient, 
 		(const float *)&c_rkLight.Diffuse);
-
+	
 	rkForest.SetWindStrength(mc_pEnvironmentData->fWindStrength);
 }
 
@@ -360,9 +347,9 @@ bool CMapOutdoor::IsWireframe()
 void CMapOutdoor::CreateTerrainPatchProxyList()
 {
 	m_wPatchCount = ((m_lViewRadius * 2) / TERRAIN_PATCHSIZE) + 2;
-
+	
 	m_pTerrainPatchProxyList = new CTerrainPatchProxy[m_wPatchCount * m_wPatchCount];
-
+	
 	m_iPatchTerrainVertexCount = (TERRAIN_PATCHSIZE+1)*(TERRAIN_PATCHSIZE+1);
 	m_iPatchWaterVertexCount = TERRAIN_PATCHSIZE * TERRAIN_PATCHSIZE * 6;
 	m_iPatchTerrainVertexSize = 24;
@@ -379,12 +366,8 @@ void CMapOutdoor::DestroyTerrainPatchProxyList()
 		m_pTerrainPatchProxyList = nullptr;
 	}
 
-#ifdef WORLD_EDITOR
-	m_IndexBuffer.Destroy();
-#else
 	for (int i = 0; i < TERRAINPATCH_LODMAX; ++i)
 		m_IndexBuffer[i].Destroy();
-#endif
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -408,7 +391,7 @@ void CMapOutdoor::DestroyArea()
 #endif
 
 	CArea::ms_kPool.FreeAll();
-
+	
 	for (int i = 0; i < AROUND_AREA_NUM; ++i)
 		m_pArea[i] = nullptr;
 }
@@ -439,7 +422,7 @@ bool CMapOutdoor::GetTerrainNum(float fx, float fy, BYTE * pbyTerrainNum)
 		fy = -fy;
 
 	int ix, iy;
-
+	
 	PR_FLOAT_TO_INT(fx, ix);
 	PR_FLOAT_TO_INT(fy, iy);
 
@@ -501,25 +484,25 @@ bool CMapOutdoor::GetPickingPointWithRay(const CRay & rRay, D3DXVECTOR3 * v3Inte
 	rRay.GetStartPoint(&v3Start);
 	rRay.GetDirection(&v3Dir, &fRayRange);
 	rRay.GetEndPoint(&v3End);
-
+	
 	Vector3d v3dStart, v3dEnd;
 	v3dStart.Set(v3Start.x, v3Start.y, v3Start.z);
 	v3dEnd.Set(v3End.x - v3Start.x, v3End.y - v3Start.y, v3End.z - v3Start.z);
-
+	
 	if (!m_bEnableTerrainOnlyForHeight)
 	{
 		//DWORD baseTime = timeGetTime();
 		CCullingManager & rkCullingMgr = CCullingManager::Instance();
-		FGetPickingPoint kGetPickingPoint(v3Start, v3Dir);
+		FGetPickingPoint kGetPickingPoint(v3Start, v3Dir);	
 		rkCullingMgr.ForInRange2d(v3dStart, &kGetPickingPoint);
 
 		if (kGetPickingPoint.m_bPicked)
 		{
 			bObjectPick = true;
 			v3ObjectPick = kGetPickingPoint.m_v3PickingPoint;
-		}
-	}
-
+		}		
+	}	
+	
 	float fPos = 0.0f;
 	//float fStep = 1.0f;
 	//float fRayRangeInv=1.0f/fRayRange;
@@ -529,8 +512,8 @@ bool CMapOutdoor::GetPickingPointWithRay(const CRay & rRay, D3DXVECTOR3 * v3Inte
 		if (!__PickTerrainHeight(fPos, v3Start, v3End, 10.0f, fRayRange, 10000.0f, &v3TerrainPick))
 			if (!__PickTerrainHeight(fPos, v3Start, v3End, 100.0f, fRayRange, 100000.0f, &v3TerrainPick))
 					bTerrainPick=false;
-
-
+	
+	
 	if (bObjectPick && bTerrainPick)
 	{
 		const auto vv = (v3TerrainPick - v3Start);
@@ -551,7 +534,7 @@ bool CMapOutdoor::GetPickingPointWithRay(const CRay & rRay, D3DXVECTOR3 * v3Inte
 		*v3IntersectPt = v3TerrainPick;
 		return true;
 	}
-
+	
 	return false;
 }
 
@@ -565,24 +548,26 @@ bool CMapOutdoor::GetPickingPointWithRayOnlyTerrain(const CRay & rRay, D3DXVECTO
 	rRay.GetStartPoint(&v3Start);
 	rRay.GetDirection(&v3Dir, &fRayRange);
 	rRay.GetEndPoint(&v3End);
-
+	
 	Vector3d v3dStart, v3dEnd;
 	v3dStart.Set(v3Start.x, v3Start.y, v3Start.z);
 	v3dEnd.Set(v3End.x - v3Start.x, v3End.y - v3Start.y, v3End.z - v3Start.z);
+	
 
-	float fPos = 0.0f;
+	
+	float fPos = 0.0f;	
 	bTerrainPick=true;
 	if (!__PickTerrainHeight(fPos, v3Start, v3End, 5.0f, fRayRange, 5000.0f, &v3TerrainPick))
 		if (!__PickTerrainHeight(fPos, v3Start, v3End, 10.0f, fRayRange, 10000.0f, &v3TerrainPick))
 			if (!__PickTerrainHeight(fPos, v3Start, v3End, 100.0f, fRayRange, 100000.0f, &v3TerrainPick))
 					bTerrainPick=false;
-
+	
 	if (bTerrainPick)
 	{
 		*v3IntersectPt = v3TerrainPick;
 		return true;
 	}
-
+	
 	return false;
 }
 /*
@@ -630,13 +615,13 @@ bool CMapOutdoor::GetPickingPointWithRayOnlyTerrain(const CRay & rRay, D3DXVECTO
 		}
 		ft += fAdd * fMultiplier;
 	}
-
+	
 	if (bTerrainPick)
 	{
 		*v3IntersectPt = v3TerrainPick;
 		return true;
 	}
-
+	
 	return false;
 }
 */
@@ -648,7 +633,7 @@ void CMapOutdoor::GetHeightMap(const BYTE & c_rucTerrainNum, WORD ** pwHeightMap
 		*pwHeightMap = nullptr;
 		return;
 	}
-
+	
 	*pwHeightMap = m_pTerrain[c_rucTerrainNum]->GetHeightMap();
 }
 
@@ -659,7 +644,7 @@ void CMapOutdoor::GetNormalMap(const BYTE & c_rucTerrainNum, char ** pucNormalMa
 		*pucNormalMap = nullptr;
 		return;
 	}
-
+	
 	*pucNormalMap = m_pTerrain[c_rucTerrainNum]->GetNormalMap();
 }
 
@@ -704,7 +689,7 @@ bool CMapOutdoor::GetWaterHeight(int iX, int iY, long * plWaterHeight)
 	WORD wLocalX, wLocalY;
 	wLocalX = (iX - wTerrainCoordX * CTerrainImpl::TERRAIN_XSIZE) / (CTerrainImpl::WATERMAP_XSIZE);
 	wLocalY = (iY - wTerrainCoordY * CTerrainImpl::TERRAIN_YSIZE) / (CTerrainImpl::WATERMAP_YSIZE);
-
+	
 	return pTerrain->GetWaterHeight(wLocalX, wLocalY, plWaterHeight);
 }
 
@@ -714,9 +699,9 @@ bool CMapOutdoor::GetWaterHeight(int iX, int iY, long * plWaterHeight)
 
 bool CMapOutdoor::GetTerrainNumFromCoord(WORD wCoordX, WORD wCoordY, BYTE * pbyTerrainNum)
 {
-	*pbyTerrainNum = (wCoordY - m_CurCoordinate.m_sTerrainCoordY + LOAD_SIZE_WIDTH) * 3 +
+	*pbyTerrainNum = (wCoordY - m_CurCoordinate.m_sTerrainCoordY + LOAD_SIZE_WIDTH) * 3 + 
 		(wCoordX - m_CurCoordinate.m_sTerrainCoordX + LOAD_SIZE_WIDTH);
-
+	
 	if (*pbyTerrainNum < 0 || *pbyTerrainNum > AROUND_AREA_NUM)
 		return false;
 	return true;
@@ -766,7 +751,7 @@ float CMapOutdoor::GetHeight(float fx, float fy)
 		Vector3d aVector3d;
 		aVector3d.Set(fx, -fy, fTerrainHeight);
 
-		FGetObjectHeight kGetObjHeight(fx, fy); // not called (if cculling not process|update()ed)
+		FGetObjectHeight kGetObjHeight(fx, fy);
 
 		RangeTester<FGetObjectHeight> kRangeTester_kGetObjHeight(&kGetObjHeight);
 		rkCullingMgr.PointTest2d(aVector3d, &kRangeTester_kGetObjHeight);
@@ -812,7 +797,7 @@ float CMapOutdoor::GetCacheHeight(float fx, float fy)
 			{
 #ifdef __HEIGHT_CACHE_TRACE__
 				s_dwHitCount++;
-
+				
 				if (s_dwTotalCount>1000)
 				{
 					DWORD dwHitRate=s_dwHitCount*1000/s_dwTotalCount;
@@ -824,11 +809,11 @@ float CMapOutdoor::GetCacheHeight(float fx, float fy)
 					}
 
 
-				}
+				}			
 #endif
 				return rkItem.m_fHeight;
 			}
-		}
+		}		
 	}
 	else
 	{
@@ -837,7 +822,7 @@ float CMapOutdoor::GetCacheHeight(float fx, float fy)
 		//printf("NoCache (%f, %f)\n", fx/100.0f, fy/100.0f);
 #endif
 	}
-#ifdef __HEIGHT_CACHE_TRACE__
+#ifdef __HEIGHT_CACHE_TRACE__	
 	if (s_dwTotalCount>=1000000)
 	{
 		printf("HitRate %f\n", s_dwHitCount*1000/s_dwTotalCount*0.1f);
@@ -847,7 +832,7 @@ float CMapOutdoor::GetCacheHeight(float fx, float fy)
 		s_dwErrorCount=0;
 	}
 #endif
-
+	
 	float fTerrainHeight = GetTerrainHeight(fx, fy);
 #ifdef SPHERELIB_STRICT
 	if (MAPOUTDOOR_GET_HEIGHT_TRACE)
@@ -862,9 +847,9 @@ float CMapOutdoor::GetCacheHeight(float fx, float fy)
 	{
 		Vector3d aVector3d;
 		aVector3d.Set(fx, -fy, fTerrainHeight);
-
+		
 		FGetObjectHeight kGetObjHeight(fx, fy);
-
+		
 		RangeTester<FGetObjectHeight> kRangeTester_kGetObjHeight(&kGetObjHeight);
 		rkCullingMgr.PointTest2d(aVector3d, &kRangeTester_kGetObjHeight);
 
@@ -897,13 +882,13 @@ float CMapOutdoor::GetCacheHeight(float fx, float fy)
 #endif
 			pkVct_kItem->clear();
 		}
-
+		
 		SHeightCache::SItem kItem;
 		kItem.m_dwKey=dwKey;
 		kItem.m_fHeight=fHeight;
 		pkVct_kItem->push_back(kItem);
 	}
-
+	
 	return fHeight;
 }
 
@@ -913,32 +898,32 @@ bool CMapOutdoor::GetNormal(int ix, int iy, D3DXVECTOR3 * pv3Normal)
 		ix = 0;
 	else if (ix >= m_sTerrainCountX * CTerrainImpl::TERRAIN_XSIZE)
 		ix = m_sTerrainCountX * CTerrainImpl::TERRAIN_XSIZE;
-
+	
 	if (iy <= 0)
 		iy = 0;
 	else if (iy >= m_sTerrainCountY * CTerrainImpl::TERRAIN_YSIZE)
 		iy = m_sTerrainCountY * CTerrainImpl::TERRAIN_YSIZE;
-
+	
 	WORD usCoordX, usCoordY;
-
+	
 	usCoordX = (WORD) (ix / (CTerrainImpl::TERRAIN_XSIZE));
 	usCoordY = (WORD) (iy / (CTerrainImpl::TERRAIN_YSIZE));
-
+	
 	if (usCoordX >= m_sTerrainCountX - 1)
 		usCoordX = m_sTerrainCountX - 1;
-
+	
 	if (usCoordY >= m_sTerrainCountY - 1)
 		usCoordY = m_sTerrainCountY - 1;
-
+	
 	BYTE byTerrainNum;
 	if (!GetTerrainNumFromCoord(usCoordX, usCoordY, &byTerrainNum))
 		return false;
-
+	
 	CTerrain * pTerrain;
-
+	
 	if (!GetTerrainPointer(byTerrainNum, &pTerrain))
 		return false;
-
+	
 	while (ix >= CTerrainImpl::TERRAIN_XSIZE)
 		ix -= CTerrainImpl::TERRAIN_XSIZE;
 
@@ -966,7 +951,7 @@ float CMapOutdoor::GetTerrainHeight(float fx, float fy)
 		return 0.0f;
 
 	CTerrain * pTerrain;
-
+	
 	if (!GetTerrainPointer(byTerrainNum, &pTerrain))
 		return 0.0f;
 
@@ -981,33 +966,33 @@ float CMapOutdoor::GetHeight(float * pPos)
 	return pPos[2];
 }
 
-bool CMapOutdoor::GetBrushColor(float fX, float fY, float* pLowColor, float* pHighColor)
+bool CMapOutdoor::GetBrushColor(float fX, float fY, float *pLowColor, float *pHighColor)
 {
 	bool bSuccess = false;
-
+	
 //	float fU, fV;
-//
+//	
 //	GetOneToOneMappingCoordinates(fX, fY, fU, fV);
-//
+//	
 //	if (fU >= 0.0f && fU <= 1.0f && fV >= 0.0f && fV <= 1.0f)
 //	{
 //		int nImageCol = (m_cBrushMap.GetWidth() - 1) * fU;
 //		int nImageRow = (m_cBrushMap.GetHeight() - 1) * fV;
-//
+//		
 //		// low
 //		BYTE* pPixel = m_cBrushMap.GetPixel(nImageCol, nImageRow);
 //		pLowColor[0] = (pPixel[0] / 255.0f);
 //		pLowColor[1] = (pPixel[1] / 255.0f);
 //		pLowColor[2] = (pPixel[2] / 255.0f);
 //		pLowColor[3] = (pPixel[3] / 255.0f);
-//
+//		
 //		// high
 //		pPixel = m_cBrushMap2.GetPixel(nImageCol, nImageRow);
 //		pHighColor[0] = (pPixel[0] / 255.0f);
 //		pHighColor[1] = (pPixel[1] / 255.0f);
 //		pHighColor[2] = (pPixel[2] / 255.0f);
 //		pHighColor[3] = (pPixel[3] / 255.0f);
-//
+//		
 //		bSuccess = true;
 //	}
 	pLowColor[0] = (1.0f);
@@ -1018,7 +1003,7 @@ bool CMapOutdoor::GetBrushColor(float fX, float fY, float* pLowColor, float* pHi
 	pHighColor[1] = (1.0f);
 	pHighColor[2] = (1.0f);
 	pHighColor[3] = (1.0f);
-
+	
 	return bSuccess;
 }
 
@@ -1077,14 +1062,8 @@ void CMapOutdoor::SaveAlphaFogOperation()
 	STATEMANAGER.SetTextureStageState(1, D3DTSS_ALPHAOP,	D3DTOP_MODULATE);
 	STATEMANAGER.SetTextureStageState(1, D3DTSS_TEXTURETRANSFORMFLAGS, D3DTTFF_COUNT2);
 	STATEMANAGER.SetTextureStageState(1, D3DTSS_TEXCOORDINDEX, D3DTSS_TCI_CAMERASPACEPOSITION);
-
-#ifdef ENABLE_DIRECTX9_UPDATE
-    STATEMANAGER.SetSamplerState(1, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
-    STATEMANAGER.SetSamplerState(1, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
-#else
-    STATEMANAGER.SetTextureStageState(1, D3DTSS_ADDRESSU, D3DTADDRESS_CLAMP);
-    STATEMANAGER.SetTextureStageState(1, D3DTSS_ADDRESSV, D3DTADDRESS_CLAMP);
-#endif
+	STATEMANAGER.SetTextureStageState(1, D3DTSS_ADDRESSU, D3DTADDRESS_CLAMP);
+	STATEMANAGER.SetTextureStageState(1, D3DTSS_ADDRESSV, D3DTADDRESS_CLAMP);
 
 	STATEMANAGER.SetTransform(D3DTS_TEXTURE1, &m_matAlphaFogTexture);
 	STATEMANAGER.SaveRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
@@ -1249,7 +1228,7 @@ bool CMapOutdoor::isAttrOn(int iX, int iY, BYTE byAttr)
 	WORD wLocalX, wLocalY;
 	wLocalX = (iX - wTerrainCoordX * CTerrainImpl::TERRAIN_XSIZE) / (CTerrainImpl::HALF_CELLSCALE);
 	wLocalY = (iY - wTerrainCoordY * CTerrainImpl::TERRAIN_YSIZE) / (CTerrainImpl::HALF_CELLSCALE);
-
+	
 	return pTerrain->isAttrOn(wLocalX, wLocalY, byAttr);
 }
 
@@ -1257,11 +1236,11 @@ bool CMapOutdoor::GetAttr(int iX, int iY, BYTE * pbyAttr)
 {
 	if (iX < 0 || iY < 0 || iX > m_sTerrainCountX * CTerrainImpl::TERRAIN_XSIZE || iY > m_sTerrainCountY * CTerrainImpl::TERRAIN_YSIZE)
 		return false;
-
+	
 	WORD wTerrainCoordX, wTerrainCoordY;
 	wTerrainCoordX = iX / CTerrainImpl::TERRAIN_XSIZE;
 	wTerrainCoordY = iY / CTerrainImpl::TERRAIN_YSIZE;
-
+	
 	BYTE byTerrainNum;
 	if (!GetTerrainNumFromCoord(wTerrainCoordX, wTerrainCoordY, &byTerrainNum))
 		return false;
@@ -1309,7 +1288,7 @@ bool CMapOutdoor::GetMonsterAreaInfoFromVectorIndex(DWORD dwMonsterAreaInfoVecto
 {
 	if (dwMonsterAreaInfoVectorIndex >= m_MonsterAreaInfoPtrVector.size())
 		return false;
-
+	
 	*ppMonsterAreaInfo = m_MonsterAreaInfoPtrVector[dwMonsterAreaInfoVectorIndex];
 	return true;
 }
@@ -1378,7 +1357,7 @@ void CMapOutdoor::XMasTree_Destroy()
 	}
 }
 
-void CMapOutdoor::__XMasTree_Create(float x, float y, float z, const char* c_szTreeName, const char* c_szEffName)
+void CMapOutdoor::__XMasTree_Create(float x, float y, float z, const char *c_szTreeName, const char *c_szEffName)
 {
 	assert(NULL==m_kXMas.m_pkTree);
 	assert(-1==m_kXMas.m_iEffectID);
@@ -1394,13 +1373,13 @@ void CMapOutdoor::__XMasTree_Create(float x, float y, float z, const char* c_szT
 												D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 }
 
-void CMapOutdoor::XMasTree_Set(float x, float y, float z, const char* c_szTreeName, const char* c_szEffName)
+void CMapOutdoor::XMasTree_Set(float x, float y, float z, const char *c_szTreeName, const char *c_szEffName)
 {
 	XMasTree_Destroy();
 	__XMasTree_Create(x, y, z, c_szTreeName, c_szEffName);
 }
 
-void CMapOutdoor::SpecialEffect_Create(DWORD dwID, float x, float y, float z, const char* c_szEffName)
+void CMapOutdoor::SpecialEffect_Create(DWORD dwID, float x, float y, float z, const char *c_szEffName)
 {
 	CEffectManager& rkEffMgr = CEffectManager::Instance();
 
@@ -1562,45 +1541,45 @@ void CMapOutdoor::ConvertToMapCoords(float fx, float fy, int *iCellX, int *iCell
 {
 	if ( fy < 0 )
 		fy = -fy;
-
+	
 	int ix, iy;
 	PR_FLOAT_TO_INT(fx, ix);
 	PR_FLOAT_TO_INT(fy, iy);
-
+	
 	*pwTerrainNumX = ix / (CTerrainImpl::TERRAIN_XSIZE);
 	*pwTerrainNumY = iy / (CTerrainImpl::TERRAIN_YSIZE);
-
+	
 	float maxx = (float) CTerrainImpl::TERRAIN_XSIZE;
 	float maxy = (float) CTerrainImpl::TERRAIN_YSIZE;
-
+	
 	while (fx < 0)
 		fx += maxx;
-
+	
 	while (fy < 0)
 		fy += maxy;
-
+	
 	while (fx >= maxx)
 		fx -= maxx;
-
+	
 	while (fy >= maxy)
 		fy -= maxy;
-
+	
 	float fooscale = 1.0f / (float)(CTerrainImpl::HALF_CELLSCALE);
-
+	
 	float fCellX, fCellY;
-
+	
 	fCellX = fx * fooscale;
 	fCellY = fy * fooscale;
-
+	
 	PR_FLOAT_TO_INT(fCellX, *iCellX);
 	PR_FLOAT_TO_INT(fCellY, *iCellY);
-
+	
 	float fRatioooscale = ((float)CTerrainImpl::HEIGHT_TILE_XRATIO) * fooscale;
-
+	
 	float fSubcellX, fSubcellY;
 	fSubcellX = fx * fRatioooscale;
 	fSubcellY = fy * fRatioooscale;
-
+	
 	PR_FLOAT_TO_INT(fSubcellX, *pucSubCellX);
 	PR_FLOAT_TO_INT(fSubcellY, *pucSubCellY);
 	*pucSubCellX = (*pucSubCellX) % CTerrainImpl::HEIGHT_TILE_XRATIO;

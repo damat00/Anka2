@@ -1,14 +1,25 @@
-//
-// Copyright 2012 Christian Henning
-//
-// Distributed under the Boost Software License, Version 1.0
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
-//
+/*
+    Copyright 2012 Christian Henning
+    Use, modification and distribution are subject to the Boost Software License,
+    Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+    http://www.boost.org/LICENSE_1_0.txt).
+*/
+
+/*************************************************************************************************/
+
 #ifndef BOOST_GIL_IO_GET_READER_HPP
 #define BOOST_GIL_IO_GET_READER_HPP
 
-#include <boost/gil/io/get_read_device.hpp>
+////////////////////////////////////////////////////////////////////////////////////////
+/// \file
+/// \brief
+/// \author Christian Henning \n
+///
+/// \date 2012 \n
+///
+////////////////////////////////////////////////////////////////////////////////////////
+
+#include "get_read_device.hpp"
 
 namespace boost { namespace gil {
 

@@ -16,8 +16,8 @@
 #include <boost/beast/http/status.hpp>
 #include <boost/beast/http/type_traits.hpp>
 #include <boost/beast/core/string.hpp>
+#include <boost/beast/core/detail/empty_base_optimization.hpp>
 #include <boost/beast/core/detail/integer_sequence.hpp>
-#include <boost/core/empty_value.hpp>
 #include <boost/assert.hpp>
 #include <boost/optional.hpp>
 #include <boost/throw_exception.hpp>
@@ -490,7 +490,7 @@ template<bool isRequest, class Body, class Fields = fields>
 struct message
     : header<isRequest, Fields>
 #if ! BOOST_BEAST_DOXYGEN
-    , boost::empty_value<
+    , beast::detail::empty_base_optimization<
         typename Body::value_type>
 #endif
 {
@@ -862,8 +862,8 @@ struct message
 #endif
     body()& noexcept
     {
-        return this->boost::empty_value<
-            typename Body::value_type>::get();
+        return this->beast::detail::empty_base_optimization<
+            typename Body::value_type>::member();
     }
 
     /// Returns the body
@@ -875,8 +875,8 @@ struct message
     body()&& noexcept
     {
         return std::move(
-            this->boost::empty_value<
-                typename Body::value_type>::get());
+            this->beast::detail::empty_base_optimization<
+                typename Body::value_type>::member());
     }
 
     /// Returns the body
@@ -887,8 +887,8 @@ struct message
 #endif
     body() const& noexcept
     {
-        return this->boost::empty_value<
-            typename Body::value_type>::get();
+        return this->beast::detail::empty_base_optimization<
+            typename Body::value_type>::member();
     }
 
 private:
@@ -902,8 +902,8 @@ private:
         std::piecewise_construct_t,
         std::tuple<BodyArgs...>& body_args,
         beast::detail::index_sequence<IBodyArgs...>)
-        : boost::empty_value<
-            typename Body::value_type>(boost::empty_init_t(),
+        : beast::detail::empty_base_optimization<
+            typename Body::value_type>(
                 std::forward<BodyArgs>(
                 std::get<IBodyArgs>(body_args))...)
     {
@@ -923,8 +923,8 @@ private:
         beast::detail::index_sequence<IFieldsArgs...>)
         : header_type(std::forward<FieldsArgs>(
             std::get<IFieldsArgs>(fields_args))...)
-        , boost::empty_value<
-            typename Body::value_type>(boost::empty_init_t(),
+        , beast::detail::empty_base_optimization<
+            typename Body::value_type>(
                 std::forward<BodyArgs>(
                 std::get<IBodyArgs>(body_args))...)
     {

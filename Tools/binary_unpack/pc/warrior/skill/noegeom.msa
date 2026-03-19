@@ -6,7 +6,7 @@ Accumulation           0.00	0.00	0.00
 
 Group MotionEventData
 {
-    MotionEventDataCount     4
+    MotionEventDataCount     3
     Group Event00
     {
         MotionEventType      1
@@ -26,9 +26,9 @@ Group MotionEventData
         
         IndependentFlag      0
         AttachingEnable      1
-        AttachingBoneName    "Bip01 R Hand"
+        AttachingBoneName    "equip_right_hand"
         FollowingEnable      1
-        EffectFileName       "d:/ymir work/pc/warrior/effect/noegeomdorae_loop.mse"
+        EffectFileName       "d:/ymir work/pc/warrior/effect/elect.mse"
         EffectPosition       0.000000 0.000000 0.000000
     }
     Group Event02
@@ -36,30 +36,21 @@ Group MotionEventData
         MotionEventType      4
         StartingTime         1.167883
         DuringTime           0.200000
-        EnableHitProcess     1
+        EnableHitProcess     0
         
         AttackType           0
         HittingType          1
         StiffenTime          0.000000
-        InvisibleTime        0.300000
+        InvisibleTime        2.000000
         ExternalForce        0.000000
-        HitLimitCount        12
+        HitLimitCount        18
         CollisionType        4
         
         SphereDataCount      1
         Group SphereData00
         {
-            Radius           250.000000
+            Radius           400.000000
             Position         0.000000 0.000000 0.000000
         }
-    }
-    Group Event03
-    {
-        MotionEventType      2
-        StartingTime         1.080292
-        
-        DuringTime           0.100000
-        Power                100
-        AffectingRange       100
     }
 }

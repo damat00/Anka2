@@ -4,14 +4,13 @@
 #include "ItemManager.h"
 #include "RaceData.h"
 
-#include "../Eterlib/ResourceManager.h"
-#include "../EterGrnlib/util.h"
+#include "../eterlib/ResourceManager.h"
+#include "../etergrnlib/util.h"
 
 #ifdef ENABLE_SKILL_COLOR_SYSTEM
 	#include "../UserInterface/InstanceBase.h"
 	#include "../UserInterface/PythonSkill.h"
 #endif
-#include "../UserInterface/AlphaAddSpecular.h"
 
 DWORD CActorInstance::GetVirtualID()
 {
@@ -184,13 +183,11 @@ void CActorInstance::SetShape(DWORD eShape, float fSpecular)
 	if (!CRaceManager::Instance().GetRaceDataPointer(m_eRace, &pRaceData))
 		return;
 
-	AlphaSpecialVnums::ApplyAlphaOnVnums(m_eRace, fSpecular);
-
 	CRaceData::SShape* pkShape=pRaceData->FindShape(eShape);
 	if (pkShape)
 	{
 		CResourceManager& rkResMgr=CResourceManager::Instance();
-
+		
 		if (pkShape->m_stModelFileName.empty())
 		{
 			CGraphicThing* pModelThing = pRaceData->GetBaseModelThing();
@@ -200,7 +197,7 @@ void CActorInstance::SetShape(DWORD eShape, float fSpecular)
 		{
 			CGraphicThing* pModelThing = (CGraphicThing *)rkResMgr.GetResourcePointer(pkShape->m_stModelFileName.c_str());
 			RegisterModelThing(0, pModelThing);
-		}
+		}		
 
 		{
 			std::string stLODModelFileName;
@@ -212,7 +209,7 @@ void CActorInstance::SetShape(DWORD eShape, float fSpecular)
 				stLODModelFileName = CFileNameHelper::NoExtension(pkShape->m_stModelFileName) + szLODModelFileNameEnd;
 				if (!rkResMgr.IsFileExist(stLODModelFileName.c_str()))
 					break;
-
+				
 				CGraphicThing* pLODModelThing = (CGraphicThing *)rkResMgr.GetResourcePointer(stLODModelFileName.c_str());
 				if (!pLODModelThing)
 					break;
@@ -240,11 +237,11 @@ void CActorInstance::SetShape(DWORD eShape, float fSpecular)
 					kMaterialData.isSpecularEnable = TRUE;
 					kMaterialData.fSpecularPower = fSpecular;
 					kMaterialData.bSphereMapIndex = 0;
-					SetMaterialData(c_rkSkinItem.m_ePart, c_rkSkinItem.m_stSrcFileName.c_str(), kMaterialData);
+	 				SetMaterialData(c_rkSkinItem.m_ePart, c_rkSkinItem.m_stSrcFileName.c_str(), kMaterialData);
 				}
 				else
 				{
-					SetMaterialImagePointer(c_rkSkinItem.m_ePart, c_rkSkinItem.m_stSrcFileName.c_str(), static_cast<CGraphicImage*>(pkRes));
+	 				SetMaterialImagePointer(c_rkSkinItem.m_ePart, c_rkSkinItem.m_stSrcFileName.c_str(), static_cast<CGraphicImage*>(pkRes));
 				}
 			}
 		}
@@ -339,14 +336,14 @@ DWORD *CActorInstance::GetSkillColorByEffectID(DWORD dwEffectID)
 {
 	switch (dwEffectID)
 	{
-		case 14: // FLY_CHAIN_LIGHTNING
+		case 14:
 			return m_dwSkillColor[108];
 			break;
 
-		case 16: //FLY_SKILL_MUYEONG
+		case 16: 
 			return m_dwSkillColor[78];
 			break;
-			/////////////////////////////////////////////
+
 		case CInstanceBase::EFFECT_AFFECT + CInstanceBase::AFFECT_CHEONGEUN:
 		case CInstanceBase::EFFECT_AFFECT + CInstanceBase::AFFECT_FALLEN_CHEONGEUN:
 			return m_dwSkillColor[19];
@@ -402,13 +399,6 @@ DWORD *CActorInstance::GetSkillColorByEffectID(DWORD dwEffectID)
 			return m_dwSkillColor[66];
 			break;
 
-#ifdef ENABLE_NINETH_SKILL
-		case CInstanceBase::EFFECT_AFFECT + CInstanceBase::AFFECT_CHEONUN:
-			return m_dwSkillColor[182];
-			break;
-#endif
-
-			/////////////////////////////////////////////
 		case CInstanceBase::EFFECT_WEAPON + CInstanceBase::WEAPON_ONEHAND:
 		case CInstanceBase::EFFECT_WEAPON + CInstanceBase::WEAPON_TWOHAND:
 			return m_dwSkillColor[4];

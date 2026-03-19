@@ -13,6 +13,7 @@
 const float CAMERA_TARGET_STANDARD = 100.0f;
 const float CAMERA_TARGET_FACE = 150.0f;
 
+
 typedef enum _eCameraState_
 {
 	CAMERA_STATE_NORMAL,
@@ -83,6 +84,7 @@ class CCamera
 		float m_fPitch;
 		float m_fRoll;
 		float m_fDistance;
+
 
 		CRay	m_kCameraBottomToTerrainRay;
 		CRay	m_kCameraFrontToTerrainRay;
@@ -259,5 +261,5 @@ class CCameraManager : public CSingleton<CCameraManager>
 		CCamera *		m_pPreviousCamera;
 };
 
-#endif // !defined(AFX_CAMERA_H__C5D086BE_7A03_4246_9145_336747C47D9E__INCLUDED_)
 
+#endif // !defined(AFX_CAMERA_H__C5D086BE_7A03_4246_9145_336747C47D9E__INCLUDED_)

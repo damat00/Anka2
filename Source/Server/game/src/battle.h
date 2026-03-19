@@ -11,22 +11,22 @@ enum EBattleTypes
 	BATTLE_DEAD
 };
 
-extern int CalcAttBonus(LPCHARACTER pkAttacker, LPCHARACTER pkVictim, int iAtk);
-extern int CalcBattleDamage(int iDam, int iAttackerLev, int iVictimLev) noexcept;
-extern int CalcMeleeDamage(LPCHARACTER pAttacker, LPCHARACTER pVictim, bool bIgnoreDefense = false, bool bIgnoreTargetRating = false);
-extern int CalcMagicDamage(LPCHARACTER pAttacker, LPCHARACTER pVictim);
-extern int CalcArrowDamage(LPCHARACTER pkAttacker, LPCHARACTER pkVictim, LPITEM pkBow, LPITEM pkArrow, bool bIgnoreDefense = false);
-extern float CalcAttackRating(const CHARACTER* pkAttacker, const CHARACTER* pkVictim, bool bIgnoreTargetRating = false);
+extern int	CalcAttBonus(LPCHARACTER pkAttacker, LPCHARACTER pkVictim, int iAtk);
+extern int	CalcBattleDamage(int iDam, int iAttackerLev, int iVictimLev);
+extern int	CalcMeleeDamage(LPCHARACTER pAttacker, LPCHARACTER pVictim, bool bIgnoreDefense = false, bool bIgnoreTargetRating = false);
+extern int	CalcMagicDamage(LPCHARACTER pAttacker, LPCHARACTER pVictim);
+extern int	CalcArrowDamage(LPCHARACTER pkAttacker, LPCHARACTER pkVictim, LPITEM pkBow, LPITEM pkArrow, bool bIgnoreDefense = false);
+extern float	CalcAttackRating(LPCHARACTER pkAttacker, LPCHARACTER pkVictim, bool bIgnoreTargetRating = false);
 
-extern bool battle_is_attackable(LPCHARACTER ch, LPCHARACTER victim);
-extern int battle_get_max_distance(const LPCHARACTER& ch, const LPCHARACTER& victim);
-extern int battle_melee_attack(LPCHARACTER ch, LPCHARACTER victim);
-extern void battle_end(LPCHARACTER ch);
+extern bool	battle_is_attackable(LPCHARACTER ch, LPCHARACTER victim);
+extern int	battle_melee_attack(LPCHARACTER ch, LPCHARACTER victim);
+extern void	battle_end(LPCHARACTER ch);
 
-extern bool battle_distance_valid_by_xy(const CHARACTER* ch, const CHARACTER* victim);
-extern bool battle_distance_valid(const CHARACTER* ch, const CHARACTER* victim);
+extern bool	battle_distance_valid_by_xy(long x, long y, long tx, long ty);
+extern bool	battle_distance_valid(LPCHARACTER ch, LPCHARACTER victim);
+extern int	battle_count_attackers(LPCHARACTER ch);
 
-extern void NormalAttackAffect(LPCHARACTER pkAttacker, LPCHARACTER pkVictim);
+extern void	NormalAttackAffect(LPCHARACTER pkAttacker, LPCHARACTER pkVictim);
 
 inline void AttackAffect(LPCHARACTER pkAttacker,
 		LPCHARACTER pkVictim,
@@ -58,14 +58,14 @@ inline void AttackAffect(LPCHARACTER pkAttacker,
 }
 
 inline void SkillAttackAffect(LPCHARACTER pkVictim,
-	int success_pct,
-	DWORD immune_flag,
-	DWORD affect_idx,
-	BYTE affect_point,
-	long affect_amount,
-	DWORD affect_flag,
-	int time,
-	const char* name)
+		int success_pct,
+		DWORD immune_flag,
+		DWORD affect_idx,
+		BYTE affect_point,
+		long affect_amount,
+		DWORD affect_flag,
+		int time,
+		const char* name)
 {
 	if (success_pct && !pkVictim->IsAffectFlag(affect_flag))
 	{
@@ -76,7 +76,7 @@ inline void SkillAttackAffect(LPCHARACTER pkVictim,
 			// SKILL_ATTACK_NO_LOG_TARGET_NAME_FIX
 			if (test_server)
 				pkVictim->ChatPacket(CHAT_TYPE_PARTY,
-					"%s(%d%%) -> %s SUCCESS", name, success_pct, name);
+						"%s(%d%%) -> %s SUCCESS", name, success_pct, name);
 			// END_OF_SKILL_ATTACK_LOG_NO_TARGET_NAME_FIX
 		}
 		else if (test_server)

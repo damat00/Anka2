@@ -50,6 +50,12 @@
 namespace boost { namespace geometry
 {
 
+namespace srs { namespace par4
+{
+    struct mbtfpp {}; // McBride-Thomas Flat-Polar Parabolic
+
+}} //namespace srs::par4
+
 namespace projections
 {
     #ifndef DOXYGEN_NO_DETAIL
@@ -74,7 +80,7 @@ namespace projections
 
                 // FORWARD(s_forward)  spheroid
                 // Project coordinates from geographic (lon, lat) to cartesian (x, y)
-                inline void fwd(T const& lp_lon, T lp_lat, T& xy_x, T& xy_y) const
+                inline void fwd(T& lp_lon, T& lp_lat, T& xy_x, T& xy_y) const
                 {
                     static const T C23 = detail::two_thirds<T>();
                     static const T C13 = detail::third<T>();
@@ -86,7 +92,7 @@ namespace projections
 
                 // INVERSE(s_inverse)  spheroid
                 // Project coordinates from cartesian (x, y) to geographic (lon, lat)
-                inline void inv(T const& xy_x, T const& xy_y, T& lp_lon, T& lp_lat) const
+                inline void inv(T& xy_x, T& xy_y, T& lp_lon, T& lp_lat) const
                 {
                     static const T half_pi = detail::half_pi<T>();
                     static const T C23 = detail::two_thirds<T>();
@@ -144,9 +150,7 @@ namespace projections
     template <typename T, typename Parameters>
     struct mbtfpp_spheroid : public detail::mbtfpp::base_mbtfpp_spheroid<T, Parameters>
     {
-        template <typename Params>
-        inline mbtfpp_spheroid(Params const& , Parameters const& par)
-            : detail::mbtfpp::base_mbtfpp_spheroid<T, Parameters>(par)
+        inline mbtfpp_spheroid(const Parameters& par) : detail::mbtfpp::base_mbtfpp_spheroid<T, Parameters>(par)
         {
             detail::mbtfpp::setup_mbtfpp(this->m_par);
         }
@@ -157,14 +161,23 @@ namespace projections
     {
 
         // Static projection
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_STATIC_PROJECTION(srs::spar::proj_mbtfpp, mbtfpp_spheroid, mbtfpp_spheroid)
+        BOOST_GEOMETRY_PROJECTIONS_DETAIL_STATIC_PROJECTION(srs::par4::mbtfpp, mbtfpp_spheroid, mbtfpp_spheroid)
 
         // Factory entry(s)
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_ENTRY_FI(mbtfpp_entry, mbtfpp_spheroid)
-        
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_INIT_BEGIN(mbtfpp_init)
+        template <typename T, typename Parameters>
+        class mbtfpp_entry : public detail::factory_entry<T, Parameters>
         {
-            BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_INIT_ENTRY(mbtfpp, mbtfpp_entry)
+            public :
+                virtual base_v<T, Parameters>* create_new(const Parameters& par) const
+                {
+                    return new base_v_fi<mbtfpp_spheroid<T, Parameters>, T, Parameters>(par);
+                }
+        };
+
+        template <typename T, typename Parameters>
+        inline void mbtfpp_init(detail::base_factory<T, Parameters>& factory)
+        {
+            factory.add_to_factory("mbtfpp", new mbtfpp_entry<T, Parameters>);
         }
 
     } // namespace detail

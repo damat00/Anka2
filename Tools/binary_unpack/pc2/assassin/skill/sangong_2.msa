@@ -22,7 +22,7 @@ Group MotionEventData
     Group Event01
     {
         MotionEventType      6
-        StartingTime         0.562044
+        StartingTime         0.554745
         
         AttachingEnable      1
         AttachingBoneName    "Bip01 Head"

@@ -96,6 +96,12 @@
 namespace boost { namespace geometry
 {
 
+namespace srs { namespace par4
+{
+    struct lcca {};
+
+}} //namespace srs::par4
+
 namespace projections
 {
     #ifndef DOXYGEN_NO_DETAIL
@@ -138,7 +144,7 @@ namespace projections
 
                 // FORWARD(e_forward)  ellipsoid
                 // Project coordinates from geographic (lon, lat) to cartesian (x, y)
-                inline void fwd(T lp_lon, T const& lp_lat, T& xy_x, T& xy_y) const
+                inline void fwd(T& lp_lon, T& lp_lat, T& xy_x, T& xy_y) const
                 {
                     T S, r, dr;
 
@@ -151,7 +157,7 @@ namespace projections
 
                 // INVERSE(e_inverse)  ellipsoid & spheroid
                 // Project coordinates from cartesian (x, y) to geographic (lon, lat)
-                inline void inv(T xy_x, T xy_y, T& lp_lon, T& lp_lat) const
+                inline void inv(T& xy_x, T& xy_y, T& lp_lon, T& lp_lat) const
                 {
                     T theta, dr, S, dif;
                     int i;
@@ -222,9 +228,7 @@ namespace projections
     template <typename T, typename Parameters>
     struct lcca_ellipsoid : public detail::lcca::base_lcca_ellipsoid<T, Parameters>
     {
-        template <typename Params>
-        inline lcca_ellipsoid(Params const& , Parameters const& par)
-            : detail::lcca::base_lcca_ellipsoid<T, Parameters>(par)
+        inline lcca_ellipsoid(const Parameters& par) : detail::lcca::base_lcca_ellipsoid<T, Parameters>(par)
         {
             detail::lcca::setup_lcca(this->m_par, this->m_proj_parm);
         }
@@ -235,14 +239,23 @@ namespace projections
     {
 
         // Static projection
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_STATIC_PROJECTION(srs::spar::proj_lcca, lcca_ellipsoid, lcca_ellipsoid)
+        BOOST_GEOMETRY_PROJECTIONS_DETAIL_STATIC_PROJECTION(srs::par4::lcca, lcca_ellipsoid, lcca_ellipsoid)
 
         // Factory entry(s)
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_ENTRY_FI(lcca_entry, lcca_ellipsoid)
-        
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_INIT_BEGIN(lcca_init)
+        template <typename T, typename Parameters>
+        class lcca_entry : public detail::factory_entry<T, Parameters>
         {
-            BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_INIT_ENTRY(lcca, lcca_entry)
+            public :
+                virtual base_v<T, Parameters>* create_new(const Parameters& par) const
+                {
+                    return new base_v_fi<lcca_ellipsoid<T, Parameters>, T, Parameters>(par);
+                }
+        };
+
+        template <typename T, typename Parameters>
+        inline void lcca_init(detail::base_factory<T, Parameters>& factory)
+        {
+            factory.add_to_factory("lcca", new lcca_entry<T, Parameters>);
         }
 
     } // namespace detail

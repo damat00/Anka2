@@ -2,7 +2,7 @@
 #include "../eterBase/Utils.h"
 #include "GrpText.h"
 
-CGraphicText::CGraphicText(const char* c_szFileName) : CResource(c_szFileName)
+CGraphicText::CGraphicText(const char *c_szFileName) : CResource(c_szFileName)
 {
 }
 
@@ -38,7 +38,10 @@ bool CGraphicText::OnLoad(int /*iSize*/, const void* /*c_pvBuf*/)
 	bool bItalic = false;
 
 	// format
-	const char * p = strrchr(GetFileName(), ':');
+	// 굴림.fnt		"굴림" 폰트 기본 사이즈 12 로 로딩
+	// 굴림:18.fnt  "굴림" 폰트 사이즈 18 로 로딩
+	// 굴림:14i.fnt "굴림" 폰트 사이즈 14 & 이탤릭으로 로딩
+	const char *p = strrchr(GetFileName(), ':');
 
 	if (p)
 	{
@@ -69,7 +72,7 @@ bool CGraphicText::OnLoad(int /*iSize*/, const void* /*c_pvBuf*/)
 		}
 		else
 			strncpy(strName, GetFileName(), MIN(31, p - GetFileName()));
-
+		
 		size = 12;
 	}
 
@@ -93,6 +96,6 @@ bool CGraphicText::OnIsType(TType type)
 {
 	if (CGraphicText::Type() == type)
 		return true;
-
+	
 	return CResource::OnIsType(type);
 }

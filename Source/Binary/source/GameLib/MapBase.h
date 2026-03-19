@@ -22,17 +22,13 @@ class CMapBase : public CScreen
 		virtual bool	Update(float fX, float fY, float fZ) = 0;
 		virtual void	UpdateAroundAmbience(float fX, float fY, float fZ) = 0;
 		virtual float	GetHeight(float fx, float fy) = 0;
-		virtual void	OnBeginEnvironment() = 0;
+		virtual void	OnBeginEnvironment() = 0; // ·»´õ¸µ ÇÒ ¶§ ºÒ·ÁÁö¸ç ¿©±â¼­ Environment¿¡ °ü·Ã ÀÖ´Â °ÍµéÀ» ¼ÂÆÃ ÇÑ´Ù.
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-        virtual void ApplyLight(DWORD dwVersion, const D3DLIGHT9& c_rkLight) = 0;
-#else
-        virtual void ApplyLight(DWORD dwVersion, const D3DLIGHT8& c_rkLight) = 0;
-#endif
+		virtual void 	ApplyLight(DWORD dwVersion, const D3DLIGHT8& c_rkLight) = 0;
 
 	protected:
 		virtual void	OnRender() = 0;
-		virtual void	OnSetEnvironmentDataPtr() = 0;
+		virtual void	OnSetEnvironmentDataPtr() = 0;	// Environment µ¥ÀÌÅÍ°¡ ¼³Á¤µÉ ¶§ ºÒ·ÁÁø´Ù.
 		virtual void	OnResetEnvironmentDataPtr() = 0;
 
 	public:
@@ -54,14 +50,14 @@ class CMapBase : public CScreen
 		const std::string & GetName() const { return m_strName; }
 		void SetName(const std::string & cr_strName) { m_strName = cr_strName; }
 
-		bool IsCopiedMap() const { return m_strParentMapName.length() > 0; }
-		const std::string& GetParentMapName() const { return m_strParentMapName; }
+		bool IsCopiedMap() const { return m_strParentMapName.length() > 0; }		// "¿øº» µ¥ÀÌÅÍ´Â µû·Î ÀÖ´Â" º¹»ç ¸ÊÀÎ°¡?
+		const std::string& GetParentMapName() const { return m_strParentMapName; }	// ¿øº» µ¥ÀÌÅÍ¸¦ °®°íÀÖ´Â ¸ÊÀÇ ÀÌ¸§À» ¸®ÅÏ (º¹»ç¸ÊÀÇ °æ¿ì ÇÊ¼ö·Î ¼¼ÆÃµÇ¾î¾ß ÇÔ)
 		const std::string& GetMapDataDirectory() const { return IsCopiedMap() ? m_strParentMapName : m_strName; }
 
 	protected:
-		EMAPTYPE				m_eType;
-		std::string				m_strName;
-		std::string				m_strParentMapName;
+		EMAPTYPE				m_eType;				// ¸Ê Á¾·ù... ÇöÀç´Â Indoor¿Í Ourdoor°¡ ÀÖ´Ù.
+		std::string				m_strName;				// ¸Ê ÀÌ¸§. ¸Ê ÀÌ¸§ÀÌ ¸Ê ½Äº°ÀÚ°¡ µÉ ¼ö ÀÖÀ»±î?
+		std::string				m_strParentMapName;		// ¿øº» ¸ÊÀÇ ÀÌ¸§. ÀÌ °ªÀÌ ¼¼ÆÃµÇ¾î ÀÖ´Ù¸é ½ÇÁ¦ ¸?µç ¸Ê µ¥ÀÌÅÍ´Â ParentMap/* °æ·Î¿¡¼­ À?¾î¿Â´Ù. ¸ÊÀÇ ÀÏºÎ¸¸ À?¾î¿À´Â ±â´ÉÀº ÇÊ¿ä¾ø´ë¼­ Æ?½º.
 		bool					m_bReady;
 
 		const TEnvironmentData *	mc_pEnvironmentData;

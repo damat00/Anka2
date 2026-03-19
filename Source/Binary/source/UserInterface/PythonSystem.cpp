@@ -25,25 +25,6 @@ void CPythonSystem::SaveWindowStatus(int iIndex, int iVisible, int iMinimized, i
 
 void CPythonSystem::GetDisplaySettings()
 {
-#ifdef ENABLE_DIRECTX9_UPDATE
-	memset(m_ResolutionList, 0, sizeof(TResolution) * RESOLUTION_MAX_NUM);
-	m_ResolutionCount = 0;
-
-	LPDIRECT3D9 lpD3D = CPythonGraphic::Instance().GetD3D();
-
-	D3DADAPTER_IDENTIFIER9 d3dAdapterIdentifier;
-	D3DDISPLAYMODE d3ddmDesktop;
-
-	lpD3D->GetAdapterIdentifier(0, 0, &d3dAdapterIdentifier);
-	lpD3D->GetAdapterDisplayMode(0, &d3ddmDesktop);
-
-	DWORD dwNumAdapterModes = lpD3D->GetAdapterModeCount(0, d3ddmDesktop.Format);
-
-	for (UINT iMode = 0; iMode < dwNumAdapterModes; iMode++)
-	{
-		D3DDISPLAYMODE DisplayMode;
-		lpD3D->EnumAdapterModes(0, d3ddmDesktop.Format, iMode, &DisplayMode);
-#else
 	memset(m_ResolutionList, 0, sizeof(TResolution) * RESOLUTION_MAX_NUM);
 	m_ResolutionCount = 0;
 
@@ -61,7 +42,6 @@ void CPythonSystem::GetDisplaySettings()
 	{
 		D3DDISPLAYMODE DisplayMode;
 		lpD3D->EnumAdapterModes(0, iMode, &DisplayMode);
-#endif
 		DWORD bpp = 0;
 
 		if (DisplayMode.Width < 800 || DisplayMode.Height < 600)
@@ -78,9 +58,7 @@ void CPythonSystem::GetDisplaySettings()
 
 		for (int i = 0; !check_res && i < m_ResolutionCount; ++i)
 		{
-			if (m_ResolutionList[i].bpp != bpp ||
-				m_ResolutionList[i].width != DisplayMode.Width ||
-				m_ResolutionList[i].height != DisplayMode.Height)
+			if (m_ResolutionList[i].bpp != bpp || m_ResolutionList[i].width != DisplayMode.Width || m_ResolutionList[i].height != DisplayMode.Height)
 				continue;
 
 			int check_fre = false;
@@ -105,11 +83,11 @@ void CPythonSystem::GetDisplaySettings()
 		{
 			if (m_ResolutionCount < RESOLUTION_MAX_NUM)
 			{
-				m_ResolutionList[m_ResolutionCount].width			= DisplayMode.Width;
-				m_ResolutionList[m_ResolutionCount].height			= DisplayMode.Height;
-				m_ResolutionList[m_ResolutionCount].bpp				= bpp;
-				m_ResolutionList[m_ResolutionCount].frequency[0]	= DisplayMode.RefreshRate;
-				m_ResolutionList[m_ResolutionCount].frequency_count	= 1;
+				m_ResolutionList[m_ResolutionCount].width = DisplayMode.Width;
+				m_ResolutionList[m_ResolutionCount].height = DisplayMode.Height;
+				m_ResolutionList[m_ResolutionCount].bpp = bpp;
+				m_ResolutionList[m_ResolutionCount].frequency[0] = DisplayMode.RefreshRate;
+				m_ResolutionList[m_ResolutionCount].frequency_count = 1;
 
 				++m_ResolutionCount;
 			}
@@ -341,7 +319,7 @@ void CPythonSystem::SetDefaultConfig()
 #ifdef ENABLE_STONE_SCALE_OPTION
 	m_Config.m_fStoneScale = 1.0f;
 #endif
-#ifdef ENABLE_TRACK_WINDOW
+#ifdef ENABLE_DUNGEON_TRACKING_SYSTEM
 	m_Config.bDungeonTrack = false;
 	m_Config.bBossTrack = false;
 #endif
@@ -746,7 +724,7 @@ bool CPythonSystem::LoadConfig()
 			else
 				m_Config.m_fStoneScale = atof(value);
 #endif
-#ifdef ENABLE_TRACK_WINDOW
+#ifdef ENABLE_DUNGEON_TRACKING_SYSTEM
 		else if (!stricmp(command, "DUNGEON_TRACK"))
 			m_Config.bDungeonTrack = atoi(value) == 1 ? true : false;
 		else if (!stricmp(command, "BOSS_TRACK"))
@@ -770,7 +748,7 @@ bool CPythonSystem::LoadConfig()
 			m_Config.height = config_height - difference;
 		}
 	}
-
+	
 	m_OldConfig = m_Config;
 
 	fclose(fp);
@@ -856,7 +834,7 @@ bool CPythonSystem::SaveConfig()
 #ifdef ENABLE_STONE_SCALE_OPTION
 	fprintf(fp, "STONE_SCALE				%.3f\n", m_Config.m_fStoneScale);
 #endif
-#ifdef ENABLE_TRACK_WINDOW
+#ifdef ENABLE_DUNGEON_TRACKING_SYSTEM
 	fprintf(fp, "DUNGEON_TRACK				%d\n", m_Config.bDungeonTrack);
 	fprintf(fp, "BOSS_TRACK					%d\n", m_Config.bBossTrack);
 #endif

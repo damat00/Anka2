@@ -49,6 +49,12 @@
 namespace boost { namespace geometry
 {
 
+namespace srs { namespace par4
+{
+    struct nell {}; // Nell
+
+}} //namespace srs::par4
+
 namespace projections
 {
     #ifndef DOXYGEN_NO_DETAIL
@@ -69,7 +75,7 @@ namespace projections
 
                 // FORWARD(s_forward)  spheroid
                 // Project coordinates from geographic (lon, lat) to cartesian (x, y)
-                inline void fwd(T const& lp_lon, T lp_lat, T& xy_x, T& xy_y) const
+                inline void fwd(T& lp_lon, T& lp_lat, T& xy_x, T& xy_y) const
                 {
                     T k, V;
                     int i;
@@ -89,7 +95,7 @@ namespace projections
 
                 // INVERSE(s_inverse)  spheroid
                 // Project coordinates from cartesian (x, y) to geographic (lon, lat)
-                inline void inv(T const& xy_x, T const& xy_y, T& lp_lon, T& lp_lat) const
+                inline void inv(T& xy_x, T& xy_y, T& lp_lon, T& lp_lat) const
                 {
                     lp_lon = 2. * xy_x / (1. + cos(xy_y));
                     lp_lat = aasin(0.5 * (xy_y + sin(xy_y)));
@@ -127,9 +133,7 @@ namespace projections
     template <typename T, typename Parameters>
     struct nell_spheroid : public detail::nell::base_nell_spheroid<T, Parameters>
     {
-        template <typename Params>
-        inline nell_spheroid(Params const& , Parameters const& par)
-            : detail::nell::base_nell_spheroid<T, Parameters>(par)
+        inline nell_spheroid(const Parameters& par) : detail::nell::base_nell_spheroid<T, Parameters>(par)
         {
             detail::nell::setup_nell(this->m_par);
         }
@@ -140,14 +144,23 @@ namespace projections
     {
 
         // Static projection
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_STATIC_PROJECTION(srs::spar::proj_nell, nell_spheroid, nell_spheroid)
+        BOOST_GEOMETRY_PROJECTIONS_DETAIL_STATIC_PROJECTION(srs::par4::nell, nell_spheroid, nell_spheroid)
 
         // Factory entry(s)
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_ENTRY_FI(nell_entry, nell_spheroid)
-
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_INIT_BEGIN(nell_init)
+        template <typename T, typename Parameters>
+        class nell_entry : public detail::factory_entry<T, Parameters>
         {
-            BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_INIT_ENTRY(nell, nell_entry)
+            public :
+                virtual base_v<T, Parameters>* create_new(const Parameters& par) const
+                {
+                    return new base_v_fi<nell_spheroid<T, Parameters>, T, Parameters>(par);
+                }
+        };
+
+        template <typename T, typename Parameters>
+        inline void nell_init(detail::base_factory<T, Parameters>& factory)
+        {
+            factory.add_to_factory("nell", new nell_entry<T, Parameters>);
         }
 
     } // namespace detail

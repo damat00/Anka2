@@ -1,14 +1,11 @@
 #include "StdAfx.h"
 #include "../eterLib/GrpMath.h"
 #include "../UserInterface/PythonBackground.h"
-#include "../UserInterface/PythonNonPlayer.h"
 
 #include "ActorInstance.h"
 
-#include "../UserInterface/Locale_inc.h"
-
 #define REMOVE_MOUNTS_COLLISION
-//#define REMOVE_STONES_COLLISION
+#define REMOVE_STONES_COLLISION
 #define REMOVE_PETS_COLLISION
 #define REMOVE_MOBS_COLLISION
 #define REMOVE_SHOPS_COLLISION
@@ -46,7 +43,7 @@ void CActorInstance::UpdatePointInstance(TCollisionPointInstance * pPointInstanc
 {
 	if (!pPointInstance)
 	{
-		assert(!"CActorInstance::UpdatePointInstance - pPointInstance is NULL");
+		assert(!"CActorInstance::UpdatePointInstance - pPointInstance is NULL"); // 레퍼런스로 교체하시오
 		return;
 	}
 
@@ -126,7 +123,7 @@ void CActorInstance::UpdateAdvancingPointInstance()
 		{
 			if (rInstance.dwModelIndex>=m_LODControllerVector.size())
 			{
-				Tracenf("CActorInstance::UpdateAdvancingPointInstance - rInstance.dwModelIndex=%d >= m_LODControllerVector.size()=%d",
+				Tracenf("CActorInstance::UpdateAdvancingPointInstance - rInstance.dwModelIndex=%d >= m_LODControllerVector.size()=%d", 
 					rInstance.dwModelIndex, m_LODControllerVector.size());
 				continue;
 			}
@@ -179,7 +176,7 @@ bool CActorInstance::CheckCollisionDetection(const CDynamicSphereInstanceVector 
 {
 	if (!c_pAttackingSphereVector)
 	{
-		assert(!"CActorInstance::CheckCollisionDetection - c_pAttackingSphereVector is NULL");
+		assert(!"CActorInstance::CheckCollisionDetection - c_pAttackingSphereVector is NULL"); // 레퍼런스로 교체하시오
 		return false;
 	}
 
@@ -209,19 +206,19 @@ bool CActorInstance::CreateCollisionInstancePiece(DWORD dwAttachingModelIndex, c
 {
 	if (!c_pAttachingData)
 	{
-		assert(!"CActorInstance::CreateCollisionInstancePiece - c_pAttachingData is NULL");
+		assert(!"CActorInstance::CreateCollisionInstancePiece - c_pAttachingData is NULL"); // 레퍼런스로 교체하시오
 		return false;
 	}
 
 	if (!c_pAttachingData->pCollisionData)
 	{
-		assert(!"CActorInstance::CreateCollisionInstancePiece - c_pAttachingData->pCollisionData is NULL");
+		assert(!"CActorInstance::CreateCollisionInstancePiece - c_pAttachingData->pCollisionData is NULL"); // 레퍼런스로 교체하시오
 		return false;
 	}
 
 	if (!pPointInstance)
 	{
-		assert(!"CActorInstance::CreateCollisionInstancePiece - pPointInstance is NULL");
+		assert(!"CActorInstance::CreateCollisionInstancePiece - pPointInstance is NULL"); // 레퍼런스로 교체하시오
 		return false;
 	}
 
@@ -237,7 +234,7 @@ bool CActorInstance::CreateCollisionInstancePiece(DWORD dwAttachingModelIndex, c
 		CGrannyModelInstance * pModelInstance = m_LODControllerVector[dwAttachingModelIndex]->GetModelInstance();
 
 		if (pModelInstance && pModelInstance->GetBoneIndexByName(c_pAttachingData->strAttachingBoneName.c_str(),
-			&iAttachingBoneIndex))
+												&iAttachingBoneIndex))
 		{
 			pPointInstance->isAttached = TRUE;
 			pPointInstance->dwBoneIndex = iAttachingBoneIndex;

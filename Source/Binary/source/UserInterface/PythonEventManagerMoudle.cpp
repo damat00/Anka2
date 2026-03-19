@@ -234,18 +234,8 @@ PyObject *eventQuestButtonClick(PyObject *poSelf, PyObject *poArgs)
 	int iIndex;
 	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
 		return Py_BuildException();
-
-#ifdef ENABLE_COLLECT_WINDOW
-	BYTE bButtonIndex;
-	if (!PyTuple_GetByte(poArgs, 1, &bButtonIndex))
-		bButtonIndex = 0;
-#endif
-
-#ifdef ENABLE_COLLECT_WINDOW
-	CPythonNetworkStream::Instance().SendScriptButtonPacket(iIndex, bButtonIndex);
-#else
+	
 	CPythonNetworkStream::Instance().SendScriptButtonPacket(iIndex);
-#endif
 
 	return Py_BuildNone();
 }
@@ -343,29 +333,6 @@ PyObject *eventGetTotalLineCount(PyObject *poSelf, PyObject *poArgs)
 
 	return Py_BuildValue("i", CPythonEventManager::Instance().GetTotalLineCount(iIndex));
 }
-
-PyObject * eventSetFontColor(PyObject * poSelf, PyObject * poArgs)
-{
-	int iIndex;
-	if (!PyTuple_GetInteger(poArgs, 0, &iIndex))
-		return Py_BuildException();
-
-	float r;
-	if (!PyTuple_GetFloat(poArgs, 1, &r))
-		return Py_BuildException();
-	
-	float g;
-	if (!PyTuple_GetFloat(poArgs, 2, &g))
-		return Py_BuildException();
-	
-	float b;
-	if (!PyTuple_GetFloat(poArgs, 3, &b))
-		return Py_BuildException();
-	
-	
-	CPythonEventManager::Instance().SetFontColor(iIndex, r, g, b);
-	return Py_BuildNone();
-}
 #endif
 
 void initEvent()
@@ -410,7 +377,6 @@ void initEvent()
 		{ "GetProcessedLineCount",		eventGetProcessedLineCount,			METH_VARARGS },
 		{ "AllProcessEventSet",			eventAllProcessEventSet,			METH_VARARGS },
 		{ "GetTotalLineCount",			eventGetTotalLineCount,				METH_VARARGS },
-		{ "SetFontColor",				eventSetFontColor,					METH_VARARGS },
 #endif
 
 		{ nullptr,							nullptr,								NULL		 },

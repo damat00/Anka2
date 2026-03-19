@@ -4,7 +4,7 @@
 
 //////////////////////////////////////////////////////////////////////////
 void CGraphicShadowTexture::Destroy()
-{
+{	
 	CGraphicTexture::Destroy();
 
 	if (m_lpd3dShadowSurface)
@@ -30,59 +30,21 @@ void CGraphicShadowTexture::Destroy()
 
 bool CGraphicShadowTexture::Create(int width, int height)
 {
-    Destroy();
+	Destroy();
 
-    m_width = width;
-    m_height = height;
+	m_width = width;
+	m_height = height;
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-    if (FAILED(ms_lpd3dDevice->CreateTexture(m_width
-                                                , m_height
-                                                , 1
-                                                , D3DUSAGE_RENDERTARGET
-                                                , D3DFMT_A8R8G8B8
-                                                , D3DPOOL_DEFAULT
-                                                , &m_lpd3dShadowTexture
-                                                , nullptr)))
-#else
-    if (FAILED(ms_lpd3dDevice->CreateTexture(m_width
-                                                , m_height
-                                                , 1
-                                                , D3DUSAGE_RENDERTARGET
-                                                , D3DFMT_A8R8G8B8
-                                                , D3DPOOL_DEFAULT
-                                                , &m_lpd3dShadowTexture)))
-#endif
-    {
-        return false;
-    }
+	if (FAILED(ms_lpd3dDevice->CreateTexture(m_width, m_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_lpd3dShadowTexture)))
+		return false;
 
-    if (FAILED(m_lpd3dShadowTexture->GetSurfaceLevel(0, &m_lpd3dShadowSurface)))
-    {
-        return false;
-    }
+	if (FAILED(m_lpd3dShadowTexture->GetSurfaceLevel(0, &m_lpd3dShadowSurface)))
+		return false;
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-    if (FAILED(ms_lpd3dDevice->CreateDepthStencilSurface(m_width
-                                                            , m_height
-                                                            , D3DFMT_D16
-                                                            , D3DMULTISAMPLE_NONE
-                                                            , 0
-                                                            , TRUE
-                                                            , &m_lpd3dDepthSurface
-                                                            , nullptr)))
-#else
-    if (FAILED(ms_lpd3dDevice->CreateDepthStencilSurface(m_width
-                                                            , m_height
-                                                            , D3DFMT_D16
-                                                            , D3DMULTISAMPLE_NONE
-                                                            , &m_lpd3dDepthSurface)))
-#endif
-    {
-        return false;
-    }
+	if (FAILED(ms_lpd3dDevice->CreateDepthStencilSurface(m_width, m_height, D3DFMT_D16, D3DMULTISAMPLE_NONE, &m_lpd3dDepthSurface)))
+		return false;
 
-    return true;
+	return true;
 }
 
 void CGraphicShadowTexture::Set(int stage) const
@@ -95,40 +57,22 @@ const D3DXMATRIX& CGraphicShadowTexture::GetLightVPMatrixReference() const
 	return m_d3dLightVPMatrix;
 }
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-LPDIRECT3DTEXTURE9 CGraphicShadowTexture::GetD3DTexture() const
-#else
 LPDIRECT3DTEXTURE8 CGraphicShadowTexture::GetD3DTexture() const
-#endif
 {
-    return m_lpd3dShadowTexture;
+	return m_lpd3dShadowTexture;
 }
 
 void CGraphicShadowTexture::Begin()
 {
 	D3DXMatrixMultiply(&m_d3dLightVPMatrix, &ms_matView, &ms_matProj);
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-    ms_lpd3dDevice->GetRenderTarget(0, &m_lpd3dOldBackBufferSurface);
-#else
-    ms_lpd3dDevice->GetRenderTarget(&m_lpd3dOldBackBufferSurface);
-#endif
-
+	ms_lpd3dDevice->GetRenderTarget(&m_lpd3dOldBackBufferSurface);
 	ms_lpd3dDevice->GetDepthStencilSurface(&m_lpd3dOldDepthBufferSurface);
 	ms_lpd3dDevice->GetViewport(&m_d3dOldViewport);
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-    ms_lpd3dDevice->SetDepthStencilSurface(m_lpd3dDepthSurface);
-    ms_lpd3dDevice->SetRenderTarget(0, m_lpd3dShadowSurface);
-#else
-    ms_lpd3dDevice->SetRenderTarget(m_lpd3dShadowSurface, m_lpd3dDepthSurface);
-#endif
+	ms_lpd3dDevice->SetRenderTarget(m_lpd3dShadowSurface, m_lpd3dDepthSurface);
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-    D3DVIEWPORT9 d3dViewport;
-#else
-    D3DVIEWPORT8 d3dViewport;
-#endif
+	D3DVIEWPORT8 d3dViewport;
 	d3dViewport.MinZ = 0.0f;
 	d3dViewport.MaxZ = 1.0f;
 	d3dViewport.X = 0;
@@ -155,19 +99,11 @@ void CGraphicShadowTexture::Begin()
 	STATEMANAGER.SaveTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_TEXTURE);
 	STATEMANAGER.SaveTextureStageState(0, D3DTSS_ALPHAOP,   D3DTOP_MODULATE);
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-    STATEMANAGER.SaveSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
-    STATEMANAGER.SaveSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
-    STATEMANAGER.SaveSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
-    STATEMANAGER.SaveSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
-    STATEMANAGER.SaveSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
-#else
-    STATEMANAGER.SaveTextureStageState(0, D3DTSS_MINFILTER, D3DTEXF_POINT);
-    STATEMANAGER.SaveTextureStageState(0, D3DTSS_MAGFILTER, D3DTEXF_POINT);
-    STATEMANAGER.SaveTextureStageState(0, D3DTSS_MIPFILTER, D3DTEXF_POINT);
-    STATEMANAGER.SaveTextureStageState(0, D3DTSS_ADDRESSU, D3DTADDRESS_CLAMP);
-    STATEMANAGER.SaveTextureStageState(0, D3DTSS_ADDRESSV, D3DTADDRESS_CLAMP);
-#endif
+	STATEMANAGER.SaveTextureStageState(0, D3DTSS_MINFILTER, D3DTEXF_POINT);
+	STATEMANAGER.SaveTextureStageState(0, D3DTSS_MAGFILTER, D3DTEXF_POINT);
+	STATEMANAGER.SaveTextureStageState(0, D3DTSS_MIPFILTER, D3DTEXF_POINT);
+	STATEMANAGER.SaveTextureStageState(0, D3DTSS_ADDRESSU, D3DTADDRESS_CLAMP);
+	STATEMANAGER.SaveTextureStageState(0, D3DTSS_ADDRESSV, D3DTADDRESS_CLAMP);
 
 	STATEMANAGER.SetTexture(1, nullptr);
 	STATEMANAGER.SaveTextureStageState(1, D3DTSS_COLORARG1, D3DTA_CURRENT);
@@ -177,19 +113,11 @@ void CGraphicShadowTexture::Begin()
 	STATEMANAGER.SaveTextureStageState(1, D3DTSS_ALPHAARG2, D3DTA_TEXTURE);
 	STATEMANAGER.SaveTextureStageState(1, D3DTSS_ALPHAOP,   D3DTOP_SELECTARG1);
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-    STATEMANAGER.SaveSamplerState(1, D3DSAMP_MINFILTER, D3DTEXF_POINT);
-    STATEMANAGER.SaveSamplerState(1, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
-    STATEMANAGER.SaveSamplerState(1, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
-    STATEMANAGER.SaveSamplerState(1, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
-    STATEMANAGER.SaveSamplerState(1, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
-#else
-    STATEMANAGER.SaveTextureStageState(1, D3DTSS_MINFILTER, D3DTEXF_POINT);
-    STATEMANAGER.SaveTextureStageState(1, D3DTSS_MAGFILTER, D3DTEXF_POINT);
-    STATEMANAGER.SaveTextureStageState(1, D3DTSS_MIPFILTER, D3DTEXF_POINT);
-    STATEMANAGER.SaveTextureStageState(1, D3DTSS_ADDRESSU, D3DTADDRESS_CLAMP);
-    STATEMANAGER.SaveTextureStageState(1, D3DTSS_ADDRESSV, D3DTADDRESS_CLAMP);
-#endif
+	STATEMANAGER.SaveTextureStageState(1, D3DTSS_MINFILTER, D3DTEXF_POINT);
+	STATEMANAGER.SaveTextureStageState(1, D3DTSS_MAGFILTER, D3DTEXF_POINT);
+	STATEMANAGER.SaveTextureStageState(1, D3DTSS_MIPFILTER, D3DTEXF_POINT);
+	STATEMANAGER.SaveTextureStageState(1, D3DTSS_ADDRESSU, D3DTADDRESS_CLAMP);
+	STATEMANAGER.SaveTextureStageState(1, D3DTSS_ADDRESSV, D3DTADDRESS_CLAMP);
 }
 
 void CGraphicShadowTexture::End()
@@ -197,18 +125,13 @@ void CGraphicShadowTexture::End()
 	assert(m_lpd3dOldBackBufferSurface != nullptr);
 	assert(m_lpd3dOldDepthBufferSurface != nullptr);
 
-	ms_lpd3dDevice->EndScene();
+	ms_lpd3dDevice->EndScene();	
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-    ms_lpd3dDevice->SetDepthStencilSurface(m_lpd3dOldDepthBufferSurface);
-    ms_lpd3dDevice->SetRenderTarget(0, m_lpd3dOldBackBufferSurface);
-#else
-    ms_lpd3dDevice->SetRenderTarget(m_lpd3dOldBackBufferSurface, m_lpd3dOldDepthBufferSurface);
-#endif
+	ms_lpd3dDevice->SetRenderTarget(m_lpd3dOldBackBufferSurface, m_lpd3dOldDepthBufferSurface);			
 	ms_lpd3dDevice->SetViewport(&m_d3dOldViewport);
 
-	m_lpd3dOldBackBufferSurface->Release();
-	m_lpd3dOldDepthBufferSurface->Release();
+	m_lpd3dOldBackBufferSurface->Release();		
+	m_lpd3dOldDepthBufferSurface->Release();	
 
 	m_lpd3dOldBackBufferSurface = nullptr;
 	m_lpd3dOldDepthBufferSurface = nullptr;
@@ -226,19 +149,11 @@ void CGraphicShadowTexture::End()
 	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_ALPHAARG2);
 	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_ALPHAOP);
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-    STATEMANAGER.RestoreSamplerState(0, D3DSAMP_MINFILTER);
-    STATEMANAGER.RestoreSamplerState(0, D3DSAMP_MAGFILTER);
-    STATEMANAGER.RestoreSamplerState(0, D3DSAMP_MIPFILTER);
-    STATEMANAGER.RestoreSamplerState(0, D3DSAMP_ADDRESSU);
-    STATEMANAGER.RestoreSamplerState(0, D3DSAMP_ADDRESSV);
-#else
-    STATEMANAGER.RestoreTextureStageState(0, D3DTSS_MINFILTER);
-    STATEMANAGER.RestoreTextureStageState(0, D3DTSS_MAGFILTER);
-    STATEMANAGER.RestoreTextureStageState(0, D3DTSS_MIPFILTER);
-    STATEMANAGER.RestoreTextureStageState(0, D3DTSS_ADDRESSU);
-    STATEMANAGER.RestoreTextureStageState(0, D3DTSS_ADDRESSV);
-#endif
+	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_MINFILTER);
+	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_MAGFILTER);
+	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_MIPFILTER);
+	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_ADDRESSU);
+	STATEMANAGER.RestoreTextureStageState(0, D3DTSS_ADDRESSV);
 
 	STATEMANAGER.RestoreTextureStageState(1, D3DTSS_COLORARG1);
 	STATEMANAGER.RestoreTextureStageState(1, D3DTSS_COLORARG2);
@@ -247,19 +162,11 @@ void CGraphicShadowTexture::End()
 	STATEMANAGER.RestoreTextureStageState(1, D3DTSS_ALPHAARG2);
 	STATEMANAGER.RestoreTextureStageState(1, D3DTSS_ALPHAOP);
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-    STATEMANAGER.RestoreSamplerState(1, D3DSAMP_MINFILTER);
-    STATEMANAGER.RestoreSamplerState(1, D3DSAMP_MAGFILTER);
-    STATEMANAGER.RestoreSamplerState(1, D3DSAMP_MIPFILTER);
-    STATEMANAGER.RestoreSamplerState(1, D3DSAMP_ADDRESSU);
-    STATEMANAGER.RestoreSamplerState(1, D3DSAMP_ADDRESSV);
-#else
-    STATEMANAGER.RestoreTextureStageState(1, D3DTSS_MINFILTER);
-    STATEMANAGER.RestoreTextureStageState(1, D3DTSS_MAGFILTER);
-    STATEMANAGER.RestoreTextureStageState(1, D3DTSS_MIPFILTER);
-    STATEMANAGER.RestoreTextureStageState(1, D3DTSS_ADDRESSU);
-    STATEMANAGER.RestoreTextureStageState(1, D3DTSS_ADDRESSV);
-#endif
+	STATEMANAGER.RestoreTextureStageState(1, D3DTSS_MINFILTER);
+	STATEMANAGER.RestoreTextureStageState(1, D3DTSS_MAGFILTER);
+	STATEMANAGER.RestoreTextureStageState(1, D3DTSS_MIPFILTER);
+	STATEMANAGER.RestoreTextureStageState(1, D3DTSS_ADDRESSU);
+	STATEMANAGER.RestoreTextureStageState(1, D3DTSS_ADDRESSV);
 }
 
 void CGraphicShadowTexture::Initialize()
@@ -267,7 +174,7 @@ void CGraphicShadowTexture::Initialize()
 	CGraphicTexture::Initialize();
 
 	m_lpd3dShadowSurface = nullptr;
-	m_lpd3dDepthSurface = nullptr;
+	m_lpd3dDepthSurface = nullptr;	
 	m_lpd3dOldBackBufferSurface = nullptr;
 	m_lpd3dOldDepthBufferSurface = nullptr;
 	m_lpd3dShadowTexture = nullptr;

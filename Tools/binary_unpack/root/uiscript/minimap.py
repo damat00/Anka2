@@ -4,11 +4,6 @@ if __USE_DYNAMIC_MODULE__:
 app = __import__(pyapi.GetModuleName("app"))
 
 ROOT = "d:/ymir work/ui/minimap/"
-PATCH_IMG = "d_ranking_gremios/"
-ROOT2 = "d:/ymir work/ui/game/minimapa/"
-
-import localeInfo
-
 
 window = {
 	"name" : "MiniMap",
@@ -100,7 +95,6 @@ window = {
 					"over_image" : ROOT + "atlas_open_over.sub",
 					"down_image" : ROOT + "atlas_open_down.sub",
 				},
-
 				## ServerInfo
 				{
 					"name" : "ServerInfo",
@@ -111,7 +105,7 @@ window = {
 					"outline" : 1,
 
 					"x" : 70,
-					"y" : 160,
+					"y" : 150,
 
 					"text" : "",
 				},
@@ -129,7 +123,6 @@ window = {
 
 					"text" : "",
 				},
-
 				## ObserverCount
 				{
 					"name" : "ObserverCount",
@@ -141,7 +134,7 @@ window = {
 
 					"x" : 70,
 					"y" : 190,
-
+	
 					"text" : "",
 				},
 
@@ -159,7 +152,6 @@ window = {
 
 					"text" : "",
 				},
-
 			],
 		},
 		{
@@ -188,29 +180,6 @@ window = {
 				},
 			],
 		},
-		## ENABLE_ZODIAC_MISSION
-		 {
-		 	"name" : "bead",
-			 "type" :"button",
-
-			 "x" : 15,
-			 "y" : 0,
-
-			 "default_image" : "d:/ymir work/ui/game/12zi/bead/bead_default.sub",
-			 "over_image" : "d:/ymir work/ui/game/12zi/bead/bead_down.sub",
-			 "down_image" : "d:/ymir work/ui/game/12zi/bead/bead_over.sub",
-		 },
-
-		 {
-		 	"name" : "beadInfo",
-			 "type" : "text",
-
-			 "x" : 27,
-			 "y" : 7,
-
-			 "text":"0",
-		 },
-		## ENABLE_ZODIAC_MISSION
 	],
 }
 
@@ -227,81 +196,48 @@ window["children"][1]["children"][0]["y"] = 2
 
 window["children"][0]["children"][5]["x"] = 0
 window["children"][0]["children"][5]["y"] = 57
-window["children"][0]["children"] = window["children"][0]["children"] + [
-			{
-				"name" : "battlepass",
-				"type" : "button",
-
-				"x" : 3,
-				"y" : 80,
-
-				"default_image" : ROOT + "battlepass_open_default.tga",
-				"over_image" : ROOT + "battlepass_open_over.tga",
-				"down_image" : ROOT + "battlepass_open_down.tga",
-			},]
-
-if app.ENABLE_BIOLOGIST_SYSTEM:
+if app.ENABLE_RENEWAL_BATTLE_PASS:
 	window["children"][0]["children"] = window["children"][0]["children"] + [
 					{
-						"name" : "BiologistButton",
+						"name" : "PortableBattlePassButton",
 						"type" : "button",
 
-						"x" : 17,
-						"y" : 102,
+						"x" : 5,
+						"y" : 85,
 
-						"default_image" : ROOT + "biolog_button_down.png",
-						"over_image" : ROOT + "biolog_button_normal.png",
-						"down_image" : ROOT + "biolog_button_over.png",
+						"default_image" : ROOT + "battlepass_open_default.tga",
+						"over_image" : ROOT + "battlepass_open_over.tga",
+						"down_image" : ROOT + "battlepass_open_down.tga",
 					},]
 
-if app.__DUNGEON_INFO__:
+if app.ENABLE_BIOLOG_SYSTEM:
 	window["children"][0]["children"] = window["children"][0]["children"] + [
-					## DungeonSystemButton
 					{
-						"name" : "DungeonSystemButton",
+						"name" : "PortableBiologButton",
 						"type" : "button",
 
-						"x" : 35,
-						"y" : 117,
+						"x" : 21,
+						"y" : 107,
 
-						"default_image" : ROOT + "dungeon_button_down.png",
-						"over_image" : ROOT + "dungeon_button_normal.png",
-						"down_image" : ROOT + "dungeon_button_over.png",
+						"default_image" : ROOT + "biolog_open_default.tga",
+						"over_image" : ROOT + "biolog_open_over.tga",
+						"down_image" : ROOT + "biolog_open_down.tga",
 					},]
 
-window["children"][0]["children"] = window["children"][0]["children"] + [
-				## OpenRewardWindow
-				{
-					"name" : "OpenRewardWindow",
-					"type" : "button",
+if app.ENABLE_DUNGEON_TRACKING_SYSTEM:
+	window["children"][0]["children"] = window["children"][0]["children"] + [
+					## PortableDungeonInfoButton
+					{
+						"name" : "PortableDungeonInfoButton",
+						"type" : "button",
 
-					"x" : 48,
-					"y" : 127,
+						"x" : 45,
+						"y" : 123,
 
-					"default_image" : ROOT + "ranking_button_down.png",
-					"over_image" : ROOT + "ranking_button_normal.png",
-					"down_image" : ROOT + "ranking_button_over.png",
-				},]
-
-# OpenRewardWindow button'unun x pozisyonuna +15 ekle (loop'tan sonra eklendiði için)
-for idx in range(len(window["children"][0]["children"])):
-	if window["children"][0]["children"][idx].get("name") == "OpenRewardWindow":
-		window["children"][0]["children"][idx]["x"] = window["children"][0]["children"][idx]["x"] + 15
-		break
-
-#if app.ENABLE_RANKING:
-#	window["children"][0]["children"] = window["children"][0]["children"] + [
-#					{
-#						"name" : "OpenRewardWindow",
-#						"type" : "button",
-#
-#						"x" : 60,
-#						"y" : 125,
-
-#						"default_image" : ROOT + "btn_ranking_normal.tga",
-#						"over_image" : ROOT + "btn_ranking_hover.tga",
-#						"down_image" : ROOT + "btn_ranking_down.tga",
-#					},]
+						"default_image" : ROOT + "dungeon_open_default.tga",
+						"over_image" : ROOT + "dungeon_open_over.tga",
+						"down_image" : ROOT + "dungeon_open_down.tga",
+					},]
 
 if app.ENABLE_OFFLINESHOP_SEARCH_SYSTEM:
 	window["children"][0]["children"] = window["children"][0]["children"] + [
@@ -309,10 +245,25 @@ if app.ENABLE_OFFLINESHOP_SEARCH_SYSTEM:
 						"name" : "PortableSearchButton",
 						"type" : "button",
 
-						"x" : 90,
+						"x" : 80,
 						"y" : 125,
 
-						"default_image" : ROOT + "shop_button_down.png",
-						"over_image" : ROOT + "shop_button_norm.png",
-						"down_image" : ROOT + "shop_button_over.png",
+						"default_image" : ROOT + "search_open_default.tga",
+						"over_image" : ROOT + "search_open_over.tga",
+						"down_image" : ROOT + "search_open_down.tga",
 					},]
+
+if app.ENABLE_EVENT_MANAGER:
+	window["children"][0]["children"] = window["children"][0]["children"] + [
+				## InGameEventButton
+				{
+					"name" : "InGameEventButton",
+					"type" : "button",
+
+					"x" : 2,
+					"y" : 28,
+
+					"default_image" : "d:/ymir work/ui/minimap/E_open_default.tga",
+					"over_image" : "d:/ymir work/ui/minimap/E_open_over.tga",
+					"down_image" : "d:/ymir work/ui/minimap/E_open_down.tga",
+				},]

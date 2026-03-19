@@ -314,10 +314,6 @@ const char *CItemData::GetUseTypeString() const
 			return DEF_STR(USE_PUT_INTO_BELT_SOCKET);
 		case USE_PUT_INTO_RING_SOCKET:
 			return DEF_STR(USE_PUT_INTO_RING_SOCKET);
-#ifdef ENABLE_TITLE_SYSTEM
-		case USE_TITLE:
-			return DEF_STR(USE_TITLE);
-#endif
 #ifdef ENABLE_BONUS_COSTUME_SYSTEM
 		case USE_CHANGE_COSTUME_ATTR:
 			return DEF_STR(USE_CHANGE_COSTUME_ATTR);
@@ -511,7 +507,7 @@ CItemData::~CItemData()
 {
 }
 
-#if defined(ENABLE_WIKI_SYSTEM) || defined(INSIDE_RENDER)
+#ifdef ENABLE_INGAME_WIKI_SYSTEM
 WORD CItemData::GetRefinedSet() const
 {
 	return m_ItemTable.wRefineSet;

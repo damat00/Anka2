@@ -57,10 +57,19 @@
 #include <boost/geometry/srs/projections/impl/aasincos.hpp>
 #include <boost/geometry/srs/projections/impl/pj_mlfn.hpp>
 
+#include <boost/geometry/srs/projections/par4.hpp>
+
 #include <boost/type_traits/is_same.hpp>
 
 namespace boost { namespace geometry
 {
+
+namespace srs { namespace par4
+{
+    struct aeqd {};
+    //struct aeqd_guam {};
+
+}} //namespace srs::par4
 
 namespace projections
 {
@@ -93,7 +102,7 @@ namespace projections
             };
 
             template <typename T, typename Par, typename ProjParm>
-            inline void e_forward(T const& lp_lon, T const& lp_lat, T& xy_x, T& xy_y, Par const& par, ProjParm const& proj_parm)
+            inline void e_forward(T& lp_lon, T& lp_lat, T& xy_x, T& xy_y, Par const& par, ProjParm const& proj_parm)
             {
                 T coslam, cosphi, sinphi, rho;
                 //T azi1, s12;
@@ -134,7 +143,7 @@ namespace projections
             }
 
             template <typename T, typename Par, typename ProjParm>
-            inline void e_inverse(T const& xy_x, T const& xy_y, T& lp_lon, T& lp_lat, Par const& par, ProjParm const& proj_parm)
+            inline void e_inverse(T& xy_x, T& xy_y, T& lp_lon, T& lp_lat, Par const& par, ProjParm const& proj_parm)
             {
                 T c;
 
@@ -166,7 +175,7 @@ namespace projections
             }
 
             template <typename T, typename Par, typename ProjParm>
-            inline void e_guam_fwd(T const& lp_lon, T const& lp_lat, T& xy_x, T& xy_y, Par const& par, ProjParm const& proj_parm)
+            inline void e_guam_fwd(T& lp_lon, T& lp_lat, T& xy_x, T& xy_y, Par const& par, ProjParm const& proj_parm)
             {
                 T cosphi, sinphi, t;
 
@@ -179,7 +188,7 @@ namespace projections
             }
 
             template <typename T, typename Par, typename ProjParm>
-            inline void e_guam_inv(T const& xy_x, T const& xy_y, T& lp_lon, T& lp_lat, Par const& par, ProjParm const& proj_parm)
+            inline void e_guam_inv(T& xy_x, T& xy_y, T& lp_lon, T& lp_lat, Par const& par, ProjParm const& proj_parm)
             {
                 T x2, t = 0.0;
                 int i;
@@ -195,7 +204,7 @@ namespace projections
             }
 
             template <typename T, typename Par, typename ProjParm>
-            inline void s_forward(T const& lp_lon, T lp_lat, T& xy_x, T& xy_y, Par const& /*par*/, ProjParm const& proj_parm)
+            inline void s_forward(T& lp_lon, T& lp_lat, T& xy_x, T& xy_y, Par const& /*par*/, ProjParm const& proj_parm)
             {
                 static const T half_pi = detail::half_pi<T>();
                     
@@ -238,7 +247,7 @@ namespace projections
             }
 
             template <typename T, typename Par, typename ProjParm>
-            inline void s_inverse(T xy_x, T xy_y, T& lp_lon, T& lp_lat, Par const& par, ProjParm const& proj_parm)
+            inline void s_inverse(T& xy_x, T& xy_y, T& lp_lon, T& lp_lat, Par const& par, ProjParm const& proj_parm)
             {
                 static const T pi = detail::pi<T>();
                 static const T half_pi = detail::half_pi<T>();
@@ -278,12 +287,12 @@ namespace projections
             }
 
             // Azimuthal Equidistant
-            template <typename Params, typename Parameters, typename T>
-            inline void setup_aeqd(Params const& params, Parameters& par, par_aeqd<T>& proj_parm, bool is_sphere, bool is_guam)
+            template <typename Parameters, typename T>
+            inline void setup_aeqd(Parameters& par, par_aeqd<T>& proj_parm, bool is_sphere, bool is_guam)
             {
                 static const T half_pi = detail::half_pi<T>();
 
-                par.phi0 = pj_get_param_r<T, srs::spar::lat_0>(params, "lat_0", srs::dpar::lat_0);
+                par.phi0 = pj_get_param_r(par.params, "lat_0");
                 if (fabs(fabs(par.phi0) - half_pi) < epsilon10) {
                     proj_parm.mode = par.phi0 < 0. ? s_pole : n_pole;
                     proj_parm.sinph0 = par.phi0 < 0. ? -1. : 1.;
@@ -338,14 +347,14 @@ namespace projections
 
                 // FORWARD(e_forward)  elliptical
                 // Project coordinates from geographic (lon, lat) to cartesian (x, y)
-                inline void fwd(T const& lp_lon, T const& lp_lat, T& xy_x, T& xy_y) const
+                inline void fwd(T& lp_lon, T& lp_lat, T& xy_x, T& xy_y) const
                 {
                     e_forward(lp_lon, lp_lat, xy_x, xy_y, this->m_par, this->m_proj_parm);
                 }
 
                 // INVERSE(e_inverse)  elliptical
                 // Project coordinates from cartesian (x, y) to geographic (lon, lat)
-                inline void inv(T const& xy_x, T const& xy_y, T& lp_lon, T& lp_lat) const
+                inline void inv(T& xy_x, T& xy_y, T& lp_lon, T& lp_lat) const
                 {
                     e_inverse(xy_x, xy_y, lp_lon, lp_lat, this->m_par, this->m_proj_parm);
                 }
@@ -370,14 +379,14 @@ namespace projections
 
                 // FORWARD(e_guam_fwd)  Guam elliptical
                 // Project coordinates from geographic (lon, lat) to cartesian (x, y)
-                inline void fwd(T const& lp_lon, T const& lp_lat, T& xy_x, T& xy_y) const
+                inline void fwd(T& lp_lon, T& lp_lat, T& xy_x, T& xy_y) const
                 {
                     e_guam_fwd(lp_lon, lp_lat, xy_x, xy_y, this->m_par, this->m_proj_parm);
                 }
 
                 // INVERSE(e_guam_inv)  Guam elliptical
                 // Project coordinates from cartesian (x, y) to geographic (lon, lat)
-                inline void inv(T const& xy_x, T const& xy_y, T& lp_lon, T& lp_lat) const
+                inline void inv(T& xy_x, T& xy_y, T& lp_lon, T& lp_lat) const
                 {
                     e_guam_inv(xy_x, xy_y, lp_lon, lp_lat, this->m_par, this->m_proj_parm);
                 }
@@ -398,11 +407,11 @@ namespace projections
 
                 static const bool is_guam = ! boost::is_same
                     <
-                        typename srs::spar::detail::tuples_find_if
+                        typename srs::par4::detail::tuples_find_if
                             <
                                 BGParameters,
                                 //srs::par4::detail::is_guam
-                                srs::spar::detail::is_param<srs::spar::guam>::pred
+                                srs::par4::detail::is_param<srs::par4::guam>::pred
                             >::type,
                         void
                     >::value;
@@ -413,7 +422,7 @@ namespace projections
 
                 // FORWARD(e_forward or e_guam_fwd)  elliptical
                 // Project coordinates from geographic (lon, lat) to cartesian (x, y)
-                inline void fwd(T const& lp_lon, T const& lp_lat, T& xy_x, T& xy_y) const
+                inline void fwd(T& lp_lon, T& lp_lat, T& xy_x, T& xy_y) const
                 {
                     if (is_guam)
                         e_guam_fwd(lp_lon, lp_lat, xy_x, xy_y, this->m_par, this->m_proj_parm);
@@ -423,7 +432,7 @@ namespace projections
 
                 // INVERSE(e_inverse or e_guam_inv)  elliptical
                 // Project coordinates from cartesian (x, y) to geographic (lon, lat)
-                inline void inv(T const& xy_x, T const& xy_y, T& lp_lon, T& lp_lat) const
+                inline void inv(T& xy_x, T& xy_y, T& lp_lon, T& lp_lat) const
                 {
                     if (is_guam)
                         e_guam_inv(xy_x, xy_y, lp_lon, lp_lat, this->m_par, this->m_proj_parm);
@@ -451,14 +460,14 @@ namespace projections
 
                 // FORWARD(s_forward)  spherical
                 // Project coordinates from geographic (lon, lat) to cartesian (x, y)
-                inline void fwd(T const& lp_lon, T const& lp_lat, T& xy_x, T& xy_y) const
+                inline void fwd(T& lp_lon, T& lp_lat, T& xy_x, T& xy_y) const
                 {
                     s_forward(lp_lon, lp_lat, xy_x, xy_y, this->m_par, this->m_proj_parm);
                 }
 
                 // INVERSE(s_inverse)  spherical
                 // Project coordinates from cartesian (x, y) to geographic (lon, lat)
-                inline void inv(T const& xy_x, T const& xy_y, T& lp_lon, T& lp_lat) const
+                inline void inv(T& xy_x, T& xy_y, T& lp_lon, T& lp_lat) const
                 {
                     s_inverse(xy_x, xy_y, lp_lon, lp_lat, this->m_par, this->m_proj_parm);
                 }
@@ -492,11 +501,9 @@ namespace projections
     template <typename T, typename Parameters>
     struct aeqd_e : public detail::aeqd::base_aeqd_e<T, Parameters>
     {
-        template <typename Params>
-        inline aeqd_e(Params const& params, Parameters const& par)
-            : detail::aeqd::base_aeqd_e<T, Parameters>(par)
+        inline aeqd_e(const Parameters& par) : detail::aeqd::base_aeqd_e<T, Parameters>(par)
         {
-            detail::aeqd::setup_aeqd(params, this->m_par, this->m_proj_parm, false, false);
+            detail::aeqd::setup_aeqd(this->m_par, this->m_proj_parm, false, false);
         }
     };
 
@@ -519,11 +526,9 @@ namespace projections
     template <typename T, typename Parameters>
     struct aeqd_e_guam : public detail::aeqd::base_aeqd_e_guam<T, Parameters>
     {
-        template <typename Params>
-        inline aeqd_e_guam(Params const& params, Parameters const& par)
-            : detail::aeqd::base_aeqd_e_guam<T, Parameters>(par)
+        inline aeqd_e_guam(const Parameters& par) : detail::aeqd::base_aeqd_e_guam<T, Parameters>(par)
         {
-            detail::aeqd::setup_aeqd(params, this->m_par, this->m_proj_parm, false, true);
+            detail::aeqd::setup_aeqd(this->m_par, this->m_proj_parm, false, true);
         }
     };
 
@@ -543,15 +548,14 @@ namespace projections
         \par Example
         \image html ex_aeqd.gif
     */
-    template <typename SParams, typename T, typename Parameters>
-    struct aeqd_e_static : public detail::aeqd::base_aeqd_e_static<SParams, T, Parameters>
+    template <typename BGParameters, typename T, typename Parameters>
+    struct aeqd_e_static : public detail::aeqd::base_aeqd_e_static<BGParameters, T, Parameters>
     {
-        inline aeqd_e_static(SParams const& params, Parameters const& par)
-            : detail::aeqd::base_aeqd_e_static<SParams, T, Parameters>(par)
+        inline aeqd_e_static(const Parameters& par) : detail::aeqd::base_aeqd_e_static<BGParameters, T, Parameters>(par)
         {
-            detail::aeqd::setup_aeqd(params, this->m_par, this->m_proj_parm,
+            detail::aeqd::setup_aeqd(this->m_par, this->m_proj_parm,
                                      false,
-                                     detail::aeqd::base_aeqd_e_static<SParams, T, Parameters>::is_guam);
+                                     detail::aeqd::base_aeqd_e_static<BGParameters, T, Parameters>::is_guam);
         }
     };
 
@@ -574,11 +578,9 @@ namespace projections
     template <typename T, typename Parameters>
     struct aeqd_s : public detail::aeqd::base_aeqd_s<T, Parameters>
     {
-        template <typename Params>
-        inline aeqd_s(Params const& params, Parameters const& par)
-            : detail::aeqd::base_aeqd_s<T, Parameters>(par)
+        inline aeqd_s(const Parameters& par) : detail::aeqd::base_aeqd_s<T, Parameters>(par)
         {
-            detail::aeqd::setup_aeqd(params, this->m_par, this->m_proj_parm, true, false);
+            detail::aeqd::setup_aeqd(this->m_par, this->m_proj_parm, true, false);
         }
     };
 
@@ -588,32 +590,40 @@ namespace projections
 
         // Static projection
         template <typename BGP, typename CT, typename P>
-        struct static_projection_type<srs::spar::proj_aeqd, srs_sphere_tag, BGP, CT, P>
+        struct static_projection_type<srs::par4::aeqd, srs_sphere_tag, BGP, CT, P>
         {
             typedef aeqd_s<CT, P> type;
         };
         template <typename BGP, typename CT, typename P>
-        struct static_projection_type<srs::spar::proj_aeqd, srs_spheroid_tag, BGP, CT, P>
+        struct static_projection_type<srs::par4::aeqd, srs_spheroid_tag, BGP, CT, P>
         {
             typedef aeqd_e_static<BGP, CT, P> type;
         };
+        //BOOST_GEOMETRY_PROJECTIONS_DETAIL_STATIC_PROJECTION(srs::par4::aeqd, aeqd_s, aeqd_e_static)
+        //BOOST_GEOMETRY_PROJECTIONS_DETAIL_STATIC_PROJECTION(srs::par4::aeqd_guam, aeqd_guam, aeqd_guam)
 
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_ENTRY_BEGIN(aeqd_entry)
+        // Factory entry(s)
+        template <typename T, typename Parameters>
+        class aeqd_entry : public detail::factory_entry<T, Parameters>
         {
-            bool const guam = pj_get_param_b<srs::spar::guam>(params, "guam", srs::dpar::guam);
+            public :
+                virtual base_v<T, Parameters>* create_new(const Parameters& par) const
+                {
+                    bool const guam = pj_get_param_b(par.params, "guam");
 
-            if (parameters.es && ! guam)
-                return new base_v_fi<aeqd_e<T, Parameters>, T, Parameters>(params, parameters);
-            else if (parameters.es && guam)
-                return new base_v_fi<aeqd_e_guam<T, Parameters>, T, Parameters>(params, parameters);
-            else
-                return new base_v_fi<aeqd_s<T, Parameters>, T, Parameters>(params, parameters);
-        }
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_ENTRY_END
+                    if (par.es && ! guam)
+                        return new base_v_fi<aeqd_e<T, Parameters>, T, Parameters>(par);
+                    else if (par.es && guam)
+                        return new base_v_fi<aeqd_e_guam<T, Parameters>, T, Parameters>(par);
+                    else
+                        return new base_v_fi<aeqd_s<T, Parameters>, T, Parameters>(par);
+                }
+        };
 
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_INIT_BEGIN(aeqd_init)
+        template <typename T, typename Parameters>
+        inline void aeqd_init(detail::base_factory<T, Parameters>& factory)
         {
-            BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_INIT_ENTRY(aeqd, aeqd_entry)
+            factory.add_to_factory("aeqd", new aeqd_entry<T, Parameters>);
         }
 
     } // namespace detail

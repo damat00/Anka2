@@ -57,7 +57,7 @@ int main()
 
 	CConfig Config;
 	CNetPoller poller;
-	CDBManager DBManager;
+	CDBManager DBManager; 
 	CClientManager ClientManager;
 	CGuildManager GuildManager;
 	CPrivManager PrivManager;
@@ -101,9 +101,7 @@ int main()
 
 void emptybeat(LPHEART heart, int pulse)
 {
-	if (!(pulse % heart->passes_per_sec))
-	{
-	}
+	if (!(pulse % heart->passes_per_sec)) {}
 }
 
 int Start()
@@ -163,7 +161,7 @@ int Start()
 
 	if (!CConfig::instance().GetValue("TABLE_POSTFIX", szBuf, 256))
 	{
-		sys_log(0, "TABLE_POSTFIX not configured use default"); // @warme012
+		sys_err("TABLE_POSTFIX not configured use default");
 		szBuf[0] = '\0';
 	}
 
@@ -304,7 +302,7 @@ int Start()
 
 	if (!CClientManager::instance().Initialize())
 	{
-		sys_log(0, "   failed");
+		sys_log(0, "   failed"); 
 		return false;
 	}
 

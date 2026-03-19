@@ -1,4 +1,7 @@
 #include "stdafx.h"
+
+#include "../../common/service.h"
+
 #include "constants.h"
 #include "sectree_manager.h"
 #include "item_manager.h"
@@ -17,11 +20,9 @@
 
 enum
 {
-	// ADD_SUPPLY_BUILDING
 	BUILDING_INCREASE_GUILD_MEMBER_COUNT_SMALL = 14061,
 	BUILDING_INCREASE_GUILD_MEMBER_COUNT_MEDIUM = 14062,
 	BUILDING_INCREASE_GUILD_MEMBER_COUNT_LARGE = 14063,
-	// END_OF_ADD_SUPPLY_BUILDING
 
 	FLAG_VNUM = 14200,
 	WALL_DOOR_VNUM	= 14201,
@@ -54,7 +55,7 @@ void CObject::Destroy()
 				GetY() + m_pProto->lRegion[1],
 				GetX() + m_pProto->lRegion[2],
 				GetY() + m_pProto->lRegion[3],
-				(long)m_data.zRot, // ADD_BUILDING_ROTATION
+				(long)m_data.zRot,
 				ATTR_OBJECT,
 				ATTR_REGION_MODE_REMOVE);
 	}
@@ -65,10 +66,8 @@ void CObject::Destroy()
 		GetSectree()->RemoveEntity(this);
 
 	RemoveSpecialEffect();
-	// END_OF_BUILDING_NPC
 }
 
-// BUILDING_NPC
 void CObject::Reconstruct(DWORD dwVnum)
 {
 	const TMapRegion * r = SECTREE_MANAGER::instance().GetMapRegion(m_data.lMapIndex);
@@ -79,7 +78,6 @@ void CObject::Reconstruct(DWORD dwVnum)
 	pLand->RequestDeleteObject(GetID());
 	pLand->RequestCreateObject(dwVnum, m_data.lMapIndex, m_data.x - r->sx, m_data.y - r->sy, m_data.xRot, m_data.yRot, m_data.zRot, false);
 }
-// END_OF_BUILDING_NPC
 
 void CObject::EncodeInsertPacket(LPENTITY entity)
 {
@@ -88,8 +86,7 @@ void CObject::EncodeInsertPacket(LPENTITY entity)
 	if (!(d = entity->GetDesc()))
 		return;
 
-	sys_log(0, "ObjectInsertPacket vid %u vnum %u rot %f %f %f", 
-			m_dwVID, m_data.dwVnum, m_data.xRot, m_data.yRot, m_data.zRot);
+	sys_log(0, "ObjectInsertPacket vid %u vnum %u rot %f %f %f", m_dwVID, m_data.dwVnum, m_data.xRot, m_data.yRot, m_data.zRot);
 
 	TPacketGCCharacterAdd pack;
 
@@ -187,10 +184,7 @@ void CObject::ApplySpecialEffect()
 {
 	if (m_pProto)
 	{
-		// ADD_SUPPLY_BUILDING
-		if (m_pProto->dwVnum == BUILDING_INCREASE_GUILD_MEMBER_COUNT_SMALL ||
-				m_pProto->dwVnum == BUILDING_INCREASE_GUILD_MEMBER_COUNT_MEDIUM ||
-				m_pProto->dwVnum == BUILDING_INCREASE_GUILD_MEMBER_COUNT_LARGE)
+		if (m_pProto->dwVnum == BUILDING_INCREASE_GUILD_MEMBER_COUNT_SMALL || m_pProto->dwVnum == BUILDING_INCREASE_GUILD_MEMBER_COUNT_MEDIUM || m_pProto->dwVnum == BUILDING_INCREASE_GUILD_MEMBER_COUNT_LARGE)
 		{
 			CLand* pLand = GetLand();
 			DWORD guild_id = 0;
@@ -217,7 +211,6 @@ void CObject::ApplySpecialEffect()
 				}
 			}
 		}
-		// END_OF_ADD_SUPPLY_BUILDING
 	}
 }
 
@@ -225,10 +218,7 @@ void CObject::RemoveSpecialEffect()
 {
 	if (m_pProto)
 	{
-		// ADD_SUPPLY_BUILDING
-		if (m_pProto->dwVnum == BUILDING_INCREASE_GUILD_MEMBER_COUNT_SMALL ||
-				m_pProto->dwVnum == BUILDING_INCREASE_GUILD_MEMBER_COUNT_MEDIUM ||
-				m_pProto->dwVnum == BUILDING_INCREASE_GUILD_MEMBER_COUNT_LARGE)
+		if (m_pProto->dwVnum == BUILDING_INCREASE_GUILD_MEMBER_COUNT_SMALL || m_pProto->dwVnum == BUILDING_INCREASE_GUILD_MEMBER_COUNT_MEDIUM || m_pProto->dwVnum == BUILDING_INCREASE_GUILD_MEMBER_COUNT_LARGE)
 		{
 			CLand* pLand = GetLand();
 			DWORD guild_id = 0;
@@ -412,7 +402,6 @@ LPOBJECT CLand::FindObjectByVnum(DWORD dwVnum)
 	return NULL;
 }
 
-// BUILDING_NPC
 LPOBJECT CLand::FindObjectByNPC(LPCHARACTER npc)
 {
 	if (!npc)
@@ -428,7 +417,6 @@ LPOBJECT CLand::FindObjectByNPC(LPCHARACTER npc)
 
 	return NULL;
 }
-// END_OF_BUILDING_NPC
 
 LPOBJECT CLand::FindObjectByVID(DWORD dwVID)
 {
@@ -461,10 +449,10 @@ struct FIsIn
 {
 	long sx, sy;
 	long ex, ey;
-
+	
 	bool bIn;
 	FIsIn (	long sx_, long sy_, long ex_, long ey_)
-		: sx(sx_), sy(sy_), ex(ex_), ey(ey_), bIn(false)
+		: sx(sx_), sy(sy_), ex(ex_), ey(ey_), bIn(false) 
 	{}
 
 	void operator () (LPENTITY ent)
@@ -499,7 +487,7 @@ bool CLand::RequestCreateObject(DWORD dwVnum, long lMapIndex, long x, long y, fl
 	if (!r)
 		return false;
 
-	sys_log(0, "RequestCreateObject(vnum=%u, map=%d, pos=(%d,%d), rot=(%.1f,%.1f,%.1f) region(%d,%d ~ %d,%d)",
+	sys_log(0, "RequestCreateObject(vnum=%u, map=%d, pos=(%d,%d), rot=(%.1f,%.1f,%.1f) region(%d,%d ~ %d,%d)", 
 			dwVnum, lMapIndex, x, y, xRot, yRot, zRot, r->sx, r->sy, r->ex, r->ey);
 
 	x += r->sx;
@@ -529,7 +517,6 @@ bool CLand::RequestCreateObject(DWORD dwVnum, long lMapIndex, long x, long y, fl
 		return false;
 	}
 
-	// ADD_BUILDING_ROTATION
 	if ( checkAnother )
 	{
 		if (rkSecTreeMgr.ForAttrRegion(lMapIndex, osx, osy, oex, oey, (long)zRot, ATTR_OBJECT, ATTR_REGION_MODE_CHECK))
@@ -539,14 +526,13 @@ bool CLand::RequestCreateObject(DWORD dwVnum, long lMapIndex, long x, long y, fl
 		}
 		FIsIn f (osx, osy, oex, oey);
 		rkSecTreeMgr.GetMap(lMapIndex)->for_each(f);
-
+		
 		if (f.bIn)
 		{
 			sys_err("another object already exist");
 			return false;
 		}
 	}
-	// END_OF_BUILDING_NPC
 
 	TPacketGDCreateObject p;
 
@@ -628,7 +614,7 @@ void CManager::Destroy()
 	m_map_pkLand.clear();
 }
 
-bool CManager::LoadObjectProto(const TObjectProto * pProto, int size) // from DB
+bool CManager::LoadObjectProto(const TObjectProto * pProto, int size)
 {
 	m_vec_kObjectProto.resize(size);
 	thecore_memcpy(&m_vec_kObjectProto[0], pProto, sizeof(TObjectProto) * size);
@@ -669,13 +655,12 @@ TObjectProto * CManager::GetObjectProto(DWORD dwVnum)
 	return it->second;
 }
 
-bool CManager::LoadLand(TLand * pTable) // from DB
+bool CManager::LoadLand(TLand * pTable)
 {
 	CLand * pkLand = M2_NEW CLand(pTable);
 	m_map_pkLand.insert(std::make_pair(pkLand->GetID(), pkLand));
 
-	sys_log(0, "LAND: %u map %d %dx%d w %u h %u",
-			pTable->dwID, pTable->lMapIndex, pTable->x, pTable->y, pTable->width, pTable->height);
+	sys_log(0, "LAND: %u map %d %dx%d w %u h %u", pTable->dwID, pTable->lMapIndex, pTable->x, pTable->y, pTable->width, pTable->height);
 
 	return true;
 }
@@ -719,7 +704,6 @@ void CManager::UpdateLand(TLand * pTable)
 
 		if (d->GetCharacter() && d->GetCharacter()->GetMapIndex() == pTable->lMapIndex)
 		{
-			// we must send the guild name first
 			d->GetCharacter()->SendGuildName(guild);
 
 			d->BufferedPacket(&p, sizeof(TPacketGCLandList));
@@ -787,7 +771,7 @@ CLand * CManager::FindLandByGuild(DWORD GID)
 	return NULL;
 }
 
-bool CManager::LoadObject(TObject * pTable, bool isBoot) // from DB
+bool CManager::LoadObject(TObject * pTable, bool isBoot)
 {
 	if (!map_allow_find(pTable->lMapIndex)) // Fix
 		return false;
@@ -828,15 +812,13 @@ bool CManager::LoadObject(TObject * pTable, bool isBoot) // from DB
 		pkObj->SetXYZ(pTable->x, pTable->y, 0);
 	}
 
-	// BUILDING_NPC
 	if (!isBoot)
-	{
+	{ 
 		if (pkProto->dwNPCVnum)
 			pkObj->RegenNPC();
 
 		pkObj->ApplySpecialEffect();
 	}
-	// END_OF_BUILDING_NPC
 
 	return true;
 }
@@ -850,15 +832,11 @@ void CManager::FinalizeBoot()
 		LPOBJECT pkObj = (it++)->second;
 
 		pkObj->Show(pkObj->GetMapIndex(), pkObj->GetX(), pkObj->GetY());
-		// BUILDING_NPC
 		pkObj->RegenNPC();
 		pkObj->ApplySpecialEffect();
-		// END_OF_BUILDING_NPC
 	}
 
-	// BUILDING_NPC
 	sys_log(0, "FinalizeBoot");
-	// END_OF_BUILDING_NPC
 
 	itertype(m_map_pkLand) it2 = m_map_pkLand.begin();
 
@@ -868,9 +846,7 @@ void CManager::FinalizeBoot()
 
 		const TLand & r = pkLand->GetData();
 
-		// LAND_MASTER_LOG
 		sys_log(0, "LandMaster map_index=%d pos=(%d, %d)", r.lMapIndex, r.x, r.y);
-		// END_OF_LAND_MASTER_LOG
 
 		if (r.dwGuildID != 0)
 			continue;
@@ -886,7 +862,7 @@ void CManager::FinalizeBoot()
 	}
 }
 
-void CManager::DeleteObject(DWORD dwID) // from DB
+void CManager::DeleteObject(DWORD dwID)
 {
 	sys_log(0, "OBJ_DEL: %u", dwID);
 
@@ -964,7 +940,6 @@ void CManager::SendLandList(LPDESC d, long lMapIndex)
 	}
 }
 
-// LAND_CLEAR
 void CManager::ClearLand(DWORD dwLandID)
 {
 	CLand* pLand = FindLand(dwLandID);
@@ -1012,9 +987,7 @@ void CLand::ClearLand()
 
 	CHARACTER_MANAGER::instance().SpawnMob(20040, r.lMapIndex, region->sx + r.x + (r.width / 2), region->sy + r.y + (r.height / 2), 0);
 }
-// END_LAND_CLEAR
 
-// BUILD_WALL
 void CLand::DrawWall(DWORD dwVnum, long nMapIndex, long& x, long& y, char length, float zRot)
 {
 	int rot = (int)zRot;

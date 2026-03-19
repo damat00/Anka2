@@ -761,7 +761,6 @@ PyObject* guildGetbuildingInfo(PyObject* poSelf, PyObject* poArgs)
 	return Py_BuildValue("iiii", 0, 0, 0, 0);
 }
 #endif
-
 void initguild()
 {
 	static PyMethodDef s_methods[] =

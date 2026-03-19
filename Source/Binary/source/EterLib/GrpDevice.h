@@ -39,18 +39,7 @@ public:
 	int				Create(HWND hWnd, int hres, int vres, bool Windowed = true, int bit = 32, int ReflashRate = 0);
 
 	EDeviceState	GetDeviceState();
-
-#ifdef ENABLE_DIRECTX9_UPDATE
-    void Clear(bool bTarget = true
-                , bool bDepth = true
-                , bool bStencil = false
-                , DWORD dwColor = 0
-                , float fDepth = 1.f
-                , DWORD dwStencil = 0
-                , DWORD nIdx = 0);
-#endif
-
-    bool Reset();
+	bool			Reset();
 
 	void			EnableWebBrowserMode(const RECT& c_rcWebPage);
 	void			DisableWebBrowserMode();
@@ -73,17 +62,10 @@ protected:
 	void __DestroyPDTVertexBufferList();
 	bool __CreatePDTVertexBufferList();
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-    LPDIRECT3DVERTEXDECLARATION9 CreatePTStreamVertexShader();
-    LPDIRECT3DVERTEXDECLARATION9 CreatePNTStreamVertexShader();
-    LPDIRECT3DVERTEXDECLARATION9 CreatePNT2StreamVertexShader();
-    LPDIRECT3DVERTEXDECLARATION9 CreateDoublePNTStreamVertexShader();
-#else
-    DWORD CreatePTStreamVertexShader();
-    DWORD CreatePNTStreamVertexShader();
-    DWORD CreatePNT2StreamVertexShader();
-    DWORD CreateDoublePNTStreamVertexShader();
-#endif
+	DWORD CreatePTStreamVertexShader();
+	DWORD CreatePNTStreamVertexShader();
+	DWORD CreatePNT2StreamVertexShader();
+	DWORD CreateDoublePNTStreamVertexShader();
 
 protected:
 	DWORD						m_uBackBufferCount;

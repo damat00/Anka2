@@ -1,5 +1,5 @@
+
 #include "stdafx.h"
-#include "config.h"
 
 #include "BlueDragon.h"
 
@@ -112,16 +112,16 @@ int BlueDragon_StateBattle(LPCHARACTER pChar)
 
 	time_t timeNow = static_cast<time_t>(get_dword_time());
 
-	for (int i = 0; i < SkillCount; ++i)
+	for (int i=0 ; i < SkillCount ; ++i)
 	{
 		const int SkillIndex = SkillPriority[i];
 
 		if (timeSkillCanUseTime[SkillIndex] < timeNow)
 		{
 			int SkillUsingDuration =
-				static_cast<int>(CMotionManager::instance().GetMotionDuration(pChar->GetRaceNum(), MAKE_MOTION_KEY(MOTION_MODE_GENERAL, MOTION_SPECIAL_1 + SkillIndex)));
+				static_cast<int>(CMotionManager::instance().GetMotionDuration( pChar->GetRaceNum(), MAKE_MOTION_KEY(MOTION_MODE_GENERAL, MOTION_SPECIAL_1 + SkillIndex) ));
 
-			timeSkillCanUseTime[SkillIndex] = timeNow + (UseBlueDragonSkill(pChar, SkillIndex) * 1000) + SkillUsingDuration + 3000;
+			timeSkillCanUseTime[SkillIndex] = timeNow + (UseBlueDragonSkill( pChar, SkillIndex ) * 1000) + SkillUsingDuration + 3000;
 
 			pChar->SendMovePacket(FUNC_MOB_SKILL, SkillIndex, pChar->GetX(), pChar->GetY(), 0, timeNow);
 
@@ -139,15 +139,15 @@ int BlueDragon_Damage (LPCHARACTER me, LPCHARACTER pAttacker, int dam)
 
 	if (true == pAttacker->IsMonster() && 2493 == pAttacker->GetMobTable().dwVnum)
 	{
-		for (int i = 1; i <= 4; ++i)
+		for (int i=1 ; i <= 4 ; ++i)
 		{
 			if (ATK_BONUS == BlueDragon_GetIndexFactor("DragonStone", i, "effect_type"))
 			{
 				DWORD dwDragonStoneID = BlueDragon_GetIndexFactor("DragonStone", i, "vnum");
 				size_t val = BlueDragon_GetIndexFactor("DragonStone", i, "val");
-				size_t cnt = SECTREE_MANAGER::instance().GetMonsterCountInMap(pAttacker->GetMapIndex(), dwDragonStoneID);
+				size_t cnt = SECTREE_MANAGER::instance().GetMonsterCountInMap( pAttacker->GetMapIndex(), dwDragonStoneID );
 
-				dam += (dam * (val * cnt)) / 100;
+				dam += (dam * (val*cnt))/100;
 
 				break;
 			}
@@ -156,15 +156,15 @@ int BlueDragon_Damage (LPCHARACTER me, LPCHARACTER pAttacker, int dam)
 
 	if (true == me->IsMonster() && 2493 == me->GetMobTable().dwVnum)
 	{
-		for (int i = 1; i <= 4; ++i)
+		for (int i=1 ; i <= 4 ; ++i)
 		{
 			if (DEF_BONUS == BlueDragon_GetIndexFactor("DragonStone", i, "effect_type"))
 			{
 				DWORD dwDragonStoneID = BlueDragon_GetIndexFactor("DragonStone", i, "vnum");
 				size_t val = BlueDragon_GetIndexFactor("DragonStone", i, "val");
-				size_t cnt = SECTREE_MANAGER::instance().GetMonsterCountInMap(me->GetMapIndex(), dwDragonStoneID);
+				size_t cnt = SECTREE_MANAGER::instance().GetMonsterCountInMap( me->GetMapIndex(), dwDragonStoneID );
 
-				dam -= (dam * (val * cnt)) / 100;
+				dam -= (dam * (val*cnt))/100;
 
 				if (dam <= 0)
 					dam = 1;
@@ -176,7 +176,7 @@ int BlueDragon_Damage (LPCHARACTER me, LPCHARACTER pAttacker, int dam)
 
 	if (true == me->IsStone() && 0 != pAttacker->GetMountVnum())
 	{
-		for (int i = 1; i <= 4; ++i)
+		for (int i=1 ; i <= 4 ; ++i)
 		{
 			if (me->GetMobTable().dwVnum == BlueDragon_GetIndexFactor("DragonStone", i, "vnum"))
 			{
@@ -194,3 +194,4 @@ int BlueDragon_Damage (LPCHARACTER me, LPCHARACTER pAttacker, int dam)
 
 	return dam;
 }
+

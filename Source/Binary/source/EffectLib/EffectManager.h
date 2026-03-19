@@ -3,8 +3,6 @@
 #include "StdAfx.h"
 #include "EffectInstance.h"
 
-#include "../UserInterface/Locale_inc.h"
-
 class CEffectManager : public CScreen, public CSingleton<CEffectManager>
 {
 	public:
@@ -34,16 +32,15 @@ class CEffectManager : public CScreen, public CSingleton<CEffectManager>
 #ifdef ENABLE_RENDER_TARGET
 		void RenderOne(DWORD id);
 #endif
-		void GetInfo(std::string* pstInfo);
-#ifdef ENABLE_WIKI_SYSTEM
+
+#ifdef ENABLE_INGAME_WIKI_SYSTEM
 		void RenderOneWiki(DWORD id);
 #endif
+
+		void GetInfo(std::string* pstInfo);
+
 		bool IsAliveEffect(DWORD dwInstanceIndex);
-#ifdef __ENABLE_STEALTH_FIX__
-		void ApplyAlwaysHidden();
-		void ReleaseAlwaysHidden();
-#endif
-		// Register
+
 		BOOL RegisterEffect(const char *c_szFileName, bool isExistDelete = false, bool isNeedCache = false
 #ifdef ENABLE_SKILL_COLOR_SYSTEM
 			, const char *name = NULL
@@ -57,7 +54,6 @@ class CEffectManager : public CScreen, public CSingleton<CEffectManager>
 
 		void DeleteAllInstances();
 
-		// Usage
 		int CreateEffect(DWORD dwID, const D3DXVECTOR3 & c_rv3Position, const D3DXVECTOR3 & c_rv3Rotation
 #ifdef ENABLE_SKILL_COLOR_SYSTEM
 			, DWORD *dwSkillColor = NULL
@@ -100,6 +96,9 @@ class CEffectManager : public CScreen, public CSingleton<CEffectManager>
 
 		void ShowEffect();
 		void HideEffect();
+
+		void ApplyAlwaysHidden();
+		void ReleaseAlwaysHidden();
 
 		void RenderEffect();
 

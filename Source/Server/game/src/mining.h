@@ -8,10 +8,8 @@ namespace mining
 	bool OreRefine(LPCHARACTER ch, LPCHARACTER npc, LPITEM item, int cost, int pct, LPITEM metinstone_item);
 	int GetFractionCount();
 
-	// REFINE_PICK
 	int RealRefinePick(LPCHARACTER ch, LPITEM item);
 	void CHEAT_MAX_PICK(LPCHARACTER ch, LPITEM item);
-	// END_OF_REFINE_PICK
 
 	bool IsVeinOfOre (DWORD vnum);
 }

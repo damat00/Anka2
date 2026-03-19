@@ -12,7 +12,7 @@ CGraphicSubImage::TType CGraphicSubImage::Type()
 	return s_type;
 }
 
-CGraphicSubImage::CGraphicSubImage(const char* c_szFileName) : CGraphicImage(c_szFileName)
+CGraphicSubImage::CGraphicSubImage(const char *c_szFileName) : CGraphicImage(c_szFileName)
 {
 }
 
@@ -33,7 +33,7 @@ void CGraphicSubImage::SetImagePointer(CGraphicImage* pImage)
 	CreateDeviceObjects();
 }
 
-bool CGraphicSubImage::SetImageFileName(const char* c_szFileName)
+bool CGraphicSubImage::SetImageFileName(const char *c_szFileName)
 {
 	CResource* pResource = CResourceManager::Instance().GetResourcePointer(c_szFileName);
 
@@ -57,7 +57,7 @@ void CGraphicSubImage::SetRectReference(const RECT& c_rRect)
 	m_rect = c_rRect;
 }
 
-void CGraphicSubImage::SetSearchPath(const char * c_szFileName)
+void CGraphicSubImage::SetSearchPath(const char *c_szFileName)
 {
 	strncpy(m_SearchPath, c_szFileName, sizeof(m_SearchPath)-1);
 }
@@ -98,10 +98,10 @@ bool CGraphicSubImage::OnLoad(int iSize, const void* c_pvBuf)
 
 	if (c_rstTitle != "subimage")
 		return false;
-
+	
 	char szFileName[256];
 	if ("2.0"==c_rstVersion)
-	{
+	{	
 		const std::string& c_rstSubFileName=GetFileNameString();
 		int nPos=c_rstSubFileName.find_last_of('\\', -1);
 		if (nPos>=0)
@@ -140,7 +140,7 @@ void CGraphicSubImage::OnClear()
 
 bool CGraphicSubImage::OnIsEmpty() const
 {
-	if (!m_roImage.IsNull())
+	if (!m_roImage.IsNull())		
 		if (!m_roImage->IsEmpty())
 			return false;
 

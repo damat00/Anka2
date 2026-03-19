@@ -53,6 +53,16 @@
 namespace boost { namespace geometry
 {
 
+namespace srs { namespace par4
+{
+    struct mil_os {}; // Miller Oblated Stereographic
+    struct lee_os {}; // Lee Oblated Stereographic
+    struct gs48 {}; // Mod. Stereographic of 48 U.S.
+    struct alsk {}; // Mod. Stereographic of Alaska
+    struct gs50 {}; // Mod. Stereographic of 50 U.S.
+
+}} //namespace srs::par4
+
 namespace projections
 {
     #ifndef DOXYGEN_NO_DETAIL
@@ -84,7 +94,7 @@ namespace projections
 
                 // FORWARD(e_forward)  ellipsoid
                 // Project coordinates from geographic (lon, lat) to cartesian (x, y)
-                inline void fwd(T const& lp_lon, T const& lp_lat, T& xy_x, T& xy_y) const
+                inline void fwd(T& lp_lon, T& lp_lat, T& xy_x, T& xy_y) const
                 {
                     static const T half_pi = detail::half_pi<T>();
 
@@ -108,7 +118,7 @@ namespace projections
 
                 // INVERSE(e_inverse)  ellipsoid
                 // Project coordinates from cartesian (x, y) to geographic (lon, lat)
-                inline void inv(T const& xy_x, T const& xy_y, T& lp_lon, T& lp_lat) const
+                inline void inv(T& xy_x, T& xy_y, T& lp_lon, T& lp_lat) const
                 {
                     static const T half_pi = detail::half_pi<T>();
 
@@ -356,9 +366,7 @@ namespace projections
     template <typename T, typename Parameters>
     struct mil_os_ellipsoid : public detail::mod_ster::base_mod_ster_ellipsoid<T, Parameters>
     {
-        template <typename Params>
-        inline mil_os_ellipsoid(Params const& , Parameters const& par)
-            : detail::mod_ster::base_mod_ster_ellipsoid<T, Parameters>(par)
+        inline mil_os_ellipsoid(const Parameters& par) : detail::mod_ster::base_mod_ster_ellipsoid<T, Parameters>(par)
         {
             detail::mod_ster::setup_mil_os(this->m_par, this->m_proj_parm);
         }
@@ -378,9 +386,7 @@ namespace projections
     template <typename T, typename Parameters>
     struct lee_os_ellipsoid : public detail::mod_ster::base_mod_ster_ellipsoid<T, Parameters>
     {
-        template <typename Params>
-        inline lee_os_ellipsoid(Params const& , Parameters const& par)
-            : detail::mod_ster::base_mod_ster_ellipsoid<T, Parameters>(par)
+        inline lee_os_ellipsoid(const Parameters& par) : detail::mod_ster::base_mod_ster_ellipsoid<T, Parameters>(par)
         {
             detail::mod_ster::setup_lee_os(this->m_par, this->m_proj_parm);
         }
@@ -400,9 +406,7 @@ namespace projections
     template <typename T, typename Parameters>
     struct gs48_ellipsoid : public detail::mod_ster::base_mod_ster_ellipsoid<T, Parameters>
     {
-        template <typename Params>
-        inline gs48_ellipsoid(Params const& , Parameters const& par)
-            : detail::mod_ster::base_mod_ster_ellipsoid<T, Parameters>(par)
+        inline gs48_ellipsoid(const Parameters& par) : detail::mod_ster::base_mod_ster_ellipsoid<T, Parameters>(par)
         {
             detail::mod_ster::setup_gs48(this->m_par, this->m_proj_parm);
         }
@@ -422,9 +426,7 @@ namespace projections
     template <typename T, typename Parameters>
     struct alsk_ellipsoid : public detail::mod_ster::base_mod_ster_ellipsoid<T, Parameters>
     {
-        template <typename Params>
-        inline alsk_ellipsoid(Params const& , Parameters const& par)
-            : detail::mod_ster::base_mod_ster_ellipsoid<T, Parameters>(par)
+        inline alsk_ellipsoid(const Parameters& par) : detail::mod_ster::base_mod_ster_ellipsoid<T, Parameters>(par)
         {
             detail::mod_ster::setup_alsk(this->m_par, this->m_proj_parm);
         }
@@ -444,9 +446,7 @@ namespace projections
     template <typename T, typename Parameters>
     struct gs50_ellipsoid : public detail::mod_ster::base_mod_ster_ellipsoid<T, Parameters>
     {
-        template <typename Params>
-        inline gs50_ellipsoid(Params const& , Parameters const& par)
-            : detail::mod_ster::base_mod_ster_ellipsoid<T, Parameters>(par)
+        inline gs50_ellipsoid(const Parameters& par) : detail::mod_ster::base_mod_ster_ellipsoid<T, Parameters>(par)
         {
             detail::mod_ster::setup_gs50(this->m_par, this->m_proj_parm);
         }
@@ -457,26 +457,71 @@ namespace projections
     {
 
         // Static projection
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_STATIC_PROJECTION(srs::spar::proj_mil_os, mil_os_ellipsoid, mil_os_ellipsoid)
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_STATIC_PROJECTION(srs::spar::proj_lee_os, lee_os_ellipsoid, lee_os_ellipsoid)
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_STATIC_PROJECTION(srs::spar::proj_gs48, gs48_ellipsoid, gs48_ellipsoid)
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_STATIC_PROJECTION(srs::spar::proj_alsk, alsk_ellipsoid, alsk_ellipsoid)
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_STATIC_PROJECTION(srs::spar::proj_gs50, gs50_ellipsoid, gs50_ellipsoid)
+        BOOST_GEOMETRY_PROJECTIONS_DETAIL_STATIC_PROJECTION(srs::par4::mil_os, mil_os_ellipsoid, mil_os_ellipsoid)
+        BOOST_GEOMETRY_PROJECTIONS_DETAIL_STATIC_PROJECTION(srs::par4::lee_os, lee_os_ellipsoid, lee_os_ellipsoid)
+        BOOST_GEOMETRY_PROJECTIONS_DETAIL_STATIC_PROJECTION(srs::par4::gs48, gs48_ellipsoid, gs48_ellipsoid)
+        BOOST_GEOMETRY_PROJECTIONS_DETAIL_STATIC_PROJECTION(srs::par4::alsk, alsk_ellipsoid, alsk_ellipsoid)
+        BOOST_GEOMETRY_PROJECTIONS_DETAIL_STATIC_PROJECTION(srs::par4::gs50, gs50_ellipsoid, gs50_ellipsoid)
 
         // Factory entry(s)
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_ENTRY_FI(mil_os_entry, mil_os_ellipsoid)
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_ENTRY_FI(lee_os_entry, lee_os_ellipsoid)
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_ENTRY_FI(gs48_entry, gs48_ellipsoid)
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_ENTRY_FI(alsk_entry, alsk_ellipsoid)
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_ENTRY_FI(gs50_entry, gs50_ellipsoid)
-        
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_INIT_BEGIN(mod_ster_init)
+        template <typename T, typename Parameters>
+        class mil_os_entry : public detail::factory_entry<T, Parameters>
         {
-            BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_INIT_ENTRY(mil_os, mil_os_entry)
-            BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_INIT_ENTRY(lee_os, lee_os_entry)
-            BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_INIT_ENTRY(gs48, gs48_entry)
-            BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_INIT_ENTRY(alsk, alsk_entry)
-            BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_INIT_ENTRY(gs50, gs50_entry)
+            public :
+                virtual base_v<T, Parameters>* create_new(const Parameters& par) const
+                {
+                    return new base_v_fi<mil_os_ellipsoid<T, Parameters>, T, Parameters>(par);
+                }
+        };
+
+        template <typename T, typename Parameters>
+        class lee_os_entry : public detail::factory_entry<T, Parameters>
+        {
+            public :
+                virtual base_v<T, Parameters>* create_new(const Parameters& par) const
+                {
+                    return new base_v_fi<lee_os_ellipsoid<T, Parameters>, T, Parameters>(par);
+                }
+        };
+
+        template <typename T, typename Parameters>
+        class gs48_entry : public detail::factory_entry<T, Parameters>
+        {
+            public :
+                virtual base_v<T, Parameters>* create_new(const Parameters& par) const
+                {
+                    return new base_v_fi<gs48_ellipsoid<T, Parameters>, T, Parameters>(par);
+                }
+        };
+
+        template <typename T, typename Parameters>
+        class alsk_entry : public detail::factory_entry<T, Parameters>
+        {
+            public :
+                virtual base_v<T, Parameters>* create_new(const Parameters& par) const
+                {
+                    return new base_v_fi<alsk_ellipsoid<T, Parameters>, T, Parameters>(par);
+                }
+        };
+
+        template <typename T, typename Parameters>
+        class gs50_entry : public detail::factory_entry<T, Parameters>
+        {
+            public :
+                virtual base_v<T, Parameters>* create_new(const Parameters& par) const
+                {
+                    return new base_v_fi<gs50_ellipsoid<T, Parameters>, T, Parameters>(par);
+                }
+        };
+
+        template <typename T, typename Parameters>
+        inline void mod_ster_init(detail::base_factory<T, Parameters>& factory)
+        {
+            factory.add_to_factory("mil_os", new mil_os_entry<T, Parameters>);
+            factory.add_to_factory("lee_os", new lee_os_entry<T, Parameters>);
+            factory.add_to_factory("gs48", new gs48_entry<T, Parameters>);
+            factory.add_to_factory("alsk", new alsk_entry<T, Parameters>);
+            factory.add_to_factory("gs50", new gs50_entry<T, Parameters>);
         }
 
     } // namespace detail

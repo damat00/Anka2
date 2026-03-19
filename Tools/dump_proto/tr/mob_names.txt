@@ -127,8 +127,6 @@ VNUM	LOCALE_NAME
 656	Cesur Siyah Ork
 657	Cesur Siyah Ork Devi
 691	Ork Reisi
-692	Elit Ork Reisi
-693	Dirilmiþ Ork Reisi
 701	Karanlýk Fanatik
 702	Karanlýk Arahan
 703	Mistik Arahan Savaþçýsý
@@ -209,9 +207,6 @@ VNUM	LOCALE_NAME
 1091	Þeytan Kralý
 1092	Kibirli Þeytan Kralý
 1093	Lusifer
-1094	Elit Çirkin Þeytan Kralý
-1095	Mavi Ölüm
-1096	Þeytan Kralý
 1101	Büyülü Buz
 1102	Buz Katil Balinasý
 1103	Buz Böceði
@@ -219,7 +214,6 @@ VNUM	LOCALE_NAME
 1105	Buz Adam
 1106	Yeti
 1107	Buz Golemi
-1108	Buz Golemi
 1131	Yeraltý Buz Parçasý
 1132	Yeraltý BuzKatilBalinasý
 1133	Yeraltý Buz Böceði
@@ -227,7 +221,6 @@ VNUM	LOCALE_NAME
 1135	Yeraltý Buz Adamý
 1136	Yeraltý Yetisi
 1137	Yeraltý Buz Golemi
-1138	Yeraltý Buz Golemi
 1151	Buz Þeytaný
 1152	Buz Boynuz. Katil Balina
 1153	Buz Haþeresi
@@ -249,17 +242,11 @@ VNUM	LOCALE_NAME
 1303	Gulyabani
 1304	Sarý Kaplan Hayaleti
 1305	Kurbaða Generali
-1306	Elit SarýKaplan Hayaleti
-1307	Elit SarýKaplan Hayaleti
-1308	Elit SarýKaplan Hayaleti
-1309	Elit SarýKaplan Hayaleti
-1310	Elit SarýKaplan Hayaleti
 1331	Büy.AðaçKurbaðasý Askeri
 1332	Büy.AðaçKurbaðasý Lideri
 1333	Büyük Gulyabani
 1334	Büy.Sarý Kaplan Hayaleti
 1335	Kötü Kurbaða Generali
-1336	Kurbaða Generali
 1401	Yokedici
 1402	Maymun Savaþçý
 1403	Bin Savaþçý
@@ -270,11 +257,6 @@ VNUM	LOCALE_NAME
 1602	Öcü Kasap
 1603	Öcü Berserker
 1901	Dokuz Kuyruk
-1902	Elit Dokuz Kuyruk
-1903	Elit Dokuz Kuyruk
-1904	Elit Dokuz Kuyruk
-1905	Elit Dokuz Kuyruk
-1906	Elit Dokuz Kuyruk
 2001	Yavru Örümcek
 2002	Zehirli Örümcek
 2003	Kýrmýzý Zehirli Örümcek
@@ -286,7 +268,6 @@ VNUM	LOCALE_NAME
 2034	Zehirli Pençe Örümceði
 2035	Zehirli Asker Örümcek
 2036	Kibirli Z. Asker Örümcek
-2037	Zehirli Asker Örümcek
 2051	Huysuz Z. Yavru Örümcek
 2052	Huysuz Ölmcl. Z. Örümcek
 2053	Huys.Kýrm.Öl.Zeh.Örümcek
@@ -305,8 +286,6 @@ VNUM	LOCALE_NAME
 2076	Vahþi Güçlü Zeh. Örümcek
 2091	Kraliçe Örümcek
 2092	Örümcek Barones
-2093	Elit Kraliçe Örümcek
-2094	Örümcek Baronu
 2095	Örümcek Yumurtasý
 2101	Çöl Tilkisi
 2102	Çölün Uçan Gözü
@@ -330,7 +309,6 @@ VNUM	LOCALE_NAME
 2157	Güçlü Yýlan Okçu
 2158	Güçlü Çöl Haydutu
 2191	Dev Çöl Kaplumbaðasý
-2192	Elit Dev ÇölKaplumbaðasý
 2201	Savaþ Kaplaný Kölesi
 2202	Alev Hayaleti
 2203	Savaþ Kaplaný
@@ -364,15 +342,6 @@ VNUM	LOCALE_NAME
 2412	Setaou Okçusu
 2413	Setaou Yargýcý
 2414	Setaou Komutaný
-2415	Setaou Komutaný
-2431	Setaou Savaþçýsý
-2432	Setaou Avcýsý
-2433	Setaou Mistik
-2434	Setaou Lideri
-2451	Setaou Askeri
-2452	Setaou Okçusu
-2453	Setaou Yargýcý
-2454	Setaou Komutaný
 2491	Komutan
 2492	General
 2493	Beran-Setaou
@@ -407,182 +376,6 @@ VNUM	LOCALE_NAME
 2596	Azrailin Tohumu
 2597	Kharoon
 2598	Azrail
-2600	Zodyak Kurdu
-2601	Zodyak Mavi Kurdu
-2602	Zodyak Lykosu
-2603	Zodyak Okçusu
-2604	Zodyak Yaban Domuzu
-2605	Kýr. Zodyak Yaban Domuzu
-2606	Zodyak Scrofa
-2607	Zodyak Mi Jung
-2608	Zodyak Bera
-2609	Zodyak Ayýsý
-2610	Zodyak Boz Ayýsý
-2611	Zodyak Kahverengi Ayý
-2612	Zodyak Eun Jung
-2613	Zodyak Tigris
-2614	Zodyak Kaplan
-2615	Beyaz Zodyak Kaplaný
-2616	Zodyak Se Rang
-2617	Zodyak Jin Hee
-2618	Zodyak Yavru Örümcek
-2619	Zodyak Zehirli Örümcek
-2620	Kr. Zod. Zehirli Örümcek
-2621	Zodyak Pençe Örümceði
-2622	Zodyak Asker Örümceði
-2623	Zodyak Alev Ruhu
-2624	Zodyak Savaþ Kaplaný
-2625	Zodyak Alevi
-2626	Zodyak Alev Savaþçýsý
-2627	Zodyak Ateþ Kralý
-2628	Karan. Zodyak Ateþ Kralý
-2629	Vahþi Zodyak Piyadesi
-2630	Vahþi Zodyak Uþaðý
-2631	Vahþi Zodyak Okçusu
-2632	Vahþi Zodyak Generali
-2633	Zalim Zodyak Yüzbaþý
-2634	Büyülü Zodyak Buzu
-2635	Zod. Katil Buz Balinasý
-2636	Zodyak Buz Böceði
-2637	Zodyak Buz Aslaný
-2638	Buzlu Zodyak Yüzbaþýsý
-2639	Zodyak Yeti
-2640	Zodyak Buz Golemi
-2641	Zodyak Çöl Tilkisi
-2642	Zodyak Kral Akrep
-2643	Zodyak Yýlan Dövüþçüsü
-2644	Zodyak Yýlan Okçusu
-2645	Zodyak Çöl Haydudu
-2646	Zod. Siyah Rüzgar Askeri
-2647	Zod. Siyah Rüzgar Delisi
-2648	Zod. Siyah Rüzgar Okçusu
-2649	Zodyak Mahon
-2650	Zodyak Bo
-2651	Zodyak Goo Pae
-2652	Zodyak Chuong
-2653	Zalim Zodyak Akrep Adam
-2654	Zodyak Akrep Okçu
-2655	Zodyak Derviþi
-2656	Zod. Aðaç Kurb. Askeri
-2657	Zod. Aðaç Kurb. Acemisi
-2658	Zodyak Gulyabanisi
-2659	Zodyak Yokedicisi
-2660	Zodyak Baltalý Savaþçýsý
-2661	Zodyak Bir Savaþçýsý
-2662	Karanlýk Zodyak Fanatiði
-2663	Zodyak Arahan
-2664	Karanlýk Zod. Dövüþçüsü
-2665	O. Karanlýk Zod. Arahan
-2666	Karanlýk Zodyak Celladý
-2667	Karanlýk Zo. Ýþkencecisi
-2668	Zodyak Çaðýrýcýsý
-2669	Gururlu Zodyak Ork
-2670	Gururlu Zod. Ork Gözcüsü
-2671	Gururlu Zodyak Ork Döv.
-2672	Gururlu Zo. Ork Büyücüsü
-2673	Gururlu Zod. Ork General
-2674	Kara Zodyak Ork
-2675	Kara Zodyak Ork Devi
-2676	Zod. Kýzýlhýrsýz Amazonu
-2677	Zod. Kýzýlhýr. Suikastçý
-2678	Zod. Kýzýlhýrsýz Büyücü
-2679	Zod. Kýzýlhýrsýz Cellat
-2680	Zodyak Yengeç Dövüþçüsü
-2681	Akrep Zodyak Okçusu
-2682	Zodyak Karides Askeri
-2683	Þeyt. Zodyak Yerleþimci
-2684	Zodyak Zýrhlý Yengeç
-2685	Devasa Zodyak Diþlek
-2686	Devasa Zodyak Kasabý
-2687	Zodyak Büyücüsü
-2688	Zodyak Yarým Dünya
-2689	Zodyak Öcü Celladý
-2690	Zodyak Öcü Okçusu
-2691	Zodyak Savaþ Öcüsü
-2692	Zodyak Öcü Büyücüsü
-2700	Vargulf
-2701	Vargulf Askeri
-2702	Vargulf Generali
-2703	Kerberos
-2704	Yýlan Kerberos
-2705	Ejder Kerberos
-2706	Kentor
-2707	Kentor Savaþçýsý
-2708	Kentor Generali
-2709	Moloch
-2710	Moloch Savaþçýsý
-2711	Moloch Generali
-2712	Ölüm Kanadý
-2713	Çürük Ölüm Kanadý
-2714	Küflü Ölüm Kanadý
-2715	Zefir
-2716	Zefir Savaþçýsý
-2717	Zefir Generali
-2718	Uruk
-2719	Uruk Savaþçýsý
-2720	Uruk Generali
-2721	Fantilla
-2722	Fantilla Savaþçýsý
-2723	Fantilla Generali
-2724	Spartalý
-2725	Spartalý Asker
-2726	Spartalý General
-2727	Kemik Gladyatör
-2728	Kemik Gladyatör Askeri
-2729	Kemik Gladyatör Generali
-2730	Uður Böceði Yay
-2731	Uður Böceði Dev
-2732	Uður Böceði Baþak
-2733	Demir Okçu
-2734	Demir Savaþçý
-2735	Demir General
-2736	Kaçak
-2737	Damage_Trap
-2750	Zi Subayý
-2751	Zi Bekçisi
-2752	Zi Generali
-2760	Chou Subayý
-2761	Chou Bekçisi
-2762	Chou Generali
-2770	Yin Subayý
-2771	Yin Bekçisi
-2772	Yin Generali
-2780	Mao Subayý
-2781	Mao Bekçisi
-2782	Mao Generali
-2790	Chen Subayý
-2791	Chen Bekçisi
-2792	Chen Generali
-2800	Si Subayý
-2801	Si Bekçisi
-2802	Si Generali
-2810	Wu Subayý
-2811	Wu Bekçisi
-2812	Wu Generali
-2820	Wei Subayý
-2821	Wei Bekçisi
-2822	Wei Generali
-2830	Shen Subayý
-2831	Shen Bekçisi
-2832	Shen Generali
-2840	Yu Subayý
-2841	Yu Bekçisi
-2842	Yu Generali
-2850	Xu Subayý
-2851	Xu Bekçisi
-2852	Xu Generali
-2860	Hai Subayý
-2861	Hai Bekçisi
-2862	Hai Generali
-2900	Fare Metini
-2901	Manda Metini
-2902	Kaplan Metini
-2903	Ejder Metini
-2904	Yýlan Metini
-2905	At Metini
-2906	Keçi Metini
-2907	Maymun Metini
-2908	Köpek Metini
 3001	Gnoll Savaþçý
 3002	Gnoll Okçu
 3003	Gnoll Savunucu
@@ -646,257 +439,9 @@ VNUM	LOCALE_NAME
 3705	Kaptan Kanca
 3790	Gargoyle
 3791	Kral Voba
-3801	Cellatork
-3802	Okçu Öcü
-3803	Kavgacý Öcü
-3804	Öcü Büyücü
-3805	General Öcü
-3890	Kaptan Þrak
-3891	Dev Öcü
-3901	Daladam
-3902	Eoten
-3903	Ruhlu Aðaç
-3904	Kaptan Kanca
-3905	Mu-Shu
-3906	Yah-Ki
-3907	Moghu
-3908	Karnifeks
-3909	General Albus
-3910	Skeletos
 3911	Aku Beku
 3912	Arboretum
 3913	Sekomor
-3949	Portal: Yeni kýta
-3950	Kappa
-3951	Lagun Kappasý
-3952	Okyanus Kappasý
-3953	Kappa lideri
-3954	Murana askeri
-3955	Okyanus Murana savaþçýsý
-3956	Siren kraliçesi
-3957	Hidra'nýn yavrusu
-3958	Hidra'nýn yavrusu
-3959	Hidra'nýn yavrusu
-3960	Hidra
-3961	Hidra
-3962	Hidra
-3963	Hidra
-3964	Hidra
-3965	Hidra'nýn hazinesi
-3970	??
-3971	Kuzey Rüzgarý kristali
-3972	Kuzey-R.D. 415 136
-3973	Kuzey-R.D. 94 139
-3974	??
-3980	Ateþ elementeri
-3981	Buz elementeri
-3982	Þimþek elementeri
-3983	Rüzgar elementeri
-3984	Toprak elementeri
-3985	Karanlýk elementeri
-3986	Kor ruhu
-3987	Buz ruhu
-3988	Elektrik ruhu
-3989	Hava ruhu
-3990	Taþ ruhu
-3991	Alacakaranlýk ruhu
-3992	Yangýn hükumdarý
-3993	Buzul hükumdarý
-3994	Yýldýrým hükumdarý
-3995	Fýrtýna hükumdarý
-3996	Toprak hükumdarý
-3997	Gece hükumdarý
-3998	Elementer dünyasý
-3999	Çýkýþ
-4000	Ateþ Metini
-4001	Buz Metini
-4002	Þimþek Metini
-4003	Rüzgar Metini
-4004	Toprak Metini
-4005	Gece Metini
-4006	Elementer korucusu
-4019	Cehennem kulesi giriþi
-4020	Sung Mahi'nin C. Kulesi
-4021	Cehennem kulesi mührü
-4022	Yýlan Tapýnaðý portalý
-4023	Kat deðiþtir
-4024	Yýlan baþý
-4025	Yýlan baþý
-4026	Yýlan baþý
-4027	Yýlan baþý
-4028	Güçlü Fare Askeri
-4029	Þaman Askeri
-4030	Beyaz ejderha yumurtasý
-4031	Enigma Tapýnaðý
-4032	Enigma Tapýnaðý'ndan çýk
-4033	Enigma Tapýnaðý (oluþt.)
-4034	Enigma Tapýn. (tekr.)
-4035	Enigma portalý
-4036	Kötülüðün Gözü
-4037	Ruh Yiyici
-4038	Kabus Ogre’i
-4039	Lanetli Cyclops
-4040	Ýþkence Çeken Ruh
-4041	Kabus Ýlk Boss
-4042	Kabus Son Boss
-4043	Rüya Yiyici Sebastian
-4062	Lanetli Kitap
-4063	Altýn Zombi
-4064	Mücevherli Golem
-4065	Tuzak Sandýk
-4066	Sikkelerin Muhafýzý
-4067	Altýn Sfenks
-4068	Hareketli Tümsek
-4069	Medusa
-4070	Tahripkar Smaug
-4090	Yer Solucaný
-4091	Kristal Golem
-4092	Kayýp Ruh
-4093	Büyücü Minotaur
-4094	Büyücü Ork Þefi
-4095	Büyücü Canavar
-4101	Son devir bekçisi Zi
-4102	Son devir bekçisi Chou
-4103	Son devir bekçisi Yin
-4104	Son devir bekçisi Mao
-4105	Son devir bekçisi Chen
-4106	Son devir bekçisi Si
-4107	Son devir bekçisi Wu
-4108	Son devir bekçisi Wei
-4109	Son devir bekçisi Shen
-4110	Son devir bekçisi Yu
-4111	Son devir bekçisi Xu
-4112	Son devir bekçisi Hai
-4121	Son devir bekçisi Zi
-4122	Son devir bekçisi Chou
-4123	Son devir bekçisi Yin
-4124	Son devir bekçisi Mao
-4125	Son devir bekçisi Chen
-4126	Son devir bekçisi Si
-4127	Son devir bekçisi Wu
-4128	Son devir bekçisi Wei
-4129	Son devir bekçisi Shen
-4130	Son devir bekçisi Yu
-4131	Son devir bekçisi Xu
-4132	Son devir bekçisi Hai
-4141	Çöküþ Metini
-4142	Kimsesizlik Metini
-4143	Lanet kapýsý
-4144	Kýyamet Metini
-4145	Son devir Henkogu
-4146	Son devir Henkogu
-4147	Son devir Kappasý
-4148	Son devir okyanus Kappa
-4149	Son devir Chuongu
-4150	Arkan son devir Chuong
-4151	Son devir büyücüsü
-4152	Arkan son devir büyücüsü
-4153	Asmodeus
-4154	Toprak Elçisi
-4155	Toprak Elçisi
-4156	Gece Elçisi
-4157	Gök Gürültüsü Elçisi
-4158	Göklerin Elçisi
-4159	Lanetlenme Savaþçýsý
-4160	Lanetlenme Büyücüsü
-4161	Ölüm Elçisi
-4162	Kurtuluþ Elçisi
-4200	ZÇ: Setaou Savaþçýsý
-4201	ZÇ: Setaou Savaþçýsý
-4202	ZÇ: Setaou Mistik
-4203	ZÇ: Setaou Askeri
-4204	ZÇ: Setaou Okçusu
-4205	ZÇ: Setaou Yargýcý
-4206	ZÇ: Setaou Komutaný
-4207	ZÇ: Yüzbaþý Yonghan
-4208	ZÇ: Yüzbaþý Yonghan
-4209	ZÇ: General Yonghan
-4210	ZÇ: General Yonghan
-4220	ZÇ: Kor Alev Hayaleti
-4221	ZÇ: Kor Alev Kaplaný
-4222	ZÇ: Kor Alev
-4223	ZÇ: Kor Alev Savaþçýsý
-4224	ZÇ: Kor Alev Kralý
-4225	ZÇ: Kor Alev Golemi
-4226	ZÇ: Kor Alev Sakallýsý
-4227	ZÇ: Kor Alev Generali
-4228	ZÇ: Kor Alev Lordu
-4229	ZÇ: Ýgnatör
-4240	ZÇ: Ayaz Kristali
-4241	ZÇ: Ayaz Böceði
-4242	ZÇ: Ayaz Adam
-4243	ZÇ: Ayaz Yetisi
-4244	ZÇ: Ayaz Golemi
-4245	ZÇ: Ayaz Trolü
-4246	ZÇ: Ayaz Sakal
-4247	ZÇ: Ayaz Generali
-4248	ZÇ: Ayaz Lordu
-4249	ZÇ: Szel
-4260	ZÇ: En-Tai Dövüþçüsü
-4261	ZÇ: En-Tai Savaþçýsý
-4262	ZÇ: En-Tai Rahibi
-4263	ZÇ: En-Tai Þifacýsý
-4264	ZÇ: En-Tai Ýmhacýsý
-4265	ZÇ: En-Tai Hükümdarý
-4266	ZÇ: Ochao Þifacýsý
-4267	ZÇ: En-Tai Dövüþçüsü
-4268	ZÇ: En-Tai Savaþçýsý
-4269	ZÇ: En-Tai Rahibi
-4270	ZÇ: En-Tai Þifacýsý
-4271	ZÇ: En-Tai Ýmhacýsý
-4272	ZÇ: Bagjanamu
-4273	ZÇ: Ochao Askeri
-4274	ZÇ: Ochao Büyücüsü
-4275	ZÇ: Ochao Celladý
-4276	ZÇ: Ochao Generali
-4280	TS: Setaou Savaþçýsý
-4281	TS: Setaou Avcýsý
-4282	TS: Setaou Mistik
-4283	TS: Setaou Askeri
-4284	TS: Setaou Okçusu
-4285	TS: Setaou Yargýcý
-4286	TS: Setaou Komutaný
-4287	TS: Yüzbaþý Yonghan
-4288	TS: Yüzbaþý Yonghan
-4289	TS: General Yonghan
-4290	TS: General Yonghan
-4300	TS: Kor Alev Hayaleti
-4301	TS: Kor Alev Kaplaný
-4302	TS: Kor Alev
-4303	TS: Kor Alev Savaþçýsý
-4304	TS: Kor Alev Kralý
-4305	TS: Kor Alev Kaplaný
-4306	TS: Kor Alev Sakallýsý
-4307	TS: Kor Alev Generali
-4308	TS: Kor Alev Lordu
-4309	TS: Ýgnatör
-4320	TS: Ayaz Kristali
-4321	TS: Ayaz Böceði
-4322	TS: Ayaz Adam
-4323	TS: Ayaz Yetisi
-4324	TS: Ayaz Golemi
-4325	TS: Ayaz Trolü
-4326	TS: Ayaz Sakal
-4327	TS: Ayaz Generali
-4328	TS: Ayaz Lordu
-4329	TS: Szel
-4340	TS: En-Tai Dövüþçüsü
-4341	TS: En-Tai Savaþçýsý
-4342	TS: En-Tai Rahibi
-4343	TS: En-Tai Þifacýsý
-4344	TS: En-Tai Ýmhacýsý
-4345	TS: En-Tai Hükümdarý
-4346	TS: Ochao Þifacýsý
-4347	TS: En-Tai Dövüþçüsü
-4348	TS: En-Tai Savaþçýsý
-4349	TS: En-Tai Rahibi
-4350	TS: En-Tai Þifacýsý
-4351	TS: En-Tai Ýmhacýsý
-4352	TS: Bagjanamu
-4353	TS: Ochao Askeri
-4354	TS: Ochao Büyücüsü
-4355	TS: Ochao Celladý
-4356	TS: Ochao Generali
 4361	Gölge Ýskelet Asker
 4362	Gölge Ýskelet Okçu
 4363	Gölge Ýskelet Mýzrakçý
@@ -925,61 +470,6 @@ VNUM	LOCALE_NAME
 4386	Acýnýn Kraliçesi
 4387	Abaddon
 4388	Nija
-4400	ZÇ: Beran-Setaou
-4401	ZÇ: Razadör
-4402	ZÇ: Nemere
-4403	ZÇ: Jotun Thrym
-4410	TS: Beran-Setaou
-4411	TS: Razadör
-4412	TS: Nemere
-4413	TS: Jotun Thrym
-4420	D: En-Tai Dövüþçüsü
-4421	D: En-Tai Savaþçýsý
-4422	D: En-Tai Rahibi
-4423	D: En-Tai Þifacýsý
-4424	D: En-Tai Ýmhacýsý
-4429	D: Bagjanamu
-4430	D: Gnoll Okçu
-4431	D: Kiklop Asker
-4432	D: Kiklop Büyücü
-4433	D: Kiklop Cellat
-4434	D: General Outis
-4439	D: Polyphemos
-4440	D: Cehennem Okçusu
-4441	D: Cehennem Mýzrakçýsý
-4442	D: Cehennem Papazý
-4443	D: Cehennem Binbaþýsý
-4444	D: Cehennem Generali
-4449	D: Azrail
-4450	D: Aðaç Kurbaðasý Askeri
-4451	D: Aðaç Kurbaðasý Lideri
-4452	D: Gulyabani
-4453	D: Sarý Kaplan Hayaleti
-4454	D: Kurbaða Generali
-4459	D: Sarý Kaplan Hayaleti
-4460	D: Kor Alev Hayaleti
-4461	D: Kor Alev Kaplaný
-4462	D: Kor Alev
-4463	D: Kor Alev Savaþçýsý
-4464	W: Magma kristali
-4469	D: Ejderha Bekçisi Ýdall
-4470	D: Cellatork
-4471	D: Okçu Öcü
-4472	D: Kavgacý Öcü
-4473	D: Öcü Büyücü
-4474	D: General Öcü
-4479	D: Dev Öcü
-4500	Enigma Metini
-4501	Savaþçý
-4502	Sura
-4503	Ninja
-4504	Þaman
-4505	Lycan
-4506	Enigma Generali
-4601	Lonca Okçusu
-4602	Lonca Büyücüsü
-4603	Lonca Savaþçýsý
-4690	Savaþlarýn Efendisi
 5001	Korsan Tanaka
 5002	Hae-Tae
 5003	Maymun
@@ -1021,15 +511,6 @@ VNUM	LOCALE_NAME
 5161	Kaya Maymun
 5162	Yürüyen Maymun
 5163	Maymun Lordu
-5201	Yabani Köpek
-5202	Yaban Domuzu
-5203	Kýrmýzý Yaban Domuzu
-5204	Ayý
-5205	Kahverengi Ayý
-5206	Siyah Ayý
-5207	Aç Kahverengi Ayý
-5208	Kaplan
-5209	Beyaz Kaplan
 6001	Kor Alev Hayaleti
 6002	Kor Alev Kaplaný
 6003	Kor Alev
@@ -1050,274 +531,20 @@ VNUM	LOCALE_NAME
 6107	Ayaz Sakal
 6108	Ayaz Generali
 6109	Ayaz Lordu
-6110	Magma Yeti
-6111	Magma Golemi
-6112	Magma Böceði
-6113	Magma Adamý
-6114	Magma Kristali
-6115	Magma Ejderi
-6116	Ejderha Bekçisi Ýdall
-6117	Ýdall'in Cellati
-6118	Ejderha Heykeli
 6151	Szel
 6191	Nemere
-6192	Jotun Thrym
-6193	Ejderha Kraliçesi Meley
-6201	Magma Yeti
-6202	Magma Golemi
-6203	Magma Böceði
-6204	Magma Adamý
-6205	Magma Kristali
-6206	Magma Ejderi
-6207	Ejderha Bekçisi Ýdall
-6209	Ejderha Heykeli
-6220	Don Büyücüsü
-6221	Buzun Efendisi
-6222	Magma Yeti
-6223	Lav Golem
-6224	Magma Böceði
-6225	Magma Golem
-6226	Alevli Kristal
-6227	Magma Yaprakcý
-6228	Alev Muhafýzý
-6229	Ejderha Celladý
-6230	Ejderha Heykeli
-6231	Meley Ejderha Kraliçesi
-6301	Ochao Savaþçýsý
-6302	Ochao Askeri
-6303	Ochao Büyücüsü
-6304	Ochao Celladý
-6305	Ochao Generali
-6306	Güçlü Ochao Savaþçýsý
-6307	Güçlü Ochao Askeri
-6308	Güçlü Ochao Büyücüsü
-6309	Güçlü Ochao Celladý
-6310	Güçlü Ochao Generali
-6311	Ochao Koruma Görevlisi
-6390	Ochao Dükü
-6391	Ochao Dükü
-6392	Ochao Muhafýzý
-6393	Güçlü Ochao Dükü
-6394	Güçlü Ochao Muhafýzý
-6400	En-Tai Gardianý
-6401	En Tai Savaþçýsý
-6402	En Tai Savaþçýsý
-6403	En Tai Rahibi
-6404	En Tai Þifacýsý
-6405	En Tai Bekçisi
-6406	En Tai Ýmhacýsý
-6407	En Tai Hükümdarý
-6408	Bagjanamu
-6409	Ochao Þifacýsý
-6410	Güçlü En Tai Savaþçýsý
-6411	Güçlü En Tai Savaþçýsý
-6412	Güçlü En Tai Rahibi
-6413	Güçlü En Tai Þifacýsý
-6414	Güçlü En Tai Ýmhacýsý
-6415	Beran Setaou Etkinliði
-6416	Nemere Etkinliði
-6417	Razadör Etkinliði
-6418	Jotun Thrym Etkinliði
-6419	Kýrmýzý Ejderha Etkinl.
-6420	Gölge Savaþçýsý
-6421	Baashido
-6422	Agoni Metini
-6430	Vahþi Yüzbaþý
-6431	Ork Reisi
-6432	Dokuz Kuyruk
-6433	Güçlü Buz Cadýsý
-6434	General
-6435	Nemere
-6436	Beran-Setaou
-6437	Razadör
-6438	Jotun Thrym
-6439	Gizemli Rahip
-6500	Ejderha Kralý Akzadur
-6501	Ejderha Kralý Nafaroth
-6502	Ejderha Kralý Exedyar
-6503	Ejderha Kralý Ruilith
-6504	Tyolduran
-6513	Ejderha portalý
-6514	Ejderha kralýna git
-6515	Çýkýþ
-6541	Cehennem köpeði yankýsý
-6542	Trol askeri yankýsý
-6543	Trol savaþçýsý yankýsý
-6544	Trol niþancýsý yankýsý
-6545	Natanan'ýn yankýsý
-6546	Argos'un yankýsý
-6547	Portal
-6601	Kýrmýzý Ejderha
-6602	RX: Mavi Ejderha
-6603	Duratus Cehennemi
-6604	Cehennem Babosa Kraliçesi
-6605	Nemere Cehennemi
-6606	Cehennem Býçkýný
-6607	Cehennem Büyücü Canavarý
-6608	Jaldabaoth
-6609	Jaldabaoth Cehennemi
-6686	Jin bing
-6687	Er Ki
-6688	Er Mao
-6689	Er Gong
-6690	Cephe büyücüsü
-6691	Kao
-6692	Kral Bao (Görev)
-6693	Jin bing
-6694	Er Ki
-6695	Er Mao
-6696	Er Gong
-6697	Cephe büyücüsü
-6698	Kao
-6699	Kral Bao
-6700	Cehennem köpeði
-6701	Troll Askeri
-6702	Troll Savaþçýsý
-6703	Troll Niþancýsý
-6704	Trol Þamaný
-6705	Natanan
-6706	Argos
-6707	Troll Askeri
-6708	Troll Savaþçýsý
-6709	Troll Niþancýsý
-6710	Baðlý ruh
-6711	Cehennem köpeði
-6712	Troll Askeri
-6713	Troll Savaþçýsý
-6714	Troll Niþancýsý
-6715	Trol Þamaný
-6716	Natanan
-6717	Argos
-6718	Myr Kovix
-6719	Myr Proleteri
-6720	Myr Golemi
-6721	Myr Savaþçý
-6722	Myr Büyücü
-6723	Myr Gazisi
-6724	Myr Primus
-6725	Myr Kovix
-6726	Myr Proleteri
-6727	Myr Golemi
-6728	Myr Savaþçý
-6729	Myr Büyücü
-6730	Myr Gazisi
-6731	Myr Primus
-6744	Kappa askeri
-6745	Kappa iþçisi
-6746	Kappa askeri
-6747	Kappa sihirbazý
-6748	Kappa avcýsý
-6749	Þiddetli Kappa
-6750	Yýlan akrebi
-6751	Yýlan iþçisi
-6752	Yýlan Kappasý
-6753	Yýlan askeri
-6754	Yýlan münzevisi
-6755	Güçlü Yýlan savaþçýsý
-6756	Yýlan kraliçesi Nethis
-6757	Yýlan Sütunu
-6758	Bozulmuþ asker
-6759	Bozulmuþ çatýþma
-6760	Bozulmuþ savaþçý
-6761	Bozulmuþ rahip
-6762	Bozulmuþ general
-6763	Bozulmuþ reis
-6764	Bozlm. Savaþ reisi
-6765	Güçlü Yýlan savaþçýsý
-6770	Donmuþ tilki
-6771	Donmuþ gözcü
-6772	Donmuþ savaþçý
-6773	Donmuþ avcý
-6774	Donmuþ general
-6775	Donmuþ reis
-6776	Donmuþ savaþ reisi
-6777	Ele geçrlmþ. buz geyiði
-6778	Ele geçrlmþ. kar leoparý
-6779	Kuzey Rüzgarý Yeti
-6780	Kuzey Rüzgarý hayaleti
-6781	Kuzey Rüzgarý Golemi
-6782	Bigfoot
-6783	Kuzey R. savaþ reisi
-6784	Kuzey Rüzgarý Z. gözcüsü
-6785	Zula Çatýþmacýsý
-6786	Kuzey Rüzg. Z. savaþçýsý
-6787	Kuzey Rüzg. Z. sihirbazý
-6788	Kuzey Rüzg. Z. Generali
-6789	Zula savaþ reisi
-6790	Alastor
-6791	Alastor
-6792	Kuzey Rüzgarý Z. gözcüsü
-6793	Zula Çatýþmacýsý
-6794	Kuzey Rüzg. Z. savaþçýsý
-6795	Kuzey Rüzg. Z. sihirbazý
-6796	Kuzey Rüzg. Z. Generali
-6797	Zula savaþ reisi
-6800	Gnoll Savaþçý
-6801	Gnoll Gözcü
-6802	Gnoll Büyücü
-6803	Gnoll Mareþal
-6804	Gnoll Usta
-6805	Gnoll Yüzbaþý
-6806	Gnoll Asker
-6807	Gnoll Ajan
-6808	Gnoll Büyücü
-6809	Gnoll Komutan
-6810	Ahtrin Savaþçý
-6811	Ahtrin Ýzci
-6812	Ahtrin Sihirbaz
-6813	Ahtrin Komutan
-6814	Ahtrin Yüzbaþý
-6815	Ahtrin Yüzbaþý
-6816	Ahtrin Ajan
-6817	Ahtrin Büyücü
-6818	Ahtrin Komutan
-6819	Ahtrin Usta
-6820	Ahtrin Büyük Üstat
-6850	Yýlan akrebi
-6851	Yýlan iþçisi
-6852	Yýlan Kappasý
-6853	Yýlan askeri
-6854	Yýlan kasabý
-6855	Güçlü Yýlan savaþçýsý
-6856	Yýlan kraliçesi Nethis
-6860	Kýlýç ustasý Jin
-6861	Mýzrak ustasý Ki
-6862	Mýzrak ustasý Mao
-6863	Okçu Gong
-6864	Kýlýç ustasý Kao
-6865	Kýlýç ustasý Jin
-6866	Mýzrak ustasý Ki
-6867	Mýzrak ustasý Mao
-6868	Okçu Gong
-6869	Kýlýç ustasý Kao
-6870	Gizemli rahip
-6871	Gizemli rahip
-6875	Bozulmuþ asker
-6876	Bozulmuþ çatýþma
-6877	Bozulmuþ savaþçý
-6878	Bozulmuþ rahip
-6879	Bozulmuþ general
-6880	Bozulmuþ reis
-6881	Bozlm. Savaþ reisi
-6882	Ruhsuz tilki
-6883	Donmuþ gözcü
-6884	Donmuþ savaþçý
-6885	Donmuþ avcý
-6886	Donmuþ general
-6887	Donmuþ reis
-6888	Donmuþ savaþ reisi
-6889	Lanetli buz geyiði
-6890	Ele geçrlmþ. kar leoparý
-6891	Kuzey Rüzgarý Yeti
-6892	Kuzey Rüzgarý hayaleti
-6893	Kuzey Rüzgarý Golemi
-6894	Bigfoot
-6895	Kuzey R. savaþ reisi
-6896	Balathor
-6897	Balathor
-6898	Hayalet savaþçý
-6899	Hayalet okçu
-6900	Hayalet yanký
+6801	Gemi direði
+6802	Kappa lideri
+6803	Kappa
+6804	Lagun Kappasý
+6805	Okyanus Kappasý
+6806	Murana askeri
+6807	Okyanus Murana savaþçýsý
+6808	Hidra'nýn yavrusu
+6809	Siren kraliçesi
+6810	Hidra
+6811	Hidra
+6812	Hidra
 7001	Maymun Asker
 7002	Maymun Binici
 7003	Gimu Maymun Asker
@@ -1345,245 +572,6 @@ VNUM	LOCALE_NAME
 7026	Juk-Mok
 7027	Hwaryu Juk
 7028	Siyah Juk-Guimok
-7029	Buz Þeytaný
-7030	Buz Boynuz. Katil Balina
-7031	Buz Böceði
-7032	Seol-Gu
-7033	Buz Adam
-7034	Buz Devi
-7035	Buz Golemi
-7036	Buz Þeytaný
-7037	Buz Boynuz. Katil Balina
-7038	Buz Böceði
-7039	Seol-Gu
-7040	Buz Adam
-7041	Buz Devi
-7042	Buz Golemi
-7043	Buz Þeytaný
-7044	Buz Boynuz. Katil Balina
-7045	Buz Böceði
-7046	Seol-Gu
-7047	Buz Adam
-7048	Buz Devi
-7049	Buz Golemi
-7050	Çölün Uçan Gözü
-7051	Kral Akrep
-7052	Genç Akrep Adam
-7053	Akrep Okçu
-7054	Yýlan Kýlýççý
-7055	Yýlan Okçu
-7056	Çöl Haydutu
-7057	Çölün Uçan Gözü
-7058	Kral Akrep
-7059	Genç Akrep Adam
-7060	Akrep Okçu
-7061	Yýlan Kýlýççý
-7062	Yýlan Okçu
-7063	Çöl Haydutu
-7064	Çölün Uçan Gözü
-7065	Kral Akrep
-7066	Genç Akrep Adam
-7067	Akrep Okçu
-7068	Yýlan Kýlýççý
-7069	Yýlan Okçu
-7070	Çöl Haydutu
-7071	Savaþ Kaplaný Kölesi
-7072	Alev Hayaleti
-7073	Savaþ Kaplaný
-7074	Alev
-7075	Alev Savaþçý
-7076	Savaþ Kaplaný Kölesi
-7077	Alev Hayaleti
-7078	Savaþ Kaplaný
-7079	Alev
-7080	Alev Savaþçý
-7081	Savaþ Kaplaný Kölesi
-7082	Alev Hayaleti
-7083	Savaþ Kaplaný
-7084	Alev
-7085	Alev Savaþçý
-7086	Hayalet Aðaç Kökü
-7087	Orman Perisi
-7088	Hayalet Söðüt
-7089	Kötü Aðaç
-7090	Hayalet Aðaç Kökü
-7091	Orman Perisi
-7092	Hayalet Söðüt
-7093	Kötü Aðaç
-7094	Hayalet Aðaç Kökü
-7095	Orman Perisi
-7096	Hayalet Söðüt
-7101	Top
-7102	Top
-7103	Ok Yaðmuru Mancýnýðý
-7104	Ok Yaðmuru Mancýnýðý
-7105	Kule
-7106	Ocak
-7107	Ocak
-7108	Ocak
-7109	Ocak
-7110	Ocak
-7111	Ocak
-7112	Ocak
-7113	Cheeta
-7114	Kraton
-7115	Charly
-7116	Nini
-7117	Zulu
-7118	Maymun Savaþçýsý Deka
-7119	Maymun Savaþçýsý Oba
-7120	Kral Keung
-7121	Kiros
-7122	Manchu
-7123	Sgok
-7124	Ýndrik
-7125	Lanetli Kurt
-7126	Lanetli Alfa Kurt
-7127	Lanetli Mavi Kurt
-7128	Lanetli Gri Kurt
-7129	Lanetli Yaban Domuzu
-7130	Lan.Kýrmýzý Yaban Domuzu
-7131	Lanetli Ayý
-7132	Lanetli Gri Ayý
-7133	Lanetli Siyah Ayý
-7134	Lanetli Kahverengi Ayý
-7135	Lanetli Kaplan
-7136	Elit Ork
-7137	Elit Ork Gözcüsü
-7138	Elit Ork Savaþçýsý
-7139	Elit Ork Büyücüsü
-7140	Elit Ork Generali
-7141	Siyah Ork
-7142	Siyah Ork Devi
-7143	Cesur Büyük Ork
-7144	Cesur Büyük Ork Gözcüsü
-7145	Cesur Büyük OrkSavaþçýsý
-7146	Cesur Büyük Ork Büyücüsü
-7147	Cesur Büyük Ork Generali
-7148	Cesur Siyah Ork
-7149	Cesur Siyah Ork Devi
-7152	Çölün Uçan Gözü
-7153	Kral Akrep
-7154	Genç Akrep Adam
-7155	Akrep Okçu
-7156	Yýlan Kýlýççý
-7157	Yýlan Okçu
-7158	Çöl Haydutu
-7159	Vahþi Akrep Adam
-7160	Huysuz Z. Yavru Örümcek
-7161	Huysuz Ölmcl. Z. Örümcek
-7162	Huys.Kýrm.Öl.Zeh.Örümcek
-7163	Huys.Zeh. Pençe Örümceði
-7164	Savaþ Kaplaný Kölesi
-7165	Alev Hayaleti
-7166	Savaþ Kaplaný
-7167	Alev
-7168	Alev Savaþçý
-7169	GüçlüSavaþKaplaný Kölesi
-7170	Güçlü Alev Hayaleti
-7171	Güçlü Savaþ Kaplaný
-7172	Güçlü Alev Hayaleti
-7173	Güçlü Alev Savaþçýsý
-7174	Büyülü Buz
-7175	Buz Katil Balinasý
-7176	Buz Böceði
-7177	Buz Arslaný
-7178	Buz Adam
-7179	Yeti
-7180	Buz Golemi
-7181	Hastalýklý Köpek
-7182	Hastalýklý Adam
-7183	Hast. Kýlýç Savaþçýsý
-7184	Hastalýklý Mýzrakçý
-7185	Hastalýklý Okçu
-7186	Cehennem Deniz Anasý
-7187	Cehennem köpeði
-7188	Zombi
-7189	Cehennem Subayý
-7190	Cehennem Bekçisi
-7191	Ýkibaþlý Cehennem Okçusu
-7192	Cehennem Kepçesi
-7193	Cehennem Savaþçýsý
-7194	Cehennem Okçusu
-7195	Cehennem Mýzrakçýsý
-7196	Cehennem Papazý
-7197	Cehennem Binbaþýsý
-7198	En Tai Savaþçýsý
-7199	En Tai Savaþçýsý
-7200	En Tai Rahibi
-7201	En Tai Þifacýsý
-7202	En Tai Ýmhacýsý
-7203	En Tai Hükümdarý
-7204	Lemur Büyücü
-7205	Lemur Savaþçý
-7206	Lemur Asker
-7207	Lemur Cellat
-7210	Ýstilacý Komutan
-7211	Ýstilacý Ateþ Komutaný
-7212	Ýstilacý Buz Komutaný
-7213	Ýstilacý Þimþek Komutaný
-7214	Ýstilacý Rüzgar Komutaný
-7215	Ýstilacý Toprak Komutaný
-7216	Ýstilacý Karanlýk Komut.
-7550	Cehennem Kulesi Kurdu
-7551	Cehennem Kulesi Zorbasý
-7552	Cehennem Kulesi Berserk.
-7553	Cehennem Kulesi Büyücüsü
-7554	Cehennem Kulesi Kasabý
-7555	Cehennem Kulesi Nigrom.
-7556	Cehennem K. Büyük Üstat
-7557	Cehennem Kulesi Kurdu
-7558	Cehennem Kulesi Zorbasý
-7559	Cehennem Kulesi Berserk.
-7560	Cehennem Kulesi Büyücüsü
-7561	Cehennem Kulesi Kasabý
-7562	Cehennem Kulesi Nigrom.
-7563	Cehennem K. Büyük Üstat
-7564	Cehennem Kulesi Kurdu
-7565	Cehennem Kulesi Zorbasý
-7566	Cehennem Kulesi Berserk.
-7567	Cehennem Kulesi Büyücüsü
-7568	Cehennem Kulesi Kasabý
-7569	Cehennem Kulesi Nigrom.
-7570	Cehennem K. Büyük Üstat
-7571	Cehennem Kulesi Kurdu
-7572	Cehennem Kulesi Zorbasý
-7573	Cehennem Kulesi Berserk.
-7574	Cehennem Kulesi Büyücüsü
-7575	Cehennem Kulesi Kasabý
-7576	Cehennem Kulesi Nigrom.
-7577	Cehennem K. Büyük Üstat
-7578	Cehennem Kulesi Kurdu
-7579	Cehennem Kulesi Zorbasý
-7580	Cehennem Kulesi Berserk.
-7581	Cehennem Kulesi Büyücüsü
-7582	Cehennem Kulesi Kasabý
-7583	Cehennem Kulesi Nigrom.
-7584	Cehennem K. Büyük Üstat
-7585	Cehennem Kulesi Kurdu
-7586	Cehennem Kulesi Zorbasý
-7587	Cehennem Kulesi Berserk.
-7588	Cehennem Kulesi Büyücüsü
-7589	Cehennem Kulesi Kasabý
-7590	Cehennem Kulesi Nigrom.
-7591	Cehennem K. Büyük Üstat
-7592	Cehennem Kulesi Yýkýcýsý
-7593	Cehennem Kulesi Yýkýcýsý
-7594	Cehenn. Kulesi Þeytan T.
-7595	Kule Okçusu
-7600	Cehennem Kulesi Ruh Taþý
-7609	Cehennem Kuls. Büyü Ust.
-7610	Cehennem Kulesi Prensi
-7611	Cehennem Kulesi Prensi
-7612	Cehennem K. Ölüm Prensi
-7613	Cehennem K. Ölüm Prensi
-7614	Cehennem Kuls. Büyü Ust.
-7615	Cehennem Kulesi Kurdu
-7616	Cehennem Kulesi Zorbasý
-7617	Cehennem Kulesi Kasabý
-7618	Cehennem Kulesi Kasabý
-7619	Cehennem Kulesi Berserk.
-7620	Cehennem Kulesi Büyücüsü
 8001	Üzüntü Metini
 8002	Dövüþ Metini
 8003	Savaþ Metini
@@ -1639,143 +627,13 @@ VNUM	LOCALE_NAME
 8056	Namertlik Metini
 8057	Cehennem Ateþi Metini
 8058	Ayaz Metini
-8059	Aðaç Yaratýðý Metini
-8060	Bal Kabaðý Metini
-8061	Orman Metini
-8062	Farkýndalýk Metini (G)
-8063	Takdir Metini
-8064	Bilinç Metini
-8065	Jin Metini
-8066	Shiho Metini
-8067	Farklandýrma Metini
-8076	Mekan Yýlaný Metini
-8077	Gumarlý Metin
-8100	Aþký-Memnu Metini
-8101	Üzüntü Metini
-8102	Dövüþ Metini
-8103	Savaþ Metini
-8104	Hýrs Metini
-8105	Siyah Metin
-8106	Karanlýk Metin
-8107	Kýskançlýk Metini
-8108	Ruh Metini
-8109	Gölge Metini
-8110	Dayanýklýlýk Metini
-8111	Þeytan Metini
-8112	Düþüþ Metini
-8113	Ölüm Metini
-8114	Katil Metini
-8115	Ay Metini
-8116	Ezoterik Metini
-8120	ZÇ: Dað Metini
-8121	ZÇ: Ýntikam Metini
-8122	ZÇ: Kimsesizlik Metini
-8123	ZÇ: Kibir Metini
-8124	ZÇ: Cehennm Ateþi Metini
-8125	ZÇ: Ýntikam Metini
-8126	ZÇ: Aðaç Yaratýðý Metini
-8127	ZÇ: Orman Metini
-8130	TS: Dað Metini
-8131	TS: Ýntikam Metini
-8132	TS: Kimsesizlik Metini
-8133	TS: Kibir Metini
-8134	TS: Cehennm Ateþi Metini
-8135	TS: Ayaz Metini
-8136	TS: Aðaç Yaratýðý Metini
-8137	TS: Orman Metini
-8150	1. Sýnav Metini
-8151	2. Sýnav Metini
-8152	3. Sýnav Metini
-8153	4. Sýnav Metini
-8154	5. Sýnav Metini
-8155	6. Sýnav Metini
-8156	7. Sýnav Metini
-8157	8. Sýnav Metini
-8158	9. Sýnav Metini
-8159	10. Sýnav Metini
-8200	Çikolata Metin Taþý
-8201	Çikolata Metin Taþý
-8202	Buz Topu
-8203	Aydýnlanma Metini
-8204	Yumurta Bayramý Metini
-8205	Yumurta Bayramý Metini
-8206	Yumurta Bayramý Metini
-8207	Futbol Metin'i
-8208	Yumurta Bayramý Metini
-8209	Yumurta Bayramý Metini
-8430	Yapýþkan Metin
-8444	Duratus Metini
-8445	Kabus Kayasý
-8446	Göz Metini
-8447	Rüya Yiyici Yumurtasý
-8452	Altýn Metin
-8453	Hazine Metini
-8454	Altýn Kurbaða
-8459	Büyülü Kristal
-8460	Büyülü Metin Taþý
-8467	Çürük Kristal Kayasý
-8468	Ganesha Kayasý
-8469	Çöl Taþý
-8469	Çöl Metini
-8470	Diken Taþý
-8470	Diken Metini
-8471	Mumya Taþý
-8471	Mumyalaþmýþ Metin
-8501	Yabani Köpek
-8502	Yaban Domuzu
-8503	Ayý
-8504	Beyaz Kaplan
-8505	Siyah Dev Ork
-8506	Aðaç Kurbaðasý Lideri
-8507	Çöl Haydutu
-8508	Mistik Ýþkenceci
-8509	Mistik Haberci
-8510	Alev Savaþçý
-8511	Buz Golemi
-8600	¿õ±Í´ëÁ·Àå
-8601	¿õ±Í´ëÁ·Àå
-8602	¹Ð±³´ëÁÖ±³
-8603	¹Ð±³´ëÁÖ±³
-8604	¸í»ç±Í¿Õ
-8605	¸í»ç±Í¿Õ
-8606	»ç½Å
-8607	»ç½Å
-8608	±¸¹ÌÈ£
-8609	±¸¹ÌÈ£
-8610	´©··Åõ¹ü±Í
-8611	´©··Åõ¹ü±Í
-8612	¿©¿Õ°Å¹Ì
-8613	¿©¿Õ°Å¹Ì
-8614	°Å´ë»ç¸·°ÅºÏ
-8615	°Å´ë»ç¸·°ÅºÏ
-8616	Billy Loomis
-8617	Jack Torrance
-8618	Chucky
-8619	Zep Hindle
-8620	Jason
-8621	Michael Myers
-8622	Freddy Krüger
-8623	Deri Surat
-8625	Troll Karakolu
-8626	1. Myr Karakolu
-8627	2. Myr Karakolu
-8630	Ateþ Yýlaný Metini
-8631	Buz Yýlaný Metini
-8632	Rüzgar Yýlaný Metini
-8633	Toprak Yýlaný Metini
-8634	Zaman Yýlaný Metini
-8635	B. e. yumurtasý (kolay)
-8636	B. e. yumurtasý (zor)
-8637	SungMa Ýstila Portalý
-8638	Lanetlenme Metini (Þifa)
-8639	Lanetlenme Metini
-8640	Kurtuluþ Metini
-8641	SungMa Ýstila Portalý
-8642	SungMa Ýstila Portalý
-8643	SungMa Ýstila Portalý
-8644	SungMa Ýstila Portalý
-8645	SungMa Ýstila Portalý
-8646	SungMa Ýstila Portalý
+8062	Hidra Metini
+8494	Gölgeler Metini
+8495	Ayartý Metini
+8496	Lanet Metini
+8497	Günah Metini
+8498	Gölge Þeytan Metini
+8499	Ruh Sütunu
 9001	Silah Satýcýsý
 9002	Zýrh Satýcýsý
 9003	Satýcý
@@ -1794,199 +652,6 @@ VNUM	LOCALE_NAME
 9016	?
 9017	Onarým tahtasý
 9018	Hidra'nýn Hazinesi
-9035	Keþiþ Milbon
-9100	Fýrtýna çiçeði
-9101	Güç çiçeði
-9102	Ateþ güç çiçeði
-9103	Buz güç çiçeði
-9104	Þimþek güç çiçeði
-9105	Rüzgar güç çiçeði
-9106	Toprak güç çiçeði
-9107	Karanlýk güç çiçeði
-9236	Salyangoz Muhafýzý
-9237	Mühür Sütunu
-9238	Salyangoz Sývýsý
-9264	Patlayýcý Dolu Kutu
-9267	Duratus Muhafýzý
-9268	Kapý
-9269	Duratus Anýtý
-9270	Sha-Sin
-9271	Duvar
-9272	Metal Kapý
-9273	Top
-9274	Ýlahi Anýt
-9275	Göz Totemi
-9276	Pis Rahip
-9277	Kabus Mantarý
-9280	Zirvelerin Muhafýzý
-9286	Çöl Muhafýzý
-9287	Altýnel
-9288	Urashak
-9289	Hazine Sandýðý
-9302	Trol Avcýsý
-9303	Kapý
-9304	Rün Sütunu
-9305	Kristal
-9306	Kristal Sütun
-9307	Kayýtlý Parþömen
-9321	Ganesha Tapýnaðý Muhafýzý
-9322	Kapý
-9323	Kapý
-9324	Lanetli Kristal
-9325	Kýrýk Heykel
-9326	Kýrýk Heykel
-9327	Kýrýk Heykel
-9328	Kýrýk Heykel
-9329	Ganesha Heykeli
-9330	Lanetli Altýn Anahtar
-9566	Mutant Arý
-9571	Mutant Yýlan
-9577	Mutant Akrep
-9578	Alevli Ejderha
-9750	Beyaz Yeminli Asker
-9751	Beyaz Yeminli Okçu
-9752	Beyaz Yeminli General
-9753	Beyaz Yeminli Komutan
-9754	Mi-Jung
-9755	Eun-Jung
-9756	Se-Rang
-9757	Jin-Hee
-9758	Zodyak Çöl Tilki
-9759	Zodyak Derviþ
-9760	Zodyak Kral Akrep
-9761	Zodyak Akrep Adam
-9762	Zodyak Akrep Okçu
-9763	Zodyak Yýlan Kýlýççý
-9764	Zodyak Yýlan Okçu
-9765	Zodyak Çöl Haydut
-9766	Zodyak Lemures Savaþçý
-9767	Zodyak Lemures Asker
-9768	Zodyak Lemures Büyücü
-9769	Zodyak Lemures Cellat
-9770	Zodyak Lemures General
-9771	Zodyak Tritonik Murana
-9772	Zodyak Köpekbalýðý Asker
-9773	Zodyak Tritonik Büyücü
-9774	Zodyak Tritonik Avcý
-9775	Zodyak Tritonik Usturac
-9776	Zodyak Kýzýl Hýrsýz Amazon
-9777	Zodyak Kýzýl Hýrsýz Suikastçi
-9778	Zodyak Kýzýl Hýrsýz Büyücü
-9779	Zodyak Kýzýl Hýrsýz Cellat
-9780	Zodyak Kara General
-9781	Zodyak Yengeç Savaþçý
-9782	Zodyak Akrep Niþancý
-9783	Zodyak Karides Asker
-9784	Zodyak Þeytani Hücreli
-9785	Zodyak Zýrhlý Yengeç
-9786	Zodyak Dev Parçalayan
-9787	Zodyak Dev Katil
-9788	Zodyak Dev Büyücü
-9789	Zodyak Ýkizbaþ
-9790	Zodyak Kaptan Kancalar
-9791	Zodyak Hangork
-9792	Zodyak Archie Ogre
-9793	Zodyak Dövüþ Ogre
-9794	Zodyak Ogre Büyücü
-9795	Zodyak General Ogg
-9796	Zodyak Mantikor Savaþçý
-9797	Zodyak Mantikor Asker
-9798	Zodyak Mantikor Büyücü
-9799	Zodyak Mantikor Cellat
-9800	Zodyak Zýrhlý
-9801	Zodyak Zýrhlý Savaþçý
-9802	Zodyak Zýrhlý General
-9803	Zodyak Ölüm Kanadý
-9804	Zodyak Küflü Ölüm Kanadý
-9805	Zodyak Çürük Ölüm Kanadý
-9806	Zodyak Moloch
-9807	Zodyak Moloch Savaþçý
-9808	Zodyak Moloch General
-9809	Zodyak Spartalý
-9810	Zodyak Spartalý Asker
-9811	Zodyak Spartalý General
-9812	Zodyak Yýrtýcý
-9813	Zodyak Yýrtýcý Savaþçý
-9814	Zodyak Yýrtýcý General
-9815	Zodyak Kemik Gladyatör
-9816	Zodyak Kemik Gladyatör Savaþçý
-9817	Zodyak Kemik Gladyatör General
-9818	Zodyak Kantar
-9819	Zodyak Kantar Savaþçý
-9820	Zodyak Kantar General
-9821	Zodyak Uruk
-9822	Zodyak Uruk Savaþçý
-9823	Zodyak Uruk General
-9824	Zodyak Kaplan
-9825	Zodyak Kaplan Savaþçý
-9826	Zodyak Kaplan General
-9827	Zodyak Çýðlýk
-9828	Zodyak Çýðlýk Savaþçý
-9829	Zodyak Çýðlýk General
-9830	Zodyak Vargulf
-9831	Zodyak Vargulf Savaþçý
-9832	Zodyak Vargulf General
-9833	Zodyak Melek
-9834	Zodyak Melek Savaþçý
-9835	Zodyak Melek General
-9836	You General
-9837	You Subayý
-9838	Zodyak
-9839	Chou Subayý
-9840	Xu General
-9841	Xu Subayý
-9842	Chen General
-9843	Chen Subayý
-9844	Wu General
-9845	Wu Subayý
-9846	Shen General
-9847	Shen Subayý
-9848	Zi General
-9849	Zi Subayý
-9850	Hai General
-9851	Hai Subayý
-9852	Mao General
-9853	Mao Subayý
-9854	Wei General
-9855	Wei Subayý
-9856	Si General
-9857	Si Subayý
-9858	Yin General
-9859	Yin Subayý
-9860	Hai Portalý
-9861	Xu Portalý
-9862	You Portalý
-9863	Shen Portalý
-9864	Wei Portalý
-9865	Wu Portalý
-9866	Si Portalý
-9867	Chen Portalý
-9868	Mao Portalý
-9869	Yin Portalý
-9870	Chou Portalý
-9871	Zi Portalý
-9875	Fare Metini
-9876	Öküz Metini
-9877	Kaplan Metini
-9878	Ejderha Metini
-9879	Yýlan Metini
-9880	At Metini
-9881	Keçi Metini
-9882	Maymun Metini
-9883	Köpek Metini
-9884	You Heykeli
-9885	Chou Heykeli
-9886	Xu Heykeli
-9887	Chen Heykeli
-9888	Wu Heykeli
-9889	Shen Heykeli
-9890	Zi Heykeli
-9891	Hai Heykeli
-9892	Mao Heykeli
-9893	Wei Heykeli
-9894	Si Heykeli
-9895	Yin Heykeli
-9896	Zodyak Tepe
 9376	Gölge Bölgesi Muhafýzý
 9377	Gölge Mühür Taþý
 9378	Biçici Heykeli
@@ -2018,11 +683,11 @@ VNUM	LOCALE_NAME
 10018	Gunsam_Kulesi 2165 7270
 10019	Jayang_Bölgesi 3211 9009
 10020	Jungrang 1356 43
-10021	Bokjun_Bölgesi 1168 2920
+10021	Bokjung_Area 1168 2920
 10022	Waryong 2219 93
-10023	Bakra_Bölgesi 9098 2948
+10023	Bakra_Area 9098 2948
 10024	Imha 2718 130
-10025	Sohan_Daðý 4993 2984
+10025	Mount_Sohan 4993 2984
 10026	Lungsam 2887 57
 10027	Lungsam 2866 437
 10028	Kýzýl_Orman 11199 708
@@ -2076,8 +741,8 @@ VNUM	LOCALE_NAME
 10076	MaymunZindaný 1352 7300
 10077	Sürgün_Maðarasý 9 12078
 10078	Dragon_Valley 2842 8106
-10079	Grotto_of_Exile 1459 13236
-10080	Grotto_of_Exile_2 2413 12755
+10079	Grotto_of_Exile 1357 13437
+10080	Grotto_of_Exile_2 2416 12744
 10081	Gate 99 13618
 10082	Gate 5028 9998
 10083	Gate 1360 14972
@@ -2103,67 +768,6 @@ VNUM	LOCALE_NAME
 10103	Yýldýrým 11345 16546
 10104	Yýldýrým 11921 16550
 10105	Gautama 12263 16811
-10106	³ì¸²Áö 8168 15050
-10107	DonganOvasý 10629 4767
-10109	ÞimþekSýrtý 451 9492
-10110	ÞimþekZirvesi 830 9454
-10111	AteþSýrtý 1430 9616
-10112	BuzDaðý 690 10169
-10113	ÞimþekZirvesi 1023 9623
-10114	BuzDaðý 303 10113
-10115	AteþZirvesi 2117 9447
-10116	AteþSýrtý 1720 9499
-10117	RüzgarAdasý 1973 10159
-10118	AteþZirvesi 2337 9633
-10119	KaranlýkSýrtý 2710 9616
-10120	RüzgarAdasý 1582 10111
-10121	KaranlýkZirve 3393 9454
-10122	KaranlýkSýrtý 3012 9500
-10123	ToprakÇölü 3069 10174
-10124	KaranlýkZirve 3685 9551
-10126	Çýkýþ 11622 5809
-10127	DonganObasý 10551 4881
-10128	Seogançoraðý 12218 4895
-10129	NamganYarýðý 12780 4411
-10130	Seogançoraðý 12144 5555
-10131	Seviye2 9916 6630
-10132	Seviye3 9896 6302
-10133	Seviye1 9534 6281
-10134	Seviye2 9564 6610
-10135	Geri 9338 6287
-10136	Yilad-Geçidi 303 14147
-10137	Namgan-Yarýðý 13184 4735
-10138	Çýkýþ
-10139	Kuzey-R.U. 1106 15997
-10140	Yilad-Geçidi 83 14763
-10141	Bekleme-Alaný 401 477
-10142	Ruh Sýrtý
-10143	Kuzey-R.U. 247 15392
-10201	Çýk
-10202	Kuzey-R.Ý. 11590 12181
-10203	Kuzey-R.Z. 11323 13499
-10204	Çýkýþ
-10205	. 70 149
-10206	. 295 157
-10207	. 190 149
-10208	. 70 149
-10209	. 650 184
-10210	. 476 53
-10211	. 70 149
-10212	. 80 330
-10213	. 351 385
-10214	. 81 451
-10215	. 70 149
-10216	. 707 445
-10217	. 351 445
-10218	. 70 149
-10219	. 215 557
-10220	. 698 325
-10221	. 70 149
-10222	Gizli-Oda 11913 12692
-10223	Geri 11553 12697
-10224	. 646 65
-10225	. 70 149
 10501	Gate 345 361
 10502	Gate 106 547
 10503	Gate 75 368
@@ -2275,109 +879,14 @@ VNUM	LOCALE_NAME
 10833	Gate 406 880
 10834	Gate 422 935
 10835	Gate 500 807
-10901	. 333 358
-10902	. 452 116
-10903	. 515 415
-10904	. 515 480
-10905	. 145 305
-10906	. 228 238
-10907	. 452 116
-10908	. 77 500
-10909	. 111 550
-10910	. 452 116
-10911	. 145 305
-10912	. 333 358
-10913	. 615 50
-10914	. 218 110
-10915	. 288 708
-10916	. 582 385
-10917	. 218 110
-10918	. 452 116
-10919	. 615 50
-10920	. 510 480
-10921	. 75 435
-10922	. 194 614
-10923	. 310 237
-10924	. 609 553
-10931	. 250 425
-10932	. 452 116
-10933	. 520 415
-10934	. 77 370
-10935	. 145 305
-10936	. 122 678
-10937	. 297 175
-10938	. 452 116
-10939	. 423 266
-10940	. 122 678
-10941	. 510 480
-10942	. 250 425
-10943	. 452 116
-10944	. 297 175
-10945	. 250 425
-10946	. 627 290
-10947	. 297 175
-10948	. 450 116
-10949	. 582 385
-10950	. 440 705
-10951	. 145 305
-10952	. 297 175
-10953	. 75 435
-10954	. 609 553
-10961	. 333 358
-10962	. 452 116
-10963	. 520 415
-10964	. 77 370
-10965	. 145 305
-10966	. 297 175
-10967	. 452 116
-10968	. 195 615
-10969	. 195 615
-10970	. 510 480
-10971	. 145 305
-10972	. 333 358
-10973	. 71 435
-10974	. 297 175
-10975	. 460 560
-10976	. 333 358
-10977	. 260 175
-10978	. 452 116
-10979	. 540 45
-10980	. 80 295
-10981	. 522 414
-10982	. 297 175
-10983	. 582 385
-10984	. 609 553
-10985	Lonca Karakolu
 11000	Köy Gardiyaný
 11001	Savaþ Sorumlusu
 11002	Köy Gardiyaný
 11003	Savaþ Sorumlusu
 11004	Köy Gardiyaný
 11005	Savaþ Sorumlusu
-11100	Köy Gardiyaný
-11101	Savaþ Sorumlusu
-11102	Köy Gardiyaný
-11103	Savaþ Sorumlusu
-11104	Köy Gardiyaný
-11105	Savaþ Sorumlusu
-11106	Köy Gardiyaný
-11107	Savaþ Sorumlusu
-11108	Köy Gardiyaný
-11109	Savaþ Sorumlusu
-11110	Köy Gardiyaný
-11111	Savaþ Sorumlusu
-11112	Köy Gardiyaný
-11113	Savaþ Sorumlusu
-11114	Köy Gardiyaný
-11115	Savaþ Sorumlusu
-11116	Köy Gardiyaný
-11117	Savaþ Sorumlusu
 11505	Altýn Kurbaða
 11506	Fener
-11507	Fener
-11508	Fener
-11509	Fener
-11510	Fener
 12000	Kamp Ateþi
 13000	Tahta Kapý
 13001	Taþ Kapý
@@ -2431,12 +940,6 @@ VNUM	LOCALE_NAME
 14047	Ocak
 14048	Ocak
 14049	Ocak
-14050	Ocak
-14051	Ocak
-14052	Ocak
-14053	Ocak
-14054	Ocak
-14055	Ocak
 20001	Simyacý
 20002	Aranyo
 20003	Ah-Yu
@@ -2461,7 +964,7 @@ VNUM	LOCALE_NAME
 20022	Huahn-So
 20023	Soon
 20024	Harang
-20025	.
+20025	No name
 20026	Ji-Ryu
 20027	Gillian
 20028	Mirinenin Erkek Kardeþi
@@ -2474,12 +977,9 @@ VNUM	LOCALE_NAME
 20035	Bayrak
 20036	Bayrak
 20037	Bayrak
-20038	..
-20039	.
 20040	Emlakçý
 20041	Sarhoþ
 20042	Seyyar satýcý
-20043	.
 20044	Silah Ustasý, Stanley
 20045	Zýrhçý, Stanton
 20046	Kuyumcu, Starbuck
@@ -2562,24 +1062,6 @@ VNUM	LOCALE_NAME
 20124	Kraliyet Kaplaný
 20125	Kraliyet Kaplaný
 20126	Noel Baba
-20127	Yýl dönümü flamasý 1
-20128	Yýl dönümü flamasý 2
-20129	Yýl dönümü flamasý 3
-20130	Yýl dönümü flamasý 4
-20131	Yýl dönümü flamasý 5
-20132	Yýl dönümü flamasý 6
-20133	Yýl dönümü flamasý 7
-20134	Güneþ flamasý
-20135	Noel Flamasý
-20138	Ramazan flamasý
-20139	Lonca flamasý (eflatun)
-20140	Lonca flam. (mavi/yeþil)
-20141	Lonca flama (kýr./altýn)
-20142	Cadýlar Bayramý Flamasý
-20143	Paskalya afiþi
-20146	Öbür Dünya Portalý
-20147	Ölüm Elçisi
-20148	Hae-Tae Bekçisi
 20149	Güçlü savaþ atý
 20150	G. sav. atý (Lonca üye.)
 20151	G. sav. atý (Lonca lid.)
@@ -2663,23 +1145,6 @@ VNUM	LOCALE_NAME
 20279	Buz Mavisi Kitsune
 20280	Kýzýl Kar Kurdu
 20281	Mavi Kar Kurdu
-20282	Ay Iþýðý Deniz Atý
-20283	Güneþ Iþýðý Deniz Atý
-20284	Kara Gece Kabusu
-20285	Altýn Gece Kabusu
-20286	Kýþ Fýrtýnasý Ren Geyiði
-20287	Kýþ Gecesi Ren Geyiði
-20288	Kar Tanesi Yýldýzý
-20289	Aceleci tavþan (kýrmýzý)
-20290	Aceleci tavþan (siyah)
-20291	Lanetli süpürge
-20292	Büyülü süpürge
-20293	Asil lejyon atý
-20294	Karanlýk lejyon atý
-20295	Halia
-20296	Aquilos
-20298	Mavi Klasik Araba
-20299	Yeþil Klasik Araba
 20300	Bedensel Savaþ Öðretmeni
 20301	Zihinsel Savaþ Öðretmeni
 20302	Yakýn Dövüþ Öðretmeni
@@ -2752,202 +1217,11 @@ VNUM	LOCALE_NAME
 20393	Yaralý Asker
 20394	Ateþ Diyarý Bekçisi
 20395	Buz Daðý Muhafýzý
-20396	NoNAme
 20397	Buz Aslaný
 20398	Arktos Küpü
 20399	Kuzeyli Ejderha Sütunu
-20400	Bilge Myonghorang
-20401	Koloni Bekçisi
-20402	Portal Bekçisi
-20403	Amarok
-20404	Nagual
-20405	Waheela
 20406	Teovahdan
-20407	Fenrir
-20408	Tapýnak Bekçisi
-20409	Orman Bekçisi
-20410	Orman Casusu
-20411	Orman Kaþifi
-20412	Orman Bekçileri Lideri
-20413	Kawuco
-20414	Andastra
-20415	Portal
-20416	Sam Pumpkin
 20417	Okey Masasý
-20419	Ejderha Bekçisi Dolnarr
-20420	Altýn Ejderha Kutusu
-20421	Ejderha Bekçisi Jaharr
-20422	Ejderha Yumurtasý
-20423	Ruh Kristali Simyacýsý
-20424	Yakut Simyacýsý
-20425	Grena Simyacýsý
-20426	Zümrüt Simyacýsý
-20427	Safir Simyacýsý
-20428	Turmalin Simyacýsý
-20429	Savaþ Bölgesi Ustasý
-20430	Pasta
-20431	Yýl Dönümü Tüccarý
-20432	Hidra yumurtasý
-20433	Savaþçý heykeli
-20434	Gemi direði
-20435	Meley'in izi
-20436	Dümen
-20437	Onarým tahtasý
-20438	Keþiþ Milbon
-20439	Zi Portalý
-20440	Chou Portalý
-20441	Yin Portalý
-20442	Mao Portalý
-20443	Chen Portalý
-20444	Si Portalý
-20445	Wu Portalý
-20446	Wei Portalý
-20447	Shen Portalý
-20448	Yu Portalý
-20449	Xu Portalý
-20450	Hai Portalý
-20451	Zodyak Tüccarý
-20452	Zi Heykeli
-20453	Chou Heykeli
-20454	Yin Heykeli
-20455	Mao Heykeli
-20456	Chen Heykeli
-20457	Si Heykeli
-20458	Wu Heykeli
-20459	Wei Heykeli
-20460	Shen Heykeli
-20461	Yu Heykeli
-20462	Xu Heykeli
-20463	Hai Heykeli
-20464	Top
-20465	Zodyak Portalý
-20470	Yanýlsama heykeli
-20471	Uyanýþ heykeli
-20472	Zaman Çatlaðý heykeli
-20473	Cephanelik heykeli
-20474	Zýrh ustasý heykeli
-20475	Kutsal set demircisi
-20476	Görkemli set demircisi
-20477	Kahraman set demircisi
-20478	Soylu set demircisi
-20479	Heybetli set demircisi
-20480	Ticaret yöneticisi
-20481	Ticaret yöneticisi
-20482	Enigma ödülü
-20483	Enigma Tapýn. (Bonus C)
-20484	Enigma Tapýn. (Bonus B)
-20485	Enigma Tapýn. (Bonus A)
-20486	Lonca Savaþý Bölgesi (D)
-20487	Lonca Savaþý Bölgesi (B)
-20488	Lonca Savaþý Bölgesi (G)
-20489	Lonca Savaþý Bölgesi (K)
-20490	Lonca Tüccarý
-20491	Lanetli taþ levha
-20492	Balathor'un hazinesi
-20493	Hwacha
-20494	Devasa buz duvarý
-20495	Donmuþ ejderha yumurtasý
-20496	Donmuþ ejderha yumurtasý
-20497	Ateþli ejderha yumurtasý
-20498	Antik buz kristali
-20499	Hwacha (dönüþmüþ)
-20500	Ejderha Yumurtasý
-20501	Gaya Sandýðý
-20502	Yutnori Masasý
-20503	Gaya Tüccarý
-20504	Gaya Maðazasý
-20505	Yut Çubuklarý
-20506	Kralý yakala masasý
-20507	Ebedi buz kristali
-20510	ZÇ: Sura Ruhu
-20511	ZÇ: Am-heh Yutaðý
-20512	ZÇ: Taramor mezar taþý
-20513	ZÇ: Ýsfet Steli
-20514	ZÇ: Kader Kilidi
-20515	ZÇ: Ejder Kapýsý
-20516	ZÇ: Buz Arslaný
-20517	ZÇ: Arktos Küpü
-20518	ZÇ: Kuzey ejderi sütunu
-20519	ZÇ: Orman Bekçisi
-20520	ZÇ: Orman Casusu
-20521	ZÇ: Orman Ýzcisi
-20522	ZÇ: Orman B. Lideri
-20530	TS: Sura Ruhu
-20531	TS: Am-heh Yutaðý
-20532	TS: Taramor mezar taþý
-20533	TS: Ýsfet Steli
-20534	TS: Kader Kilidi
-20535	TS: Ejder Kapýsý
-20536	TS: Buz Arslaný
-20537	TS: Arktos Küpü
-20538	TS: Kuzey Ejderi Sütunu
-20539	TS: Orman Bekçisi
-20540	TS: Orman Casusu
-20541	TS: Orman Ýzcisi
-20542	TS: Orman B. Lideri
-20650	Madalya korucusu
-20660	Sis jediti simyageri
-20661	Güneþ jediti simyageri
-20662	Gece jediti simyageri
-20663	Duman jediti simyageri
-20702	Enerji Tapýnaðý
-20703	Þans Tapýnaðý
-20704	Güç Tapýnaðý
-20705	Hazine Tapýnaðý
-20706	Aydýnlanma Tapýnaðý
-20707	Æ÷Å»(°ÝÀüÁö) 385 385
-20710	Tedarik kutusu(BR)
-20711	Ekipman kutusu(BR)
-20712	Elektrik alaný
-20713	Ekipman kutusu(BR)
-20714	Özel tedarik kutusu(BR)
-20798	SungMa Portalý
-20799	Çiçekler
-20800	Yaralý
-20802	Yohara bekçisi
-20803	Yohara muhafýzý
-20804	Yýlan bekçisi
-20805	Kuzey Rüzgarý bekçisi
-20806	Ruh Sýrtý bekçisi
-20807	Yýlan heykeli
-20808	General Kohan
-20809	Konfüçyus
-20810	Chaegirab
-20811	Kim Rim
-20812	Amiral Angmur
-20813	Kuzey Rüzgarý keþiþi
-20814	Kayýýp gözcü
-20815	Hayalet bekçi
-20822	Dolandýrýcý
-20823	Chi Usta
-20826	Huahn-So
-20828	Deri Ustasý
-20829	Yýlan Tapýnaðý demircisi
-20830	Ulak Komutan
-20831	Yohara komutaný
-20832	Amiral Angmur
-20833	Bozulmuþ Çiçekler
-20834	Sunak
-20835	Yazýcý
-20836	Baltalý Mýzrak
-20837	Çýkýþ
-20838	Bölüm 2
-20839	Bölüm 3
-20840	Dongan obasý
-20841	Kelle avcýsý
-20842	Tutsak demirci
-20844	Yýlan heykeli
-20845	Kelle avcýsý. (Zula)
-20846	Kelle avcýsý. (Ruh S.)
-20847	Kelle avcýsý. (Zula)
-20848	Eski kemikler
-20849	Taehvarang
-20850	Gizemli sunak
-20851	Kelle avcýsý. (Se. Ço.)
-20852	Kelle avcýsý. (Namg. Y.)
-20856	Hazine Goblini
-20857	Devasa define sandýðý
-20858	Gizemli Yanký
 30000	Takas Masasý
 30001	Renkli Bayrak
 30002	Binbir Gece
@@ -2988,21 +1262,11 @@ VNUM	LOCALE_NAME
 30128	Sura-Ýskeleti 5
 30129	Paskalya Tavþaný
 30130	Mezar Taþý
-30131	Bay B.
-30132	Bay B.
 30301	Ruh Kristali Damarý
 30302	Yakut Damarý
 30303	Grena Damarý
 30304	Zümrüt Damarý
 30305	Safir Damarý
-30306	Turmalin Maden Damarý
-30307	Summer
-30308	Posta kutusu
-30309	Sis Jeditlisi (Görev)
-30310	Güneþ Jeditlisi
-30311	Gece Jeditlisi
-30312	Duman Jeditlisi
-30313	Sis Jeditlisi
 33001	Sura-Ýskeleti
 33002	Tarihçi
 33003	Niyetli Vatandaþ
@@ -3163,129 +1427,9 @@ VNUM	LOCALE_NAME
 34153	Lapa
 34154	Yapaðý
 34155	Küçük Lapa
-34156	Buz Gibi Ürkütücü Tabut
-34157	Kan Kýrm. Ürkütücü Tabut
-34158	Küçük Ürkütücü Tabut
-34159	Çörek Dasher
-34160	Çörek Rudolf
-34161	Küçük Çörek Dasher
-34162	Sevimli aþk ejderhasý
-34163	Oyunbaz aþk ejderhasý
-34164	Küçük aþk ejderhasý
-34165	Bebek Kumandan
-34166	Bebek Kumandan (kahramn)
-34167	Minik Ateþ Kumandan
-34168	Minik Buz Kumandan
-34169	Minik Þimþek Kumandan
-34170	Minik Rüzgar Kumandan
-34171	Minik Toprak Kumandan
-34172	Minik Karanlýk Kumandan
-34173	Minik Kumandan
-34174	Beyaz Angora Kedisi
-34175	Kahverengi Angora Kedisi
-34176	Angora Kediciði
-34177	Þampiyon Topu
-34178	Kar Tanesi Bambi
-34180	Whistle
-34181	Wrench
-34182	Mini Whistle
-34183	Sadýk katil buz balinasý
-34184	Küçük buz balinasý
-34185	Cesur Tiki korkuluðu
-34186	Þýmarýk Tiki korkuluðu
-34187	Küçük Tiki korkuluðu
-34188	Kar Krampus
-34189	Kömür Krampus
-34190	Küçük Krampus
-34191	Siyah boða
-34192	Kahverengi boða
-34193	Uysal boða
-34194	Çimdik
-34195	Kýskaç
-34197	Lilith
-34198	Helena
-34199	Mini Lilith
-34200	Altýn Long
-34201	Gümüþ Long
-34202	Küçük Long
-34203	Küçük Balathor
-34204	Balathor Junior
-34207	Ay Bekçisi Baykuþu
-34208	Güneþ Bekçisi Baykuþu
-34209	Küçük Bekçi Baykuþ
-36000	Kara Cehennem Atý
-36001	Zalim Cehennem Atý
-36005	Balathor'un buz kýlýcý
-36006	Balathor'un gece kýlýcý
+34162	Sevimli Ejder Yavrusu
+34163	Oyunbaz Ejder Yavrusu
+34164	Küçük Ejder Yavrusu
 40003	Turbo sörf tahtasý
 40004	Wukong'un Fýrtýnasý
 40005	Wukong'un Gürlemesi
-60000	Lonca yöneticisi
-60001	Lonca yöneticisi
-60002	Lonca yöneticisi
-60003	Teovahdan
-8068	Ateþ-Yýlan Metini
-8069	Buz-Yýlan Metini
-8070	Rüzgar-Yýlan Metini
-8071	Toprak-Yýlan Metini
-8072	Deniz Ejderhasý Yumurtasý (Kolay)
-8073	Deniz Ejderhasý Yumurtasý (Zor)
-8075	Zaman-Yýlan Metini
-899	Kaplan Tüccarý
-30307	Yaz
-32002	Manny
-32003	Manu
-9440	Kule Nekromantý (Karanlýk)
-9441	Kule Celladý (Karanlýk)
-9442	Kule Büyük Ustasý (Karanlýk)
-9443	Kule Savaþçýsý (Karanlýk)
-9444	Kule Büyücüsü (Karanlýk)
-9445	Kule Kurdu (Karanlýk)
-9446	Kule Dövüþçüsü (Karanlýk)
-9450	Kule Nekromantý (Ateþ)
-9451	Kule Celladý (Ateþ)
-9452	Kule Büyük Ustasý (Ateþ)
-9453	Kule Savaþçýsý (Ateþ)
-9454	Kule Büyücüsü (Ateþ)
-9455	Kule Kurdu (Ateþ)
-9456	Kule Dövüþçüsü (Ateþ)
-9460	Kule Nekromantý (Buz)
-9461	Kule Celladý (Buz)
-9462	Kule Büyük Ustasý (Buz)
-9463	Kule Savaþçýsý (Buz)
-9464	Kule Büyücüsü (Buz)
-9465	Kule Kurdu (Buz)
-9466	Kule Dövüþçüsü (Buz)
-9470	Kule Nekromantý (Yýldýrým)
-9471	Kule Celladý (Yýldýrým)
-9472	Kule Büyük Ustasý (Yýldýrým)
-9473	Kule Savaþçýsý (Yýldýrým)
-9474	Kule Büyücüsü (Yýldýrým)
-9475	Kule Kurdu (Yýldýrým)
-9476	Kule Dövüþçüsü (Yýldýrým)
-9480	Kule Nekromantý (Rüzgar)
-9481	Kule Celladý (Rüzgar)
-9482	Kule Büyük Ustasý (Rüzgar)
-9483	Kule Savaþçýsý (Rüzgar)
-9484	Kule Büyücüsü (Rüzgar)
-9485	Kule Kurdu (Rüzgar)
-9486	Kule Dövüþçüsü (Rüzgar)
-9490	Kule Nekromantý (Toprak)
-9491	Kule Celladý (Toprak)
-9492	Kule Büyük Ustasý (Toprak)
-9493	Kule Savaþçýsý (Toprak)
-9494	Kule Büyücüsü (Toprak)
-9495	Kule Kurdu (Toprak)
-9496	Kule Dövüþçüsü (Toprak)
-9500	Tüccar
-9501	Sung Mahi'nin C.Kulesi
-9503	Cehennem Kulesi Ýblis Taþý
-9504	Putlaþmýþ Kule Ruhu
-9505	Kule Okçusu
-9506	Küçük Kýzýl Huashin
-9507	Küçük Beyaz Huashin
-900	Kostümler
-6601	Kýzýl Ejderha
-6602	RX: Mavi Ejderha
-8459	Büyü Kristali
-4095	Büyülü Yoldaþ

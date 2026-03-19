@@ -102,9 +102,6 @@ public:
    }
    complex_adaptor& operator = (const char* s)
    {
-      typedef typename mpl::front<unsigned_types>::type ui_type;
-      ui_type zero = 0u;
-
       using default_ops::eval_fpclassify;
 
       if (s && (*s == '('))
@@ -113,25 +110,19 @@ public:
          const char* p = ++s;
          while (*p && (*p != ',') && (*p != ')'))
             ++p;
-         part.assign(s, p);
-         if(part.size())
-            real_data() = part.c_str();
-         else
-            real_data() = zero;
+         part.assign(s + 1, p);
+         real_data() = part.c_str();
          s = p;
-         if (*p && (*p != ')'))
+         if (*p && (*p != '}'))
          {
             ++p;
-            while (*p && (*p != ')'))
+            while (*p && (*p != ',') && (*p != ')'))
                ++p;
             part.assign(s + 1, p);
          }
          else
             part.erase();
-         if(part.size())
-            imag_data() = part.c_str();
-         else
-            imag_data() = zero;
+         imag_data() = part.c_str();
 
          if (eval_fpclassify(imag_data()) == (int)FP_NAN)
          {
@@ -140,6 +131,8 @@ public:
       }
       else
       {
+         typedef typename mpl::front<unsigned_types>::type ui_type;
+         ui_type zero = 0u;
          real_data() = s;
          imag_data() = zero;
       }

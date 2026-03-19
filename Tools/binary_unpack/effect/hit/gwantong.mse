@@ -124,7 +124,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\pc\shaman\effect\w_ring.dds"
+            "blow_1\w_ring.dds"
         }
     }
 }
@@ -641,7 +641,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\pc\assassin\effect\half_ring_rainbow_line.dds"
+            "blow_1\half_ring_rainbow_line.dds"
         }
     }
 }
@@ -769,7 +769,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\pc\shaman\effect\line_ring_copy.dds"
+            "blow_1\line_ring_copy.dds"
         }
     }
 }

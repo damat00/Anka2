@@ -170,11 +170,7 @@ public:                                                                 \
     static assertion_result                                             \
     eval( Lhs const& lhs, Rhs const& rhs )                              \
     {                                                                   \
-        if( fpc_tolerance<FPT>() == FPT(0)                              \
-            || (std::numeric_limits<Lhs>::has_infinity                  \
-                && (lhs == std::numeric_limits<Lhs>::infinity()))       \
-            || (std::numeric_limits<Rhs>::has_infinity                  \
-                && (rhs == std::numeric_limits<Rhs>::infinity())))      \
+        if( fpc_tolerance<FPT>() == FPT(0) )                            \
         {                                                               \
             return eval_direct( lhs, rhs );                             \
         }                                                               \

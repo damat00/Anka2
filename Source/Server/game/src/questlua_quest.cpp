@@ -28,8 +28,8 @@ namespace quest
 	{
 		CQuestManager& q = CQuestManager::instance();
 
-		if (lua_isstring(L, -1))
-			q.GetCurrentPC()->SetCurrentQuestTitle(lua_tostring(L, -1));
+		if (lua_isstring(L,-1))
+			q.GetCurrentPC()->SetCurrentQuestTitle(lua_tostring(L,-1));
 
 		return 0;
 	}
@@ -38,8 +38,8 @@ namespace quest
 	{
 		CQuestManager& q = CQuestManager::instance();
 
-		if (lua_isstring(L, 1) && lua_isstring(L, 2))
-			q.GetCurrentPC()->SetQuestTitle(lua_tostring(L, 1), lua_tostring(L, 2));
+		if (lua_isstring(L,1) && lua_isstring(L,2))
+			q.GetCurrentPC()->SetQuestTitle(lua_tostring(L,1),lua_tostring(L,2));
 
 		return 0;
 	}
@@ -48,8 +48,8 @@ namespace quest
 	{
 		CQuestManager& q = CQuestManager::instance();
 
-		if (lua_isstring(L, -1))
-			q.GetCurrentPC()->SetCurrentQuestClockName(lua_tostring(L, -1));
+		if (lua_isstring(L,-1))
+			q.GetCurrentPC()->SetCurrentQuestClockName(lua_tostring(L,-1));
 
 		return 0;
 	}
@@ -58,8 +58,8 @@ namespace quest
 	{
 		CQuestManager& q = CQuestManager::instance();
 
-		if (lua_isnumber(L, -1))
-			q.GetCurrentPC()->SetCurrentQuestClockValue((int)rint(lua_tonumber(L, -1)));
+		if (lua_isnumber(L,-1))
+			q.GetCurrentPC()->SetCurrentQuestClockValue((int)rint(lua_tonumber(L,-1)));
 
 		return 0;
 	}
@@ -68,8 +68,8 @@ namespace quest
 	{
 		CQuestManager& q = CQuestManager::instance();
 
-		if (lua_isstring(L, -1))
-			q.GetCurrentPC()->SetCurrentQuestCounterName(lua_tostring(L, -1));
+		if (lua_isstring(L,-1))
+			q.GetCurrentPC()->SetCurrentQuestCounterName(lua_tostring(L,-1));
 
 		return 0;
 	}
@@ -78,8 +78,8 @@ namespace quest
 	{
 		CQuestManager& q = CQuestManager::instance();
 
-		if (lua_isnumber(L, -1))
-			q.GetCurrentPC()->SetCurrentQuestCounterValue((int)rint(lua_tonumber(L, -1)));
+		if (lua_isnumber(L,-1))
+			q.GetCurrentPC()->SetCurrentQuestCounterValue((int)rint(lua_tonumber(L,-1)));
 
 		return 0;
 	}
@@ -88,44 +88,44 @@ namespace quest
 	{
 		CQuestManager& q = CQuestManager::instance();
 
-		if (lua_isstring(L, -1))
-			q.GetCurrentPC()->SetCurrentQuestIconFile(lua_tostring(L, -1));
+		if (lua_isstring(L,-1))
+			q.GetCurrentPC()->SetCurrentQuestIconFile(lua_tostring(L,-1));
 
 		return 0;
 	}
 
 	int quest_setstate(lua_State* L)
 	{
-		if (lua_tostring(L, -1) == NULL)
+		if (lua_tostring(L, -1)==NULL)
 		{
 			sys_err("state name is empty");
 			return 0;
 		}
 
 		CQuestManager& q = CQuestManager::instance();
-		QuestState* pqs = q.GetCurrentState();
+		QuestState * pqs = q.GetCurrentState();
 		PC* pPC = q.GetCurrentPC();
 
-		if (L != pqs->co)
+		if (L!=pqs->co) 
 		{
 			luaL_error(L, "running thread != current thread???");
-			if (test_server)
-				sys_log(0, "running thread != current thread???");
+			if ( test_server )
+				sys_log(0 ,"running thread != current thread???");
 			return 0;
 		}
 
 		if (pPC)
 		{
-			std::string stCurrentState = lua_tostring(L, -1);
-			if (test_server)
-				sys_log(0, "questlua->setstate( %s, %s )", pPC->GetCurrentQuestName().c_str(), stCurrentState.c_str());
+			std::string stCurrentState = lua_tostring(L,-1);
+			if ( test_server )
+				sys_log ( 0 ,"questlua->setstate( %s, %s )", pPC->GetCurrentQuestName().c_str(), stCurrentState.c_str() );
 			pqs->st = q.GetQuestStateIndex(pPC->GetCurrentQuestName(), stCurrentState);
-			pPC->SetCurrentQuestStateName(stCurrentState);
+			pPC->SetCurrentQuestStateName(stCurrentState );
 		}
 		return 0;
 	}
 
-	int quest_coroutine_yield(lua_State* L)
+	int quest_coroutine_yield(lua_State * L)
 	{
 		CQuestManager& q = CQuestManager::instance();
 
@@ -135,17 +135,22 @@ namespace quest
 			PC* pPC = q.GetOtherPCBlockRootPC();
 			if (NULL == pPC)
 			{
-				sys_err("... FFFAAATTTAAALLL Error. RootPC is NULL");
+				sys_err("	... FFFAAATTTAAALLL Error. RootPC is NULL");
 				return 0;
 			}
 			QuestState* pQS = pPC->GetRunningQuestState();
+
+			std::string stQuestName = pPC->GetCurrentQuestName();
+			if (pQS->quest_name.length() != 0)
+				stQuestName = pQS->quest_name;
+
 			if (NULL == pQS || NULL == q.GetQuestStateName(pPC->GetCurrentQuestName(), pQS->st))
 			{
-				sys_err("... WHO AM I? WHERE AM I? I only know QuestName(%s)...", pPC->GetCurrentQuestName().c_str());
+				sys_err("	... WHO AM I? WHERE AM I? I only know QuestName(%s)...", pPC->GetCurrentQuestName().c_str());
 			}
 			else
 			{
-				sys_err("Current Quest(%s). State(%s)", pPC->GetCurrentQuestName().c_str(), q.GetQuestStateName(pPC->GetCurrentQuestName(), pQS->st));
+				sys_err("	Current Quest(%s). State(%s)", pPC->GetCurrentQuestName().c_str(), q.GetQuestStateName(pPC->GetCurrentQuestName(), pQS->st));
 			}
 			return 0;
 		}
@@ -186,7 +191,7 @@ namespace quest
 
 	void RegisterQuestFunctionTable()
 	{
-		luaL_reg quest_functions[] =
+		luaL_reg quest_functions[] = 
 		{
 			{ "setstate",				quest_setstate				},
 			{ "set_state",				quest_setstate				},
@@ -210,3 +215,7 @@ namespace quest
 		CQuestManager::instance().AddLuaFunctionTable("q", quest_functions);
 	}
 }
+
+
+
+

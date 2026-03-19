@@ -57,7 +57,7 @@ class CItemManager : public CSingleton<CItemManager>
 
 		BOOL GetItemDataPointer(DWORD dwItemID, CItemData ** ppItemData);
 
-#if defined(ENABLE_WIKI_SYSTEM) || defined(INSIDE_RENDER) || defined(ENABLE_RENEWAL_OFFLINESHOP)
+#ifdef ENABLE_RENEWAL_OFFLINESHOP
 		TItemMap GetItems() const { return m_ItemMap; }
 #endif
 

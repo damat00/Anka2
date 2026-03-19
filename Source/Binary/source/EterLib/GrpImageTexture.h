@@ -19,11 +19,7 @@ class CGraphicImageTexture : public CGraphicTexture
 		bool		CreateFromMemoryFile(UINT bufSize, const void* c_pvBuf, D3DFORMAT d3dFmt, DWORD dwFilter = D3DX_FILTER_LINEAR);
 		bool		CreateDDSTexture(CDXTCImage & image, const BYTE * c_pbBuf);
 
-#ifndef ENABLE_DIRECTX9_UPDATE
-        bool CreateDDSTexture(CDXTCImage& image, const BYTE* c_pbBuf);
-#endif
-
-		void		SetFileName(const char * c_szFileName);
+		void		SetFileName(const char *c_szFileName);
 
 		bool		Lock(int* pRetPitch, void** ppRetPixels, int level=0);
 		void		Unlock(int level=0);

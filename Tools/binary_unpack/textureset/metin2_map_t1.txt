@@ -13,8 +13,8 @@ Start Texture001
 End Texture001
 Start Texture002
     "d:\ymir work\terrainmaps\b\field\field 02.dds"
-    3.000000
-    3.000000
+    6.000000
+    6.000000
     0.000000
     0.000000
     0
@@ -22,9 +22,9 @@ Start Texture002
     0
 End Texture002
 Start Texture003
-    "d:\ymir work\terrainmaps\wom\t1_field.dds"
-    4.000000
-    4.000000
+    "d:\ymir work\terrainmaps\b\field\field 03.dds"
+    5.000000
+    5.000000
     0.000000
     0.000000
     0
@@ -33,8 +33,8 @@ Start Texture003
 End Texture003
 Start Texture004
     "d:\ymir work\terrainmaps\b\field\field 04.dds"
-    3.000000
-    3.000000
+    6.000000
+    6.000000
     0.000000
     0.000000
     0
@@ -42,9 +42,9 @@ Start Texture004
     0
 End Texture004
 Start Texture005
-    "d:\ymir work\terrainmaps\wom\t1_grass.dds"
-    2.000000
-    2.000000
+    "d:\ymir work\terrainmaps\b\grass\grass 01.dds"
+    9.000000
+    9.000000
     0.000000
     0.000000
     0
@@ -52,9 +52,9 @@ Start Texture005
     0
 End Texture005
 Start Texture006
-    "d:\ymir work\terrainmaps\wom\b_grass_02.dds"
-    3.000000
-    3.000000
+    "d:\ymir work\terrainmaps\b\grass\grass 02.dds"
+    8.000000
+    8.000000
     0.000000
     0.000000
     0
@@ -62,9 +62,9 @@ Start Texture006
     0
 End Texture006
 Start Texture007
-    "d:\ymir work\terrainmaps\wom\t1_field2.dds"
-    3.000000
-    3.000000
+    "d:\ymir work\terrainmaps\b\grass\grass 03.dds"
+    9.000000
+    9.000000
     0.000000
     0.000000
     0

@@ -1,6 +1,5 @@
 ScriptType               MotionData
 
-MotionFileName           "D:/Ymir Work/npc/lion/combo_attack1.GR2"
-MotionDuration           2.000000
-Accumulation             0.00	0.00	0.00
+MotionFileName           "D:\ymir work\npc\lion\combo_attack1.GR2"
+MotionDuration           1.000000
 

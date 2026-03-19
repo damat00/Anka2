@@ -57,7 +57,7 @@ PyObject *imeSetText(PyObject *poSelf, PyObject *poArgs)
 }
 
 PyObject *imeGetText(PyObject *poSelf, PyObject *poArgs)
-{
+{	
 	int bCodePage;
 	if (!PyTuple_GetInteger(poArgs, 0, &bCodePage))
 		bCodePage = 0;
@@ -94,7 +94,7 @@ PyObject *imeGetCandidateSelection(PyObject *poSelf, PyObject *poArgs)
 }
 
 PyObject *imeGetReading(PyObject *poSelf, PyObject *poArgs)
-{
+{	
 	std::string strText;
 	CPythonIME::Instance().GetReading(strText);
 	return Py_BuildValue("s", strText.c_str());
@@ -269,7 +269,7 @@ void initime()
 		{ "SetStringMode",			imeSetStringMode,			METH_VARARGS },
 		{ "AddExceptKey",			imeAddExceptKey,			METH_VARARGS },
 		{ "ClearExceptKey",			imeClearExceptKey,			METH_VARARGS },
-
+		
 		{ "MoveLeft",				imeMoveLeft,				METH_VARARGS },
 		{ "MoveRight",				imeMoveRight,				METH_VARARGS },
 		{ "MoveHome",				imeMoveHome,				METH_VARARGS },

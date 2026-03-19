@@ -32,12 +32,12 @@ struct wrap_rand
 {
     typedef unsigned int result_type;
 
-    static BOOST_CONSTEXPR result_type (min)()
+    static result_type (min)()
     {
         return 0;
     }
 
-    static BOOST_CONSTEXPR result_type (max)()
+    static result_type (max)()
     {
         return RAND_MAX;
     }
@@ -64,12 +64,12 @@ struct wrap_generator
 
     wrap_generator(Generator& gen) : g(gen) {}
 
-    static BOOST_CONSTEXPR result_type (min)()
+    static result_type (min)()
     {
         return 0;
     }
 
-    static BOOST_CONSTEXPR result_type (max)()
+    static result_type (max)()
     {
         return max_arg - 1;
     }

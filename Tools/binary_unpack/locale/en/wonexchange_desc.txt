@@ -1,2 +1,0 @@
-[DELAY value;0]
-Heyy do you know about the new currency? Yes, as you know, this is called Won. 1 Won is worth 100,000,000 yang. Just choose the currency you want.[ENTER]

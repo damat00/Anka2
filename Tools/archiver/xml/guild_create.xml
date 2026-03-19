@@ -33,9 +33,6 @@
 		<File ArchivedPath="d:/ymir work/guild/object/c1-038-wall-door.msm"><![CDATA[../binary_unpack/guild/object/c1-038-wall-door.msm]]></File>
 		<File ArchivedPath="d:/ymir work/guild/object/c1-038-wall-lin.msm"><![CDATA[../binary_unpack/guild/object/c1-038-wall-lin.msm]]></File>
 		<File ArchivedPath="d:/ymir work/guild/object/c1-038-wall-lin2.msm"><![CDATA[../binary_unpack/guild/object/c1-038-wall-lin2.msm]]></File>
-		<File ArchivedPath="d:/ymir work/guild/object/flag_a.msm"><![CDATA[../binary_unpack/guild/object/flag_a.msm]]></File>
-		<File ArchivedPath="d:/ymir work/guild/object/flag_b.msm"><![CDATA[../binary_unpack/guild/object/flag_b.msm]]></File>
-		<File ArchivedPath="d:/ymir work/guild/object/flag_c.msm"><![CDATA[../binary_unpack/guild/object/flag_c.msm]]></File>
 		<File ArchivedPath="d:/ymir work/guild/object/general_obj_stone01.msm"><![CDATA[../binary_unpack/guild/object/general_obj_stone01.msm]]></File>
 		<File ArchivedPath="d:/ymir work/guild/object/general_obj_stone02.msm"><![CDATA[../binary_unpack/guild/object/general_obj_stone02.msm]]></File>
 		<File ArchivedPath="d:/ymir work/guild/object/general_obj_stone03.msm"><![CDATA[../binary_unpack/guild/object/general_obj_stone03.msm]]></File>
@@ -129,9 +126,6 @@
 		<File ArchivedPath="d:/ymir work/guild/fence/fence01_right01.msm"><![CDATA[../binary_unpack/guild/fence/fence01_right01.msm]]></File>
 		<File ArchivedPath="d:/ymir work/guild/fence/fence02.dds"><![CDATA[../binary_unpack/guild/fence/fence02.dds]]></File>
 		<File ArchivedPath="d:/ymir work/guild/facility/gongjakso.msm"><![CDATA[../binary_unpack/guild/facility/gongjakso.msm]]></File>
-		<File ArchivedPath="d:/ymir work/guild/facility/guildbank_01.msm"><![CDATA[../binary_unpack/guild/facility/guildbank_01.msm]]></File>
-		<File ArchivedPath="d:/ymir work/guild/facility/guildbank_02.msm"><![CDATA[../binary_unpack/guild/facility/guildbank_02.msm]]></File>
-		<File ArchivedPath="d:/ymir work/guild/facility/guildbank_03.msm"><![CDATA[../binary_unpack/guild/facility/guildbank_03.msm]]></File>
 		<File ArchivedPath="d:/ymir work/guild/facility/himuijedan_01.msm"><![CDATA[../binary_unpack/guild/facility/himuijedan_01.msm]]></File>
 		<File ArchivedPath="d:/ymir work/guild/facility/himuijedan_02.msm"><![CDATA[../binary_unpack/guild/facility/himuijedan_02.msm]]></File>
 		<File ArchivedPath="d:/ymir work/guild/facility/himuijedan_03.msm"><![CDATA[../binary_unpack/guild/facility/himuijedan_03.msm]]></File>
@@ -160,13 +154,6 @@
 		<File ArchivedPath="d:/ymir work/guild/facility/himuijedan/himuijedan_03.mdatr"><![CDATA[../binary_unpack/guild/facility/himuijedan/himuijedan_03.mdatr]]></File>
 		<File ArchivedPath="d:/ymir work/guild/facility/himuijedan/temple_of_power.dds"><![CDATA[../binary_unpack/guild/facility/himuijedan/temple_of_power.dds]]></File>
 		<File ArchivedPath="d:/ymir work/guild/facility/himuijedan/temple_of_power2.dds"><![CDATA[../binary_unpack/guild/facility/himuijedan/temple_of_power2.dds]]></File>
-		<File ArchivedPath="d:/ymir work/guild/facility/guildbank/a1-031_1.dds"><![CDATA[../binary_unpack/guild/facility/guildbank/a1-031_1.dds]]></File>
-		<File ArchivedPath="d:/ymir work/guild/facility/guildbank/guildbank_01.gr2"><![CDATA[../binary_unpack/guild/facility/guildbank/guildbank_01.gr2]]></File>
-		<File ArchivedPath="d:/ymir work/guild/facility/guildbank/guildbank_01.mdatr"><![CDATA[../binary_unpack/guild/facility/guildbank/guildbank_01.mdatr]]></File>
-		<File ArchivedPath="d:/ymir work/guild/facility/guildbank/guildbank_02.gr2"><![CDATA[../binary_unpack/guild/facility/guildbank/guildbank_02.gr2]]></File>
-		<File ArchivedPath="d:/ymir work/guild/facility/guildbank/guildbank_02.mdatr"><![CDATA[../binary_unpack/guild/facility/guildbank/guildbank_02.mdatr]]></File>
-		<File ArchivedPath="d:/ymir work/guild/facility/guildbank/guildbank_03.gr2"><![CDATA[../binary_unpack/guild/facility/guildbank/guildbank_03.gr2]]></File>
-		<File ArchivedPath="d:/ymir work/guild/facility/guildbank/guildbank_03.mdatr"><![CDATA[../binary_unpack/guild/facility/guildbank/guildbank_03.mdatr]]></File>
 		<File ArchivedPath="d:/ymir work/guild/facility/gongjakso/gongjakso.gr2"><![CDATA[../binary_unpack/guild/facility/gongjakso/gongjakso.gr2]]></File>
 		<File ArchivedPath="d:/ymir work/guild/facility/gongjakso/gongjakso.mdatr"><![CDATA[../binary_unpack/guild/facility/gongjakso/gongjakso.mdatr]]></File>
 		<File ArchivedPath="d:/ymir work/guild/facility/gongjakso/gongjakso01.dds"><![CDATA[../binary_unpack/guild/facility/gongjakso/gongjakso01.dds]]></File>

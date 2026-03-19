@@ -1,27 +1,39 @@
-//
-// Copyright 2012 Christian Henning
-//
-// Distributed under the Boost Software License, Version 1.0
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
-//
+/*
+    Copyright 2012 Christian Henning
+    Use, modification and distribution are subject to the Boost Software License,
+    Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+    http://www.boost.org/LICENSE_1_0.txt).
+*/
+
+/*************************************************************************************************/
+
 #ifndef BOOST_GIL_EXTENSION_IO_PNM_DETAIL_WRITE_HPP
 #define BOOST_GIL_EXTENSION_IO_PNM_DETAIL_WRITE_HPP
 
-#include <boost/gil/extension/io/pnm/tags.hpp>
-#include <boost/gil/extension/io/pnm/detail/writer_backend.hpp>
-
-#include <boost/gil/io/base.hpp>
-#include <boost/gil/io/device.hpp>
+////////////////////////////////////////////////////////////////////////////////////////
+/// \file
+/// \brief
+/// \author Christian Henning \n
+///
+/// \date 2012 \n
+///
+////////////////////////////////////////////////////////////////////////////////////////
 
 #include <cstdlib>
 #include <string>
 
-namespace boost { namespace gil {
+#include <boost/gil/extension/io/pnm/tags.hpp>
 
-#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400)
-#pragma warning(push)
-#pragma warning(disable:4512) //assignment operator could not be generated
+#include <boost/gil/io/base.hpp>
+#include <boost/gil/io/device.hpp>
+
+#include <boost/gil/extension/io/pnm/detail/writer_backend.hpp>
+
+namespace boost { namespace gil { 
+
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(push) 
+#pragma warning(disable:4512) //assignment operator could not be generated 
 #endif
 
 namespace detail {
@@ -29,7 +41,7 @@ namespace detail {
 struct pnm_write_is_supported
 {
     template< typename View >
-    struct apply
+    struct apply 
         : public is_write_supported< typename get_pixel_type< View >::type
                                    , pnm_tag
                                    >
@@ -246,9 +258,9 @@ public:
     }
 };
 
-#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400)
-#pragma warning(pop)
-#endif
+#if BOOST_WORKAROUND(BOOST_MSVC, >= 1400) 
+#pragma warning(pop) 
+#endif 
 
 } // gil
 } // boost

@@ -12,8 +12,8 @@
 
 #include <boost/beast/core/detail/config.hpp>
 #include <boost/beast/core/detail/allocator.hpp>
+#include <boost/beast/core/detail/empty_base_optimization.hpp>
 #include <boost/asio/buffer.hpp>
-#include <boost/core/empty_value.hpp>
 #include <boost/intrusive/list.hpp>
 #include <iterator>
 #include <limits>
@@ -37,7 +37,7 @@ namespace beast {
 template<class Allocator>
 class basic_multi_buffer
 #if ! BOOST_BEAST_DOXYGEN
-    : private boost::empty_value<
+    : private detail::empty_base_optimization<
         typename detail::allocator_traits<Allocator>::
             template rebind_alloc<char>>
 #endif
@@ -217,7 +217,7 @@ public:
     allocator_type
     get_allocator() const
     {
-        return this->get();
+        return this->member();
     }
 
     /// Returns the size of the input sequence.

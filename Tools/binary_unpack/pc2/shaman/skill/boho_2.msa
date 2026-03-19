@@ -20,15 +20,11 @@ Group MotionEventData
     }
     Group Event01
     {
-        MotionEventType      1
+        MotionEventType      10
         StartingTime         1.313869
-        
-        IndependentFlag      0
-        AttachingEnable      0
-        AttachingBoneName    "equip_left"
-        FollowingEnable      0        
         
         EffectFileName       "d:/ymir work/pc/shaman/effect/boho.mse"
         EffectPosition       0.000000 0.000000 0.000000
+        FollowingEnable      1
     }
 }

@@ -53,6 +53,12 @@
 namespace boost { namespace geometry
 {
 
+namespace srs { namespace par4
+{
+    struct eqdc {}; // Equidistant Conic
+
+}} //namespace srs::par4
+
 namespace projections
 {
     #ifndef DOXYGEN_NO_DETAIL
@@ -86,7 +92,7 @@ namespace projections
 
                 // FORWARD(e_forward)  sphere & ellipsoid
                 // Project coordinates from geographic (lon, lat) to cartesian (x, y)
-                inline void fwd(T lp_lon, T const& lp_lat, T& xy_x, T& xy_y) const
+                inline void fwd(T& lp_lon, T& lp_lat, T& xy_x, T& xy_y) const
                 {
                     T rho = 0.0;
 
@@ -98,7 +104,7 @@ namespace projections
 
                 // INVERSE(e_inverse)  sphere & ellipsoid
                 // Project coordinates from cartesian (x, y) to geographic (lon, lat)
-                inline void inv(T xy_x, T xy_y, T& lp_lon, T& lp_lat) const
+                inline void inv(T& xy_x, T& xy_y, T& lp_lon, T& lp_lat) const
                 {
                     static T const half_pi = detail::half_pi<T>();
 
@@ -128,14 +134,14 @@ namespace projections
             };
 
             // Equidistant Conic
-            template <typename Params, typename Parameters, typename T>
-            inline void setup_eqdc(Params const& params, Parameters& par, par_eqdc<T>& proj_parm)
+            template <typename Parameters, typename T>
+            inline void setup_eqdc(Parameters& par, par_eqdc<T>& proj_parm)
             {
                 T cosphi, sinphi;
                 int secant;
 
-                proj_parm.phi1 = pj_get_param_r<T, srs::spar::lat_1>(params, "lat_1", srs::dpar::lat_1);
-                proj_parm.phi2 = pj_get_param_r<T, srs::spar::lat_2>(params, "lat_2", srs::dpar::lat_2);
+                proj_parm.phi1 = pj_get_param_r(par.params, "lat_1");
+                proj_parm.phi2 = pj_get_param_r(par.params, "lat_2");
 
                 if (fabs(proj_parm.phi1 + proj_parm.phi2) < epsilon10)
                     BOOST_THROW_EXCEPTION( projection_exception(error_conic_lat_equal) );
@@ -189,11 +195,9 @@ namespace projections
     template <typename T, typename Parameters>
     struct eqdc_ellipsoid : public detail::eqdc::base_eqdc_ellipsoid<T, Parameters>
     {
-        template <typename Params>
-        inline eqdc_ellipsoid(Params const& params, Parameters const& par)
-            : detail::eqdc::base_eqdc_ellipsoid<T, Parameters>(par)
+        inline eqdc_ellipsoid(const Parameters& par) : detail::eqdc::base_eqdc_ellipsoid<T, Parameters>(par)
         {
-            detail::eqdc::setup_eqdc(params, this->m_par, this->m_proj_parm);
+            detail::eqdc::setup_eqdc(this->m_par, this->m_proj_parm);
         }
     };
 
@@ -202,14 +206,23 @@ namespace projections
     {
 
         // Static projection
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_STATIC_PROJECTION(srs::spar::proj_eqdc, eqdc_ellipsoid, eqdc_ellipsoid)
+        BOOST_GEOMETRY_PROJECTIONS_DETAIL_STATIC_PROJECTION(srs::par4::eqdc, eqdc_ellipsoid, eqdc_ellipsoid)
 
         // Factory entry(s)
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_ENTRY_FI(eqdc_entry, eqdc_ellipsoid)
-        
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_INIT_BEGIN(eqdc_init)
+        template <typename T, typename Parameters>
+        class eqdc_entry : public detail::factory_entry<T, Parameters>
         {
-            BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_INIT_ENTRY(eqdc, eqdc_entry);
+            public :
+                virtual base_v<T, Parameters>* create_new(const Parameters& par) const
+                {
+                    return new base_v_fi<eqdc_ellipsoid<T, Parameters>, T, Parameters>(par);
+                }
+        };
+
+        template <typename T, typename Parameters>
+        inline void eqdc_init(detail::base_factory<T, Parameters>& factory)
+        {
+            factory.add_to_factory("eqdc", new eqdc_entry<T, Parameters>);
         }
 
     } // namespace detail

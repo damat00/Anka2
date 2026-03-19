@@ -22,7 +22,6 @@ Phil Endecott and Frank Gennari
 #include <functional>
 #include <boost/static_assert.hpp>
 #include <boost/serialization/static_warning.hpp>
-#include <boost/sort/pdqsort/pdqsort.hpp>
 #include <boost/sort/spreadsort/detail/constants.hpp>
 #include <boost/cstdint.hpp>
 

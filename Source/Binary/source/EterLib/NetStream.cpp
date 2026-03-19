@@ -294,9 +294,7 @@ void CNetworkStream::Disconnect()
 void CNetworkStream::Clear()
 {
 	if (m_sock == INVALID_SOCKET)
-	{
 		return;
-	}
 
 	closesocket(m_sock);
 	m_sock = INVALID_SOCKET;
@@ -312,20 +310,20 @@ void CNetworkStream::Clear()
 	m_recvTEABufInputPos = 0;
 	m_sendTEABufInputPos = 0;
 
-	m_recvBufInputPos = 0;
+	m_recvBufInputPos = 0;	
 	m_recvBufOutputPos = 0;
-
-	m_sendBufInputPos = 0;
+	
+	m_sendBufInputPos = 0;	
 	m_sendBufOutputPos = 0;
 }
 
-bool CNetworkStream::Connect (const CNetworkAddress& c_rkNetAddr, int limitSec)
+bool CNetworkStream::Connect(const CNetworkAddress& c_rkNetAddr, int limitSec)
 {
 	Clear();
 
 	m_addr = c_rkNetAddr;
 
-	m_sock = socket (AF_INET, SOCK_STREAM, 0);
+	m_sock = socket(AF_INET, SOCK_STREAM, 0);
 
 	if (m_sock == INVALID_SOCKET)
 	{
@@ -335,7 +333,7 @@ bool CNetworkStream::Connect (const CNetworkAddress& c_rkNetAddr, int limitSec)
 	}
 
 	DWORD arg = 1;
-	ioctlsocket (m_sock, FIONBIO, &arg);	// Non-blocking mode
+	ioctlsocket(m_sock, FIONBIO, &arg);
 
 	if (connect(m_sock, reinterpret_cast<PSOCKADDR>(&m_addr), m_addr.GetSize()) == SOCKET_ERROR)
 	{
@@ -365,41 +363,37 @@ bool CNetworkStream::Connect (const CNetworkAddress& c_rkNetAddr, int limitSec)
 		}
 	}
 
-	m_connectLimitTime = time (nullptr) + limitSec;
-	return true;
+	m_connectLimitTime = time(nullptr) + limitSec;
+	return true;	
 }
 
-bool CNetworkStream::Connect (DWORD dwAddr, int port, int limitSec)
+bool CNetworkStream::Connect(DWORD dwAddr, int port, int limitSec)
 {
 	char szAddr[256];
 	{
 		BYTE ip[4];
-		ip[0]=dwAddr&0xff;
-		dwAddr>>=8;
-		ip[1]=dwAddr&0xff;
-		dwAddr>>=8;
-		ip[2]=dwAddr&0xff;
-		dwAddr>>=8;
-		ip[3]=dwAddr&0xff;
-		dwAddr>>=8;
+		ip[0]=dwAddr&0xff;dwAddr>>=8;
+		ip[1]=dwAddr&0xff;dwAddr>>=8;
+		ip[2]=dwAddr&0xff;dwAddr>>=8;
+		ip[3]=dwAddr&0xff;dwAddr>>=8;
 
-		sprintf (szAddr, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
+		sprintf(szAddr, "%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
 	}
 
-	return Connect (szAddr, port, limitSec);
+	return Connect(szAddr, port, limitSec);
 }
 
-bool CNetworkStream::Connect (const char* c_szAddr, int port, int /*limitSec*/)
+bool CNetworkStream::Connect(const char *c_szAddr, int port, int /*limitSec*/)
 {
 	CNetworkAddress kNetAddr;
-	kNetAddr.Set (c_szAddr, port);
+	kNetAddr.Set(c_szAddr, port);
 
-	return Connect (kNetAddr);
+	return Connect(kNetAddr);
 }
 
 void CNetworkStream::ClearRecvBuffer()
 {
-	m_recvBufOutputPos = m_recvBufInputPos = 0;
+	m_recvBufOutputPos = m_recvBufInputPos = 0;	 
 }
 
 int CNetworkStream::GetRecvBufferSize()
@@ -407,44 +401,36 @@ int CNetworkStream::GetRecvBufferSize()
 	return m_recvBufInputPos - m_recvBufOutputPos;
 }
 
-bool CNetworkStream::Peek (int size)
+bool CNetworkStream::Peek(int size)
 {
 	if (GetRecvBufferSize() < size)
-	{
 		return false;
-	}
 
 	return true;
 }
 
-bool CNetworkStream::Peek (int size, char* pDestBuf)
+bool CNetworkStream::Peek(int size, char *pDestBuf)
 {
 	if (GetRecvBufferSize() < size)
-	{
 		return false;
-	}
 
-	memcpy (pDestBuf, m_recvBuf + m_recvBufOutputPos, size);
+	memcpy(pDestBuf, m_recvBuf + m_recvBufOutputPos, size);
 	return true;
 }
 
-bool CNetworkStream::Recv (int size)
+bool CNetworkStream::Recv(int size)
 {
-	if (!Peek (size))
-	{
+	if (!Peek(size))
 		return false;
-	}
 
 	m_recvBufOutputPos += size;
 	return true;
 }
 
-bool CNetworkStream::Recv (int size, char* pDestBuf)
+bool CNetworkStream::Recv(int size, char *pDestBuf)
 {
-	if (!Peek (size, pDestBuf))
-	{
+	if (!Peek(size, pDestBuf))
 		return false;
-	}
 
 	m_recvBufOutputPos += size;
 	return true;
@@ -455,43 +441,39 @@ int CNetworkStream::__GetSendBufferSize()
 	return m_sendBufInputPos-m_sendBufOutputPos;
 }
 
-bool CNetworkStream::Send (int size, const char* pSrcBuf)
+bool CNetworkStream::Send(int size, const char *pSrcBuf)
 {
 	int sendBufRestSize = m_sendBufSize - m_sendBufInputPos;
 	if ((size + 1) > sendBufRestSize)
-	{
 		return false;
-	}
 
-	memcpy (m_sendBuf + m_sendBufInputPos, pSrcBuf, size);
+	memcpy(m_sendBuf + m_sendBufInputPos, pSrcBuf, size);
 	m_sendBufInputPos += size;
 
 	return true;
 }
 
-bool CNetworkStream::Peek (int len, void* pDestBuf)
+bool CNetworkStream::Peek(int len, void* pDestBuf)
 {
-	return Peek (len, (char*)pDestBuf);
+	return Peek(len, (char *)pDestBuf);
 }
 
-bool CNetworkStream::Recv (int len, void* pDestBuf)
+bool CNetworkStream::Recv(int len, void* pDestBuf)
 {
-	return Recv (len, (char*)pDestBuf);
+	return Recv(len, (char *)pDestBuf);
 }
 
-bool CNetworkStream::SendFlush (int len, const void* pSrcBuf)
+bool CNetworkStream::SendFlush(int len, const void* pSrcBuf)
 {
-	if (!Send (len, pSrcBuf))
-	{
+	if (!Send(len, pSrcBuf))
 		return false;
-	}
 
 	return __SendInternalBuffer();
 }
 
-bool CNetworkStream::Send (int len, const void* pSrcBuf)
+bool CNetworkStream::Send(int len, const void* pSrcBuf)
 {
-	return Send (len, (const char*)pSrcBuf);
+	return Send(len, (const char *)pSrcBuf);
 }
 
 bool CNetworkStream::IsOnline()
@@ -523,12 +505,12 @@ void CNetworkStream::OnDisconnect()
 
 void CNetworkStream::OnConnectSuccess()
 {
-	Tracen ("Succeed connecting.");
+	Tracen("Succeed connecting.");
 }
 
 void CNetworkStream::OnConnectFailure()
 {
-	Tracen ("Failed to connect.");
+	Tracen("Failed to connect.");
 }
 
 CNetworkStream::CNetworkStream()
@@ -542,18 +524,18 @@ CNetworkStream::CNetworkStream()
 	m_recvTEABuf = nullptr;
 	m_recvTEABufSize = 0;
 	m_recvTEABufInputPos = 0;
-
-	m_recvBuf = nullptr;
-	m_recvBufSize = 0;
+	
+	m_recvBuf = nullptr;	
+	m_recvBufSize = 0;	
 	m_recvBufOutputPos = 0;
-	m_recvBufInputPos = 0;
+	m_recvBufInputPos = 0;	
 
 	m_sendTEABuf = nullptr;
 	m_sendTEABuf = 0;
 	m_sendTEABufInputPos = 0;
 
-	m_sendBuf = nullptr;
-	m_sendBufSize = 0;
+	m_sendBuf = nullptr;	
+	m_sendBufSize = 0;	
 	m_sendBufOutputPos = 0;
 	m_sendBufInputPos = 0;
 }

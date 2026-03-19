@@ -29,12 +29,7 @@ void CLightInstance::OnSetDataPointer(CEffectElementBase * pElement)
 
 	m_iLoopCount = m_pData->GetLoopCount();
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-	D3DLIGHT9 Light;
-#else
 	D3DLIGHT8 Light;
-#endif
-
 	m_pData->InitializeLight(Light);
 	CLightManager::Instance().RegisterLight(LIGHT_TYPE_DYNAMIC, &m_LightID, Light);
 }

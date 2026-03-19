@@ -53,14 +53,14 @@ bool CMapOutdoor::Update(float fX, float fY, float fZ)
 	if ( fY < 0 )
 		fY = -fY;
 	PR_FLOAT_TO_INT(fY, iy);
-
+	
 	short sCoordX = MINMAX(0, ix / CTerrainImpl::TERRAIN_XSIZE, m_sTerrainCountX - 1);
 	short sCoordY = MINMAX(0, iy / CTerrainImpl::TERRAIN_YSIZE, m_sTerrainCountY - 1);
 
 	bool bNeedInit = (m_PrevCoordinate.m_sTerrainCoordX == -1 || m_PrevCoordinate.m_sTerrainCoordY == -1);
 
 	if ( bNeedInit ||
-		(m_CurCoordinate.m_sTerrainCoordX/LOAD_SIZE_WIDTH) != (sCoordX/LOAD_SIZE_WIDTH) ||
+		(m_CurCoordinate.m_sTerrainCoordX/LOAD_SIZE_WIDTH) != (sCoordX/LOAD_SIZE_WIDTH) || 
 		(m_CurCoordinate.m_sTerrainCoordY/LOAD_SIZE_WIDTH) != (sCoordY/LOAD_SIZE_WIDTH) )
 	{
 		if (bNeedInit)
@@ -167,9 +167,9 @@ struct FGetShadowReceiverFromCollisionData
 struct FPCBlockerDistanceSort
 {
 	D3DXVECTOR3 m_v3Eye;
-	FPCBlockerDistanceSort(D3DXVECTOR3& v3Eye) : m_v3Eye(v3Eye) { }
+	FPCBlockerDistanceSort(D3DXVECTOR3 & v3Eye) : m_v3Eye(v3Eye) { }
 
-	bool operator () (CGraphicObjectInstance* plhs, CGraphicObjectInstance* prhs) const
+	bool operator () (CGraphicObjectInstance * plhs, CGraphicObjectInstance * prhs) const
 	{
 		const auto vv = (plhs->GetPosition() - m_v3Eye);
 		const auto vv2 = (prhs->GetPosition() - m_v3Eye);
@@ -272,7 +272,7 @@ struct FGetShadowReceiverFromHeightData
 	float m_fReturnHeight;
 
 	CGraphicObjectInstance* m_apkShadowReceiver[COLLECT_MAX];
-
+	
 	FGetShadowReceiverFromHeightData(float fFromX, float fFromY, float fToX, float fToY) :
 	m_fFromX(fFromX), m_fFromY(fFromY), m_fToX(fToX), m_fToY(fToY), m_bReceiverFound(false)
 	{
@@ -340,7 +340,7 @@ void CMapOutdoor::__CollectShadowReceiver(D3DXVECTOR3 & v3Target, D3DXVECTOR3 & 
 		{
 			CGraphicObjectInstance * pObjInstEach = kGetShadowReceiverFromHeightData.GetCollectItem(i);
 			if (!__IsInShadowReceiverList(pObjInstEach))
-				m_ShadowReceiverVector.push_back(pObjInstEach);
+				m_ShadowReceiverVector.push_back(pObjInstEach);	
 		}
 	}
 }
@@ -401,7 +401,7 @@ struct PCBlocker_SInstanceList
 			s_dwInstMaxCount=m_dwInstCount;
 		}
 	}
-
+	
 	Iterator Begin()
 	{
 		return m_apkPCBlocker;
@@ -486,6 +486,7 @@ struct PCBlocker_SInstanceList
 	}
 };
 
+
 void CMapOutdoor::__CollectCollisionPCBlocker(D3DXVECTOR3& v3Eye, D3DXVECTOR3& v3Target, float fDistance)
 {
 	Vector3d v3dRayStart;
@@ -561,7 +562,7 @@ void CMapOutdoor::__CollectCollisionShadowReceiver(D3DXVECTOR3& v3Target, D3DXVE
 	if (!kGetShadowReceiverFromCollisionData.m_bCollide)
 		return;
 
-	std::vector<CGraphicObjectInstance * >::iterator i;
+	std::vector<CGraphicObjectInstance * >::iterator i;		
 	for ( i = kVct_pkShadowReceiver.begin(); i != kVct_pkShadowReceiver.end(); ++i)
 	{
 		CGraphicObjectInstance * pObjInstEach = *i;
@@ -704,7 +705,7 @@ void CMapOutdoor::__ClearGarvage()
 	std::for_each(m_TerrainDeleteVector.begin(), m_TerrainDeleteVector.end(), CTerrain::Delete);
 	m_TerrainDeleteVector.clear();
 
-	std::for_each(m_AreaDeleteVector.begin(), m_AreaDeleteVector.end(), CArea::Delete);
+	std::for_each(m_AreaDeleteVector.begin(), m_AreaDeleteVector.end(), CArea::Delete);	
 	m_AreaDeleteVector.clear();
 }
 
@@ -817,8 +818,8 @@ void CMapOutdoor::ConvertTerrainToTnL(long lx, long ly)
 	for (long i = 0; i < m_wPatchCount * m_wPatchCount; i++)
 		m_pTerrainPatchProxyList[i].SetUsed(false);
 
-	lx -= m_lViewRadius;          /* Move to the top left corner of the */
-	ly -= m_lViewRadius;          /* input rectangle */
+	lx -= m_lViewRadius; /* Move to the top left corner of the */
+	ly -= m_lViewRadius; /* input rectangle */
 
 	long diameter = m_lViewRadius * 2;
 
@@ -827,7 +828,7 @@ void CMapOutdoor::ConvertTerrainToTnL(long lx, long ly)
 	long x1 = ( lx + diameter - 1 ) / TERRAIN_PATCHSIZE;
 	long y1 = ( ly + diameter - 1 ) / TERRAIN_PATCHSIZE;
 
-	long xw = x1 - x0 + 1;     /* Figure out how many patches are needed */
+	long xw = x1 - x0 + 1; /* Figure out how many patches are needed */
 	long yw = y1 - y0 + 1;
 
 	long ex = lx + diameter;

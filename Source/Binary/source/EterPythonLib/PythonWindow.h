@@ -2,15 +2,10 @@
 
 #include "StdAfx.h"
 #include "../eterBase/Utils.h"
-#include <cstdint>
 
 #ifdef ENABLE_RENDER_TARGET
 	#include <cstdint>
 	#include "../EterLib/GrpRenderTargetTexture.h"
-#endif
-
-#ifdef INSIDE_RENDER
-#include <cstdint>
 #endif
 
 namespace UI
@@ -65,7 +60,7 @@ namespace UI
 			};
 
 		public:
-			CWindow(PyObject * ppyObject);
+			CWindow(PyObject *ppyObject);
 			virtual ~CWindow();
 
 			void			AddChild(CWindow * pWin);
@@ -97,13 +92,7 @@ namespace UI
 
 			void			Show();
 			void			Hide();
-#ifdef INSIDE_RENDER
-			virtual	bool	IsShow();
-			void			OnHideWithChilds();
-			void			OnHide();
-#else
 			bool			IsShow() { return m_bShow; }
-#endif
 			bool			IsRendering();
 
 			bool			HasParent()		{ return m_pParent ? true : false; }
@@ -115,11 +104,7 @@ namespace UI
 
 			CWindow *		GetRoot();
 			CWindow *		GetParent();
-#ifdef INSIDE_RENDER
-			bool			IsChild(CWindow* pWin, bool bCheckRecursive = false);
-#else
 			bool			IsChild(CWindow * pWin);
-#endif
 			void			DeleteChild(CWindow * pWin);
 			void			SetTop(CWindow * pWin);
 
@@ -134,21 +119,9 @@ namespace UI
 			void			RemoveFlag(DWORD flag)	{ REMOVE_BIT(m_dwFlag, flag);	}
 			bool			IsFlag(DWORD flag)		{ return (m_dwFlag & flag) ? true : false;	}
 
-#ifdef INSIDE_RENDER
-			void			SetInsideRender(BOOL flag);
-			void			GetRenderBox(RECT* box);
-			void			UpdateTextLineRenderBox();
-			void			UpdateRenderBox();
-			void			UpdateRenderBoxRecursive();
-#endif
 			virtual void	OnRender();
 			virtual void	OnUpdate();
 			virtual void	OnChangePosition(){}
-
-#ifdef INSIDE_RENDER
-			virtual void	OnAfterRender();
-			virtual void	OnUpdateRenderBox() {}
-#endif
 
 			virtual void	OnSetFocus();
 			virtual void	OnKillFocus();
@@ -208,18 +181,6 @@ namespace UI
 			virtual void	SetClippingMaskWindow(CWindow* pMaskWindow);
 #endif
 
-#ifdef INSIDE_RENDER
-		public:
-			virtual void	iSetRenderingRect(int iLeft, int iTop, int iRight, int iBottom);
-			virtual void	SetRenderingRect(float fLeft, float fTop, float fRight, float fBottom);
-			virtual int		GetRenderingWidth();
-			virtual int		GetRenderingHeight();
-			void			ResetRenderingRect(bool bCallEvent = true);
-
-		private:
-			virtual void	OnSetRenderingRect();
-#endif
-
 		protected:
 			std::string			m_strName;
 
@@ -232,11 +193,6 @@ namespace UI
 
 			bool				m_bMovable;
 			bool				m_bShow;
-#ifdef INSIDE_RENDER
-			RECT				m_renderingRect;
-			BOOL				m_isInsideRender;
-			RECT				m_renderBox;
-#endif
 
 			DWORD				m_dwFlag;
 
@@ -281,7 +237,7 @@ namespace UI
 
 			bool SetRenderTarget(int index);
 
-#ifdef ENABLE_WIKI_SYSTEM
+#ifdef ENABLE_INGAME_WIKI_SYSTEM
 			void SetRenderingRect(float fLeft, float fTop, float fRight, float fBottom);
 			RECT rect_ex;
 #endif
@@ -295,7 +251,7 @@ namespace UI
 	class CBox : public CWindow
 	{
 		public:
-			CBox(PyObject * ppyObject);
+			CBox(PyObject *ppyObject);
 			virtual ~CBox();
 
 			void SetColor(DWORD dwColor);
@@ -310,7 +266,7 @@ namespace UI
 	class CBar : public CWindow
 	{
 		public:
-			CBar(PyObject * ppyObject);
+			CBar(PyObject *ppyObject);
 			virtual ~CBar();
 
 			void SetColor(DWORD dwColor);
@@ -325,7 +281,7 @@ namespace UI
 	class CLine : public CWindow
 	{
 		public:
-			CLine(PyObject * ppyObject);
+			CLine(PyObject *ppyObject);
 			virtual ~CLine();
 
 			void SetColor(DWORD dwColor);
@@ -343,7 +299,7 @@ namespace UI
 			static DWORD Type();
 
 		public:
-			CBar3D(PyObject * ppyObject);
+			CBar3D(PyObject *ppyObject);
 			virtual ~CBar3D();
 
 			void SetColor(DWORD dwLeft, DWORD dwRight, DWORD dwCenter);
@@ -357,16 +313,11 @@ namespace UI
 			DWORD m_dwCenterColor;
 	};
 
-	// Text
 	class CTextLine : public CWindow
 	{
 		public:
-			CTextLine(PyObject * ppyObject);
+			CTextLine(PyObject *ppyObject);
 			virtual ~CTextLine();
-
-#ifdef INSIDE_RENDER
-			static DWORD Type();
-#endif
 
 			void SetMax(int iMax);
 			void SetHorizontalAlign(int iType);
@@ -375,27 +326,17 @@ namespace UI
 			void SetOutline(BOOL bFlag);
 			void SetFeather(BOOL bFlag);
 			void SetMultiLine(BOOL bFlag);
-			void SetFontName(const char * c_szFontName);
+			void SetFontName(const char *c_szFontName);
 			void SetFontColor(DWORD dwColor);
 			void SetLimitWidth(float fWidth);
-
-#ifdef INSIDE_RENDER
-			void SetFixedRenderPos(WORD startPos, WORD endPos) { m_TextInstance.SetFixedRenderPos(startPos, endPos); }
-			void GetRenderPositions(WORD& startPos, WORD& endPos) { m_TextInstance.GetRenderPositions(startPos, endPos); }
-			bool IsShowCursor();
-			bool IsShow();
-			int GetRenderingWidth();
-			int GetRenderingHeight();
-			void OnSetRenderingRect();
-#endif
 
 			void ShowCursor();
 			void HideCursor();
 
 			int GetCursorPosition();
 
-			void SetText(const char * c_szText);
-			const char * GetText();
+			void SetText(const char *c_szText);
+			const char *GetText();
 
 			void GetTextSize(int* pnWidth, int* pnHeight);
 
@@ -405,22 +346,13 @@ namespace UI
 			void SetLineHeight(int iHeight);
 			int GetLineHeight();
 #endif
-#ifdef ENABLE_SUNG_MAHI_TOWER
-			void GetCharSize(short* sWidth);
-#endif
+
 		protected:
 			void OnUpdate();
 			void OnRender();
 			void OnChangePosition();
 
-			virtual void OnSetText(const char * c_szText);
-
-#ifdef INSIDE_RENDER
-			void OnUpdateRenderBox() {
-				UpdateTextLineRenderBox();
-				m_TextInstance.SetRenderBox(m_renderBox);
-			}
-#endif
+			virtual void OnSetText(const char *c_szText);
 
 		protected:
 			CGraphicTextInstance m_TextInstance;
@@ -429,11 +361,11 @@ namespace UI
 	class CNumberLine : public CWindow
 	{
 		public:
-			CNumberLine(PyObject * ppyObject);
+			CNumberLine(PyObject *ppyObject);
 			CNumberLine(CWindow * pParent);
 			virtual ~CNumberLine();
 
-			void SetPath(const char * c_szPath);
+			void SetPath(const char *c_szPath);
 			void SetHorizontalAlign(int iType);
 			void SetNumber(const char *c_szNumber);
 
@@ -451,25 +383,12 @@ namespace UI
 			DWORD m_dwWidthSummary;
 	};
 
-	// Image
 	class CImageBox : public CWindow
 	{
 		public:
-			CImageBox(PyObject * ppyObject);
+			CImageBox(PyObject *ppyObject);
 			virtual ~CImageBox();
 
-#ifdef INSIDE_RENDER
-			void UnloadImage()
-			{
-				OnDestroyInstance();
-				SetSize(GetWidth(), GetHeight());
-				UpdateRect();
-			}
-#endif
-
-#ifdef ENABLE_OFFICAL_FEATURES
-			void LeftRightReverse();
-#endif
 			BOOL LoadImage(const char *c_szFileName);
 			void SetDiffuseColor(float fr, float fg, float fb, float fa);
 
@@ -482,6 +401,11 @@ namespace UI
 			float m_fCoolTime;
 			float m_fCoolTimeStart;
 #endif
+
+#ifdef ENABLE_OFFICAL_FEATURES
+			void LeftRightReverse();
+#endif
+
 		protected:
 			virtual void OnCreateInstance();
 			virtual void OnDestroyInstance();
@@ -492,14 +416,14 @@ namespace UI
 
 		protected:
 			CGraphicImageInstance * m_pImageInstance;
-	};
+	};	
 	class CMarkBox : public CWindow
 	{
 		public:
-			CMarkBox(PyObject * ppyObject);
+			CMarkBox(PyObject *ppyObject);
 			virtual ~CMarkBox();
 
-			void LoadImage(const char * c_szFilename);
+			void LoadImage(const char *c_szFilename);
 			void SetDiffuseColor(float fr, float fg, float fb, float fa);
 			void SetIndex(UINT uIndex);
 			void SetScale(FLOAT fScale);
@@ -521,7 +445,7 @@ namespace UI
 			static DWORD Type();
 
 		public:
-			CExpandedImageBox(PyObject * ppyObject);
+			CExpandedImageBox(PyObject *ppyObject);
 			virtual ~CExpandedImageBox();
 
 			void SetScale(float fx, float fy);
@@ -530,18 +454,10 @@ namespace UI
 			void SetRenderingRect(float fLeft, float fTop, float fRight, float fBottom);
 			void SetRenderingRectWithScale(float fLeft, float fTop, float fRight, float fBottom);
 			void SetRenderingMode(int iMode);
-// #if defined(ENABLE_IMAGE_CLIP_RECT) || defined(ENABLE_BATTLE_PASS_SYSTEM)
+
 			void SetImageClipRect(float fLeft, float fTop, float fRight, float fBottom, bool bIsVertical = false);
-// #endif
-#ifdef INSIDE_RENDER
-			int GetRenderingWidth();
-			int GetRenderingHeight();
-			void OnSetRenderingRect();
-			void SetExpandedRenderingRect(float fLeftTop, float fLeftBottom, float fTopLeft, float fTopRight, float fRightTop, float fRightBottom, float fBottomLeft, float fBottomRight);
-			void SetTextureRenderingRect(float fLeft, float fTop, float fRight, float fBottom);
-			DWORD GetPixelColor(DWORD x, DWORD y);
-			void OnUpdateRenderBox();
-#endif
+
+			D3DXCOLOR GetPixelColor(int x, int y) { if (m_pImageInstance) return m_pImageInstance->GetPixelColor(x, y); else return D3DXCOLOR(0, 0, 0, 0); }
 
 		protected:
 			void OnCreateInstance();
@@ -635,7 +551,7 @@ namespace UI
 			BOOL SetDownVisual(const char *c_szFileName);
 			BOOL SetDisableVisual(const char *c_szFileName);
 
-#if defined(ENABLE_TRACK_WINDOW) && defined(ENABLE_ADVANCED_GAME_OPTIONS)
+#ifdef ENABLE_DUNGEON_TRACKING_SYSTEM
 			static DWORD Type();
 			void SetRenderingRect(float fLeft, float fTop, float fRight, float fBottom);
 #endif
@@ -661,11 +577,7 @@ namespace UI
 
 			BOOL IsDisable();
 			BOOL IsPressed();
-#ifdef INSIDE_RENDER
-			void OnSetRenderingRect();
-			void OnUpdateRenderBox();
-#endif
-
+			
 #ifdef ENABLE_OFFICAL_FEATURES
 			void LeftRightReverse();
 #endif
@@ -683,7 +595,7 @@ namespace UI
 
 			BOOL IsEnable();
 
-#if defined(ENABLE_TRACK_WINDOW) && defined(ENABLE_ADVANCED_GAME_OPTIONS)
+#ifdef ENABLE_DUNGEON_TRACKING_SYSTEM
 			void SetCurrentVisual(CGraphicExpandedImageInstance* pVisual);
 			BOOL OnIsType(DWORD dwType);
 #else
@@ -695,7 +607,7 @@ namespace UI
 			BOOL m_isPressed;
 			BOOL m_isFlash;
 
-#if defined(ENABLE_TRACK_WINDOW) && defined(ENABLE_ADVANCED_GAME_OPTIONS)
+#ifdef ENABLE_DUNGEON_TRACKING_SYSTEM
 			CGraphicExpandedImageInstance* m_pcurVisual;
 			CGraphicExpandedImageInstance m_upVisual;
 			CGraphicExpandedImageInstance m_overVisual;
@@ -713,7 +625,7 @@ namespace UI
 	class CRadioButton : public CButton
 	{
 		public:
-#if defined(ENABLE_TRACK_WINDOW) && defined(ENABLE_ADVANCED_GAME_OPTIONS)
+#ifdef ENABLE_DUNGEON_TRACKING_SYSTEM
 			static DWORD Type();
 #endif
 			CRadioButton(PyObject *ppyObject);
@@ -724,7 +636,7 @@ namespace UI
 			BOOL OnMouseLeftButtonUp();
 			void OnMouseOverIn();
 			void OnMouseOverOut();
-#if defined(ENABLE_TRACK_WINDOW) && defined(ENABLE_ADVANCED_GAME_OPTIONS)
+#ifdef ENABLE_DUNGEON_TRACKING_SYSTEM
 			BOOL OnIsType(DWORD dwType);
 #endif
 	};
@@ -732,7 +644,7 @@ namespace UI
 	class CToggleButton : public CButton
 	{
 		public:
-#if defined(ENABLE_TRACK_WINDOW) && defined(ENABLE_ADVANCED_GAME_OPTIONS)
+#ifdef ENABLE_DUNGEON_TRACKING_SYSTEM
 			static DWORD Type();
 #endif
 			CToggleButton(PyObject *ppyObject);
@@ -743,7 +655,7 @@ namespace UI
 			BOOL OnMouseLeftButtonUp();
 			void OnMouseOverIn();
 			void OnMouseOverOut();
-#if defined(ENABLE_TRACK_WINDOW) && defined(ENABLE_ADVANCED_GAME_OPTIONS)
+#ifdef ENABLE_DUNGEON_TRACKING_SYSTEM
 			BOOL OnIsType(DWORD dwType);
 #endif
 	};

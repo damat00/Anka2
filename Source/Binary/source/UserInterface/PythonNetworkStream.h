@@ -28,7 +28,7 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 
 			MAX_ACCOUNT_PLAYER
 		};
-
+		
 		enum
 		{
 			ERROR_NONE,
@@ -67,13 +67,6 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 #endif
 			ACCOUNT_CHARACTER_SLOT_LAST_PLAYTIME,
 			ACCOUNT_CHARACTER_SLOT_MAPINDEX,
-#ifdef ENABLE_CONQUEROR_LEVEL
-			ACCOUNT_CHARACTER_SLOT_CONQUEROR_LEVEL,
-			ACCOUNT_CHARACTER_SLOT_SUNGMA_ST,
-			ACCOUNT_CHARACTER_SLOT_SUNGMA_HP,
-			ACCOUNT_CHARACTER_SLOT_SUNGMA_MOVE,
-			ACCOUNT_CHARACTER_SLOT_SUNGMA_IMMUNE,
-#endif
 		};
 
 		enum
@@ -208,10 +201,6 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 #else
 		bool SendShopSellPacketNew(BYTE bySlot, BYTE byCount);
 #endif
-#ifdef ENABLE_FISH_EVENT_SYSTEM
-		bool SendFishBoxUse(BYTE bWindow, WORD wCell);
-		bool SendFishShapeAdd(BYTE bPos);
-#endif
 
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
 		// Offline Shop
@@ -232,11 +221,6 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		bool SendOfflineShopChangeDecoration(const char *sign, DWORD vnum, DWORD type);
 #endif
 
-#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
-		bool SoulRoulette(const BYTE option);
-		bool RecvSoulRoulette();
-#endif
-
 		// Exchange
 		bool SendExchangeStartPacket(DWORD vid);
 		bool SendExchangeItemAddPacket(TItemPos ItemPos, BYTE byDisplayPos);
@@ -251,12 +235,7 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 
 		// Quest
 		bool SendScriptAnswerPacket(int iAnswer);
-#ifdef ENABLE_COLLECT_WINDOW
-		bool SendScriptButtonPacket(unsigned int iIndex, BYTE bButtonIndex);
-#else
 		bool SendScriptButtonPacket(unsigned int iIndex);
-#endif
-		bool SendAnswerMakeGuildPacket(const char * c_szName);
 		bool SendQuestInputStringPacket(const char *c_szString);
 #ifdef ENABLE_RENEWAL_OX_EVENT
 		bool SendQuestInputStringLongPacket(const char *c_szString);
@@ -266,6 +245,13 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		// Event
 		bool SendOnClickPacket(DWORD vid);
 
+#ifdef ENABLE_EVENT_MANAGER
+		bool SendRequestEventQuest(const char *c_szName);
+		bool SendRequestEventData(int iMonth);
+		bool RecvEventInformation();
+		bool RecvEventReload();
+#endif
+
 		// Fly
 		bool SendFlyTargetingPacket(DWORD dwTargetVID, const TPixelPosition& kPPosTarget);
 		bool SendAddFlyTargetingPacket(DWORD dwTargetVID, const TPixelPosition& kPPosTarget);
@@ -274,10 +260,6 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		// Command
 		bool ClientCommand(const char *c_szCommand);
 		void ServerCommand(char *c_szCommand);
-
-#ifdef ENABLE_KILL_STATISTICS
-		bool RecvKillStatistics();
-#endif
 
 		// Emoticon
 		void RegisterEmoticonString(const char *pcEmoticonString);
@@ -353,9 +335,7 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		// Lover
 		bool RecvLoverInfoPacket();
 		bool RecvLovePointUpdatePacket();
-#ifdef ENABLE_CONQUEROR_LEVEL
-		bool RecvSungmaAttrUpdatePacket();
-#endif
+
 		// Dig
 		bool RecvDigMotionPacket();
 
@@ -395,11 +375,7 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		bool SendBuildPrivateShopPacket(const char *c_szName, const std::vector<TShopItemTable> & c_rSellingItemStock);
 
 		// Refine
-		bool SendRefinePacket(BYTE byPos, BYTE byType
-#ifdef ENABLE_PITTY_REFINE
-, bool bUseSealOfGod
-#endif
-		);
+		bool SendRefinePacket(BYTE byPos, BYTE byType);
 		bool SendSelectItemPacket(DWORD dwItemPos);
 
 		// CRC Report
@@ -411,13 +387,6 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		bool RecvHandshakePacket();
 		bool RecvHandshakeOKPacket();
 
-#ifdef ENABLE_DUNGEON_INFO
-		bool SendDungeonInfoOpen();
-		bool SendDungeonInfoTeleport(int index_teleport);
-		bool SendDungeonInfoRanking(int index_dungeon);
-		bool SendDungeonInfoMision(int index);
-#endif
-
 		// ETC
 		DWORD GetMainActorVID();
 		DWORD GetMainActorRace();
@@ -426,17 +395,6 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		void SetEmpireID(DWORD dwEmpireID);
 		DWORD GetEmpireID();
 		void __TEST_SetSkillGroupFake(int iIndex);
-
-#ifdef ENABLE_MINI_GAME_CATCH_KING
-		bool SendMiniGameCatchKing(BYTE bSubHeader, BYTE bSubArgument);
-#endif
-#ifdef ENABLE_EVENT_SYSTEM
-		bool RecvEventInfo();
-#endif
-
-#ifdef ENABLE_ATTENDANCE_EVENT
-		bool SendAttendanceGetReward();
-#endif
 
 #ifdef ENABLE_ACCE_COSTUME_SYSTEM
 		bool SendAcceClosePacket();
@@ -533,7 +491,7 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 			RefreshStatus = (1 << 0),
 			RefreshAlignmentWindow = (1 << 1),
 			RefreshCharacterWindow = (1 << 2),
-			RefreshEquipmentWindow = (1 << 3),
+			RefreshEquipmentWindow = (1 << 3), 
 			RefreshInventoryWindow = (1 << 4),
 			RefreshExchangeWindow = (1 << 5),
 			RefreshSkillWindow = (1 << 6),
@@ -541,7 +499,7 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 			RefreshMessengerWindow = (1 << 8),
 			RefreshGuildWindowInfoPage = (1 << 9),
 			RefreshGuildWindowBoardPage = (1 << 10),
-			RefreshGuildWindowMemberPage = (1 << 11),
+			RefreshGuildWindowMemberPage = (1 << 11), 
 			RefreshGuildWindowMemberPageGradeComboBox = (1 << 12),
 			RefreshGuildWindowSkillPage = (1 << 13),
 			RefreshGuildWindowGradePage = (1 << 14),
@@ -657,6 +615,7 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		bool RecvQuestInfoPacket();
 		bool RecvQuestConfirmPacket();
 		bool RecvRequestMakeGuild();
+		bool RecvMarkPass();
 
 		// Skill
 		bool RecvSkillLevel();
@@ -667,9 +626,7 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		bool RecvTargetPacket();
 		bool RecvViewEquipPacket();
 		bool RecvDamageInfoPacket();
-#ifdef ENABLE_STONE_EVENT
-		bool RecvStoneEvent();
-#endif
+
 #ifdef ENABLE_MOB_DROP_INFO
 		bool RecvTargetInfoPacket();
 
@@ -712,25 +669,8 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		bool RecvSafeBoxSizePacket();
 		bool RecvSafeBoxMoneyChangePacket();
 
-#ifdef ENABLE_MINI_GAME_CATCH_KING
-		bool RecvMiniGameCatchKingPacket();
-#endif
-
-#ifdef ENABLE_ATTENDANCE_EVENT
-		bool RecvHitCountInfo();
-		bool RecvAttendanceEvent();
-		bool RecvAttendanceEventInfo();
-#endif
-
-#ifdef ENABLE_FISH_EVENT_SYSTEM
-		bool RecvFishEventInfo();
-#endif
-
 		// Fishing
 		bool RecvFishing();
-#ifdef ENABLE_ITEMSHOP
-		bool RecvItemShop();
-#endif
 
 #ifdef ENABLE_EXTENDED_WHISPER_DETAILS
 		// Whisper Details
@@ -774,19 +714,16 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		// Channel
 		bool RecvChannelPacket();
 
-#ifdef ENABLE_COLLECT_WINDOW
-		bool RecvCollectPacket();
-#endif
 #ifdef ENABLE_ACCE_COSTUME_SYSTEM
 		bool RecvAccePacket(bool bReturn = false);
 #endif
 
-#ifdef ENABLE_DUNGEON_INFO
-		bool RecvDungeonInfoPacket();
+#ifdef ENABLE_RENEWAL_INGAME_ITEMSHOP
+		bool RecvItemShop();
 #endif
 
-#ifdef ENABLE_RANKING
-		bool RecvRankingTable();
+#ifdef ENABLE_GUILD_TOKEN_AUTH
+		bool RecvGuildTokenPacket();
 #endif
 
 	protected:
@@ -801,6 +738,19 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		void SetGameOnline();
 		void SetGameOffline();
 		BOOL IsGameOnline();
+
+#ifdef ENABLE_RENEWAL_BATTLE_PASS
+	public:
+		bool SendExtBattlePassAction(BYTE bAction);
+		bool SendExtBattlePassPremiumItem(int slotindex);
+
+	protected:
+		bool RecvExtBattlePassOpenPacket();
+		bool RecvExtBattlePassGeneralInfoPacket();
+		bool RecvExtBattlePassMissionInfoPacket();
+		bool RecvExtBattlePassMissionUpdatePacket();
+		bool RecvExtBattlePassRankingPacket();
+#endif
 
 #ifdef ENABLE_HUNTING_SYSTEM
 	public:
@@ -847,6 +797,10 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 
 		void __SetGuildID(DWORD id);
 
+#ifdef ENABLE_GUILD_TOKEN_AUTH
+		void __SetGuildToken(uint64_t token);
+#endif
+
 	protected:
 		TPacketGCHandshake m_HandshakeData;
 		DWORD m_dwChangingPhaseTime;
@@ -859,6 +813,10 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		BOOL m_isStartGame;
 
 		DWORD m_dwGuildID;
+#ifdef ENABLE_GUILD_TOKEN_AUTH
+		uint64_t m_dwGuildToken{};
+#endif
+		DWORD m_dwGuildMarkPass;
 		DWORD m_dwEmpireID;
 
 		struct SServerTimeSync
@@ -993,21 +951,20 @@ class CPythonNetworkStream : public CNetworkStream, public CSingleton<CPythonNet
 		BOOL m_bLanguageSet;
 #endif
 
-#ifdef ENABLE_RESP_SYSTEM
-	public:
-		bool SendRespFetchDropPacket(uint32_t mobVnum);
-		bool SendRespFetchRespPacket(uint32_t mobVnum);
-		bool SendRespTeleportPacket(size_t id);
-	private:
-		bool RecvRespPacket();
-#endif
-
 #ifdef ENABLE_RENEWAL_SWITCHBOT
 	public:
 		bool RecvSwitchbotPacket();
 
 		bool SendSwitchbotStartPacket(BYTE slot, std::vector<CPythonSwitchbot::TSwitchbotAttributeAlternativeTable> alternatives);
 		bool SendSwitchbotStopPacket(BYTE slot);
+#endif
+
+#ifdef ENABLE_BIOLOG_SYSTEM
+	public:
+		bool SendBiologManagerAction(BYTE bSubHeader);
+
+	protected:
+		bool RecvBiologManager();
 #endif
 
 #ifdef ENABLE_CLIENT_LOCALE_STRING

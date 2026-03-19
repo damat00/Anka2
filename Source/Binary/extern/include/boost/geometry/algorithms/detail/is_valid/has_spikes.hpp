@@ -126,11 +126,8 @@ struct has_spikes
 
         while (next != boost::end(view))
         {
-            // Verify spike. TODO: this is a reverse order from expected
-            // in is_spike_or_equal, but this order calls the side
-            // strategy in the way to correctly detect the spikes,
-            // also in geographic cases going over the pole
-            if (detail::is_spike_or_equal(*next, *cur, *prev, strategy))
+            if ( geometry::detail::point_is_spike_or_equal(*prev, *next, *cur,
+                                                           strategy) )
             {
                 return
                     ! visitor.template apply<failure_spikes>(is_linear, *cur);
@@ -150,7 +147,7 @@ struct has_spikes
                                                          boost::rend(view));
 
             iterator next = find_different_from_first(cur, boost::end(view));
-            if (detail::is_spike_or_equal(*next, *cur, *prev, strategy))
+            if (detail::point_is_spike_or_equal(*prev, *next, *cur, strategy))
             {
                 return
                     ! visitor.template apply<failure_spikes>(is_linear, *cur);

@@ -9,7 +9,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-class CTerrainQuadtreeNode
+class CTerrainQuadtreeNode  
 {
 public:
 	CTerrainQuadtreeNode();
@@ -28,5 +28,5 @@ public:
 	BYTE					m_byLODLevel;
 };
 
-#endif // !defined(AFX_TERRAINQUADTREENODE_H__C788298F_1098_4CEE_B6F3_5975D618BBF3__INCLUDED_)
 
+#endif // !defined(AFX_TERRAINQUADTREENODE_H__C788298F_1098_4CEE_B6F3_5975D618BBF3__INCLUDED_)

@@ -10,14 +10,12 @@
 class CSpecialAttrGroup
 {
 public:
-	CSpecialAttrGroup(DWORD vnum)
-		: m_dwVnum(vnum)
-	{}
+	CSpecialAttrGroup(DWORD vnum) : m_dwVnum(vnum) {}
+
 	struct CSpecialAttrInfo
 	{
-		CSpecialAttrInfo (DWORD _apply_type, DWORD _apply_value)
-			: apply_type(_apply_type), apply_value(_apply_value)
-		{}
+		CSpecialAttrInfo (DWORD _apply_type, DWORD _apply_value) : apply_type(_apply_type), apply_value(_apply_value) {}
+
 		DWORD apply_type;
 		DWORD apply_value;
 
@@ -50,14 +48,10 @@ class CSpecialItemGroup
 			int count;
 			int rare;
 
-			CSpecialItemInfo(DWORD _vnum, int _count, int _rare)
-				: vnum(_vnum), count(_count), rare(_rare)
-				{}
+			CSpecialItemInfo(DWORD _vnum, int _count, int _rare) : vnum(_vnum), count(_count), rare(_rare) {}
 		};
 
-		CSpecialItemGroup(DWORD vnum, BYTE type=0)
-			: m_dwVnum(vnum), m_bType(type)
-			{}
+		CSpecialItemGroup(DWORD vnum, BYTE type=0) : m_dwVnum(vnum), m_bType(type) {}
 
 		void AddItem(DWORD vnum, int count, int prob, int rare)
 		{
@@ -156,7 +150,7 @@ class CSpecialItemGroup
 		DWORD m_dwVnum;
 		BYTE	m_bType;
 		std::vector<int> m_vecProbs;
-		std::vector<CSpecialItemInfo> m_vecItems; // vnum, count
+		std::vector<CSpecialItemInfo> m_vecItems;
 };
 
 class CMobItemGroup
@@ -217,7 +211,7 @@ class CMobItemGroup
 			return m_vecItems[GetOneIndex()];
 		}
 
-#if defined(ENABLE_MOB_DROP_INFO) | defined(ENABLE_RESP_SYSTEM)
+#ifdef ENABLE_MOB_DROP_INFO
 		std::vector<std::pair<int,int>> GetVector()
 		{
 			std::vector<std::pair<int,int>> item_list;
@@ -236,48 +230,6 @@ class CMobItemGroup
 		std::vector<SMobItemGroupInfo> m_vecItems;
 };
 
-#ifdef __SYSTEM_SEARCH_ITEM_MOB__
-class CDropItemGroup
-{
-	struct SDropItemGroupInfo
-	{
-		DWORD	dwVnum;
-		DWORD	dwPct;
-		int	iProcent;
-		int	iCount;
-
-		SDropItemGroupInfo(DWORD dwVnum, DWORD dwPct, DWORD iProcent, int iCount)
-			: dwVnum(dwVnum), dwPct(dwPct), iProcent(iProcent), iCount(iCount)
-			{}
-
-	};
-
-	public:
-	CDropItemGroup(DWORD dwVnum, DWORD dwMobVnum, const std::string& r_stName)
-		:
-		m_dwVnum(dwVnum),
-	m_dwMobVnum(dwMobVnum),
-	m_stName(r_stName)
-	{
-	}
-
-	const std::vector<SDropItemGroupInfo> & GetVector()
-	{
-		return m_vec_items;
-	}
-
-	void AddItem(DWORD dwItemVnum, DWORD dwPct, DWORD iProcent, int iCount)
-	{
-		m_vec_items.push_back(SDropItemGroupInfo(dwItemVnum, dwPct, iProcent, iCount));
-	}
-
-	private:
-	DWORD m_dwVnum;
-	DWORD m_dwMobVnum;
-	std::string m_stName;
-	std::vector<SDropItemGroupInfo> m_vec_items;
-};
-#else
 class CDropItemGroup
 {
 	struct SDropItemGroupInfo
@@ -316,7 +268,6 @@ class CDropItemGroup
 	std::string m_stName;
 	std::vector<SDropItemGroupInfo> m_vec_items;
 };
-#endif
 
 class CLevelItemGroup
 {
@@ -326,20 +277,27 @@ class CLevelItemGroup
 		DWORD dwPct;
 		int iCount;
 
-		SLevelItemGroupInfo(DWORD dwVnum, DWORD dwPct, int iCount)
-			: dwVNum(dwVnum), dwPct(dwPct), iCount(iCount)
-		{ }
+		SLevelItemGroupInfo(DWORD dwVnum, DWORD dwPct, int iCount) : dwVNum(dwVnum), dwPct(dwPct), iCount(iCount) {}
 	};
 
-	private :
+	private:
+#ifdef ENABLE_DROP_LEVEL_LIMIT_RANGE
+		DWORD m_dwLevelLimitStart;
+		DWORD m_dwLevelLimitEnd;
+#endif
 		DWORD m_dwLevelLimit;
 		std::string m_stName;
 		std::vector<SLevelItemGroupInfo> m_vec_items;
 
-	public :
-		CLevelItemGroup(DWORD dwLevelLimit)
-			: m_dwLevelLimit(dwLevelLimit)
-		{}
+	public:
+#ifdef ENABLE_DROP_LEVEL_LIMIT_RANGE
+		CLevelItemGroup(DWORD dwLevelLimitStart, DWORD dwLevelLimitEnd) : m_dwLevelLimitStart(dwLevelLimitStart),  m_dwLevelLimitEnd(dwLevelLimitEnd) {}
+
+		DWORD GetLevelLimitStart() { return m_dwLevelLimitStart; }
+		DWORD GetLevelLimitEnd() { return m_dwLevelLimitEnd; }
+#else
+		CLevelItemGroup(DWORD dwLevelLimit) : m_dwLevelLimit(dwLevelLimit) {}
+#endif
 
 		DWORD GetLevelLimit() { return m_dwLevelLimit; }
 
@@ -427,10 +385,6 @@ class ITEM_MANAGER : public singleton<ITEM_MANAGER>
 		bool			GetDropPct(LPCHARACTER pkChr, LPCHARACTER pkKiller, OUT int& iDeltaPercent, OUT int& iRandRange);
 		bool			CreateDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, std::vector<LPITEM> & vec_item);
 
-#ifdef __SYSTEM_SEARCH_ITEM_MOB__
-		void			FindItemMonster(LPCHARACTER ch, std::string name_item);
-#endif
-
 #ifdef ENABLE_MOB_DROP_INFO
 		bool			CreateDropItemVector(LPCHARACTER pkChr, LPCHARACTER pkKiller, std::vector<std::pair<int,int> > & vec_item);
 #endif
@@ -442,7 +396,6 @@ class ITEM_MANAGER : public singleton<ITEM_MANAGER>
 		bool			ReadSpecialDropItemFile(const char * c_pszFileName, bool isReloading = false);
 
 		bool			ConvSpecialDropItemFile();
-		// convert name -> vnum special_item_group.txt
 
 		DWORD			GetRefineFromVnum(DWORD dwVnum);
 
@@ -457,12 +410,14 @@ class ITEM_MANAGER : public singleton<ITEM_MANAGER>
 
 		const std::vector<TItemTable> & GetTable() { return m_vec_prototype; }
 
-		// CHECK_UNIQUE_GROUP
 		int GetSpecialGroupFromItem(DWORD dwVnum) const { itertype(m_ItemToSpecialGroup) it = m_ItemToSpecialGroup.find(dwVnum); return (it == m_ItemToSpecialGroup.end()) ? 0 : it->second; }
-		// END_OF_CHECK_UNIQUE_GROUP
 
 	protected:
 		int RealNumber(DWORD vnum);
+#ifdef ENABLE_EVENT_MANAGER
+		void DropEventItem(const CHARACTER& pkKiller, const CHARACTER& pkChr, ITEM_MANAGER& itemMgr, std::vector<LPITEM>& vec_item,
+			DWORD dwVnum, int iLevelDiff, int bDropType, int iChanceMax, int iDeltaPercent, int iRandRange);
+#endif
 		void CreateQuestDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, std::vector<LPITEM> & vec_item, int iDeltaPercent, int iRandRange);
 
 	protected:
@@ -489,10 +444,8 @@ class ITEM_MANAGER : public singleton<ITEM_MANAGER>
 		std::map<DWORD, CMobItemGroup*> m_map_pkMobItemGroup;
 		std::map<DWORD, CLevelItemGroup*> m_map_pkLevelItemGroup;
 		std::map<DWORD, CBuyerThiefGlovesItemGroup*> m_map_pkGloveItemGroup;
-
-		// CHECK_UNIQUE_GROUP
 		std::map<DWORD, int>		m_ItemToSpecialGroup;
-		// END_OF_CHECK_UNIQUE_GROUP
+
 	private:
 		typedef std::map <DWORD, DWORD> TMapDW2DW;
 		TMapDW2DW	m_map_new_to_ori;

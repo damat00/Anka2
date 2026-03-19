@@ -60,9 +60,9 @@ void CLZObject::BeginCompress(const void * pvIn, UINT uiInLen)
 	m_pbIn = (const BYTE *) pvIn;
 
 	// sizeof(SHeader) +
-	// ¨?????¡???? ?¡×?? fourCC 4?????¨¡??
-	// ¨?????? ?? ??????¨???? ¨?? ????? ????? ???¡¤?? +
-	// ¨?????¡???? ?¡×?? 8 ?????¨¡??
+	// 암호화를 위한 fourCC 4바이트
+	// 압축된 후 만들어질 수 있는 최대 용량 +
+	// 암호화를 위한 8 바이트
 	m_dwBufferSize = sizeof(THeader) + sizeof(DWORD) + (uiInLen + uiInLen / 64 + 16 + 3) + 8;
 
 	m_pbBuffer = new BYTE[m_dwBufferSize];
@@ -79,12 +79,6 @@ bool CLZObject::Compress()
 {
 	UINT	iOutLen;
 	BYTE *	pbBuffer;
-
-	if (!CLZO::instance().GetWorkMemory())
-	{
-		fprintf(stderr, "LZO: work memory not allocated\n");
-		return false;
-	}
 
 	pbBuffer = m_pbBuffer + sizeof(THeader);
 	*(DWORD *) pbBuffer = ms_dwFourCC;
@@ -188,9 +182,7 @@ BYTE * CLZObject::Decrypt(DWORD * pdwKey)
 	return pbDecryptBuffer;
 }
 
-static BYTE s_abLzoWorkMemFallback[LZO1X_MEM_COMPRESS];
-
-CLZO::CLZO() : m_pWorkMem(s_abLzoWorkMemFallback)
+CLZO::CLZO() : m_pWorkMem(NULL)
 {
 	if (lzo_init() != LZO_E_OK)
 	{
@@ -198,16 +190,22 @@ CLZO::CLZO() : m_pWorkMem(s_abLzoWorkMemFallback)
 		return;
 	}
 
-	BYTE* p = (BYTE*)malloc(LZO1X_MEM_COMPRESS);
-	if (p)
-		m_pWorkMem = p;
+	m_pWorkMem = (BYTE *) malloc(LZO1X_MEM_COMPRESS);
+
+	if (NULL == m_pWorkMem)
+	{
+		fprintf(stderr, "LZO: cannot alloc memory\n");
+		return;
+	}
 }
 
 CLZO::~CLZO()
 {
-	if (m_pWorkMem && m_pWorkMem != s_abLzoWorkMemFallback)
+	if (m_pWorkMem)
+	{
 		free(m_pWorkMem);
-	m_pWorkMem = NULL;
+		m_pWorkMem = NULL;
+	}
 }
 
 bool CLZO::CompressMemory(CLZObject & rObj, const void * pIn, UINT uiInLen)

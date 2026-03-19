@@ -301,7 +301,6 @@ void CRaceData::RegisterMotionMode(WORD wMotionModeIndex)
 {
 	TMotionModeData * pMotionModeData = ms_MotionModeDataPool.Alloc();
 	pMotionModeData->wMotionModeIndex = wMotionModeIndex;
-	pMotionModeData->MotionVectorMap.clear();
 	m_pMotionModeDataMap.insert(TMotionModeDataMap::value_type(wMotionModeIndex, pMotionModeData));
 }
 
@@ -340,6 +339,7 @@ CGraphicThing* CRaceData::RegisterMotionData(WORD wMotionMode, WORD wMotionIndex
 
 	/////
 
+
 	return NEW_RegisterMotion(pRaceMotionData, wMotionMode, wMotionIndex, pRaceMotionData->GetMotionFileName(), byPercentage);
 
 	//TMotion	Motion;
@@ -349,6 +349,7 @@ CGraphicThing* CRaceData::RegisterMotionData(WORD wMotionMode, WORD wMotionIndex
 	//__OLD_RegisterMotion(wMotionMode, wMotionIndex, Motion);
 	//return true;
 }
+
 
 void CRaceData::OLD_RegisterMotion(WORD wMotionModeIndex, WORD wMotionIndex, const char * c_szFileName, BYTE byPercentage)
 {
@@ -384,6 +385,7 @@ void CRaceData::__OLD_RegisterMotion(WORD wMotionMode, WORD wMotionIndex, const 
 		rMotionVector.push_back(rMotion);
 	}
 }
+
 
 bool CRaceData::SetMotionRandomWeight(WORD wMotionModeIndex, WORD wMotionIndex, WORD wMotionSubIndex, BYTE byPercentage)
 {
@@ -496,7 +498,7 @@ CGraphicThing * CRaceData::GetBaseModelThing()
 	return m_pBaseModelThing;
 }
 
-CGraphicThing * CRaceData::GetLODModelThing()
+CGraphicThing* CRaceData::GetLODModelThing()
 {
 	if (!m_pLODModelThing)
 	{

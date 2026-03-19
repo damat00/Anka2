@@ -223,27 +223,7 @@ void LogManager::ChangeNameLog(DWORD pid, const char *old_name, const char *new_
 
 void LogManager::GMCommandLog(DWORD dwPID, const char* szName, const char* szIP, BYTE byChannel, const char* szCommand)
 {
-	// Türkçe karakterler için encoding sorununu önlemek için
-	// command string'i temizle (sadece geçerli ASCII karakterleri kabul et)
-	char szCommandClean[256];
-	memset(szCommandClean, 0, sizeof(szCommandClean));
-	
-	size_t len = strlen(szCommand);
-	size_t j = 0;
-	for (size_t i = 0; i < len && j < sizeof(szCommandClean) - 1; i++)
-	{
-		unsigned char c = (unsigned char)szCommand[i];
-		// Sadece geçerli ASCII karakterleri kabul et (32-126: printable ASCII)
-		// veya yeni satýr, tab gibi kontrol karakterleri (9, 10, 13)
-		if ((c >= 32 && c <= 126) || c == 9 || c == 10 || c == 13)
-		{
-			szCommandClean[j++] = c;
-		}
-		// Geçersiz karakterler (Türkçe karakterler dahil) atlanýr
-	}
-	szCommandClean[j] = '\0';
-	
-	m_sql.EscapeString(__escape_hint, sizeof(__escape_hint), szCommandClean, strlen(szCommandClean));
+	m_sql.EscapeString(__escape_hint, sizeof(__escape_hint), szCommand, strlen(szCommand));
 
 	Query("INSERT DELAYED INTO command_log%s (userid, server, ip, port, username, command, date ) VALUES(%u, 999, '%s', %u, '%s', '%s', NOW()) ",
 			get_table_postfix(), dwPID, szIP, byChannel, szName, __escape_hint);
@@ -321,21 +301,7 @@ void LogManager::AcceLog(DWORD dwPID, DWORD x, DWORD y, DWORD item_vnum, DWORD i
 }
 #endif
 
-#ifdef ENABLE_ITEMSHOP
-void LogManager::WheelOfFortuneLog(DWORD id, DWORD pid, long mapindex, long x, long y, long long price)
-{
-	Query("INSERT INTO `wheel_of_fortune%s` (`id`, `pid`, `mapindex`, `x`, `y`, `price`, `when`) VALUES(%u, %u, %ld, %ld, %ld, %lld, NOW())", get_table_postfix(), id, pid, mapindex, x, y, price);
-}
-#endif
-
-#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
-void LogManager::SoulRouletteLog(const char* table, const char* Name, const int vnum, const int count, const bool state)
-{
-	Query("INSERT INTO %s%s (name, vnum, count, state, date) VALUES('%s', '%d', '%d', '%s', NOW())", table, get_table_postfix(), Name, vnum, count, (state ? "OK" : "ERROR"));
-}
-#endif
-
-#ifdef ENABLE_MINIGAME_RUMI_EVENT
+#ifdef ENABLE_MINIGAME_OKEY_CARDS_SYSTEM
 void LogManager::OkayEventLog(int dwPID, const char * c_pszText, int points)
 {
 	Query("INSERT INTO okay_event%s (pid, name, points) VALUES(%d, '%s', %d)", get_table_postfix(), dwPID, c_pszText, points);

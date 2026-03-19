@@ -12,7 +12,6 @@ window = {
 	
 	"children" :
 	(
-		## MainBoard
 		{
 			"name" : "MoveChannelBoard",
 			"type" : "board",
@@ -26,7 +25,6 @@ window = {
 			
 			"children" :
 			(
-				## Title Bar
 				{
 					"name" : "MoveChannelTitle",
 					"type" : "titlebar",
@@ -80,6 +78,6 @@ window = {
 					"disable_image" : "d:/ymir work/ui/public/cancelbutton02.sub",
 				},
 			),
-		}, ## MainBoard End
+		},
 	),
 }

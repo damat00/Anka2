@@ -1,15 +1,14 @@
 #ifndef __INC_METIN_II_MOB_MANAGER_H__
 #define __INC_METIN_II_MOB_MANAGER_H__
 
+#include "../../common/service.h"
+
 typedef struct SMobSplashAttackInfo
 {
-	DWORD	dwTiming;
-	DWORD	dwHitDistance;
+	DWORD dwTiming;
+	DWORD dwHitDistance;
 
-	SMobSplashAttackInfo(DWORD dwTiming, DWORD dwHitDistance)
-		: dwTiming(dwTiming)
-		, dwHitDistance(dwHitDistance)
-		{}
+	SMobSplashAttackInfo(DWORD dwTiming, DWORD dwHitDistance) : dwTiming(dwTiming), dwHitDistance(dwHitDistance) {}
 } TMobSplashAttackInfo;
 
 typedef struct SMobSkillInfo
@@ -23,11 +22,10 @@ class CMob
 {
 	public:
 		CMob();
-
 		~CMob();
 
-		TMobTable	m_table;
-		TMobSkillInfo	m_mobSkillInfo[MOB_SKILL_MAX_NUM];
+		TMobTable m_table;
+		TMobSkillInfo m_mobSkillInfo[MOB_SKILL_MAX_NUM];
 
 		void AddSkillSplash(int iIndex, DWORD dwTiming, DWORD dwHitDistance);
 };
@@ -37,9 +35,9 @@ class CMobInstance
 	public:
 		CMobInstance();
 
-		PIXEL_POSITION	m_posLastAttacked;
-		DWORD		m_dwLastAttackedTime;
-		DWORD		m_dwLastWarpTime;
+		PIXEL_POSITION m_posLastAttacked;
+		DWORD m_dwLastAttackedTime;
+		DWORD m_dwLastWarpTime;
 
 		bool m_IsBerserk;
 		bool m_IsGodSpeed;
@@ -54,7 +52,6 @@ class CMobGroupGroup
 			m_dwVnum = dwVnum;
 		}
 
-		// ADD_MOB_GROUP_GROUP_PROB
 		void AddMember(DWORD dwVnum, int prob = 1)
 		{
 			if (prob == 0)
@@ -66,28 +63,22 @@ class CMobGroupGroup
 			m_vec_iProbs.push_back(prob);
 			m_vec_dwMemberVnum.push_back(dwVnum);
 		}
-		// END_OF_ADD_MOB_GROUP_GROUP_PROB
 
 		DWORD GetMember()
 		{
 			if (m_vec_dwMemberVnum.empty())
 				return 0;
 
-			// ADD_MOB_GROUP_GROUP_PROB
 			int n = number(1, m_vec_iProbs.back());
 			itertype(m_vec_iProbs) it = lower_bound(m_vec_iProbs.begin(), m_vec_iProbs.end(), n);
 
 			return m_vec_dwMemberVnum[std::distance(m_vec_iProbs.begin(), it)];
-			// END_OF_ADD_MOB_GROUP_GROUP_PROB
-			//return m_vec_dwMemberVnum[number(1, m_vec_dwMemberVnum.size())-1];
 		}
 
-		DWORD                   m_dwVnum;
-		std::vector<DWORD>      m_vec_dwMemberVnum;
+		DWORD m_dwVnum;
+		std::vector<DWORD> m_vec_dwMemberVnum;
 
-		// ADD_MOB_GROUP_GROUP_PROB
-		std::vector<int>	m_vec_iProbs;
-		// END_OF_ADD_MOB_GROUP_GROUP_PROB
+		std::vector<int> m_vec_iProbs;
 };
 
 class CMobGroup
@@ -115,9 +106,9 @@ class CMobGroup
 		}
 
 	protected:
-		DWORD                   m_dwVnum;
-		std::string             m_stName;
-		std::vector<DWORD>      m_vec_dwMemberVnum;
+		DWORD m_dwVnum;
+		std::string m_stName;
+		std::vector<DWORD> m_vec_dwMemberVnum;
 };
 
 class CMobManager : public singleton<CMobManager>
@@ -139,8 +130,8 @@ class CMobManager : public singleton<CMobManager>
 		const CMob *	Get(DWORD dwVnum);
 		const CMob *	Get(const char * c_pszName, bool bIsAbbrev);
 
-		const iterator	begin()	{ return m_map_pkMobByVnum.begin();	}
-		const iterator	end()	{ return m_map_pkMobByVnum.end();	}
+		const iterator	begin() { return m_map_pkMobByVnum.begin(); }
+		const iterator	end() { return m_map_pkMobByVnum.end(); }
 
 		void RebindMobProto(LPCHARACTER ch);
 

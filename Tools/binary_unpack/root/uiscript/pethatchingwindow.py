@@ -75,7 +75,7 @@ window = {
 					"name" : "HatchingMoneyWindow", "type" : "window", "x" : 13, "y" : 132, "width" : 150, "height" : 14, "style" : ("attach",),
 					"children" :
 					(
-						{"name":"HatchingMoney", "type":"text", "x":0, "y":0, "text": "Coin : 100000 ?", "r":1.0, "g":1.0, "b":1.0, "a":1.0, "all_align" : "center"},
+						{"name":"HatchingMoney", "type":"text", "x":0, "y":0, "text": "Coin : 100000 ¾ç", "r":1.0, "g":1.0, "b":1.0, "a":1.0, "all_align" : "center"},
 					),
 				},
 				
@@ -87,11 +87,10 @@ window = {
 					"x" : 39,
 					"y" : 151,
 
-					"text" : uiScriptLocale.PET_HATCHING_BUTTON,
-
-					"default_image" : "d:/ymir work/ui/pattern/LargeB_Button_01.tga",
-					"over_image" : "d:/ymir work/ui/pattern/LargeB_Button_02.tga",
-					"down_image" : "d:/ymir work/ui/pattern/LargeB_Button_03.tga",
+					"default_image" : "d:/ymir work/ui/public/acceptbutton00.sub",
+					"over_image" : "d:/ymir work/ui/public/acceptbutton01.sub",
+					"down_image" : "d:/ymir work/ui/public/acceptbutton02.sub",
+					"disable_image" : "d:/ymir work/ui/public/acceptbutton02.sub",
 				},
 				
 				## Pet Naming Area
@@ -137,6 +136,3 @@ window = {
 		},
 	),
 }
-
-#"name":"pet_name"
-window["children"][0]["children"][5]["children"][0]["movable_text"]	= 1

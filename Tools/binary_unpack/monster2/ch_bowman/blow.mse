@@ -119,7 +119,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\pc\assassin\effect\ring_rainbow_line.dds"
+            "ring_rainbow_line.jpg"
         }
     }
 }
@@ -242,7 +242,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\pc\assassin\effect\ring_rainbow_line.dds"
+            "ring_rainbow_line.jpg"
         }
     }
 }
@@ -375,7 +375,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\pc\assassin\effect\14.dds"
+            "14.jpg"
         }
     }
 }
@@ -434,11 +434,11 @@ Group Particle
         }
         List TimeEventSizeX
         {
-            0.000000 250.000000
+            0.000000 500.000000
         }
         List TimeEventSizeY
         {
-            0.000000 250.000000
+            0.000000 500.000000
         }
     }
     
@@ -499,7 +499,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\pc\assassin\effect\amseup.dds"
+            "amseup.jpg"
         }
     }
 }

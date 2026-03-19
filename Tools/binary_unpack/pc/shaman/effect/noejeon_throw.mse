@@ -367,7 +367,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\pc\assassin\effect\ls1_1 copy.dds"
+            "ls1_1 copy.dds"
         }
     }
 }

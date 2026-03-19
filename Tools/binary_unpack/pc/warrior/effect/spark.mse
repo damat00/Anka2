@@ -246,7 +246,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\pc\shaman\effect\bottom_under.dds"
+            "bottom_under.dds"
         }
     }
 }

@@ -12,13 +12,6 @@
 extern int g_test_server;
 extern int g_log;
 
-//
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// !!!!!!!!!!! IMPORTANT !!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//
-// Check all SELECT syntax on item table before change this function!!!
-//
 bool CreateItemTableFromRes(MYSQL_RES * res, std::vector<TPlayerItem> * pVec, DWORD dwPID)
 {
 	if (!res)
@@ -44,9 +37,6 @@ bool CreateItemTableFromRes(MYSQL_RES * res, std::vector<TPlayerItem> * pVec, DW
 
 		int cur = 0;
 
-		// Check all SELECT syntax on item table before change this function!!!
-		// Check all SELECT syntax on item table before change this function!!!
-		// Check all SELECT syntax on item table before change this function!!!
 		str_to_number(item.id, row[cur++]);
 		str_to_number(item.window, row[cur++]);
 		str_to_number(item.pos, row[cur++]);
@@ -74,24 +64,16 @@ bool CreateItemTableFromRes(MYSQL_RES * res, std::vector<TPlayerItem> * pVec, DW
 #ifdef ENABLE_SKILL_COLOR_SYSTEM
 bool CreateSkillColorTableFromRes(MYSQL_RES* res, DWORD* dwSkillColor)
 {
-	if (!res || mysql_num_rows(res) == 0)
+	if (mysql_num_rows(res) == 0)
 		return false;
 
 	MYSQL_ROW row = mysql_fetch_row(res);
-	if (!row)
-		return false;
-
-	const unsigned int nFields = mysql_num_fields(res);
 
 	for (BYTE bySlot = 0; bySlot < ESkillColorLength::MAX_SKILL_COUNT + ESkillColorLength::MAX_BUFF_COUNT; ++bySlot)
 	{
 		for (BYTE byLayer = 0; byLayer < ESkillColorLength::MAX_EFFECT_COUNT; ++byLayer)
 		{
-			const unsigned int idx = byLayer + (unsigned int)(bySlot * ESkillColorLength::MAX_EFFECT_COUNT);
-			DWORD val = 0;
-			if (idx < nFields && row[idx] != NULL)
-				val = (DWORD)strtoul(row[idx], NULL, 10);
-			*(dwSkillColor++) = val;
+			*(dwSkillColor++) = atoi(row[byLayer + (bySlot * ESkillColorLength::MAX_EFFECT_COUNT)]);
 		}
 	}
 
@@ -132,9 +114,6 @@ size_t CreatePlayerSaveQuery(char * pszQuery, size_t querySize, TPlayerTable * p
 #else
 			"gold = %d, "
 #endif
-#ifdef ENABLE_GAYA_SYSTEM
-			"gem = %d, "
-#endif
 			"exp = %u, "
 			"stat_point = %d, "
 			"skill_point = %d, "
@@ -152,18 +131,6 @@ size_t CreatePlayerSaveQuery(char * pszQuery, size_t querySize, TPlayerTable * p
 			"last_play = NOW(), "
 			"skill_group = %d, "
 			"alignment = %ld, "
-#ifdef ENABLE_CONQUEROR_LEVEL
-			"conquerorlevel = %d, "
-			"conqueror_level_step = %d, "
-			"sungma_str = %d, "
-			"sungma_hp = %d, "
-			"sungma_move = %d, "
-			"sungma_immune = %d, "
-			"conqueror_exp = %u, "
-			"conqueror_point = %d, "
-#endif
-
-
 			"horse_level = %d, "
 			"horse_riding = %d, "
 			"horse_hp = %d, "
@@ -172,6 +139,15 @@ size_t CreatePlayerSaveQuery(char * pszQuery, size_t querySize, TPlayerTable * p
 			"horse_skill_point = %d, "
 #ifdef ENABLE_ANTI_EXP
 			"anti_exp = %d, "
+#endif
+#ifdef ENABLE_BIOLOG_SYSTEM
+			"biolog_mission = %d, "
+			"biolog_collected = %d, "
+			"biolog_cooldown_reminder = %d, "
+			"biolog_cooldown = %ld, "
+#endif
+#ifdef ENABLE_RENEWAL_BATTLE_PASS
+			"battle_pass_premium_id = %d, "
 #endif
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
 			"shop_flag = %llu, "
@@ -187,57 +163,22 @@ size_t CreatePlayerSaveQuery(char * pszQuery, size_t querySize, TPlayerTable * p
 			"inventory_4 = %d, "
 			"inventory_5 = %d, "
 #endif
+#ifdef ENABLE_RENEWAL_BONUS_BOARD
+			"monster_killed = %lld, "
+			"stone_killed = %lld, "
+			"boss_killed = %lld, "
+			"blue_player_killed = %lld, "
+			"yellow_player_killed = %lld, "
+			"red_player_killed = %lld, "
+			"allplayer_killed = %lld, "
+			"duel_won = %lld, "
+			"duel_lost = %lld, "
+#endif
 #ifdef ENABLE_RIDING_EXTENDED
 			"mount_up_grade_exp = %d, "
 			"mount_up_grade_fail = %d, "
 #endif
-#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
-			"soul = %d, "
-			"soulre = %d, "
-#endif
-#ifdef ENABLE_HALLOWEEN_EVENT_SYSTEM
-			"halounlv = %d, "
-			"phaloun = %lld, "
-			"rhaloun = %d, "
-#endif
-#ifdef ENABLE_KILL_STATISTICS
-			"statistics_jinno_kills = %d, "
-			"statistics_shinsoo_kills = %d, "
-			"statistics_chunjo_kills = %d, "
-			"statistics_total_kills = %d, "
-			"statistics_total_deaths = %d, "
-			"statistics_duels_won = %d, "
-			"statistics_duels_lost = %d, "
-			"statistics_bosses_kills = %d, "
-			"statistics_stones_kills = %d, "
-			"statistics_mobs_kills = %d, "
-			"top_damage = %d, "
-#endif
-#ifdef ENABLE_RANKING
-			"r0 = %lld, "
-			"r1 = %lld, "
-			"r2 = %lld, "
-			"r3 = %lld, "
-			"r4 = %lld, "
-			"r5 = %lld, "
-			"r6 = %lld, "
-			"r7 = %lld, "
-			"r8 = %lld, "
-			"r9 = %lld, "
-			"r10 = %lld, "
-			"r11 = %lld, "
-			"r12 = %lld, "
-			"r13 = %lld, "
-			"r14 = %lld, "
-			"r15 = %lld, "
-			"r16 = %lld, "
-			"r17 = %lld, "
-			"r18 = %lld, "
-			"r19 = %lld, "
-			"r20 = %lld, "
-#endif
-			,
-		GetTablePostfix(),
+		,GetTablePostfix(),
 		pkTab->job,
 		pkTab->voice,
 		pkTab->dir,
@@ -261,9 +202,6 @@ size_t CreatePlayerSaveQuery(char * pszQuery, size_t querySize, TPlayerTable * p
 		pkTab->dx,
 		pkTab->iq,
 		pkTab->gold,
-#ifdef ENABLE_GAYA_SYSTEM
-		pkTab->gem,
-#endif
 		pkTab->exp,
 		pkTab->stat_point,
 		pkTab->skill_point,
@@ -280,16 +218,6 @@ size_t CreatePlayerSaveQuery(char * pszQuery, size_t querySize, TPlayerTable * p
 #endif
 		pkTab->skill_group,
 		pkTab->lAlignment,
-#ifdef ENABLE_CONQUEROR_LEVEL
-		pkTab->conquerorlevel,
-		pkTab->conqueror_level_step,
-		pkTab->sungma_str,
-		pkTab->sungma_hp,
-		pkTab->sungma_move,
-		pkTab->sungma_immune,
-		pkTab->conqueror_exp,
-		pkTab->conqueror_point,
-#endif
 		pkTab->horse.bLevel,
 		pkTab->horse.bRiding,
 		pkTab->horse.sHealth,
@@ -298,6 +226,15 @@ size_t CreatePlayerSaveQuery(char * pszQuery, size_t querySize, TPlayerTable * p
 		pkTab->horse_skill_point
 #ifdef ENABLE_ANTI_EXP
 		,pkTab->anti_exp
+#endif
+#ifdef ENABLE_BIOLOG_SYSTEM
+		,pkTab->m_BiologActualMission
+		,pkTab->m_BiologCollectedItems
+		,pkTab->m_BiologCooldownReminder
+		,pkTab->m_BiologCooldown
+#endif
+#ifdef ENABLE_RENEWAL_BATTLE_PASS
+		,pkTab->battle_pass_premium_id
 #endif
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
 		,pkTab->shopFlag
@@ -313,56 +250,22 @@ size_t CreatePlayerSaveQuery(char * pszQuery, size_t querySize, TPlayerTable * p
 		,pkTab->inventory_unlock[4]
 		,pkTab->inventory_unlock[5]
 #endif
+#ifdef ENABLE_RENEWAL_BONUS_BOARD
+		,pkTab->llMonsterKilled
+		,pkTab->llStoneKilled
+		,pkTab->llBossKilled
+		,pkTab->llBluePlayerKilled
+		,pkTab->llYellowPlayerKilled
+		,pkTab->llRedPlayerKilled
+		,pkTab->llAllPlayerKilled
+		,pkTab->llDuelWon
+		,pkTab->llDuelLost
+#endif
 #ifdef ENABLE_RIDING_EXTENDED
 		,pkTab->mount_up_grade_exp
 		,pkTab->mount_up_grade_fail
 #endif
-#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
-		,pkTab->soul
-		,pkTab->soulre
-#endif
-#ifdef ENABLE_HALLOWEEN_EVENT_SYSTEM
-		,pkTab->halounlv
-		,pkTab->phaloun
-		,pkTab->rhaloun
-#endif
-#ifdef ENABLE_KILL_STATISTICS
-		, pkTab->iJinnoKills,
-		pkTab->iShinsooKills,
-		pkTab->iChunjoKills,
-		pkTab->iTotalKills,
-		pkTab->iTotalDeaths,
-		pkTab->iDuelsWon,
-		pkTab->iDuelsLost,
-		pkTab->iBossesKills,
-		pkTab->iStonesKills,
-		pkTab->iMobsKills,
-		pkTab->top_damage
-#endif
-#ifdef ENABLE_RANKING
-		, pkTab->lRankPoints[0],
-		pkTab->lRankPoints[1],
-		pkTab->lRankPoints[2],
-		pkTab->lRankPoints[3],
-		pkTab->lRankPoints[4],
-		pkTab->lRankPoints[5],
-		pkTab->lRankPoints[6],
-		pkTab->lRankPoints[7],
-		pkTab->lRankPoints[8],
-		pkTab->lRankPoints[9],
-		pkTab->lRankPoints[10],
-		pkTab->lRankPoints[11],
-		pkTab->lRankPoints[12],
-		pkTab->lRankPoints[13],
-		pkTab->lRankPoints[14],
-		pkTab->lRankPoints[15],
-		pkTab->lRankPoints[16],
-		pkTab->lRankPoints[17],
-		pkTab->lRankPoints[18],
-		pkTab->lRankPoints[19],
-		pkTab->lRankPoints[20]
-#endif
-		);
+	);
 
 	static char text[8192 + 1];
 
@@ -418,7 +321,6 @@ void CClientManager::QUERY_SKILL_COLOR_LOAD(CPeer* peer, DWORD dwHandle, TPlayer
 	else
 	{
 		char szQuery[QUERY_MAX_LEN];
-#if !defined(ENABLE_NINETH_SKILL) && !defined(ENABLE_WOLFMAN_CHARACTER)
 		snprintf(szQuery, sizeof(szQuery), "SELECT "
 			"skillSlot1_Col1, skillSlot1_Col2, skillSlot1_Col3, skillSlot1_Col4, skillSlot1_Col5"
 			", skillSlot2_Col1, skillSlot2_Col2, skillSlot2_Col3, skillSlot2_Col4, skillSlot2_Col5"
@@ -426,21 +328,7 @@ void CClientManager::QUERY_SKILL_COLOR_LOAD(CPeer* peer, DWORD dwHandle, TPlayer
 			", skillSlot4_Col1, skillSlot4_Col2, skillSlot4_Col3, skillSlot4_Col4, skillSlot4_Col5"
 			", skillSlot5_Col1, skillSlot5_Col2, skillSlot5_Col3, skillSlot5_Col4, skillSlot5_Col5"
 			", skillSlot6_Col1, skillSlot6_Col2, skillSlot6_Col3, skillSlot6_Col4, skillSlot6_Col5"
-			", buffSkill1_Col1, buffSkill1_Col2, buffSkill1_Col3, buffSkill1_Col4, buffSkill1_Col5"
-			", buffSkill2_Col1, buffSkill2_Col2, buffSkill2_Col3, buffSkill2_Col4, buffSkill2_Col5"
-			", buffSkill3_Col1, buffSkill3_Col2, buffSkill3_Col3, buffSkill3_Col4, buffSkill3_Col5"
-			", buffSkill4_Col1, buffSkill4_Col2, buffSkill4_Col3, buffSkill4_Col4, buffSkill4_Col5"
-			", buffSkill5_Col1, buffSkill5_Col2, buffSkill5_Col3, buffSkill5_Col4, buffSkill5_Col5"
-			" FROM skill_color%s WHERE player_id = %d",
-			GetTablePostfix(), packet->player_id);
-#elif !defined(ENABLE_NINETH_SKILL)
-		snprintf(szQuery, sizeof(szQuery), "SELECT "
-			"skillSlot1_Col1, skillSlot1_Col2, skillSlot1_Col3, skillSlot1_Col4, skillSlot1_Col5"
-			", skillSlot2_Col1, skillSlot2_Col2, skillSlot2_Col3, skillSlot2_Col4, skillSlot2_Col5"
-			", skillSlot3_Col1, skillSlot3_Col2, skillSlot3_Col3, skillSlot3_Col4, skillSlot3_Col5"
-			", skillSlot4_Col1, skillSlot4_Col2, skillSlot4_Col3, skillSlot4_Col4, skillSlot4_Col5"
-			", skillSlot5_Col1, skillSlot5_Col2, skillSlot5_Col3, skillSlot5_Col4, skillSlot5_Col5"
-			", skillSlot6_Col1, skillSlot6_Col2, skillSlot6_Col3, skillSlot6_Col4, skillSlot6_Col5"
+			// Buff Skills
 			", buffSkill1_Col1, buffSkill1_Col2, buffSkill1_Col3, buffSkill1_Col4, buffSkill1_Col5"
 			", buffSkill2_Col1, buffSkill2_Col2, buffSkill2_Col3, buffSkill2_Col4, buffSkill2_Col5"
 			", buffSkill3_Col1, buffSkill3_Col2, buffSkill3_Col3, buffSkill3_Col4, buffSkill3_Col5"
@@ -449,53 +337,11 @@ void CClientManager::QUERY_SKILL_COLOR_LOAD(CPeer* peer, DWORD dwHandle, TPlayer
 			", buffSkill6_Col1, buffSkill6_Col2, buffSkill6_Col3, buffSkill6_Col4, buffSkill6_Col5"
 			" FROM skill_color%s WHERE player_id = %d",
 			GetTablePostfix(), packet->player_id);
-#elif !defined(ENABLE_WOLFMAN_CHARACTER)
-		snprintf(szQuery, sizeof(szQuery), "SELECT "
-			"skillSlot1_Col1, skillSlot1_Col2, skillSlot1_Col3, skillSlot1_Col4, skillSlot1_Col5"
-			", skillSlot2_Col1, skillSlot2_Col2, skillSlot2_Col3, skillSlot2_Col4, skillSlot2_Col5"
-			", skillSlot3_Col1, skillSlot3_Col2, skillSlot3_Col3, skillSlot3_Col4, skillSlot3_Col5"
-			", skillSlot4_Col1, skillSlot4_Col2, skillSlot4_Col3, skillSlot4_Col4, skillSlot4_Col5"
-			", skillSlot5_Col1, skillSlot5_Col2, skillSlot5_Col3, skillSlot5_Col4, skillSlot5_Col5"
-			", skillSlot6_Col1, skillSlot6_Col2, skillSlot6_Col3, skillSlot6_Col4, skillSlot6_Col5"
-			", skillSlot7_Col1, skillSlot7_Col2, skillSlot7_Col3, skillSlot7_Col4, skillSlot7_Col5"
-			", skillSlot8_Col1, skillSlot8_Col2, skillSlot8_Col3, skillSlot8_Col4, skillSlot8_Col5"
-			", skillSlot9_Col1, skillSlot9_Col2, skillSlot9_Col3, skillSlot9_Col4, skillSlot9_Col5"
-			", buffSkill1_Col1, buffSkill1_Col2, buffSkill1_Col3, buffSkill1_Col4, buffSkill1_Col5"
-			", buffSkill2_Col1, buffSkill2_Col2, buffSkill2_Col3, buffSkill2_Col4, buffSkill2_Col5"
-			", buffSkill3_Col1, buffSkill3_Col2, buffSkill3_Col3, buffSkill3_Col4, buffSkill3_Col5"
-			", buffSkill4_Col1, buffSkill4_Col2, buffSkill4_Col3, buffSkill4_Col4, buffSkill4_Col5"
-			", buffSkill5_Col1, buffSkill5_Col2, buffSkill5_Col3, buffSkill5_Col4, buffSkill5_Col5"
-			" FROM skill_color%s WHERE player_id = %d",
-			GetTablePostfix(), packet->player_id);
-#else
-		snprintf(szQuery, sizeof(szQuery), "SELECT "
-			"skillSlot1_Col1, skillSlot1_Col2, skillSlot1_Col3, skillSlot1_Col4, skillSlot1_Col5"
-			", skillSlot2_Col1, skillSlot2_Col2, skillSlot2_Col3, skillSlot2_Col4, skillSlot2_Col5"
-			", skillSlot3_Col1, skillSlot3_Col2, skillSlot3_Col3, skillSlot3_Col4, skillSlot3_Col5"
-			", skillSlot4_Col1, skillSlot4_Col2, skillSlot4_Col3, skillSlot4_Col4, skillSlot4_Col5"
-			", skillSlot5_Col1, skillSlot5_Col2, skillSlot5_Col3, skillSlot5_Col4, skillSlot5_Col5"
-			", skillSlot6_Col1, skillSlot6_Col2, skillSlot6_Col3, skillSlot6_Col4, skillSlot6_Col5"
-			", skillSlot7_Col1, skillSlot7_Col2, skillSlot7_Col3, skillSlot7_Col4, skillSlot7_Col5"
-			", skillSlot8_Col1, skillSlot8_Col2, skillSlot8_Col3, skillSlot8_Col4, skillSlot8_Col5"
-			", skillSlot9_Col1, skillSlot9_Col2, skillSlot9_Col3, skillSlot9_Col4, skillSlot9_Col5"
-			", buffSkill1_Col1, buffSkill1_Col2, buffSkill1_Col3, buffSkill1_Col4, buffSkill1_Col5"
-			", buffSkill2_Col1, buffSkill2_Col2, buffSkill2_Col3, buffSkill2_Col4, buffSkill2_Col5"
-			", buffSkill3_Col1, buffSkill3_Col2, buffSkill3_Col3, buffSkill3_Col4, buffSkill3_Col5"
-			", buffSkill4_Col1, buffSkill4_Col2, buffSkill4_Col3, buffSkill4_Col4, buffSkill4_Col5"
-			", buffSkill5_Col1, buffSkill5_Col2, buffSkill5_Col3, buffSkill5_Col4, buffSkill5_Col5"
-			", buffSkill6_Col1, buffSkill6_Col2, buffSkill6_Col3, buffSkill6_Col4, buffSkill6_Col5"
-			", buffSkill7_Col1, buffSkill7_Col2, buffSkill7_Col3, buffSkill7_Col4, buffSkill7_Col5"
-			" FROM skill_color%s WHERE player_id = %d",
-			GetTablePostfix(), packet->player_id);
-#endif
 		CDBManager::instance().ReturnQuery(szQuery, QID_SKILL_COLOR, peer->GetHandle(), new ClientHandleInfo(dwHandle, packet->player_id));
 	}
 }
 #endif
 
-/*
- * PLAYER LOAD
- */
 void CClientManager::QUERY_PLAYER_LOAD(CPeer * peer, DWORD dwHandle, TPlayerLoadPacket * packet)
 {
 	CPlayerTableCache * c;
@@ -517,7 +363,7 @@ void CClientManager::QUERY_PLAYER_LOAD(CPeer * peer, DWORD dwHandle, TPlayerLoad
 		if (!pkLD || pkLD->IsPlay())
 		{
 			sys_log(0, "PLAYER_LOAD_ERROR: LoginData %p IsPlay %d", pkLD, pkLD ? pkLD->IsPlay() : 0);
-			peer->EncodeHeader(HEADER_DG_PLAYER_LOAD_FAILED, dwHandle, 0);
+			peer->EncodeHeader(HEADER_DG_PLAYER_LOAD_FAILED, dwHandle, 0); 
 			return;
 		}
 
@@ -576,25 +422,15 @@ void CClientManager::QUERY_PLAYER_LOAD(CPeer * peer, DWORD dwHandle, TPlayerLoad
 			if (dwCount)
 				peer->Encode(&s_items[0], sizeof(TPlayerItem) * dwCount);
 
-			// Quest
-			snprintf(szQuery, sizeof(szQuery),
-					"SELECT dwPID,szName,szState,lValue FROM quest%s WHERE dwPID=%d AND lValue<>0",
-					GetTablePostfix(), pTab->id);
-
+			snprintf(szQuery, sizeof(szQuery), "SELECT dwPID,szName,szState,lValue FROM quest%s WHERE dwPID=%d AND lValue<>0", GetTablePostfix(), pTab->id);
 			CDBManager::instance().ReturnQuery(szQuery, QID_QUEST, peer->GetHandle(), new ClientHandleInfo(dwHandle,0,packet->account_id));
 
-			// Affect
-			snprintf(szQuery, sizeof(szQuery),
-					"SELECT dwPID,bType,bApplyOn,lApplyValue,dwFlag,lDuration,lSPCost"
-					" FROM affect%s WHERE dwPID=%d",
-					GetTablePostfix(), pTab->id);
-			// @fixme402 ClientHandleInfo+pTab->id
-			CDBManager::instance().ReturnQuery(szQuery, QID_AFFECT, peer->GetHandle(), new ClientHandleInfo(dwHandle, pTab->id));
+			snprintf(szQuery, sizeof(szQuery), "SELECT dwPID,bType,bApplyOn,lApplyValue,dwFlag,lDuration,lSPCost FROM affect%s WHERE dwPID=%d", GetTablePostfix(), pTab->id);
+			CDBManager::instance().ReturnQuery(szQuery, QID_AFFECT, peer->GetHandle(), new ClientHandleInfo(dwHandle));
 		}
-
 		else
 		{
-			snprintf(szQuery, sizeof(szQuery),
+			snprintf(szQuery, sizeof(szQuery), 
 				"SELECT "
 				"id,"
 				"window+0,"
@@ -638,70 +474,28 @@ void CClientManager::QUERY_PLAYER_LOAD(CPeer * peer, DWORD dwHandle, TPlayerLoad
 
 		snprintf(queryStr, sizeof(queryStr),
 				"SELECT "
-				"id, "
-				"name, "
-				"job, "
-				"voice, "
-				"dir, "
-				"x, "
-				"y, "
-				"z, "
-				"map_index, "
-				"exit_x, "
-				"exit_y, "
-				"exit_map_index, "
-				"hp, "
-				"mp, "
-				"stamina, "
-				"random_hp, "
-				"random_sp, "
-				"playtime, "
-				"gold, "
-#ifdef ENABLE_GAYA_SYSTEM
-				"gem, "
-#endif
-				"level, "
-				"level_step, "
-				"st, "
-				"ht, "
-				"dx, "
-				"iq, "
-				"exp, "
-				"stat_point, "
-				"skill_point, "
-				"sub_skill_point, "
-				"stat_reset_count, "
-				"part_base, "
-				"part_hair, "
+				"id,name,job,voice,dir,x,y,z,map_index,exit_x,exit_y,exit_map_index,hp,mp,stamina,random_hp,random_sp,playtime,"
+				"gold,level,level_step,st,ht,dx,iq,exp,"
+				"stat_point,skill_point,sub_skill_point,stat_reset_count,part_base,part_hair,"
 #ifdef ENABLE_ACCE_COSTUME_SYSTEM
 				"part_acce, "
 #endif
 #ifdef ENABLE_AURA_COSTUME_SYSTEM
 				"part_aura, "
 #endif
-				"skill_level, "
-				"quickslot, "
-				"skill_group, "
-				"alignment, "
-#ifdef ENABLE_CONQUEROR_LEVEL
-				"conquerorlevel, "
-				"conqueror_level_step, "
-				"sungma_str, "
-				"sungma_hp, "
-				"sungma_move, "
-				"sungma_immune, "
-				"conqueror_exp, "
-				"conqueror_point, "
-#endif
-				"horse_level, "
-				"horse_riding, "
-				"horse_hp, "
-				"horse_hp_droptime, "
-				"horse_stamina, "
-				"UNIX_TIMESTAMP(NOW())-UNIX_TIMESTAMP(last_play), "
-				"horse_skill_point"
+				"skill_level,quickslot,skill_group,alignment,horse_level,horse_riding,horse_hp,horse_hp_droptime,horse_stamina,"
+				"UNIX_TIMESTAMP(NOW())-UNIX_TIMESTAMP(last_play),horse_skill_point"
 #ifdef ENABLE_ANTI_EXP
 				",anti_exp "
+#endif
+#ifdef ENABLE_BIOLOG_SYSTEM
+				",biolog_mission "
+				",biolog_collected "
+				",biolog_cooldown_reminder "
+				",biolog_cooldown "
+#endif
+#ifdef ENABLE_RENEWAL_BATTLE_PASS
+				",battle_pass_premium_id "
 #endif
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
 				",shop_flag "
@@ -717,66 +511,29 @@ void CClientManager::QUERY_PLAYER_LOAD(CPeer * peer, DWORD dwHandle, TPlayerLoad
 				",inventory_4 "
 				",inventory_5 "
 #endif
+#ifdef ENABLE_RENEWAL_BONUS_BOARD
+				",monster_killed "
+				",stone_killed "
+				",boss_killed "
+				",blue_player_killed "
+				",yellow_player_killed "
+				",red_player_killed "
+				",allplayer_killed "
+				",duel_won "
+				",duel_lost "
+#endif
 #ifdef ENABLE_RIDING_EXTENDED
 				",mount_up_grade_exp "
 				",mount_up_grade_fail "
 #endif
-#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
-				",soul "
-				",soulre "
-#endif
-#ifdef ENABLE_HALLOWEEN_EVENT_SYSTEM
-				",halounlv "
-				",phaloun "
-				",rhaloun "
-#endif
-#ifdef ENABLE_KILL_STATISTICS
-				", statistics_jinno_kills, "
-				"statistics_shinsoo_kills, "
-				"statistics_chunjo_kills, "
-				"statistics_total_kills, "
-				"statistics_total_deaths, "
-				"statistics_duels_won, "
-				"statistics_duels_lost, "
-				"statistics_bosses_kills, "
-				"statistics_stones_kills, "
-				"statistics_mobs_kills, "
-				"top_damage "
-#endif
-#ifdef ENABLE_RANKING
-				", r0, "
-				"r1, "
-				"r2, "
-				"r3, "
-				"r4, "
-				"r5, "
-				"r6, "
-				"r7, "
-				"r8, "
-				"r9, "
-				"r10, "
-				"r11, "
-				"r12, "
-				"r13, "
-				"r14, "
-				"r15, "
-				"r16, "
-				"r17, "
-				"r18, "
-				"r19, "
-				"r20 "
-#endif
-				"FROM player%s WHERE id=%d"
-				,
-				GetTablePostfix(),
-				packet->player_id
-				);
+				"FROM player%s WHERE id=%d",
+				GetTablePostfix(), packet->player_id);
 
 		ClientHandleInfo * pkInfo = new ClientHandleInfo(dwHandle, packet->player_id);
 		pkInfo->account_id = packet->account_id;
 		CDBManager::instance().ReturnQuery(queryStr, QID_PLAYER, peer->GetHandle(), pkInfo);
 
-		snprintf(queryStr, sizeof(queryStr),
+		snprintf(queryStr, sizeof(queryStr), 
 				"SELECT "
 				"id,"
 				"window+0,"
@@ -811,6 +568,14 @@ void CClientManager::QUERY_PLAYER_LOAD(CPeer * peer, DWORD dwHandle, TPlayerLoad
 		snprintf(queryStr, sizeof(queryStr), "SELECT dwPID,bType,bApplyOn,lApplyValue,dwFlag,lDuration,lSPCost FROM affect%s WHERE dwPID=%d", GetTablePostfix(), packet->player_id);
 		CDBManager::instance().ReturnQuery(queryStr, QID_AFFECT, peer->GetHandle(), new ClientHandleInfo(dwHandle, packet->player_id));
 	}
+
+#ifdef ENABLE_RENEWAL_BATTLE_PASS
+	char queryStrBP[QUERY_MAX_LEN];
+	snprintf(queryStrBP, sizeof(queryStrBP),
+		"SELECT player_id, battlepass_type+0, mission_index, mission_type+0, battle_pass_id, extra_info, completed FROM battlepass_missions WHERE player_id = %d", packet->player_id);
+
+	CDBManager::instance().ReturnQuery(queryStrBP, QID_EXT_BATTLE_PASS, peer->GetHandle(), new ClientHandleInfo(dwHandle, packet->player_id));
+#endif
 
 #ifdef ENABLE_GROWTH_PET_SYSTEM
 	TGrowthPetCacheSet* pSet = GetGrowthPetCacheSet(packet->player_id);
@@ -866,24 +631,24 @@ void CClientManager::ItemAward(CPeer * peer,char* login)
 	while(it != pSet->end() )
 	{
 		TItemAward * pItemAward = *(it++);
-		char* whyStr = pItemAward->szWhy; //why colum read
-		char cmdStr[100] = ""; //Copy the value read from the why Colum into a temporary string
-		strcpy(cmdStr,whyStr); //If you write a token in the process of obtaining the command, the original is also tokenized.
+		char* whyStr = pItemAward->szWhy;
+		char cmdStr[100] = "";
+		strcpy(cmdStr,whyStr);
 		char command[20] = "";
-		// @fixme203 directly GetCommand instead of strcpy
-		GetCommand(cmdStr, command); // Get command
-		if( !(strcmp(command,"GIFT") )) // If command is GIFT
+		strcpy(command,GetCommand(cmdStr));
+		if( !(strcmp(command,"GIFT") ))
 		{
 			TPacketItemAwardInfromer giftData;
-			strcpy(giftData.login, pItemAward->szLogin); //Login ID Copy
-			strcpy(giftData.command, command); //Command copy
-			giftData.vnum = pItemAward->dwVnum; //Copy item vnum too
+			strcpy(giftData.login, pItemAward->szLogin);
+			strcpy(giftData.command, command);
+			giftData.vnum = pItemAward->dwVnum;
 			ForwardPacket(HEADER_DG_ITEMAWARD_INFORMER,&giftData,sizeof(TPacketItemAwardInfromer));
 		}
 	}
 }
-char* CClientManager::GetCommand(char* str, char* command) // @fixme203
+char* CClientManager::GetCommand(char* str)
 {
+	char command[20] = "";
 	char* tok;
 
 	if( str[0] == '[' )
@@ -897,7 +662,7 @@ char* CClientManager::GetCommand(char* str, char* command) // @fixme203
 
 bool CreatePlayerTableFromRes(MYSQL_RES * res, TPlayerTable * pkTab)
 {
-	if (mysql_num_rows(res) == 0) // no data
+	if (mysql_num_rows(res) == 0)
 		return false;
 
 	memset(pkTab, 0, sizeof(TPlayerTable));
@@ -906,10 +671,6 @@ bool CreatePlayerTableFromRes(MYSQL_RES * res, TPlayerTable * pkTab)
 
 	int	col = 0;
 
-	// "id,name,job,voice,dir,x,y,z,map_index,exit_x,exit_y,exit_map_index,hp,mp,stamina,random_hp,random_sp,playtime,"
-	// "gold,level,level_step,st,ht,dx,iq,exp,"
-	// "stat_point,skill_point,sub_skill_point,stat_reset_count,part_base,part_hair,"
-	// "skill_level,quickslot,skill_group,alignment,mobile,horse_level,horse_riding,horse_hp,horse_stamina FROM player%s WHERE id=%d",
 	str_to_number(pkTab->id, row[col++]);
 	strlcpy(pkTab->name, row[col++], sizeof(pkTab->name));
 	str_to_number(pkTab->job, row[col++]);
@@ -929,9 +690,6 @@ bool CreatePlayerTableFromRes(MYSQL_RES * res, TPlayerTable * pkTab)
 	str_to_number(pkTab->sRandomSP, row[col++]);
 	str_to_number(pkTab->playtime, row[col++]);
 	str_to_number(pkTab->gold, row[col++]);
-#ifdef ENABLE_GAYA_SYSTEM
-	str_to_number(pkTab->gem, row[col++]);
-#endif
 	str_to_number(pkTab->level, row[col++]);
 	str_to_number(pkTab->level_step, row[col++]);
 	str_to_number(pkTab->st, row[col++]);
@@ -968,16 +726,6 @@ bool CreatePlayerTableFromRes(MYSQL_RES * res, TPlayerTable * pkTab)
 
 	str_to_number(pkTab->skill_group, row[col++]);
 	str_to_number(pkTab->lAlignment, row[col++]);
-#ifdef ENABLE_CONQUEROR_LEVEL
-	str_to_number(pkTab->conquerorlevel, row[col++]);
-	str_to_number(pkTab->conqueror_level_step, row[col++]);
-	str_to_number(pkTab->sungma_str, row[col++]);
-	str_to_number(pkTab->sungma_hp, row[col++]);
-	str_to_number(pkTab->sungma_move, row[col++]);
-	str_to_number(pkTab->sungma_immune, row[col++]);
-	str_to_number(pkTab->conqueror_exp, row[col++]);
-	str_to_number(pkTab->conqueror_point, row[col++]);
-#endif
 	str_to_number(pkTab->horse.bLevel, row[col++]);
 	str_to_number(pkTab->horse.bRiding, row[col++]);
 	str_to_number(pkTab->horse.sHealth, row[col++]);
@@ -988,15 +736,21 @@ bool CreatePlayerTableFromRes(MYSQL_RES * res, TPlayerTable * pkTab)
 #ifdef ENABLE_ANTI_EXP
 	str_to_number(pkTab->anti_exp, row[col++]);
 #endif
-
+#ifdef ENABLE_BIOLOG_SYSTEM
+	str_to_number(pkTab->m_BiologActualMission, row[col++]);
+	str_to_number(pkTab->m_BiologCollectedItems, row[col++]);
+	str_to_number(pkTab->m_BiologCooldownReminder, row[col++]);
+	str_to_number(pkTab->m_BiologCooldown, row[col++]);
+#endif
+#ifdef ENABLE_RENEWAL_BATTLE_PASS
+	str_to_number(pkTab->battle_pass_premium_id, row[col++]);
+#endif
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
 	str_to_number(pkTab->shopFlag, row[col++]);
 #endif
-
 #ifdef ENABLE_AUTOMATIC_PICK_UP_SYSTEM
 	str_to_number(pkTab->dwPickUPMode, row[col++]);
 #endif
-
 #ifdef ENABLE_INVENTORY_EXPANSION_SYSTEM
 	str_to_number(pkTab->inventory_unlock[0], row[col++]);
 	str_to_number(pkTab->inventory_unlock[1], row[col++]);
@@ -1005,56 +759,36 @@ bool CreatePlayerTableFromRes(MYSQL_RES * res, TPlayerTable * pkTab)
 	str_to_number(pkTab->inventory_unlock[4], row[col++]);
 	str_to_number(pkTab->inventory_unlock[5], row[col++]);
 #endif
-
+#ifdef ENABLE_RENEWAL_BONUS_BOARD
+	str_to_number(pkTab->llMonsterKilled, row[col++]);
+	str_to_number(pkTab->llStoneKilled, row[col++]);
+	str_to_number(pkTab->llBossKilled, row[col++]);
+	str_to_number(pkTab->llBluePlayerKilled, row[col++]);
+	str_to_number(pkTab->llYellowPlayerKilled, row[col++]);
+	str_to_number(pkTab->llRedPlayerKilled, row[col++]);
+	str_to_number(pkTab->llAllPlayerKilled, row[col++]);
+	str_to_number(pkTab->llDuelWon, row[col++]);
+	str_to_number(pkTab->llDuelLost, row[col++]);
+#endif
 #ifdef ENABLE_RIDING_EXTENDED
 	str_to_number(pkTab->mount_up_grade_exp, row[col++]);
 	str_to_number(pkTab->mount_up_grade_fail, row[col++]);
 #endif
 
-#ifdef ENABLE_SOUL_ROULETTE_SYSTEM
-	str_to_number(pkTab->soul, row[col++]);
-	str_to_number(pkTab->soulre, row[col++]);
-#endif
-
-#ifdef ENABLE_HALLOWEEN_EVENT_SYSTEM
-	str_to_number(pkTab->halounlv, row[col++]);
-	str_to_number(pkTab->phaloun, row[col++]);
-	str_to_number(pkTab->rhaloun, row[col++]);
-#endif
-
-#ifdef ENABLE_KILL_STATISTICS
-	str_to_number(pkTab->iJinnoKills, row[col++]);
-	str_to_number(pkTab->iShinsooKills, row[col++]);
-	str_to_number(pkTab->iChunjoKills, row[col++]);
-	str_to_number(pkTab->iTotalKills, row[col++]);
-	str_to_number(pkTab->iTotalDeaths, row[col++]);
-	str_to_number(pkTab->iDuelsWon, row[col++]);
-	str_to_number(pkTab->iDuelsLost, row[col++]);
-	str_to_number(pkTab->iBossesKills, row[col++]);
-	str_to_number(pkTab->iStonesKills, row[col++]);
-	str_to_number(pkTab->iMobsKills, row[col++]);
-	str_to_number(pkTab->top_damage, row[col++]);
-#endif
-
-#ifdef ENABLE_RANKING
-	for (int i = 0; i < RANKING_MAX_CATEGORIES; ++i)
-		str_to_number(pkTab->lRankPoints[i], row[col++]);
-#endif
-
 	// reset sub_skill_point
 	{
-		pkTab->skills[123].bLevel = 0; // SKILL_CREATE
+		pkTab->skills[123].bLevel = 0;
 
 		if (pkTab->level > 9)
 		{
 			int max_point = pkTab->level - 9;
 
-			int skill_point =
-				MIN(20, pkTab->skills[121].bLevel) +	// SKILL_LEADERSHIP
-				MIN(20, pkTab->skills[124].bLevel) +	// SKILL_MINING
-				MIN(10, pkTab->skills[131].bLevel) +	// SKILL_HORSE_SUMMON
-				MIN(20, pkTab->skills[141].bLevel) +	// SKILL_ADD_HP
-				MIN(20, pkTab->skills[142].bLevel);		// SKILL_RESIST_PENETRATE
+			int skill_point = 
+				MIN(20, pkTab->skills[121].bLevel) +
+				MIN(20, pkTab->skills[124].bLevel) +
+				MIN(10, pkTab->skills[131].bLevel) +
+				MIN(20, pkTab->skills[141].bLevel) +
+				MIN(20, pkTab->skills[142].bLevel);
 
 			pkTab->sub_skill_point = max_point - skill_point;
 		}
@@ -1069,7 +803,7 @@ void CClientManager::RESULT_COMPOSITE_PLAYER(CPeer * peer, SQLMsg * pMsg, DWORD 
 {
 	CQueryInfo * qi = (CQueryInfo *) pMsg->pvUserData;
 	std::unique_ptr<ClientHandleInfo> info((ClientHandleInfo *) qi->pvData);
-
+	
 	MYSQL_RES * pSQLResult = pMsg->Get()->pSQLResult;
 	if (!pSQLResult)
 	{
@@ -1097,39 +831,37 @@ void CClientManager::RESULT_COMPOSITE_PLAYER(CPeer * peer, SQLMsg * pMsg, DWORD 
 			break;
 #endif
 
-        case QID_QUEST:
-        {
-            sys_log(0, "QID_QUEST %u", info->dwHandle);
-            RESULT_QUEST_LOAD(peer, pSQLResult, info->dwHandle, info->player_id);
+		case QID_QUEST:
+			{
+				sys_log(0, "QID_QUEST %u", info->dwHandle);
+				RESULT_QUEST_LOAD(peer, pSQLResult, info->dwHandle, info->player_id);
 
-            ClientHandleInfo* temp1 = info.get();
-            if (temp1 == NULL)
-            {
-                break;
-            }
+				ClientHandleInfo*  temp1 = info.get();
+				if (temp1 == NULL)
+					break;
 
-            CLoginData* pLoginData1 = GetLoginDataByAID(temp1->account_id);
-            if (pLoginData1 == NULL)
-            {
-                break;
-            }
+				CLoginData* pLoginData1 = GetLoginDataByAID(temp1->account_id);
 
-            const char* login = pLoginData1->GetAccountRef().login;
-            if (!login)
-            {
-                break;
-            }
-
-            sys_log(0, "info of pLoginData1 before call ItemAwardfunction %d", pLoginData1);
-            ItemAward(peer, pLoginData1->GetAccountRef().login);
-            break;
-        }
+				if( pLoginData1->GetAccountRef().login == NULL)
+					break;
+				if( pLoginData1 == NULL )
+					break;
+				sys_log(0,"info of pLoginData1 before call ItemAwardfunction %d",pLoginData1);
+				ItemAward(peer,pLoginData1->GetAccountRef().login);
+			}
+			break;
 
 		case QID_AFFECT:
 			sys_log(0, "QID_AFFECT %u", info->dwHandle);
-			// @fixme402 RESULT_AFFECT_LOAD+info->player_id
-			RESULT_AFFECT_LOAD(peer, pSQLResult, info->dwHandle, info->player_id);
+			RESULT_AFFECT_LOAD(peer, pSQLResult, info->dwHandle);
 			break;
+
+#ifdef ENABLE_RENEWAL_BATTLE_PASS
+		case QID_EXT_BATTLE_PASS:
+			sys_log(0, "QID_EXT_BATTLE_PASS %u", info->dwHandle);
+			RESULT_EXT_BATTLE_PASS_LOAD(peer, pSQLResult, info->dwHandle, info->player_id);
+			break;
+#endif
 
 #ifdef ENABLE_GROWTH_PET_SYSTEM
 		case QID_GROWTH_PET:
@@ -1146,16 +878,16 @@ void CClientManager::RESULT_PLAYER_LOAD(CPeer * peer, MYSQL_RES * pRes, ClientHa
 
 	if (!CreatePlayerTableFromRes(pRes, &tab))
 	{
-		peer->EncodeHeader(HEADER_DG_PLAYER_LOAD_FAILED, pkInfo->dwHandle, 0);
+		peer->EncodeHeader(HEADER_DG_PLAYER_LOAD_FAILED, pkInfo->dwHandle, 0); 
 		return;
 	}
 
 	CLoginData * pkLD = GetLoginDataByAID(pkInfo->account_id);
-
+	
 	if (!pkLD || pkLD->IsPlay())
 	{
 		sys_log(0, "PLAYER_LOAD_ERROR: LoginData %p IsPlay %d", pkLD, pkLD ? pkLD->IsPlay() : 0);
-		peer->EncodeHeader(HEADER_DG_PLAYER_LOAD_FAILED, pkInfo->dwHandle, 0);
+		peer->EncodeHeader(HEADER_DG_PLAYER_LOAD_FAILED, pkInfo->dwHandle, 0); 
 		return;
 	}
 
@@ -1180,26 +912,23 @@ void CClientManager::RESULT_PLAYER_LOAD(CPeer * peer, MYSQL_RES * pRes, ClientHa
 void CClientManager::RESULT_ITEM_LOAD(CPeer * peer, MYSQL_RES * pRes, DWORD dwHandle, DWORD dwPID)
 {
 	static std::vector<TPlayerItem> s_items;
-	// DB
+
 	CreateItemTableFromRes(pRes, &s_items, dwPID);
 	DWORD dwCount = s_items.size();
 
 	peer->EncodeHeader(HEADER_DG_ITEM_LOAD, dwHandle, sizeof(DWORD) + sizeof(TPlayerItem) * dwCount);
 	peer->EncodeDWORD(dwCount);
 
-	// Create a CacheSet
 	CreateItemCacheSet(dwPID);
 
-	// ITEM_LOAD_LOG_ATTACH_PID
 	sys_log(0, "ITEM_LOAD: count %u pid %u", dwCount, dwPID);
-	// END_OF_ITEM_LOAD_LOG_ATTACH_PID
 
 	if (dwCount)
 	{
 		peer->Encode(&s_items[0], sizeof(TPlayerItem) * dwCount);
 
 		for (DWORD i = 0; i < dwCount; ++i)
-			PutItemCache(&s_items[i], true); // Since there is no need to save the loaded one, put true in the argument bSkipQuery.
+			PutItemCache(&s_items[i], true);
 	}
 }
 
@@ -1231,28 +960,12 @@ void CClientManager::RESULT_SKILL_COLOR_LOAD(CPeer* peer, MYSQL_RES* pRes, DWORD
 }
 #endif
 
-// @fixme402 (RESULT_AFFECT_LOAD +dwRealPID)
-void CClientManager::RESULT_AFFECT_LOAD(CPeer * peer, MYSQL_RES * pRes, DWORD dwHandle, DWORD dwRealPID)
+void CClientManager::RESULT_AFFECT_LOAD(CPeer * peer, MYSQL_RES * pRes, DWORD dwHandle)
 {
 	int iNumRows;
 
 	if ((iNumRows = mysql_num_rows(pRes)) == 0)
-	{
-		// @fixme402 begin
-		static DWORD dwPID;
-		static DWORD dwCount = 0; //1;
-		static TPacketAffectElement paeTable = {0};
-
-		dwPID = dwRealPID;
-		sys_log(0, "AFFECT_LOAD: count %u PID %u RealPID %u", dwCount, dwPID, dwRealPID);
-
-		peer->EncodeHeader(HEADER_DG_AFFECT_LOAD, dwHandle, sizeof(DWORD) + sizeof(DWORD) + sizeof(TPacketAffectElement) * dwCount);
-		peer->Encode(&dwPID, sizeof(DWORD));
-		peer->Encode(&dwCount, sizeof(DWORD));
-		peer->Encode(&paeTable, sizeof(TPacketAffectElement) * dwCount);
-		// @fixme402 end
 		return;
-	}
 
 	static std::vector<TPacketAffectElement> s_elements;
 	s_elements.resize(iNumRows);
@@ -1293,7 +1006,7 @@ void CClientManager::RESULT_QUEST_LOAD(CPeer * peer, MYSQL_RES * pRes, DWORD dwH
 
 	if ((iNumRows = mysql_num_rows(pRes)) == 0)
 	{
-		DWORD dwCount = 0;
+		DWORD dwCount = 0; 
 		peer->EncodeHeader(HEADER_DG_QUEST_LOAD, dwHandle, sizeof(DWORD));
 		peer->Encode(&dwCount, sizeof(DWORD));
 		return;
@@ -1325,9 +1038,75 @@ void CClientManager::RESULT_QUEST_LOAD(CPeer * peer, MYSQL_RES * pRes, DWORD dwH
 	peer->Encode(&s_table[0], sizeof(TQuestTable) * dwCount);
 }
 
-/*
- * PLAYER SAVE
- */
+#ifdef ENABLE_RENEWAL_BATTLE_PASS
+void CClientManager::RESULT_EXT_BATTLE_PASS_LOAD(CPeer* peer, MYSQL_RES* pRes, DWORD dwHandle, DWORD dwRealPID)
+{
+	int iNumRows;
+
+	if ((iNumRows = mysql_num_rows(pRes)) == 0)
+	{
+		DWORD dwCount = 0;
+		TPlayerExtBattlePassMission pbpTable = { 0 };
+
+		sys_log(0, "EXT_BATTLE_PASS_LOAD: count %u PID %u", dwCount, dwRealPID);
+
+		peer->EncodeHeader(HEADER_DG_EXT_BATTLE_PASS_LOAD, dwHandle, sizeof(DWORD) + sizeof(DWORD) + sizeof(TPlayerExtBattlePassMission) * dwCount);
+		peer->Encode(&dwRealPID, sizeof(DWORD));
+		peer->Encode(&dwCount, sizeof(DWORD));
+		peer->Encode(&pbpTable, sizeof(TPlayerExtBattlePassMission) * dwCount);
+		return;
+	}
+
+	static std::vector<TPlayerExtBattlePassMission> s_mission;
+	s_mission.resize(iNumRows);
+
+	MYSQL_ROW row;
+
+	for (int i = 0; i < iNumRows; ++i)
+	{
+		int col = 0;
+		TPlayerExtBattlePassMission& r = s_mission[i];
+		row = mysql_fetch_row(pRes);
+
+		str_to_number(r.dwPlayerId, row[col++]);
+		str_to_number(r.dwBattlePassType, row[col++]);
+		str_to_number(r.dwMissionIndex, row[col++]);
+		str_to_number(r.dwMissionType, row[col++]);
+		str_to_number(r.dwBattlePassId, row[col++]);
+		str_to_number(r.dwExtraInfo, row[col++]);
+		str_to_number(r.bCompleted, row[col++]);
+
+		r.bIsUpdated = 0;
+	}
+
+	sys_log(0, "EXT_BATTLE_PASS_LOAD: count %d PID %u", s_mission.size(), dwRealPID);
+
+	DWORD dwCount = s_mission.size();
+
+	peer->EncodeHeader(HEADER_DG_EXT_BATTLE_PASS_LOAD, dwHandle, sizeof(DWORD) + sizeof(DWORD) + sizeof(TPlayerExtBattlePassMission) * dwCount);
+	peer->Encode(&dwRealPID, sizeof(DWORD));
+	peer->Encode(&dwCount, sizeof(DWORD));
+	peer->Encode(&s_mission[0], sizeof(TPlayerExtBattlePassMission) * dwCount);
+}
+
+void CClientManager::QUERY_SAVE_EXT_BATTLE_PASS(CPeer* peer, DWORD dwHandle, TPlayerExtBattlePassMission* battlePass)
+{
+	if (g_test_server)
+		sys_log(0, "QUERY_SAVE_EXT_BATTLE_PASS: %lu", battlePass->dwPlayerId);
+
+	char szQuery[QUERY_MAX_LEN];
+	snprintf(szQuery, sizeof(szQuery),
+		"REPLACE INTO battlepass_missions (player_id, battlepass_type, mission_index, mission_type, battle_pass_id, extra_info, completed) VALUES (%lu, %d, %d, %d, %d, %d, %d)",
+		battlePass->dwPlayerId,
+		battlePass->dwBattlePassType,
+		battlePass->dwMissionIndex,
+		battlePass->dwMissionType,
+		battlePass->dwBattlePassId,
+		battlePass->dwExtraInfo,
+		battlePass->bCompleted ? 1 : 0);
+	CDBManager::instance().AsyncQuery(szQuery);
+}
+#endif
 
 void CClientManager::QUERY_PLAYER_SAVE(CPeer * peer, DWORD dwHandle, TPlayerTable * pkTab)
 {
@@ -1340,9 +1119,6 @@ void CClientManager::QUERY_PLAYER_SAVE(CPeer * peer, DWORD dwHandle, TPlayerTabl
 typedef std::map<DWORD, time_t> time_by_id_map_t;
 static time_by_id_map_t s_createTimeByAccountID;
 
-/*
- * PLAYER CREATE
- */
 void CClientManager::__QUERY_PLAYER_CREATE(CPeer *peer, DWORD dwHandle, TPlayerCreatePacket* packet)
 {
 	char	queryStr[QUERY_MAX_LEN];
@@ -1362,7 +1138,7 @@ void CClientManager::__QUERY_PLAYER_CREATE(CPeer *peer, DWORD dwHandle, TPlayerC
 		}
 	}
 
-	queryLen = snprintf(queryStr, sizeof(queryStr),
+	queryLen = snprintf(queryStr, sizeof(queryStr), 
 			"SELECT pid%u FROM player_index%s WHERE id=%d", packet->account_index + 1, GetTablePostfix(), packet->account_id);
 
 	std::unique_ptr<SQLMsg> pMsg0(CDBManager::instance().DirectQuery(queryStr));
@@ -1418,143 +1194,73 @@ void CClientManager::__QUERY_PLAYER_CREATE(CPeer *peer, DWORD dwHandle, TPlayerC
 		return;
 	}
 
-	static char text[4096 + 1];
-
-	queryLen = snprintf(queryStr, sizeof(queryStr),
-			"INSERT INTO player%s ("
-			"id, "
-			"account_id, "
-			"name, "
-			"level, "
-			"st, "
-			"ht, "
-			"dx, "
-			"iq, "
-			"job, "
-			"voice, "
-			"dir, "
-			"x, "
-			"y, "
-			"z, "
-			"hp, "
-			"mp, "
-			"random_hp, "
-			"random_sp, "
-			"stat_point, "
-			"stamina, "
-			"part_base, "
-			"part_main, "
-			"part_hair, "
+	queryLen = snprintf(queryStr, sizeof(queryStr), 
+			"INSERT INTO player%s "
+			"(id, account_id, name, level, st, ht, dx, iq, "
+			"job, voice, dir, x, y, z, "
+			"hp, mp, random_hp, random_sp, stat_point, stamina, part_base, part_main, part_hair, "
 #ifdef ENABLE_ACCE_COSTUME_SYSTEM
 			"part_acce, "
 #endif
 #ifdef ENABLE_AURA_COSTUME_SYSTEM
 			"part_aura, "
 #endif
-			"gold, "
-#ifdef ENABLE_GAYA_SYSTEM
-			"gem, "
+#ifdef ENABLE_RENEWAL_BONUS_BOARD
+			"monster_killed, "
+			"stone_killed, "
+			"boss_killed, "
+			"blue_player_killed, "
+			"yellow_player_killed, "
+			"red_player_killed, "
+			"allplayer_killed, "
+			"duel_won, "
+			"duel_lost, "
 #endif
-			"playtime, "
-#ifdef ENABLE_HALLOWEEN_EVENT_SYSTEM
-			"halounlv, phaloun, rhaloun, "
-#endif
-			"skill_level, "
-			"quickslot"
-			") VALUES("
-			"0, "
-			"%u, "
-			"'%s', "
-			"%d, "
-			"%d, "
-			"%d, "
-			"%d, "
-			"%d, "
-			"%d, "
-			"%d, "
-			"%d, "
-			"%d, "
-			"%d, "
-			"%d, "
-			"%d, "
-			"%d, "
-			"%d, "
-			"%d, "
-			"%d, "
-			"%d, "
-			"%d, "
-			"%d, "
-			"0, "
+			"gold, playtime, "
+			"skill_level, quickslot "
+			")VALUES(0, %u, '%s', %d, %d, %d, %d, %d, "
+			"%d, %d, %d, %d, %d, %d, %d, "
+			"%d, %d, %d, %d, %d, %d, %d, 0, "
 #ifdef ENABLE_ACCE_COSTUME_SYSTEM
 			"0, "
 #endif
 #ifdef ENABLE_AURA_COSTUME_SYSTEM
 			"0, "
 #endif
+#ifdef ENABLE_RENEWAL_BONUS_BOARD
+			"%lld, "
+			"%lld, "
+			"%lld, "
+			"%lld, "
+			"%lld, "
+			"%lld, "
+			"%lld, "
+			"%lld, "
+			"%lld, "
+#endif
 #ifdef ENABLE_GOLD_LIMIT
 			"%lld, "
 #else
 			"%d, "
 #endif
-#ifdef ENABLE_GAYA_SYSTEM
-			"%d, "
-#endif
 			"0, "
-#ifdef ENABLE_HALLOWEEN_EVENT_SYSTEM
-			"%d, %lld, %d, "
+			,GetTablePostfix(),
+			packet->account_id, packet->player_table.name, packet->player_table.level, packet->player_table.st, packet->player_table.ht, packet->player_table.dx, packet->player_table.iq,
+			packet->player_table.job, packet->player_table.voice, packet->player_table.dir, packet->player_table.x, packet->player_table.y, packet->player_table.z,
+			packet->player_table.hp, packet->player_table.sp, packet->player_table.sRandomHP, packet->player_table.sRandomSP, packet->player_table.stat_point, packet->player_table.stamina, packet->player_table.part_base, packet->player_table.part_base, packet->player_table.gold
+#ifdef ENABLE_RENEWAL_BONUS_BOARD
+			,packet->player_table.llMonsterKilled, packet->player_table.llStoneKilled, packet->player_table.llBossKilled, packet->player_table.llBluePlayerKilled, packet->player_table.llYellowPlayerKilled, packet->player_table.llRedPlayerKilled, packet->player_table.llAllPlayerKilled, packet->player_table.llDuelWon, packet->player_table.llDuelLost
 #endif
-			,
-			GetTablePostfix(),
-			packet->account_id,
-			packet->player_table.name,
-			packet->player_table.level,
-			packet->player_table.st,
-			packet->player_table.ht,
-			packet->player_table.dx,
-			packet->player_table.iq,
-			packet->player_table.job,
-			packet->player_table.voice,
-			packet->player_table.dir,
-			packet->player_table.x,
-			packet->player_table.y,
-			packet->player_table.z,
-			packet->player_table.hp,
-			packet->player_table.sp,
-			packet->player_table.sRandomHP,
-			packet->player_table.sRandomSP,
-			packet->player_table.stat_point,
-			packet->player_table.stamina,
-			packet->player_table.part_base,
-			packet->player_table.part_base,
-			packet->player_table.gold
-#ifdef ENABLE_HALLOWEEN_EVENT_SYSTEM
-			,packet->player_table.halounlv, packet->player_table.phaloun, packet->player_table.rhaloun
-#endif
-			);
+	);
 
 #ifdef ENABLE_GOLD_LIMIT
-	sys_log(0, "PlayerCreate accountid %d name %s level %d gold %lld"
+	sys_log(0, "PlayerCreate accountid %d name %s level %d gold %lld, st %d ht %d job %d",
 #else
-	sys_log(0, "PlayerCreate accountid %d name %s level %d gold %d"
+	sys_log(0, "PlayerCreate accountid %d name %s level %d gold %d, st %d ht %d job %d",
 #endif
-#ifdef ENABLE_GAYA_SYSTEM
-			" gem %d"
-#endif
-			", st %d ht %d job %d"
-			,packet->account_id
-			,packet->player_table.name
-			,packet->player_table.level
-			,packet->player_table.gold
-#ifdef ENABLE_GAYA_SYSTEM
-			, packet->player_table.gem
-#endif
-			,packet->account_id
-			,packet->player_table.name
-			,packet->player_table.level
-			,packet->player_table.gold
-			,packet->player_table.st
-			,packet->player_table.ht
-			,packet->player_table.job);
+			packet->account_id, packet->player_table.name, packet->player_table.level, packet->player_table.gold, packet->player_table.st, packet->player_table.ht, packet->player_table.job);
+
+	static char text[4096 + 1];
 
 	CDBManager::instance().EscapeString(text, packet->player_table.skills, sizeof(packet->player_table.skills));
 	queryLen += snprintf(queryStr + queryLen, sizeof(queryStr) - queryLen, "'%s', ", text);
@@ -1577,7 +1283,7 @@ void CClientManager::__QUERY_PLAYER_CREATE(CPeer *peer, DWORD dwHandle, TPlayerC
 
 	player_id = pMsg2->Get()->uiInsertID;
 
-	snprintf(queryStr, sizeof(queryStr), "UPDATE player_index%s SET pid%d=%d WHERE id=%d",
+	snprintf(queryStr, sizeof(queryStr), "UPDATE player_index%s SET pid%d=%d WHERE id=%d", 
 			GetTablePostfix(), packet->account_index + 1, player_id, packet->account_id);
 	std::unique_ptr<SQLMsg> pMsg3(CDBManager::instance().DirectQuery(queryStr));
 
@@ -1597,24 +1303,18 @@ void CClientManager::__QUERY_PLAYER_CREATE(CPeer *peer, DWORD dwHandle, TPlayerC
 
 	pack.bAccountCharacterIndex = packet->account_index;
 
-	pack.player.dwID			= player_id;
+	pack.player.dwID = player_id;
 	strlcpy(pack.player.szName, packet->player_table.name, sizeof(pack.player.szName));
-	pack.player.byJob			= packet->player_table.job;
-	pack.player.byLevel			= 1;
-	pack.player.dwPlayMinutes	= 0;
-	pack.player.byST			= packet->player_table.st;
-	pack.player.byHT			= packet->player_table.ht;
-	pack.player.byDX 			= packet->player_table.dx;
-	pack.player.byIQ			= packet->player_table.iq;
-#ifdef ENABLE_CONQUEROR_LEVEL
-	pack.player.bySungmaST			= packet->player_table.sungma_str;
-	pack.player.bySungmaHP			= packet->player_table.sungma_hp;
-	pack.player.bySungmaMV 			= packet->player_table.sungma_move;
-	pack.player.bySungmaINM			= packet->player_table.sungma_immune;
-#endif
-	pack.player.wMainPart		= packet->player_table.part_base;
-	pack.player.x			= packet->player_table.x;
-	pack.player.y			= packet->player_table.y;
+	pack.player.byJob = packet->player_table.job;
+	pack.player.byLevel = 1;
+	pack.player.dwPlayMinutes = 0;
+	pack.player.byST = packet->player_table.st;
+	pack.player.byHT = packet->player_table.ht;
+	pack.player.byDX = packet->player_table.dx;
+	pack.player.byIQ = packet->player_table.iq;
+	pack.player.wMainPart = packet->player_table.part_base;
+	pack.player.x = packet->player_table.x;
+	pack.player.y = packet->player_table.y;
 
 	peer->EncodeHeader(HEADER_DG_PLAYER_CREATE_SUCCESS, dwHandle, sizeof(TPacketDGCreateSuccess));
 	peer->Encode(&pack, sizeof(TPacketDGCreateSuccess));
@@ -1624,15 +1324,10 @@ void CClientManager::__QUERY_PLAYER_CREATE(CPeer *peer, DWORD dwHandle, TPlayerC
 	s_createTimeByAccountID[packet->account_id] = time(0);
 }
 
-/*
- * PLAYER DELETE
- */
 void CClientManager::__QUERY_PLAYER_DELETE(CPeer* peer, DWORD dwHandle, TPlayerDeletePacket* packet)
 {
 	if (!packet->login[0] || !packet->player_id || packet->account_index >= PLAYER_PER_ACCOUNT)
-	{
 		return;
-	}
 
 	CLoginData * ld = GetLoginDataByLogin(packet->login);
 
@@ -1646,7 +1341,7 @@ void CClientManager::__QUERY_PLAYER_DELETE(CPeer* peer, DWORD dwHandle, TPlayerD
 	TAccountTable & r = ld->GetAccountRef();
 
 	char szQuery[128];
-	snprintf(szQuery, sizeof(szQuery), "SELECT p.id, p.level, p.name FROM player_index%s AS i, player%s AS p WHERE pid%u=%u AND pid%u=p.id",
+	snprintf(szQuery, sizeof(szQuery), "SELECT p.id, p.level, p.name FROM player_index%s AS i, player%s AS p WHERE pid%u=%u AND pid%u=p.id", 
 			GetTablePostfix(), GetTablePostfix(), packet->account_index + 1, packet->player_id, packet->account_index + 1);
 
 	ClientHandleInfo * pi = new ClientHandleInfo(dwHandle, packet->player_id);
@@ -1696,7 +1391,7 @@ void CClientManager::__RESULT_PLAYER_DELETE(CPeer *peer, SQLMsg* msg)
 
 		char queryStr[QUERY_MAX_LEN];
 
-		snprintf(queryStr, sizeof(queryStr), "INSERT INTO player_deleted%s SELECT * FROM player%s WHERE id=%d",
+		snprintf(queryStr, sizeof(queryStr), "INSERT INTO player_deleted%s SELECT * FROM player%s WHERE id=%d", 
 				GetTablePostfix(), GetTablePostfix(), pi->player_id);
 		std::unique_ptr<SQLMsg> pIns(CDBManager::instance().DirectQuery(queryStr));
 
@@ -1741,10 +1436,10 @@ void CClientManager::__RESULT_PLAYER_DELETE(CPeer *peer, SQLMsg* msg)
 			m_map_pkItemCacheSetPtr.erase(pi->player_id);
 		}
 
-		snprintf(queryStr, sizeof(queryStr), "UPDATE player_index%s SET pid%u=0 WHERE pid%u=%d",
-				GetTablePostfix(),
-				pi->account_index + 1,
-				pi->account_index + 1,
+		snprintf(queryStr, sizeof(queryStr), "UPDATE player_index%s SET pid%u=0 WHERE pid%u=%d", 
+				GetTablePostfix(), 
+				pi->account_index + 1, 
+				pi->account_index + 1, 
 				pi->player_id);
 
 		std::unique_ptr<SQLMsg> pMsg(CDBManager::instance().DirectQuery(queryStr));
@@ -1765,7 +1460,6 @@ void CClientManager::__RESULT_PLAYER_DELETE(CPeer *peer, SQLMsg* msg)
 #else
 		snprintf(queryStr, sizeof(queryStr), "DELETE FROM item%s WHERE owner_id=%d AND (`window` in ('INVENTORY','EQUIPMENT','DRAGON_SOUL_INVENTORY','BELT_INVENTORY'))", GetTablePostfix(), pi->player_id);
 #endif
-
 		delete CDBManager::instance().DirectQuery(queryStr);
 
 		snprintf(queryStr, sizeof(queryStr), "DELETE FROM quest%s WHERE dwPID=%d", GetTablePostfix(), pi->player_id);
@@ -1777,10 +1471,8 @@ void CClientManager::__RESULT_PLAYER_DELETE(CPeer *peer, SQLMsg* msg)
 		snprintf(queryStr, sizeof(queryStr), "DELETE FROM guild_member%s WHERE pid=%d", GetTablePostfix(), pi->player_id);
 		CDBManager::instance().AsyncQuery(queryStr);
 
-		// MYSHOP_PRICE_LIST
 		snprintf(queryStr, sizeof(queryStr), "DELETE FROM myshop_pricelist%s WHERE owner_id=%d", GetTablePostfix(), pi->player_id);
 		CDBManager::instance().AsyncQuery(queryStr);
-		// END_OF_MYSHOP_PRICE_LIST
 
 		snprintf(queryStr, sizeof(queryStr), "DELETE FROM messenger_list%s WHERE account='%s' OR companion='%s'", GetTablePostfix(), szName, szName);
 		CDBManager::instance().AsyncQuery(queryStr);
@@ -1799,6 +1491,7 @@ void CClientManager::__RESULT_PLAYER_DELETE(CPeer *peer, SQLMsg* msg)
 void CClientManager::QUERY_ADD_AFFECT(CPeer * peer, TPacketGDAddAffect * p)
 {
 	char queryStr[QUERY_MAX_LEN];
+
 	snprintf(queryStr, sizeof(queryStr),
 			"REPLACE INTO affect%s (dwPID, bType, bApplyOn, lApplyValue, dwFlag, lDuration, lSPCost) "
 			"VALUES(%u, %u, %u, %ld, %u, %ld, %ld)",
@@ -1824,6 +1517,7 @@ void CClientManager::QUERY_REMOVE_AFFECT(CPeer * peer, TPacketGDRemoveAffect * p
 
 	CDBManager::instance().AsyncQuery(queryStr);
 }
+
 
 void CClientManager::QUERY_HIGHSCORE_REGISTER(CPeer* peer, TPacketGDHighscore * data)
 {
@@ -1870,7 +1564,7 @@ void CClientManager::RESULT_HIGHSCORE_REGISTER(CPeer * pkPeer, SQLMsg * msg)
 		if (row && row[0])
 		{
 			int current_value = 0; str_to_number(current_value, row[0]);
-			if (((pi->account_index)&&(current_value >= value)) || ((!pi->account_index)&&(current_value <= value)))
+			if (pi->account_index && current_value >= value || !pi->account_index && current_value <= value)
 			{
 				value = current_value;
 			}
@@ -1904,7 +1598,7 @@ void CClientManager::InsertLogoutPlayer(DWORD pid)
 		it->second->time = time(0);
 		return;
 	}
-
+		
 	TLogoutPlayer * pLogout = new TLogoutPlayer;
 	pLogout->pid = pid;
 	pLogout->time = time(0);
@@ -1963,7 +1657,6 @@ void CClientManager::FlushPlayerCacheSet(DWORD pid)
 		m_map_playerCache.erase(it);
 
 		c->Flush();
-		delete c;
+		delete c; 
 	}
 }
-

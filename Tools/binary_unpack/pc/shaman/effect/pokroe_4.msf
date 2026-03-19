@@ -11,10 +11,9 @@ PierceCount             0
 CollisionSphereRadius   0.000000
 BombRange               10.000000
 BombEffect              "pokroe_4_boom.mse"
-HomingFlag              1
+HomingFlag              0
 HomingStartTime         0.000000
-HomingMaxAngle          180.000000
-SendDamageOnCollision	1
+HomingMaxAngle          3.000000
 Range                   10000.000000
 Acceleration            0.000000 0.000000 0.000000
 Group AttachData

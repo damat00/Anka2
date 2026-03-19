@@ -7,13 +7,13 @@ Accumulation           0.00	0.00	0.00
 Group AttackingData
 {
     AttackType           0
-    HittingType          2
+    HittingType          0
     StiffenTime          0.000000
     InvisibleTime        0.000000
     ExternalForce        0.000000
     HitLimitCount        0
     
-    MotionType           1
+    MotionType           0
     HitDataCount         1
     Group HitData00
     {

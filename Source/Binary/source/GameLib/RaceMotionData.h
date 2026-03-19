@@ -33,14 +33,14 @@ class CRaceMotionData
 			MODE_RESERVED,
 			MODE_GENERAL,
 
-			MODE_ONEHAND_SWORD,
-			MODE_TWOHAND_SWORD,
-			MODE_DUALHAND_SWORD,
-			MODE_BOW,
-			MODE_BOW_SPECIAL,
-			MODE_FAN,
-			MODE_BELL,
-			MODE_FISHING,
+		MODE_ONEHAND_SWORD,
+		MODE_TWOHAND_SWORD,
+		MODE_DUALHAND_SWORD,
+		MODE_BOW,
+		MODE_BOW_SPECIAL,
+		MODE_FAN,
+		MODE_BELL,
+		MODE_FISHING,
 
 			MODE_HORSE,
 			MODE_HORSE_ONEHAND_SWORD,
@@ -295,11 +295,8 @@ class CRaceMotionData
 		const NSound::TSoundInstanceVector * GetSoundInstanceVectorPointer() const;
 
 		// File
-#ifdef WORLD_EDITOR
-		bool			SaveMotionData(const char * c_szFileName);
-#endif
-		bool			LoadMotionData(const char * c_szFileName);
-		bool			LoadSoundScriptData(const char * c_szFileName);
+		bool			LoadMotionData(const char *c_szFileName);
+		bool			LoadSoundScriptData(const char *c_szFileName);
 
 	protected:
 		void			SetType(UINT eType);

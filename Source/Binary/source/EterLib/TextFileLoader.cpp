@@ -99,7 +99,7 @@ CTextFileLoader* CTextFileLoader::Cache(const char *c_szFileName)
 			delete f->second;
 
 			CTextFileLoader* pkNewTextFileLoader=new CTextFileLoader;
-			pkNewTextFileLoader->Load(c_szFileName);
+			pkNewTextFileLoader->Load(c_szFileName);			
 			f->second=pkNewTextFileLoader;
 		}
 		f->second->SetTop();
@@ -208,7 +208,7 @@ bool CTextFileLoader::LoadGroup(TGroupNode * pGroupNode)
 {
 	CTokenVector stTokenVector;
 	int nLocalGroupDepth = 0;
-
+	
 	for (; m_dwcurLineIndex < m_textFileLoader.GetLineCount(); ++m_dwcurLineIndex)
 	{
 		int iRet;
@@ -246,7 +246,7 @@ bool CTextFileLoader::LoadGroup(TGroupNode * pGroupNode)
 			m_kVct_pkNode.push_back(pNewNode);
 
 			pNewNode->pParentNode = pGroupNode;
-			pNewNode->SetGroupName(stTokenVector[1]);
+			pNewNode->SetGroupName(stTokenVector[1]);			
 			pGroupNode->ChildNodeVector.push_back(pNewNode);
 
 			++m_dwcurLineIndex;
@@ -278,7 +278,7 @@ bool CTextFileLoader::LoadGroup(TGroupNode * pGroupNode)
 
 				if ('{' == stSubTokenVector[0][0])
 					continue;
-
+				
 				if ('}' == stSubTokenVector[0][0])
 					break;
 
@@ -578,18 +578,18 @@ BOOL CTextFileLoader::GetTokenVector4(const std::string & c_rstrKey, D3DXVECTOR4
 	CTokenVector * pTokenVector;
 	if (!GetTokenVector(c_rstrKey, &pTokenVector))
 		return FALSE;
-
+	
 	if (pTokenVector->size() != 4)
 	{
 		//Tracef(" CTextFileLoader::GetTokenVector3 - This key should have 3 values %s [%s : %s]\n", m_File.GetFileName(), m_pcurNode->strGroupName.c_str(), c_rstrKey.c_str());
 		return FALSE;
 	}
-
+	
 	pVector4->x = atof(pTokenVector->at(0).c_str());
 	pVector4->y = atof(pTokenVector->at(1).c_str());
 	pVector4->z = atof(pTokenVector->at(2).c_str());
 	pVector4->w = atof(pTokenVector->at(3).c_str());
-
+	
 	return TRUE;
 }
 
@@ -604,18 +604,18 @@ BOOL CTextFileLoader::GetTokenQuaternion(const std::string & c_rstrKey, D3DXQUAT
 	CTokenVector * pTokenVector;
 	if (!GetTokenVector(c_rstrKey, &pTokenVector))
 		return FALSE;
-
+	
 	if (pTokenVector->size() != 4)
 	{
 		//Tracef(" CTextFileLoader::GetTokenVector3 - This key should have 3 values %s [%s : %s]\n", m_File.GetFileName(), m_pcurNode->strGroupName.c_str(), c_rstrKey.c_str());
 		return FALSE;
 	}
-
+	
 	pQ->x = atof(pTokenVector->at(0).c_str());
 	pQ->y = atof(pTokenVector->at(1).c_str());
 	pQ->z = atof(pTokenVector->at(2).c_str());
 	pQ->w = atof(pTokenVector->at(3).c_str());
-
+	
 	return TRUE;
 }
 

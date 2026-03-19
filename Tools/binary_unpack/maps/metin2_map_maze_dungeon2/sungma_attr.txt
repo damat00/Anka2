@@ -1,4 +1,0 @@
-sungma_str	55
-sungma_hp	35
-sungma_move	45
-sungma_immune	45

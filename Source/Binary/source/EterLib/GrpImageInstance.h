@@ -9,15 +9,6 @@
 class CGraphicImageInstance
 {
 	public:
-#ifdef ENABLE_OFFICAL_FEATURES
-		void LeftRightReverse();
-#endif
-	protected:
-#ifdef ENABLE_OFFICAL_FEATURES
-		bool m_bLeftRightReverse;
-#endif
-
-	public:
 		static DWORD Type();
 		BOOL IsType(DWORD dwType);
 
@@ -34,10 +25,10 @@ class CGraphicImageInstance
 #endif
 
 		void SetDiffuseColor(float fr, float fg, float fb, float fa);
+		void SetPosition(float fx, float fy);
 #if defined(ENABLE_RENDER_TARGET) || defined(ENABLE_EMOTICONS_SYSTEM)
 		void SetScale(float fx, float fy);
 #endif
-		void SetPosition(float fx, float fy);
 
 		const D3DXVECTOR2& GetScale() const;
 
@@ -49,45 +40,41 @@ class CGraphicImageInstance
 		int GetHeight();
 
 #ifdef ENABLE_NEW_DUNGEON_LIB
-#ifdef ENABLE_CLIP_MASKING
-        void RenderCoolTime(float fCoolTime, RECT* pClipRect = nullptr);
-#else
-        void RenderCoolTime(float fCoolTime);
+		void RenderCoolTime(float fCoolTime);
+		virtual void OnRenderCoolTime(float fCoolTime);
 #endif
-#endif
-		D3DXCOLOR GetPixelColor(int x, int y);
 
 		CGraphicTexture * GetTexturePointer();
 		const CGraphicTexture &	GetTextureReference() const;
 		CGraphicImage * GetGraphicImagePointer();
 
 		bool operator == (const CGraphicImageInstance & rhs) const;
+#ifdef ENABLE_OFFICAL_FEATURES
+		void LeftRightReverse();
+#endif
+		D3DXCOLOR GetPixelColor(int x, int y);
 
 	protected:
 		void Initialize();
 
 #ifdef ENABLE_CLIP_MASKING
-        virtual void OnRender(RECT* pClipRect);
-#ifdef ENABLE_NEW_DUNGEON_LIB
-        virtual void OnRenderCoolTime(float fCoolTime, RECT* pClipRect);
-#endif
+		virtual void OnRender(RECT* pClipRect);
 #else
-        virtual void OnRender();
-#ifdef ENABLE_NEW_DUNGEON_LIB
-        virtual void OnRenderCoolTime(float fCoolTime);
+		virtual void OnRender();
 #endif
-#endif
-
 		virtual void OnSetImagePointer();
 
 		virtual BOOL OnIsType(DWORD dwType);
 
 	protected:
 		D3DXCOLOR m_DiffuseColor;
-		D3DXVECTOR2 m_v2Position;
 #if defined(ENABLE_RENDER_TARGET) || defined(ENABLE_EMOTICONS_SYSTEM)
 		D3DXVECTOR2 m_v2Scale;
 #endif
+#ifdef ENABLE_OFFICAL_FEATURES
+		bool m_bLeftRightReverse;
+#endif
+		D3DXVECTOR2 m_v2Position;
 
 		CGraphicImage::TRef m_roImage;
 

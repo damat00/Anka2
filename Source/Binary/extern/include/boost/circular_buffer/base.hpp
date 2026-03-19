@@ -3,9 +3,7 @@
 // Copyright (c) 2003-2008 Jan Gaspar
 // Copyright (c) 2013 Paul A. Bristow  // Doxygen comments changed.
 // Copyright (c) 2013 Antony Polukhin  // Move semantics implementation.
-
-// Copyright 2014,2018 Glen Joseph Fernandes
-// (glenjofe@gmail.com)
+// Copyright (c) 2014 Glen Fernandes   // C++11 allocator model support.
 
 // Use, modification, and distribution is subject to the Boost Software
 // License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -19,10 +17,12 @@
 #endif
 
 #include <boost/config.hpp>
+#include <boost/call_traits.hpp>
 #include <boost/concept_check.hpp>
 #include <boost/limits.hpp>
-#include <boost/circular_buffer/allocators.hpp>
-#include <boost/core/empty_value.hpp>
+#include <boost/container/allocator_traits.hpp>
+#include <boost/iterator/reverse_iterator.hpp>
+#include <boost/iterator/iterator_traits.hpp>
 #include <boost/type_traits/is_stateless.hpp>
 #include <boost/type_traits/is_integral.hpp>
 #include <boost/type_traits/is_scalar.hpp>
@@ -32,8 +32,8 @@
 #include <boost/type_traits/conditional.hpp>
 #include <boost/move/adl_move_swap.hpp>
 #include <boost/move/move.hpp>
+#include <boost/utility/addressof.hpp>
 #include <algorithm>
-#include <iterator>
 #include <utility>
 #include <deque>
 #include <stdexcept>
@@ -70,15 +70,12 @@ namespace boost {
 */
 template <class T, class Alloc>
 class circular_buffer
-:
 /*! \cond */
 #if BOOST_CB_ENABLE_DEBUG
-public cb_details::debug_iterator_registry,
+: public cb_details::debug_iterator_registry
 #endif
 /*! \endcond */
-private empty_value<Alloc>
 {
-    typedef empty_value<Alloc> base;
 
   // Requirements
     //BOOST_CLASS_REQUIRE(T, boost, SGIAssignableConcept);
@@ -99,31 +96,31 @@ public:
     typedef circular_buffer<T, Alloc> this_type;
 
     //! The type of elements stored in the <code>circular_buffer</code>.
-    typedef typename cb_details::allocator_traits<Alloc>::value_type value_type;
+    typedef typename boost::container::allocator_traits<Alloc>::value_type value_type;
 
     //! A pointer to an element.
-    typedef typename cb_details::allocator_traits<Alloc>::pointer pointer;
+    typedef typename boost::container::allocator_traits<Alloc>::pointer pointer;
 
     //! A const pointer to the element.
-    typedef typename cb_details::allocator_traits<Alloc>::const_pointer const_pointer;
+    typedef typename boost::container::allocator_traits<Alloc>::const_pointer const_pointer;
 
     //! A reference to an element.
-    typedef value_type& reference;
+    typedef typename boost::container::allocator_traits<Alloc>::reference reference;
 
     //! A const reference to an element.
-    typedef const value_type& const_reference;
+    typedef typename boost::container::allocator_traits<Alloc>::const_reference const_reference;
 
     //! The distance type.
     /*!
         (A signed integral type used to represent the distance between two iterators.)
     */
-    typedef typename cb_details::allocator_traits<Alloc>::difference_type difference_type;
+    typedef typename boost::container::allocator_traits<Alloc>::difference_type difference_type;
 
     //! The size type.
     /*!
         (An unsigned integral type that can represent any non-negative value of the container's distance type.)
     */
-    typedef typename cb_details::allocator_traits<Alloc>::size_type size_type;
+    typedef typename boost::container::allocator_traits<Alloc>::size_type size_type;
 
     //! The type of an allocator used in the <code>circular_buffer</code>.
     typedef Alloc allocator_type;
@@ -131,16 +128,16 @@ public:
 // Iterators
 
     //! A const (random access) iterator used to iterate through the <code>circular_buffer</code>.
-    typedef cb_details::iterator< circular_buffer<T, Alloc>, cb_details::const_traits<cb_details::allocator_traits<Alloc> > > const_iterator;
+    typedef cb_details::iterator< circular_buffer<T, Alloc>, cb_details::const_traits<boost::container::allocator_traits<Alloc> > > const_iterator;
 
     //! A (random access) iterator used to iterate through the <code>circular_buffer</code>.
-    typedef cb_details::iterator< circular_buffer<T, Alloc>, cb_details::nonconst_traits<cb_details::allocator_traits<Alloc> > > iterator;
+    typedef cb_details::iterator< circular_buffer<T, Alloc>, cb_details::nonconst_traits<boost::container::allocator_traits<Alloc> > > iterator;
 
     //! A const iterator used to iterate backwards through a <code>circular_buffer</code>.
-    typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+    typedef boost::reverse_iterator<const_iterator> const_reverse_iterator;
 
     //! An iterator used to iterate backwards through a <code>circular_buffer</code>.
-    typedef std::reverse_iterator<iterator> reverse_iterator;
+    typedef boost::reverse_iterator<iterator> reverse_iterator;
 
 // Container specific types
 
@@ -196,6 +193,9 @@ private:
     //! The number of items currently stored in the circular buffer.
     size_type m_size;
 
+    //! The allocator.
+    allocator_type m_alloc;
+
 // Friends
 #if defined(BOOST_NO_MEMBER_TEMPLATE_FRIENDS)
     friend iterator;
@@ -219,7 +219,7 @@ public:
              Constant (in the size of the <code>circular_buffer</code>).
         \sa <code>get_allocator()</code> for obtaining an allocator %reference.
     */
-    allocator_type get_allocator() const BOOST_NOEXCEPT { return alloc(); }
+    allocator_type get_allocator() const BOOST_NOEXCEPT { return m_alloc; }
 
     //! Get the allocator reference.
     /*!
@@ -235,7 +235,7 @@ public:
               although use of stateful allocators in STL is discouraged.
         \sa <code>get_allocator() const</code>
     */
-    allocator_type& get_allocator() BOOST_NOEXCEPT { return alloc(); }
+    allocator_type& get_allocator() BOOST_NOEXCEPT { return m_alloc; }
 
 // Element access
 
@@ -666,7 +666,7 @@ public:
                         break;
                     }
                     if (is_uninitialized(dest)) {
-                        cb_details::allocator_traits<Alloc>::construct(alloc(), boost::to_address(dest), boost::move_if_noexcept(*src));
+                        boost::container::allocator_traits<Alloc>::construct(m_alloc, boost::to_address(dest), boost::move_if_noexcept(*src));
                         ++constructed;
                     } else {
                         value_type tmp = boost::move_if_noexcept(*src); 
@@ -787,7 +787,7 @@ public:
         \sa <code>size()</code>, <code>capacity()</code>, <code>reserve()</code>
     */
     size_type max_size() const BOOST_NOEXCEPT {
-        return (std::min<size_type>)(cb_details::allocator_traits<Alloc>::max_size(alloc()), (std::numeric_limits<difference_type>::max)());
+        return (std::min<size_type>)(boost::container::allocator_traits<Alloc>::max_size(m_alloc), (std::numeric_limits<difference_type>::max)());
     }
 
     //! Is the <code>circular_buffer</code> empty?
@@ -878,7 +878,7 @@ public:
         iterator b = begin();
         BOOST_TRY {
             reset(buff,
-                cb_details::uninitialized_move_if_noexcept(b, b + (std::min)(new_capacity, size()), buff, alloc()),
+                cb_details::uninitialized_move_if_noexcept(b, b + (std::min)(new_capacity, size()), buff, m_alloc),
                 new_capacity);
         } BOOST_CATCH(...) {
             deallocate(buff, new_capacity);
@@ -954,7 +954,7 @@ public:
         iterator e = end();
         BOOST_TRY {
             reset(buff, cb_details::uninitialized_move_if_noexcept(e - (std::min)(new_capacity, size()),
-                e, buff, alloc()), new_capacity);
+                e, buff, m_alloc), new_capacity);
         } BOOST_CATCH(...) {
             deallocate(buff, new_capacity);
             BOOST_RETHROW
@@ -1020,7 +1020,7 @@ public:
             <code>set_capacity(capacity_type)</code>
     */
     explicit circular_buffer(const allocator_type& alloc = allocator_type()) BOOST_NOEXCEPT
-    : base(boost::empty_init_t(), alloc), m_buff(0), m_end(0), m_first(0), m_last(0), m_size(0) {}
+    : m_buff(0), m_end(0), m_first(0), m_last(0), m_size(0), m_alloc(alloc) {}
 
     //! Create an empty <code>circular_buffer</code> with the specified capacity.
     /*!
@@ -1033,7 +1033,7 @@ public:
              Constant.
     */
     explicit circular_buffer(capacity_type buffer_capacity, const allocator_type& alloc = allocator_type())
-    : base(boost::empty_init_t(), alloc), m_size(0) {
+    : m_size(0), m_alloc(alloc) {
         initialize_buffer(buffer_capacity);
         m_first = m_last = m_buff;
     }
@@ -1052,7 +1052,7 @@ public:
              Linear (in the <code>n</code>).
     */
     circular_buffer(size_type n, param_value_type item, const allocator_type& alloc = allocator_type())
-    : base(boost::empty_init_t(), alloc), m_size(n) {
+    : m_size(n), m_alloc(alloc) {
         initialize_buffer(n, item);
         m_first = m_last = m_buff;
     }
@@ -1074,7 +1074,7 @@ public:
     */
     circular_buffer(capacity_type buffer_capacity, size_type n, param_value_type item,
         const allocator_type& alloc = allocator_type())
-    : base(boost::empty_init_t(), alloc), m_size(n) {
+    : m_size(n), m_alloc(alloc) {
         BOOST_CB_ASSERT(buffer_capacity >= size()); // check for capacity lower than size
         initialize_buffer(buffer_capacity, item);
         m_first = m_buff;
@@ -1097,12 +1097,11 @@ public:
 #if BOOST_CB_ENABLE_DEBUG
     debug_iterator_registry(),
 #endif
-    base(boost::empty_init_t(), cb.get_allocator()),
-    m_size(cb.size()) {
+    m_size(cb.size()), m_alloc(cb.get_allocator()) {
         initialize_buffer(cb.capacity());
         m_first = m_buff;
         BOOST_TRY {
-            m_last = cb_details::uninitialized_copy(cb.begin(), cb.end(), m_buff, alloc());
+            m_last = cb_details::uninitialized_copy(cb.begin(), cb.end(), m_buff, m_alloc);
         } BOOST_CATCH(...) {
             deallocate(m_buff, cb.capacity());
             BOOST_RETHROW
@@ -1122,7 +1121,7 @@ public:
         \par Constant.
     */
     circular_buffer(circular_buffer<T, Alloc>&& cb) BOOST_NOEXCEPT
-    : base(boost::empty_init_t(), cb.get_allocator()), m_buff(0), m_end(0), m_first(0), m_last(0), m_size(0) {
+    : m_buff(0), m_end(0), m_first(0), m_last(0), m_size(0), m_alloc(cb.get_allocator()) {
         cb.swap(*this);
     }
 #endif // BOOST_NO_CXX11_RVALUE_REFERENCES
@@ -1145,7 +1144,7 @@ public:
     */
     template <class InputIterator>
     circular_buffer(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type())
-    : base(boost::empty_init_t(), alloc) {
+    : m_alloc(alloc) {
         initialize(first, last, is_integral<InputIterator>());
     }
 
@@ -1175,7 +1174,7 @@ public:
     template <class InputIterator>
     circular_buffer(capacity_type buffer_capacity, InputIterator first, InputIterator last,
         const allocator_type& alloc = allocator_type())
-    : base(boost::empty_init_t(), alloc) {
+    : m_alloc(alloc) {
         initialize(buffer_capacity, first, last, is_integral<InputIterator>());
     }
 
@@ -1226,7 +1225,7 @@ public:
             return *this;
         pointer buff = allocate(cb.capacity());
         BOOST_TRY {
-            reset(buff, cb_details::uninitialized_copy(cb.begin(), cb.end(), buff, alloc()), cb.capacity());
+            reset(buff, cb_details::uninitialized_copy(cb.begin(), cb.end(), buff, m_alloc), cb.capacity());
         } BOOST_CATCH(...) {
             deallocate(buff, cb.capacity());
             BOOST_RETHROW
@@ -1246,7 +1245,7 @@ public:
     */
     circular_buffer<T, Alloc>& operator = (circular_buffer<T, Alloc>&& cb) BOOST_NOEXCEPT {
         cb.swap(*this); // now `this` holds `cb`
-        circular_buffer<T, Alloc>(get_allocator()) // temporary that holds initial `cb` allocator
+        circular_buffer<T, Alloc>(get_allocator()) // temprary that holds initial `cb` allocator
             .swap(cb); // makes `cb` empty
         return *this;
     }
@@ -1277,7 +1276,7 @@ public:
             <code>assign(capacity_type, InputIterator, InputIterator)</code>
     */
     void assign(size_type n, param_value_type item) {
-        assign_n(n, n, cb_details::assign_n<param_value_type, allocator_type>(n, item, alloc()));
+        assign_n(n, n, cb_details::assign_n<param_value_type, allocator_type>(n, item, m_alloc));
     }
 
     //! Assign <code>n</code> items into the <code>circular_buffer</code> specifying the capacity.
@@ -1307,7 +1306,7 @@ public:
     */
     void assign(capacity_type buffer_capacity, size_type n, param_value_type item) {
         BOOST_CB_ASSERT(buffer_capacity >= n); // check for new capacity lower than n
-        assign_n(buffer_capacity, n, cb_details::assign_n<param_value_type, allocator_type>(n, item, alloc()));
+        assign_n(buffer_capacity, n, cb_details::assign_n<param_value_type, allocator_type>(n, item, m_alloc));
     }
 
     //! Assign a copy of the range into the <code>circular_buffer</code>.
@@ -1423,7 +1422,7 @@ private:
             increment(m_last);
             m_first = m_last;
         } else {
-            cb_details::allocator_traits<Alloc>::construct(alloc(), boost::to_address(m_last), static_cast<ValT>(item));
+            boost::container::allocator_traits<Alloc>::construct(m_alloc, boost::to_address(m_last), static_cast<ValT>(item));
             increment(m_last);
             ++m_size;
         }        
@@ -1440,7 +1439,7 @@ private:
                 m_last = m_first;
             } else {
                 decrement(m_first);
-                cb_details::allocator_traits<Alloc>::construct(alloc(), boost::to_address(m_first), static_cast<ValT>(item));
+                boost::container::allocator_traits<Alloc>::construct(m_alloc, boost::to_address(m_first), static_cast<ValT>(item));
                 ++m_size;
             }
         } BOOST_CATCH(...) {
@@ -2174,7 +2173,7 @@ public:
              the erased element (towards the beginning).
         \par Complexity
              Linear (in <code>std::distance(begin(), pos)</code>).
-        \note This method is symmetric to the <code>erase(iterator)</code> method and is more effective than
+        \note This method is symetric to the <code>erase(iterator)</code> method and is more effective than
               <code>erase(iterator)</code> if the iterator <code>pos</code> is close to the beginning of the
               <code>circular_buffer</code>. (See the <i>Complexity</i>.)
         \sa <code>erase(iterator)</code>, <code>erase(iterator, iterator)</code>,
@@ -2215,7 +2214,7 @@ public:
              the erased range (towards the beginning).
         \par Complexity
              Linear (in <code>std::distance(begin(), last)</code>).
-        \note This method is symmetric to the <code>erase(iterator, iterator)</code> method and is more effective than
+        \note This method is symetric to the <code>erase(iterator, iterator)</code> method and is more effective than
               <code>erase(iterator, iterator)</code> if <code>std::distance(begin(), first)</code> is lower that
               <code>std::distance(last, end())</code>.
         \sa <code>erase(iterator)</code>, <code>erase(iterator, iterator)</code>, <code>rerase(iterator)</code>,
@@ -2368,31 +2367,23 @@ private:
     //! Map the null pointer to virtual end of circular buffer.
     pointer map_pointer(pointer p) const { return p == 0 ? m_last : p; }
 
-    const Alloc& alloc() const {
-        return base::get();
-    }
-
-    Alloc& alloc() {
-        return base::get();
-    }
-
     //! Allocate memory.
     pointer allocate(size_type n) {
         if (n > max_size())
             throw_exception(std::length_error("circular_buffer"));
 #if BOOST_CB_ENABLE_DEBUG
-        pointer p = (n == 0) ? 0 : alloc().allocate(n);
+        pointer p = (n == 0) ? 0 : m_alloc.allocate(n);
         cb_details::do_fill_uninitialized_memory(p, sizeof(value_type) * n);
         return p;
 #else
-        return (n == 0) ? 0 : alloc().allocate(n);
+        return (n == 0) ? 0 : m_alloc.allocate(n);
 #endif
     }
 
     //! Deallocate memory.
     void deallocate(pointer p, size_type n) {
         if (p != 0)
-            alloc().deallocate(p, n);
+            m_alloc.deallocate(p, n);
     }
 
     //! Does the pointer point to the uninitialized memory?
@@ -2423,7 +2414,7 @@ private:
     */
     void construct_or_replace(bool construct, pointer pos, param_value_type item) {
         if (construct)
-            cb_details::allocator_traits<Alloc>::construct(alloc(), boost::to_address(pos), item);
+            boost::container::allocator_traits<Alloc>::construct(m_alloc, boost::to_address(pos), item);
         else
             replace(pos, item);
     }
@@ -2435,14 +2426,14 @@ private:
     */
     void construct_or_replace(bool construct, pointer pos, rvalue_type item) {
         if (construct)
-            cb_details::allocator_traits<Alloc>::construct(alloc(), boost::to_address(pos), boost::move(item));
+            boost::container::allocator_traits<Alloc>::construct(m_alloc, boost::to_address(pos), boost::move(item));
         else
             replace(pos, boost::move(item));
     }
 
     //! Destroy an item.
     void destroy_item(pointer p) {
-        cb_details::allocator_traits<Alloc>::destroy(alloc(), boost::to_address(p));
+        boost::container::allocator_traits<Alloc>::destroy(m_alloc, boost::to_address(p));
 #if BOOST_CB_ENABLE_DEBUG
         invalidate_iterators(iterator(this, p));
         cb_details::do_fill_uninitialized_memory(p, sizeof(value_type));
@@ -2497,7 +2488,7 @@ private:
     void initialize_buffer(capacity_type buffer_capacity, param_value_type item) {
         initialize_buffer(buffer_capacity);
         BOOST_TRY {
-            cb_details::uninitialized_fill_n_with_alloc(m_buff, size(), item, alloc());
+            cb_details::uninitialized_fill_n_with_alloc(m_buff, size(), item, m_alloc);
         } BOOST_CATCH(...) {
             deallocate(m_buff, size());
             BOOST_RETHROW
@@ -2518,9 +2509,9 @@ private:
     void initialize(Iterator first, Iterator last, const false_type&) {
         BOOST_CB_IS_CONVERTIBLE(Iterator, value_type); // check for invalid iterator type
 #if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x581))
-        initialize(first, last, std::iterator_traits<Iterator>::iterator_category());
+        initialize(first, last, iterator_category<Iterator>::type());
 #else
-        initialize(first, last, BOOST_DEDUCED_TYPENAME std::iterator_traits<Iterator>::iterator_category());
+        initialize(first, last, BOOST_DEDUCED_TYPENAME iterator_category<Iterator>::type());
 #endif
     }
 
@@ -2529,7 +2520,7 @@ private:
     void initialize(InputIterator first, InputIterator last, const std::input_iterator_tag&) {
         BOOST_CB_ASSERT_TEMPLATED_ITERATOR_CONSTRUCTORS // check if the STL provides templated iterator constructors
                                                         // for containers
-        std::deque<value_type, allocator_type> tmp(first, last, alloc());
+        std::deque<value_type, allocator_type> tmp(first, last, m_alloc);
         size_type distance = tmp.size();
         initialize(distance, boost::make_move_iterator(tmp.begin()), boost::make_move_iterator(tmp.end()), distance);
     }
@@ -2557,9 +2548,9 @@ private:
     void initialize(capacity_type buffer_capacity, Iterator first, Iterator last, const false_type&) {
         BOOST_CB_IS_CONVERTIBLE(Iterator, value_type); // check for invalid iterator type
 #if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x581))
-        initialize(buffer_capacity, first, last, std::iterator_traits<Iterator>::iterator_category());
+        initialize(buffer_capacity, first, last, iterator_category<Iterator>::type());
 #else
-        initialize(buffer_capacity, first, last, BOOST_DEDUCED_TYPENAME std::iterator_traits<Iterator>::iterator_category());
+        initialize(buffer_capacity, first, last, BOOST_DEDUCED_TYPENAME iterator_category<Iterator>::type());
 #endif
     }
 
@@ -2575,7 +2566,7 @@ private:
         if (buffer_capacity == 0)
             return;
         while (first != last && !full()) {
-            cb_details::allocator_traits<Alloc>::construct(alloc(), boost::to_address(m_last), *first++);
+            boost::container::allocator_traits<Alloc>::construct(m_alloc, boost::to_address(m_last), *first++);
             increment(m_last);
             ++m_size;
         }
@@ -2611,7 +2602,7 @@ private:
             m_size = distance;
         }
         BOOST_TRY {
-            m_last = cb_details::uninitialized_copy(first, last, m_buff, alloc());
+            m_last = cb_details::uninitialized_copy(first, last, m_buff, m_alloc);
         } BOOST_CATCH(...) {
             deallocate(m_buff, buffer_capacity);
             BOOST_RETHROW
@@ -2637,7 +2628,7 @@ private:
 
     //! Specialized method for swapping the allocator.
     void swap_allocator(circular_buffer<T, Alloc>& cb, const false_type&) {
-        adl_move_swap(alloc(), cb.alloc());
+        adl_move_swap(m_alloc, cb.m_alloc);
     }
 
     //! Specialized assign method.
@@ -2651,9 +2642,9 @@ private:
     void assign(Iterator first, Iterator last, const false_type&) {
         BOOST_CB_IS_CONVERTIBLE(Iterator, value_type); // check for invalid iterator type
 #if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x581))
-        assign(first, last, std::iterator_traits<Iterator>::iterator_category());
+        assign(first, last, iterator_category<Iterator>::type());
 #else
-        assign(first, last, BOOST_DEDUCED_TYPENAME std::iterator_traits<Iterator>::iterator_category());
+        assign(first, last, BOOST_DEDUCED_TYPENAME iterator_category<Iterator>::type());
 #endif
     }
 
@@ -2662,11 +2653,11 @@ private:
     void assign(InputIterator first, InputIterator last, const std::input_iterator_tag&) {
         BOOST_CB_ASSERT_TEMPLATED_ITERATOR_CONSTRUCTORS // check if the STL provides templated iterator constructors
                                                         // for containers
-        std::deque<value_type, allocator_type> tmp(first, last, alloc());
+        std::deque<value_type, allocator_type> tmp(first, last, m_alloc);
         size_type distance = tmp.size();
         assign_n(distance, distance,
             cb_details::make_assign_range
-                (boost::make_move_iterator(tmp.begin()), boost::make_move_iterator(tmp.end()), alloc()));
+                (boost::make_move_iterator(tmp.begin()), boost::make_move_iterator(tmp.end()), m_alloc));
     }
 
     //! Specialized assign method.
@@ -2674,7 +2665,7 @@ private:
     void assign(ForwardIterator first, ForwardIterator last, const std::forward_iterator_tag&) {
         BOOST_CB_ASSERT(std::distance(first, last) >= 0); // check for wrong range
         size_type distance = std::distance(first, last);
-        assign_n(distance, distance, cb_details::make_assign_range(first, last, alloc()));
+        assign_n(distance, distance, cb_details::make_assign_range(first, last, m_alloc));
     }
 
     //! Specialized assign method.
@@ -2688,9 +2679,9 @@ private:
     void assign(capacity_type new_capacity, Iterator first, Iterator last, const false_type&) {
         BOOST_CB_IS_CONVERTIBLE(Iterator, value_type); // check for invalid iterator type
 #if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x581))
-        assign(new_capacity, first, last, std::iterator_traits<Iterator>::iterator_category());
+        assign(new_capacity, first, last, iterator_category<Iterator>::type());
 #else
-        assign(new_capacity, first, last, BOOST_DEDUCED_TYPENAME std::iterator_traits<Iterator>::iterator_category());
+        assign(new_capacity, first, last, BOOST_DEDUCED_TYPENAME iterator_category<Iterator>::type());
 #endif
     }
 
@@ -2701,7 +2692,7 @@ private:
             clear();
             insert(begin(), first, last);
         } else {
-            circular_buffer<value_type, allocator_type> tmp(new_capacity, first, last, alloc());
+            circular_buffer<value_type, allocator_type> tmp(new_capacity, first, last, m_alloc);
             tmp.swap(*this);
         }
     }
@@ -2717,7 +2708,7 @@ private:
             distance = new_capacity;
         }
         assign_n(new_capacity, distance,
-            cb_details::make_assign_range(first, last, alloc()));
+            cb_details::make_assign_range(first, last, m_alloc));
     }
 
     //! Helper assign method.
@@ -2797,9 +2788,9 @@ private:
     void insert(const iterator& pos, Iterator first, Iterator last, const false_type&) {
         BOOST_CB_IS_CONVERTIBLE(Iterator, value_type); // check for invalid iterator type
 #if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x581))
-        insert(pos, first, last, std::iterator_traits<Iterator>::iterator_category());
+        insert(pos, first, last, iterator_category<Iterator>::type());
 #else
-        insert(pos, first, last, BOOST_DEDUCED_TYPENAME std::iterator_traits<Iterator>::iterator_category());
+        insert(pos, first, last, BOOST_DEDUCED_TYPENAME iterator_category<Iterator>::type());
 #endif
     }
 
@@ -2840,7 +2831,7 @@ private:
             pointer p = m_last;
             BOOST_TRY {
                 for (; ii < construct; ++ii, increment(p))
-                    cb_details::allocator_traits<Alloc>::construct(alloc(), boost::to_address(p), *wrapper());
+                    boost::container::allocator_traits<Alloc>::construct(m_alloc, boost::to_address(p), *wrapper());
                 for (;ii < n; ++ii, increment(p))
                     replace(p, *wrapper());
             } BOOST_CATCH(...) {
@@ -2888,9 +2879,9 @@ private:
     void rinsert(const iterator& pos, Iterator first, Iterator last, const false_type&) {
         BOOST_CB_IS_CONVERTIBLE(Iterator, value_type); // check for invalid iterator type
 #if BOOST_WORKAROUND(__BORLANDC__, BOOST_TESTED_AT(0x581))
-        rinsert(pos, first, last, std::iterator_traits<Iterator>::iterator_category());
+        rinsert(pos, first, last, iterator_category<Iterator>::type());
 #else
-        rinsert(pos, first, last, BOOST_DEDUCED_TYPENAME std::iterator_traits<Iterator>::iterator_category());
+        rinsert(pos, first, last, BOOST_DEDUCED_TYPENAME iterator_category<Iterator>::type());
 #endif
     }
 
@@ -2934,7 +2925,7 @@ private:
                 for (;ii > construct; --ii, increment(p))
                     replace(p, *wrapper());
                 for (; ii > 0; --ii, increment(p))
-                    cb_details::allocator_traits<Alloc>::construct(alloc(), boost::to_address(p), *wrapper());
+                    boost::container::allocator_traits<Alloc>::construct(m_alloc, boost::to_address(p), *wrapper());
             } BOOST_CATCH(...) {
                 size_type constructed = ii < construct ? construct - ii : 0;
                 m_last = add(m_last, constructed);

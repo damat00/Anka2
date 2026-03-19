@@ -2,35 +2,35 @@ import uiScriptLocale
 
 ROOT = "d:/ymir work/ui/game/"
 
-WINDOW_WIDTH	= 352
-WINDOW_HEIGHT	= 384
+WINDOW_WIDTH = 352
+WINDOW_HEIGHT = 384
 
-BOARD_WIDTH		= 305
-BOARD_HEIGHT	= 300
+BOARD_WIDTH = 305
+BOARD_HEIGHT = 300
 
 window = {
 	"name" : "RumiWaitingPage",
 	"style" : ("movable",),
-	
+
 	"x" : SCREEN_WIDTH / 2 - WINDOW_WIDTH / 2,
 	"y" : SCREEN_HEIGHT / 2 - WINDOW_HEIGHT / 2,
-	
+
 	"width" : WINDOW_WIDTH,
 	"height" : WINDOW_HEIGHT,
-	
+
 	"children" :
 	(
 		{
 			"name" : "board",
 			"type" : "board",
 			"style" : ("attach",),
-			
+
 			"x" : 0,
 			"y" : 0,
-			
+
 			"width" : WINDOW_WIDTH,
 			"height" : WINDOW_HEIGHT,
-			
+
 			"children" :
 			(
 				{
@@ -38,10 +38,10 @@ window = {
 					"type" : "titlebar",
 					"style" : ("attach",),
 
-					"x" : 0,
-					"y" : 0,
+					"x" : 7,
+					"y" : 7,
 
-					"width" : WINDOW_WIDTH,
+					"width" : 338,
 					"color" : "yellow",
 
 					"children" :
@@ -129,69 +129,69 @@ window = {
 				{
 					"name" : "game_start_button",
 					"type" : "button",
-					
+
 					"x" : 40,
 					"y" : 40,
-					
+
 					"text" : uiScriptLocale.MINI_GAME_RUMI_START_TEXT,
-					
+
 					"vertical_align" : "bottom",
 					"horizontal_align" : "left",
-					
-					
+
 					"default_image" : "d:/ymir work/ui/public/large_button_01.sub",
 					"over_image" : "d:/ymir work/ui/public/large_button_02.sub",
 					"down_image" : "d:/ymir work/ui/public/large_button_03.sub",
 				},
-				
+
 				{
 					"name" : "confirm_check_button_text_window",
 					"type" : "window",
 					"style" : ("attach",),
-					
+
 					"x" : 275,
 					"y" : 348,
-					
+
 					"width" : 29,
 					"height" : 18,
-					
+
 					"children" :
 					(
 						{
 							"name" : "confirm_check_button_text",
 							"type" : "text",
-							
+
 							"x" : 0,
 							"y" : 0,
-							
+
 							"text_horizontal_align" : "right",
-							
 							"text" : uiScriptLocale.MINI_GAME_RUMI_DISCARD_TEXT,
 						},
 					),
 				},
-				
+
 				{
 					"name" : "confirm_check_button",
-					"type" : "expanded_image",
-					
+					"type" : "button",
+
 					"x" : 285,
 					"y" : 344,
-					
-					"image" : "d:/ymir work/ui/public/Parameter_Slot_07.sub",
+
+					"default_image" : "d:/ymir work/ui/public/Parameter_Slot_07.sub",
+					"over_image" : "d:/ymir work/ui/public/Parameter_Slot_07.sub",
+					"down_image" : "d:/ymir work/ui/public/Parameter_Slot_07.sub",
 				},
 				{
 					"name" : "check_image",
-					"type" : "expanded_image",
-					"style" : ("not_pick",),
-					
+					"type" : "button",
+
 					"x" : 290,
 					"y" : 344,
-					
-					"image" : "d:/ymir work/ui/public/check_image.sub",
+
+					"default_image" : "d:/ymir work/ui/public/check_image.sub",
+					"over_image" : "d:/ymir work/ui/public/check_image.sub",
+					"down_image" : "d:/ymir work/ui/public/check_image.sub",
 				},
-				
 			),
 		},
-	),	
+	),
 }

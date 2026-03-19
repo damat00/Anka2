@@ -22,7 +22,7 @@ BOOL CItemManager::SelectItemData(DWORD dwIndex)
 		for (int i = 0; i < n; i++)
 		{
 			CItemData * p = m_vec_ItemRange[i];
-			const CItemData::TItemTable * pTable = p->GetTable();
+			const CItemData::TItemTable * pTable = p->GetTable(); 
 			if ((pTable->dwVnum < dwIndex) &&
 				dwIndex < (pTable->dwVnum + pTable->dwVnumRange))
 			{
@@ -57,7 +57,7 @@ BOOL CItemManager::GetItemDataPointer(DWORD dwItemID, CItemData ** ppItemData)
 		for (int i = 0; i < n; i++)
 		{
 			CItemData * p = m_vec_ItemRange[i];
-			const CItemData::TItemTable * pTable = p->GetTable();
+			const CItemData::TItemTable * pTable = p->GetTable(); 
 			if ((pTable->dwVnum < dwItemID) &&
 				dwItemID < (pTable->dwVnum + pTable->dwVnumRange))
 			{
@@ -88,7 +88,7 @@ CItemData * CItemManager::MakeItemData(DWORD dwIndex)
 	{
 		CItemData * pItemData = CItemData::New();
 
-		m_ItemMap.insert(TItemMap::value_type(dwIndex, pItemData));
+		m_ItemMap.insert(TItemMap::value_type(dwIndex, pItemData));		
 
 		return pItemData;
 	}
@@ -96,10 +96,7 @@ CItemData * CItemManager::MakeItemData(DWORD dwIndex)
 	return f->second;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////
-// Load Item Table
-
-bool CItemManager::LoadItemList(const char * c_szFileName)
+bool CItemManager::LoadItemList(const char *c_szFileName)
 {
 	CMappedFile File;
 	LPCVOID pData;
@@ -311,16 +308,15 @@ bool CItemManager::LoadItemTable(const char *c_szFileName)
 	{
 		file.Read(&dwVersion, sizeof(DWORD));
 		file.Read(&dwStride, sizeof(DWORD));
-
+	
 		if (dwVersion != 1)
 		{
 			TraceError("CPythonItem::LoadItemTable: invalid item_proto[%s] VERSION[%d]", c_szFileName, dwVersion);
 			return false;
 		}
-
 		if (dwStride != sizeof(CItemData::TItemTable))
 		{
-			TraceError("CPythonItem::LoadItemTable: invalid item_proto[%s] STRIDE[%d] != sizeof(SItemTable)",
+			TraceError("CPythonItem::LoadItemTable: invalid item_proto[%s] STRIDE[%d] != sizeof(SItemTable)", 
 				c_szFileName, dwStride, sizeof(CItemData::TItemTable));
 			return false;
 		}
@@ -363,7 +359,7 @@ bool CItemManager::LoadItemTable(const char *c_szFileName)
 			if (CResourceManager::Instance().IsFileExist(szName) == false)
 			{
 				std::map<DWORD, DWORD>::iterator itVnum = itemNameMap.find(GetHashCode(table->szName));
-
+				
 				if (itVnum != itemNameMap.end())
 					_snprintf(szName, sizeof(szName), "icon/item/%05d.tga", itVnum->second);
 				else

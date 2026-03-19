@@ -75,6 +75,13 @@ class CGuildManager : public singleton<CGuildManager>
 
 		void		ChangeMaster(DWORD dwGID);
 
+#ifdef ENABLE_GUILD_TOKEN_AUTH
+		uint64_t	GenerateTokenHashNumber();
+		bool		IsCorrectGuildToken(DWORD guildID, uint64_t hashID);
+		void		SendGuildToken(LPCHARACTER ch, uint64_t token);
+		void		GuildRelink(DWORD guildID, LPCHARACTER ch);
+#endif
+
 	private:
 		typedef std::map<DWORD, CGuild*> TGuildMap;
 		TGuildMap m_mapGuild;

@@ -2,7 +2,7 @@
 
 #include "MapUtil.h"
 
-class IPhysicsWorld
+class IPhysicsWorld 
 {
 public:
 	IPhysicsWorld()
@@ -13,7 +13,7 @@ public:
 
 	virtual ~IPhysicsWorld()
 	{
-		if (this == ms_pWorld)
+		if (this == ms_pWorld) 
 			ms_pWorld = nullptr;
 	}
 
@@ -29,7 +29,9 @@ private:
 };
 
 class CActorInstance;
-class IObjectManager
+//NOTE : 맘에 안들지만 Dependency Inversion을 막고 이전과 동일한 interface를 유지하기 위해서 이방식대로 간다
+//하지만 제대로 설계를 한다면 world와 live object들의 관리는 조�?더 base project에서 (gamelib이나 더 base project에서 해야 한다 )
+class IObjectManager 
 {
 public:
 	IObjectManager()
@@ -40,7 +42,7 @@ public:
 
 	virtual ~IObjectManager()
 	{
-		if (this == ms_ObjManager)
+		if (this == ms_ObjManager) 
 			ms_ObjManager = nullptr;
 	}
 

@@ -1,3 +1,4 @@
+
 #ifndef STABLE_PRIORITY_QUEUE_H_
 #define STABLE_PRIORITY_QUEUE_H_
 

@@ -47,21 +47,21 @@ void CSoundBase::Initialize()
 
 	if (ms_iRefCount > 1)
 		return;
-
+	
 	AIL_set_redist_directory("miles");
 	AIL_startup();
 
 	ms_ProviderVector.clear();
 	ms_dataMap.clear();
-
+	
 }
 
-DWORD CSoundBase::GetFileCRC(const char * filename)
+DWORD CSoundBase::GetFileCRC(const char *filename)
 {
 	return GetCRC32(filename, strlen(filename));
 }
 
-CSoundData * CSoundBase::AddFile(DWORD dwFileCRC, const char* filename)
+CSoundData * CSoundBase::AddFile(DWORD dwFileCRC, const char *filename)
 {
 	CSoundData * pSoundData = new CSoundData;
 	pSoundData->Assign(filename);

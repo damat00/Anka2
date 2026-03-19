@@ -32,11 +32,6 @@ class CDungeon
 		void Purge();
 		void KillAll();
 
-#ifdef ENABLE_ZODIAC_MISSION
-		void ZodiacGiveChest(DWORD dwMapIndex);
-		void ZodiacFlag(DWORD dwMapIndex);
-#endif
-
 		void IncMonster() { m_iMonsterCount++; sys_log(0, "MonsterCount %d", m_iMonsterCount); }
 		void DecMonster() { m_iMonsterCount--; CheckEliminated(); }
 		int	CountMonster() { return m_iMonsterCount; }
@@ -56,11 +51,7 @@ class CDungeon
 		long GetMapIndex() { return m_lMapIndex; }
 
 		void Spawn(DWORD vnum, const char* pos);
-#ifdef ENABLE_SUNG_MAHI_TOWER
-		LPCHARACTER	SpawnMob(DWORD vnum, int x, int y, int dir = 0, bool isNomove = false);
-#else
 		LPCHARACTER	SpawnMob(DWORD vnum, int x, int y, int dir = 0);
-#endif
 		LPCHARACTER	SpawnMob_ac_dir(DWORD vnum, int x, int y, int dir = 0);
 		LPCHARACTER	SpawnGroup(DWORD vnum, long x, long y, float radius, bool bAggressive=false, int count=1);
 
@@ -73,13 +64,6 @@ class CDungeon
 		bool IsValidRegen(LPREGEN regen, size_t regen_id);
 
 		void SetUnique(const char* key, DWORD vid);
-#ifdef ENABLE_SUNG_MAHI_TOWER
-		void SetUniqueMaster(const char* key);
-		void ClearDungeonFlags() { m_map_Flag.clear(); }
-		
-		void SetDungeonDifficulty(BYTE dungeonLevel) { m_bDungeon_Difficulty = dungeonLevel; }
-		BYTE GetDungeonDifficulty() const { return m_bDungeon_Difficulty; }
-#endif
 		void SpawnMoveUnique(const char* key, DWORD vnum, const char* pos_from, const char* pos_to);
 		void SpawnMoveGroup(DWORD vnum, const char* pos_from, const char* pos_to, int count=1);
 		void SpawnUnique(const char* key, DWORD vnum, const char* pos);
@@ -106,9 +90,8 @@ class CDungeon
 		void JumpParty(LPPARTY pParty, long lFromMapIndex, int x, int y);
 
 #ifdef ENABLE_NEW_DUNGEON_LIB
-	void NewKillAll(DWORD dwMapIndex);
-	void MissionNotice(DWORD dwMapIndex, const char* msg, BYTE value = 0);
-	void DungeonCommand(DWORD dwMapIndex, const char* msg);
+		void NewKillAll(DWORD dwMapIndex);
+		void DungeonCommand(DWORD dwMapIndex, const char *msg);
 #endif
 
 		void ExitAll();
@@ -149,9 +132,6 @@ class CDungeon
 		TPartyMap m_map_pkParty;
 		TAreaMap& m_map_Area;
 		TUniqueMobMap m_map_UniqueMob;
-#ifdef ENABLE_SUNG_MAHI_TOWER
-		BYTE m_bDungeon_Difficulty;
-#endif
 
 		int m_iMobKill;
 		int m_iStoneKill;

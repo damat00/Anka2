@@ -19,7 +19,7 @@ class CSoundData
 		CSoundData();
 		virtual ~CSoundData();
 
-		void			Assign(const char* filename);
+		void			Assign(const char *filename);
 		LPVOID			Get();
 		ULONG			GetSize();
 		void			Release();
@@ -32,7 +32,7 @@ class CSoundData
 	protected:
 		bool			ReadFromDisk();
 		void			Destroy();
-
+		
 	protected:
 		char			m_filename[128];
 		int				m_iRefCount;

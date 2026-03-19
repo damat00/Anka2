@@ -12,11 +12,11 @@ CMSWindow::TWindowClassSet CMSWindow::ms_stWCSet;
 HINSTANCE CMSWindow::ms_hInstance = nullptr;
 
 LRESULT CALLBACK MSWindowProcedure(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM lParam)
-{
+{	
 	CMSWindow * pWnd = (CMSWindow *) GetWindowLong(hWnd, GWL_USERDATA);
 
 	if (pWnd)
-		return pWnd->WindowProcedure(hWnd, uiMsg, wParam, lParam);
+		return pWnd->WindowProcedure(hWnd, uiMsg, wParam, lParam);	
 
 	return DefWindowProc(hWnd, uiMsg, wParam, lParam);
 }
@@ -39,10 +39,10 @@ LRESULT CMSWindow::WindowProcedure(HWND hWnd, UINT uiMsg, WPARAM wParam, LPARAM 
 
 void CMSWindow::OnSize(WPARAM wParam, LPARAM /*lParam*/)
 {
-	if (wParam == SIZE_MINIMIZED)
+	if (wParam == SIZE_MINIMIZED) 
 	{
 		InvalidateRect(m_hWnd, nullptr, true);
-		m_isActive = false;
+		m_isActive = false;        
 		m_isVisible = false;
 	}
 	else
@@ -59,7 +59,7 @@ void CMSWindow::Destroy()
 
 	if (IsWindow(m_hWnd))
 		DestroyWindow(m_hWnd);
-
+	
 	m_hWnd = nullptr;
 	m_isVisible = false;
 }
@@ -68,16 +68,16 @@ bool CMSWindow::Create(const char *c_szName, int brush, DWORD cs, DWORD ws, HICO
 {
 	//assert(ms_hInstance != nullptr);
 	Destroy();
-
+		
 	const char *c_szClassName = RegisterWindowClass(cs, brush, MSWindowProcedure, hIcon, iCursorResource);
 
 	m_hWnd = CreateWindow(
 						c_szClassName,
 						c_szName,
-						ws,
-						0, 0, 0, 0,
+						ws, 
+						0, 0, 0, 0, 
 						nullptr,
-						nullptr,
+						nullptr, 
 						ms_hInstance,
 						nullptr);
 
@@ -110,12 +110,12 @@ void CMSWindow::SetVisibleMode(bool isVisible)
 
 	if (m_isVisible)
 	{
-		ShowWindow(m_hWnd, SW_SHOW);
+		ShowWindow(m_hWnd, SW_SHOW);		
 	}
 	else
 	{
 		ShowWindow(m_hWnd, SW_HIDE);
-	}
+	}	
 }
 
 void CMSWindow::Show()
@@ -199,17 +199,17 @@ void CMSWindow::AdjustSize(int width, int height)
 	SetRect(&m_rect, 0, 0, width, height);
 
 	AdjustWindowRectEx(&m_rect,
-						GetWindowStyle(m_hWnd),
-						GetMenu(m_hWnd ) != nullptr,
-						GetWindowExStyle(m_hWnd ) );
+						GetWindowStyle(m_hWnd),     
+						GetMenu(m_hWnd ) != nullptr,    
+						GetWindowExStyle(m_hWnd ) ); 
 
 	MoveWindow
-	(
-		m_hWnd,
-		0,
-		0,
-		m_rect.right - m_rect.left,
-		m_rect.bottom - m_rect.top,
+	( 
+		m_hWnd, 
+		0, 
+		0, 
+		m_rect.right - m_rect.left, 
+		m_rect.bottom - m_rect.top, 
 		FALSE
 	);
 }
@@ -220,7 +220,7 @@ void CMSWindow::SetText(const char *c_szText)
 }
 
 void CMSWindow::SetSize(int width, int height)
-{
+{	
 	SetWindowPos(m_hWnd, nullptr, 0, 0, width, height, SWP_NOZORDER|SWP_NOMOVE);
 }
 
@@ -247,11 +247,11 @@ const char *CMSWindow::RegisterWindowClass(DWORD style, int brush, WNDPROC pfnWn
 	wc.hCursor			= LoadCursor(ms_hInstance, MAKEINTRESOURCE(iCursorResource));
 	wc.hIcon			= hIcon ? hIcon : LoadIcon(ms_hInstance, IDI_APPLICATION);
 	wc.hbrBackground	= (HBRUSH) GetStockObject(brush);
-	wc.hInstance		= ms_hInstance;
+	wc.hInstance		= ms_hInstance;	
 	wc.lpszClassName	= c_szStaticClassName;
 	wc.lpszMenuName		= "";
 
-	if (!RegisterClass(&wc))
+	if (!RegisterClass(&wc)) 
 		return "";
 
 	return c_szStaticClassName;

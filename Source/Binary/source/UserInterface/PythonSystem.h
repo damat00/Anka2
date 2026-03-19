@@ -109,7 +109,7 @@ class CPythonSystem : public CSingleton<CPythonSystem>
 #ifdef ENABLE_STONE_SCALE_OPTION
 			float m_fStoneScale;
 #endif
-#ifdef ENABLE_TRACK_WINDOW
+#ifdef ENABLE_DUNGEON_TRACKING_SYSTEM
 			bool bDungeonTrack;
 			bool bBossTrack;
 #endif
@@ -214,7 +214,7 @@ class CPythonSystem : public CSingleton<CPythonSystem>
 		void SetStoneScale(float fScale);
 #endif
 
-#ifdef ENABLE_TRACK_WINDOW
+#ifdef ENABLE_DUNGEON_TRACKING_SYSTEM
 		bool GetDungeonTrack() { return m_Config.bDungeonTrack; }
 		void SetDungeonTrack(bool flag) { m_Config.bDungeonTrack = flag; }
 

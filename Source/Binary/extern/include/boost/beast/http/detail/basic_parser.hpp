@@ -35,12 +35,6 @@ struct basic_parser_base
     //
     static std::size_t constexpr max_obs_fold = 4096;
 
-    template<class T>
-    struct is_unsigned_integer:
-        std::integral_constant<bool,
-            std::numeric_limits<T>::is_integer &&
-            ! std::numeric_limits<T>::is_signed> {};
-
     enum class state
     {
         nothing_yet = 0,
@@ -307,7 +301,9 @@ struct basic_parser_base
 
     template<class Iter, class T>
     static
-    typename std::enable_if<is_unsigned_integer<T>::value, bool>::type
+    typename std::enable_if<
+        std::numeric_limits<T>::is_integer &&
+        ! std::numeric_limits<T>::is_signed, bool>::type
     parse_dec(Iter it, Iter last, T& v)
     {
         if(it == last)
@@ -329,26 +325,24 @@ struct basic_parser_base
         return true;
     }
 
-    template<class Iter, class T>
+    template<class Iter, class Unsigned>
     static
-    typename std::enable_if<is_unsigned_integer<T>::value, bool>::type
-    parse_hex(Iter& it, T& v)
+    bool
+    parse_hex(Iter& it, Unsigned& v)
     {
         unsigned char d;
         if(! unhex(d, *it))
             return false;
-        T tmp = 0;
-        do
+        v = d;
+        for(;;)
         {
-            if(tmp > (std::numeric_limits<T>::max)() / 16)
+            if(! unhex(d, *++it))
+                break;
+            auto const v0 = v;
+            v = 16 * v + d;
+            if(v < v0)
                 return false;
-            tmp *= 16;
-            if((std::numeric_limits<T>::max)() - tmp < d)
-                return false;
-            tmp += d;
         }
-        while(unhex(d, *++it));
-        v = tmp;
         return true;
     }
 

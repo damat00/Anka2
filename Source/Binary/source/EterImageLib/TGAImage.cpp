@@ -33,7 +33,7 @@ void CTGAImage::Create(int width, int height)
 	m_Header.width		= (short) width;
 	m_Header.height		= (short) height;
 	m_Header.colorBits	= 32;
-	m_Header.desc		= 0x08;
+	m_Header.desc		= 0x08;	// alpha channel ÀÖÀ½
 
 	CImage::Create(width, height);
 }
@@ -54,7 +54,7 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 
 	switch (m_Header.imgType)
 	{
-		case 3:
+		case 3:	// ¾ËÆÄ¸¸ ÀÖ´Â °Í (1bytes per pixel, °ÅÀÇ ¾È¾²ÀÓ)
 			{
 				for (i = 0; i < hxw; ++i)
 				{
@@ -64,7 +64,7 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 			}
 			break;
 
-		case 2:
+		case 2:	// ¾?Ãà ¾ÈµÈ TGA
 			{
 				if (m_Header.colorBits == 16)	// 16bit
 				{
@@ -75,16 +75,16 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 						memcpy(&w, c_pbMem, sizeof(WORD));
 						c_pbMem += sizeof(WORD);
 						iSize -= sizeof(WORD);
-
+						
 						b = (BYTE) (w & 0x1F);
 						g = (BYTE) ((w >> 5) & 0x1F);
 						r = (BYTE) ((w >> 10) & 0x1F);
-
+						
 						b <<= 3;
 						g <<= 3;
 						r <<= 3;
 						a = 0xff;
-
+						
 						pdwDest[i] = (a << 24) | (r << 16) | (g << 8) | b;
 					}
 				}
@@ -96,7 +96,7 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 						g = (BYTE) *(c_pbMem++); --iSize;
 						b = (BYTE) *(c_pbMem++); --iSize;
 						a = 0xff;
-
+						
 						pdwDest[i] = (a << 24) | (r << 16) | (g << 8) | b;
 					}
 				}
@@ -112,7 +112,7 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 			}
 			break;
 
-		case 10:
+		case 10: // ¾?Ãà µÈ TGA (RLE)
 			{
 				BYTE rle;
 
@@ -123,7 +123,7 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 					{
 						rle = (BYTE) *(c_pbMem++); --iSize;
 
-						if (rle < 0x80)
+						if (rle < 0x80)	// ¾?Ãà ¾ÈµÈ °÷
 						{
 							rle++;
 
@@ -146,6 +146,7 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 						}
 						else
 						{
+							// ¾?Ãà µÈ °÷
 							rle -= 127;
 
 							b = (BYTE) *(c_pbMem++); --iSize;
@@ -174,11 +175,11 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 					while (i < hxw)
 					{
 						rle = (BYTE) *(c_pbMem++); --iSize;
-
+						
 						if (rle < 0x80)
 						{
 							rle++;
-
+							
 							while (rle)
 							{
 								b = (BYTE) *(c_pbMem++); --iSize;
@@ -186,7 +187,7 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 								r = (BYTE) *(c_pbMem++); --iSize;
 								a = (BYTE) *(c_pbMem++); --iSize;
 								pdwDest[i++] = (a << 24) | (r << 16) | (g << 8) | b;
-
+								
 								if (i > hxw)
 								{
 									assert(!"RLE overflow");
@@ -199,16 +200,16 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 						else
 						{
 							rle -= 127;
-
+							
 							b = (BYTE) *(c_pbMem++); --iSize;
 							g = (BYTE) *(c_pbMem++); --iSize;
 							r = (BYTE) *(c_pbMem++); --iSize;
 							a = (BYTE) *(c_pbMem++); --iSize;
-
+							
 							while (rle)
 							{
 								pdwDest[i++] = (a << 24) | (r << 16) | (g << 8) | b;
-
+								
 								if (i > hxw)
 								{
 									assert(!"RLE overflow");
@@ -224,7 +225,7 @@ bool CTGAImage::LoadFromMemory(int iSize, const BYTE * c_pbMem)
 			}
 			break;
 	}
-
+	
 	if (!(m_Header.desc & 0x20))
 	{
 		FlipTopToBottom();
@@ -249,43 +250,43 @@ int CTGAImage::GetRLEPixelCount(const DWORD * data)
 {
     int r = 0;
 	DWORD pixel;
-
+    
     r = 1;
-
+	
     if (data >= m_pdwEndPtr)
         return 0;
-
+    
 	pixel = *data;
-
+    
     while ((r < 127) && (data < m_pdwEndPtr))
     {
 		if (pixel != *(++data))
 			return r;
-
+		
         r++;
     }
-
+	
 	return r;
 }
 
 int CTGAImage::GetRawPixelCount(const DWORD * data)
 {
     int i = 0;
-
+    
     if (data >= m_pdwEndPtr)
         return 0;
-
+	
     while ((data < m_pdwEndPtr) && (i < 127))
     {
 		int rle = GetRLEPixelCount(data);
-
+		
 		if (rle >= 4)
 			break;
 
         data++;
         i++;
     }
-
+	
     return i;
 }
 
@@ -308,29 +309,29 @@ void CTGAImage::SetAlphaChannel(bool isExist)
 bool CTGAImage::SaveToDiskFile(const char *c_szFileName)
 {
 	FILE * fp = fopen(c_szFileName, "wb");
-
+	
 	if (!fp)
 		return false;
 
 	fwrite(&m_Header, 18, 1, fp);
-
-	if (m_Header.imgType == 10)
+	
+	if (m_Header.imgType == 10)	// RLE ¾?ÃàÀ¸·Î ÀúÀå
 	{
 		DWORD * data = GetBasePointer();
-
+		
 		while (data < m_pdwEndPtr)
 		{
 			int rle = GetRLEPixelCount(data);
-
+			
 			if (rle < 4)
 			{
 				int raw = GetRawPixelCount(data);
-
+				
 				if (raw == 0)
 					break;
-
+				
 				fputc(raw - 1, fp);
-
+				
 				while (raw)
 				{
 					fwrite(data, sizeof(DWORD), 1, fp);

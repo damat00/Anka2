@@ -6,7 +6,7 @@ CSoundManager2D::CSoundManager2D()
 }
 
 CSoundManager2D::~CSoundManager2D()
-{
+{	
 }
 
 bool CSoundManager2D::Initialize()
@@ -17,7 +17,7 @@ bool CSoundManager2D::Initialize()
 		return true;
 
 	ms_DIGDriver = AIL_open_digital_driver(44100, 16, 2, 0);
-
+	
 	for (int i = 0; i < INSTANCE_MAX_COUNT; ++i)
 		ms_Instances[i].Initialize();
 /*	ms_DIGDriver = AIL_open_digital_driver(44100,
@@ -29,20 +29,20 @@ bool CSoundManager2D::Initialize()
 }
 
 void CSoundManager2D::Destroy()
-{
+{	
 	for (int i = 0; i < INSTANCE_MAX_COUNT; ++i)
 		ms_Instances[i].Destroy();
-
+	
 	if (ms_DIGDriver != nullptr)
 	{
 		AIL_close_digital_driver(ms_DIGDriver);
 		ms_DIGDriver = nullptr;
-	}
+	}	
 
 	CSoundBase::Destroy();
 }
 
-ISoundInstance * CSoundManager2D::GetInstance(const char * c_pszFileName)
+ISoundInstance * CSoundManager2D::GetInstance(const char *c_pszFileName)
 {
 	DWORD dwFileCRC = GetFileCRC(c_pszFileName);
 	TSoundDataMap::iterator itor = ms_dataMap.find(dwFileCRC);

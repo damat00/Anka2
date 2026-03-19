@@ -367,6 +367,7 @@ bool CPythonNetworkStream::RecvItemGroundAddPacket()
 	return true;
 }
 
+
 bool CPythonNetworkStream::RecvItemOwnership()
 {
 	TPacketGCItemOwnership p;
@@ -377,91 +378,6 @@ bool CPythonNetworkStream::RecvItemOwnership()
 	CPythonItem::Instance().SetOwnership(p.dwVID, p.szName);
 	return true;
 }
-
-#ifdef ENABLE_FISH_EVENT_SYSTEM
-bool CPythonNetworkStream::SendFishBoxUse(BYTE bWindow, WORD wCell)
-{
-	if (!__CanActMainInstance())
-		return true;
-
-	TPacketCGFishEvent packetFishEvent;
-	packetFishEvent.bHeader = HEADER_CG_FISH_EVENT_SEND;
-	packetFishEvent.bSubheader = FISH_EVENT_SUBHEADER_BOX_USE;
-
-	if (!Send(sizeof(TPacketCGFishEvent), &packetFishEvent))
-	{
-		Tracef("SendFishEventPacket Error\n");
-		return false;
-	}
-	
-	if (!Send(sizeof(bWindow), &bWindow))
-	{
-		Tracef("SendFishBoxUse Error\n");
-		return false;
-	}
-	
-	if (!Send(sizeof(wCell), &wCell))
-	{
-		Tracef("SendFishBoxUse Error\n");
-		return false;
-	}
-
-	return SendSequence();
-}
-
-bool CPythonNetworkStream::SendFishShapeAdd(BYTE bPos)
-{
-	if (!__CanActMainInstance())
-		return true;
-
-	TPacketCGFishEvent packetFishEvent;
-	packetFishEvent.bHeader = HEADER_CG_FISH_EVENT_SEND;
-	packetFishEvent.bSubheader = FISH_EVENT_SUBHEADER_SHAPE_ADD;
-
-	if (!Send(sizeof(TPacketCGFishEvent), &packetFishEvent))
-	{
-		Tracef("SendFishEventPacket Error\n");
-		return false;
-	}
-	
-	if (!Send(sizeof(BYTE), &bPos))
-	{
-		Tracef("SendFishShapeAdd Error\n");
-		return false;
-	}
-
-	return SendSequence();
-}
-
-bool CPythonNetworkStream::RecvFishEventInfo()
-{
-	TPacketGCFishEventInfo fishEventPacket;
-
-	if (!Recv(sizeof(fishEventPacket), &fishEventPacket))
-		return false;
-
-	switch (fishEventPacket.bSubheader)
-	{
-		case FISH_EVENT_SUBHEADER_BOX_USE:
-			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "MiniGameFishUse", Py_BuildValue("(ii)", fishEventPacket.dwFirstArg, fishEventPacket.dwSecondArg));
-			break;
-			
-		case FISH_EVENT_SUBHEADER_SHAPE_ADD:
-			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "MiniGameFishAdd", Py_BuildValue("(ii)", fishEventPacket.dwFirstArg, fishEventPacket.dwSecondArg));
-			break;
-			
-		case FISH_EVENT_SUBHEADER_GC_REWARD:
-			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "MiniGameFishReward", Py_BuildValue("(i)", fishEventPacket.dwFirstArg));
-			break;
-			
-		case FISH_EVENT_SUBHEADER_GC_ENABLE:
-			PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "MiniGameFishEvent", Py_BuildValue("(ii)", fishEventPacket.dwFirstArg, fishEventPacket.dwSecondArg));
-			break;
-	};
-
-	return true;
-}
-#endif
 
 bool CPythonNetworkStream::RecvItemGroundDelPacket()
 {
@@ -543,7 +459,7 @@ bool CPythonNetworkStream::SendShopBuyPacket(BYTE bPos)
 {
 	if (!__CanActMainInstance())
 		return true;
-
+	
 	TPacketCGShop PacketShop;
 	PacketShop.header = HEADER_CG_SHOP;
 	PacketShop.subheader = SHOP_SUBHEADER_CG_BUY;
@@ -691,7 +607,7 @@ bool CPythonNetworkStream::SendItemUsePacket(TItemPos pos)
 bool CPythonNetworkStream::SendItemUseToItemPacket(TItemPos source_pos, TItemPos target_pos)
 {
 	if (!__CanActMainInstance())
-		return true;
+		return true;	
 
 	TPacketCGItemUseToItem itemUseToItemPacket;
 	itemUseToItemPacket.header = HEADER_CG_ITEM_USE_TO_ITEM;
@@ -827,7 +743,7 @@ void CPythonNetworkStream::__PlayInventoryItemDropSound(TItemPos uSlotPos)
 //	CPythonShop& rkShop=CPythonShop::Instance();
 //	if (!rkShop.GetSlotItemID(uSlotPos, &dwItemID))
 //		return;
-//
+//	
 //	CPythonItem& rkItem=CPythonItem::Instance();
 //	rkItem.PlayDropSound(dwItemID);
 //}
@@ -859,10 +775,10 @@ bool CPythonNetworkStream::SendItemMovePacket(TItemPos pos, TItemPos change_pos,
 #else
 bool CPythonNetworkStream::SendItemMovePacket(TItemPos pos, TItemPos change_pos, BYTE num)
 #endif
-{
+{	
 	if (!__CanActMainInstance())
 		return true;
-
+	
 	if (__IsEquipItemInSlot(pos))
 	{
 		if (CPythonExchange::Instance().isTrading())
@@ -953,9 +869,9 @@ bool CPythonNetworkStream::SendQuickSlotAddPacket(BYTE wpos, BYTE type, BYTE pos
 
 	TPacketCGQuickSlotAdd quickSlotAddPacket;
 
-	quickSlotAddPacket.header		= HEADER_CG_QUICKSLOT_ADD;
-	quickSlotAddPacket.pos			= wpos;
-	quickSlotAddPacket.slot.Type	= type;
+	quickSlotAddPacket.header = HEADER_CG_QUICKSLOT_ADD;
+	quickSlotAddPacket.pos = wpos;
+	quickSlotAddPacket.slot.Type = type;
 	quickSlotAddPacket.slot.Position = pos;
 
 	if (!Send(sizeof(TPacketCGQuickSlotAdd), &quickSlotAddPacket))
@@ -1124,6 +1040,24 @@ bool CPythonNetworkStream::RecvSpecialEffect()
 			break;
 #endif
 
+#ifdef ENABLE_RENEWAL_BATTLE_PASS
+		case SE_EFFECT_BP_NORMAL_MISSION_COMPLETED:
+			effect = CInstanceBase::EFFECT_BP_NORMAL_MISSION_COMPLETED;
+			break;
+
+		case SE_EFFECT_BP_PREMIUM_MISSION_COMPLETED:
+			effect = CInstanceBase::EFFECT_BP_PREMIUM_MISSION_COMPLETED;
+			break;
+
+		case SE_EFFECT_BP_NORMAL_BATTLEPASS_COMPLETED:
+			effect = CInstanceBase::EFFECT_BP_NORMAL_BATTLEPASS_COMPLETED;
+			break;
+
+		case SE_EFFECT_BP_PREMIUM_BATTLEPASS_COMPLETED:
+			effect = CInstanceBase::EFFECT_BP_PREMIUM_BATTLEPASS_COMPLETED;
+			break;
+#endif
+
 #ifdef ENABLE_GROWTH_PET_SYSTEM
 		case SE_GYEONGGONG_BOOM:
 			effect = CInstanceBase::EFFECT_GYEONGGONG_BOOM;
@@ -1131,94 +1065,13 @@ bool CPythonNetworkStream::RecvSpecialEffect()
 			break;
 #endif
 
-#ifdef ENABLE_OCHAO_TEMPLE_SYSTEM
-		case SE_EFFECT_HEALER:
-			effect = CInstanceBase::EFFECT_HEALER;
-			break;
-#endif
-
-#ifdef ENABLE_ZODIAC_MISSION
-		case EFFECT_SKILL_DAMAGE_ZONE:
-			effect = CInstanceBase::EFFECT_SKILL_DAMAGE_ZONE;
-			break;
-
-		case EFFECT_SKILL_DAMAGE_ZONE_BUYUK:
-			effect = CInstanceBase::EFFECT_SKILL_DAMAGE_ZONE_BUYUK;
-			break;
-
-		case EFFECT_SKILL_DAMAGE_ZONE_ORTA:
-			effect = CInstanceBase::EFFECT_SKILL_DAMAGE_ZONE_ORTA;
-			break;
-
-		case EFFECT_SKILL_DAMAGE_ZONE_KUCUK:
-			effect = CInstanceBase::EFFECT_SKILL_DAMAGE_ZONE_KUCUK;
-			break;
-
-		case EFFECT_SKILL_SAFE_ZONE:
-			effect = CInstanceBase::EFFECT_SKILL_SAFE_ZONE;
-			break;
-
-		case EFFECT_SKILL_SAFE_ZONE_BUYUK:
-			effect = CInstanceBase::EFFECT_SKILL_SAFE_ZONE_BUYUK;
-			break;
-
-		case EFFECT_SKILL_SAFE_ZONE_ORTA:
-			effect = CInstanceBase::EFFECT_SKILL_SAFE_ZONE_ORTA;
-			break;
-
-		case EFFECT_SKILL_SAFE_ZONE_KUCUK:
-			effect = CInstanceBase::EFFECT_SKILL_SAFE_ZONE_KUCUK;
-			break;
-
-		case EFFECT_METEOR:
-			effect = CInstanceBase::EFFECT_METEOR;
-			break;
-
-		case EFFECT_BEAD_RAIN:
-			effect = CInstanceBase::EFFECT_BEAD_RAIN;
-			break;
-
-		case EFFECT_FALL_ROCK:
-			effect = CInstanceBase::EFFECT_FALL_ROCK;
-			break;
-
-		case EFFECT_ARROW_RAIN:
-			effect = CInstanceBase::EFFECT_ARROW_RAIN;
-			break;
-
-		case EFFECT_HORSE_DROP:
-			effect = CInstanceBase::EFFECT_HORSE_DROP;
-			break;
-
-		case EFFECT_EGG_DROP:
-			effect = CInstanceBase::EFFECT_EGG_DROP;
-			break;
-
-		case EFFECT_DEAPO_BOOM:
-			effect = CInstanceBase::EFFECT_DEAPO_BOOM;
-			break;
-#endif
-
-#ifdef ENABLE_QUEEN_NETHIS
-		case SE_EFFECT_SNAKE_REGEN:
-			effect = CInstanceBase::EFFECT_SNAKE_REGEN;
-			bAttachEffect = false;
-			break;
-#endif
-
-#ifdef ENABLE_PASSIVE_SYSTEM
-		case SE_PASSIVE_EFFECT:
-			effect = CInstanceBase::EFFECT_PASSIVE;
-			break;
-#endif
-
 		default:
-			TraceError("%d is not a special effect number. TPacketGCSpecialEffect",kSpecialEffect.type);
+			TraceError("%d 는 없는 스페셜 이펙트 번호입니다.TPacketGCSpecialEffect", kSpecialEffect.type);
 			break;
 	}
 
 	if (bPlayPotionSound)
-	{
+	{		
 		IAbstractPlayer& rkPlayer=IAbstractPlayer::GetSingleton();
 		if(rkPlayer.IsMainCharacterIndex(kSpecialEffect.vid))
 		{
@@ -1282,42 +1135,18 @@ bool CPythonNetworkStream::RecvSpecificEffect()
 
 	CInstanceBase * pInstance = CPythonCharacterManager::Instance().GetInstancePtr(kSpecificEffect.vid);
 	//EFFECT_TEMP
-#ifdef ENABLE_TITLE_SYSTEM
-	if (pInstance)
-	{
-		const bool bClearTitleEffect =
-			(strcmp(kSpecificEffect.effect_file, "__TITLE_EFFECT_CLEAR__") == 0);
-		const bool bIsTitleEffect =
-			(strstr(kSpecificEffect.effect_file, "/effect/etc/title/") != nullptr) ||
-			(strstr(kSpecificEffect.effect_file, "\\effect\\etc\\title\\") != nullptr);
-
-		if (bClearTitleEffect || bIsTitleEffect)
-			pInstance->ClearSpecialEffectOverHead();
-
-		if (!bClearTitleEffect)
-		{
-			CInstanceBase::RegisterEffect(CInstanceBase::EFFECT_TEMP, "", kSpecificEffect.effect_file, false);
-			if (bIsTitleEffect)
-				pInstance->AttachSpecialEffectOverHead(CInstanceBase::EFFECT_TEMP);
-			else
-				pInstance->AttachSpecialEffect(CInstanceBase::EFFECT_TEMP);
-		}
-	}
-#else
 	if (pInstance)
 	{
 		CInstanceBase::RegisterEffect(CInstanceBase::EFFECT_TEMP, "", kSpecificEffect.effect_file, false);
 		pInstance->AttachSpecialEffect(CInstanceBase::EFFECT_TEMP);
 	}
 
-#endif
-
-#ifdef ENABLE_GM_INV_EFFECT
+	#ifdef ENABLE_GM_INV_EFFECT
     if (strstr(kSpecificEffect.effect_file, "yellow_tigerman_24_1"))
     {
 		CSoundManager::Instance().PlaySound2D("sound/ambience/gm_alert.wav");
     }
-#endif
+	#endif
 
 	return true;
 }
@@ -1340,11 +1169,11 @@ bool CPythonNetworkStream::RecvDragonSoulRefine()
 	case DS_SUB_HEADER_REFINE_FAIL_NOT_ENOUGH_MONEY:
 	case DS_SUB_HEADER_REFINE_FAIL_NOT_ENOUGH_MATERIAL:
 	case DS_SUB_HEADER_REFINE_FAIL_TOO_MUCH_MATERIAL:
-		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_DragonSoulRefineWindow_RefineFail", Py_BuildValue("(iii)",
+		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_DragonSoulRefineWindow_RefineFail", Py_BuildValue("(iii)", 
 			kDragonSoul.bSubType, kDragonSoul.Pos.window_type, kDragonSoul.Pos.cell));
 		break;
 	case DS_SUB_HEADER_REFINE_SUCCEED:
-		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_DragonSoulRefineWindow_RefineSucceed",
+		PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_DragonSoulRefineWindow_RefineSucceed", 
 				Py_BuildValue("(ii)", kDragonSoul.Pos.window_type, kDragonSoul.Pos.cell));
 		break;
 	}

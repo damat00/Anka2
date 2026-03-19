@@ -89,15 +89,12 @@ bool CMobManager::Initialize(TMobTable * pTable, int iSize)
 		quest::CQuestManager::instance().RegisterNPCVnum(t->dwVnum);
 	}
 
-	// LOCALE_SERVICE
 	const int FILE_NAME_LEN = 256;
 	char szGroupFileName[FILE_NAME_LEN];
 	char szGroupGroupFileName[FILE_NAME_LEN];
 
-	snprintf(szGroupFileName, sizeof(szGroupGroupFileName),
-			"%s/group.txt", LocaleService_GetBasePath().c_str());
-	snprintf(szGroupGroupFileName, sizeof(szGroupGroupFileName),
-			"%s/group_group.txt", LocaleService_GetBasePath().c_str());
+	snprintf(szGroupFileName, sizeof(szGroupGroupFileName), "%s/group.txt", LocaleService_GetBasePath().c_str());
+	snprintf(szGroupGroupFileName, sizeof(szGroupGroupFileName), "%s/group_group.txt", LocaleService_GetBasePath().c_str());
 
 	if (!LoadGroup(szGroupFileName))
 	{
@@ -109,10 +106,8 @@ bool CMobManager::Initialize(TMobTable * pTable, int iSize)
 		sys_err("cannot load %s", szGroupGroupFileName);
 		thecore_shutdown();
 	}
-	// END_OF_LOCALE_SERVICE
 
-	//exit(1);
-    CHARACTER_MANAGER::instance().for_each_pc([this](LPCHARACTER ch) { RebindMobProto(ch); });
+	CHARACTER_MANAGER::instance().for_each_pc(std::bind(&CMobManager::RebindMobProto, this, std::placeholders::_1));
 	return true;
 }
 
@@ -291,11 +286,9 @@ bool CMobManager::LoadGroupGroup(const char * c_pszFileName, bool isReloading)
 				DWORD dwMobVnum = 0;
 				str_to_number(dwMobVnum, pTok->at(0).c_str());
 
-				// ADD_MOB_GROUP_GROUP_PROB
 				int prob = 1;
 				if (pTok->size() > 1)
 					str_to_number(prob, pTok->at(1).c_str());
-				// END_OF_ADD_MOB_GROUP_GROUP_PROB
 
 				if (dwMobVnum)
 					pkGroup->AddMember(dwMobVnum);

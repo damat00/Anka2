@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////  
 //	SpeedTreeRT runtime configuration #defines
 //
 //	(c) 2003 IDV, Inc.
@@ -98,7 +98,7 @@ const float	c_afLightGlobalAmbient[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	#error Please define exactly one loading mechanism
 #endif
 
-// billboard modes
+// billboard modes 
 #define WRAPPER_BILLBOARD_MODE
 //#define WRAPPER_RENDER_HORIZONTAL_BILLBOARD
 

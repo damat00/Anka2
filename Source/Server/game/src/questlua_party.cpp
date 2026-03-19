@@ -15,8 +15,6 @@ namespace quest
 {
 	using namespace std;
 
-	// "party" Lua functions
-
 	int party_clear_ready(lua_State* L)
 	{
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
@@ -34,7 +32,7 @@ namespace quest
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 
 		if (ch->GetParty())
-			lua_pushnumber(L, ch->GetParty()->GetMemberMaxLevel());
+			lua_pushnumber(L,ch->GetParty()->GetMemberMaxLevel());
 		else
 			lua_pushnumber(L, 1);
 
@@ -75,7 +73,7 @@ namespace quest
 	{
 		if (!lua_isstring(L, 1))
 			return 0;
-
+		
 		sys_log(0, "RUN_CINEMA %s", lua_tostring(L, 1));
 		LPCHARACTER ch = CQuestManager::instance().GetCurrentCharacterPtr();
 
@@ -115,7 +113,7 @@ namespace quest
 			{
 				sys_log(0, "CINEMASEND %s", ch->GetName());
 				ch->GetDesc()->BufferedPacket(&packet_script, sizeof(struct packet_script));
-				ch->GetDesc()->Packet(str, len);
+				ch->GetDesc()->Packet(str,len);
 			}
 		}
 	};
@@ -200,6 +198,7 @@ namespace quest
 		return 1;
 	}
 
+
 	int party_chat(lua_State* L)
 	{
 		LPPARTY pParty = CQuestManager::Instance().GetCurrentCharacterPtr()->GetParty();
@@ -217,8 +216,10 @@ namespace quest
 		return 0;
 	}
 
+
 	int party_is_map_member_flag_lt(lua_State* L)
 	{
+
 		if (!lua_isstring(L, 1) || !lua_isnumber(L, 2))
 		{
 			lua_pushnumber(L, 0);
@@ -230,13 +231,13 @@ namespace quest
 		LPCHARACTER ch = q.GetCurrentCharacterPtr();
 		PC* pPC = q.GetCurrentPC();
 
-		const char* sz = lua_tostring(L, 1);
+		const char* sz = lua_tostring(L,1);
 
 		if (pParty)
 		{
 			FPartyCheckFlagLt f;
-			f.flagname = pPC->GetCurrentQuestName() + "." + sz;
-			f.value = (int)rint(lua_tonumber(L, 2));
+			f.flagname = pPC->GetCurrentQuestName() + "."+sz;
+			f.value = (int) rint(lua_tonumber(L, 2));
 
 			bool returnBool = pParty->ForEachOnMapMemberBool(f, ch->GetMapIndex());
 			lua_pushboolean(L, returnBool);
@@ -325,8 +326,8 @@ namespace quest
 	{
 		CQuestManager & q = CQuestManager::instance();
 		LPCHARACTER ch = q.GetCurrentCharacterPtr();
-
-		if (!lua_isnumber(L, 1) || !lua_isnumber(L, 2) || !lua_isnumber(L, 3) || !lua_isnumber(L, 4) ||
+		
+		if (!lua_isnumber(L, 1) || !lua_isnumber(L, 2) || !lua_isnumber(L, 3) || !lua_isnumber(L, 4) || 
 			!lua_isnumber(L, 5) || !lua_isnumber(L, 6) || !lua_isboolean(L, 7) || !lua_isboolean(L, 8))
 		{
 			lua_pushboolean (L, false);
@@ -366,42 +367,24 @@ namespace quest
 	{
 		CQuestManager & q = CQuestManager::instance();
 		LPCHARACTER ch = q.GetCurrentCharacterPtr();
-		if (!ch)
-			return 0;
-
 		LPPARTY pParty = ch->GetParty();
 		if (NULL == pParty)
 		{
 			return 0;
 		}
-
 		FPartyPIDCollector f;
 		pParty->ForEachOnMapMember(f, ch->GetMapIndex());
-		for (std::vector <DWORD>::iterator it = f.vecPIDs.begin(); it != f.vecPIDs.end(); ++it)	//@fixme541
+		
+		for (std::vector <DWORD>::iterator it = f.vecPIDs.begin(); it != f.vecPIDs.end(); it++)
 		{
 			lua_pushnumber(L, *it);
 		}
-
 		return f.vecPIDs.size();
-	}
-
-	int party_get_member_count(lua_State *L)
-	{
-		LPCHARACTER ch = CQuestManager::Instance().GetCurrentCharacterPtr();
-		if (!ch)
-			return 0;
-
-		if (ch->GetParty())
-			lua_pushnumber(L, ch->GetParty()->GetMemberCount());
-		else
-			lua_pushnumber(L, 0);
-
-		return 1;
 	}
 
 	void RegisterPartyFunctionTable()
 	{
-		luaL_reg party_functions[] =
+		luaL_reg party_functions[] = 
 		{
 			{ "is_leader",		party_is_leader		},
 			{ "is_party",		party_is_party		},
@@ -420,11 +403,13 @@ namespace quest
 			{ "give_buff",		party_give_buff		},
 			{ "is_map_member_flag_lt",	party_is_map_member_flag_lt	},
 			{ "get_member_pids",		party_get_member_pids	},
-
-			{ "get_member_count",		party_get_member_count },
 			{ NULL,				NULL				}
 		};
 
 		CQuestManager::instance().AddLuaFunctionTable("party", party_functions);
 	}
 }
+
+
+
+

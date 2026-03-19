@@ -50,21 +50,13 @@ void CGraphicMarkInstance::Render()
 
 void CGraphicMarkInstance::OnRender()
 {
-#ifdef ENABLE_DIRECTX9_UPDATE
-    D3DPERF_BeginEvent(D3DCOLOR_ARGB(255, 50, 50, 0), L"** CGraphicMarkInstance::OnRender **");
-#endif
-
 	CGraphicImage * pImage = m_roImage.GetPointer();
 	CGraphicTexture * pTexture = pImage->GetTexturePointer();
 
-    UINT uColCount = pImage->GetWidth() / MARK_WIDTH;
-    if (uColCount == 0)
-    {
-#ifdef ENABLE_DIRECTX9_UPDATE
-        D3DPERF_EndEvent();
-#endif
-        return;
-    }
+	UINT uColCount = pImage->GetWidth() / MARK_WIDTH;
+
+	if (uColCount == 0)
+		return;
 
 	UINT uCol = m_uIndex % uColCount;
 	UINT uRow = m_uIndex / uColCount;
@@ -116,20 +108,9 @@ void CGraphicMarkInstance::OnRender()
 
 		STATEMANAGER.SetTexture(0, pTexture->GetD3DTexture());
 		STATEMANAGER.SetTexture(1, nullptr);
-
-#ifdef ENABLE_DIRECTX9_UPDATE
-        STATEMANAGER.SetFVF(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
-#else
-        STATEMANAGER.SetVertexShader(D3DFVF_XYZ | D3DFVF_DIFFUSE | D3DFVF_TEX1);
-#endif
-
+		STATEMANAGER.SetVertexShader(D3DFVF_XYZ|D3DFVF_DIFFUSE|D3DFVF_TEX1);
 		STATEMANAGER.DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 4, 0, 2);
-		//OLD: STATEMANAGER.DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, 4, 2, c_FillRectIndices, D3DFMT_INDEX16, vertices, sizeof(TPDTVertex));
 	}
-
-#ifdef ENABLE_DIRECTX9_UPDATE
-    D3DPERF_EndEvent();
-#endif
 }
 
 const CGraphicTexture & CGraphicMarkInstance::GetTextureReference() const

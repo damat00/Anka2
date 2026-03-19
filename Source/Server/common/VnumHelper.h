@@ -11,9 +11,6 @@ class CItemVnumHelper
 		static const bool IsHalloweenCandy(DWORD vnum)		{ return 71136 == vnum; }
 		static const bool IsHappinessRing(DWORD vnum)		{ return 71143 == vnum; }
 		static const bool IsLovePendant(DWORD vnum)			{ return 71145 == vnum; }
-#ifdef ENABLE_PASSIVE_SYSTEM
-		static	const bool	IsPassive(DWORD vnum)			{ return 30272 <= vnum && vnum <= 30276; }
-#endif
 #ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
 		static const bool IsDragonSoul(DWORD vnum)			{ return 110000 <= vnum && 165400 <= vnum; }
 #endif

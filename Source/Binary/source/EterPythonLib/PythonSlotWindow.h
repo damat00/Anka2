@@ -2,9 +2,8 @@
 
 #include "StdAfx.h"
 #include "PythonWindow.h"
-#include "../UserInterface/Locale_inc.h"
 
-namespace UI
+namespace UI 
 {
 	enum
 	{
@@ -143,9 +142,6 @@ namespace UI
 
 			void EnableCoverButton(DWORD dwIndex);
 			void DisableCoverButton(DWORD dwIndex);
-#ifdef ENABLE_FISH_EVENT_SYSTEM
-			void DeleteCoverButton(DWORD dwIndex);
-#endif
 			void SetAlwaysRenderCoverButton(DWORD dwIndex, bool bAlwaysRender = false);
 
 			void ShowSlotBaseImage(DWORD dwIndex);
@@ -156,8 +152,8 @@ namespace UI
 			void ClearAllSlot();
 			void ClearSlot(DWORD dwIndex);
 			void SetSlot(DWORD dwIndex, DWORD dwVirtualNumber, BYTE byWidth, BYTE byHeight, CGraphicImage * pImage, D3DXCOLOR& diffuseColor);
-#ifdef ENABLE_MINI_GAME
-			void SetCardSlot(DWORD dwIndex, DWORD dwVirtualNumber, BYTE byWidth, BYTE byHeight, const char* c_szFileName, D3DXCOLOR& diffuseColor);
+#ifdef ENABLE_MINIGAME_OKEY_CARDS_SYSTEM
+			void SetCardSlot(DWORD dwIndex, DWORD dwVirtualNumber, BYTE byWidth, BYTE byHeight, const char *c_szFileName, D3DXCOLOR& diffuseColor);
 #endif
 			void SetSlotCount(DWORD dwIndex, DWORD dwCount);
 			void SetSlotCountNew(DWORD dwIndex, DWORD dwGrade, DWORD dwCount);

@@ -22,25 +22,7 @@ bool CEffectElementBaseInstance::Update(float fElapsedTime)
 void CEffectElementBaseInstance::Render()
 {
 	if (!m_bStart)
-	{
 		return;
-	}
-
-    if (!isActive())
-    {
-        return;
-    }
-
-#ifdef USE_EFFECTS_LOD
-    if (IsHiddenByLod()
-#ifdef ENABLE_WIKI_SYSTEM
-        && !m_wikiIgnoreFrustum
-#endif
-        && !m_ignoreFrustum)
-    {
-        return;
-    }
-#endif
 
 	assert(mc_pmatLocal);
 
@@ -57,9 +39,6 @@ void CEffectElementBaseInstance::SetDataPointer(CEffectElementBase * pElement)
 	m_pBase = pElement;
 
 	m_dwStartTime = CTimer::Instance().GetCurrentMillisecond();
-
-	//////////////////////////////////////////////////////////////////////////
-	//add by ipkn, start time management
 
 	m_fRemainingTime = pElement->GetStartTime();
 	if (m_fRemainingTime<=0.0f)
@@ -97,44 +76,25 @@ void CEffectElementBaseInstance::SetDeactive()
 	m_isActive = false;
 }
 
-#ifdef USE_EFFECTS_LOD
-bool CEffectElementBaseInstance::IsHiddenByLod()
-{
-    return m_isHiddenByLod;
-}
-
-void CEffectElementBaseInstance::SetHiddenByLod()
-{
-    m_isHiddenByLod = true;
-}
-
-void CEffectElementBaseInstance::SetShownByLod()
-{
-    m_isHiddenByLod = false;
-}
-#endif
-
 void CEffectElementBaseInstance::Initialize()
 {
 	mc_pmatLocal = nullptr;
 
 	m_isActive = true;
 
-#ifdef USE_EFFECTS_LOD
-    m_isHiddenByLod = false;
-#endif
-
 	m_fLocalTime = 0.0f;
 	m_dwStartTime = 0;
 	m_fElapsedTime = 0.0f;
-#ifdef ENABLE_WIKI_SYSTEM
-	m_wikiIgnoreFrustum = false;
-#endif
+
 	m_bStart = false;
 	m_fRemainingTime = 0.0f;
 
 #ifdef ENABLE_RENDER_TARGET
 	m_ignoreFrustum = false;
+#endif
+
+#ifdef ENABLE_INGAME_WIKI_SYSTEM
+	m_wikiIgnoreFrustum = false;
 #endif
 
 #ifdef ENABLE_AURA_COSTUME_SYSTEM

@@ -6,14 +6,13 @@
 #ifndef BOOST_LEXER_RUNTIME_ERROR_HPP
 #define BOOST_LEXER_RUNTIME_ERROR_HPP
 
-#include <boost/config.hpp> // for BOOST_SYMBOL_VISIBLE
 #include <stdexcept>
 
 namespace boost
 {
 namespace lexer
 {
-class BOOST_SYMBOL_VISIBLE runtime_error : public std::runtime_error
+class runtime_error : public std::runtime_error
 {
 public:
     runtime_error (const std::string &what_arg_) :

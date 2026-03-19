@@ -1,3 +1,0 @@
-[BANNER_IMG = d:/ymir work/ui/game/wiki/skins.tga]
-
-[COLOR=0xffd700; Y_PADDING=15; CENTER_ALIGN; FONT_SIZE=20]Bilgiler yakýnda burada olacak!

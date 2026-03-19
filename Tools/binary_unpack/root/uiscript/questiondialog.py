@@ -48,11 +48,11 @@ window = {
 					"height" : 21,
 
 					"horizontal_align" : "center",
-					"text" : uiScriptLocale.YES,
 
-					"default_image" : "d:/ymir work/ui/public/middle_button_01.sub",
-					"over_image" : "d:/ymir work/ui/public/middle_button_02.sub",
-					"down_image" : "d:/ymir work/ui/public/middle_button_03.sub",
+					"default_image" : "d:/ymir work/ui/public/acceptbutton00.sub",
+					"over_image" : "d:/ymir work/ui/public/acceptbutton01.sub",
+					"down_image" : "d:/ymir work/ui/public/acceptbutton02.sub",
+					"disable_image" : "d:/ymir work/ui/public/acceptbutton02.sub",
 				},
 				{
 					"name" : "cancel",
@@ -65,11 +65,11 @@ window = {
 					"height" : 21,
 
 					"horizontal_align" : "center",
-					"text" : uiScriptLocale.NO,
 
-					"default_image" : "d:/ymir work/ui/public/middle_button_01.sub",
-					"over_image" : "d:/ymir work/ui/public/middle_button_02.sub",
-					"down_image" : "d:/ymir work/ui/public/middle_button_03.sub",
+					"default_image" : "d:/ymir work/ui/public/cancelbutton00.sub",
+					"over_image" : "d:/ymir work/ui/public/cancelbutton01.sub",
+					"down_image" : "d:/ymir work/ui/public/cancelbutton02.sub",
+					"disable_image" : "d:/ymir work/ui/public/cancelbutton02.sub",
 				},
 			),
 		},

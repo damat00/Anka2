@@ -138,11 +138,7 @@ class CGrannyModelInstance : public CGraphicCollisionObject
 		bool	__IsDeformableVertexBuffer();
 		void	__SetSharedDeformableVertexBuffer(CGraphicVertexBuffer* pkSharedDeformableVertexBuffer);
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-        IDirect3DVertexBuffer9* __GetDeformableD3DVertexBufferPtr();
-#else
         IDirect3DVertexBuffer8* __GetDeformableD3DVertexBufferPtr();
-#endif
 		CGraphicVertexBuffer&	__GetDeformableVertexBufferRef();
 
 		granny_world_pose* __GetWorldPosePtr() const;

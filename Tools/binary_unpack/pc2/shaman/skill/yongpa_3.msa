@@ -14,7 +14,7 @@ Group MotionEventData
         
         AttachingEnable      1
         AttachingBoneName    "equip_right"
-        FlyFileName       "d:/ymir work/pc/shaman/effect/yongpa_3.msf"
+        flyfilename       "d:/ymir work/pc/shaman/effect/yongpa_3.msf"
         FlyPosition       0.000000 0.000000 0.000000
     }
     Group Event01
@@ -34,7 +34,7 @@ Group MotionEventData
         MotionEventType      1
         StartingTime         1.131387
         
-        IndependentFlag      1
+        IndependentFlag      0
         AttachingEnable      0
         AttachingBoneName    "Bip01 Head"
         FollowingEnable      0

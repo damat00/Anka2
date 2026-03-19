@@ -51,7 +51,7 @@ LRESULT CPythonApplication::WindowProcedure(HWND hWnd, UINT uiMsg, WPARAM wParam
 	const int c_DoubleClickTime = 300;
 	const int c_DoubleClickBox = 5;
 	static int s_xDownPosition = 0;
-	static int s_yDownPosition = 0;
+	static int s_yDownPosition = 0;	
 
 	switch (uiMsg)
 	{
@@ -167,7 +167,7 @@ LRESULT CPythonApplication::WindowProcedure(HWND hWnd, UINT uiMsg, WPARAM wParam
 			return 0;
 
 		case WM_RBUTTONUP:
-			if (hWnd == GetCapture())
+			if (hWnd == GetCapture()) 
 			{
 				SafeReleaseCapture();
 
@@ -191,12 +191,12 @@ LRESULT CPythonApplication::WindowProcedure(HWND hWnd, UINT uiMsg, WPARAM wParam
 				case SIZE_RESTORED:
 				case SIZE_MAXIMIZED:
 					{
-						RECT rcWnd;
-						GetClientRect(&rcWnd);
-
-						UINT uWidth=rcWnd.right-rcWnd.left;
-						UINT uHeight=rcWnd.bottom-rcWnd.left;
-						m_grpDevice.ResizeBackBuffer(uWidth, uHeight);
+						RECT rcWnd; 
+						GetClientRect(&rcWnd); 
+				
+						UINT uWidth=rcWnd.right-rcWnd.left; 
+						UINT uHeight=rcWnd.bottom-rcWnd.left; 
+						m_grpDevice.ResizeBackBuffer(uWidth, uHeight);				
 					}
 					break;
 			}
@@ -220,7 +220,7 @@ LRESULT CPythonApplication::WindowProcedure(HWND hWnd, UINT uiMsg, WPARAM wParam
 				m_grpDevice.ResizeBackBuffer(uWidth, uHeight);
 				OnSizeChange(short(LOWORD(lParam)), short(HIWORD(lParam)));
 			}
-			break;
+			break; 
 
 		case WM_SYSKEYDOWN:
 			switch (LOWORD(wParam))
@@ -264,7 +264,7 @@ LRESULT CPythonApplication::WindowProcedure(HWND hWnd, UINT uiMsg, WPARAM wParam
 		case WM_CLOSE:
 #ifdef _DEBUG
 			PostQuitMessage(0);
-#else
+#else	
 			RunPressExitKey();
 #endif
 			return 0;

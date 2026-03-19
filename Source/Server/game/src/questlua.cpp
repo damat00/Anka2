@@ -25,51 +25,45 @@ namespace quest
 {
 	using namespace std;
 
-	string ScriptToString(const string& str) {
-    lua_State* L = CQuestManager::instance().GetLuaState();
-    int top = lua_gettop(L);  // Zapisujemy aktualny stan stosu
+	string ScriptToString(const string& str)
+	{
+		lua_State* L = CQuestManager::instance().GetLuaState();
+		int x = lua_gettop(L);
 
-    // Zak³adamy, ¿e 'str' to skrypt, który chcemy bezpiecznie uruchomiæ w Lua
-    string luaCommand = "return " + str; // Budujemy komendê Lua
-
-    // Wywo³ujemy bufor ze skryptem
-    int errcode = luaL_loadbuffer(L, luaCommand.c_str(), luaCommand.size(), "ScriptToString");
-    if (errcode != 0) {  // Zamiast LUA_OK, sprawdzamy, czy errcode nie wynosi 0
-        sys_err("LUA Script Load Error (code:%d src:[%s])", errcode, str.c_str());
-        lua_settop(L, top);  // Przywracamy stan stosu
-        return "";  // Zwracamy pusty string w przypadku b³êdu
-    }
-
-    // Uruchomienie skryptu
-    errcode = lua_pcall(L, 0, 1, 0);  // Oczekujemy jednego rezultatu na stosie
-    if (errcode != 0) {  // Zamiast LUA_OK, sprawdzamy, czy errcode nie wynosi 0
-        sys_err("LUA Script Run Error (code:%d src:[%s])", errcode, str.c_str());
-        lua_settop(L, top);  // Przywracamy stan stosu
-        return "";
-    }
-
-    string result;
-    if (lua_isstring(L, -1)) {
-        result = lua_tostring(L, -1);  // Pobieramy wynik ze stosu
-    } else {
-        sys_err("LUA Script Result is not a string (src:[%s])", str.c_str());
-    }
-
-    lua_settop(L, top);  // Przywracamy stan stosu
-
-    return result;  // Zwracamy wynik
-}
+		int errcode = lua_dobuffer(L, ("return " + str).c_str(), str.size() + 7, "ScriptToString");
+		string retstr;
+		if (!errcode)
+		{
+			if (lua_isstring(L, -1))
+				retstr = lua_tostring(L, -1);
+		}
+		else
+		{
+			sys_err("LUA ScriptRunError (code:%d src:[%s])", errcode, str.c_str());
+		}
+		lua_settop(L, x);
+		return retstr;
+	}
 
 	void FSetWarpLocation::operator() (LPCHARACTER ch)
 	{
-		if (ch->IsPC())
-		{
-			ch->SetWarpLocation (map_index, x, y);
-		}
+		if (ch && ch->IsPC())
+			ch->SetWarpLocation(map_index, x, y);
 	}
+
+#ifdef ENABLE_RENEWAL_BATTLE_PASS
+	void FDungeonUpdateAllBattlepassProcess::operator() (LPCHARACTER ch)
+	{
+		if (ch->IsPC())
+			ch->UpdateExtBattlePassMissionProgress(COMPLETE_DUNGEON, 1, dungeon_index);
+	}
+#endif
 
 	void FSetQuestFlag::operator() (LPCHARACTER ch)
 	{
+		if (!ch)
+			return;
+
 		if (!ch->IsPC())
 			return;
 
@@ -81,6 +75,9 @@ namespace quest
 
 	bool FPartyCheckFlagLt::operator() (LPCHARACTER ch)
 	{
+		if (!ch)
+			return false;
+
 		if (!ch->IsPC())
 			return false;
 
@@ -197,7 +194,7 @@ namespace quest
 		return bStart != 0;
 	}
 
-	void combine_lua_string(lua_State * L, ostringstream & s)
+	void combine_lua_string(lua_State* L, ostringstream& s)
 	{
 		char buf[32];
 
@@ -224,7 +221,7 @@ namespace quest
 		DWORD mypid = q.GetCurrentCharacterPtr()->GetPlayerID();
 		bool bOrder = (int) lua_tonumber(L, 2) != 0 ? true : false;
 
-		DBManager::instance().ReturnQuery(QID_HIGHSCORE_SHOW, mypid, NULL,
+		DBManager::instance().ReturnQuery(QID_HIGHSCORE_SHOW, mypid, NULL, 
 				"SELECT h.pid, p.name, h.value FROM highscore%s as h, player%s as p WHERE h.board = '%s' AND h.pid = p.id ORDER BY h.value %s LIMIT 10",
 				get_table_postfix(), get_table_postfix(), pszBoardName, bOrder ? "DESC" : "");
 		return 0;
@@ -246,8 +243,9 @@ namespace quest
 		return 1;
 	}
 
+	//
 	// "member" Lua functions
-
+	//
 	int member_chat(lua_State* L)
 	{
 		ostringstream s;
@@ -284,6 +282,8 @@ namespace quest
 		float radius = (float) lua_tonumber(L, 4)*100;
 		bool bAggressive = lua_toboolean(L, 5);
 		DWORD count = (lua_isnumber(L, 6))?(DWORD) lua_tonumber(L, 6):1;
+		bool noReward = lua_toboolean(L, 7);	//@fixme000
+		const char* mobName = lua_tostring(L, 8);	//@fixme000
 
 		if (count == 0)
 			count = 1;
@@ -409,10 +409,6 @@ namespace quest
 		return 1;
 	}
 
-	// global Lua functions
-
-	// Registers Lua function table
-
 	void CQuestManager::AddLuaFunctionTable(const char * c_pszName, luaL_reg * preg)
 	{
 		lua_newtable(L);
@@ -426,35 +422,6 @@ namespace quest
 		}
 
 		lua_setglobal(L, c_pszName);
-	}
-
-	void CQuestManager::AddLuaFunctionSubTable(const char * c_pszName, const char * c_pszSubName, luaL_reg * preg)
-	{
-		// lua_State* L = CQuestManager::instance().GetLuaState();
-		int x = lua_gettop(L);
-		{
-			lua_getglobal(L, c_pszName);
-			if (!lua_istable(L, -1))
-			{
-				sys_err("%s global index not found for %s", c_pszName, c_pszSubName);
-				lua_settop(L, x);
-				return;
-			}
-			lua_pushstring(L, c_pszSubName);
-			{
-				lua_newtable(L);
-				while ((preg->name))
-				{
-					lua_pushstring(L, preg->name);
-					lua_pushcfunction(L, preg->func);
-					lua_rawset(L, -3);
-					preg++;
-				}
-			}
-			lua_rawset(L, -3);
-			lua_setglobal(L, c_pszName);
-		}
-		lua_settop(L, x);
 	}
 
 	void CQuestManager::BuildStateIndexToName(const char* questName)
@@ -485,8 +452,12 @@ namespace quest
 		lua_settop(L, x);
 	}
 
+	/**
+	* @version 05/06/08 Bang2ni - Register __get_guildid_byname script function
+	*/
 	bool CQuestManager::InitializeLua()
 	{
+#if LUA_V == 503
 		L = lua_open();
 
 		luaopen_base(L);
@@ -496,6 +467,14 @@ namespace quest
 		//TEMP
 		luaopen_io(L);
 		luaopen_debug(L);
+#elif LUA_V == 523
+		L = luaL_newstate();
+
+		luaL_openlibs(L);
+		//luaopen_debug(L);
+#else
+#error "lua version not found"
+#endif
 
 		RegisterAffectFunctionTable();
 		RegisterBuildingFunctionTable();
@@ -519,21 +498,7 @@ namespace quest
 		RegisterDanceEventFunctionTable();
 		RegisterDragonLairFunctionTable();
 		RegisterDragonSoulFunctionTable();
-#ifdef ENABLE_ZODIAC_MISSION
-		RegisterZodiacFunctionTable();
-#endif
-#ifdef ENABLE_DUNGEON_INFO
-		RegisterDungeonInfoFunctionTable();
-#endif
-#ifdef ENABLE_OCHAO_TEMPLE_SYSTEM
-		RegisterTempleOchaoFunctionTable();
-#endif
-#ifdef ENABLE_WHITE_DRAGON
-		RegisterWhiteLairFunctionTable();
-#endif
-#ifdef ENABLE_QUEEN_NETHIS
-		RegisterSnakeLairFunctionTable();
-#endif
+
 		{
 			luaL_reg member_functions[] =
 			{
@@ -657,8 +622,9 @@ namespace quest
 			}
 		}
 
+#if LUA_V == 503
 		lua_setgcthreshold(L, 0);
-
+#endif
 		lua_newtable(L);
 		lua_setglobal(L, "__codecache");
 		return true;
@@ -672,6 +638,7 @@ namespace quest
 		int n = luaL_getn(qs.co, -1);
 		qs.args = n;
 		//cout << "select here (1-" << qs.args << ")" << endl;
+		//
 
 		ostringstream os;
 		os << "[QUESTION ";
@@ -698,6 +665,7 @@ namespace quest
 
 		AddScript(os.str());
 		qs.suspend_state = SUSPEND_STATE_SELECT;
+		qs.quest_name = GetCurrentPC() ? GetCurrentPC()->GetCurrentQuestName() : "no_quest";
 		if ( test_server )
 			sys_log( 0, "%s", m_strScript.c_str() );
 		SendScript();
@@ -805,9 +773,11 @@ namespace quest
 		SendScript();
 	}
 
+	//
 	// * OpenState
-
+	//
 	// The beginning of script
+	// 
 
 	QuestState CQuestManager::OpenState(const string& quest_name, int state_index)
 	{
@@ -819,10 +789,11 @@ namespace quest
 		return qs;
 	}
 
+	//
 	// * RunState
-
+	// 
 	// decides script to wait for user input, or finish
-
+	// 
 	bool CQuestManager::RunState(QuestState & qs)
 	{
 		ClearError();
@@ -881,10 +852,11 @@ namespace quest
 		return false;
 	}
 
+	//
 	// * CloseState
-
+	//
 	// makes script end
-
+	//
 	void CQuestManager::CloseState(QuestState& qs)
 	{
 		if (qs.co)

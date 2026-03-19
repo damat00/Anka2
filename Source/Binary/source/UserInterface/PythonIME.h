@@ -8,7 +8,7 @@ class CPythonIME :
 	public CIME,
 	public CSingleton<CPythonIME>
 {
-public:
+public:	
 	CPythonIME();
 	virtual ~CPythonIME();
 

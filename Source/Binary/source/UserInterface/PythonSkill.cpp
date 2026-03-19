@@ -149,6 +149,7 @@ bool CPythonSkill::RegisterSkillTable(const char *c_szFileName)
 
 		rSkillData.strDuration = TokenVector[TABLE_TOKEN_TYPE_DURATION_POLY];
 
+		
 		const DWORD LevelEmpty = 1;
 
 		const std::string & c_strMaxLevel = TokenVector[TABLE_TOKEN_TYPE_MAX_LEVEL];
@@ -168,14 +169,11 @@ bool CPythonSkill::RegisterSkillTable(const char *c_szFileName)
 		}
 		const std::string & c_strPointPoly = TokenVector[TABLE_TOKEN_TYPE_POINT_POLY];
 
-		// OVERWRITE_SKILLPROTO_POLY
 		bool USE_SKILL_PROTO = true;
 
 		switch (iVnum)
 		{
 			case 34:
-
-			// GUILD_SKILL_DISPLAY_BUG_FIX
 			case 151:
 			case 152:
 			case 153:
@@ -183,7 +181,6 @@ bool CPythonSkill::RegisterSkillTable(const char *c_szFileName)
 			case 155:
 			case 156:
 			case 157:
-			// END_OF_GUILD_SKILL_DISPLAY_BUG_FIX
 				USE_SKILL_PROTO = false;
 				break;
 		}
@@ -200,23 +197,13 @@ bool CPythonSkill::RegisterSkillTable(const char *c_szFileName)
 				src_poly_atk = "";
 				src_poly_mwep = "";
 
-				// MIN
-				string_replace_word(c_strPointPoly.c_str(), c_strPointPoly.length(),
-					"number", 6, "min", 3, src_poly_rand);
-				string_replace_word(src_poly_rand.c_str(), src_poly_rand.length(),
-					"atk", 3, "minatk", 6, src_poly_atk);
-				string_replace_word(src_poly_atk.c_str(), src_poly_atk.length(),
-					"mwep", 4, "minmwep", 7, affect.strAffectMinFormula);
-				// END_OF_MIN
+				string_replace_word(c_strPointPoly.c_str(), c_strPointPoly.length(), "number", 6, "min", 3, src_poly_rand);
+				string_replace_word(src_poly_rand.c_str(), src_poly_rand.length(), "atk", 3, "minatk", 6, src_poly_atk);
+				string_replace_word(src_poly_atk.c_str(), src_poly_atk.length(), "mwep", 4, "minmwep", 7, affect.strAffectMinFormula);
 
-				// MAX
-				string_replace_word(c_strPointPoly.c_str(), c_strPointPoly.length(),
-					"number", 6, "max", 3, src_poly_rand);
-				string_replace_word(src_poly_rand.c_str(), src_poly_rand.length(),
-					"atk", 3, "maxatk", 6, src_poly_atk);
-				string_replace_word(src_poly_atk.c_str(), src_poly_atk.length(),
-					"mwep", 4, "maxmwep", 7, affect.strAffectMaxFormula);
-				// END_OF_MAX
+				string_replace_word(c_strPointPoly.c_str(), c_strPointPoly.length(), "number", 6, "max", 3, src_poly_rand);
+				string_replace_word(src_poly_rand.c_str(), src_poly_rand.length(), "atk", 3, "maxatk", 6, src_poly_atk);
+				string_replace_word(src_poly_atk.c_str(), src_poly_atk.length(), "mwep", 4, "maxmwep", 7, affect.strAffectMaxFormula);
 
 				switch (iVnum)
 				{
@@ -225,7 +212,6 @@ bool CPythonSkill::RegisterSkillTable(const char *c_szFileName)
 						affect.strAffectMaxFormula += "* 3";
 						break;
 				}
-
 			}
 			else
 			{
@@ -291,7 +277,7 @@ bool CPythonSkill::RegisterSkillDesc(const char *c_szFileName)
 			TraceError("SkillDesc.line(%d).NO_VNUM_ERROR\n", i + 1);
 			continue;
 		}
-
+		
 		DWORD iSkillIndex = atoi(TokenVector[DESC_TOKEN_TYPE_VNUM].c_str());
 		if (iSkillIndex == 0)
 		{
@@ -308,10 +294,8 @@ bool CPythonSkill::RegisterSkillDesc(const char *c_szFileName)
 		m_SkillDataMap.insert(std::make_pair(iSkillIndex, TSkillData()));
 		TSkillData & rSkillData = m_SkillDataMap[iSkillIndex];
 
-		// Vnum
 		rSkillData.dwSkillIndex = iSkillIndex;
 
-		// Type
 		{
 			std::string strJob = TokenVector[DESC_TOKEN_TYPE_JOB];
 			stl_lowers(strJob);
@@ -326,7 +310,6 @@ bool CPythonSkill::RegisterSkillDesc(const char *c_szFileName)
 			rSkillData.byType = BYTE(it->second);
 		}
 
-		// Name
 		{
 			rSkillData.strName = TokenVector[DESC_TOKEN_TYPE_NAME1];
 			rSkillData.GradeData[0].strName = TokenVector[DESC_TOKEN_TYPE_NAME1];
@@ -339,12 +322,10 @@ bool CPythonSkill::RegisterSkillDesc(const char *c_szFileName)
 				rSkillData.GradeData[2].strName = TokenVector[DESC_TOKEN_TYPE_NAME1];
 		}
 
-		// Description
 		{
 			rSkillData.strDescription = TokenVector[DESC_TOKEN_TYPE_DESCRIPTION];
 		}
 
-		// Condition
 		{
 			rSkillData.ConditionDataVector.clear();
 			for (int j = 0; j < CONDITION_COLUMN_COUNT; ++j)
@@ -355,7 +336,6 @@ bool CPythonSkill::RegisterSkillDesc(const char *c_szFileName)
 			}
 		}
 
-		// Attribute
 		{
 			const std::string & c_rstrAttribute = TokenVector[DESC_TOKEN_TYPE_ATTRIBUTE];
 			CTokenVector AttributeTokenVector;
@@ -374,7 +354,6 @@ bool CPythonSkill::RegisterSkillDesc(const char *c_szFileName)
 			}
 		}
 
-		// Weapon
 		{
 			const std::string & c_rstrWeapon = TokenVector[DESC_TOKEN_TYPE_WEAPON];
 			CTokenVector WeaponTokenVector;
@@ -393,21 +372,20 @@ bool CPythonSkill::RegisterSkillDesc(const char *c_szFileName)
 			}
 		}
 
-		// Icon Name
 		{
 			const std::string & c_rstrJob = TokenVector[DESC_TOKEN_TYPE_JOB];
 			const std::string & c_rstrIconName = TokenVector[DESC_TOKEN_TYPE_ICON_NAME];
 
 			if (c_iSkillIndex_Riding == iSkillIndex)
 			{
-				char szIconFileNameHeader[64 + 1];
+				char szIconFileNameHeader[64+1];
 				_snprintf(szIconFileNameHeader, sizeof(szIconFileNameHeader), "%sskill/common/support/", g_strImagePath.c_str());
 
 				__RegisterGradeIconImage(rSkillData, szIconFileNameHeader, c_rstrIconName.c_str());
 			}
 			else if (m_PathNameMap.end() != m_PathNameMap.find(c_rstrJob))
 			{
-				char szIconFileNameHeader[64 + 1];
+				char szIconFileNameHeader[64+1];
 				_snprintf(szIconFileNameHeader, sizeof(szIconFileNameHeader), "%sskill/%s/", g_strImagePath.c_str(), m_PathNameMap[c_rstrJob].c_str());
 
 				switch (rSkillData.byType)
@@ -428,7 +406,6 @@ bool CPythonSkill::RegisterSkillDesc(const char *c_szFileName)
 			}
 		}
 
-		// Motion Index
 		if (TokenVector.size() > DESC_TOKEN_TYPE_MOTION_INDEX)
 		{
 			const std::string & c_rstrMotionIndex = TokenVector[DESC_TOKEN_TYPE_MOTION_INDEX];
@@ -456,12 +433,11 @@ bool CPythonSkill::RegisterSkillDesc(const char *c_szFileName)
 		rSkillData.AffectDataNewVector.clear();
 		rSkillData.AffectDataNewVector.reserve(3);
 
-		// Affect
 		for (int j = 0; j < AFFECT_COLUMN_COUNT; ++j)
 		{
-			int iDescriptionSlotIndex = DESC_TOKEN_TYPE_AFFECT_DESCRIPTION_1 + j * AFFECT_STEP_COUNT;
-			int iMinSlotIndex = DESC_TOKEN_TYPE_AFFECT_MIN_1 + j * AFFECT_STEP_COUNT;
-			int iMaxSlotIndex = DESC_TOKEN_TYPE_AFFECT_MAX_1 + j * AFFECT_STEP_COUNT;
+			int iDescriptionSlotIndex = DESC_TOKEN_TYPE_AFFECT_DESCRIPTION_1 + j*AFFECT_STEP_COUNT;
+			int iMinSlotIndex = DESC_TOKEN_TYPE_AFFECT_MIN_1 + j*AFFECT_STEP_COUNT;
+			int iMaxSlotIndex = DESC_TOKEN_TYPE_AFFECT_MAX_1 + j*AFFECT_STEP_COUNT;
 
 			if (TokenVector.size() > iDescriptionSlotIndex)
 			if (!TokenVector[iDescriptionSlotIndex].empty())
@@ -886,129 +862,6 @@ const char *CPythonSkill::GetPathName()
 	return m_strPathName.c_str();
 }
 
-void CPythonSkill::TEST()
-{
-	BOOL isFirst;
-	std::map<std::string, DWORD>::iterator itorSub;
-
-	FILE * File = fopen("test.txt", "w");
-
-	for (TSkillDataMap::iterator itor = m_SkillDataMap.begin(); itor != m_SkillDataMap.end(); ++itor)
-	{
-		TSkillData & rSkillData = itor->second;
-
-		std::string strLine = "";
-		strLine += rSkillData.strName.c_str();
-		strLine += "\t";
-		// Name2
-		strLine += "\t";
-		// Name3
-		strLine += "\t";
-		strLine += rSkillData.strDescription;
-		strLine += "\t";
-		if (rSkillData.ConditionDataVector.size() > 0)
-			strLine += rSkillData.ConditionDataVector[0];
-		strLine += "\t";
-		if (rSkillData.ConditionDataVector.size() > 1)
-			strLine += rSkillData.ConditionDataVector[1];
-		strLine += "\t";
-		if (rSkillData.ConditionDataVector.size() > 2)
-			strLine += rSkillData.ConditionDataVector[2];
-		strLine += "\t";
-		if (rSkillData.ConditionDataVector.size() > 3)
-			strLine += rSkillData.ConditionDataVector[3];
-
-		strLine += "\t";
-		isFirst = TRUE;
-		for (itorSub = m_SkillAttributeIndexMap.begin(); itorSub != m_SkillAttributeIndexMap.end(); ++itorSub)
-		{
-			if (itorSub->second & rSkillData.dwSkillAttribute)
-			{
-				if (isFirst)
-				{
-					isFirst = FALSE;
-				}
-				else
-				{
-					strLine += "|";
-				}
-				strLine += itorSub->first.c_str();
-			}
-		}
-
-		strLine += "\t";
-		isFirst = TRUE;
-		for (itorSub = m_SkillNeedWeaponIndexMap.begin(); itorSub != m_SkillNeedWeaponIndexMap.end(); ++itorSub)
-		{
-			if (itorSub->second & rSkillData.dwNeedWeapon)
-			{
-				if (isFirst)
-				{
-					isFirst = FALSE;
-				}
-				else
-				{
-					strLine += "|";
-				}
-				strLine += itorSub->first.c_str();
-			}
-		}
-
-		strLine += "\t";
-		std::string strFileName = rSkillData.strIconFileName;
-		int iPos = strFileName.find_last_of("/", rSkillData.strIconFileName.length());
-		if (iPos > 0)
-			strFileName = strFileName.substr(iPos + 1, strFileName.length() - iPos - 4 - 1);
-		strLine += strFileName;
-
-		strLine += "\t";
-		char szMotionIndex[32 + 1];
-		_snprintf(szMotionIndex, sizeof(szMotionIndex), "%d", rSkillData.wMotionIndex);
-		strLine += szMotionIndex;
-
-		strLine += "\t";
-		if (rSkillData.wMotionIndexForMe > 1)
-		{
-			char szMotionIndexForMe[32 + 1];
-			_snprintf(szMotionIndexForMe, sizeof(szMotionIndexForMe), "%d", rSkillData.wMotionIndexForMe);
-			strLine += szMotionIndexForMe;
-		}
-
-		assert(rSkillData.AffectDataVector.size() <= 3);
-		strLine += "\t";
-		if (rSkillData.AffectDataVector.size() > 0)
-		{
-			strLine += rSkillData.AffectDataVector[0].strAffectDescription;
-			strLine += "\t";
-			strLine += rSkillData.AffectDataVector[0].strAffectMinFormula;
-			strLine += "\t";
-			strLine += rSkillData.AffectDataVector[0].strAffectMaxFormula;
-		}
-		strLine += "\t";
-		if (rSkillData.AffectDataVector.size() > 1)
-		{
-			strLine += rSkillData.AffectDataVector[1].strAffectDescription;
-			strLine += "\t";
-			strLine += rSkillData.AffectDataVector[1].strAffectMinFormula;
-			strLine += "\t";
-			strLine += rSkillData.AffectDataVector[1].strAffectMaxFormula;
-		}
-		strLine += "\t";
-		if (rSkillData.AffectDataVector.size() > 2)
-		{
-			strLine += rSkillData.AffectDataVector[2].strAffectDescription;
-			strLine += "\t";
-			strLine += rSkillData.AffectDataVector[2].strAffectMinFormula;
-			strLine += "\t";
-			strLine += rSkillData.AffectDataVector[2].strAffectMaxFormula;
-		}
-
-		fprintf(File, "%s\n", strLine.c_str());
-	}
-
-	fclose(File);
-}
-
 CPythonSkill::CPythonSkill()
 {
 	m_SkillTypeIndexMap.insert(std::map<std::string, DWORD>::value_type("none", SKILL_TYPE_NONE));
@@ -1046,7 +899,6 @@ CPythonSkill::CPythonSkill()
 	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type("ONLY_FOR_GUILD_WAR", SKILL_ATTRIBUTE_ONLY_FOR_GUILD_WAR));
 	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type("CIRCLE_RANGE", SKILL_ATTRIBUTE_CIRCLE_RANGE));
 	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type("SEARCH_TARGET", SKILL_ATTRIBUTE_SEARCH_TARGET));
-	m_SkillAttributeIndexMap.insert(std::map<std::string, DWORD>::value_type("IGNORE_BLOCK", SKILL_ATTRIBUTE_IGNORE_BLOCK));
 
 	m_SkillNeedWeaponIndexMap.insert(std::map<std::string, DWORD>::value_type("SWORD", SKILL_NEED_WEAPON_SWORD));
 	m_SkillNeedWeaponIndexMap.insert(std::map<std::string, DWORD>::value_type("DAGGER", SKILL_NEED_WEAPON_DAGGER));
@@ -1211,11 +1063,6 @@ BOOL CPythonSkill::SSkillData::IsCircleRange()
 BOOL CPythonSkill::SSkillData::IsAutoSearchTarget()
 {
 	return 0 != (dwSkillAttribute & SKILL_ATTRIBUTE_SEARCH_TARGET);
-}
-
-BOOL CPythonSkill::SSkillData::IsIgnoreTarget()
-{
-	return 0 != (dwSkillAttribute & SKILL_ATTRIBUTE_IGNORE_BLOCK);
 }
 
 BOOL CPythonSkill::SSkillData::IsNeedCorpse()
@@ -1387,7 +1234,6 @@ const char *CPythonSkill::SSkillData::GetAffectDescription(DWORD dwIndex, float 
 	minPoly.SetStr(c_rstrAffectMinFormula.c_str());
 	maxPoly.SetStr(c_rstrAffectMaxFormula.c_str());
 
-	// OVERWRITE_SKILLPROTO_POLY
 	float fMinValue = ProcessFormula(&minPoly, fSkillLevel);
 	float fMaxValue = ProcessFormula(&maxPoly, fSkillLevel);
 
@@ -1446,6 +1292,7 @@ DWORD CPythonSkill::SSkillData::GetSkillCoolTime(float fSkillPoint)
 
 	return DWORD(ProcessFormula(&poly, fSkillPoint));
 }
+
 
 DWORD CPythonSkill::SSkillData::GetTargetCount(float fSkillPoint)
 {

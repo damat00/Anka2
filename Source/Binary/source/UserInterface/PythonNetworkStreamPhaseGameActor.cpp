@@ -4,24 +4,26 @@
 #include "PythonBackground.h"
 #include "PythonApplication.h"
 #include "AbstractPlayer.h"
+
 #include "../gamelib/ActorInstance.h"
+
 
 void CPythonNetworkStream::__GlobalPositionToLocalPosition(LONG& rGlobalX, LONG& rGlobalY)
 {
-	CPythonBackground& rkBgMgr = CPythonBackground::Instance();
+	CPythonBackground&rkBgMgr=CPythonBackground::Instance();
 	rkBgMgr.GlobalPositionToLocalPosition(rGlobalX, rGlobalY);
 }
 
 void CPythonNetworkStream::__LocalPositionToGlobalPosition(LONG& rLocalX, LONG& rLocalY)
 {
-	CPythonBackground& rkBgMgr = CPythonBackground::Instance();
+	CPythonBackground&rkBgMgr=CPythonBackground::Instance();
 	rkBgMgr.LocalPositionToGlobalPosition(rLocalX, rLocalY);
 }
 
 bool CPythonNetworkStream::__CanActMainInstance()
 {
-	CPythonCharacterManager& rkChrMgr = CPythonCharacterManager::Instance();
-	CInstanceBase* pkInstMain = rkChrMgr.GetMainInstancePtr();
+	CPythonCharacterManager& rkChrMgr=CPythonCharacterManager::Instance();
+	CInstanceBase* pkInstMain=rkChrMgr.GetMainInstancePtr();
 	if (!pkInstMain)
 		return false;
 
@@ -35,22 +37,22 @@ void CPythonNetworkStream::__ClearNetworkActorManager()
 
 void __SetWeaponPower(IAbstractPlayer& rkPlayer, DWORD dwWeaponID)
 {
-	DWORD minPower = 0;
-	DWORD maxPower = 0;
-	DWORD minMagicPower = 0;
-	DWORD maxMagicPower = 0;
-	DWORD addPower = 0;
+	DWORD minPower=0;
+	DWORD maxPower=0;
+	DWORD minMagicPower=0;
+	DWORD maxMagicPower=0;
+	DWORD addPower=0;
 
 	CItemData* pkWeapon;
 	if (CItemManager::Instance().GetItemDataPointer(dwWeaponID, &pkWeapon))
 	{
-		if (pkWeapon->GetType() == CItemData::ITEM_TYPE_WEAPON)
+		if (pkWeapon->GetType()==CItemData::ITEM_TYPE_WEAPON)
 		{
-			minPower = pkWeapon->GetValue(3);
-			maxPower = pkWeapon->GetValue(4);
-			minMagicPower = pkWeapon->GetValue(1);
-			maxMagicPower = pkWeapon->GetValue(2);
-			addPower = pkWeapon->GetValue(5);
+			minPower=pkWeapon->GetValue(3);
+			maxPower=pkWeapon->GetValue(4);
+			minMagicPower=pkWeapon->GetValue(1);
+			maxMagicPower=pkWeapon->GetValue(2);
+			addPower=pkWeapon->GetValue(5);
 		}
 	}
 
@@ -120,7 +122,7 @@ bool CPythonNetworkStream::RecvCharacterAppendPacket()
 	kNetActorData.m_dwMovSpd = chrAddPacket.bMovingSpeed;
 	kNetActorData.m_dwAtkSpd = chrAddPacket.bAttackSpeed;
 	kNetActorData.m_dwRace = chrAddPacket.wRaceNum;
-
+	
 	kNetActorData.m_dwStateFlags = chrAddPacket.bStateFlag;
 	kNetActorData.m_dwVID = chrAddPacket.dwVID;
 	kNetActorData.m_fRot = chrAddPacket.angle;
@@ -135,6 +137,9 @@ bool CPythonNetworkStream::RecvCharacterAppendPacket()
 
 	kNetActorData.m_sAlignment = 0;
 	kNetActorData.m_byPKMode = 0;
+#ifdef ENABLE_TITLE_SYSTEM
+	kNetActorData.m_iTitleID = 0;
+#endif
 	kNetActorData.m_dwGuildID = 0;
 	kNetActorData.m_dwEmpireID = 0;
 	kNetActorData.m_dwArmor = 0;
@@ -162,9 +167,7 @@ bool CPythonNetworkStream::RecvCharacterAppendPacket()
 #else
 	kNetActorData.m_dwLevel = 0;
 #endif
-#ifdef ENABLE_CONQUEROR_LEVEL
-	kNetActorData.m_dwConquerorLevel = 0;
-#endif
+
 	if (kNetActorData.m_bType != CActorInstance::TYPE_PC && !IsNPCType(kNetActorData.m_bType))
 	{
 		const char *c_szName;
@@ -232,11 +235,11 @@ bool CPythonNetworkStream::RecvCharacterAdditionalInfo()
 #endif
 		kNetActorData.m_dwGuildID = chrInfoPacket.dwGuildID;
 		kNetActorData.m_dwLevel = chrInfoPacket.dwLevel;
-#ifdef ENABLE_CONQUEROR_LEVEL
-		kNetActorData.m_dwConquerorLevel = chrInfoPacket.dwConquerorLevel;
-#endif
 		kNetActorData.m_sAlignment = chrInfoPacket.sAlignment;
 		kNetActorData.m_byPKMode = chrInfoPacket.bPKMode;
+#ifdef ENABLE_TITLE_SYSTEM
+		kNetActorData.m_iTitleID = chrInfoPacket.iTitleID;
+#endif
 		kNetActorData.m_dwGuildID = chrInfoPacket.dwGuildID;
 		kNetActorData.m_dwEmpireID = chrInfoPacket.bEmpire;
 		kNetActorData.m_dwArmor = chrInfoPacket.awPart[CHR_EQUIPPART_ARMOR];
@@ -277,7 +280,6 @@ bool CPythonNetworkStream::RecvCharacterAdditionalInfo()
 
 bool CPythonNetworkStream::RecvCharacterAppendPacketNew()
 {
-	TraceError("TPacketGCCharacterAdd2 is packet that doesn't write.");
 	TPacketGCCharacterAdd2 chrAddPacket;
 
 	if (!Recv(sizeof(chrAddPacket), &chrAddPacket))
@@ -290,9 +292,6 @@ bool CPythonNetworkStream::RecvCharacterAppendPacketNew()
 
 	SNetworkActorData kNetActorData;
 	kNetActorData.m_dwLevel = 0;
-#ifdef ENABLE_CONQUEROR_LEVEL
-	kNetActorData.m_dwConquerorLevel = 0;
-#endif
 	kNetActorData.m_bType = chrAddPacket.bType;
 	kNetActorData.m_dwGuildID = chrAddPacket.dwGuild;
 	kNetActorData.m_dwEmpireID = chrAddPacket.bEmpire;
@@ -333,9 +332,6 @@ bool CPythonNetworkStream::RecvCharacterUpdatePacket()
 		return false;
 
 	SNetworkUpdateActorData kNetUpdateActorData;
-#ifdef ENABLE_CONQUEROR_LEVEL
-	kNetUpdateActorData.m_dwConquerorLevel=chrUpdatePacket.dwConquerorLevel;
-#endif
 	kNetUpdateActorData.m_dwGuildID = chrUpdatePacket.dwGuildID;
 	kNetUpdateActorData.m_dwMovSpd = chrUpdatePacket.bMovingSpeed;
 	kNetUpdateActorData.m_dwAtkSpd = chrUpdatePacket.bAttackSpeed;
@@ -353,6 +349,9 @@ bool CPythonNetworkStream::RecvCharacterUpdatePacket()
 	kNetUpdateActorData.m_kAffectFlags.CopyData(32, sizeof(chrUpdatePacket.dwAffectFlag[1]), &chrUpdatePacket.dwAffectFlag[1]);
 	kNetUpdateActorData.m_sAlignment = chrUpdatePacket.sAlignment;
 	kNetUpdateActorData.m_byPKMode = chrUpdatePacket.bPKMode;
+#ifdef ENABLE_TITLE_SYSTEM
+	kNetUpdateActorData.m_iTitleID = chrUpdatePacket.iTitleID;
+#endif
 	kNetUpdateActorData.m_dwStateFlags = chrUpdatePacket.bStateFlag;
 	kNetUpdateActorData.m_dwMountVnum = chrUpdatePacket.dwMountVnum;
 #ifdef ENABLE_GUILD_LEADER_TEXTAIL
@@ -397,6 +396,9 @@ bool CPythonNetworkStream::RecvCharacterUpdatePacketNew()
 	kNetUpdateActorData.m_kAffectFlags.CopyData(32, sizeof(chrUpdatePacket.dwAffectFlag[1]), &chrUpdatePacket.dwAffectFlag[1]);
 	kNetUpdateActorData.m_sAlignment = chrUpdatePacket.sAlignment;
 	kNetUpdateActorData.m_byPKMode = chrUpdatePacket.bPKMode;
+#ifdef ENABLE_TITLE_SYSTEM
+	kNetUpdateActorData.m_iTitleID = chrUpdatePacket.iTitleID;
+#endif
 	kNetUpdateActorData.m_dwStateFlags = chrUpdatePacket.bStateFlag;
 	kNetUpdateActorData.m_dwMountVnum = chrUpdatePacket.dwMountVnum;
 #ifdef ENABLE_GUILD_LEADER_TEXTAIL
@@ -489,13 +491,11 @@ bool CPythonNetworkStream::RecvCharacterDeletePacket()
 
 	m_rokNetActorMgr->RemoveActor(chrDelPacket.dwVID);
 
-	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME],
-		"BINARY_PrivateShop_Disappear",
-		Py_BuildValue("(i)", chrDelPacket.dwVID)
-	);
+	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "BINARY_PrivateShop_Disappear", Py_BuildValue("(i)", chrDelPacket.dwVID));
 
 	return true;
 }
+
 
 bool CPythonNetworkStream::RecvCharacterMovePacket()
 {
@@ -545,7 +545,7 @@ bool CPythonNetworkStream::RecvSyncPositionPacket()
 
 	UINT uSyncPosCount=(kPacketSyncPos.wSize-sizeof(kPacketSyncPos))/sizeof(kSyncPos);
 	for (UINT iSyncPos=0; iSyncPos<uSyncPosCount; ++iSyncPos)
-	{
+	{		
 		if (!Recv(sizeof(TPacketGCSyncPositionElement), &kSyncPos))
 			return false;
 

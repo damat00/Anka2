@@ -41,17 +41,13 @@ void CActorInstance::OnRender()
 		}
 	}
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-	D3DMATERIAL9 kMtrl;
-#else
 	D3DMATERIAL8 kMtrl;
-#endif
 	STATEMANAGER.GetMaterial(&kMtrl);
 
-	kMtrl.Diffuse=D3DXCOLOR(m_dwMtrlColor);
+	kMtrl.Diffuse=D3DXCOLOR(m_dwMtrlColor);	
 	STATEMANAGER.SetMaterial(&kMtrl);
 
-	STATEMANAGER.SaveRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	STATEMANAGER.SaveRenderState(D3DRS_CULLMODE, D3DCULL_NONE);	
 
 	switch(m_iRenderMode)
 	{
@@ -138,11 +134,7 @@ void CActorInstance::OnRender()
 		STATEMANAGER.RestoreTextureStageState(0, D3DTSS_COLORARG1);
 		STATEMANAGER.RestoreTextureStageState(0, D3DTSS_COLOROP);
 		STATEMANAGER.RestoreTextureStageState(0, D3DTSS_ALPHAOP);
-#ifdef ENABLE_DIRECTX9_UPDATE
-		STATEMANAGER.RestoreFVF();
-#else
 		STATEMANAGER.RestoreVertexShader();
-#endif
 	}
 }
 

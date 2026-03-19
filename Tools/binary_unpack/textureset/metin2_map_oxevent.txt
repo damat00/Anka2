@@ -22,9 +22,9 @@ Start Texture002
     0
 End Texture002
 Start Texture003
-    "d:\ymir work\terrainmaps\wom\c_tile_04.DDS"
-    2.000000
-    2.000000
+    "d:\ymir work\terrainmaps\C\tile\tile04.DDS"
+    5.000000
+    5.000000
     0.000000
     0.000000
     0
@@ -33,8 +33,8 @@ Start Texture003
 End Texture003
 Start Texture004
     "d:\ymir work\terrainmaps\C\tile\tile05.DDS"
-    3.000000
-    3.000000
+    6.000000
+    6.000000
     0.000000
     0.000000
     0

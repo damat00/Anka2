@@ -543,15 +543,12 @@ PyObject *chatGetLinkFromHyperlink(PyObject *poSelf, PyObject *poArgs)
 
 	}
 #endif
-
-#ifdef LINK_IN_CHAT
 	else if (0 == results[0].compare("link"))
 	{
 		char buf[1024] = { 0 };
 		snprintf(buf, sizeof(buf), "|cffc9c0f1|H|h%s|h|r", results[1].c_str());
 		return Py_BuildValue("s", buf);
 	}
-#endif
 
 	return Py_BuildValue("s", "");
 }

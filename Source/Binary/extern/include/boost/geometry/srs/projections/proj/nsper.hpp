@@ -52,6 +52,13 @@
 namespace boost { namespace geometry
 {
 
+namespace srs { namespace par4
+{
+    struct nsper {}; // Near-sided perspective
+    struct tpers {}; // Tilted perspective
+
+}} //namespace srs::par4
+
 namespace projections
 {
     #ifndef DOXYGEN_NO_DETAIL
@@ -98,7 +105,7 @@ namespace projections
 
                 // FORWARD(s_forward)  spheroid
                 // Project coordinates from geographic (lon, lat) to cartesian (x, y)
-                inline void fwd(T const& lp_lon, T const& lp_lat, T& xy_x, T& xy_y) const
+                inline void fwd(T& lp_lon, T& lp_lat, T& xy_x, T& xy_y) const
                 {
                     T  coslam, cosphi, sinphi;
 
@@ -151,7 +158,7 @@ namespace projections
 
                 // INVERSE(s_inverse)  spheroid
                 // Project coordinates from cartesian (x, y) to geographic (lon, lat)
-                inline void inv(T xy_x, T xy_y, T& lp_lon, T& lp_lat) const
+                inline void inv(T& xy_x, T& xy_y, T& lp_lon, T& lp_lat) const
                 {
                     T  rh, cosz, sinz;
 
@@ -204,11 +211,10 @@ namespace projections
 
             };
 
-            template <typename Params, typename Parameters, typename T>
-            inline void setup(Params const& params, Parameters& par, par_nsper<T>& proj_parm) 
+            template <typename Parameters, typename T>
+            inline void setup(Parameters& par, par_nsper<T>& proj_parm) 
             {
-                proj_parm.height = pj_get_param_f<T, srs::spar::h>(params, "h", srs::dpar::h);
-                if (proj_parm.height <= 0.)
+                if ((proj_parm.height = pj_get_param_f(par.params, "h")) <= 0.)
                     BOOST_THROW_EXCEPTION( projection_exception(error_h_less_than_zero) );
 
                 if (fabs(fabs(par.phi0) - geometry::math::half_pi<T>()) < epsilon10)
@@ -230,25 +236,27 @@ namespace projections
 
 
             // Near-sided perspective
-            template <typename Params, typename Parameters, typename T>
-            inline void setup_nsper(Params const& params, Parameters& par, par_nsper<T>& proj_parm)
+            template <typename Parameters, typename T>
+            inline void setup_nsper(Parameters& par, par_nsper<T>& proj_parm)
             {
                 proj_parm.tilt = 0;
 
-                setup(params, par, proj_parm);
+                setup(par, proj_parm);
             }
 
             // Tilted perspective
-            template <typename Params, typename Parameters, typename T>
-            inline void setup_tpers(Params const& params, Parameters& par, par_nsper<T>& proj_parm)
+            template <typename Parameters, typename T>
+            inline void setup_tpers(Parameters& par, par_nsper<T>& proj_parm)
             {
-                T const omega = pj_get_param_r<T, srs::spar::tilt>(params, "tilt", srs::dpar::tilt);
-                T const gamma = pj_get_param_r<T, srs::spar::azi>(params, "azi", srs::dpar::azi);
+                T omega, gamma;
+
+                omega = pj_get_param_r(par.params, "tilt");
+                gamma = pj_get_param_r(par.params, "azi");
                 proj_parm.tilt = 1;
                 proj_parm.cg = cos(gamma); proj_parm.sg = sin(gamma);
                 proj_parm.cw = cos(omega); proj_parm.sw = sin(omega);
 
-                setup(params, par, proj_parm);
+                setup(par, proj_parm);
             }
 
     }} // namespace detail::nsper
@@ -271,11 +279,9 @@ namespace projections
     template <typename T, typename Parameters>
     struct nsper_spheroid : public detail::nsper::base_nsper_spheroid<T, Parameters>
     {
-        template <typename Params>
-        inline nsper_spheroid(Params const& params, Parameters const& par)
-            : detail::nsper::base_nsper_spheroid<T, Parameters>(par)
+        inline nsper_spheroid(const Parameters& par) : detail::nsper::base_nsper_spheroid<T, Parameters>(par)
         {
-            detail::nsper::setup_nsper(params, this->m_par, this->m_proj_parm);
+            detail::nsper::setup_nsper(this->m_par, this->m_proj_parm);
         }
     };
 
@@ -298,11 +304,9 @@ namespace projections
     template <typename T, typename Parameters>
     struct tpers_spheroid : public detail::nsper::base_nsper_spheroid<T, Parameters>
     {
-        template <typename Params>
-        inline tpers_spheroid(Params const& params, Parameters const& par)
-            : detail::nsper::base_nsper_spheroid<T, Parameters>(par)
+        inline tpers_spheroid(const Parameters& par) : detail::nsper::base_nsper_spheroid<T, Parameters>(par)
         {
-            detail::nsper::setup_tpers(params, this->m_par, this->m_proj_parm);
+            detail::nsper::setup_tpers(this->m_par, this->m_proj_parm);
         }
     };
 
@@ -311,17 +315,35 @@ namespace projections
     {
 
         // Static projection
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_STATIC_PROJECTION(srs::spar::proj_nsper, nsper_spheroid, nsper_spheroid)
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_STATIC_PROJECTION(srs::spar::proj_tpers, tpers_spheroid, tpers_spheroid)
+        BOOST_GEOMETRY_PROJECTIONS_DETAIL_STATIC_PROJECTION(srs::par4::nsper, nsper_spheroid, nsper_spheroid)
+        BOOST_GEOMETRY_PROJECTIONS_DETAIL_STATIC_PROJECTION(srs::par4::tpers, tpers_spheroid, tpers_spheroid)
 
         // Factory entry(s)
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_ENTRY_FI(nsper_entry, nsper_spheroid)
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_ENTRY_FI(tpers_entry, tpers_spheroid)
-
-        BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_INIT_BEGIN(nsper_init)
+        template <typename T, typename Parameters>
+        class nsper_entry : public detail::factory_entry<T, Parameters>
         {
-            BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_INIT_ENTRY(nsper, nsper_entry)
-            BOOST_GEOMETRY_PROJECTIONS_DETAIL_FACTORY_INIT_ENTRY(tpers, tpers_entry)
+            public :
+                virtual base_v<T, Parameters>* create_new(const Parameters& par) const
+                {
+                    return new base_v_fi<nsper_spheroid<T, Parameters>, T, Parameters>(par);
+                }
+        };
+
+        template <typename T, typename Parameters>
+        class tpers_entry : public detail::factory_entry<T, Parameters>
+        {
+            public :
+                virtual base_v<T, Parameters>* create_new(const Parameters& par) const
+                {
+                    return new base_v_fi<tpers_spheroid<T, Parameters>, T, Parameters>(par);
+                }
+        };
+
+        template <typename T, typename Parameters>
+        inline void nsper_init(detail::base_factory<T, Parameters>& factory)
+        {
+            factory.add_to_factory("nsper", new nsper_entry<T, Parameters>);
+            factory.add_to_factory("tpers", new tpers_entry<T, Parameters>);
         }
 
     } // namespace detail

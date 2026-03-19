@@ -46,7 +46,7 @@ bool CPropertyManager::Initialize(const char *c_pszPackFileName)
 
 				if (!Register(strLine.c_str(), nullptr))
 				{
-					//TraceError("CPropertyManager::Initialize: Cannot register property '%s'!", strLine.c_str());
+					TraceError("CPropertyManager::Initialize: Cannot register property '%s'!", strLine.c_str());
 				}
 			}
 		}
@@ -209,7 +209,7 @@ bool CPropertyManager::LoadReservedCRC(const char *c_pszFileName)
 
 	if (!CEterPackManager::Instance().Get(file, c_pszFileName, &c_pvData))
 		return false;
-
+	
 	CMemoryTextFileLoader textFileLoader;
 	textFileLoader.Bind(file.Size(), c_pvData);
 
@@ -341,7 +341,7 @@ bool CPropertyManager::Erase(DWORD dwCRC)
 	FILE * fp = fopen("property/reserve", "a+");
 
 	if (!fp)
-		LogBox("Cannot open the CRC file 'property/reserve'.");
+		LogBox("예약 CRC 파일을 열 수 없습니다.");
 	else
 	{
 		char szCRC[64 + 1];

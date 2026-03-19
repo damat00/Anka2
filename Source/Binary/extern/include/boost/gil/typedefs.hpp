@@ -9,15 +9,21 @@
 #ifndef BOOST_GIL_TYPEDEFS_HPP
 #define BOOST_GIL_TYPEDEFS_HPP
 
-#include <boost/gil/cmyk.hpp>
-#include <boost/gil/device_n.hpp>
-#include <boost/gil/gray.hpp>
-#include <boost/gil/point.hpp>
-#include <boost/gil/rgb.hpp>
-#include <boost/gil/rgba.hpp>
+/// \file
+/// \brief Useful public typedefs
+/// \author Lubomir Bourdev and Hailin Jin \n
+///         Adobe Systems Incorporated
+
+#include "gil_config.hpp"
 
 #include <cstdint>
 #include <memory>
+
+#include "cmyk.hpp"
+#include "device_n.hpp"
+#include "gray.hpp"
+#include "rgb.hpp"
+#include "rgba.hpp"
 
 // B - bits size/signedness, CM - channel model, CS - colour space, LAYOUT - pixel layout
 // Example: B = '8', CM = 'uint8_t', CS = 'bgr,  LAYOUT='bgr_layout_t'
@@ -26,7 +32,7 @@
     template <typename, typename> struct planar_pixel_reference;                         \
     template <typename, typename> struct planar_pixel_iterator;                          \
     template <typename> class memory_based_step_iterator;                                \
-    template <typename> class point;                                                    \
+    template <typename> class point2;                                                    \
     template <typename> class memory_based_2d_locator;                                   \
     template <typename> class image_view;                                                \
     template <typename, bool, typename> class image;                                     \

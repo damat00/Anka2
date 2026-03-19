@@ -1,6 +1,6 @@
 // Boost.Geometry
 
-// Copyright (c) 2017-2018, Oracle and/or its affiliates.
+// Copyright (c) 2017, Oracle and/or its affiliates.
 // Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
 // Use, modification and distribution is subject to the Boost Software License,
@@ -23,43 +23,57 @@ namespace boost { namespace geometry
 namespace projections
 {
 
-template <>
-struct dynamic_parameters<srs::epsg>
+template <typename CT>
+struct dynamic_parameters<srs::epsg, CT>
 {
-    static const bool is_specialized = true;
-    static inline srs::dpar::parameters<> apply(srs::epsg const& params)
+    static inline projections::parameters<CT> apply(srs::epsg const& params)
     {
-        return projections::detail::epsg_to_parameters(params.code);
-    }
+        return projections::detail::pj_init_plus<CT>(
+                srs::dynamic(),
+                projections::detail::epsg_to_string(params.code),
+                false);
+    }  
 };
 
 template <int Code, typename CT>
 class proj_wrapper<srs::static_epsg<Code>, CT>
-    : public proj_wrapper
+    : public static_proj_wrapper_base
         <
-            typename projections::detail::epsg_traits<Code>::parameters_type,
+            typename projections::detail::epsg_traits<Code>::static_parameters_type,
             CT
         >
 {
     typedef projections::detail::epsg_traits<Code> epsg_traits;
-
-    typedef proj_wrapper
-        <
-            typename epsg_traits::parameters_type,
-            CT
-        > base_t;
+    typedef typename epsg_traits::static_parameters_type static_parameters_type;
+    typedef static_proj_wrapper_base<static_parameters_type, CT> base_t;
 
 public:
     proj_wrapper()
-        : base_t(epsg_traits::parameters())
-    {}
-
-    explicit proj_wrapper(srs::static_epsg<Code> const&)
-        : base_t(epsg_traits::parameters())
+        : base_t(epsg_traits::s_par(), epsg_traits::par())
     {}
 };
 
+
 } // namespace projections
+
+
+namespace srs
+{
+
+
+template <int Code, typename CT>
+class projection<srs::static_epsg<Code>, CT>
+    : public projections::projection<srs::static_epsg<Code>, CT>
+{
+    typedef projections::projection<srs::static_epsg<Code>, CT> base_t;
+
+public:
+    projection()
+    {}
+};
+
+
+} // namespace srs
 
 
 }} // namespace boost::geometry

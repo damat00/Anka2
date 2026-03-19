@@ -426,3 +426,6 @@ const cCsvRow* const cCsvTable::CurRow() const
 
     return m_File[m_CurRow];
 }
+
+
+

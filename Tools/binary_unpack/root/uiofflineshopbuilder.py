@@ -14,7 +14,6 @@ import systemSetting
 import item
 import snd
 import shop
-import chat
 import renderTarget
 
 import ui
@@ -89,10 +88,6 @@ def UpdateADText(vid,type,text):
 def UpdateADBoard():
 	global g_offlineShopAdvertisementBoardDict
 
-	if not systemSetting.IsShowSalesText():
-		for key in g_offlineShopAdvertisementBoardDict.keys():
-			g_offlineShopAdvertisementBoardDict[key].Hide()
-		return
 	for key in g_offlineShopAdvertisementBoardDict.keys():
 		g_offlineShopAdvertisementBoardDict[key].Show()
 
@@ -186,7 +181,7 @@ class OfflineShopAdvertisementBoard(ui.ThinBoardNorm):
 			DeleteADBoardwithKey(self.vid)
 			return
 
-		if not systemSetting.IsShowSalesText():
+		if systemSetting.IsShowSalesText():
 			self.SetPosition(-800, -300)
 			return
 

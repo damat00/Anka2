@@ -46,7 +46,7 @@ void CPythonExceptionSender::Send()
 	//{
 	//	// send plain text
 	//	ret = send(s,(char *)(&m_strExceptionString[0])+total,length-total,0);
-	//
+	//	
 	//	if (ret<0)
 	//		break;
 

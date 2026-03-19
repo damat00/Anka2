@@ -35,14 +35,19 @@ bool CSoundInstance3D::SetSound(CSoundData* pSoundData)
 {
 	assert(m_sample != nullptr && pSoundData != nullptr);
 
+	// 레퍼런스 카운트가 1이 될 때 로드를 해야 제대로 사이즈가 리턴
+	// 되므로 �?드시 Get을 호출 하고 진행해야 한다.
+	// 또, m_pSoundData가 pSoundData와 같고 m_pSoundData의 레퍼런스
+	// 카운터가 1일 경우, 불필요하게 로드가 일어나므로 미리 레퍼런스
+	// 카운터를 올려놔야 한다.
 	LPVOID lpData = pSoundData->Get();
-
+	
 	if (m_pSoundData != nullptr)
 	{
 		m_pSoundData->Release();
 		m_pSoundData = nullptr;
 	}
-
+	
 	if (AIL_set_3D_sample_file(m_sample, lpData) == NULL)
 	{
 		TraceError("%s: %s", AIL_last_error(), pSoundData->GetFileName());
@@ -109,7 +114,7 @@ void CSoundInstance3D::SetPosition(float x, float y, float z) const
 	AIL_set_3D_position(m_sample, x, y, -z);
 }
 
-void CSoundInstance3D::SetOrientation(float x_face, float y_face, float z_face,
+void CSoundInstance3D::SetOrientation(float x_face, float y_face, float z_face, 
 									  float x_normal, float y_normal, float z_normal) const
 {
 	assert(!" CSoundInstance3D::SetOrientation - Don't use this function");

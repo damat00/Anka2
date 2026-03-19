@@ -41,9 +41,6 @@ def RunApp():
 
 	app.SetCamera(1500.0, 30.0, 0.0, 180.0)
 
-	#Gets and sets the floating-point control word
-	#app.SetControlFP()
-
 	if not mouseModule.mouseController.Create():
 		return
 

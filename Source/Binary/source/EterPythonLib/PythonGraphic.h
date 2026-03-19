@@ -18,11 +18,7 @@ class CPythonGraphic : public CScreen, public CSingleton<CPythonGraphic>
 		void PushState();
 		void PopState();
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-		LPDIRECT3D9 GetD3D();
-#else
 		LPDIRECT3D8 GetD3D();
-#endif
 
 		float GetOrthoDepth();
 		void SetInterfaceRenderState();
@@ -35,9 +31,6 @@ class CPythonGraphic : public CScreen, public CSingleton<CPythonGraphic>
 		void SetViewport(float fx, float fy, float fWidth, float fHeight);
 		void RestoreViewport();
 
-#ifdef ENABLE_UI_DEBUG_WINDOW
-        void RenderTextLine(float x, float y, const char* c_szText, DWORD dwColor);
-#endif
 		long GenerateColor(float r, float g, float b, float a);
 		void RenderDownButton(float sx, float sy, float ex, float ey);
 		void RenderUpButton(float sx, float sy, float ex, float ey);
@@ -52,7 +45,7 @@ class CPythonGraphic : public CScreen, public CSingleton<CPythonGraphic>
 
 		DWORD GetAvailableMemory();
 		void SetGamma(float fGammaFactor = 1.0f);
-
+		
 	protected:
 		typedef struct SState
 		{
@@ -70,11 +63,7 @@ class CPythonGraphic : public CScreen, public CSingleton<CPythonGraphic>
 
 		CCullingManager							m_CullingManager;
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-		D3DVIEWPORT9							m_backupViewport;
-#else
 		D3DVIEWPORT8							m_backupViewport;
-#endif
 
 		float									m_fOrthoDepth;
 };

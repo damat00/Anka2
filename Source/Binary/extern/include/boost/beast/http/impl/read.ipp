@@ -18,11 +18,9 @@
 #include <boost/beast/core/handler_ptr.hpp>
 #include <boost/beast/core/read_size.hpp>
 #include <boost/beast/core/type_traits.hpp>
-#include <boost/beast/core/detail/buffer.hpp>
 #include <boost/asio/associated_allocator.hpp>
 #include <boost/asio/associated_executor.hpp>
 #include <boost/asio/coroutine.hpp>
-#include <boost/asio/error.hpp>
 #include <boost/asio/executor_work_guard.hpp>
 #include <boost/asio/handler_continuation_hook.hpp>
 #include <boost/asio/handler_invoke_hook.hpp>
@@ -123,6 +121,8 @@ operator()(
     bool cont)
 {
     cont_ = cont;
+    boost::optional<typename
+        DynamicBuffer::mutable_buffers_type> mb;
     BOOST_ASIO_CORO_REENTER(*this)
     {
         if(b_.size() == 0)
@@ -139,22 +139,18 @@ operator()(
                 break;
 
         do_read:
-            BOOST_ASIO_CORO_YIELD
+            try
             {
-                // VFALCO This was read_size_or_throw
-                auto const size = read_size(b_, 65536);
-                if(size == 0)
-                {
-                    ec = error::buffer_overflow;
-                    goto upcall;
-                }
-                auto const mb =
-                    beast::detail::dynamic_buffer_prepare(
-                        b_, size, ec, error::buffer_overflow);
-                if(ec)
-                    goto upcall;
-                s_.async_read_some(*mb, std::move(*this));
+                mb.emplace(b_.prepare(
+                    read_size_or_throw(b_, 65536)));
             }
+            catch(std::length_error const&)
+            {
+                ec = error::buffer_overflow;
+                break;
+            }
+            BOOST_ASIO_CORO_YIELD
+            s_.async_read_some(*mb, std::move(*this));
             if(ec == boost::asio::error::eof)
             {
                 BOOST_ASSERT(bytes_transferred == 0);
@@ -517,18 +513,19 @@ read_some(
                 break;
         }
     do_read:
-        auto const size = read_size(buffer, 65536);
-        if(size == 0)
+        boost::optional<typename
+            DynamicBuffer::mutable_buffers_type> b;
+        try
+        {
+            b.emplace(buffer.prepare(
+                read_size_or_throw(buffer, 65536)));
+        }
+        catch(std::length_error const&)
         {
             ec = error::buffer_overflow;
-            break;
+            return bytes_transferred;
         }
-        auto const mb =
-            beast::detail::dynamic_buffer_prepare(
-                buffer, size, ec, error::buffer_overflow);
-        if(ec)
-            break;
-        auto const n = stream.read_some(*mb, ec);
+        auto const n = stream.read_some(*b, ec);
         if(ec == boost::asio::error::eof)
         {
             BOOST_ASSERT(n == 0);

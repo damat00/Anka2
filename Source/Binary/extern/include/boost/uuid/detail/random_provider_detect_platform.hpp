@@ -14,15 +14,10 @@
 #include <boost/predef/library/c/cloudabi.h>
 #include <boost/predef/library/c/gnu.h>
 #include <boost/predef/os/bsd/open.h>
+#include <boost/predef/os/linux.h>
 #include <boost/predef/os/windows.h>
-
-// Note: Don't use Boost.Predef to detect Linux and Android as it may give different results depending on header inclusion order.
-// https://github.com/boostorg/predef/issues/81#issuecomment-413329061
-#if (defined(__linux__) || defined(__linux) || defined(linux)) && (!defined(__ANDROID__) || __ANDROID_API__ >= 28)
+#if BOOST_OS_LINUX
 #include <sys/syscall.h>
-#if defined(SYS_getrandom)
-#define BOOST_UUID_RANDOM_PROVIDER_HAS_GETRANDOM
-#endif // defined(SYS_getrandom)
 #endif
 
 //
@@ -50,7 +45,7 @@
 #  error Unable to find a suitable windows entropy provider
 # endif
 
-#elif defined(BOOST_UUID_RANDOM_PROVIDER_HAS_GETRANDOM) && !defined(BOOST_UUID_RANDOM_PROVIDER_FORCE_POSIX) && !defined(BOOST_UUID_RANDOM_PROVIDER_DISABLE_GETRANDOM)
+#elif BOOST_OS_LINUX && defined(SYS_getrandom) && !defined(BOOST_UUID_RANDOM_PROVIDER_FORCE_POSIX) && !defined(BOOST_UUID_RANDOM_PROVIDER_DISABLE_GETRANDOM)
 # define BOOST_UUID_RANDOM_PROVIDER_GETRANDOM
 # define BOOST_UUID_RANDOM_PROVIDER_NAME getrandom
 

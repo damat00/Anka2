@@ -1,6 +1,6 @@
 ScriptType               MotionData
 
-MotionFileName           "season2/npc/ent_elder/20.gr2"
+MotionFileName           "D:/YMIR WORK/npc/ent_elder/20.gr2"
 MotionDuration           2.333333
 
 Group MotionEventData

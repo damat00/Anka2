@@ -23,15 +23,10 @@
 namespace boost { 
 namespace archive {
 
-class BOOST_SYMBOL_VISIBLE polymorphic_xml_oarchive :
-    public detail::polymorphic_oarchive_route<xml_oarchive>
-{
-public:
-    polymorphic_xml_oarchive(std::ostream & os, unsigned int flags = 0) :
-        detail::polymorphic_oarchive_route<xml_oarchive>(os, flags)
-    {}
-    ~polymorphic_xml_oarchive(){}
-};
+typedef detail::polymorphic_oarchive_route<
+    xml_oarchive_impl<xml_oarchive> 
+> polymorphic_xml_oarchive;
+
 } // namespace archive
 } // namespace boost
 

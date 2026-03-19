@@ -61,6 +61,7 @@ void CItem::Initialize()
 	m_bExchanging = false;
 	memset(&m_alSockets, 0, sizeof(m_alSockets));
 	memset(&m_aAttr, 0, sizeof(m_aAttr));
+
 	m_pkDestroyEvent = NULL;
 	m_pkOwnershipEvent = NULL;
 	m_dwOwnershipPID = 0;
@@ -544,7 +545,6 @@ bool CItem::DistanceValid(LPCHARACTER ch)
 
 bool CItem::CanUsedBy(LPCHARACTER ch)
 {
-	// Anti flag check
 	switch (ch->GetJob())
 	{
 		case JOB_WARRIOR:
@@ -582,13 +582,11 @@ int CItem::FindEquipCell(LPCHARACTER ch, int iCandidateCell)
 #ifdef ENABLE_PET_SYSTEM
 		&& ITEM_PET != GetType()
 #endif
-#ifdef ENABLE_PASSIVE_SYSTEM
-		&& ITEM_PASSIVE != GetType()
+#ifdef ENABLE_TITLE_SYSTEM
+		&& ITEM_TITLE != GetType()
 #endif
-		)
-	{
+	)
 		return -1;
-	}
 
 	/* Dragon Soul Stone slots cannot be processed as WEAR (up to 32 WEARs are possible, but if you add Dragon Soul Stones, it will exceed 32.)
 	* From a specific location in the inventory ((INVENTORY_MAX_NUM + WEAR_MAX_NUM) to (INVENTORY_MAX_NUM + WEAR_MAX_NUM + DRAGON_SOUL_DECK_MAX_NUM * DS_SLOT_MAX - 1))
@@ -655,11 +653,10 @@ int CItem::FindEquipCell(LPCHARACTER ch, int iCandidateCell)
 	else if (GetType() == ITEM_PET)
 		return WEAR_PET;
 #endif
-#ifdef ENABLE_PASSIVE_SYSTEM
-	else if (GetType() == ITEM_PASSIVE)
-		return WEAR_PASSIVE;
+#ifdef ENABLE_TITLE_SYSTEM
+	else if (GetType() == ITEM_TITLE)
+		return WEAR_TITLE;
 #endif
-
 	else if (GetWearFlag() & WEARABLE_BODY)
 		return WEAR_BODY;
 	else if (GetWearFlag() & WEARABLE_HEAD)
@@ -818,11 +815,6 @@ void CItem::ModifyPoints(bool bAdd)
 			}
 		}
 	}
-#endif
-
-#ifdef ENABLE_PASSIVE_SYSTEM
-	if (CItemVnumHelper::IsPassive(GetVnum()) && GetSubType() == PASSIVE_JOB && GetSocket(1) == 0)
-		return;
 #endif
 
 	for (int i = 0; i < ITEM_APPLY_MAX_NUM; ++i)
@@ -1185,8 +1177,8 @@ bool CItem::IsEquipable() const
 #ifdef ENABLE_PET_SYSTEM
 		case ITEM_PET:
 #endif
-#ifdef ENABLE_PASSIVE_SYSTEM
-		case ITEM_PASSIVE:
+#ifdef ENABLE_TITLE_SYSTEM
+		case ITEM_TITLE:
 #endif
 			return true;
 	}
@@ -1267,54 +1259,15 @@ bool CItem::EquipTo(LPCHARACTER ch, BYTE bWearCell)
 	{
 		ModifyPoints(true);
 		StartUniqueExpireEvent();
+
 		if (-1 != GetProto()->cLimitTimerBasedOnWearIndex)
 			StartTimerBasedOnWearExpireEvent();
 
-		// ACCESSORY_REFINE
 		StartAccessorySocketExpireEvent();
-		// END_OF_ACCESSORY_REFINE
 #ifdef ENABLE_AURA_COSTUME_SYSTEM
 		StartAuraBoosterSocketExpireEvent();
 #endif
 	}
-
-#ifdef ENABLE_EQUIPMENT_HAND_EFFECT
-	if (GetVnum() == DBONE_VNUM_1 || GetVnum() == DBONE_VNUM_2 || GetVnum() == DBONE_VNUM_3 || GetVnum() == DBONE_VNUM_4 || GetVnum() == DBONE_VNUM_5)
-	{
-		if (!ch->IsAffectFlag(AFFECT_DBONE_BRONZE))
-			ch->AddAffect(AFFECT_DBONE_BRONZE, POINT_NONE, 0, AFF_DBONE_BRONZE, INFINITE_AFFECT_DURATION, 0, false);
-	}
-
-	if (GetVnum() == DBONE_VNUM_6 || GetVnum() == DBONE_VNUM_7 || GetVnum() == DBONE_VNUM_8)
-	{
-		if (!ch->IsAffectFlag(AFFECT_DBONE_SILVER))
-			ch->AddAffect(AFFECT_DBONE_SILVER, POINT_NONE, 0, AFF_DBONE_SILVER, INFINITE_AFFECT_DURATION, 0, false);
-	}
-
-	if (GetVnum() == DBONE_VNUM_9 || GetVnum() == DBONE_VNUM_10 || GetVnum() == DBONE_VNUM_11)
-	{
-		if (!ch->IsAffectFlag(AFFECT_DBONE_GOLD))
-			ch->AddAffect(AFFECT_DBONE_GOLD, POINT_NONE, 0, AFF_DBONE_GOLD, INFINITE_AFFECT_DURATION, 0, false);
-	}
-
-	if (GetVnum() == DBONE_VNUM_12 || GetVnum() == DBONE_VNUM_13 || GetVnum() == DBONE_VNUM_14 || GetVnum() == DBONE_VNUM_15 || GetVnum() == DBONE_VNUM_16)
-	{
-		if (!ch->IsAffectFlag(AFFECT_DBONE_DIAMOND))
-			ch->AddAffect(AFFECT_DBONE_DIAMOND, POINT_NONE, 0, AFF_DBONE_DIAMOND, INFINITE_AFFECT_DURATION, 0, false);
-	}
-
-	if (GetVnum() == DBONE_VNUM_17 || GetVnum() == DBONE_VNUM_18 || GetVnum() == DBONE_VNUM_19)
-	{
-		if (!ch->IsAffectFlag(AFFECT_DBONE_PLATIN))
-			ch->AddAffect(AFFECT_DBONE_PLATIN, POINT_NONE, 0, AFF_DBONE_PLATIN, INFINITE_AFFECT_DURATION, 0, false);
-	}
-
-	if (GetVnum() == DBONE_VNUM_20 || GetVnum() == DBONE_VNUM_21 || GetVnum() == DBONE_VNUM_22)
-	{
-		if (!ch->IsAffectFlag(AFFECT_DBONE_EMERALD))
-			ch->AddAffect(AFFECT_DBONE_EMERALD, POINT_NONE, 0, AFF_DBONE_EMERALD, INFINITE_AFFECT_DURATION, 0, false);
-	}
-#endif
 
 	ch->BuffOnAttr_AddBuffsFromItem(this);
 
@@ -1326,6 +1279,11 @@ bool CItem::EquipTo(LPCHARACTER ch, BYTE bWearCell)
 #ifdef ENABLE_PET_SYSTEM
 	if (IsPetItem())
 		ch->PetSummon(this);
+#endif
+
+#ifdef ENABLE_TITLE_SYSTEM
+	if (IsTitleItem())
+		ch->EquipTitle(this);
 #endif
 
 #ifdef ENABLE_MOUNT_PET_SKIN
@@ -1349,10 +1307,7 @@ bool CItem::Unequip()
 {
 	if (!m_pOwner || GetCell() < INVENTORY_MAX_NUM)
 	{
-		// ITEM_OWNER_INVALID_PTR_BUG
-		sys_err("%s %u m_pOwner %p, GetCell %d",
-				GetName(), GetID(), get_pointer(m_pOwner), GetCell());
-		// END_OF_ITEM_OWNER_INVALID_PTR_BUG
+		sys_err("%s %u m_pOwner %p, GetCell %d", GetName(), GetID(), get_pointer(m_pOwner), GetCell());
 		return false;
 	}
 
@@ -1372,6 +1327,11 @@ bool CItem::Unequip()
 		m_pOwner->PetUnsummon(this);
 #endif
 
+#ifdef ENABLE_TITLE_SYSTEM
+	if (IsTitleItem())
+		m_pOwner->UnequipTitle(this);
+#endif
+
 #ifdef ENABLE_MOUNT_PET_SKIN
 	if (IsCostumeMountSkin())
 		m_pOwner->RemoveCostumeMountSkin(this);
@@ -1382,23 +1342,6 @@ bool CItem::Unequip()
 
 	if (IsRideItem())
 		ClearMountAttributeAndAffect();
-
-#ifdef ENABLE_EQUIPMENT_HAND_EFFECT
-	if (GetVnum() == DBONE_VNUM_1 || GetVnum() == DBONE_VNUM_2 || GetVnum() == DBONE_VNUM_3 || GetVnum() == DBONE_VNUM_4 || GetVnum() == DBONE_VNUM_5) { m_pOwner->RemoveAffect(AFFECT_DBONE_BRONZE); }
-	if (GetVnum() == DBONE_VNUM_6 || GetVnum() == DBONE_VNUM_7 || GetVnum() == DBONE_VNUM_8) { m_pOwner->RemoveAffect(AFFECT_DBONE_SILVER); }
-	if (GetVnum() == DBONE_VNUM_9 || GetVnum() == DBONE_VNUM_10 || GetVnum() == DBONE_VNUM_11) { m_pOwner->RemoveAffect(AFFECT_DBONE_GOLD); }
-	if (GetVnum() == DBONE_VNUM_12 || GetVnum() == DBONE_VNUM_13 || GetVnum() == DBONE_VNUM_14 || GetVnum() == DBONE_VNUM_15 || GetVnum() == DBONE_VNUM_16) { m_pOwner->RemoveAffect(AFFECT_DBONE_DIAMOND); }
-	if (GetVnum() == DBONE_VNUM_17 || GetVnum() == DBONE_VNUM_18 || GetVnum() == DBONE_VNUM_19) { m_pOwner->RemoveAffect(AFFECT_DBONE_PLATIN); }
-	if (GetVnum() == DBONE_VNUM_20 || GetVnum() == DBONE_VNUM_21 || GetVnum() == DBONE_VNUM_22) { m_pOwner->RemoveAffect(AFFECT_DBONE_EMERALD); }
-#endif
-
-#ifdef ENABLE_PASSIVE_SYSTEM
-	if (CItemVnumHelper::IsPassive(GetVnum()) && GetSubType() == PASSIVE_JOB)
-	{
-		m_pOwner->RemoveAffect(AFFECT_PASSIVE_RELIC_STONE_DEF);
-		m_pOwner->RemoveAffect(AFFECT_PASSIVE_RELIC_DISMOUNT_SPEED);
-	}
-#endif
 
 	if (IsDragonSoul())
 	{
@@ -1414,9 +1357,7 @@ bool CItem::Unequip()
 	if (-1 != GetProto()->cLimitTimerBasedOnWearIndex)
 		StopTimerBasedOnWearExpireEvent();
 
-	// ACCESSORY_REFINE
 	StopAccessorySocketExpireEvent();
-	// END_OF_ACCESSORY_REFINE
 #ifdef ENABLE_AURA_COSTUME_SYSTEM
 	StopAuraBoosterSocketExpireEvent();
 #endif
@@ -1775,14 +1716,6 @@ EVENTFUNC(unique_expire_event)
 		{
 			sys_log(0, "UNIQUE_ITEM: expire %s %u", pkItem->GetName(), pkItem->GetID());
 			pkItem->SetUniqueExpireEvent(NULL);
-#ifdef ENABLE_EQUIPMENT_HAND_EFFECT
-			if (pkItem->GetVnum() == DBONE_VNUM_1 || pkItem->GetVnum() == DBONE_VNUM_2 || pkItem->GetVnum() == DBONE_VNUM_3 || pkItem->GetVnum() == DBONE_VNUM_4 || pkItem->GetVnum() == DBONE_VNUM_5) { pkItem->GetOwner()->RemoveAffect(AFFECT_DBONE_BRONZE); }
-			if (pkItem->GetVnum() == DBONE_VNUM_6 || pkItem->GetVnum() == DBONE_VNUM_7 || pkItem->GetVnum() == DBONE_VNUM_8) { pkItem->GetOwner()->RemoveAffect(AFFECT_DBONE_SILVER); }
-			if (pkItem->GetVnum() == DBONE_VNUM_9 || pkItem->GetVnum() == DBONE_VNUM_10 || pkItem->GetVnum() == DBONE_VNUM_11) { pkItem->GetOwner()->RemoveAffect(AFFECT_DBONE_GOLD); }
-			if (pkItem->GetVnum() == DBONE_VNUM_12 || pkItem->GetVnum() == DBONE_VNUM_13 || pkItem->GetVnum() == DBONE_VNUM_14 || pkItem->GetVnum() == DBONE_VNUM_15 || pkItem->GetVnum() == DBONE_VNUM_16) { pkItem->GetOwner()->RemoveAffect(AFFECT_DBONE_DIAMOND); }
-			if (pkItem->GetVnum() == DBONE_VNUM_17 || pkItem->GetVnum() == DBONE_VNUM_18 || pkItem->GetVnum() == DBONE_VNUM_19) { pkItem->GetOwner()->RemoveAffect(AFFECT_DBONE_PLATIN); }
-			if (pkItem->GetVnum() == DBONE_VNUM_20 || pkItem->GetVnum() == DBONE_VNUM_21 || pkItem->GetVnum() == DBONE_VNUM_22) { pkItem->GetOwner()->RemoveAffect(AFFECT_DBONE_EMERALD); }
-#endif
 			ITEM_MANAGER::instance().RemoveItem(pkItem, "UNIQUE_EXPIRE");
 			return 0;
 		}
@@ -1799,14 +1732,6 @@ EVENTFUNC(unique_expire_event)
 		if (pkItem->GetSocket(ITEM_SOCKET_UNIQUE_REMAIN_TIME) <= cur)
 		{
 			pkItem->SetUniqueExpireEvent(NULL);
-#ifdef ENABLE_EQUIPMENT_HAND_EFFECT
-			if (pkItem->GetVnum() == DBONE_VNUM_1 || pkItem->GetVnum() == DBONE_VNUM_2 || pkItem->GetVnum() == DBONE_VNUM_3 || pkItem->GetVnum() == DBONE_VNUM_4 || pkItem->GetVnum() == DBONE_VNUM_5) { pkItem->GetOwner()->RemoveAffect(AFFECT_DBONE_BRONZE); }
-			if (pkItem->GetVnum() == DBONE_VNUM_6 || pkItem->GetVnum() == DBONE_VNUM_7 || pkItem->GetVnum() == DBONE_VNUM_8) { pkItem->GetOwner()->RemoveAffect(AFFECT_DBONE_SILVER); }
-			if (pkItem->GetVnum() == DBONE_VNUM_9 || pkItem->GetVnum() == DBONE_VNUM_10 || pkItem->GetVnum() == DBONE_VNUM_11) { pkItem->GetOwner()->RemoveAffect(AFFECT_DBONE_GOLD); }
-			if (pkItem->GetVnum() == DBONE_VNUM_12 || pkItem->GetVnum() == DBONE_VNUM_13 || pkItem->GetVnum() == DBONE_VNUM_14 || pkItem->GetVnum() == DBONE_VNUM_15 || pkItem->GetVnum() == DBONE_VNUM_16) { pkItem->GetOwner()->RemoveAffect(AFFECT_DBONE_DIAMOND); }
-			if (pkItem->GetVnum() == DBONE_VNUM_17 || pkItem->GetVnum() == DBONE_VNUM_18 || pkItem->GetVnum() == DBONE_VNUM_19) { pkItem->GetOwner()->RemoveAffect(AFFECT_DBONE_PLATIN); }
-			if (pkItem->GetVnum() == DBONE_VNUM_20 || pkItem->GetVnum() == DBONE_VNUM_21 || pkItem->GetVnum() == DBONE_VNUM_22) { pkItem->GetOwner()->RemoveAffect(AFFECT_DBONE_EMERALD); }
-#endif
 			ITEM_MANAGER::instance().RemoveItem(pkItem, "UNIQUE_EXPIRE");
 			return 0;
 		}
@@ -1958,21 +1883,6 @@ bool CItem::IsRealTimeItem()
 	return false;
 }
 
-#ifdef ENABLE_PITTY_REFINE
-int CItem::GetLimitPittyRefine()
-{
-	if(!GetProto())
-		return 0;
-
-	for (int i=0 ; i < ITEM_LIMIT_MAX_NUM ; i++)
-	{
-		if (LIMIT_PITTY_REFINE == GetProto()->aLimits[i].bType)
-			return GetProto()->aLimits[i].lValue;
-	}
-	return 0;
-}
-#endif
-
 void CItem::StartUniqueExpireEvent()
 {
 	if (GetType() != ITEM_UNIQUE)
@@ -1981,11 +1891,9 @@ void CItem::StartUniqueExpireEvent()
 	if (m_pkUniqueExpireEvent)
 		return;
 
-	//For fixed-term items, time-based items do not work.
 	if (IsRealTimeItem())
 		return;
 
-	// HARD CODING
 	if (GetVnum() == UNIQUE_ITEM_HIDE_ALIGNMENT_TITLE)
 		m_pOwner->ShowAlignment(false);
 
@@ -2004,14 +1912,11 @@ void CItem::StartUniqueExpireEvent()
 	SetUniqueExpireEvent(event_create(unique_expire_event, info, PASSES_PER_SEC(iSec)));
 }
 
-// Pay after time
-// see timer_based_on_wear_expire_event description
 void CItem::StartTimerBasedOnWearExpireEvent()
 {
 	if (m_pkTimerBasedOnWearExpireEvent)
 		return;
 
-	//In case of a fixed-term item, the part-time item does not work.
 	if (IsRealTimeItem())
 		return;
 
@@ -2020,7 +1925,6 @@ void CItem::StartTimerBasedOnWearExpireEvent()
 
 	int iSec = GetSocket(0);
 
-	// To cut off the remaining time in minutes...
 	if (0 != iSec)
 	{
 		iSec %= 60;
@@ -2039,10 +1943,9 @@ void CItem::StopUniqueExpireEvent()
 	if (!m_pkUniqueExpireEvent)
 		return;
 
-	if (GetValue(2) != 0) // Items other than game-timed cannot stop UniqueExpireEvent.
+	if (GetValue(2) != 0)
 		return;
 
-	// HARD CODING
 	if (GetVnum() == UNIQUE_ITEM_HIDE_ALIGNMENT_TITLE)
 		m_pOwner->ShowAlignment(true);
 
@@ -2398,13 +2301,10 @@ bool CItem::CheckItemUseLevel(int nLevel)
 	{
 		if (this->m_pProto->aLimits[i].bType == LIMIT_LEVEL)
 		{
-			if (this->m_pProto->aLimits[i].lValue > nLevel)
-			{
-				return false;
-			}
+			if (this->m_pProto->aLimits[i].lValue > nLevel) return false;
+			else return true;
 		}
 	}
-
 	return true;
 }
 
@@ -2527,10 +2427,8 @@ bool CItem::IsItemDragonGod()
 
 bool CItem::OnAfterCreatedItem()
 {
-	// If an item is used at least once, the time is deducted even if it is not being used after that
 	if (-1 != this->GetProto()->cLimitRealTimeFirstUseIndex)
 	{
-		// Since the number of times an item has been used is recorded in Socket1, an item that has been used even once starts a timer.
 		if (0 != GetSocket(1))
 		{
 			StartRealTimeExpireEvent();
@@ -2727,16 +2625,19 @@ bool CItem::IsStone()
 
 bool CItem::IsGiftBox()
 {
-#ifdef ENABLE_NEW_ITEM_TYPE_GACHA
-	return (GetType() == ITEM_GACHA || GetType() == ITEM_GIFTBOX);
-#else
 	return (GetType() == ITEM_GIFTBOX);
-#endif
 }
 
 bool CItem::IsChanger()
 {
 	return (GetType() == ITEM_USE && (GetSubType() == USE_CHANGE_ATTRIBUTE || GetSubType() == USE_ADD_ATTRIBUTE || GetSubType() == USE_ADD_ATTRIBUTE2 || GetSubType() == USE_CHANGE_COSTUME_ATTR || GetSubType() == USE_RESET_COSTUME_ATTR));
+}
+#endif
+
+#ifdef ENABLE_TITLE_SYSTEM
+bool CItem::IsTitleItem()
+{
+	return (GetType() == ITEM_TITLE);
 }
 #endif
 

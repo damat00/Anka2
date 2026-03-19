@@ -23,12 +23,16 @@
 #ifdef ENABLE_RENEWAL_CUBE
 	#include "cube_renewal.h"
 #endif
-#ifdef ENABLE_EVENT_SYSTEM
-	#include "PetSystem.h"
+
+#ifdef ENABLE_BIOLOG_SYSTEM
+	#include "biolog_manager.h"
 #endif
 
-ITEM_MANAGER::ITEM_MANAGER()
-	: m_iTopOfTable(0), m_dwVIDCount(0), m_dwCurrentID(0)
+#ifdef ENABLE_EVENT_MANAGER
+	#include "event_manager.h"
+#endif
+
+ITEM_MANAGER::ITEM_MANAGER() : m_iTopOfTable(0), m_dwVIDCount(0), m_dwCurrentID(0)
 {
 	m_ItemIDRange.dwMin = m_ItemIDRange.dwMax = m_ItemIDRange.dwUsableItemIDMin = 0;
 	m_ItemIDSpareRange.dwMin = m_ItemIDSpareRange.dwMax = m_ItemIDSpareRange.dwUsableItemIDMin = 0;
@@ -82,7 +86,6 @@ bool ITEM_MANAGER::Initialize(TItemTable * table, int size)
 		if (m_vec_prototype[i].dwRefinedVnum)
 			m_map_ItemRefineFrom.insert(std::make_pair(m_vec_prototype[i].dwRefinedVnum, m_vec_prototype[i].dwVnum));
 
-		// NOTE: The QUEST_GIVE flag occurs as an npc event.
 		if
 		(
 			m_vec_prototype[i].bType == ITEM_QUEST || IS_SET(m_vec_prototype[i].dwFlags, ITEM_FLAG_QUEST_USE | ITEM_FLAG_QUEST_USE_MULTIPLE)
@@ -172,7 +175,6 @@ LPITEM ITEM_MANAGER::CreateItem(DWORD vnum, DWORD count, DWORD id, bool bTryMagi
 
 	LPITEM item = NULL;
 
-	//If it exists by checking by id - return!
 	if (m_map_pkItemByID.find(id) != m_map_pkItemByID.end())
 	{
 		item = m_map_pkItemByID[id];
@@ -194,12 +196,10 @@ LPITEM ITEM_MANAGER::CreateItem(DWORD vnum, DWORD count, DWORD id, bool bTryMagi
 		}
 	}
 
-	//Allocate one item
 	item = M2_NEW CItem(vnum);
 
 	bool bIsNewItem = (0 == id);
 
-	//Initialize it. Three tables
 	item->Initialize();
 	item->SetProto(table);
 	item->SetMaskVnum(dwMaskVnum);
@@ -319,26 +319,6 @@ LPITEM ITEM_MANAGER::CreateItem(DWORD vnum, DWORD count, DWORD id, bool bTryMagi
 		}
 	}
 
-#ifdef ENABLE_MINI_GAME_CATCH_KING
-	if(item->GetVnum() == 79603 || item->GetVnum() == 79604)
-	{
-		if(quest::CQuestManager::instance().GetEventFlag("enable_catch_king_event"))
-		{
-			int iEndTime = quest::CQuestManager::instance().GetEventFlag("catch_king_event_end_day");
-	
-			if(iEndTime)
-			{
-				item->SetSocket(0, iEndTime);
-			}
-		}
-	}
-#endif
-
-#ifdef ENABLE_NEW_ITEM_TYPE_GACHA
-	if(item->GetType() == ITEM_GACHA)
-		item->SetSocket(0, item->GetLimitValue(1));
-#endif
-
 	if (id == 0) // Process only when newly created
 	{
 		// In the case of newly added herbs, the performance is treated differently
@@ -370,53 +350,17 @@ LPITEM ITEM_MANAGER::CreateItem(DWORD vnum, DWORD count, DWORD id, bool bTryMagi
 
 		if (vnum == 50300 || vnum == ITEM_SKILLFORGET_VNUM)	//Fertigkeitsbuch || Buch des Vergessens
 		{
-			if (vnum == ITEM_SKILLFORGET_VNUM)
-			{
-#ifdef ENABLE_78TH_SKILL
-				if (number(1, 100) >= 70)
-				{
-					DWORD dwSkillVnum;
-					if (number(1, 100) >= 50)
-					{
-					#if defined(ENABLE_78TH_SKILL) && defined(ENABLE_WOLFMAN_CHARACTER)
-						dwSkillVnum = number(221, 229);
-					#else
-						dwSkillVnum = number(221, 228);
-					#endif
-					}
-					else
-					{
-					#if defined(ENABLE_78TH_SKILL) && defined(ENABLE_WOLFMAN_CHARACTER)
-						dwSkillVnum = number(236, 244);
-					#else
-						dwSkillVnum = number(236, 243);
-					#endif
-					}
+			DWORD dwSkillVnum;
 
-					item->SetSocket(0, dwSkillVnum);
-				}
-				else
-#endif
-				{
-#ifdef ENABLE_NINETH_SKILL
-					if (number(1, 100) >= 70)
-					{
-						extern const DWORD GetRandomForgetSkillVnum(uint8_t bJob = JOB_MAX_NUM);
-						item->SetSocket(0, GetRandomForgetSkillVnum());
-					}
-					else
-#endif
-					{
-						extern const DWORD GetRandomSkillVnum(uint8_t bJob = JOB_MAX_NUM);
-						item->SetSocket(0, GetRandomSkillVnum());
-					}
-				}
-			}
-			else
+			do
 			{
-				extern const DWORD GetRandomSkillVnum(uint8_t bJob = JOB_MAX_NUM);
-				item->SetSocket(0, GetRandomSkillVnum());
-			}
+				dwSkillVnum = number(1, 111);
+
+				if (NULL != CSkillManager::instance().Get(dwSkillVnum))
+					break;
+			} while (true);
+
+			item->SetSocket(0, dwSkillVnum);
 		}
 		else if (ITEM_SKILLFORGET2_VNUM == vnum)
 		{
@@ -462,12 +406,6 @@ LPITEM ITEM_MANAGER::CreateItem(DWORD vnum, DWORD count, DWORD id, bool bTryMagi
 		}
 	}
 
-#ifdef ENABLE_NEW_ITEM_TYPE_GACHA
-	else if (item->GetType() == ITEM_GACHA) {
-		item->SetSocket(0, item->GetLimitValue(1) * count);
-	}
-#endif
-
 	// Newly generated dragon spirit stone treatment.
 	if (item->IsDragonSoul() && 0 == id)
 	{
@@ -483,7 +421,6 @@ LPITEM ITEM_MANAGER::CreateItem(DWORD vnum, DWORD count, DWORD id, bool bTryMagi
 		item->SetSocket(ITEM_SOCKET_AURA_CURRENT_LEVEL, (1000 + c_bBaseLevel) * 100000 + c_wBaseExp);
 	}
 #endif
-
 	return item;
 }
 
@@ -785,55 +722,44 @@ int GetDropPerKillPct(int iMinimum, int iDefault, int iDeltaPercent, const char 
 	return (40000 * iDeltaPercent / iVal);
 }
 
-#ifdef __SYSTEM_SEARCH_ITEM_MOB__
-#include "mob_manager.h"
-#include "sectree_manager.h"
-#include <string>
-#include <boost/algorithm/string.hpp>
-void ITEM_MANAGER::FindItemMonster(LPCHARACTER ch, std::string name_item)
+bool ITEM_MANAGER::GetDropPct(LPCHARACTER pkChr, LPCHARACTER pkKiller, OUT int& iDeltaPercent, OUT int& iRandRange)
 {
-	DWORD iGasite = 1;
-	int iIndex = 0;
-	itertype(m_map_pkDropItemGroup) it;
+	if (NULL == pkChr || NULL == pkKiller)
+		return false;
 
-	for (std::map<DWORD, CDropItemGroup*>::iterator it = m_map_pkDropItemGroup.begin(); it != m_map_pkDropItemGroup.end(); it++)
-	{
-		if (it != m_map_pkDropItemGroup.end())
-		{
-			__typeof(it->second->GetVector()) v = it->second->GetVector();
-
-			for (DWORD i = 0; i < v.size(); ++i)
-			{
-				TItemTable* Titem = ITEM_MANAGER::instance().GetTable(v[i].dwVnum);
-				bool nume = (name_item.length() ? strstr(Titem->szLocaleName, name_item.c_str()) != NULL : true);
-				const CMob* pMob = CMobManager::instance().Get(it->first);
-				std::string name_monster(pMob->m_table.szLocaleName);
-				if (nume)
-				{
-					DWORD mob_vnum = pMob->m_table.dwVnum;
-					int iFounded = SECTREE_MANAGER::instance().GetMonsterCountSpawned(mob_vnum);
-					std::string nume_item(Titem->szLocaleName);
-					boost::algorithm::replace_all(nume_item, " ", "_");
-					std::string nume_mob(name_monster.c_str());
-					boost::algorithm::replace_all(nume_mob, " ", "_");
-					ch->ChatPacket(CHAT_TYPE_COMMAND, "searched_item %d %s %s %d %d %d %d %d", iIndex, nume_item.c_str(), nume_mob.c_str(), v[i].dwVnum, v[i].iCount, v[i].iProcent, iFounded, mob_vnum);
-					iIndex = iIndex + 1;
-					iGasite = iGasite + 1;
-
-				}
-
-			}
-		}
-	}
-	
-	ch->ChatPacket(CHAT_TYPE_COMMAND, "searched_item_count %d", iGasite);
-	
-	iGasite = 0;
-	iIndex = 0;
-}
+#ifdef ENABLE_BOT_PLAYER
+	if (pkKiller->IsBotCharacter())
+		return false;
 #endif
 
-#if defined(ENABLE_MOB_DROP_INFO) | defined(ENABLE_RESP_SYSTEM)
+	int iLevel = pkKiller->GetLevel();
+	iDeltaPercent = 100;
+
+	if (!pkChr->IsStone() && pkChr->GetMobRank() >= MOB_RANK_BOSS)
+		iDeltaPercent = PERCENT_LVDELTA_BOSS(pkKiller->GetLevel(), pkChr->GetLevel());
+	else
+		iDeltaPercent = PERCENT_LVDELTA(pkKiller->GetLevel(), pkChr->GetLevel());
+
+	BYTE bRank = pkChr->GetMobRank();
+
+	if (1 == number(1, 50000))
+		iDeltaPercent += 1000;
+	else if (1 == number(1, 10000))
+		iDeltaPercent += 500;
+
+	sys_log(3, "CreateDropItem for level: %d rank: %u pct: %d", iLevel, bRank, iDeltaPercent);
+	iDeltaPercent = iDeltaPercent * CHARACTER_MANAGER::instance().GetMobItemRate(pkKiller) / 100;
+
+	if (pkKiller->GetPremiumRemainSeconds(PREMIUM_ITEM) > 0 || pkKiller->IsEquipUniqueGroup(UNIQUE_GROUP_DOUBLE_ITEM))
+		iDeltaPercent += iDeltaPercent;
+
+	iRandRange = 4000000;
+	iRandRange = iRandRange * 100 / (100 + CPrivManager::instance().GetPriv(pkKiller, PRIV_ITEM_DROP) + pkKiller->IsEquipUniqueItem(UNIQUE_ITEM_DOUBLE_ITEM)?100:0);
+
+	return true;
+}
+
+#ifdef ENABLE_MOB_DROP_INFO
 bool ITEM_MANAGER::CreateDropItemVector(LPCHARACTER pkChr, LPCHARACTER pkKiller, std::vector<std::pair<int,int> > & vec_item)
 {
 	if (pkChr->IsPolymorphed() || pkChr->IsPC())
@@ -945,54 +871,14 @@ bool ITEM_MANAGER::CreateDropItemVector(LPCHARACTER pkChr, LPCHARACTER pkKiller,
 }
 #endif
 
-bool ITEM_MANAGER::GetDropPct(LPCHARACTER pkChr, LPCHARACTER pkKiller, OUT int& iDeltaPercent, OUT int& iRandRange)
-{
-	if (NULL == pkChr || NULL == pkKiller)
-		return false;
-
-#ifdef ENABLE_BOT_PLAYER
-	if (pkKiller->IsBotCharacter())
-		return false;
-#endif
-
-	int iLevel = pkKiller->GetLevel();
-	iDeltaPercent = 100;
-
-	if (!pkChr->IsStone() && pkChr->GetMobRank() >= MOB_RANK_BOSS)
-		iDeltaPercent = PERCENT_LVDELTA_BOSS(pkKiller->GetLevel(), pkChr->GetLevel());
-	else
-		iDeltaPercent = PERCENT_LVDELTA(pkKiller->GetLevel(), pkChr->GetLevel());
-
-	BYTE bRank = pkChr->GetMobRank();
-
-	if (1 == number(1, 50000))
-		iDeltaPercent += 1000;
-	else if (1 == number(1, 10000))
-		iDeltaPercent += 500;
-
-	sys_log(3, "CreateDropItem for level: %d rank: %u pct: %d", iLevel, bRank, iDeltaPercent);
-	iDeltaPercent = iDeltaPercent * CHARACTER_MANAGER::instance().GetMobItemRate(pkKiller) / 100;
-
-	// ADD_PREMIUM
-	if (pkKiller->GetPremiumRemainSeconds(PREMIUM_ITEM) > 0 ||
-		pkKiller->IsEquipUniqueGroup(UNIQUE_GROUP_DOUBLE_ITEM))
-		iDeltaPercent += iDeltaPercent;
-	// END_OF_ADD_PREMIUM
-
-	iRandRange = 4000000;
-	iRandRange = iRandRange * 100 /
-		(100 +
-		 CPrivManager::instance().GetPriv(pkKiller, PRIV_ITEM_DROP) +
-		 pkKiller->IsEquipUniqueItem(UNIQUE_ITEM_DOUBLE_ITEM)?100:0);
-
-	if (distribution_test_server) iRandRange /= 3;
-
-	return true;
-}
-
 bool ITEM_MANAGER::CreateDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, std::vector<LPITEM> & vec_item)
 {
 	int iLevel = pkKiller->GetLevel();
+
+#ifdef ENABLE_DROP_LEVEL_LIMIT_RANGE
+	bool iLevelMin = false;
+	bool iLevelMax = false;
+#endif
 
 #ifdef ENABLE_BOT_PLAYER
 	if (pkKiller->IsBotCharacter())
@@ -1045,7 +931,6 @@ bool ITEM_MANAGER::CreateDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, std::
 		}
 	}
 
-	// Drop Item Group
 	{
 		itertype(m_map_pkDropItemGroup) it;
 		it = m_map_pkDropItemGroup.find(pkChr->GetRaceNum());
@@ -1071,7 +956,6 @@ bool ITEM_MANAGER::CreateDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, std::
 								item->SetSocket(0, pkChr->GetRaceNum());
 							}
 						}
-
 						vec_item.push_back(item);
 					}
 				}
@@ -1079,7 +963,6 @@ bool ITEM_MANAGER::CreateDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, std::
 		}
 	}
 
-	// MobDropItem Group
 	{
 		itertype(m_map_pkMobItemGroup) it;
 		it = m_map_pkMobItemGroup.find(pkChr->GetRaceNum());
@@ -1087,8 +970,6 @@ bool ITEM_MANAGER::CreateDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, std::
 		if ( it != m_map_pkMobItemGroup.end() )
 		{
 			CMobItemGroup* pGroup = it->second;
-
-			// MOB_DROP_ITEM_BUG_FIX
 
 			if (pGroup && !pGroup->IsEmpty())
 			{
@@ -1101,25 +982,40 @@ bool ITEM_MANAGER::CreateDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, std::
 					if (item) vec_item.push_back(item);
 				}
 			}
-			// END_OF_MOB_DROP_ITEM_BUG_FIX
 		}
 	}
 
-	// Level Item Group
 	{
 		itertype(m_map_pkLevelItemGroup) it;
 		it = m_map_pkLevelItemGroup.find(pkChr->GetRaceNum());
 
+#ifdef ENABLE_DROP_LEVEL_LIMIT_RANGE
+		if (it != m_map_pkLevelItemGroup.end())
+		{
+			if (it->second->GetLevelLimitStart() <= (DWORD)iLevel)
+			{
+				iLevelMin = true;
+			}
+
+			if (it->second->GetLevelLimitEnd() >= (DWORD)iLevel)
+			{
+				iLevelMax = true;
+			}
+
+			if (iLevelMin && iLevelMax)
+			{
+				__typeof(it->second->GetVector()) v = it->second->GetVector();
+#else
 		if ( it != m_map_pkLevelItemGroup.end() )
 		{
 			if ( it->second->GetLevelLimit() <= (DWORD)iLevel )
 			{
 				__typeof(it->second->GetVector()) v = it->second->GetVector();
+#endif
 
-
-				for (DWORD i = 0; i < v.size(); i++)
+				for (DWORD i=0; i < v.size(); i++)
 				{
-					if (v[i].dwPct >= (DWORD)number(1, 1000000/*iRandRange*/))
+					if (v[i].dwPct >= (DWORD)number(1, 1000000))
 					{
 						DWORD dwVnum = v[i].dwVNum;
 						item = CreateItem(dwVnum, v[i].iCount, 0, true);
@@ -1130,7 +1026,6 @@ bool ITEM_MANAGER::CreateDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, std::
 		}
 	}
 
-	// BuyerTheitGloves Item Group
 	{
 		if (pkKiller->GetPremiumRemainSeconds(PREMIUM_ITEM) > 0 ||
 				pkKiller->IsEquipUniqueGroup(UNIQUE_GROUP_DOUBLE_ITEM))
@@ -1187,7 +1082,7 @@ bool ITEM_MANAGER::CreateDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, std::
 		}
 	}
 
-	if (pkKiller->IsHorseRiding() &&
+	if (pkKiller->IsHorseRiding() && 
 			GetDropPerKillPct(1000, 1000000, iDeltaPercent, "horse_skill_book_drop") >= number(1, iRandRange))
 	{
 		sys_log(0, "EVENT HORSE_SKILL_BOOK_DROP");
@@ -1196,18 +1091,27 @@ bool ITEM_MANAGER::CreateDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, std::
 			vec_item.push_back(item);
 	}
 
-	if (GetDropPerKillPct(100, 1000, iDeltaPercent, "lotto_drop") >= number(1, iRandRange))
+#ifdef ENABLE_BIOLOG_SYSTEM
 	{
-		DWORD * pdw = M2_NEW DWORD[3];
+		DWORD itemVnum = 0;
+		BYTE chance = 0;
+		int random = number(1, 100);
 
-		pdw[0] = 50001;
-		pdw[1] = 1;
-		pdw[2] = quest::CQuestManager::instance().GetEventFlag("lotto_round");
-
-		DBManager::instance().ReturnQuery(QID_LOTTO, pkKiller->GetPlayerID(), pdw,
-				"INSERT INTO lotto_list VALUES(0, 'server%s', %u, NOW())",
-				get_table_postfix(), pkKiller->GetPlayerID());
+		if (pkChr->IsMonster() && pkKiller)
+		{
+			CBiologSystem* pkBiologManager = pkKiller->GetBiologManager();
+			if (pkBiologManager->GetBiologItemByMobVnum(pkKiller, pkChr->GetRaceNum(), itemVnum, chance))
+			{
+				if (random <= chance)
+				{
+					sys_log(0, "CBiologSystem::GetBiologItemByMobVnum, trying to get drop item: %u, chance: %u, number: %d", itemVnum, chance, random);
+					if ((item = CreateItem(itemVnum, 1, 0, true)))
+						vec_item.push_back(item);
+				}
+			}
+		}
 	}
+#endif
 
 	CreateQuestDropItem(pkChr, pkKiller, vec_item, iDeltaPercent, iRandRange);
 
@@ -1220,7 +1124,6 @@ bool ITEM_MANAGER::CreateDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, std::
 	return vec_item.size();
 }
 
-// ADD_GRANDMASTER_SKILL
 int GetThreeSkillLevelAdjust(int level)
 {
 	if (level < 40)
@@ -1235,7 +1138,6 @@ int GetThreeSkillLevelAdjust(int level)
 		return 2;
 	return 1;
 }
-// END_OF_ADD_GRANDMASTER_SKILL
 
 static struct DropEvent_CharStone
 {
@@ -1295,8 +1197,8 @@ static void __DropEvent_CharStone_DropItem(CHARACTER & killer, CHARACTER & victi
 			return;
 		}
 
-		static const int Stones[] = { 30210, 30211, 30212, 30213, 30214, 30215, 30216, 30217, 30218, 30219, 30258, 30259, 30260, 30261, 30262, 30263 };
-		int item_vnum = Stones[number(0, _countof(Stones) - 1)]; // @fixme189
+		static const int Stones[] = {30210, 30211, 30212, 30213, 30214, 30215, 30216, 30217, 30218, 30219, 30258, 30259, 30260, 30261, 30262, 30263};
+		int item_vnum = Stones[number(0, _countof(Stones))];
 
 		LPITEM p_item = NULL;
 
@@ -1304,8 +1206,7 @@ static void __DropEvent_CharStone_DropItem(CHARACTER & killer, CHARACTER & victi
 		{
 			vec_item.push_back(p_item);
 
-			sys_log(log_level,
-				"dropevent.drop_char_stone.item_drop: killer(%s: lv%d), victim(%s: lv:%d), item_name(%s)",
+			sys_log(log_level, "dropevent.drop_char_stone.item_drop: killer(%s: lv%d), victim(%s: lv:%d), item_name(%s)",
 				killer.GetName(), killer.GetLevel(), victim.GetName(), victim.GetLevel(), p_item->GetName());
 		}
 	}
@@ -1321,6 +1222,7 @@ bool DropEvent_CharStone_SetValue(const std::string& name, int value)
 			sys_log(0, "dropevent.drop_char_stone = on");
 		else
 			sys_log(0, "dropevent.drop_char_stone = off");
+
 	}
 	else if (name == "drop_char_stone.percent_lv01_10")
 		gs_dropEvent_charStone.percent_lv01_10 = value;
@@ -1342,10 +1244,6 @@ bool DropEvent_CharStone_SetValue(const std::string& name, int value)
 	return true;
 }
 
-// END_OF_DROPEVENT_CHARSTONE
-
-// fixme
-
 static struct DropEvent_RefineBox
 {
 	int percent_low;
@@ -1353,28 +1251,28 @@ static struct DropEvent_RefineBox
 	int percent_mid;
 	int mid;
 	int percent_high;
-	//int level_range;
 	bool alive;
 
 	DropEvent_RefineBox()
 	{
-		percent_low = 100;
+		percent_low =  100;
 		low = 20;
-		percent_mid = 100;
+		percent_mid =  100;
 		mid = 45;
-		percent_high = 100;
-		//level_range = 10;
+		percent_high =  100;
 		alive = false;
 	}
 } gs_dropEvent_refineBox;
 
-static LPITEM __DropEvent_RefineBox_GetDropItem(CHARACTER& killer, CHARACTER& victim, ITEM_MANAGER& itemMgr)
+static LPITEM __DropEvent_RefineBox_GetDropItem(CHARACTER & killer, CHARACTER & victim, ITEM_MANAGER& itemMgr)
 {
-	static const int lowerBox[] = { 50197, 50198, 50199 };
+	static const int lowerBox[] = {50197, 50198, 50199};
 	static const int lowerBox_range = 3;
-	static const int midderBox[] = { 50203, 50204, 50205, 50206 };
+
+	static const int midderBox[] = {50203, 50204, 50205, 50206};
 	static const int midderBox_range = 4;
-	static const int higherBox[] = { 50207, 50208, 50209, 50210, 50211 };
+
+	static const int higherBox[] = {50207, 50208, 50209, 50210, 50211};
 	static const int higherBox_range = 5;
 
 	if (victim.GetMobRank() < MOB_RANK_KNIGHT)
@@ -1419,8 +1317,7 @@ static void __DropEvent_RefineBox_DropItem(CHARACTER & killer, CHARACTER & victi
 	{
 		vec_item.push_back(p_item);
 
-		sys_log(log_level,
-			"dropevent.drop_refine_box.item_drop: killer(%s: lv%d), victim(%s: lv:%d), item_name(%s)",
+		sys_log(log_level, "dropevent.drop_refine_box.item_drop: killer(%s: lv%d), victim(%s: lv:%d), item_name(%s)",
 			killer.GetName(), killer.GetLevel(), victim.GetName(), victim.GetLevel(), p_item->GetName());
 	}
 }
@@ -1454,8 +1351,119 @@ bool DropEvent_RefineBox_SetValue(const std::string& name, int value)
 	return true;
 }
 
+#ifdef ENABLE_EVENT_MANAGER
+void ITEM_MANAGER::DropEventItem(const CHARACTER& pkKiller, const CHARACTER& pkChr, ITEM_MANAGER& itemMgr, std::vector<LPITEM>& vec_item,
+	DWORD dwVnum, int iLevelDiff, int bDropType, int iChanceMax, int iDeltaPercent, int iRandRange)
+{
+	if ((dwVnum <= 0) || (iLevelDiff <= 0) || (iChanceMax <= 0))
+		return;
+
+	iDeltaPercent = 40000 * iDeltaPercent / iChanceMax;
+	if ((iDeltaPercent < 0) || (iRandRange < 0))
+		return;
+
+	if (iDeltaPercent < number(1, iRandRange))
+		return;
+
+	bool canDropLevel = false;
+	bool canReceiveDrop = false;
+
+	if (abs(pkKiller.GetLevel() - pkChr.GetLevel()) <= iLevelDiff)
+		canDropLevel = true;
+
+	if (!canDropLevel)
+		return;
+
+	switch (bDropType)
+	{
+		case CEventManager::DROP_TYPE_GENERAL:
+		{
+			canReceiveDrop = true;
+		}
+		break;
+
+		case CEventManager::DROP_TYPE_BOSS_AND_MORE:
+		{
+			if (pkChr.GetMobRank() >= MOB_RANK_BOSS)
+				canReceiveDrop = true;
+		}
+		break;
+
+		case CEventManager::DROP_TYPE_BOSS:
+		{
+			if (pkChr.GetMobRank() >= MOB_RANK_BOSS && !pkChr.IsStone())
+				canReceiveDrop = true;
+		}
+		break;
+
+		case CEventManager::DROP_TYPE_STONE:
+		{
+			if (pkChr.IsStone())
+				canReceiveDrop = true;
+		}
+		break;
+
+		default:
+			break;
+	}
+
+	if (!canReceiveDrop)
+		return;
+
+	LPITEM item = NULL;
+	if ((item = itemMgr.CreateItem(dwVnum, 1, 0)))
+		vec_item.emplace_back(item);
+}
+#endif
+
 void ITEM_MANAGER::CreateQuestDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, std::vector<LPITEM> & vec_item, int iDeltaPercent, int iRandRange)
 {
+#ifdef ENABLE_EVENT_MANAGER
+	if (!pkChr || !pkKiller)
+		return;
+
+	sys_log(1, "CreateQuestDropItem victim(%s), killer(%s)", pkChr->GetName(), pkKiller->GetName());
+
+	DWORD dwVnum = 0;
+	int iLevelDiff = 0;
+	int bDropType = CEventManager::DROP_TYPE_NONE;
+	int iChanceMax = 0;
+
+	if (CEventManager::Instance().GetEventState(CEventManager::EVENT_TYPE_MOONLIGHT))
+	{
+		dwVnum = 50011;
+		iLevelDiff = 20;
+
+		bDropType = CEventManager::DROP_TYPE_GENERAL;
+		iChanceMax = quest::CQuestManager::Instance().GetEventFlag("moon_drop_perc");
+
+		DropEventItem(*pkKiller, *pkChr, *this, vec_item, dwVnum, iLevelDiff, bDropType, iChanceMax, iDeltaPercent, iRandRange);
+	}
+
+	if (CEventManager::Instance().GetEventState(CEventManager::EVENT_TYPE_HEXEGONAL_CHEST))
+	{
+		dwVnum = 50037;
+		iLevelDiff = 20;
+
+		bDropType = CEventManager::DROP_TYPE_GENERAL;
+		iChanceMax = quest::CQuestManager::Instance().GetEventFlag("hexegonal_drop_perc");
+
+		DropEventItem(*pkKiller, *pkChr, *this, vec_item, dwVnum, iLevelDiff, bDropType, iChanceMax, iDeltaPercent, iRandRange);
+	}
+
+#ifdef ENABLE_MINIGAME_OKEY_CARDS_SYSTEM
+	if (CEventManager::Instance().GetEventState(CEventManager::EVENT_TYPE_OKEY_CARDS))
+	{
+		dwVnum = 79505;
+		iLevelDiff = 20;
+
+		bDropType = CEventManager::DROP_TYPE_GENERAL;
+		iChanceMax = quest::CQuestManager::Instance().GetEventFlag("okey_cards_perc");
+
+		DropEventItem(*pkKiller, *pkChr, *this, vec_item, dwVnum, iLevelDiff, bDropType, iChanceMax, iDeltaPercent, iRandRange);
+	}
+#endif
+#else
 	LPITEM item = NULL;
 
 	if (!pkChr || !pkKiller)
@@ -1547,7 +1555,7 @@ void ITEM_MANAGER::CreateQuestDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, 
 	{
 		sys_log(0, "EVENT NEWYEAR_MOON DROP");
 
-		const static DWORD wonso_items[6] = { 50016, 50017, 50018, 50019, 50019, 50019, };
+		const static DWORD wonso_items[6] = {50016, 50017, 50018, 50019, 50019, 50019,};
 		DWORD dwVnum = wonso_items[number(0,5)];
 
 		if ((item = CreateItem(dwVnum, 1, 0, true)))
@@ -1558,7 +1566,7 @@ void ITEM_MANAGER::CreateQuestDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, 
 	{
 		sys_log(0, "EVENT VALENTINE_DROP");
 
-		const static DWORD valentine_items[2] = { 50024, 50025 };
+		const static DWORD valentine_items[2] = {50024, 50025};
 		DWORD dwVnum = valentine_items[number(0, 1)];
 
 		if ((item = CreateItem(dwVnum, 1, 0, true)))
@@ -1584,114 +1592,6 @@ void ITEM_MANAGER::CreateQuestDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, 
 		const static DWORD xmas_sock = 50010;
 		pkKiller->AutoGiveItem (xmas_sock, 1);
 	}
-
-#ifdef ENABLE_EVENT_DROPS
-	if (GetDropPerKillPct(100, 350, iDeltaPercent, "ds_drop") >= number(1, iRandRange))
-	{
-		const static DWORD dragon_soul_gemstone = 50255;
-		if ((item = CreateItem(dragon_soul_gemstone, 1, 0, true)))
-			vec_item.push_back(item);
-	}
-	
-	if (GetDropPerKillPct(100, 350, iDeltaPercent, "ayisigi_event") >= number(1, iRandRange))
-	{
-		const static DWORD ayisigi = 50011;
-		if ((item = CreateItem(ayisigi, 1, 0, true)))
-			vec_item.push_back(item);
-	}
-	
-	if (GetDropPerKillPct(100, 300, iDeltaPercent, "okeycard_event") >= number(1, iRandRange))
-	{
-		const static DWORD okeycard_event = 79505;
-		if ((item = CreateItem(okeycard_event, 1, 0, true)))
-			vec_item.push_back(item);
-	}
-	
-	if (GetDropPerKillPct(100, 300, iDeltaPercent, "ex_enable_catch_king_event") >= number(1, iRandRange))
-	{
-		const static DWORD enable_catch_king_event = 79603;
-		if ((item = CreateItem(enable_catch_king_event, 1, 0, true)))
-			vec_item.push_back(item);
-	}
-	
-	if (GetDropPerKillPct(100, 400, iDeltaPercent, "football_event") >= number(1, iRandRange))
-	{
-		const static DWORD football_event = 50096;
-		if ((item = CreateItem(football_event, 1, 0, true)))
-			vec_item.push_back(item);
-	}
-	
-	if (GetDropPerKillPct(50, 300, iDeltaPercent, "word_event") >= number(1, iRandRange))
-	{
-		const static DWORD word_event[] = { 30216, 30213, 30219, 30214, 30217, 30210 };
-		int i = number (0, 5);
-		item = CreateItem(word_event[i]);
-		if (item != NULL)
-			vec_item.push_back(item);
-	}
-	
-	if (GetDropPerKillPct(100, 300, iDeltaPercent, "halloween_event") >= number(1, iRandRange))
-	{
-		const static DWORD hallowen_event[] = { 8700, 8700, 8700, 8701, 8701, 8701 };
-		int i = number (0, 5);
-		item = CreateItem(hallowen_event[i]);
-		if (item != NULL)
-			vec_item.push_back(item);
-	}
-	
-	if (GetDropPerKillPct(150, 300, iDeltaPercent, "ex_ritualsoul") >= number(1, iRandRange))
-	{
-		const static DWORD soul_roulette = 30370;
-		if ((item = CreateItem(soul_roulette, 1, 0, true)))
-			vec_item.push_back(item);
-	}
-	
-	if (quest::CQuestManager::instance().GetEventFlag("ex_ramadan_drop"))
-	{
-		int levelrange = 10;
-		int randomnumberlimit = 1450;
-		int prob = 10;
-		
-		const DWORD ex_ramadan_drop_vnum = 30315;
-
-		if (pkChr->GetLevel() >= (pkKiller->GetLevel() - levelrange))
-		{
-			if (number(1, randomnumberlimit) <= prob)
-			{
-				if ((item = CreateItem(ex_ramadan_drop_vnum, 1, 0, true)))
-					vec_item.push_back(item);
-			}
-		}
-	}
-	
-	if (quest::CQuestManager::instance().GetEventFlag("ex_xmas_drop"))
-	{
-		int levelrange = 10;
-		int randomnumberlimit = 1450;
-		int prob = 10;
-		
-		const DWORD ex_xmas_drop_vnum = 50010;
-
-		if (pkChr->GetLevel() >= (pkKiller->GetLevel() - levelrange))
-		{
-			CPetSystem* petSystem = pkKiller->GetPetSystem();
-			if (petSystem)
-			{
-				CPetActor * petActor = petSystem->GetByVnum(53002);
-				if (petActor)
-				{
-					prob += 10;
-				}
-			}
-			
-			if (number(1, randomnumberlimit) <= prob)
-			{
-				if ((item = CreateItem(ex_xmas_drop_vnum, 1, 0, true)))
-					vec_item.push_back(item);
-			}
-		}
-	}
-#endif
 
 	if (GetDropPerKillPct(100, 2000, iDeltaPercent, "halloween_drop") >= number (1, iRandRange))
 	{
@@ -1758,22 +1658,20 @@ void ITEM_MANAGER::CreateQuestDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, 
 
 	if (pkChr->GetLevel() >= 30 && GetDropPerKillPct(50, 100, iDeltaPercent, "medal_part_drop") >= number(1, iRandRange))
 	{
-		const static DWORD drop_items[] = { 30265, 30266, 30267, 30268, 30269 };
+		const static DWORD drop_items[] = {30265, 30266, 30267, 30268, 30269};
 		int i = number (0, 4);
 		item = CreateItem(drop_items[i]);
 		if (item != NULL)
 			vec_item.push_back(item);
 	}
 
-	// ADD_GRANDMASTER_SKILL
-	if (pkChr->GetLevel() >= 40 && pkChr->GetMobRank() >= MOB_RANK_BOSS && GetDropPerKillPct(/* minimum */ 1, /* default */ 1000, iDeltaPercent, "three_skill_item") / GetThreeSkillLevelAdjust(pkChr->GetLevel()) >= number(1, iRandRange))
+	if (pkChr->GetLevel() >= 40 && pkChr->GetMobRank() >= MOB_RANK_BOSS && GetDropPerKillPct(1, 1000, iDeltaPercent, "three_skill_item") / GetThreeSkillLevelAdjust(pkChr->GetLevel()) >= number(1, iRandRange))
 	{
 		const DWORD ITEM_VNUM = 50513;
 
 		if ((item = CreateItem(ITEM_VNUM, 1, 0, true)))
 			vec_item.push_back(item);
 	}
-	// END_OF_ADD_GRANDMASTER_SKILL
 
 	if (GetDropPerKillPct(100, 1000, iDeltaPercent, "dragon_boat_festival_drop") >= number(1, iRandRange))
 	{
@@ -1786,23 +1684,15 @@ void ITEM_MANAGER::CreateQuestDropItem(LPCHARACTER pkChr, LPCHARACTER pkKiller, 
 	if (pkKiller->GetLevel() >= 15 && quest::CQuestManager::instance().GetEventFlag("mars_drop"))
 	{
 		const DWORD ITEM_HANIRON = 70035;
-		int iDropMultiply[MOB_RANK_MAX_NUM] =
-		{
-			50,
-			30,
-			5,
-			1,
-			0,
-			0,
-		};
+		int iDropMultiply[MOB_RANK_MAX_NUM] = {50, 30, 5, 1, 0, 0,};
 
-		if (iDropMultiply[pkChr->GetMobRank()] &&
-				GetDropPerKillPct(1000, 1500, iDeltaPercent, "mars_drop") >= number(1, iRandRange) * iDropMultiply[pkChr->GetMobRank()])
+		if (iDropMultiply[pkChr->GetMobRank()] && GetDropPerKillPct(1000, 1500, iDeltaPercent, "mars_drop") >= number(1, iRandRange) * iDropMultiply[pkChr->GetMobRank()])
 		{
 			if ((item = CreateItem(ITEM_HANIRON, 1, 0, true)))
 				vec_item.push_back(item);
 		}
 	}
+#endif
 }
 
 DWORD ITEM_MANAGER::GetRefineFromVnum(DWORD dwVnum)
@@ -1844,23 +1734,17 @@ DWORD ITEM_MANAGER::GetMaskVnum(DWORD dwVnum)
 		return 0;
 }
 
-// A function that retrieves all attributes and socket values with pkNewItem.
-// TransformRefineItem, a local function that was previously in the char_item.cpp file, is copied as it is
 void ITEM_MANAGER::CopyAllAttrTo(LPITEM pkOldItem, LPITEM pkNewItem)
 {
-	// ACCESSORY_REFINE
 	if (pkOldItem->IsAccessoryForSocket())
 	{
 		for (int i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
 		{
 			pkNewItem->SetSocket(i, pkOldItem->GetSocket(i));
 		}
-		//pkNewItem->StartAccessorySocketExpireEvent();
 	}
-	// END_OF_ACCESSORY_REFINE
 	else
 	{
-
 		for (int i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
 		{
 			if (!pkOldItem->GetSocket(i))
@@ -1874,7 +1758,7 @@ void ITEM_MANAGER::CopyAllAttrTo(LPITEM pkOldItem, LPITEM pkNewItem)
 		for (int i = 0; i < ITEM_SOCKET_MAX_NUM; ++i)
 		{
 			long socket = pkOldItem->GetSocket(i);
-			const int ITEM_BROKEN_METIN_VNUM = 28960; // Is there 3 places with the same constant? I'll put it in one
+			const int ITEM_BROKEN_METIN_VNUM = 28960;
 			if (socket > 2 && socket != ITEM_BROKEN_METIN_VNUM)
 				pkNewItem->SetSocket(slot++, socket);
 		}

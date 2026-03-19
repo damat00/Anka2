@@ -8,17 +8,12 @@
 class CItem : public CEntity
 {
 	protected:
-		// override methods from ENTITY class
 		virtual void EncodeInsertPacket(LPENTITY entity);
 		virtual void EncodeRemovePacket(LPENTITY entity);
 
 	public:
 		CItem(DWORD dwVnum);
 		virtual ~CItem();
-
-#ifdef ENABLE_PITTY_REFINE
-		int GetLimitPittyRefine();
-#endif
 
 		int GetLevelLimit();
 
@@ -291,6 +286,10 @@ class CItem : public CEntity
 
 #ifdef ENABLE_PET_SYSTEM
 		bool IsPetItem();
+#endif
+
+#ifdef ENABLE_TITLE_SYSTEM
+		bool IsTitleItem();
 #endif
 
 #ifdef ENABLE_MOUNT_PET_SKIN

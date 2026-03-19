@@ -9,7 +9,7 @@ Group AttackingData
     AttackType           1
     HittingType          2
     StiffenTime          0.000000
-    InvisibleTime        0.500000
+    InvisibleTime        0.000000
     ExternalForce        0.000000
     HitLimitCount        0
     

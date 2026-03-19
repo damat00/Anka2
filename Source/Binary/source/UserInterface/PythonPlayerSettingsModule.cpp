@@ -46,6 +46,11 @@ void CPythonPlayerSettingsModule::Load()
 	__RegisterTitleColors();
 	__RegisterEmotionIcons();
 
+#ifdef ENABLE_TITLE_SYSTEM
+	__RegisterTitleSystemNames();
+	__RegisterTitleSystemColors();
+#endif
+
 	__LoadGameSound();
 	__LoadGameEffects();
 	__LoadGameInit();
@@ -301,15 +306,11 @@ void CPythonPlayerSettingsModule::__LoadGameWarriorEx(CRaceData *pRaceData, cons
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 3, std::string("jeongwi" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 4, std::string("geomgyeong" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 5, std::string("tanhwan" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 6, std::string("gihyeol" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 9, std::string("finish" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 16, std::string("gigongcham" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 17, std::string("gyeoksan" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 18, std::string("daejin" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 19, std::string("cheongeun" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 20, std::string("geompung" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 21, std::string("noegeom" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 24, std::string("finish" + END_STRING + ".msa").c_str());
 
 		pRaceData->ReserveComboAttack(CRaceMotionData::MODE_GENERAL, COMBO_TYPE_1, 1);
 		pRaceData->RegisterComboAttack(CRaceMotionData::MODE_GENERAL, COMBO_TYPE_1, COMBO_INDEX_1, CRaceMotionData::NAME_COMBO_ATTACK_1);
@@ -333,15 +334,11 @@ void CPythonPlayerSettingsModule::__LoadGameWarriorEx(CRaceData *pRaceData, cons
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 3, std::string("jeongwi" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 4, std::string("geomgyeong" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 5, std::string("tanhwan" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 6, std::string("gihyeol" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 9, std::string("finish" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 16, std::string("gigongcham" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 17, std::string("gyeoksan" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 18, std::string("daejin" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 19, std::string("cheongeun" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 20, std::string("geompung" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 21, std::string("noegeom" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 24, std::string("finish" + END_STRING + ".msa").c_str());
 	}
 
 	// Standing mount TWOHAND_SWORD için skill motion'larý
@@ -357,15 +354,11 @@ void CPythonPlayerSettingsModule::__LoadGameWarriorEx(CRaceData *pRaceData, cons
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_TWOHAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 3, std::string("jeongwi" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_TWOHAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 4, std::string("geomgyeong" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_TWOHAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 5, std::string("tanhwan" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_TWOHAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 6, std::string("gihyeol" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_TWOHAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 9, std::string("finish" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_TWOHAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 16, std::string("gigongcham" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_TWOHAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 17, std::string("gyeoksan" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_TWOHAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 18, std::string("daejin" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_TWOHAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 19, std::string("cheongeun" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_TWOHAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 20, std::string("geompung" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_TWOHAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 21, std::string("noegeom" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_TWOHAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 24, std::string("finish" + END_STRING + ".msa").c_str());
 	}
 #endif
 
@@ -454,15 +447,11 @@ void CPythonPlayerSettingsModule::__LoadGameAssassinEx(CRaceData *pRaceData, con
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 3, std::string("charyun" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 4, std::string("eunhyeong" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 5, std::string("sangong" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 6, std::string("seomjeon" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 9, std::string("ilgangpyo" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 16, std::string("yeonsa" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 17, std::string("gwangyeok" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 18, std::string("hwajo" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 19, std::string("gyeonggong" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 20, std::string("dokgigung" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 21, std::string("seomgwang" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 24, std::string("pungraepo" + END_STRING + ".msa").c_str());
 		pRaceData->ReserveComboAttack(CRaceMotionData::MODE_GENERAL, COMBO_TYPE_1, 1);
 		pRaceData->RegisterComboAttack(CRaceMotionData::MODE_GENERAL, COMBO_TYPE_1, COMBO_INDEX_1, CRaceMotionData::NAME_COMBO_ATTACK_1);
 	}
@@ -485,15 +474,11 @@ void CPythonPlayerSettingsModule::__LoadGameAssassinEx(CRaceData *pRaceData, con
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 3, std::string("charyun" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 4, std::string("eunhyeong" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 5, std::string("sangong" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 6, std::string("seomjeon" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 9, std::string("ilgangpyo" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 16, std::string("yeonsa" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 17, std::string("gwangyeok" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 18, std::string("hwajo" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 19, std::string("gyeonggong" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 20, std::string("dokgigung" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 21, std::string("seomgwang" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 24, std::string("pungraepo" + END_STRING + ".msa").c_str());
 	}
 
 	// Standing mount DUALHAND_SWORD için skill motion'larý
@@ -509,15 +494,11 @@ void CPythonPlayerSettingsModule::__LoadGameAssassinEx(CRaceData *pRaceData, con
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_DUALHAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 3, std::string("charyun" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_DUALHAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 4, std::string("eunhyeong" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_DUALHAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 5, std::string("sangong" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_DUALHAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 6, std::string("seomjeon" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_DUALHAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 9, std::string("ilgangpyo" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_DUALHAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 16, std::string("yeonsa" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_DUALHAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 17, std::string("gwangyeok" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_DUALHAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 18, std::string("hwajo" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_DUALHAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 19, std::string("gyeonggong" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_DUALHAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 20, std::string("dokgigung" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_DUALHAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 21, std::string("seomgwang" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_DUALHAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 24, std::string("pungraepo" + END_STRING + ".msa").c_str());
 	}
 
 	// Standing mount BOW için skill motion'larý
@@ -533,15 +514,11 @@ void CPythonPlayerSettingsModule::__LoadGameAssassinEx(CRaceData *pRaceData, con
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BOW, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 3, std::string("charyun" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BOW, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 4, std::string("eunhyeong" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BOW, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 5, std::string("sangong" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BOW, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 6, std::string("seomjeon" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BOW, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 9, std::string("ilgangpyo" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BOW, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 16, std::string("yeonsa" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BOW, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 17, std::string("gwangyeok" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BOW, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 18, std::string("hwajo" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BOW, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 19, std::string("gyeonggong" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BOW, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 20, std::string("dokgigung" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BOW, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 21, std::string("seomgwang" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BOW, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 24, std::string("pungraepo" + END_STRING + ".msa").c_str());
 	}
 #endif
 
@@ -650,14 +627,12 @@ void CPythonPlayerSettingsModule::__LoadGameSuraEx(CRaceData *pRaceData, const s
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 4, std::string("gongpo" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 5, std::string("jumagap" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 6, std::string("pabeop" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 9, std::string("akgi" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 16, std::string("maryeong" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 17, std::string("hwayeom" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 18, std::string("muyeong" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 19, std::string("heuksin" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 20, std::string("tusok" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 21, std::string("mahwan" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 24, std::string("akgi_dark" + END_STRING + ".msa").c_str());
 		pRaceData->ReserveComboAttack(CRaceMotionData::MODE_GENERAL, COMBO_TYPE_1, 1);
 		pRaceData->RegisterComboAttack(CRaceMotionData::MODE_GENERAL, COMBO_TYPE_1, COMBO_INDEX_1, CRaceMotionData::NAME_COMBO_ATTACK_1);
 	}
@@ -680,14 +655,12 @@ void CPythonPlayerSettingsModule::__LoadGameSuraEx(CRaceData *pRaceData, const s
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 4, std::string("gongpo" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 5, std::string("jumagap" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 6, std::string("pabeop" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 9, std::string("akgi" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 16, std::string("maryeong" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 17, std::string("hwayeom" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 18, std::string("muyeong" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 19, std::string("heuksin" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 20, std::string("tusok" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 21, std::string("mahwan" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_SWORD, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 24, std::string("akgi_dark" + END_STRING + ".msa").c_str());
 	}
 #endif
 	__LoadGuildSkill(pRaceData, c_rstrFolderName);
@@ -753,14 +726,12 @@ void CPythonPlayerSettingsModule::__LoadGameShamanEx(CRaceData *pRaceData, const
 	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + 4, "hosin_target.msa");
 	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + 5, "boho_target.msa");
 	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + 6, "gicheon_target.msa");
-	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + 9, "meteo.msa");
 	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + 16, "noejeon.msa");
 	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + 17, "byeorak.msa");
 	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + 18, "pokroe.msa");
 	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + 19, "jeongeop_target.msa");
 	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + 20, "kwaesok_target.msa");
 	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + 21, "jeungryeok_target.msa");
-	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + 24, "chunwoon.msa");
 
 	std::vector<int> skillList{ 1, 2, 3 };
 
@@ -774,14 +745,12 @@ void CPythonPlayerSettingsModule::__LoadGameShamanEx(CRaceData *pRaceData, const
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 4, std::string("hosin" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 5, std::string("boho" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 6, std::string("gicheon" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 9, std::string("meteo" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 16, std::string("noejeon" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 17, std::string("byeorak" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 18, std::string("pokroe" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 19, std::string("jeongeop" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 20, std::string("kwaesok" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 21, std::string("jeungryeok" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_GENERAL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 24, std::string("chunwoon" + END_STRING + ".msa").c_str());
 		pRaceData->ReserveComboAttack(CRaceMotionData::MODE_GENERAL, COMBO_TYPE_1, 1);
 		pRaceData->RegisterComboAttack(CRaceMotionData::MODE_GENERAL, COMBO_TYPE_1, COMBO_INDEX_1, CRaceMotionData::NAME_COMBO_ATTACK_1);
 	}
@@ -799,14 +768,12 @@ void CPythonPlayerSettingsModule::__LoadGameShamanEx(CRaceData *pRaceData, const
 	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_FAN, CRaceMotionData::NAME_SKILL + 4, "hosin_target.msa");
 	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_FAN, CRaceMotionData::NAME_SKILL + 5, "boho_target.msa");
 	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_FAN, CRaceMotionData::NAME_SKILL + 6, "gicheon_target.msa");
-	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_FAN, CRaceMotionData::NAME_SKILL + 9, "meteo.msa");
 	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_FAN, CRaceMotionData::NAME_SKILL + 16, "noejeon.msa");
 	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_FAN, CRaceMotionData::NAME_SKILL + 17, "byeorak.msa");
 	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_FAN, CRaceMotionData::NAME_SKILL + 18, "pokroe.msa");
 	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_FAN, CRaceMotionData::NAME_SKILL + 19, "jeongeop_target.msa");
 	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_FAN, CRaceMotionData::NAME_SKILL + 20, "kwaesok_target.msa");
 	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_FAN, CRaceMotionData::NAME_SKILL + 21, "jeungryeok_target.msa");
-	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_FAN, CRaceMotionData::NAME_SKILL + 24, "chunwoon.msa");
 
 	for (const auto& i : skillList)
 	{
@@ -817,14 +784,12 @@ void CPythonPlayerSettingsModule::__LoadGameShamanEx(CRaceData *pRaceData, const
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_FAN, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 4, std::string("hosin" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_FAN, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 5, std::string("boho" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_FAN, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 6, std::string("gicheon" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_FAN, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 9, std::string("meteo" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_FAN, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 16, std::string("noejeon" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_FAN, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 17, std::string("byeorak" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_FAN, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 18, std::string("pokroe" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_FAN, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 19, std::string("jeongeop" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_FAN, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 20, std::string("kwaesok" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_FAN, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 21, std::string("jeungryeok" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_FAN, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 24, std::string("chunwoon" + END_STRING + ".msa").c_str());
 	}
 
 	// Standing mount BELL için skill motion'larý
@@ -835,14 +800,12 @@ void CPythonPlayerSettingsModule::__LoadGameShamanEx(CRaceData *pRaceData, const
 	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BELL, CRaceMotionData::NAME_SKILL + 4, "hosin_target.msa");
 	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BELL, CRaceMotionData::NAME_SKILL + 5, "boho_target.msa");
 	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BELL, CRaceMotionData::NAME_SKILL + 6, "gicheon_target.msa");
-	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BELL, CRaceMotionData::NAME_SKILL + 9, "meteo.msa");
 	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BELL, CRaceMotionData::NAME_SKILL + 16, "noejeon.msa");
 	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BELL, CRaceMotionData::NAME_SKILL + 17, "byeorak.msa");
 	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BELL, CRaceMotionData::NAME_SKILL + 18, "pokroe.msa");
 	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BELL, CRaceMotionData::NAME_SKILL + 19, "jeongeop_target.msa");
 	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BELL, CRaceMotionData::NAME_SKILL + 20, "kwaesok_target.msa");
 	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BELL, CRaceMotionData::NAME_SKILL + 21, "jeungryeok_target.msa");
-	__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BELL, CRaceMotionData::NAME_SKILL + 24, "chunwoon.msa");
 
 	for (const auto& i : skillList)
 	{
@@ -853,14 +816,12 @@ void CPythonPlayerSettingsModule::__LoadGameShamanEx(CRaceData *pRaceData, const
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BELL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 4, std::string("hosin" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BELL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 5, std::string("boho" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BELL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 6, std::string("gicheon" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BELL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 9, std::string("meteo" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BELL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 16, std::string("noejeon" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BELL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 17, std::string("byeorak" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BELL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 18, std::string("pokroe" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BELL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 19, std::string("jeongeop" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BELL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 20, std::string("kwaesok" + END_STRING + ".msa").c_str());
 		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BELL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 21, std::string("jeungryeok" + END_STRING + ".msa").c_str());
-		__RegisterCacheMotionData(pRaceData, CRaceMotionData::MODE_HORSE_STAND_BELL, CRaceMotionData::NAME_SKILL + (i * CPythonSkill::SKILL_GRADEGAP) + 24, std::string("chunwoon" + END_STRING + ".msa").c_str());
 	}
 #endif
 
@@ -997,9 +958,6 @@ void CPythonPlayerSettingsModule::__LoadGameEffects()
 	CFlyingManager::Instance().RegisterIndexedFlyData(CFlyingManager::FLY_CHAIN_LIGHTNING, CFlyingManager::INDEX_FLY_TYPE_NORMAL, "d:/ymir work/pc/shaman/effect/pokroe.msf");
 	CFlyingManager::Instance().RegisterIndexedFlyData(CFlyingManager::FLY_HP_SMALL, CFlyingManager::INDEX_FLY_TYPE_NORMAL, "d:/ymir work/effect/etc/gathering/ga_piece_red_smallest.msf");
 	CFlyingManager::Instance().RegisterIndexedFlyData(CFlyingManager::FLY_SKILL_MUYEONG, CFlyingManager::INDEX_FLY_TYPE_AUTO_FIRE, "d:/ymir work/pc/sura/effect/muyeong_fly.msf");
-#ifdef ENABLE_CONQUEROR_LEVEL
-	CFlyingManager::Instance().RegisterIndexedFlyData(CFlyingManager::FLY_SKILL_MUYEONG, CFlyingManager::INDEX_FLY_TYPE_AUTO_FIRE, "d:/ymir work/effect/etc/gathering/ga_piece_orange_small.msf");
-#endif
 }
 
 void CPythonPlayerSettingsModule::__LoadEmoticons()
@@ -1126,6 +1084,25 @@ void CPythonPlayerSettingsModule::__RegisterEmotionIcons()
 	}
 }
 
+#ifdef ENABLE_TITLE_SYSTEM
+void CPythonPlayerSettingsModule::__RegisterTitleSystemNames()
+{
+	for (size_t index = 0; index < titleSystemNameList.size(); ++index)
+	{
+		CInstanceBase::RegisterTitleSystemName(index, GetLocaleString(titleSystemNameList[index]));
+	}
+}
+
+void CPythonPlayerSettingsModule::__RegisterTitleSystemColors()
+{
+	for (const auto &[index, rgbTuple] : characterTitleSystemColors)
+	{
+		const auto &[r, g, b] = rgbTuple;
+		CInstanceBase::RegisterTitleSystemColor(index, r, g, b);
+	}
+}
+#endif
+
 void CPythonPlayerSettingsModule::RegisterSkills()
 {
 	CPythonNetworkStream& net = CPythonNetworkStream::Instance();
@@ -1179,6 +1156,14 @@ int32_t CPythonPlayerSettingsModule::GetCharacterTitleColor(uint8_t index)
 	const auto &[r, g, b] = characterTitleColors.at(index);
 	return CPythonGraphic::Instance().GenerateColor(r, g, b, 1.0);
 }
+
+#ifdef ENABLE_TITLE_SYSTEM
+int32_t CPythonPlayerSettingsModule::GetCharacterTitleSystemColor(uint8_t index)
+{
+	const auto& [r, g, b] = characterTitleSystemColors.at(index);
+	return CPythonGraphic::Instance().GenerateColor(r, g, b, 1.0);
+}
+#endif
 
 bool CPythonPlayerSettingsModule::RegisterGuildBuildingList(const char* filepath)
 {

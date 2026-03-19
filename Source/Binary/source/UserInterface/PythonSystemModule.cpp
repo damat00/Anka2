@@ -625,31 +625,33 @@ PyObject *systemGetStoneScale(PyObject *poSelf, PyObject *poArgs)
 }
 #endif
 
-#ifdef ENABLE_TRACK_WINDOW
-PyObject* systemSetDungeonTrack(PyObject* poSelf, PyObject* poArgs)
+#ifdef ENABLE_DUNGEON_TRACKING_SYSTEM
+PyObject *systemSetDungeonTrack(PyObject *poSelf, PyObject *poArgs)
 {
 	int iValue;
 	if (!PyTuple_GetInteger(poArgs, 0, &iValue))
 		return Py_BuildException();
+
 	CPythonSystem::Instance().SetDungeonTrack(iValue);
 	return Py_BuildNone();
 }
 
-PyObject* systemGetDungeonTrack(PyObject* poSelf, PyObject* poArgs)
+PyObject *systemGetDungeonTrack(PyObject *poSelf, PyObject *poArgs)
 {
 	return Py_BuildValue("i", CPythonSystem::Instance().GetDungeonTrack());
 }
 
-PyObject* systemSetBossTrack(PyObject* poSelf, PyObject* poArgs)
+PyObject *systemSetBossTrack(PyObject *poSelf, PyObject *poArgs)
 {
 	int iValue;
 	if (!PyTuple_GetInteger(poArgs, 0, &iValue))
 		return Py_BuildException();
+
 	CPythonSystem::Instance().SetBossTrack(iValue);
 	return Py_BuildNone();
 }
 
-PyObject* systemGetBossTrack(PyObject* poSelf, PyObject* poArgs)
+PyObject *systemGetBossTrack(PyObject *poSelf, PyObject *poArgs)
 {
 	return Py_BuildValue("i", CPythonSystem::Instance().GetBossTrack());
 }
@@ -659,97 +661,97 @@ void initsystem()
 {
 	static PyMethodDef s_methods[] =
 	{
-		{ "GetWidth",					systemGetWidth,					METH_VARARGS },
-		{ "GetHeight",					systemGetHeight,				METH_VARARGS },
+		{ "GetWidth", systemGetWidth, METH_VARARGS },
+		{ "GetHeight", systemGetHeight, METH_VARARGS },
 
-		{ "SetInterfaceHandler",		systemSetInterfaceHandler,		METH_VARARGS },
-		{ "DestroyInterfaceHandler",	systemDestroyInterfaceHandler,	METH_VARARGS },
-		{ "ReserveResource",			systemReserveResource,			METH_VARARGS },
+		{ "SetInterfaceHandler", systemSetInterfaceHandler, METH_VARARGS },
+		{ "DestroyInterfaceHandler", systemDestroyInterfaceHandler, METH_VARARGS },
+		{ "ReserveResource", systemReserveResource, METH_VARARGS },
 
-		{ "isInterfaceConfig",			systemisInterfaceConfig,		METH_VARARGS },
-		{ "SaveWindowStatus",			systemSaveWindowStatus,			METH_VARARGS },
-		{ "GetWindowStatus",			systemGetWindowStatus,			METH_VARARGS },
+		{ "isInterfaceConfig", systemisInterfaceConfig, METH_VARARGS },
+		{ "SaveWindowStatus", systemSaveWindowStatus, METH_VARARGS },
+		{ "GetWindowStatus", systemGetWindowStatus, METH_VARARGS },
 
-		{ "GetResolutionCount",			systemGetResolutionCount,		METH_VARARGS },
-		{ "GetFrequencyCount",			systemGetFrequencyCount,		METH_VARARGS },
+		{ "GetResolutionCount", systemGetResolutionCount, METH_VARARGS },
+		{ "GetFrequencyCount", systemGetFrequencyCount, METH_VARARGS },
 
-		{ "GetCurrentResolution",		systemGetCurrentResolution,		METH_VARARGS },
+		{ "GetCurrentResolution", systemGetCurrentResolution, METH_VARARGS },
 
-		{ "GetResolution",				systemGetResolution,			METH_VARARGS },
-		{ "GetFrequency",				systemGetFrequency,				METH_VARARGS },
+		{ "GetResolution", systemGetResolution, METH_VARARGS },
+		{ "GetFrequency", systemGetFrequency, METH_VARARGS },
 
-		{ "ApplyConfig",				systemApplyConfig,				METH_VARARGS },
-		{ "SetConfig",					systemSetConfig,				METH_VARARGS },
-		{ "SaveConfig",					systemSaveConfig,				METH_VARARGS },
-		{ "GetConfig",					systemGetConfig,				METH_VARARGS },
+		{ "ApplyConfig", systemApplyConfig, METH_VARARGS },
+		{ "SetConfig", systemSetConfig, METH_VARARGS },
+		{ "SaveConfig", systemSaveConfig, METH_VARARGS },
+		{ "GetConfig", systemGetConfig, METH_VARARGS },
 
-		{ "SetSaveID",					systemSetSaveID,				METH_VARARGS },
-		{ "isSaveID",					systemisSaveID,					METH_VARARGS },
-		{ "GetSaveID",					systemGetSaveID,				METH_VARARGS },
+		{ "SetSaveID", systemSetSaveID, METH_VARARGS },
+		{ "isSaveID", systemisSaveID, METH_VARARGS },
+		{ "GetSaveID", systemGetSaveID, METH_VARARGS },
 
-		{ "GetMusicVolume",				systemGetMusicVolume,			METH_VARARGS },
-		{ "GetSoundVolume",				systemGetSoundVolume,			METH_VARARGS },
+		{ "GetMusicVolume", systemGetMusicVolume, METH_VARARGS },
+		{ "GetSoundVolume", systemGetSoundVolume, METH_VARARGS },
 
-		{ "SetMusicVolume",				systemSetMusicVolume,			METH_VARARGS },
-		{ "SetSoundVolumef",			systemSetSoundVolumef,			METH_VARARGS },
-		{ "IsSoftwareCursor",			systemIsSoftwareCursor,			METH_VARARGS },
+		{ "SetMusicVolume", systemSetMusicVolume, METH_VARARGS },
+		{ "SetSoundVolumef", systemSetSoundVolumef, METH_VARARGS },
+		{ "IsSoftwareCursor", systemIsSoftwareCursor, METH_VARARGS },
 
-		{ "SetViewChatFlag",			systemSetViewChatFlag,			METH_VARARGS },
-		{ "IsViewChat",					systemIsViewChat,				METH_VARARGS },
+		{ "SetViewChatFlag", systemSetViewChatFlag, METH_VARARGS },
+		{ "IsViewChat", systemIsViewChat, METH_VARARGS },
 
-		{ "SetAlwaysShowNameFlag",		systemSetAlwaysShowNameFlag,	METH_VARARGS },
-		{ "IsAlwaysShowName",			systemIsAlwaysShowName,			METH_VARARGS },
+		{ "SetAlwaysShowNameFlag", systemSetAlwaysShowNameFlag, METH_VARARGS },
+		{ "IsAlwaysShowName", systemIsAlwaysShowName, METH_VARARGS },
 
-		{ "SetShowDamageFlag",			systemSetShowDamageFlag,		METH_VARARGS },
-		{ "IsShowDamage",				systemIsShowDamage,				METH_VARARGS },
+		{ "SetShowDamageFlag", systemSetShowDamageFlag, METH_VARARGS },
+		{ "IsShowDamage", systemIsShowDamage, METH_VARARGS },
 
-		{ "SetShowSalesTextFlag",		systemSetShowSalesTextFlag,		METH_VARARGS },
-		{ "IsShowSalesText",			systemIsShowSalesText,			METH_VARARGS },
+		{ "SetShowSalesTextFlag", systemSetShowSalesTextFlag, METH_VARARGS },
+		{ "IsShowSalesText", systemIsShowSalesText, METH_VARARGS },
 
-		{ "GetShadowLevel",				systemGetShadowLevel,			METH_VARARGS },
-		{ "SetShadowLevel",				systemSetShadowLevel,			METH_VARARGS },
+		{ "GetShadowLevel", systemGetShadowLevel, METH_VARARGS },
+		{ "SetShadowLevel", systemSetShadowLevel, METH_VARARGS },
 
 #ifdef ENABLE_FOG_FIX
-		{ "SetFogMode",					systemSetFogMode, METH_VARARGS },
-		{ "IsFogMode",					systemIsFogMode, METH_VARARGS },
+		{ "SetFogMode", systemSetFogMode, METH_VARARGS },
+		{ "IsFogMode", systemIsFogMode, METH_VARARGS },
 #endif
 
 #ifdef ENABLE_ENB_MODE
-		{ "SetENBModeStatusFlag",		systemSetENBModeStatusFlag,			METH_VARARGS },
-		{ "IsENBModeStatus",			systemIsENBModeStatus,			METH_VARARGS },
+		{ "SetENBModeStatusFlag", systemSetENBModeStatusFlag, METH_VARARGS },
+		{ "IsENBModeStatus", systemIsENBModeStatus, METH_VARARGS },
 #endif
 
 #ifdef ENABLE_ENVIRONMENT_EFFECT_OPTION
-		{ "SetNightModeOption",			systemSetNightModeOption,			METH_VARARGS },
-		{ "GetNightModeOption",			systemGetNightModeOption,			METH_VARARGS },
+		{ "SetNightModeOption", systemSetNightModeOption, METH_VARARGS },
+		{ "GetNightModeOption", systemGetNightModeOption, METH_VARARGS },
 
-		{ "SetSnowModeOption",			systemSetSnowModeOption,			METH_VARARGS },
-		{ "GetSnowModeOption",			systemGetSnowModeOption,			METH_VARARGS },
+		{ "SetSnowModeOption", systemSetSnowModeOption, METH_VARARGS },
+		{ "GetSnowModeOption", systemGetSnowModeOption, METH_VARARGS },
 
-		{ "SetSnowTextureModeOption",	systemSetSnowTextureModeOption,			METH_VARARGS },
-		{ "GetSnowTextureModeOption",	systemGetSnowTextureModeOption,			METH_VARARGS },
+		{ "SetSnowTextureModeOption", systemSetSnowTextureModeOption, METH_VARARGS },
+		{ "GetSnowTextureModeOption", systemGetSnowTextureModeOption, METH_VARARGS },
 #endif
 
 #ifdef ENABLE_GRAPHIC_ON_OFF
-		{ "GetEffectLevel", systemGetEffectLevel,			METH_VARARGS },
-		{ "SetEffectLevel", systemSetEffectLevel,			METH_VARARGS },
+		{ "GetEffectLevel", systemGetEffectLevel, METH_VARARGS },
+		{ "SetEffectLevel", systemSetEffectLevel, METH_VARARGS },
 
-		{ "GetPrivateShopLevel", systemGetPrivateShopLevel,			METH_VARARGS },
-		{ "SetPrivateShopLevel", systemSetPrivateShopLevel,			METH_VARARGS },
+		{ "GetPrivateShopLevel", systemGetPrivateShopLevel, METH_VARARGS },
+		{ "SetPrivateShopLevel", systemSetPrivateShopLevel, METH_VARARGS },
 
-		{ "GetDropItemLevel", systemGetDropItemLevel,			METH_VARARGS },
-		{ "SetDropItemLevel", systemSetDropItemLevel,			METH_VARARGS },
+		{ "GetDropItemLevel", systemGetDropItemLevel, METH_VARARGS },
+		{ "SetDropItemLevel", systemSetDropItemLevel, METH_VARARGS },
 
-		{ "SetPetStatusFlag", systemSetPetStatusFlag,			METH_VARARGS },
-		{ "IsPetStatus", systemIsPetStatus,			METH_VARARGS },
+		{ "SetPetStatusFlag", systemSetPetStatusFlag, METH_VARARGS },
+		{ "IsPetStatus", systemIsPetStatus, METH_VARARGS },
 
 		{ "SetNpcNameStatusFlag", systemSetNpcNameStatusFlag, METH_VARARGS },
 		{ "IsNpcNameStatus", systemIsNpcNameStatus, METH_VARARGS },
 #endif
 
 #ifdef ENABLE_SHOW_MOB_INFO
-		{ "SetShowMobAIFlag", systemSetShowMobAIFlag,			METH_VARARGS },
-		{ "IsShowMobAIFlag", systemIsShowMobAIFlag,			METH_VARARGS },
+		{ "SetShowMobAIFlag", systemSetShowMobAIFlag, METH_VARARGS },
+		{ "IsShowMobAIFlag", systemIsShowMobAIFlag, METH_VARARGS },
 
 		{ "SetShowMobLevel", systemSetShowMobLevel, METH_VARARGS },
 		{ "IsShowMobLevel", systemIsShowMobLevel, METH_VARARGS },
@@ -770,7 +772,7 @@ void initsystem()
 		{ "GetStoneScale", systemGetStoneScale, METH_VARARGS },
 	#endif
 
-#ifdef ENABLE_TRACK_WINDOW
+#ifdef ENABLE_DUNGEON_TRACKING_SYSTEM
 		{ "SetDungeonTrack", systemSetDungeonTrack, METH_VARARGS },
 		{ "GetDungeonTrack", systemGetDungeonTrack, METH_VARARGS },
 		{ "SetBossTrack", systemSetBossTrack, METH_VARARGS },

@@ -34,7 +34,7 @@ class InGameEventManager : public CSingleton<InGameEventManager>
 			EVENT_TYPE_OX,
 			EVENT_TYPE_TANAKA,
 			EVENT_TYPE_YANG,
-#ifdef ENABLE_MINI_GAME_OKEY
+#ifdef ENABLE_MINIGAME_OKEY_CARDS_SYSTEM
 			EVENT_TYPE_OKEY_CARDS,
 #endif
 			EVENT_MAX_NUM

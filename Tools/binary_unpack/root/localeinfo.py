@@ -3,102 +3,9 @@ if __USE_DYNAMIC_MODULE__:
 
 app = __import__(pyapi.GetModuleName("app"))
 net = __import__(pyapi.GetModuleName("net"))
-pack = __import__(pyapi.GetModuleName("pack"))
 
 import constInfo
 import dbg
-
-def ShopSecondsToDHM(time):
-	if time < 60:
-		if IsARABIC():
-			return "%.2f%s" % (time, IKASHOP_SECOND)
-		else:
-			return "0" + IKASHOP_MINUTE
-
-	second = int(time % 60)
-	minute = int((time / 60) % 60)
-	hour = int((time / 60) / 60) % 24
-	day = int(int((time / 60) / 60) / 24)
-
-	text = ""
-
-	if day > 0:
-		text += str(day) + IKASHOP_DAY
-		text += " "
-
-	if hour > 0:
-		text += str(hour) + IKASHOP_HOUR
-		text += " "
-
-	if minute > 0:
-		text += str(minute) + IKASHOP_MINUTE
-
-	return text
-
-def NumberToWithItemString(n,c) :
-	if n <= 0 :
-		return "0 %s" % (c)
-	return "%s x | %s" % ('.'.join([ i-3<0 and str(n)[:i] or str(n)[i-3:i] for i in range(len(str(n))%3, len(str(n))+1, 3) if i ]), c)
-
-def NumberToString(n):
-	if n < 0:
-		return "-" + NumberToString(-n)
-
-	ret = ""
-	while n >= 1000:
-		r = n % 1000
-		ret = (".%03d"%r) + ret
-		n //= 1000
-
-	return str(n) + ret
-
-def DottedNumber(n) :
-	return "%s" % ('.'.join([ i-3<0 and str(n)[:i] or str(n)[i-3:i] for i in range(len(str(n))%3, len(str(n))+1, 3) if i ])) 
-
-def SecondToDHMSNew(time):
-	if time < 60:
-		return "0" + MINUTE
-
-	second = int(time % 60)
-	minute = int((time / 60) % 60)
-	hour = int((time / 60) / 60) % 24
-	day = int(int((time / 60) / 60) / 24)
-	text = ""
-
-	if day > 0:
-		text += str(day) + DAY
-		text += " "
-
-	if hour > 0:
-		text += str(hour) + HOUR
-		text += " "
-
-	if minute > 0:
-		text += str(minute) + MINUTE
-
-	if second > 0:
-		text += str(second) + "s"
-
-	return text
-
-def SecondToMS(time):
-	if time < 60:
-		return "%d%s" % (time, SECOND)
-
-	second = int(time % 60)
-	minute = int((time / 60) % 60)
-
-	text = ""
-
-	if minute > 0:
-		text += str(minute) + MINUTE
-		if minute > 0:
-			text += " "
-
-	if second > 0:
-		text += str(second) + SECOND
-
-	return text
 
 APP_TITLE 							= 'METIN2'
 
@@ -132,10 +39,7 @@ VIRTUAL_KEY_SYMBOLS_BR				= "!@#$%^&*()_+|{}:'<>?~áàãâéèêíìóòôõúùç"
 
 
 
-__IS_ENGLISH = "ENGLISH" == app.GetLocaleServiceName()
-__IS_HONGKONG = "HONGKONG" == app.GetLocaleServiceName()
 __IS_NEWCIBN	= "locale/country/newcibn" == app.GetLocalePath()
-__IS_EUROPE = "EUROPE" == app.GetLocaleServiceName()
 __IS_CANADA		= "locale/country/ca" == app.GetLocalePath()
 __IS_BRAZIL		= "locale/country/br" == app.GetLocalePath()
 __IS_SINGAPORE	= "locale/country/sg" == app.GetLocalePath()
@@ -223,7 +127,6 @@ def SA(text):
 		return text % x
 	return f
 
-## PET_SKILL_INFO FNCS BEGIN
 def SAA(text):
 	def f(x1, x2):
 		return text % (x1, x2)
@@ -244,7 +147,6 @@ def SAAAA(text):
 	def f(x1, x2, x3, x4):
 		return text % (x1, x2, x3, x4)
 	return f
-## PET_SKILL_INFO FNCS END
 
 def LoadLocaleFile(srcFileName, localeDict):
 	def SNA(text):
@@ -307,26 +209,6 @@ def LoadLocaleFile(srcFileName, localeDict):
 LOCALE_FILE_NAME = "%s/locale_game.txt" % app.GetLocalePath()
 LoadLocaleFile(LOCALE_FILE_NAME, locals())
 
-# Baglanti / giris metinleri (locale dosyasinda yoksa varsayilan; hata kullaniciya gosterilsin)
-try:
-	LOGIN_CONNETING
-except NameError:
-	LOGIN_CONNETING = "Lutfen bekle. Sunucuya baglaniyorsun."
-try:
-	LOGIN_PROCESSING
-except NameError:
-	LOGIN_PROCESSING = "Lutfen bekle. Sunucuya baglaniyorsun."
-try:
-	LOGIN_CONNECT_SUCCESS
-except NameError:
-	LOGIN_CONNECT_SUCCESS = "Baglanti basarili."
-try:
-	LOGIN_CLIENT_LOADING
-except NameError:
-	LOGIN_CLIENT_LOADING = "Yukleniyor..."
-LOGIN_CONNECT_TIMEOUT = "Baglanti zaman asimina ugradi. Sunucuya ulasilamiyor veya yanit vermiyor. Adres ve portu kontrol edin."
-LOGIN_CONNECT_ERROR = "Sunucuya baglanilamadi. Ag baglantisini veya sunucu adresini kontrol edin."
-
 # Option pvp messages
 OPTION_PVPMODE_MESSAGE_DICT = {
 	0: PVP_MODE_NORMAL,
@@ -368,6 +250,9 @@ GUILDWAR_CTF_DESCLIST = 					(GUILD_WAR_USE_BATTLE_MAP, GUILD_WAR_WIN_TAKE_AWAY_
 MODE_NAME_LIST = 							(PVP_OPTION_NORMAL, PVP_OPTION_REVENGE, PVP_OPTION_KILL, PVP_OPTION_PROTECT)
 # Title name of alignment
 TITLE_NAME_LIST =							(PVP_LEVEL0, PVP_LEVEL1, PVP_LEVEL2, PVP_LEVEL3, PVP_LEVEL4, PVP_LEVEL5, PVP_LEVEL6, PVP_LEVEL7, PVP_LEVEL8)
+# Title name of title system
+if app.ENABLE_TITLE_SYSTEM:
+	TITLE_SYSTEM_LIST = 					(TITLE_SYSTEM_NAME_0, TITLE_SYSTEM_NAME_1, TITLE_SYSTEM_NAME_2, TITLE_SYSTEM_NAME_3, TITLE_SYSTEM_NAME_4, TITLE_SYSTEM_NAME_5, TITLE_SYSTEM_NAME_6, TITLE_SYSTEM_NAME_7, TITLE_SYSTEM_NAME_8, TITLE_SYSTEM_NAME_9, TITLE_SYSTEM_NAME_10, TITLE_SYSTEM_NAME_11, TITLE_SYSTEM_NAME_12, TITLE_SYSTEM_NAME_13, TITLE_SYSTEM_NAME_14, TITLE_SYSTEM_NAME_15, TITLE_SYSTEM_NAME_16, TITLE_SYSTEM_NAME_17, TITLE_SYSTEM_NAME_18, TITLE_SYSTEM_NAME_19, TITLE_SYSTEM_NAME_20)
 
 # Notify messages
 NOTIFY_MESSAGE = {
@@ -436,9 +321,9 @@ HEALTH_LIST=[
 
 
 # Skill messages
-USE_SKILL_ERROR_CHAT_DICT = {
+USE_SKILL_ERROR_CHAT_DICT = {	
 	'NEED_EMPTY_BOTTLE': 					SKILL_NEED_EMPTY_BOTTLE,
-	'NEED_POISON_BOTTLE': 					SKILL_NEED_POISON_BOTTLE,
+	'NEED_POISON_BOTTLE': 					SKILL_NEED_POISON_BOTTLE, 
 	'ONLY_FOR_GUILD_WAR': 					SKILL_ONLY_FOR_GUILD_WAR,
 }
 
@@ -497,13 +382,13 @@ MINIMAP_ZONE_NAME_DICT = {
 # Path of quest icon file
 def GetLetterImageName():
 	return "icon/scroll_close.tga"
-
+	
 def GetLetterOpenImageName():
 	return "icon/scroll_open.tga"
-
+	
 def GetLetterCloseImageName():
 	return "icon/scroll_close.tga"
-
+	
 # Sell item question
 def DO_YOU_SELL_ITEM(sellItemName, sellItemCount, sellItemPrice):
 	return DO_YOU_SELL_ITEM2 % (sellItemName, sellItemCount, NumberToMoneyString(sellItemPrice)) if (sellItemCount > 1) else DO_YOU_SELL_ITEM1 % (sellItemName, NumberToMoneyString(sellItemPrice))
@@ -543,14 +428,6 @@ def NumberToMoneyString(n):
 def NumberToSecondaryCoinString(n):
 	return '0 {:s}'.format(MONETARY_UNIT_JUN) if (n <= 0) else '{:s} {:s}'.format('.'.join([(i - 3) < 0 and str(n)[:i] or str(n)[i - 3: i] for i in range(len(str(n)) % 3, len(str(n)) + 1, 3) if i]), MONETARY_UNIT_JUN)
 
-def NumberToMoneyStringNEW(n) :
-	if n <= 0 :
-		return "0"
-	return "%s" % ('.'.join([ i-3<0 and str(n)[:i] or str(n)[i-3:i] for i in range(len(str(n))%3, len(str(n))+1, 3) if i ]))
-
-def MoneyFormat(n):
-	return "%s" % ('.'.join([ i-3<0 and str(n)[:i] or str(n)[i-3:i] for i in range(len(str(n))%3, len(str(n))+1, 3) if i ])) 
-
 # Convert a integer amount into a string and add . as separator with decimal.
 def NumberToDecimalString(n):
 	return str('.'.join([ i-3<0 and str(n)[:i] or str(n)[i-3:i] for i in range(len(str(n))%3, len(str(n))+1, 3) if i ]))
@@ -580,239 +457,6 @@ def GetAlignmentTitleName(alignment):
 		return TITLE_NAME_LIST[7]
 
 	return TITLE_NAME_LIST[8]
-
-def NumberWithPoint(n) :
-	if n <= 0 :
-		return "0"
-
-	return "%s" % ('.'.join([ i-3<0 and str(n)[:i] or str(n)[i-3:i] for i in range(len(str(n))%3, len(str(n))+1, 3) if i ]))
-
-def NumberToMoneyString2(n) :
-	if long(n) <= 0 :
-		return "0"
-
-	return "%s " % ('.'.join([ i-3<0 and str(n)[:i] or str(n)[i-3:i] for i in range(len(str(n))%3, len(str(n))+1, 3) if i ]))
-
-if app.ENABLE_SUNG_MAHI_TOWER:
-	import constInfo
-	def LoadSungMahiInfo():
-		if len(constInfo.sungMahiRewardInfo) > 0 or len(constInfo.sungMahiElementInfo) > 0:
-			return
-		
-		loadFiles = ["sungmahee_tower_reward", "sungmahee_tower_element"]
-		fileIndex = 1
-		
-		for file in loadFiles:
-			lineIndex = 1
-			
-			# Try different possible paths
-			possiblePaths = [
-				"{}/common/sungmahee_tower/standard/{}.txt".format(app.GetLocalePath(), file),
-				"common/sungmahee_tower/standard/{}.txt".format(file),
-				"locale/common/sungmahee_tower/standard/{}.txt".format(file),
-				"{}/sungmahee_tower/standard/{}.txt".format(app.GetLocalePath(), file),
-			]
-			
-			lines = None
-			filePath = None
-			for path in possiblePaths:
-				try:
-					if pack.Exist(path):
-						filePath = path
-						lines = pack_open(path, "r").readlines()
-						break
-				except:
-					pass
-			
-			if lines is None:
-				dbg.TraceError("LoadSungMahiInfo read error file({}). Tried paths: {}".format(file, ", ".join(possiblePaths)))
-				# Dosya bulunamazsa boþ liste ile devam et, abort etme
-				if fileIndex == 1:
-					constInfo.sungMahiRewardInfo = []
-				else:
-					constInfo.sungMahiElementInfo = []
-				fileIndex += 1
-				continue
-			
-			for line in lines:
-				try:
-					if not line:
-						lineIndex += 1
-						continue
-					
-					#skip first line
-					if lineIndex == 1:
-						lineIndex += 1
-						continue
-					
-					tokens = line[:-1].split("\t")
-					if fileIndex == 1:
-						tempListInfo = []
-						tempTokenInfo = []
-						
-						#set level info
-						tempTokenInfo.append(tokens[0])
-						for tokenInfo in xrange(len(tokens)):
-							if (tokenInfo < 1):
-								continue
-							
-							if len(tempListInfo) < 2:
-								tempListInfo.append(tokens[tokenInfo])
-								
-							if len(tempListInfo) > 1:
-								tempTokenInfo.append(tempListInfo)
-								tempListInfo= []
-						
-						constInfo.sungMahiRewardInfo.append(tempTokenInfo)
-					else:
-						constInfo.sungMahiElementInfo.append(tokens)
-					
-					lineIndex += 1
-				except:
-					raise
-					
-			fileIndex += 1
-
-	LoadSungMahiInfo()
-
-	def SecondToM(time):
-		if time < 60:
-			return "1" + MINUTE
-
-		minute = int((time / 60) % 60)
-		text = ""
-
-		if minute > 0:
-			text += str(minute) + MINUTE
-
-		return text
-
-	def SecondToMS(time):
-		if time < 60:
-			return "%d%s" % (time, SECOND)
-
-		second = int(time % 60)
-		minute = int((time / 60) % 60)
-
-		text = ""
-
-		if minute > 0:
-			text += str(minute) + MINUTE
-			if minute > 0:
-				text += " "
-
-		if second > 0:
-			text += str(second) + SECOND
-
-		return text
-
-def GetMiniMapZoneNameByIdx(idx):
-	if idx in MINIMAP_ZONE_NAME_DICT_BY_IDX and idx != 0:
-		return MINIMAP_ZONE_NAME_DICT_BY_IDX[idx]
-	return MAP_NONE
-
-MINIMAP_ZONE_NAME_DICT_BY_IDX = {
-	0 : "",
-	1 : MAP_A1,
-	3 : MAP_A3,
-	4 : MAP_GUILD_01,
-	5 : MAP_MONKEY_DUNGEON_11,
-	6 : GUILD_VILLAGE_01,
-	21 : MAP_B1,
-	23 : MAP_B3,
-	24 : MAP_GUILD_02,
-	25 : MAP_MONKEY_DUNGEON_12,
-	26 : GUILD_VILLAGE_02,
-	41 : MAP_C1,
-	43 : MAP_C3,
-	44 : MAP_GUILD_03,
-	45 : MAP_MONKEY_DUNGEON_13,
-	46 : GUILD_VILLAGE_03,
-	61 : MAP_SNOW,
-	62 : MAP_N_FLAME_01,
-	63 : MAP_DESERT,
-	64 : MAP_A2,
-	65 : MAP_TEMPLE,
-	66 : MAP_DEVILTOWER1,
-	67 : MAP_TRENT,
-	68 : MAP_TRENT02,
-	69 : MAP_WL,
-	70 : MAP_NUSLUCK,
-	71 : MAP_SPIDERDUNGEON_02,
-	72 : MAP_SKIPIA_DUNGEON_01,
-	73 : MAP_SKIPIA_DUNGEON_02,
-	81 : MAP_WEDDING_01,
-	103 : MAP_T1,
-	104 : MAP_SPIDERDUNGEON,
-	105 : MAP_T2,
-	107 : MAP_MONKEY_DUNGEON,
-	108 : MAP_MONKEY_DUNGEON2,
-	109 : MAP_MONKEY_DUNGEON3,
-	110 : MAP_T3,
-	111 : MAP_T4,
-	112 : MAP_DUEL,
-	113 : MAP_OXEVENT,
-	181 : MAP_EMPIREWAR01,
-	182 : MAP_EMPIREWAR02,
-	183 : MAP_EMPIREWAR03,
-	208 : MAP_SKIPIA_DUNGEON_BOSS,
-	216 : MAP_DEVILCATACOMB,
-	217 : MAP_SPIDERDUNGEON_03,
-	301 : MAP_CAPE,
-	302 : MAP_DAWN,
-	303 : MAP_BAY,
-	304 : MAP_THUNDER,
-	351 : MAP_N_FLAME_DUNGEON_01,
-	352 : MAP_N_SNOW_DUNGEON_01,
-	355 : DEFENSAWE_HYDRA,
-}
-
-if app.ENABLE_GROWTH_PET_SYSTEM:
-	def SecondToDay(time):
-		if time < 60:
-			return "1" + DAY
-
-		second = int(time % 60)
-		minute = int((time / 60) % 60)
-		hour = int((time / 60) / 60) % 24
-		day = int(int((time / 60) / 60) / 24)
-
-		if day < 1:
-			day = 1
-
-		if day > 9999:
-			day = 9999
-
-		text = str(day) + DAY
-		return text
-
-if app.ENABLE_GROWTH_PET_SYSTEM:
-	def SecondToDayNumber(time):
-		if time < 60:
-			return 1
-
-		second = int(time % 60)
-		minute = int((time / 60) % 60)
-		hour = int((time / 60) / 60) % 24
-		day = int(int((time / 60) / 60) / 24)
-
-		if day < 1:
-			day = 1
-
-		if day > 9999:
-			day = 9999
-
-		return day
-
-if app.ENABLE_GROWTH_PET_SYSTEM:
-	def SecondToH(time):
-		hour = int((time / 60) / 60)
-
-		text = ""
-		hour = max( 0, hour )
-		text += str(hour)
-
-		return text
 
 # Convert seconds to Days-Hours-Minutes
 def SecondToDHM(time):
@@ -895,29 +539,131 @@ def SecondToHMS(time):
 
 def RTSecondToDHMS(time):
 	text = ""
-	g = time // (24 * 3600)
+
+	d = time // (24 * 3600)
 	time = time % (24 * 3600)
-	s = time // 3600
+	h = time // 3600
 	time %= 3600
-	d = time // 60
+	m = time // 60
 	time %= 60
-	sn = time
-	if g:
-		text += "%dg " % g
+	s = time
+
+	if d:
+		text += "%dd " % d
+	if text or h:
+		text += "%dh " % h
+	if text or m:
+		text += "%dm " % m
 	if text or s:
 		text += "%ds " % s
-	if text or d:
-		text += "%ddk. " % d
-	if text or sn:
-		text += "%dsn. " % sn
+
 	return text[:-1]
 
-if app.ENABLE_EVENT_SYSTEM:
-	def FormatTime(time):
+def GetMiniMapZoneNameByIdx(idx):
+	if idx in MINIMAP_ZONE_NAME_DICT_BY_IDX and idx != 0:
+		return MINIMAP_ZONE_NAME_DICT_BY_IDX[idx]
+	return MAP_NONE
+
+MINIMAP_ZONE_NAME_DICT_BY_IDX = {
+	0 : "",
+	1 : MAP_A1,
+	3 : MAP_A3,
+	4 : MAP_GUILD_01,
+	5 : MAP_MONKEY_DUNGEON_11,
+	6 : GUILD_VILLAGE_01,
+	21 : MAP_B1,
+	23 : MAP_B3,
+	24 : MAP_GUILD_02,
+	25 : MAP_MONKEY_DUNGEON_12,
+	26 : GUILD_VILLAGE_02,
+	41 : MAP_C1,
+	43 : MAP_C3,
+	44 : MAP_GUILD_03,
+	45 : MAP_MONKEY_DUNGEON_13,
+	46 : GUILD_VILLAGE_03,
+	61 : MAP_SNOW,
+	62 : MAP_N_FLAME_01,
+	63 : MAP_DESERT,
+	64 : MAP_A2,
+	65 : MAP_TEMPLE,
+	66 : MAP_DEVILTOWER1,
+	67 : MAP_TRENT,
+	68 : MAP_TRENT02,
+	69 : MAP_WL,
+	70 : MAP_NUSLUCK,
+	71 : MAP_SPIDERDUNGEON_02,
+	72 : MAP_SKIPIA_DUNGEON_01,
+	73 : MAP_SKIPIA_DUNGEON_02,
+	81 : MAP_WEDDING_01,
+	103 : MAP_T1,
+	104 : MAP_SPIDERDUNGEON,
+	105 : MAP_T2,
+	107 : MAP_MONKEY_DUNGEON,
+	108 : MAP_MONKEY_DUNGEON2,
+	109 : MAP_MONKEY_DUNGEON3,
+	110 : MAP_T3,
+	111 : MAP_T4,
+	112 : MAP_DUEL,
+	113 : MAP_OXEVENT,
+	181 : MAP_EMPIREWAR01,
+	182 : MAP_EMPIREWAR02,
+	183 : MAP_EMPIREWAR03,
+	208 : MAP_SKIPIA_DUNGEON_BOSS,
+	216 : MAP_DEVILCATACOMB,
+	217 : MAP_SPIDERDUNGEON_03,
+	301 : MAP_CAPE,
+	302 : MAP_DAWN,
+	303 : MAP_BAY,
+	304 : MAP_THUNDER,
+	351 : MAP_N_FLAME_DUNGEON_01,
+	352 : MAP_N_SNOW_DUNGEON_01,
+	355 : DEFENSAWE_HYDRA,
+}
+
+if app.ENABLE_GROWTH_PET_SYSTEM:
+	def SecondToDay(time):
+		if time < 60:
+			return "1" + DAY
+
 		second = int(time % 60)
 		minute = int((time / 60) % 60)
 		hour = int((time / 60) / 60) % 24
-		return "%02d Saat %02d Dakika %02d Saniye" % (hour, minute, second)
+		day = int(int((time / 60) / 60) / 24)
 
-# Cevher bilgisi ižin locale tanžmž
-POSSIBLE_ORE = "Cevher Türü:"
+		if day < 1:
+			day = 1
+
+		if day > 9999:
+			day = 9999
+
+		text = str(day) + DAY
+		return text
+
+	def SecondToDayNumber(time):
+		if time < 60:
+			return 1
+
+		second = int(time % 60)
+		minute = int((time / 60) % 60)
+		hour = int((time / 60) / 60) % 24
+		day = int(int((time / 60) / 60) / 24)
+
+		if day < 1:
+			day = 1
+
+		if day > 9999:
+			day = 9999
+
+		return day
+
+	def SecondToH(time):
+		hour = int((time / 60) / 60)
+
+		text = ""
+		hour = max( 0, hour )
+		text += str(hour)
+
+		return text
+
+# Cevher bilgisi için locale tanýmý
+POSSIBLE_ORE = "Kullanýlabilir Cevher:"

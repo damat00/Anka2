@@ -276,308 +276,28 @@ GAME_INIT_ERROR_MAIN_WINDOW	Mainframe could not be established
 GAME_INIT_ERROR_MOB_PROTO	No Monster Data there.\nInstall the game again.
 GAME_INIT_ERROR_NETWORK	Network devices could not be established.\nCheck your internet connection.
 GAME_PICK_MONEY	You have received %d Yang.
-GEM_CONVERTER_MESSAGE_CONVERT_SUCCESS_CONVERTER	You have used %d Gaya Transmuters.
-GEM_CONVERTER_MESSAGE_CONVERT_SUCCESS_GEM_STONE	Converted %d Glimmerstones.
-GEM_CONVERTER_MESSAGE_GEM_MAX	You already have the maximum amount of Gaya.
-GEM_CONVERTER_MESSAGE_NOT_ENOUGH_GEMSTONE	You require at least %s Glimmerstones.
-GEM_CONVERTER_MESSAGE_NOT_ENOUGH_GOLD	You don't have enough Yang.
-GEM_CONVERTER_MESSAGE_USE_CONVERTER_QUESTION	Do you want to use the Gaya Transmuter?
-GEM_SYSTEM_ADD_SLOT	Item required: %s.\nDo you want use %d of them to unlock an additional slot?
-GEM_SYSTEM_BUY_ITEM	Do you want to purchase this item?
-GEM_SYSTEM_NAME	Gaya
-GEM_SYSTEM_NOT_ENOUGHT_REFRESHITEM	[Gaya] You don't have enough Refresh Gaya Market items.
-GEM_SYSTEM_NOT_ENOUGH_HP_GEM	[Gaya] You don't have enough Gaya.
-GEM_SYSTEM_NO_MORE_ADDSLOT	[Gaya] No more slots can be unlocked.
-GEM_SYSTEM_OPEN_GEMSHOP	[Gaya] Open the Gaya Market first.
-GEM_SYSTEM_PICK_GEM	You have received %s Gaya.
-GEM_SYSTEM_REFRESH_SHOP_ITEMS	Do you want to refresh the shop?
-GEM_USE_GEM	%s Gaya have been deducted.
-GIVEUP_QUESTION	Do you really want to give up?
-GOLDEN_LAND_CHAT_MESSAGE_CANNOT_USE_FRUIT_BOX_EVENT_CLOSED	The event is over. You cannot use this item.
-GOLDEN_LAND_CHAT_MESSAGE_CANNOT_USE_MINE_TOWER_SKILL_PROCESSING	You cannot use this once a Bomb Tower has been activated.
-GOLDEN_LAND_CHAT_MESSAGE_FIND_CARD_CLEAR	You have found all the Goldberry squares! You will receive your reward per post.
-GOLDEN_LAND_CHAT_MESSAGE_FIND_CARD_GOLDEN_FRUIT_FOUND	You have found a Goldberry square!
-GOLDEN_LAND_CHAT_MESSAGE_FIND_CARD_GOLDEN_FRUIT_NOT_FOUND	It seems that wasn't a Goldberry square.
-GOLDEN_LAND_CHAT_MESSAGE_FIND_CARD_NOT_ENOUGH_YELLOW_FRUIT	You don't have enough Goldberries.
-GOLDEN_LAND_CHAT_MESSAGE_MINE_TOWER_GUARD_CREATED	You are now Bombproof and protected from the next Bomb Tower.
-GOLDEN_LAND_CHAT_MESSAGE_MINE_TOWER_SKILL_GUARDED	The Bombproof buff protected you and has been consumed. Bomb Towers can damage you again.
-GOLDEN_LAND_CHAT_MESSAGE_NOTICE_BATTLE_STAGE_START	You will be teleported to the next level.
-GOLDEN_LAND_CHAT_MESSAGE_NOTICE_DUNGEON_REMAIN_TIME_MIN	You can only remain in the Land of Gold for %d minutes.
-GOLDEN_LAND_CHAT_MESSAGE_NOTICE_EVENT_END	The Primordis Expedition is over.
-GOLDEN_LAND_CHAT_MESSAGE_NOTICE_EVENT_START	The Primordis Expedition has started! Defeat the Primordis Guardian and travel to the Land of Gold!
-GOLDEN_LAND_CHAT_MESSAGE_NOTICE_OASIS_SHOP	You can purchase items from the Caravan Trader.
-GOLDEN_LAND_CHAT_MESSAGE_NOTICE_OASIS_STAGE_START	You will be teleported to the oasis.
-GOLDEN_LAND_CHAT_MESSAGE_NOTICE_STONE_SPAWN_AFTER_10SEC	Primordis Statues will appear in 10 seconds.
-GOLDEN_LAND_CHAT_MESSAGE_NOT_ENOUGH_LEVEL	You cannot use this item as your level is too low.
-GOLDEN_LAND_CHAT_MESSAGE_RESET_ALREADY_RESET	You have already reset that.
-GOLDEN_LAND_CHAT_MESSAGE_RESET_NOT_ENOUGH_ITEM	You do not have a Primordis Reset.
-GOLDEN_LAND_CHAT_MESSAGE_RESET_SUCCESS	Your entries and the game board have been reset.
-GOLDEN_LAND_CHAT_MESSAGE_SHOP_NOT_ENOUGH_INVENTORY_SPACE	There isn't enough space in your inventory.
-GOLDEN_LAND_CHAT_MESSAGE_SHOP_NOT_ENOUGH_TREE_FRUIT	You don't have enough Bitterberries.
-GOLDEN_LAND_CHAT_MESSAGE_SHOP_YELLOW_FRUIT_EXCEED	You cannot purchase any more Goldberries as you have already exceeded the maximum.
-GOLDEN_LAND_CHAT_MESSAGE_TREE_FRUIT_GAINED	You receive %d Bitterberries.
-GOLDEN_LAND_CHAT_MESSAGE_TREE_FRUIT_GAINED_WITH_POSSESS_INFO	You receive %d Bitterberries. (You have %d.)
-GOLDEN_LAND_CHAT_MESSAGE_YELLOW_FRUIT_GAINED	You receive %d Goldberries.
-GOLDEN_LAND_FIND_CARD_QUESTION_OPEN_CARD	Do you want to reveal a square for %d Goldberries?
-GOLDEN_LAND_FIND_CARD_QUESTION_RESET	When you use this, your entries to the Land of Gold and your Goldberry Hunt game board will be reset. Do you want to continue?
-GOLDEN_LAND_REMAIN_MINE_TOWER_KILL_COUNT	Remaining Bomb Towers: %d
-GOLDEN_LAND_REMAIN_STONE_KILL_COUNT	Remaining Primordis Statues: %d
-GUILDBANK_CLEARBANK	Warning: The Guild Warehouse must be emptied!
-GUILDBANK_DONT_MONEY_OUT	You don't have any Yang in the guild bank!
-GUILDBANK_GOLD_IN	Deposit
-GUILDBANK_GOLD_OUT	Withdrawal
-GUILDBANK_ITEM_IN	Store
-GUILDBANK_ITEM_OUT	Remove
-GUILDBANK_MONEYIN	Deposit Yang
-GUILDBANK_MONEYOUT	Withdraw Yang
-GUILDBANK_NOTUSE	You do not have the necessary permissions.
-GUILDBANK_NOT_ENOUGH_MONEY	You do not have enough Yang to deposit.
-GUILDBANK_OVER_INCOME	Account limit reached.
-GUILDBANK_OVER_MONEY	The guild account is full.
-GUILDLAND_ABANDON	Abandon Guild Territory
-GUILDLAND_ABANDON_TEXT1	Do you want to abandon the guild territory?
-GUILDLAND_ABANDON_TEXT2	Are you sure you want to abandon the guild territory?
-GUILDLAND_ABANDON_TEXT3	The guild warehouse and all buildings will be removed.
-GUILDLAND_ACCEPT	Yes
-GUILDLAND_DONTHAVE_LAND	You do not own any guild territory.
-GUILDLAND_NOT	No
-GUILDLIST_APPLICANT	Do you want to apply?
+GUILDMARK_UPLOADER_ERROR_128_HEIGHT	Height is not 128 Pixel
 GUILDMARK_UPLOADER_ERROR_12_HEIGHT	Height is not 12 Pixel
 GUILDMARK_UPLOADER_ERROR_16_WIDTH	Width is not 16 Pixel
 GUILDMARK_UPLOADER_ERROR_64_WIDTH	Width is not 64 Pixel
-GUILDMARK_UPLOADER_ERROR_128_HEIGHT	Height is not 128 Pixel
 GUILDMARK_UPLOADER_ERROR_FILE_FORMAT	The game does not support this picture.
-GUILDMARK_UPLOADER_ERROR_PATH	Move the data into the folder metin2/upload.
+GUILDMARK_UPLOADER_ERROR_PATH	Move the data into the folder Metin2/upload.
 GUILDMARK_UPLOADER_ERROR_SELECT	No picture file chosen.
-GUILDWAR_ALL	Battles (B)
-GUILDWAR_CTF_TITLE	Capture the Flag
-GUILDWAR_DRAW	Draws (D)
-GUILDWAR_GAINSCORE_FIFTY	50 points
-GUILDWAR_GAINSCORE_HUNDRED	100 points
-GUILDWAR_GAINSCORE_THIRTY	30 points
-GUILDWAR_GAMETIME_SIXTY	60 minutes
-GUILDWAR_GAMETIME_TEN	10 minutes
-GUILDWAR_GAMETIME_THIRTY	30 minutes
-GUILDWAR_INPUT_OTHERGUILD	Please enter opposing guild.
-GUILDWAR_LADDER	Rank Points
-GUILDWAR_LIMIT_MEMBER_FIVE	Minimum 5 participants.
-GUILDWAR_LOSE	Losses (L)
+GUILDWAR_CTF_TITLE	Capture the flag
 GUILDWAR_NORMAL_TITLE	Field Battle
-GUILDWAR_OVER_MEMBERCOUNT	You have reached the member limit.
-GUILDWAR_QUESTION_LINE_1	The Guild %s  declared war on your Guild.
+GUILDWAR_QUESTION_LINE_1	The Guild %s  declared war on your guild.
 GUILDWAR_QUESTION_LINE_2	Do you accept? (%s)
-GUILDWAR_RANKING	Rank
-GUILDWAR_RECODE_ALL	%d B, %d W, %d L, %d D
-GUILDWAR_SELECT_MEMBER_COUNT	Select the number of participants.
-GUILDWAR_TYPE_DEFENSE	Shield Battle
-GUILDWAR_TYPE_TIGER	Annihilation
-GUILDWAR_TYPE_TIME	Time Attack
 GUILDWAR_UNKNOWN_TITLE	...
-GUILDWAR_WARP_TITLE	Arena Battle
-GUILDWAR_WIN	Wins (W)
-GUILDWAR_WIN_FIVE	5 rounds
-GUILDWAR_WIN_ONE	1 round
-GUILDWAR_WIN_THREE	3 rounds
-GUILDWINDOW_BUTTON_BANKGOLDINFO	Guild Warehouse Log
-GUILDWINDOW_BUTTON_BASEABANDON	Abandon Guild Territory
-GUILDWINDOW_BUTTON_BASEDEAL	Sell Guild Territory
-GUILDWINDOW_BUTTON_BOARD	Guild Messages
-GUILDWINDOW_BUTTON_CHANGEMASTER	Change Guild Leader
-GUILDWINDOW_BUTTON_DECLARE	Declare War
-GUILDWINDOW_BUTTON_DONATE	Donate
-GUILDWINDOW_BUTTON_GOLDIN	Deposit
-GUILDWINDOW_BUTTON_GOLDOUT	Withdrawal
-GUILDWINDOW_BUTTON_GRADE	Manage Permissions
-GUILDWINDOW_BUTTON_GUILDLIST	Guild List
-GUILDWINDOW_BUTTON_GUILD_BATTLE	Guild Battle
-GUILDWINDOW_BUTTON_GUILD_CONTENTS_LIST	Back to Guild Battle Window
-GUILDWINDOW_BUTTON_HEALGSP	Restore Dragon God Power
-GUILDWINDOW_BUTTON_INFO	Guild Information
-GUILDWINDOW_BUTTON_LANDINFO	Territory Information
-GUILDWINDOW_BUTTON_MARK	Upload Guild Symbol
-GUILDWINDOW_BUTTON_MEMBER	Member
-GUILDWINDOW_BUTTON_OFFER	Donate EXP
-GUILDWINDOW_BUTTON_OUTMEMBER	Remove Member
-GUILDWINDOW_BUTTON_SKILL	Guild Skills
-GUILDWINDOW_BUTTON_SYMBOL	Upload Guild Flag
-GUILDWINDOW_BUY_GUILD_LAND	Purchase Land
-GUILDWINDOW_CHANGE_BLACKSMITH	Change Profession
-GUILDWINDOW_CHANGE_OBJECT	Reconstruction
-GUILDWINDOW_CHANGE_SMELTER	Change Smelter
-GUILDWINDOW_CREATE_OBJECT	Construction
-GUILDWINDOW_DEAL_GUILD_LAND	Sell Land
-GUILDWINDOW_GRADE_BANK	May use guild bank and warehouse
-GUILDWINDOW_GRADE_DRIVEOUTAUTHORITY	May remove members from the guild
-GUILDWINDOW_GRADE_GRADENAME	Rank Name
-GUILDWINDOW_GRADE_GRADENUMBER	Rank Number
-GUILDWINDOW_GRADE_GUILDWAR	May select members to participate as combatants
-GUILDWINDOW_GRADE_INVITEAUTHORITY	May accept players into the guild
-GUILDWINDOW_GRADE_NOTICEAUTHORITY	May compose guild messages
-GUILDWINDOW_GRADE_SKILLAUTHORITY	May use guild skills
-GUILDWINDOW_INFO_LEVEL5	+5% EXP to guild donations
-GUILDWINDOW_INFO_LEVEL10	Increased max. member count
-GUILDWINDOW_INFO_LEVEL15	Cost red.: Dragon God Power
-GUILDWINDOW_INFO_LEVEL20	Bank: Tax exemption
-GUILDWINDOW_LAND_TAX	Lease
-GUILDWINDOW_LIST_ALL	All Kingdoms
-GUILDWINDOW_LIST_ALREADY_REGISTER	[Guild] You have already applied.
-GUILDWINDOW_LIST_APPLICANT_LIST	Application List
-GUILDWINDOW_LIST_CHRACTER_JOB	Class
-GUILDWINDOW_LIST_CHRACTER_LV	Level
-GUILDWINDOW_LIST_CHRACTER_NAME	Character Name
-GUILDWINDOW_LIST_CHRACTER_SUB_JOB	Subclass
-GUILDWINDOW_LIST_EMPIRE_A	Shinsoo
-GUILDWINDOW_LIST_EMPIRE_B	Chunjo
-GUILDWINDOW_LIST_EMPIRE_C	Jinno
-GUILDWINDOW_LIST_GUILDMEMBER	Member
-GUILDWINDOW_LIST_GUILD_LIST	Guild List
-GUILDWINDOW_LIST_GUILD_LV	Level
-GUILDWINDOW_LIST_GUILD_NAME	Guild
-GUILDWINDOW_LIST_INPUT_GUILDNAME	[Guild] Please enter a guild name.
-GUILDWINDOW_LIST_LADDER	Rank Points
-GUILDWINDOW_LIST_NOTPROMOTEGUILD	[Guild] This guild is not advertising.
-GUILDWINDOW_LIST_PROMOTE_GUILD	Application
-GUILDWINDOW_LIST_PROMOTE_GUILD_LIST	Guild List
-GUILDWINDOW_LIST_RANKING	Position
-GUILDWINDOW_LIST_RANKING_COUNT	Position
-GUILDWINDOW_LIST_REGISTER	Applications
-GUILDWINDOW_LIST_REGISTER_GUILD	Apply to guild
-GUILDWINDOW_LIST_SEARCH	Search
-GUILDWINDOW_LIST_SELECT_GUILD	[Guild] Please select a guild to apply to.
-GUILDWINDOW_PROMOTE_REFRESH	Advertise
-GUILDWINDOW_PROMOTE_REGISTER	Advertise
-GUILDWINDOW_SP_RECOVER	Dragon God Power
-GUILDWINDOW_UPGRADE_ALTEROFPOWER	Upgrade Altar
-GUILDWINDOW_UPGRADE_GUILDBANK	Upgrade Bank
-GUILD_ATTENDANCE_FAIL_ALREADY	You have already attended today.
-GUILD_ATTENDANCE_FAIL_JOIN_TIME	You cannot attend now. Attendance is reset every day at 5:00 AM.
-GUILD_BANKINFO_CLOSE	Close
-GUILD_BANKINFO_NAME	Member
-GUILD_BANKINFO_TYPE	Item/Currency
-GUILD_BANKINFO_USETYPE	Action
-GUILD_BANK_CLOSE	Close
-GUILD_BANK_INFO	Guild Warehouse Log
-GUILD_BATTLE_APPLY_SUCCESS_MESSAGE	You have successfully registered for the Guild Battle.
-GUILD_BATTLE_AREA_INFO_TEXT	Time remaining: %s\nMonsters remaining (%d/61)\nBlue: (%s) Yellow: (%s) Green: (%s) Red: (%s)
-GUILD_BATTLE_AREA_INFO_TEXT_FONT	Tahoma:14b
-GUILD_BATTLE_AREA_UNDER_ATTCK_MESSAGE	Monsters are being attacked in %s.
-GUILD_BATTLE_CANNOT_APPLY_TIME_MESSAGE	You cannot participate in the Guild Battle this time as all slots are full. Try again next time!
-GUILD_BATTLE_CANNOT_ENTER_JOIN_TIME	You cannot participate yet. Time remaining: %d minutes.
-GUILD_BATTLE_CANNOT_ENTER_MAP_MESSAGE	You can only enter from the first village or the Dong Gwang Plain.
-GUILD_BATTLE_CANNOT_ENTER_NOT_MATCHING_MESSAGE	Unable to find a suitable challenger for your guild. Please try again next time.
-GUILD_BATTLE_CANNOT_GET_REWARD_NOT_ENOUGH_INEVENTORY	There isn't enough space in your inventory.
-GUILD_BATTLE_CANNOT_GUILD_ACTION_MESSAGE	
-GUILD_BATTLE_CANNOT_PARTICIPATION_MESSAGE	You don't fulfil all the requirements to participate in the Guild Battle.
-GUILD_BATTLE_CANNOT_USE_MOVE_TICKET_NOT_OCCUPY_MESSAGE	You cannot enter this zone as it has already been conquered by another guild.
-GUILD_BATTLE_CANNOT_USE_PORTAL_NOT_OCCUPY	You can only use that once the zone has been conquered by your guild.
-GUILD_BATTLE_CANNOT_USE_TICKET_NOT_MASTER	Only the guild leader can use this item.
-GUILD_BATTLE_CANNOT_USE_TICKET_NOT_OPEN	You cannot use the Guild Battle Ticket.
-GUILD_BATTLE_CAN_NOT_USE_TICKET_MESSAGE	That has already been used and cannot be used again.
-GUILD_BATTLE_CMD_FAIL_IMMEDIATELY_START	You must wait until at least 2 other guilds are participating.
-GUILD_BATTLE_DEAD_TO_PLAYER	You were killed by a member of the %s guild.
-GUILD_BATTLE_DROP_ITEM_BY_REWARD_BOX_MESSAGE	From the %s you have received %s.
-GUILD_BATTLE_ENCOURAGE_MESSAGE	The Guild Battle starts in %d minutes. You are registered to participate. Get ready and give it your best!
-GUILD_BATTLE_END_MESSAGE	The Guild Battle is over.
-GUILD_BATTLE_END_REMAIN_TIME_MESSAGE	The Guild Battle ends in %d minutes.
-GUILD_BATTLE_ENTER_AREA_MESSAGE	You have entered %s. Defeat all the monsters!
-GUILD_BATTLE_ENTER_BUTTON_TOOLTIP	Enter
-GUILD_BATTLE_ENTER_MESSAGE	You will be registered for the Guild Battle shortly.
-GUILD_BATTLE_ENTER_OCCUPY_AREA_MESSAGE	You have entered %s.
-GUILD_BATTLE_ENTER_OUTPOST_BLUE	You are a member of the blue team. Use the portal to enter the Guild Battle zone.
-GUILD_BATTLE_ENTER_OUTPOST_GREEN	You are a member of the green team. Use the portal to enter the Guild Battle zone.
-GUILD_BATTLE_ENTER_OUTPOST_RED	You are a member of the red team. Use the portal to enter the Guild Battle zone.
-GUILD_BATTLE_ENTER_OUTPOST_YELLOW	You are a member of the yellow team. Use the portal to enter the Guild Battle zone.
-GUILD_BATTLE_GET_GUILD_REWARD_MESSAGE	You have received a guild reward. You'll find it in your inventory.
-GUILD_BATTLE_GET_PERSONAL_REWARD_BUFF_MESSAGE	You have received a buff reward! Check the buff icon to learn more.
-GUILD_BATTLE_GUILD_REWARD_BUTTON_TOOLTIP	Collect Guild Reward
-GUILD_BATTLE_LIST_REMAIN_TIME	Time remaining: %s
-GUILD_BATTLE_MONSTER_KILL_GUILD_MESSAGE	%s killed %d monsters.
-GUILD_BATTLE_NEED_REWARD_OPEN_KEY_MESSAGE	You don't have a Victor's Key to open the chest. Defeat monsters to find a key.
-GUILD_BATTLE_NOT_ENOUGH_INEVENTORY_MESSAGE	Make some space in your inventory and try again.
-GUILD_BATTLE_NOT_ENOUGH_MOVE_TICKET_MESSAGE	You don't have a Guild Portal Ticket.
-GUILD_BATTLE_NOT_ENOUGH_TIME_OF_CREATE_TO_APPLY	You cannot participate yet as your guild was only founded within the last 24 hours.
-GUILD_BATTLE_OCCUPY_AREA_MESSAGE	The zone has been conquered. A portal will appear shortly and monsters will spawn to defend the zone.
-GUILD_BATTLE_OCCUPY_AREA_MESSAGE_IN_OUTPOST	%s has been conquered. A portal will appear shortly and monsters will spawn to defend the zone.
-GUILD_BATTLE_OCCUPY_AREA_OTHERS_GUILD_MESSAGE	This zone has already been conquered by another guild. You will be teleported back to the Guild Outpost shortly.
-GUILD_BATTLE_ONGOING	Battle in Progress
-GUILD_BATTLE_OPEN_REWARD_BOX	Do you want to open %s?
-GUILD_BATTLE_OTHER_GUILD_ONGOING	The other guilds are already fighting.
-GUILD_BATTLE_OUTPOST_REMAIN_TIME	Time remaining: %s
-GUILD_BATTLE_OUTPOST_REMAIN_TIME_FONT	Tahoma:14b
-GUILD_BATTLE_PAGE_ENTER_REQUIRMENTS	Conditions met?
-GUILD_BATTLE_PAGE_START_REMAIN_TIME	The battle begins in: %s
-GUILD_BATTLE_PERSONAL_BUFF	Reward Buff
-GUILD_BATTLE_PERSONAL_REWARD_BUTTON_TOOLTIP	Receive Reward Buff
-GUILD_BATTLE_PK_GUILD_MESSAGE	%s killed %d players from other guilds.
-GUILD_BATTLE_PLAYER_KILL	You have killed a member of the %s guild.
-GUILD_BATTLE_QUALIFICATION	Defeat the Dragon King or use a\nGuild Battle Ticket to participate.
-GUILD_BATTLE_RELOAD_BUTTON_COOLTIME_MESSAGE	Please try again.
-GUILD_BATTLE_RESULT_BOARD_REMAIN_TIME_MESSAGE	You will be teleported in %s.
-GUILD_BATTLE_REVIVE_USE_SCROLL_MESSAGE	You have been resurrected with the Guild Respawn.
-GUILD_BATTLE_START_MESSAGE	The Guild Battle has started! Join the challenge by clicking the Enter button in the Guild Battle menu!
-GUILD_BATTLE_STATUS_BOARD_PK	PK: %d
-GUILD_BATTLE_STATUS_BOARD_REMAIN_MONSTER_COUNT	%s: %d/%d
-GUILD_BATTLE_TEAM_NAME_BLUE	Blue
-GUILD_BATTLE_TEAM_NAME_GREEN	Green
-GUILD_BATTLE_TEAM_NAME_RED	Red
-GUILD_BATTLE_TEAM_NAME_YELLOW	Yellow
-GUILD_BATTLE_USE_MOVE_TICKET_MESSAGE	You have used the Guild Portal Ticket and will be teleported to %s shortly.
-GUILD_BATTLE_USE_SCROLL	Do you want to participate in the Guild Battle?
-GUILD_BATTLE_USE_TICKET_CANCEL_MESSAGE	Your registration for the Guild Battle was cancelled.
-GUILD_BOARD_ID	Member
-GUILD_BOARD_TEXT	Message
-GUILD_BUILDING_FIX_CHANGE	Do you really want to change the position?
-GUILD_BUILDING_FIX_CHANGE_GOLD	Cost: 1,000,000 Yang
-GUILD_BUILDING_FIX_DELETE	Do you really want to delete the object?
-GUILD_BUILDING_FIX_NEED_BUILDING	No building present.
+GUILDWAR_WARP_TITLE	Arena battle
 GUILD_BUILDING_GRADE	Rank
-GUILD_BUILDING_LOG_PLUS	Trunk+
 GUILD_BUILDING_NAME	Name of building
-GUILD_BUILDING_PLY_PLUS	Plywood+
-GUILD_BUILDING_SMELT_STONE	Runestone
-GUILD_BUILDING_STONE_PLUS	Foundation Stone+
 GUILD_CANNOT_HEAL_GSP_ANYMORE	The Dragon Ghost Energy is already fully restored.
-GUILD_CHANGEMASTER_TEXT1	New leader will be: %s
-GUILD_CHANGEMASTER_TEXT2	Would you like to appoint a new guild leader?
-GUILD_CHANGEMASTER_TEXT3	Are you sure that you want to hand
-GUILD_CHANGEMASTER_TEXT4	over the position of guild leader?
 GUILD_COMMENT	Write
-GUILD_CONTENTS_ONGOING	Battle in Progress
-GUILD_CREATE_ERROR_INSULT_NAME	Guildname is not valid.
 GUILD_DEFAULT_GRADE	Guild members
 GUILD_DELETE	Delete
 GUILD_DEPOSIT	Deposit
-GUILD_DISBAND_OR_LEAVE_OR_OUT_FAIL_MESSAGE	You cannot leave the guild now as you are in combat.
-GUILD_DISBAND_SUCCESS_MESSAGE	The guild has been disbanded.
-GUILD_DONATE_FAIL_NOT_ENOUGH_HIGH_ITEM	You don't have enough Large Donation Tickets.
-GUILD_DONATE_FAIL_NOT_ENOUGH_INVENTORY	Your inventory is full. You cannot donate.
-GUILD_DONATE_FAIL_NOT_ENOUGH_LEVEL	You must have reached level 30 to be able to donate.
-GUILD_DONATE_FAIL_NOT_ENOUGH_MIDDLE_ITEM	You don't have enough Medium Donation Tickets.
-GUILD_DONATE_FAIL_NOT_ENOUGH_YANG	Not enough Yang.
-GUILD_DONATE_FAIL_TIME	You cannot donate for 24 hours after joining the guild.
-GUILD_DONATE_QUESTION_HIGH	Do you want to make a Large Donation?
-GUILD_DONATE_QUESTION_MIDDLE	Do you want to make a Medium Donation?
-GUILD_DONATE_QUESTION_NORMAL	Do you want to make a Small Donation?
 GUILD_DO_YOU_HEAL_GSP	Do you want to use %d Yang to restore %d units of Dragon Ghost?
-GUILD_DO_YOU_JOIN	 has invited you. Do you want to join the guild?
-GUILD_DRAGONLAIR_MIN	min.
-GUILD_DRAGONLAIR_PARTY_ALL	Overall Rankings
-GUILD_DRAGONLAIR_PARTY_LINE_FOUR	11th Place and Below: 100 Gaya
-GUILD_DRAGONLAIR_PARTY_LINE_HELP	Help
-GUILD_DRAGONLAIR_PARTY_LINE_ONE	1st Place: 400 Gaya
-GUILD_DRAGONLAIR_PARTY_LINE_THREE	4th-10th Place: 200 Gaya
-GUILD_DRAGONLAIR_PARTY_LINE_TWO	2nd-3rd Place: 300 Gaya
-GUILD_DRAGONLAIR_PARTY_MEMBER	Members
-GUILD_DRAGONLAIR_PARTY_NOW	Weekly Rankings
-GUILD_DRAGONLAIR_PARTY_PAST	Previous Rankings
-GUILD_DRAGONLAIR_PARTY_TIME	Time
-GUILD_DRAGONLAIR_PARTY_TOOLTIP_TITLE	Reward
-GUILD_DRAGONLAIR_RANKING_FAIL	FAILED
-GUILD_DRAGONLAIR_RANKING_NONE	NEW
-GUILD_DRAGONLAIR_RANKING_SUCCESS	SUCCESS
-GUILD_DRAGONLAIR_SECOND	sec.
-GUILD_DRAGON_LAIR_DUNGEON_APPLY_SUCCESS	You have registered for Balathor's Crypt. Talk to Dragon Watcher Dolnarr to enter. After that, you have 10 minutes to start the fight.
-GUILD_DRAGON_LAIR_DUNGEON_START	The battle for Balathor's Crypt has started. The time limit in the dungeon is one hour.
+GUILD_DO_YOU_JOIN	has invited you. Do you want to join the guild?
 GUILD_EMPTY_AREA	Empty land
 GUILD_ENEMY_GUILD_NAME	Guild name of the enemy
 GUILD_FACILITY	Outbuilding
@@ -586,116 +306,30 @@ GUILD_HEADQUARTER	Main Building
 GUILD_HEAL_GSP	Restore Dragon ghost
 GUILD_INFO_ENEMY_GUILD_EMPTY	None
 GUILD_MARK_NOT_ENOUGH_LEVEL	Minimum level of 3 required
-GUILD_MARK_UPLOAD_NOTICE	Please wait a moment so you can add guild logos.
-GUILD_MEMBEROUT_AUTH	You cannot remove any members.
-GUILD_MEMBEROUT_NOMAL	Do you want to remove this member?
-GUILD_MEMBER_JOB	Class
-GUILD_MEMBER_KNIGHT	Combatant
-GUILD_MEMBER_LEVEL	Level
-GUILD_MEMBER_NAME	Member
-GUILD_MEMBER_RANK	Rank
-GUILD_MEMBER_SPECIFIC_GRAVITY	Donated EXP
 GUILD_NAME	Guild name
 GUILD_NOT_ENOUGH_MATERIAL	Not enough building material for this building.
 GUILD_NOT_ENOUGH_MONEY	Not enough Yang for this building.
 GUILD_NO_NOTICE_PERMISSION	You do not have the rights to make an announcement.
 GUILD_OBJECT	Objects
-GUILD_OBJECT_POSSIBLE_NEWWORLD	This building is only available on the continent of Yohara.
 GUILD_OFFER_EXP	Invest experience
-GUILD_SELECT_ONE	Choose a guild member.
 GUILD_SHORT_EXP	Not enough experience points.
-GUILD_SITE_AUCTION_END_TIME	Territory Auction: %02d/%02d (month/day) at %02d:%02d
-GUILD_SITE_AUCTION_END_TIME_DEFAULT	Territory auction: N/A
-GUILD_SITE_AUCTION_INFO	Territory being offered: %s / %d,%d
-GUILD_SITE_AUCTION_INFO_DEFAULT	Territory being offered: N/A
-GUILD_SITE_AUCTION_MAP_INFO	Date (month/day): %02d/%02d; Time: %02d:%02d
-GUILD_SITE_AUCTION_STATE_NONE	All bids have been submitted.
-GUILD_SITE_AUCTION_STATE_REGIST	In %s, the territory at %s,%s is being auctioned. Only guild leaders can register for the territory auction.
-GUILD_SITE_AUCTION_STATE_RUN	The territory auction ends on %02d/%02d (month/day) at %02d:%02d.
-GUILD_SITE_AUCTION_STATE_WAIT	The territory auction starts on %02d/%02d (month/day) at %02d:%02d for %s, territory %d,%d.
-GUILD_SITE_AUTO_ABNDON_TIME	Automatic Abandonment of Territory: %s
-GUILD_SITE_TAX_INFO	The guild territory will be abandoned in %s. All items in the guild warehouse will be deleted.
-GUILD_TILE_BASEINFO	Territory Information
-GUILD_TILE_BOARD	Guild Messages
-GUILD_TILE_GRADE	Rights Administration
-GUILD_TILE_GUILD_BATTLE	Guild Battle
-GUILD_TILE_GUILD_CONTENTS_LIST	Guild Battle
-GUILD_TILE_INFO	Guild Information
+GUILD_TILE_BASEINFO	Territory information
+GUILD_TILE_BOARD	Guild messages
+GUILD_TILE_GRADE	Rights administration
+GUILD_TILE_INFO	Guild information
 GUILD_TILE_MEMBER	Member
-GUILD_TILE_SKILL	Guild Skills
-GUILD_USE_MASTER_ONLY	Only the guild leader has this right.
+GUILD_TILE_SKILL	Guild skills
 GUILD_VILLAGE_01	Miryang
 GUILD_VILLAGE_02	Songpa
 GUILD_VILLAGE_03	Daeyami
-GUILD_WAR1	Guild War Area
-GUILD_WAR2	Guild War Area
-GUILD_WAR3	Guild War Area
-GUILD_WAR4	Guild War Area
-GUILD_WAR_GAINSCORE_FIFTY	50 points
-GUILD_WAR_GAINSCORE_HUNDRED	100 points
-GUILD_WAR_GAINSCORE_THIRTY	30 points
-GUILD_WAR_GAMETIME_SIXTY	60 minutes
-GUILD_WAR_GAMETIME_TEN	10 minutes
-GUILD_WAR_GAMETIME_THIRTY	30 minutes
-GUILD_WAR_LIMIT_30MIN	Time: 30 Minutes
-GUILD_WAR_REWARD_POTION	Reward: The winner receives a Potion
-GUILD_WAR_SELECT_WAR	Select type
-GUILD_WAR_TYPE_DEFENSE	Shield Battle
-GUILD_WAR_TYPE_DIE	Arena Battle
-GUILD_WAR_TYPE_FLAG	Capture the Flag
-GUILD_WAR_TYPE_NORMAL	Field Battle
-GUILD_WAR_TYPE_TIGER	Annihilation
-GUILD_WAR_TYPE_TIME	Time Attack
-GUILD_WAR_USE_BATTLE_MAP	Location: Guild War Arena
-GUILD_WAR_USE_NORMAL_MAP	Location: Normal Map
+GUILD_WAR_LIMIT_30MIN	Time: 30 minutes
+GUILD_WAR_REWARD_POTION	Reward: The winner receives a potion
+GUILD_WAR_USE_BATTLE_MAP	Location: Guild war arena
+GUILD_WAR_USE_NORMAL_MAP	Location: Normal map
 GUILD_WAR_WIN_CHECK_SCORE	The highest result wins the war.
-GUILD_WAR_WIN_FIVE	5 rounds
-GUILD_WAR_WIN_ONE	1 round
 GUILD_WAR_WIN_TAKE_AWAY_FLAG1	Capture the flag of your enemy
 GUILD_WAR_WIN_TAKE_AWAY_FLAG2	and carry it to your base.
-GUILD_WAR_WIN_THREE	3 rounds
 GUILD_WAR_WIN_WIPE_OUT_GUILD	Defeat all enemies to win.
-GUILD_WHITE_DRAGON_LAIR_ALREADY_USED_BUFF_POTION	The effects are already active.
-GUILD_WHITE_DRAGON_LAIR_BUFF_POTION_CANNOT_USE_IN_MAP	You can only use that in Balathor's Crypt.
-GUILD_WHITE_DRAGON_LAIR_CANNOT_ATTACK_EGG	You must move the Flaming Dragon Egg in the other direction.
-GUILD_WHITE_DRAGON_LAIR_CAN_USE_SINGIJEON	The Hwacha is ready to be fired!
-GUILD_WHITE_DRAGON_LAIR_CONCENTRATED_STRIKE_REMAIN_TIME	Concentrate on the Frozen Dragon Egg before it disappears in %d seconds.
-GUILD_WHITE_DRAGON_LAIR_CONCENTRATED_STRIKE_SUCCESS	You have successfully warded off the ice cold.
-GUILD_WHITE_DRAGON_LAIR_DRAGON_CRY_SOUNDS_LOUDER	Balathor's roar shakes the crypt.
-GUILD_WHITE_DRAGON_LAIR_DRAGON_STARTS_GOING_CRAZY	Balathor has lost sight of his Dragon Eggs. Now he's going to get angry!
-GUILD_WHITE_DRAGON_LAIR_DRAGON_STARTS_GOING_MILD	Balathor has his Dragon Eggs again. He will be careful not use his full power.
-GUILD_WHITE_DRAGON_LAIR_FAIL_1	You failed to complete Balathor's Crypt. You will be teleported out in 5 minutes.
-GUILD_WHITE_DRAGON_LAIR_FAIL_2	You will be teleported out in 3 minutes. You can talk to Dragon Watcher Dolnarr to leave the dungeon immediately.
-GUILD_WHITE_DRAGON_LAIR_FIRE_ARROW_COUNT_FULL	You cannot load any more arrows.
-GUILD_WHITE_DRAGON_LAIR_GAUGE_INCREASED_BY_DESTROYED_EGG	Balathor's seal has been greatly weakened as a Dragon Egg has been destroyed.
-GUILD_WHITE_DRAGON_LAIR_GAUGE_INCREASED_BY_DYING	The death of a hero has weakened Balathor's seal.
-GUILD_WHITE_DRAGON_LAIR_GAUGE_INCREASED_BY_FREEZING_DEBUFF	Balathor's seal has been weakened as someone has been frozen.
-GUILD_WHITE_DRAGON_LAIR_GET_FIRE_ARROW	Destroy Ancient Ice Crystals to get Fire Arrows.
-GUILD_WHITE_DRAGON_LAIR_HIDDEN_CONCENTRATED_STRIKE_START	Destroy the Frozen Dragon Egg quickly!
-GUILD_WHITE_DRAGON_LAIR_HIDDEN_CONCENTRATED_STRIKE_WAIT	In 10 seconds, Balathor's Dragon Egg will appear and you can initiate a targetted attack.
-GUILD_WHITE_DRAGON_LAIR_HIDDEN_FAIL_REWARD	Balathor flees and leaves his treasure behind.
-GUILD_WHITE_DRAGON_LAIR_NEXT_CONCENTRATED_STRIKE_NEED_MORE_DAMAGE	More damage will be needed for the next attack.
-GUILD_WHITE_DRAGON_LAIR_NOTICE_CONCENTRATED_STRIKE_START	One of Balathor's Dragon Eggs is summoning ice cold! Focus your attacks to stop it.
-GUILD_WHITE_DRAGON_LAIR_NOTICE_GIVE_UP	You have cancelled your attempt to master Balathor's Crypt. You will be teleported out in 1 minute.
-GUILD_WHITE_DRAGON_LAIR_NOTICE_INCREASE_ARROW_COUNT	The Hwacha is currently loaded with %d Fire Arrows.
-GUILD_WHITE_DRAGON_LAIR_NOTICE_LIMIT_TIME	Time remaining: %d
-GUILD_WHITE_DRAGON_LAIR_NOTICE_REWARD_STAGE_REMAIN_TIME	You will be teleported out in %d minutes. You can talk to Dragon Watcher Dolnarr to leave the dungeon immediately.
-GUILD_WHITE_DRAGON_LAIR_NOTICE_REWARD_STATGE	You can collect your reward from Balathor's Treasure. You will be teleported out in 5 minutes.
-GUILD_WHITE_DRAGON_LAIR_NOTICE_SPAWNEED_BROKEN_EGG	A Flaming Dragon Egg has appeared.
-GUILD_WHITE_DRAGON_LAIR_NOT_ENOUGH_GUILD_SP	You don't have enough Dragon God Power.
-GUILD_WHITE_DRAGON_LAIR_PROTECTED_EGGS	Destroy the eggs to inflict damage!
-GUILD_WHITE_DRAGON_LAIR_PUT_EGGS_BACK_IN_ORIGINAL_PLACE	Balathor's Dragon Egg reappears at its original location.
-GUILD_WHITE_DRAGON_LAIR_REPAIR_SINGIJEON	The Hwacha cannot be loaded before it has been repaired.
-GUILD_WHITE_DRAGON_LAIR_REPAIR_SINGIJEON_SUCCESS	The Hwacha is now fully repaired.
-GUILD_WHITE_DRAGON_LAIR_RUN_AWAY_TO_BREATH	Balathor saw a Dragon Egg being destroyed. Avoid his icy breath!
-GUILD_WHITE_DRAGON_LAIR_UI_BOSS_NAME_TOOLTIP	Balathor
-GUILD_WHITE_DRAGON_LAIR_UI_BROKEN_EGG_INFO_1	Remaining
-GUILD_WHITE_DRAGON_LAIR_UI_BROKEN_EGG_INFO_2	Chances: %d
-GUILD_WHITE_DRAGON_LAIR_UI_BROKEN_EGG_TOOLTIP	If %d Flaming Dragon Eggs are destroyed, the dungeon attempt is failed.
-GUILD_WHITE_DRAGON_LAIR_UI_FLYING_FLMAE_BREATH_TOOLTIP	If the seal fails 100%%, Balathor will direct his deadly gaze on you. (Current seal weakness: %d%%)
-GUILD_WHITE_DRAGON_LAIR_UI_HIDDEN_BOSS_NAME_TOOLTIP	Balathor
-GUILD_WHITE_DRAGON_LAIR_UI_SINGIJEON_NAME_TOOLTIP	Hwacha
-GUILD_WHITE_DRAGON_LAIR_UI_SINGIJEON_TOOLTIP	Once 8 arrows are loaded, Balathor's scale armour can be destroyed. Fire Arrows can be acquired from Ancient Ice Crystals. Currently loaded: %d
 GUILD_WITHDRAW	Fallback
 GUILD_YOU_DO_NOT_JOIN	You are not a member of any guild.
 HORSE_HEALTH0	Dead
@@ -1363,7 +997,7 @@ SWITCHBOT_CLEAR_ATTR	Delete
 SWITCHBOT_LOAD_CONFIGURATION	Load
 SWITCHBOT_CLEAR_CONFIGURATION	Clear
 SYMBOLLIST_TITLE	Register guild flag
-SYSTEM_WHISPER	[Anka2]
+SYSTEM_WHISPER	[Nirvana2]
 TARGET_BUTTON_ACCEPT_FIGHT	Agree
 TARGET_BUTTON_AVENGE	Revenge
 TARGET_BUTTON_BLOCK	Block
@@ -1864,54 +1498,8 @@ WIKI_SUBCATEGORY_WEAPONS	Weapons
 WIKI_TITLE	Wikipedia
 WIKI_UNKOWN_ITEM	Unknown item: %d
 WIKI_UNKOWN_MOB	Unknown mob: %d
-REFINE_ERROR_ADD_PERC_STONES	[Refine] You cannot add an elixir to increase the stone success rate.
-REFINE_ERROR_ITEM_COUNT	[Refine] You can only add 1 item, not more.
-REFINE_ERROR_ITEM_OVERFLOW_PERCENTAGE	[Refine] Total percentage exceeds 100, you cannot do this.
-REFINE_ERROR_ADD_PERC_STONES	[Refine] You cannot increase the success rate of the stones.
-REFINE_POPUP_NO_DOWNGRADE_MESSAGE	An upgraded item cannot be destroyed or downgraded.
-REFINE_INCREASE_PERCENTAGE	[Extra + %d%%]
-REFINE_NEED_ITEMS	[i] Required items
-REFINE_NEXT_ITEM	[i] Improved Item
-REFINE_PERCENTAGE_LOW	+%5
-REFINE_PERCENTAGE_MEDIUM	+%10
-REFINE_PERCENTAGE_EXTRA	+%15
-REFINE_SUCCESS_PROBALITY	|cFFE53931The item may fail.|r
-REFINE_TOOLTIP_ITEM_DESCRIPTION_1	
-REFINE_TOOLTIP_ITEM_DESCRIPTION_2	
-REFINE_TOOLTIP_ITEM_DESCRIPTION_3	
-REFINE_TOOLTIP_ITEM_DESCRIPTION_4
-REVIVE_AUTO_TOWN_MESSAGE	Auto-revive time: {}
-STAT_TOOLTIP_IMG_DEF	Defense
-GUILD_DIAMANT_OVEN	Diamond furnace
-GUILD_FOSSIL_OVEN	Fossil wood furnace
-GUILD_COPPER_OVEN	Copper furnace
-GUILD_SILVER_OVEN	Silver furnace
-GUILD_GOLD_OVEN	Gold furnace
-GUILD_JADE_OVEN	Jade furnace
-GUILD_EBONY_OVEN	Ebony furnace
-GUILD_PEARL_OVEN	Pearl furnace
-GUILD_WHITEGOLD_OVEN	White gold furnace
-GUILD_KRISTALL_OVEN	Crystal furnace
-GUILD_QUARZ_OVEN	Quartz furnace
-GUILD_TEARS_OVEN	Celestial tear furnace
-GUILD_SOULCRISTAL_OVEN	Soul crystal furnace
-GUILD_RUBIN_OVEN	Ruby furnace
-GUILD_GRANAT_OVEN	Garnet furnace
-GUILD_SMARAGD_OVEN	Emerald furnace
-GUILD_SAPHIR_OVEN	Sapphire furnace
-GUILD_TURMALIN_OVEN	Tourmaline furnace
-GUILD_WEAPON_BLACKSMITH	Weapon blacksmith
-GUILD_ARMOR_BLACKSMITH	Armor blacksmith
-GUILD_JUWELER_BLACKSMITH	Jeweler
 NEW_AFFECT_AUTO_HUNT	Auto Hunt	SNA
-OTO_SATIS	|Eemoji/key_ctrl|e + |Eemoji/key_x|e + |Eemoji/key_rclick|e - Auto Sell.
-OTOMATIK_SAT_UYARI	<Auto Sell> You cannot add more than 1 item, separate the items first!
-OTOMATIK_SAT_UYARI_SANDIK	<Auto Sell> You cannot add chests to auto sell!
-POSSIBLE_ORE    Suitable Ore:
-EMOJI_TEXTLINE_VIEW_RENDER	Hold |Eemoji/key_ctrl|e to preview.
-REFINE_INCRESE3	Automatically use every enhancement
-REFINE_INCRESE2	Use only for the current upgrade
-REFINE_INCRESE	[i] Increase upgrade chances
-REFINE_NO_SOULD_OF_GOD_ALERT	You do not have the Seal of God!
-REFINE_INFO_PITTY_DESC1	The Pity System serves as an anti-frustration mechanic for regular players. It helps prevent progression blockage caused by repeated failures during expensive item upgrades.
-REFINE_INFO_PITTY_DESC2	This system guarantees success after a certain number of attempts and is enabled only for high-level equipment, ensuring a smoother progression for players. It is especially effective when using the Magic Stone refinement scroll, as failure count resets if the item level decreases.
+OTO_SATIS	|Eemoji/key_ctrl|e + |Eemoji/key_x|e + |Eemoji/key_rclick|e - Otomatik Sat.
+OTOMATIK_SAT_UYARI	<Otomatik Satma> 1 den fazla itemi ekleyemezsin, önce itemi ayır!
+OTOMATIK_SAT_UYARI_SANDIK	<Otomatik Satma> Sandıkları otomatik satmaya ekleyemezsin!
+POSSIBLE_ORE	Suitable Ore:

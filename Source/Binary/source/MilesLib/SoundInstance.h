@@ -20,7 +20,7 @@ public:
 	virtual void	SetVolume(float volume) const = 0;
 	virtual bool	IsDone() const = 0;
 	virtual void	SetPosition(float x, float y, float z) const = 0;
-	virtual void	SetOrientation(float x_face, float y_face, float z_face,
+	virtual void	SetOrientation(float x_face, float y_face, float z_face, 
 						   float x_normal, float y_normal, float z_normal) const = 0;
 	virtual void	SetVelocity(float x, float y, float z, float fMagnitude) const = 0;
 };
@@ -44,7 +44,7 @@ public: // from interface
 	void	SetVolume(float volume) const;
 	bool	IsDone() const;
 	void	SetPosition(float x, float y, float z) const;
-	void	SetOrientation(float x_face, float y_face, float z_face,
+	void	SetOrientation(float x_face, float y_face, float z_face, 
 						   float x_normal, float y_normal, float z_normal) const;
 	void	SetVelocity(float fx, float fy, float fz, float fMagnitude) const;
 
@@ -73,7 +73,7 @@ class CSoundInstance3D : public ISoundInstance
 		bool	IsDone() const;
 
 		void	SetPosition(float x, float y, float z) const;
-		void	SetOrientation(float x_face, float y_face, float z_face,
+		void	SetOrientation(float x_face, float y_face, float z_face, 
 							   float x_normal, float y_normal, float z_normal) const;
 		void	SetVelocity(float fx, float fy, float fz, float fMagnitude) const;
 
@@ -93,7 +93,7 @@ public:
 public: // from interface
 	bool	Initialize();
 	void	Destroy();
-
+	
 	void	SetStream(HSTREAM stream);
 	bool	SetSound(CSoundData* pSound);
 
@@ -107,7 +107,7 @@ public: // from interface
 	bool	IsData() const;
 
 	void	SetPosition(float x, float y, float z) const;
-	void	SetOrientation(float x_face, float y_face, float z_face,
+	void	SetOrientation(float x_face, float y_face, float z_face, 
 						   float x_normal, float y_normal, float z_normal) const;
 	void	SetVelocity(float fx, float fy, float fz, float fMagnitude) const;
 

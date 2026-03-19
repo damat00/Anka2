@@ -94,15 +94,23 @@ public:
     }
 };
 
+inline
+error_category const&
+get_http_error_category()
+{
+    static http_error_category const cat{};
+    return cat;
+}
+
 } // detail
 
 inline
 error_code
 make_error_code(error ev)
 {
-    static detail::http_error_category const cat{};
-    return error_code{static_cast<
-        std::underlying_type<error>::type>(ev), cat};
+    return error_code{
+        static_cast<std::underlying_type<error>::type>(ev),
+            detail::get_http_error_category()};
 }
 
 } // http

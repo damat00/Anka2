@@ -13,7 +13,6 @@
 #include "../../common/service.h"
 #include "../../common/VnumHelper.h"
 
-
 bool CHARACTER::StartRiding()
 {
 	if (IsDead() == true)
@@ -67,10 +66,6 @@ bool CHARACTER::StartRiding()
 
 	MountVnum(dwMountVnum);
 
-#ifdef ENABLE_PASSIVE_SYSTEM
-	RemoveAffect(AFFECT_PASSIVE_RELIC_DISMOUNT_SPEED);
-#endif
-
 	if(test_server)
 		sys_log(0, "Ride Horse : %s ", GetName());
 
@@ -95,11 +90,6 @@ bool CHARACTER::StopRiding()
 			m_dwMountVnum = 0;
 			ComputePoints();
 			UpdatePacket();
-		}
-
-		LPITEM item_mount = GetWear(WEAR_MOUNT);
-		if(item_mount){
-			UnequipItem(item_mount);
 		}
 
 		PointChange(POINT_ST, 0);
@@ -200,6 +190,10 @@ void CHARACTER::HorseSummon(bool bSummon, bool bFromFar, DWORD dwVnum, const cha
 			return;
 		}
 
+		m_chHorse->m_stateIdle.Set(m_chHorse, &CHARACTER::BeginStateEmpty, &CHARACTER::StateHorse, &CHARACTER::EndStateEmpty);
+		m_chHorse->m_stateMove.Set(m_chHorse, &CHARACTER::BeginStateEmpty, &CHARACTER::StateMove, &CHARACTER::EndStateEmpty);
+		m_chHorse->m_stateBattle.Set(m_chHorse, &CHARACTER::BeginStateEmpty, &CHARACTER::StateHorse, &CHARACTER::EndStateEmpty);
+
 		if (GetHorseHealth() <= 0)
 		{
 			m_chHorse->SetPosition(POS_DEAD);
@@ -229,7 +223,7 @@ void CHARACTER::HorseSummon(bool bSummon, bool bFromFar, DWORD dwVnum, const cha
 			m_chHorse->m_stName += m_horseText[locale];
 #else
 			m_chHorse->m_stName = GetName();
-			m_chHorse->m_stName += "'s Binek";
+			m_chHorse->m_stName += "";
 #endif
 		}
 
@@ -380,7 +374,7 @@ bool CHARACTER::CanUseHorseSkill()
 
 		if (GetMountVnum())
 		{
-			if (GetMountVnum() >= 20201 && GetMountVnum() <= 20249)
+			if (GetMountVnum() >= 20209 && GetMountVnum() <= 20249)
 				return true;
 
 			if (CMobVnumHelper::IsRamadanBlackHorse(GetMountVnum()))

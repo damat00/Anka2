@@ -444,20 +444,11 @@ void CPythonPlayer::SetStatus(DWORD dwType, long lValue)
 
 		if (pkPlayer)
 		{
-			pkPlayer->SetLevel(lValue);
 			pkPlayer->UpdateTextTailLevel(lValue);
+			pkPlayer->SetLevel(lValue);
 		}
-	}
 
-#ifdef ENABLE_CONQUEROR_LEVEL
-	if (dwType == POINT_CONQUEROR_LEVEL)
-	{
-		CInstanceBase* pkPlayer = NEW_GetMainActorPtr();
-
-		if (pkPlayer)
-			pkPlayer->UpdateTextTailConquerorLevel(lValue);
 	}
-#endif
 
 	switch (dwType)
 	{
@@ -471,20 +462,13 @@ void CPythonPlayer::SetStatus(DWORD dwType, long lValue)
 		case POINT_ST:
 		case POINT_DX:
 		case POINT_IQ:
-#ifdef ENABLE_CONQUEROR_LEVEL
-		case POINT_CONQUEROR_LEVEL:
-		case POINT_SUNGMA_STR:
-		case POINT_SUNGMA_HP:
-		case POINT_SUNGMA_MOVE:
-		case POINT_SUNGMA_IMMUNE:			
-#endif
-			m_playerStatus.SetPoint (dwType, lValue);
+			m_playerStatus.SetPoint(dwType, lValue);
 			__UpdateBattleStatus();
 			break;
 		default:
-			m_playerStatus.SetPoint (dwType, lValue);
+			m_playerStatus.SetPoint(dwType, lValue);
 			break;
-	}
+	}		
 }
 
 #ifdef ENABLE_GOLD_LIMIT
@@ -516,9 +500,7 @@ void CPythonPlayer::SetName(const char *name)
 void CPythonPlayer::NotifyDeletingCharacterInstance(DWORD dwVID)
 {
 	if (m_dwMainCharacterIndex == dwVID)
-	{
 		m_dwMainCharacterIndex = 0;
-	}
 }
 
 void CPythonPlayer::NotifyCharacterDead(DWORD dwVID)
@@ -560,6 +542,7 @@ void CPythonPlayer::NotifyChangePKMode()
 {
 	PyCallClassMemberFunc(m_ppyGameWindow, "OnChangePKMode", Py_BuildValue("()"));
 }
+
 
 void CPythonPlayer::MoveItemData(TItemPos SrcCell, TItemPos DstCell)
 {
@@ -650,76 +633,6 @@ int CPythonPlayer::GetItemSlotIndex(DWORD dwVnum)
 
 	return -1;
 }
-
-#ifdef ENABLE_ATTENDANCE_EVENT
-void CPythonPlayer::SetHitCountInfo(DWORD dwVid, DWORD dwCount)
-{
-	bool bContain = false;
-	
-	if(!m_hitCount.empty())
-	{
-		for (DWORD i = 0; i < m_hitCount.size(); i++)
-		{
-			if(m_hitCount[i].dwVid == dwVid)
-			{
-				bContain = true;
-				m_hitCount[i].dwCount  = dwCount;
-				break;
-			}
-		}
-	}
-	
-	if(!bContain)
-	{
-		m_hitCount.push_back(THitCountInfo(dwVid, dwCount));
-	}
-}
-
-DWORD CPythonPlayer::GetHitCountInfo(DWORD dwVid)
-{
-	DWORD dwCount = 0;
-	
-	for (DWORD i = 0; i < m_hitCount.size(); i++)
-	{
-		if(m_hitCount[i].dwVid == dwVid)
-		{
-			dwCount = m_hitCount[i].dwCount;
-			break;
-		}
-	}
-	
-	return dwCount;
-}
-
-void CPythonPlayer::SetRewardItem(BYTE bDay, DWORD dwVnum, DWORD dwCount)
-{
-	bool bContain = false;
-	
-	if(!m_rewardItems.empty())
-	{
-		for (DWORD i = 0; i < m_rewardItems.size(); i++)
-		{
-			if(m_rewardItems[i].bDay == bDay)
-			{
-				bContain = true;
-				m_rewardItems[i].dwVnum = dwVnum;
-				m_rewardItems[i].dwCount = dwCount;
-				break;
-			}
-		}
-	}
-	
-	if(!bContain)
-	{
-		TRewardItem tempItem;
-		tempItem.bDay = bDay;
-		tempItem.dwVnum = dwVnum;
-		tempItem.dwCount = dwCount;
-		
-		m_rewardItems.push_back(tempItem);
-	}
-}
-#endif
 
 DWORD CPythonPlayer::GetItemFlags(TItemPos Cell)
 {
@@ -1987,11 +1900,6 @@ void CPythonPlayer::Clear()
 	m_PetDataMap.clear();
 #endif
 
-#ifdef ENABLE_ATTENDANCE_EVENT
-	m_hitCount.clear();
-	m_rewardItems.clear();
-#endif
-
 	__ClearAutoAttackTargetActorID();
 }
 
@@ -2338,7 +2246,6 @@ CPythonPlayer::CPythonPlayer(void)
 {
 	SetMovableGroundDistance(40.0f);
 
-	// AffectIndex To SkillIndex
 	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int(CInstanceBase::AFFECT_JEONGWI), 3));
 	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int(CInstanceBase::AFFECT_GEOMGYEONG), 4));
 	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int(CInstanceBase::AFFECT_CHEONGEUN), 19));
@@ -2353,19 +2260,9 @@ CPythonPlayer::CPythonPlayer(void)
 	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int(CInstanceBase::AFFECT_JEUNGRYEOK), 111));
 	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int(CInstanceBase::AFFECT_PABEOP), 66));
 	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int(CInstanceBase::AFFECT_FALLEN_CHEONGEUN), 19));
-	/////
 	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int(CInstanceBase::AFFECT_GWIGEOM), 63));
 	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int(CInstanceBase::AFFECT_MUYEONG), 78));
 	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int(CInstanceBase::AFFECT_HEUKSIN), 79));
-
-#ifdef ENABLE_WOLFMAN_CHARACTER
-	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int(CInstanceBase::AFFECT_RED_POSSESSION), 174));
-	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int(CInstanceBase::AFFECT_BLUE_POSSESSION), 175));
-#endif
-
-#ifdef ENABLE_NINETH_SKILL
-	m_kMap_dwAffectIndexToSkillIndex.insert(std::make_pair(int(CInstanceBase::AFFECT_CHEONUN), 182));
-#endif
 
 	m_ppyGameWindow = nullptr;
 
@@ -2395,8 +2292,9 @@ CPythonPlayer::CPythonPlayer(void)
 
 CPythonPlayer::~CPythonPlayer(void) {}
 
-#ifdef ENABLE_ULTIMATE_REGEN
+#ifdef ENABLE_RENEWAL_REGEN
 #include "../eterPack/EterPackManager.h"
+
 void localToGlobal(long& X, long& Y)
 {
 	CPythonBackground::Instance().LocalPositionToGlobalPosition(X, Y);
@@ -2929,56 +2827,12 @@ void CPythonPlayer::AutoHuntLoop()
 						return;
 			}
 		}
-		// Takýlma kontrolü - eðer hareket ediyorsa ve belirli bir süre geçtiyse kontrol et
-		static DWORD dwLastMoveTime = 0;
-		static TPixelPosition lastPos = {0, 0, 0};
-		TPixelPosition currentPos;
-		pkInstMain->NEW_GetPixelPosition(&currentPos);
-		
 		if (pkInstMain->IsWalking())
 		{
-			// Hareket ediyor - takýlma kontrolü
-			DWORD dwCurrentTime = GetTickCount();
-			const float fPosDiff = GetDistanceNew(currentPos, lastPos);
-			
-			// Eðer pozisyon deðiþmiyorsa (takýlmýþ) ve 3 saniye geçtiyse
-			if (fPosDiff < 10.0f && dwLastMoveTime > 0 && (dwCurrentTime - dwLastMoveTime) > 3000)
-			{
-				// Takýldý - hedefi deðiþtir veya durdur
-				pkInstMain->NEW_Stop();
-				__ClearReservedAction();
-				SetTarget(0);
-				m_dwVIDReserved = 0;
-				m_dwTargetVID = 0;
-				dwLastMoveTime = 0;
-				// Yeni hedef ara
-				pkInstVictim = NULL;
-			}
-			else if (fPosDiff >= 10.0f)
-			{
-				// Pozisyon deðiþiyor - normal hareket
-				lastPos = currentPos;
-				dwLastMoveTime = dwCurrentTime;
-			}
-			
-			// Saldýrý menzilindeyse dur ve saldýr
 			if (pkInstVictim && CPythonCharacterManager::Instance().CanAttackToTarget(pkInstMain, pkInstVictim))
-			{
-				pkInstMain->NEW_Stop();
-				dwLastMoveTime = 0;
-			}
-			else
-			{
-				return;
-			}
+				AutoHuntStop();
+			return;
 		}
-		else
-		{
-			// Hareket etmiyor - takýlma zamanlayýcýsýný sýfýrla
-			dwLastMoveTime = 0;
-			lastPos = currentPos;
-		}
-		
 		if (!pkInstVictim || pkInstVictim->IsDead())
 		{
 			// AUTO_HUNT menzil artýrýldý: +40.0 -> +150.0, çarpan: 4000.0 -> 8000.0 (2x menzil)
@@ -2996,22 +2850,9 @@ void CPythonPlayer::AutoHuntLoop()
 			m_dwVIDReserved = pkInstVictim->GetVirtualID();
 			m_dwTargetVID = pkInstVictim->GetVirtualID();
 			__OnPressActor(*pkInstMain, m_dwTargetVID, true);
-			dwLastMoveTime = GetTickCount();
-			lastPos = currentPos;
 			return;
 		}
-
-		// Hedef var ve ölü deðil - saldýrý menzilinde mi kontrol et
-		if (!CPythonCharacterManager::Instance().CanAttackToTarget(pkInstMain, pkInstVictim))
-		{
-			// Saldýrý menzilinde deðil - hedefe doðru hareket et
-			__ReserveProcess_ClickActor();
-		}
-		else
-		{
-			// Saldýrý menzilinde - direkt saldýr
-			__ReserveProcess_ClickActor();
-		}
+		__ReserveProcess_ClickActor();
 	}
 }
 #endif

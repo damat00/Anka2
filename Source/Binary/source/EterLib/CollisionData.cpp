@@ -212,7 +212,7 @@ void CSphereCollisionInstance::OnDestroy()
 	gs_sci.Free(this);
 }
 
-bool CSphereCollisionInstance::OnMovementCollisionDynamicSphere(const CDynamicSphereInstance & s) const
+bool CSphereCollisionInstance::OnMovementCollisionDynamicSphere(const CDynamicSphereInstance & s) const 
 {
 	if (square_distance_between_linesegment_and_point(s.v3LastPosition,s.v3Position,m_attribute.v3Position) < (m_attribute.fRadius+s.fRadius)*(m_attribute.fRadius+s.fRadius))
 	{
@@ -224,7 +224,7 @@ bool CSphereCollisionInstance::OnMovementCollisionDynamicSphere(const CDynamicSp
 	return false;
 }
 
-bool CSphereCollisionInstance::OnCollisionDynamicSphere(const CDynamicSphereInstance & s) const
+bool CSphereCollisionInstance::OnCollisionDynamicSphere(const CDynamicSphereInstance & s) const 
 {
 	if (square_distance_between_linesegment_and_point(s.v3LastPosition,s.v3Position,m_attribute.v3Position)<(m_attribute.fRadius+s.fRadius)*(m_attribute.fRadius+s.fRadius))
 	{
@@ -280,7 +280,7 @@ bool CPlaneCollisionInstance::OnMovementCollisionDynamicSphere(const CDynamicSph
 	float fPosition1 = D3DXVec3Dot(&m_attribute.v3Normal, &v3SpherePosition);
 	float fPosition2 = D3DXVec3Dot(&m_attribute.v3Normal, &v3SphereLastPosition);
 
-	if (fPosition1 >0.0f && fPosition2 < 0.0f  || fPosition1 <0.0f && fPosition2 >0.0f
+	if (fPosition1 >0.0f && fPosition2 < 0.0f  || fPosition1 <0.0f && fPosition2 >0.0f 
 		|| (fPosition1) <= s.fRadius && fPosition1 >= -s.fRadius)
 	{
 		D3DXVECTOR3 v3QuadPosition1 = s.v3Position - m_attribute.v3QuadPosition[0];

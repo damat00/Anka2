@@ -109,9 +109,9 @@ void CRaceMotionData::SetName(UINT eName)
 		case NAME_SHY:
 		case NAME_CHEERUP:
 		case NAME_BANTER:
-		case NAME_JOY:
+		case NAME_JOY:			
 		case NAME_CHEERS_1:
-		case NAME_CHEERS_2:
+		case NAME_CHEERS_2:	
 		case NAME_KISS_WITH_WARRIOR:
 		case NAME_KISS_WITH_ASSASSIN:
 		case NAME_KISS_WITH_SURA:
@@ -162,7 +162,7 @@ void CRaceMotionData::SetName(UINT eName)
 			else
 				TraceError("CRaceMotionData::SetName - UNKNOWN NAME %d", eName);
 			break;
-	}
+	}	
 }
 void CRaceMotionData::SetType(UINT eType)
 {
@@ -188,7 +188,7 @@ UINT CRaceMotionData::GetType() const
 
 bool CRaceMotionData::IsLock() const
 {
-	return m_isLock ? true : false;
+	return m_isLock ? true : false;	
 }
 
 int CRaceMotionData::GetLoopCount() const
@@ -487,7 +487,7 @@ bool CRaceMotionData::LoadMotionData(const char *c_szFileName)
 
 	if (strSoundFileNameTemp.length() > 13)
 	{
-		const char * c_szHeader = &strSoundFileNameTemp[13];
+		const char *c_szHeader = &strSoundFileNameTemp[13];
 
 		m_strSoundScriptDataFileName = "sound/";
 		m_strSoundScriptDataFileName += c_szHeader;
@@ -497,88 +497,8 @@ bool CRaceMotionData::LoadMotionData(const char *c_szFileName)
 
 	return true;
 }
-#ifdef WORLD_EDITOR
-bool CRaceMotionData::SaveMotionData(const char * c_szFileName)
-{
-	FILE * File;
 
-	SetFileAttributes(c_szFileName, FILE_ATTRIBUTE_NORMAL);
-	File = fopen(c_szFileName, "w");
-
-	if (!File)
-	{
-		TraceError("CRaceMotionData::SaveMotionData : cannot open file for writing (filename: %s)", c_szFileName);
-		return false;
-	}
-
-	fprintf(File, "ScriptType               MotionData\n");
-	fprintf(File, "\n");
-
-	fprintf(File, "MotionFileName           \"%s\"\n", m_strMotionFileName.c_str());
-	fprintf(File, "MotionDuration           %f\n", m_fMotionDuration);
-
-	if (m_isAccumulationMotion)
-		fprintf(File, "Accumulation           %.2f\t%.2f\t%.2f\n", m_accumulationPosition.x, m_accumulationPosition.y, m_accumulationPosition.z);
-
-	fprintf(File, "\n");
-
-	if (m_isComboMotion)
-	{
-		fprintf(File, "Group ComboInputData\n");
-		fprintf(File, "{\n");
-		fprintf(File, "    PreInputTime             %f\n", m_ComboInputData.fInputStartTime);
-		fprintf(File, "    DirectInputTime          %f\n", m_ComboInputData.fNextComboTime);
-		fprintf(File, "    InputLimitTime           %f\n", m_ComboInputData.fInputEndTime);
-		fprintf(File, "}\n");
-		fprintf(File, "\n");
-	}
-
-	if (m_isAttackingMotion)
-	{
-		fprintf(File, "Group AttackingData\n");
-		fprintf(File, "{\n");
-		NRaceData::SaveMotionAttackData(File, 1, m_MotionAttackData);
-		fprintf(File, "}\n");
-		fprintf(File, "\n");
-	}
-
-	if (m_isLoopMotion)
-	{
-		fprintf(File, "Group LoopData\n");
-		fprintf(File, "{\n");
-		fprintf(File, "    MotionLoopCount          %d\n", m_iLoopCount);
-		fprintf(File, "    LoopCancelEnable         %d\n", m_bCancelEnableSkill);
-		fprintf(File, "    LoopStartTime            %f\n", m_fLoopStartTime);
-		fprintf(File, "    LoopEndTime              %f\n", m_fLoopEndTime);
-		fprintf(File, "}\n");
-		fprintf(File, "\n");
-	}
-
-	if (!m_MotionEventDataVector.empty())
-	{
-		fprintf(File, "Group MotionEventData\n");
-		fprintf(File, "{\n");
-		fprintf(File, "    MotionEventDataCount     %d\n", m_MotionEventDataVector.size());
-
-		for (DWORD j = 0; j < m_MotionEventDataVector.size(); ++j)
-		{
-			TMotionEventData * c_pData = m_MotionEventDataVector[j];
-
-			fprintf(File, "    Group Event%02d\n", j);
-			fprintf(File, "    {\n");
-			fprintf(File, "        MotionEventType      %d\n", c_pData->iType);
-			fprintf(File, "        StartingTime         %f\n", c_pData->fStartingTime);
-			c_pData->Save(File, 2);
-			fprintf(File, "    }\n");
-		}
-		fprintf(File, "}\n");
-	}
-
-	fclose(File);
-	return true;
-}
-#endif
-bool CRaceMotionData::LoadSoundScriptData(const char * c_szFileName)
+bool CRaceMotionData::LoadSoundScriptData(const char *c_szFileName)
 {
 	NSound::TSoundDataVector SoundDataVector;
 	if (!NSound::LoadSoundInformationPiece(c_szFileName, SoundDataVector))
@@ -590,12 +510,12 @@ bool CRaceMotionData::LoadSoundScriptData(const char * c_szFileName)
 	return true;
 }
 
-const char * CRaceMotionData::GetMotionFileName() const
+const char *CRaceMotionData::GetMotionFileName() const
 {
 	return m_strMotionFileName.c_str();
 }
 
-const char * CRaceMotionData::GetSoundScriptFileName() const
+const char *CRaceMotionData::GetSoundScriptFileName() const
 {
 	return m_strSoundScriptDataFileName.c_str();
 }

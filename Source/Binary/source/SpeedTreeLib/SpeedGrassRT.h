@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////  
 //	CSpeedGrassRT Class
 //
 //	(c) 2003 IDV, Inc.
@@ -33,7 +33,7 @@
 class CIdvTerrain;
 
 
-///////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////  
 //	class CSpeedGrassRT declaration
 
 class CSpeedGrassRT
@@ -43,7 +43,7 @@ public:
 		virtual ~CSpeedGrassRT( );
 
 
-        ///////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////  
         //  struct SBlade
 
 		struct SBlade
@@ -66,7 +66,7 @@ public:
 		};
 
 
-        ///////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////  
         //  struct SRegion
 
 		struct SRegion
@@ -90,60 +90,60 @@ public:
 
 		void				DeleteRegions(void);
 		const SRegion*		GetRegions(unsigned int& uiNumRegions);
-		bool				ParseBsfFile(const char* pFilename, unsigned int nNumBlades, unsigned int uiRows, unsigned int uiCols, float fCollisionDistance = 0.0f);
+		bool				ParseBsfFile(const char *pFilename, unsigned int nNumBlades, unsigned int uiRows, unsigned int uiCols, float fCollisionDistance = 0.0f);
 		bool				CustomPlacement(unsigned int uiRows, unsigned int uiCols);
 
 		//////////////////////////////////////////////////////////////////////////
 		// Utility
 static	void				RotateAxisFromIdentity(D3DXMATRIX * pMat, const float & c_fAngle, const D3DXVECTOR3 & c_rv3Axis);
 
-        ///////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////  
         //  Geometry
 
 static	const float*		GetUnitBillboard(void)											{ return m_afUnitBillboard; }
 
 
-        ///////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////  
         //  LOD
 
 static  void		        GetLodParams(float& fFarDistance, float& fTransitionLength);
 static  void		        SetLodParams(float fFarDistance, float fTransitionLength);
 
 
-        ///////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////  
         //  Culling
 
 		bool				AllRegionsAreCulled(void) const									{ return m_bAllRegionsCulled; }
 		void				Cull(void);
 
 
-        ///////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////  
         //  Wind
 
-static	void				SetWindDirection(const float* pWindDir);
+static	void				SetWindDirection(const float *pWindDir);
 static	const float*		GetWindDirection(void);
 
 
-        ///////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////  
         //  Camera
 
 static  const float*		GetCameraPos(void);
-static  void                SetCamera(const float* pPosition, const double* pModelviewMatrix);
+static  void                SetCamera(const float *pPosition, const double *pModelviewMatrix);
 static	void				SetPerspective(float fAspectRatio, float fFieldOfView);
 
 
-        ///////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////  
         //  Terrain hugging
 
-virtual float				Color(float fX, float fY, const float* pNormal, float* pTopColor, float* pBottomColor) const { return 0.0f; }
-virtual float				Height(float fX, float fY, float* pNormal) const { return 0.0f; }
+virtual float				Color(float fX, float fY, const float *pNormal, float *pTopColor, float *pBottomColor) const { return 0.0f; }	
+virtual float				Height(float fX, float fY, float *pNormal) const { return 0.0f; }	
 
 protected:
 
 		void				CreateRegions(const std::vector<SBlade>& vSceneBlades, float fCollisionDistance = 0.0f);
 static	void				ComputeFrustum(void);
 static	void				ComputeUnitBillboard(void);
-		void				ConvertCoordsToCell(const float* pCoords, int* pGridCoords) const;
+		void				ConvertCoordsToCell(const float *pCoords, int* pGridCoords) const;
 		unsigned int		GetRegionIndex(unsigned int uiRow, unsigned int uiCol) const	{ return uiRow * m_nNumRegionCols + uiCol; }
 static	bool				OutsideFrustum(SRegion* pRegion);
 

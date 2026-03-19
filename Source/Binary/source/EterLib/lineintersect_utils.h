@@ -1,4 +1,4 @@
-/* Copyright (C) Graham Rhodes, 2001.
+/* Copyright (C) Graham Rhodes, 2001. 
  * All rights reserved worldwide.
  *
  * This software is provided "as is" without express or implied
@@ -26,16 +26,16 @@
 #define _lineintersect_utils_h
 
 void IntersectLineSegments(const D3DXVECTOR3 & A1,
-                           const D3DXVECTOR3 & A2,
+                           const D3DXVECTOR3 & A2, 
                            const D3DXVECTOR3 & B1,
                            const D3DXVECTOR3 & B2,
-                           //bool infinite_lines, /*float epsilon,*/
-						   D3DXVECTOR3 & OutA,
+                           //bool infinite_lines, /*float epsilon,*/ 
+						   D3DXVECTOR3 & OutA, 
 						   D3DXVECTOR3 & OutB);
 
 
 void IntersectLineSegments(const float A1x, const float A1y, const float A1z,
-                           const float A2x, const float A2y, const float A2z,
+                           const float A2x, const float A2y, const float A2z, 
                            const float B1x, const float B1y, const float B1z,
                            const float B2x, const float B2y, const float B2z,
                            bool infinite_lines, float epsilon, float &PointOnSegAx,
@@ -45,7 +45,7 @@ void IntersectLineSegments(const float A1x, const float A1y, const float A1z,
                            float &NearestVectorY, float &NearestVectorZ, bool &true_intersection);
 
 void IntersectLineSegments(const float A1x, const float A1y, const float A1z,
-                           const float A2x, const float A2y, const float A2z,
+                           const float A2x, const float A2y, const float A2z, 
                            const float B1x, const float B1y, const float B1z,
                            const float B2x, const float B2y, const float B2z,
                            bool infinite_lines, float epsilon, float &PointOnSegAx,

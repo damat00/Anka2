@@ -9,6 +9,7 @@ net = __import__(pyapi.GetModuleName("net"))
 import constInfo
 import systemSetting
 import wndMgr
+import os
 import chat
 import uiTaskBar
 import uiCharacter
@@ -38,9 +39,9 @@ import uiGameButton
 import uiTip
 import uiCube
 import miniMap
-import uiNameReinforce
 import uiselectitem
 import uiScriptLocale
+
 import shop
 import event
 import localeInfo
@@ -54,17 +55,23 @@ if app.ENABLE_RENEWAL_SWITCHBOT:
 if app.ENABLE_ACCE_COSTUME_SYSTEM:
 	import uiAcce
 
+if app.ENABLE_BIOLOG_SYSTEM:
+	import uiBiologManager
+
 if app.ENABLE_VIEW_CHEST_DROP:
 	import uiChestDrop
 
 if app.ENABLE_SPECIAL_INVENTORY:
 	import uiSpecialInventory
 
-if app.ENABLE_EVENT_SYSTEM:
+if app.ENABLE_EVENT_MANAGER:
 	import uiEvent
 
-if app.ENABLE_MINI_GAME_OKEY:
-	import uiMiniGameRumi
+if app.ENABLE_MINIGAME_OKEY_CARDS_SYSTEM:
+	import uiCards
+
+if app.ENABLE_RENEWAL_BATTLE_PASS:
+	import uiBattlePass
 
 if app.ENABLE_RENDER_TARGET:
 	import uiRenderTarget
@@ -76,7 +83,7 @@ if app.ENABLE_RENEWAL_OFFLINESHOP:
 if app.ENABLE_OFFLINESHOP_SEARCH_SYSTEM:
 	import uiPrivateShopSearch
 
-if app.ENABLE_WIKI_SYSTEM:
+if app.ENABLE_INGAME_WIKI_SYSTEM:
 	import uiWiki
 
 if app.ENABLE_RENEWAL_SKILL_SELECT:
@@ -85,11 +92,8 @@ if app.ENABLE_RENEWAL_SKILL_SELECT:
 if app.ENABLE_NEW_DUNGEON_LIB:
 	import uiDungeonTimer
 
-if app.ENABLE_TRACK_WINDOW:
-	import uiTrack
-
-if app.ENABLE_ITEMSHOP:
-	import uiItemShopNew
+if app.ENABLE_RENEWAL_INGAME_ITEMSHOP:
+	import uiItemShop
 
 if app.ENABLE_AURA_COSTUME_SYSTEM:
 	import uiAura
@@ -106,18 +110,8 @@ if app.ENABLE_GROWTH_PET_SYSTEM:
 if app.ENABLE_RENEWAL_TELEPORT_SYSTEM:
 	import uiTeleport
 
-if app.ENABLE_SUNG_MAHI_TOWER:
-	import uiSungMahi
-
-if app.LINK_IN_CHAT:
-	import os
-
-if app.ENABLE_DUNGEON_INFO:
-	import uiDungeonInfo
-	import uitabledungeon
-
-if app.__DUNGEON_INFO__:
-	import uiDungeonTrack
+if app.ENABLE_DUNGEON_TRACKING_SYSTEM:
+	import uiTrack
 
 if app.ENABLE_RENEWAL_SPECIAL_CHAT:
 	import uiSpecialChat
@@ -137,55 +131,6 @@ if app.__AUTO_HUNT__:
 if app.ENABLE_AUTO_SELL_SYSTEM:
 	import uiautosell
 
-if app.ENABLE_BIOLOGIST_SYSTEM:
-	import uiBiyolog
-
-if app.ENABLE_ZODIAC_MISSION:
-	import ui12zi
-
-import uiitemfinder
-
-if app.ENABLE_RESP_SYSTEM:
-	import uiresp
-
-if app.ENABLE_COLLECT_WINDOW:
-	import uiCollectWindow
-
-if app.ENABLE_COLLECTIONS_SYSTEM:
-	import uiCollections
-
-if app.ENABLE_SOUL_ROULETTE_SYSTEM:
-	import uiMiniGameRoulette
-
-if app.ENABLE_MINI_GAME_CATCH_KING:
-	import uiminigamecatchking
-
-if app.ENABLE_EVENT_SYSTEM:
-	import uiMiniGame
-
-if app.ENABLE_ATTENDANCE_EVENT:
-	import uiMiniGameAttendance
-
-if app.ENABLE_FISH_EVENT_SYSTEM:
-	import uiMiniGameFishEvent
-
-if app.ENABLE_HALLOWEEN_EVENT_SYSTEM:
-	import uihalloween
-
-if app.ENABLE_GAYA_SYSTEM:
-	import uiGemShop
-	import uiselectitemEx
-
-if app.ENABLE_GAYA_TICKET_SYSTEM:
-	import uiGemTicket
-
-if app.ENABLE_BATTLE_PASS:
-	import uibattlepass
-	import uibattlepasspremium
-
-if app.ENABLE_RANKING:
-	import uiranking
-
 IsQBHide = 0
 class Interface(object):
 	CHARACTER_STATUS_TAB = 1
@@ -193,32 +138,11 @@ class Interface(object):
 
 	def __init__(self):
 		systemSetting.SetInterfaceHandler(self)
-
-		if app.__DUNGEON_INFO__:
-			self.wndDungeonTrack = None
-			self.wndDungeonManager = None
-
-		if app.ENABLE_TRACK_WINDOW:
-			self.wndTrackWindow = None
-
 		self.windowOpenPosition = 0
 		self.dlgWhisperWithoutTarget = None
 		self.inputDialog = None
 		self.tipBoard = None
 		self.bigBoard = None
-
-		if app.ENABLE_ZODIAC_MISSION:
-			self.wnd12ziReward = None
-			self.wnd12ziTimer = None
-
-		if app.ENABLE_DUNGEON_INFO:
-			self.wndDungeonInfo = None
-
-		if app.ENABLE_WIKI_SYSTEM:
-			self.wndWiki = None
-
-		if app.ENABLE_ITEMSHOP:
-			self.wndItemShop=None
 
 		if app.ENABLE_RENEWAL_OX_EVENT:
 			self.bigBoardControl = None
@@ -226,15 +150,12 @@ class Interface(object):
 		if app.ENABLE_AUTO_SELL_SYSTEM:
 			self.wndAutoSell = None
 
-		# ITEM_MALL
 		self.mallPageDlg = None
-		# END_OF_ITEM_MALL
 
 		self.wndWeb = None
 		self.wndTaskBar = None
 		self.wndCharacter = None
 		self.wndInventory = None
-		self.wndExpandedMoney = None
 		self.wndExpandedTaskBar = None
 		self.wndChat = None
 		self.wndMessenger = None
@@ -242,35 +163,27 @@ class Interface(object):
 		self.wndGuild = None
 		self.wndGuildBuilding = None
 
-		if app.ENABLE_EVENT_SYSTEM:
-			self.wndMiniGame = None
-
-		if app.ENABLE_SOUL_ROULETTE_SYSTEM:
-			self.wndMiniGameRoulette = None
-
-		if app.ENABLE_COLLECTIONS_SYSTEM:
-			self.wndCollections = None
-
-		if app.ENABLE_RESP_SYSTEM:
-			self.wndResp = None
-
-		if app.ENABLE_COLLECT_WINDOW:
-			self.wndCollectWindow = None
-
 		if app.ENABLE_RENEWAL_SWITCHBOT:
 			self.wndSwitchbot = None
 
-		if app.ENABLE_SUNG_MAHI_TOWER:
-			self.wndSungMahiWindow = None
-
 		if app.ENABLE_RENEWAL_CUBE:
 			self.wndCubeRenewal = None
+
+		if app.ENABLE_BIOLOG_SYSTEM:
+			self.wndBiologManager = {}
 
 		if app.ENABLE_VIEW_CHEST_DROP:
 			self.dlgChestDrop = None
 
 		if app.ENABLE_SPECIAL_INVENTORY:
 			self.wndSpecialInventory = None
+
+		if app.ENABLE_EVENT_MANAGER:
+			self.wndEventOverview = None
+
+		if app.ENABLE_RENEWAL_BATTLE_PASS:
+			self.wndBattlePassExtended = None
+			self.isFirstOpeningExtBattlePass = FALSE
 
 		if app.ENABLE_RENDER_TARGET:
 			self.wndRenderTarget = None
@@ -284,8 +197,14 @@ class Interface(object):
 		if app.ENABLE_OFFLINESHOP_SEARCH_SYSTEM:
 			self.wndPrivateShopSearch = None
 
+		if app.ENABLE_INGAME_WIKI_SYSTEM:
+			self.wndWiki = None
+
 		if app.ENABLE_NEW_DUNGEON_LIB:
 			self.wndDungeonTimer = None
+
+		if app.ENABLE_RENEWAL_INGAME_ITEMSHOP:
+			self.wndItemShop = None
 
 		if app.ENABLE_SLOT_MARKING_SYSTEM:
 			self.OnTopWindow = None
@@ -304,6 +223,9 @@ class Interface(object):
 		if app.ENABLE_RENEWAL_TELEPORT_SYSTEM:
 			self.wndWarpWindow = None
 
+		if app.ENABLE_DUNGEON_TRACKING_SYSTEM:
+			self.wndTrackWindow = None
+
 		if app.ENABLE_RENEWAL_SPECIAL_CHAT:
 			self.wndSpecialChat = None
 
@@ -318,15 +240,6 @@ class Interface(object):
 		if app.__AUTO_HUNT__:
 			self.wndAutoHunt = None
 
-		if app.ENABLE_BIOLOGIST_SYSTEM:
-			self.wndBiyologWindow = None
-
-		if app.ENABLE_GAYA_TICKET_SYSTEM:
-			self.wndImproveGemTicket = None
-
-		if app.ENABLE_RANKING:
-			self.wndRanking = None
-
 		self.listGMName = {}
 		self.wndQuestWindow = {}
 		self.wndQuestWindowNewKey = 0
@@ -334,8 +247,7 @@ class Interface(object):
 		self.guildScoreBoardDict = {}
 		self.equipmentDialogDict = {}
 
-		if app.LINK_IN_CHAT:
-			self.OpenLinkQuestionDialog = None
+		self.OpenLinkQuestionDialog = None
 
 		self.wndExpandedMoneyTaskBar = None
 
@@ -354,9 +266,6 @@ class Interface(object):
 		wndUICurtain.Hide()
 		self.wndUICurtain = wndUICurtain
 
-	def __MakeExpandMoney(self):
-		self.wndExpandedMoney = uiTaskBar.ExpandedMoneyTaskBar()
-	
 	def __MakeMessengerWindow(self):
 		self.wndMessenger = uiMessenger.MessengerWindow()
 
@@ -389,30 +298,22 @@ class Interface(object):
 		self.wndTaskBar.SetToggleButtonEvent(uiTaskBar.TaskBar.BUTTON_INVENTORY, ui.__mem_func__(self.ToggleInventoryWindow))
 		self.wndTaskBar.SetToggleButtonEvent(uiTaskBar.TaskBar.BUTTON_MESSENGER, ui.__mem_func__(self.ToggleMessenger))
 		self.wndTaskBar.SetToggleButtonEvent(uiTaskBar.TaskBar.BUTTON_SYSTEM, ui.__mem_func__(self.ToggleSystemDialog))
-		self.wndTaskBar.SetToggleButtonEvent(uiTaskBar.TaskBar.BUTTON_EXPAND_MONEY, ui.__mem_func__(self.ToggleExpandedMoneyButton))
-		self.wndExpandedMoneyTaskBar = uiTaskBar.ExpandedMoneyTaskBar()
 		if uiTaskBar.TaskBar.IS_EXPANDED:
 			self.wndTaskBar.SetToggleButtonEvent(uiTaskBar.TaskBar.BUTTON_EXPAND, ui.__mem_func__(self.ToggleExpandedButton))
 			self.wndExpandedTaskBar = uiTaskBar.ExpandedTaskBar()
 			self.wndExpandedTaskBar.LoadWindow()
-			# Interface class'?n? ba?la
+			# Interface class'ýný baðla
 			self.wndExpandedTaskBar.BindInterfaceClass(self)
 
 			if app.ENABLE_GROWTH_PET_SYSTEM:
 				self.PetInformationActivate()
 				self.wndExpandedTaskBar.SetToggleButtonEvent(uiTaskBar.ExpandedTaskBar.BUTTON_PET_INFO, ui.__mem_func__(self.TogglePetInformationWindow))
-
 			if app.ENABLE_HUNTING_SYSTEM:
 				self.wndExpandedTaskBar.SetToggleButtonEvent(uiTaskBar.ExpandedTaskBar.BUTTON_HUNTING, ui.__mem_func__(self.ToggleHuntingWindow))
-
 			if app.__AUTO_HUNT__:
 				self.wndExpandedTaskBar.SetToggleButtonEvent(uiTaskBar.ExpandedTaskBar.BUTTON_AUTO_WINDOW, ui.__mem_func__(self.ToggleAutoHuntWindow))
-
 			if app.ENABLE_AUTO_SELL_SYSTEM:
 				self.wndExpandedTaskBar.SetToggleButtonEvent(uiTaskBar.ExpandedTaskBar.BUTTON_AUTO_SELL, ui.__mem_func__(self.ToggleAutoSellWindow))
-
-			if app.ENABLE_BIOLOGIST_SYSTEM:
-				self.wndExpandedTaskBar.SetToggleButtonEvent(uiTaskBar.ExpandedTaskBar.BUTTON_BIOLOGIST, ui.__mem_func__(self.SetBiyologMission))
 
 			# Sidebar buton event'lerini ExpandedTaskBar'daki metodlara ata
 			if app.ENABLE_RENEWAL_TELEPORT_SYSTEM:
@@ -429,13 +330,16 @@ class Interface(object):
 
 			self.wndExpandedTaskBar.SetSidebarButtonEvent(uiTaskBar.ExpandedTaskBar.SIDEBAR_POTIONS, ui.__mem_func__(self.wndExpandedTaskBar.OnClickSidebarPotions))
 
-			if app.ENABLE_WIKI_SYSTEM:
-				self.wndExpandedTaskBar.SetToggleButtonEvent(uiTaskBar.ExpandedTaskBar.BUTTON_WIKI, ui.__mem_func__(self.OpenWikiWindow))
-
-			if app.ENABLE_BIOLOGIST_SYSTEM:
-				self.wndExpandedTaskBar.SetToggleButtonEvent(uiTaskBar.ExpandedTaskBar.BUTTON_BIOLOGIST, ui.__mem_func__(self.OpenBiyologDialog))
+			if app.ENABLE_INGAME_WIKI_SYSTEM:
+				self.wndExpandedTaskBar.SetSidebarButtonEvent(uiTaskBar.ExpandedTaskBar.SIDEBAR_WIKIPEDIA, ui.__mem_func__(self.wndExpandedTaskBar.OnClickSidebarWikipedia))
 		else:
 			self.wndTaskBar.SetToggleButtonEvent(uiTaskBar.TaskBar.BUTTON_CHAT, ui.__mem_func__(self.ToggleChat))
+
+		self.wndExpandedMoneyTaskBar = uiTaskBar.ExpandedMoneyTaskBar()
+		self.wndExpandedMoneyTaskBar.LoadWindow()
+
+		if self.wndInventory:
+			self.wndInventory.SetExpandedMoneyBar(self.wndExpandedMoneyTaskBar)
 
 	def __MakeParty(self):
 		wndParty = uiParty.PartyWindow()
@@ -456,23 +360,16 @@ class Interface(object):
 	def __IsChatOpen(self):
 		return TRUE
 
-	if app.ENABLE_AUTO_REFINE:
-		def CheckRefineDialog(self, isFail):
-			self.dlgRefineNew.CheckRefine(isFail)
-
 	def __MakeWindows(self):
 		wndCharacter = uiCharacter.CharacterWindow()
 
 		wndInventory = uiInventory.InventoryWindow()
 		wndInventory.BindInterfaceClass(self)
 
-		# Sidebar butonlar? art?k ExpandedTaskBar'da, bu ça?r?lar kald?r?ld?
+		# Sidebar butonlarý artýk ExpandedTaskBar'da, bu çaðrýlar kaldýrýldý
 
 		wndMiniMap = uiMiniMap.MiniMap()
 		wndMiniMap.BindInterfaceClass(self)
-
-		if app.ENABLE_COLLECT_WINDOW:
-			self.wndCollectWindow = uiCollectWindow.CollectWindow()
 
 		if not app.ENABLE_SPECIAL_INVENTORY:
 			wndSafebox = uiSafebox.SafeboxWindow()
@@ -498,15 +395,6 @@ class Interface(object):
 
 		self.wndChatLog = wndChatLog
 
-		if app.ENABLE_SOUL_ROULETTE_SYSTEM:
-			self.wndMiniGameRoulette = uiMiniGameRoulette.RouletteWindow()
-
-		if app.ENABLE_COLLECTIONS_SYSTEM:
-			self.wndCollections = uiCollections.CollectionsWindow()
-
-		if app.ENABLE_SUNG_MAHI_TOWER:
-			self.wndSungMahiWindow = uiSungMahi.SungMahiWindow()
-
 		if app.ENABLE_RIDING_EXTENDED:
 			self.wndMountUpGrade = uiMountUpGrade.MountUpGradeWindow()
 
@@ -515,6 +403,10 @@ class Interface(object):
 
 		if app.ENABLE_RENEWAL_SWITCHBOT:
 			self.wndSwitchbot = uiSwitchbot.SwitchbotWindow()
+
+		if app.ENABLE_BIOLOG_SYSTEM:
+			self.wndBiologManager["PANEL"] = uiBiologManager.BiologManager()
+			self.wndBiologManager["ALERT"] = uiBiologManager.BiologManager_Alert()
 
 		if app.ENABLE_VIEW_CHEST_DROP:
 			self.dlgChestDrop = uiChestDrop.ChestDropWindow()
@@ -525,6 +417,10 @@ class Interface(object):
 			self.wndSafebox = uiSafebox.SafeboxWindow(self.wndSpecialInventory)
 			self.wndMall = uiSafebox.MallWindow(self.wndSpecialInventory)
 			self.wndSpecialInventory.BindSafeboxAndMallClass(self.wndSafebox, self.wndMall)
+
+		if app.ENABLE_EVENT_MANAGER:
+			self.wndEventOverview = uiEvent.EventOverview()
+			self.wndEventOverview.BindInterface(self)
 
 		if app.ENABLE_AURA_COSTUME_SYSTEM:
 			wndAura = uiAura.AuraWindow()
@@ -543,12 +439,6 @@ class Interface(object):
 		if app.ENABLE_CHANGE_LOOK_SYSTEM:
 			self.wndChangeLook = uiChangeLook.ChangeLookWindow()
 
-		if app.ENABLE_BIOLOGIST_SYSTEM:
-			self.wndBiyologWindow = uiBiyolog.BiyologWindow()
-
-		if app.ENABLE_RANKING:
-			self.wndRanking = uiranking.RankingWindow()
-
 	def __MakeDialogs(self):
 		self.dlgExchange = uiExchange.ExchangeDialog()
 		self.dlgExchange.LoadDialog()
@@ -566,9 +456,6 @@ class Interface(object):
 		if app.ENABLE_SLOT_MARKING_SYSTEM:
 			self.dlgShop.BindInterface(self)
 		self.dlgShop.Hide()
-
-		if app.ENABLE_GAYA_TICKET_SYSTEM:
-			self.wndImproveGemTicket = uiGemTicket.GemTicketWindow()
 
 		self.dlgRestart = uiRestart.RestartDialog()
 		self.dlgRestart.LoadDialog()
@@ -593,13 +480,6 @@ class Interface(object):
 		self.tooltipSkill = uiToolTip.SkillToolTip()
 		self.tooltipSkill.Hide()
 
-		self.whisper_tooltip = None
-		if app.ENABLE_WHISPER_CLOSE_SHORTCUT:
-			self.whisper_tooltip = uiToolTip.ToolTip()
-			self.whisper_tooltip.AutoAppendTextLine(localeInfo.WHISPER_TOOLTIP_CLOSE_SHORTCUT)
-			self.whisper_tooltip.AlignHorizonalCenter()
-			self.whisper_tooltip.Hide()
-
 		self.privateShopBuilder = uiPrivateShopBuilder.PrivateShopBuilder()
 		if app.ENABLE_SLOT_MARKING_SYSTEM:
 			self.privateShopBuilder.BindInterface(self)
@@ -608,15 +488,10 @@ class Interface(object):
 		self.dlgRefineNew = uiRefine.RefineDialogNew()
 		if app.ENABLE_SLOT_MARKING_SYSTEM:
 			self.dlgRefineNew.SetInven(self.wndInventory)
-
-		if constInfo.SHOW_REFINE_ITEM_DESC:
-			self.dlgRefineNew.BindInterface(self)
-
 		self.dlgRefineNew.Hide()
 
-		if app.ENABLE_RESP_SYSTEM:
-			self.wndResp = uiresp.RespDialog()
-			self.wndResp.Hide()
+		if app.ENABLE_RENEWAL_BATTLE_PASS:
+			self.wndBattlePassExtended = uiBattlePass.BattlePassWindow()
 
 		if app.ENABLE_GROWTH_PET_SYSTEM:
 			self.tooltipPetSkill = uiToolTip.PetSkillToolTip()
@@ -659,19 +534,9 @@ class Interface(object):
 		self.wndCubeResult.LoadWindow()
 		self.wndCubeResult.Hide()
 
-	def __MakeItemFinder(self):
-		self.wndItemFinder = uiitemfinder.ItemFinder()
-		self.wndItemFinder.LoadWindow()
-		self.wndItemFinder.Hide()
-
 	def __MakeItemSelectWindow(self):
 		self.wndItemSelect = uiselectitem.SelectItemWindow()
 		self.wndItemSelect.Hide()
-
-	if app.ENABLE_DUNGEON_INFO:
-		def __MakeTableDungeonInfo(self):
-			self.wndTableDungeonInfo = uitabledungeon.TableDungeonWindows()
-			self.wndTableDungeonInfo.Hide()
 
 	if app.ENABLE_RENEWAL_CUBE:
 		def __MakeCubeRenewal(self):
@@ -700,46 +565,19 @@ class Interface(object):
 			if self.wndInventory:
 				self.wndInventory.SetAcceWindow(self.wndAcceCombine, self.wndAcceAbsorption)
 
-	if app.ENABLE_BATTLE_PASS:
-		def __BoardBpass(self):
-			self.wndbpass = uibattlepass.Battlepass()
-			self.wndbpass.LoadWindow()
-			self.wndbpass.Hide()
-
-		def __BoardBpasspremium(self):
-			self.wndbpasspremium = uibattlepasspremium.Battlepass()
-			self.wndbpasspremium.LoadWindow()
-			self.wndbpasspremium.Hide()
-
-	if app.ENABLE_EVENT_SYSTEM:
-		def __MakeEventWindow(self):
-			self.wndEvent = uiEvent.EventWindow(self)
-			self.wndEvent.LoadWindow()
-			self.wndEvent.Hide()
-
-		def __MakeMiniGameAttendance(self):
-			self.wndMiniGameAttendance = uiMiniGameAttendance.MiniGameAttendance()
-			self.wndMiniGameAttendance.Hide()
-
-	if app.ENABLE_HALLOWEEN_EVENT_SYSTEM:
-		def __BoardHalloweenEvent(self):
-			self.wndhaloun = uihalloween.Halloween()
-			self.wndhaloun.LoadWindow()
-			self.wndhaloun.Hide()
-
-	if app.ENABLE_MINI_GAME_OKEY:
+	if app.ENABLE_MINIGAME_OKEY_CARDS_SYSTEM:
 		def __MakeCardsInfoWindow(self):
-			self.wndCardsInfo = uiMiniGameRumi.CardsInfoWindow()
+			self.wndCardsInfo = uiCards.CardsInfoWindow()
 			self.wndCardsInfo.LoadWindow()
 			self.wndCardsInfo.Hide()
 
 		def __MakeCardsWindow(self):
-			self.wndCards = uiMiniGameRumi.CardsWindow()
+			self.wndCards = uiCards.CardsWindow()
 			self.wndCards.LoadWindow()
 			self.wndCards.Hide()
 
 		def __MakeCardsIconWindow(self):
-			self.wndCardsIcon = uiMiniGameRumi.IngameWindow()
+			self.wndCardsIcon = uiCards.IngameWindow()
 			self.wndCardsIcon.LoadWindow()
 			self.wndCardsIcon.Hide()
 
@@ -748,20 +586,6 @@ class Interface(object):
 			self.wndSkillSelect = uiSkillSelect.SkillSelectWindow()
 			self.wndSkillSelect.LoadWindow()
 			self.wndSkillSelect.Hide()
-
-	if app.ENABLE_GAYA_SYSTEM:
-		def __MakeItemSelectWindowEx(self):
-			self.wndItemSelectEx = uiselectitemEx.SelectItemWindowEx()
-			self.wndItemSelectEx.Hide()
-
-		def __MakeGemGui(self):
-			self.wndGemG = uiGemShop.SelectGems()
-			self.wndGemG.LoadWindow()
-			self.wndGemG.Hide()
-
-			self.wndGemM = uiGemShop.SelectGemsShop()
-			self.wndGemM.LoadWindow()
-			self.wndGemM.Hide()
 
 	def MakeInterface(self):
 		self.__MakeMessengerWindow()
@@ -778,8 +602,6 @@ class Interface(object):
 		self.__MakeWebWindow()
 		self.__MakeCubeWindow()
 		self.__MakeCubeResultWindow()
-		self.__MakeExpandMoney()
-		self.__MakeItemFinder()
 		self.__MakeItemSelectWindow()
 
 		if app.ENABLE_RENEWAL_CUBE:
@@ -788,20 +610,10 @@ class Interface(object):
 		if app.ENABLE_ACCE_COSTUME_SYSTEM:
 			self.__MakeAcceWindow()
 
-		if app.ENABLE_BATTLE_PASS:
-			self.__BoardBpass()
-			self.__BoardBpasspremium()
-
-		if app.ENABLE_MINI_GAME_OKEY:
+		if app.ENABLE_MINIGAME_OKEY_CARDS_SYSTEM:
 			self.__MakeCardsInfoWindow()
 			self.__MakeCardsWindow()
 			self.__MakeCardsIconWindow()
-
-		if app.ENABLE_HALLOWEEN_EVENT_SYSTEM:
-			self.__BoardHalloweenEvent()
-
-		if app.ENABLE_GAYA_SYSTEM:
-			self.__MakeGemGui()
 
 		if app.ENABLE_RENEWAL_SKILL_SELECT:
 			self.__MakeSkillSelectWindow()
@@ -809,28 +621,10 @@ class Interface(object):
 		if app.ENABLE_AUTO_SELL_SYSTEM:
 			self.__MakeAutoSellWindow()
 
-		if app.ENABLE_DUNGEON_INFO:
-			self.__MakeTableDungeonInfo()
-
 		self.questButtonList = []
 		self.whisperButtonList = []
 		self.whisperDialogDict = {}
-
-		if app.ENABLE_ZODIAC_MISSION:
-			self.__Make12ziTimerWindow()
-			self.__Make12ziRewardWindow()
-
-		if app.ENABLE_EVENT_SYSTEM:
-			self.__MakeEventWindow()
-			self.__MakeMiniGameAttendance()
-
-		if app.ENABLE_GAYA_SYSTEM:
-			self.__MakeItemSelectWindowEx()
-
 		self.privateShopAdvertisementBoardDict = {}
-
-		if app.ENABLE_BIOLOGIST_SYSTEM:
-			self.wndBiyologWindow.SetItemToolTip(self.tooltipItem)
 
 		self.wndInventory.SetItemToolTip(self.tooltipItem)
 		self.wndSafebox.SetItemToolTip(self.tooltipItem)
@@ -844,28 +638,14 @@ class Interface(object):
 		# ITEM_MALL
 		self.wndMall.SetItemToolTip(self.tooltipItem)
 		# END_OF_ITEM_MALL
-		if app.ENABLE_SUNG_MAHI_TOWER:
-			self.wndSungMahiWindow.SetItemToolTip(self.tooltipItem)
 		self.wndCharacter.SetSkillToolTip(self.tooltipSkill)
 		self.wndTaskBar.SetItemToolTip(self.tooltipItem)
 		self.wndTaskBar.SetSkillToolTip(self.tooltipSkill)
 		self.wndGuild.SetSkillToolTip(self.tooltipSkill)
-		# ACCESSORY_REFINE_ADD_METIN_STONE
 		self.wndItemSelect.SetItemToolTip(self.tooltipItem)
-		# END_OF_ACCESSORY_REFINE_ADD_METIN_STONE
-
-		if app.ENABLE_GAYA_SYSTEM:
-			self.wndGemM.SetItemToolTip(self.tooltipItem)
-
 		self.dlgShop.SetItemToolTip(self.tooltipItem)
 		self.dlgExchange.SetItemToolTip(self.tooltipItem)
 		self.privateShopBuilder.SetItemToolTip(self.tooltipItem)
-
-		if app.ENABLE_SOUL_ROULETTE_SYSTEM:
-			self.wndMiniGameRoulette.SetItemToolTip(self.tooltipItem)
-
-		if app.ENABLE_RESP_SYSTEM:
-			self.wndResp.SetItemToolTip(self.tooltipItem)
 
 		if app.ENABLE_RENEWAL_SWITCHBOT:
 			self.wndSwitchbot.SetItemToolTip(self.tooltipItem)
@@ -873,6 +653,9 @@ class Interface(object):
 		if app.ENABLE_ACCE_COSTUME_SYSTEM:
 			self.wndAcceCombine.SetItemToolTip(self.tooltipItem)
 			self.wndAcceAbsorption.SetItemToolTip(self.tooltipItem)
+
+		if app.ENABLE_BIOLOG_SYSTEM:
+			self.wndBiologManager["PANEL"].SetItemToolTip(self.tooltipItem)
 
 		if app.ENABLE_VIEW_CHEST_DROP:
 			self.dlgChestDrop.SetItemToolTip(self.tooltipItem)
@@ -890,9 +673,6 @@ class Interface(object):
 				self.privateShopBuilder.SetSpecialInven(self.wndSpecialInventory)
 				self.dlgExchange.SetSpecialInven(self.wndSpecialInventory)
 
-		if app.ENABLE_HALLOWEEN_EVENT_SYSTEM:
-			self.wndhaloun.SetItemToolTip(self.tooltipItem)
-
 		if app.ENABLE_GROWTH_PET_SYSTEM:
 			self.wndPetInfoWindow.SetItemToolTip(self.tooltipItem)
 			self.wndPetInfoWindow.SetInven(self.wndInventory)
@@ -901,24 +681,20 @@ class Interface(object):
 		if app.ENABLE_CHANGE_LOOK_SYSTEM:
 			self.wndChangeLook.SetItemToolTip(self.tooltipItem)
 
-		if app.ENABLE_GAYA_SYSTEM:
-			self.wndItemSelectEx.SetItemToolTip(self.tooltipItem)
-
 		self.__InitWhisper()
 
-	if app.LINK_IN_CHAT:
-		def AnswerOpenLink(self, answer):
-			if not self.OpenLinkQuestionDialog:
-				return
+	def AnswerOpenLink(self, answer):
+		if not self.OpenLinkQuestionDialog:
+			return
 
-			self.OpenLinkQuestionDialog.Close()
-			self.OpenLinkQuestionDialog = None
+		self.OpenLinkQuestionDialog.Close()
+		self.OpenLinkQuestionDialog = None
 
-			if not answer:
-				return
+		if not answer:
+			return
 
-			link = constInfo.link
-			os.system(link)
+		link = constInfo.link
+		os.system(link)
 
 	if app.ENABLE_AUTO_SELL_SYSTEM:
 		def __MakeAutoSellWindow(self):
@@ -956,40 +732,14 @@ class Interface(object):
 				os.system("start " + tokens[1].replace("XxX", "://"))
 			elif "petitem" == type and app.ENABLE_GROWTH_PET_SYSTEM:
 				self.hyperlinkItemTooltip.SetHyperlinkPetItem(tokens)
-			elif "wiki" == type:
-				self.OpenWikiWindow()
-				self.wndWiki.OpenRules()
 
 	## Make Windows & Dialogs
 	################################
 
 	def Close(self):
-
-		if app.__DUNGEON_INFO__:
-			if self.wndDungeonTrack:
-				self.wndDungeonTrack.Close()
-				self.wndDungeonTrack.Destroy()
-				self.wndDungeonTrack = None
-			if self.wndDungeonManager:
-				self.wndDungeonManager.Destroy()
-				self.wndDungeonManager = None
-
-		if app.ENABLE_TRACK_WINDOW:
-			if self.wndTrackWindow:
-				self.wndTrackWindow.Close()
-				self.wndTrackWindow.Destroy()
-				self.wndTrackWindow=None
 		if self.dlgWhisperWithoutTarget:
 			self.dlgWhisperWithoutTarget.Destroy()
 			del self.dlgWhisperWithoutTarget
-
-		if app.ENABLE_ZODIAC_MISSION:
-			if self.wnd12ziTimer:
-				self.wnd12ziTimer.Hide()
-				self.wnd12ziTimer=None
-			if self.wnd12ziReward:
-				self.wnd12ziReward.Hide()
-				self.wnd12ziReward=None
 
 		if uiQuest.QuestDialog.__dict__.has_key("QuestCurtain"):
 			uiQuest.QuestDialog.QuestCurtain.Close()
@@ -1001,24 +751,6 @@ class Interface(object):
 				eachQuestWindow = None
 		self.wndQuestWindow = {}
 
-		if app.ENABLE_WIKI_SYSTEM:
-			if self.wndWiki:
-				self.wndWiki.Close()
-				self.wndWiki.Destroy()
-				self.wndWiki=None
-
-		if app.ENABLE_ITEMSHOP:
-			if self.wndItemShop:
-				self.wndItemShop.Hide()
-				self.wndItemShop.Destroy()
-				self.wndItemShop = None
-
-		if app.ENABLE_DUNGEON_INFO:
-			if self.wndDungeonInfo:
-				self.wndDungeonInfo.Close()
-				self.wndDungeonInfo.Destroy()
-				self.wndDungeonInfo = None
-
 		if self.wndChat:
 			self.wndChat.Destroy()
 
@@ -1028,23 +760,15 @@ class Interface(object):
 		if self.wndExpandedTaskBar:
 			self.wndExpandedTaskBar.Destroy()
 
+		if self.wndExpandedMoneyTaskBar:
+			self.wndExpandedMoneyTaskBar.Destroy()
+
 		if self.wndCharacter:
 			self.wndCharacter.Destroy()
 
 		if self.wndInventory:
 			self.wndInventory.Hide()
 			self.wndInventory.Destroy()
-
-		if self.wndExpandedMoney:
-			self.wndExpandedMoney.Destroy()
-
-		if app.ENABLE_HALLOWEEN_EVENT_SYSTEM:
-			if self.wndhaloun:
-				self.wndhaloun.Destroy()
-
-		if app.ENABLE_GAYA_TICKET_SYSTEM:
-			if (self.wndImproveGemTicket):
-				del self.wndImproveGemTicket
 
 		if self.dlgExchange:
 			self.dlgExchange.Destroy()
@@ -1080,33 +804,14 @@ class Interface(object):
 		if self.wndParty:
 			self.wndParty.Destroy()
 
-		if app.ENABLE_MINI_GAME_OKEY:
-			if self.wndCardsInfo:
-				self.wndCardsInfo.Destroy()
-
-			if self.wndCards:
-				self.wndCards.Destroy()
-
-			if self.wndCardsIcon:
-				self.wndCardsIcon.Destroy()
-
 		if self.wndCube:
 			self.wndCube.Destroy()
 
 		if self.wndCubeResult:
 			self.wndCubeResult.Destroy()
 
-		if app.ENABLE_DUNGEON_INFO:
-			if self.wndTableDungeonInfo:
-				self.wndTableDungeonInfo.Hide()
-				self.wndTableDungeonInfo.Close()
-				self.wndTableDungeonInfo.Destroy()
-
 		if self.wndMessenger:
 			self.wndMessenger.Destroy()
-
-		if self.wndItemFinder:
-			self.wndItemFinder.Destroy()
 
 		if self.wndGuild:
 			self.wndGuild.Destroy()
@@ -1117,19 +822,11 @@ class Interface(object):
 		if self.dlgRefineNew:
 			self.dlgRefineNew.Destroy()
 
-		if app.ENABLE_COLLECTIONS_SYSTEM:
-			if self.wndCollections:
-				self.wndCollections.Destroy()
-
 		if self.wndGuildBuilding:
 			self.wndGuildBuilding.Destroy()
 
 		if self.wndGameButton:
 			self.wndGameButton.Destroy()
-
-		if app.ENABLE_EVENT_SYSTEM:
-			if self.wndMiniGame:
-				self.wndMiniGame.Destroy()
 
 		if app.ENABLE_HUNTING_SYSTEM:
 			if self.wndHunting:
@@ -1148,10 +845,6 @@ class Interface(object):
 				self.wndAutoHunt.Destroy()
 				self.wndAutoHunt = None
 
-		if app.ENABLE_BIOLOGIST_SYSTEM:
-			if self.wndBiyologWindow:
-				self.wndBiyologWindow.Destroy()
-
 		# ITEM_MALL
 		if self.mallPageDlg:
 			self.mallPageDlg.Destroy()
@@ -1162,14 +855,6 @@ class Interface(object):
 			self.wndItemSelect.Destroy()
 		# END_OF_ACCESSORY_REFINE_ADD_METIN_STONE
 
-		if app.ENABLE_SOUL_ROULETTE_SYSTEM:
-			if self.wndMiniGameRoulette:
-				self.wndMiniGameRoulette.Destroy()
-
-		if app.ENABLE_SUNG_MAHI_TOWER:
-			if self.wndSungMahiWindow:
-				self.wndSungMahiWindow.Destroy()
-
 		if app.ENABLE_GUILD_RANK_SYSTEM:
 			if self.wndGuildRanking:
 				self.wndGuildRanking.Destory()
@@ -1179,44 +864,10 @@ class Interface(object):
 				self.wndSwitchbot.Hide()
 				self.wndSwitchbot.Destroy()
 
-		if app.ENABLE_GAYA_SYSTEM:
-			if self.wndItemSelectEx:
-				self.wndItemSelectEx.Destroy()
-
-			if self.wndGemG:
-				self.wndGemG.Destroy()
-
-			if self.wndGemM:
-				self.wndGemM.Destroy()
-
-		if app.ENABLE_BATTLE_PASS:
-			if self.wndbpass:
-				self.wndbpass.Hide()
-				self.wndbpass.Destroy()
-				self.wndbpass = None
-				del self.wndbpass
-
-			if self.wndbpasspremium:
-				self.wndbpasspremium.Hide()
-				self.wndbpasspremium.Destroy()
-				self.wndbpasspremium = None
-				del self.wndbpasspremium
-
 		if app.ENABLE_RENEWAL_CUBE:
 			if self.wndCubeRenewal:
 				self.wndCubeRenewal.Destroy()
 				self.wndCubeRenewal.Close()
-
-		if app.ENABLE_RANKING:
-			if self.wndRanking:
-				self.wndRanking.Destroy()
-				del self.wndRanking
-
-		if app.ENABLE_RESP_SYSTEM:
-			if self.wndResp:
-				self.wndResp.Destroy()
-
-				del self.wndResp
 
 		if app.ENABLE_ACCE_COSTUME_SYSTEM:
 			if self.wndAcceCombine:
@@ -1224,6 +875,11 @@ class Interface(object):
 
 			if self.wndAcceAbsorption:
 				self.wndAcceAbsorption.Destroy()
+
+		if app.ENABLE_BIOLOG_SYSTEM:
+			if self.wndBiologManager:
+				for wnd in self.wndBiologManager.values():
+					wnd.Destroy()
 
 		if app.ENABLE_GUILDBANK_LOG:
 			if self.wndGuildBank:
@@ -1238,6 +894,25 @@ class Interface(object):
 			if self.wndSpecialInventory:
 				self.wndSpecialInventory.Hide()
 				self.wndSpecialInventory.Destroy()
+
+		if app.ENABLE_EVENT_MANAGER:
+			if self.wndEventOverview:
+				self.wndEventOverview.Hide()
+				self.wndEventOverview.Destroy()
+
+		if app.ENABLE_MINIGAME_OKEY_CARDS_SYSTEM:
+			if self.wndCardsInfo:
+				self.wndCardsInfo.Destroy()
+
+			if self.wndCards:
+				self.wndCards.Destroy()
+
+			if self.wndCardsIcon:
+				self.wndCardsIcon.Destroy()
+
+		if app.ENABLE_RENEWAL_BATTLE_PASS:
+			if self.wndBattlePassExtended:
+				self.wndBattlePassExtended.Destroy()
 
 		if app.ENABLE_RENDER_TARGET:
 			if self.wndRenderTarget:
@@ -1273,9 +948,22 @@ class Interface(object):
 				del self.wndPrivateShopSearch
 				self.wndPrivateShopSearch = 0
 
+		if app.ENABLE_INGAME_WIKI_SYSTEM:
+			if self.wndWiki:
+				self.wndWiki.Close()
+				self.wndWiki.Destroy()
+				del self.wndWiki
+				self.wndWiki = None
+
 		if app.ENABLE_RENEWAL_SKILL_SELECT:
 			if self.wndSkillSelect:
 				self.wndSkillSelect.Destroy()
+
+		if app.ENABLE_RENEWAL_INGAME_ITEMSHOP:
+			if self.wndItemShop:
+				self.wndItemShop.Hide()
+				self.wndItemShop.Destroy()
+				self.wndItemShop = None
 
 		if app.ENABLE_AURA_COSTUME_SYSTEM:
 			if self.wndAura:
@@ -1296,6 +984,12 @@ class Interface(object):
 			if self.wndWarpWindow:
 				self.wndWarpWindow.Destroy()
 
+		if app.ENABLE_DUNGEON_TRACKING_SYSTEM:
+			if self.wndTrackWindow:
+				self.wndTrackWindow.Close()
+				self.wndTrackWindow.Destroy()
+				self.wndTrackWindow = None
+
 		if app.ENABLE_RENEWAL_SPECIAL_CHAT:
 			if self.wndSpecialChat:
 				self.wndSpecialChat.Destroy()
@@ -1308,17 +1002,6 @@ class Interface(object):
 			if self.wndMountUpGrade:
 				self.wndMountUpGrade.Destroy()
 				del self.wndMountUpGrade
-
-		if app.ENABLE_COLLECT_WINDOW:
-			if self.wndCollectWindow:
-				self.wndCollectWindow.Destroy()
-
-		if app.ENABLE_EVENT_SYSTEM:
-			if self.wndEvent:
-				self.wndEvent.Destroy()
-
-			if self.wndMiniGameAttendance:
-				self.wndMiniGameAttendance.Destroy()
 
 		self.wndChatLog.Destroy()
 		for btn in self.questButtonList:
@@ -1340,14 +1023,14 @@ class Interface(object):
 		del self.wndMessenger
 		del self.wndUICurtain
 		del self.wndChat
-
 		del self.wndTaskBar
 		if self.wndExpandedTaskBar:
 			del self.wndExpandedTaskBar
 
+		if self.wndExpandedMoneyTaskBar:
+			del self.wndExpandedMoneyTaskBar
 		del self.wndCharacter
 		del self.wndInventory
-		del self.wndExpandedMoney
 		del self.dlgExchange
 		del self.dlgPointReset
 		del self.dlgShop
@@ -1365,7 +1048,6 @@ class Interface(object):
 		del self.wndCubeResult
 		del self.privateShopBuilder
 		del self.inputDialog
-		del self.wndItemFinder
 		del self.wndChatLog
 		del self.dlgRefineNew
 		del self.wndGuildBuilding
@@ -1373,18 +1055,6 @@ class Interface(object):
 		del self.tipBoard
 		del self.bigBoard
 		del self.wndItemSelect
-
-		if app.ENABLE_EVENT_SYSTEM:
-			del self.wndMiniGame
-
-		if app.ENABLE_COLLECTIONS_SYSTEM:
-			del self.wndCollections
-
-		if app.ENABLE_COLLECT_WINDOW:
-			del self.wndCollectWindow
-
-		if app.ENABLE_SUNG_MAHI_TOWER:
-			del self.wndSungMahiWindow
 
 		if app.ENABLE_GUILD_RANK_SYSTEM:
 			del self.wndGuildRanking
@@ -1399,6 +1069,10 @@ class Interface(object):
 			del self.wndAcceCombine
 			del self.wndAcceAbsorption
 
+		if app.ENABLE_BIOLOG_SYSTEM:
+			for wnd in self.wndBiologManager.values():
+				del wnd
+
 		if app.ENABLE_VIEW_CHEST_DROP:
 			if self.dlgChestDrop:
 				del self.dlgChestDrop
@@ -1407,29 +1081,23 @@ class Interface(object):
 			if self.wndSpecialInventory:
 				del self.wndSpecialInventory
 
+		if app.ENABLE_EVENT_MANAGER:
+			del self.wndEventOverview
+
+
 		if app.ENABLE_GUILDBANK_LOG:
 			del self.wndGuildBank
 
-		if app.ENABLE_MINI_GAME_OKEY:
+		if app.ENABLE_MINIGAME_OKEY_CARDS_SYSTEM:
 			del self.wndCardsInfo
 			del self.wndCards
 			del self.wndCardsIcon
 
-		if app.ENABLE_GAYA_SYSTEM:
-			del self.wndGemG
-			del self.wndGemM
-
-		if app.ENABLE_HALLOWEEN_EVENT_SYSTEM:
-			del self.wndhaloun
+		if app.ENABLE_RENEWAL_BATTLE_PASS:
+			del self.wndBattlePassExtended
 
 		if app.ENABLE_RENEWAL_OX_EVENT:
 			del self.bigBoardControl
-
-		if app.ENABLE_GAYA_SYSTEM:
-			del self.wndItemSelectEx
-
-		if app.ENABLE_SOUL_ROULETTE_SYSTEM:
-			del self.wndMiniGameRoulette
 
 		if app.ENABLE_RENEWAL_SKILL_SELECT:
 			del self.wndSkillSelect
@@ -1451,17 +1119,6 @@ class Interface(object):
 		if app.ENABLE_RENEWAL_SPECIAL_CHAT:
 			del self.wndSpecialChat
 
-		if app.ENABLE_BIOLOGIST_SYSTEM:
-			if self.wndBiyologWindow:
-				del self.wndBiyologWindow
-
-		if app.ENABLE_DUNGEON_INFO:
-			del self.wndTableDungeonInfo
-
-		if app.ENABLE_EVENT_SYSTEM:
-			del self.wndEvent
-			del self.wndMiniGameAttendance
-
 		self.questButtonList = []
 		self.whisperButtonList = []
 		self.whisperDialogDict = {}
@@ -1470,19 +1127,6 @@ class Interface(object):
 		self.equipmentDialogDict = {}
 
 		uiChat.DestroyChatInputSetWindow()
-
-	if app.ENABLE_BATTLE_PASS:
-		def ShowBoardBpass(self):
-			if self.wndbpass.IsShow():
-				self.wndbpass.Close()
-			else:
-				self.wndbpass.Show()
-
-		def ShowBoardBpassPremium(self):
-			if self.wndbpasspremium.IsShow():
-				self.wndbpasspremium.Close()
-			else:
-				self.wndbpasspremium.Show()
 
 	## Skill
 	def OnUseSkill(self, slotIndex, coolTime):
@@ -1515,9 +1159,6 @@ class Interface(object):
 	def RefreshStatus(self):
 		self.wndTaskBar.RefreshStatus()
 		self.wndCharacter.RefreshStatus()
-		self.wndExpandedMoney.RefreshStatus()
-		if self.wndExpandedMoneyTaskBar:
-			self.wndExpandedMoneyTaskBar.RefreshStatus()
 		self.wndInventory.RefreshStatus()
 
 		if app.ENABLE_GROWTH_PET_SYSTEM:
@@ -1531,14 +1172,8 @@ class Interface(object):
 		self.wndTaskBar.RefreshSkill()
 
 	def RefreshInventory(self):
-		if self.wndTaskBar:
-			self.wndTaskBar.RefreshQuickSlot()
-		if self.wndInventory:
-			self.wndInventory.RefreshItemSlot()
-
-		if app.ENABLE_BIOLOGIST_SYSTEM:
-			if self.wndBiyologWindow:
-				self.wndBiyologWindow.RefreshItemSlot()
+		self.wndTaskBar.RefreshQuickSlot()
+		self.wndInventory.RefreshItemSlot()
 
 		if app.ENABLE_SPECIAL_INVENTORY:
 			self.wndSpecialInventory.RefreshItemSlot()
@@ -1630,7 +1265,6 @@ class Interface(object):
 	# Shop
 	def OpenShopDialog(self, vid):
 		self.wndInventory.Show()
-		self.wndExpandedMoney.Show()
 		self.wndInventory.SetTop()
 		self.dlgShop.Open(vid)
 		self.dlgShop.SetTop()
@@ -1847,6 +1481,10 @@ class Interface(object):
 	def AppendMaterialToRefineDialog(self, vnum, count):
 		self.dlgRefineNew.AppendMaterial(vnum, count)
 
+	if app.ENABLE_AUTO_REFINE:
+		def CheckRefineDialog(self, isFail):
+			self.dlgRefineNew.CheckRefine(isFail)
+
 	## Show & Hide
 	def ShowDefaultWindows(self):
 		self.wndTaskBar.Show()
@@ -1857,34 +1495,22 @@ class Interface(object):
 		self.wndTaskBar.Show()
 		self.wndCharacter.Show()
 		self.wndInventory.Show()
-		self.wndExpandedMoney.Show()
 		self.wndChat.Show()
-
 		self.wndMiniMap.Show()
 
 		if self.wndExpandedTaskBar:
 			self.wndExpandedTaskBar.Show()
 			self.wndExpandedTaskBar.SetTop()
 
-		if app.ENABLE_ZODIAC_MISSION:
-			if self.wnd12ziTimer:
-				self.wnd12ziTimer.Show()
-			if self.wnd12ziReward:
-				self.wnd12ziReward.Show()
-
-		if app.ENABLE_RANKING:
-			if self.wndRanking:
-				self.wndRanking.Open()
+		if self.wndExpandedMoneyTaskBar:
+			self.wndExpandedMoneyTaskBar.Show()
+			self.wndExpandedMoneyTaskBar.SetTop()
 
 	def HideAllWindows(self):
 		if self.wndTaskBar:
 			self.wndTaskBar.Hide()
 
-		if app.ENABLE_COLLECTIONS_SYSTEM:
-			if self.wndCollections:
-				self.wndCollections.Hide()
-
-		if app.ENABLE_DETAILS_UI:
+		if app.ENABLE_RENEWAL_BONUS_BOARD:
 			if self.wndCharacter:
 				self.wndCharacter.Close()
 		else:
@@ -1896,19 +1522,6 @@ class Interface(object):
 
 		if self.wndChat:
 			self.wndChat.Hide()
-
-		if app.ENABLE_GAYA_TICKET_SYSTEM:
-			if (self.wndImproveGemTicket):
-				self.wndImproveGemTicket.Hide()
-
-		if self.wndExpandedMoney:
-			self.wndExpandedMoney.Hide()
-
-		if app.ENABLE_ZODIAC_MISSION:
-			if self.wnd12ziTimer:
-				self.wnd12ziTimer.Hide()
-			if self.wnd12ziReward:
-				self.wnd12ziReward.Hide()
 
 		if self.wndMiniMap:
 			self.wndMiniMap.Hide()
@@ -1922,32 +1535,29 @@ class Interface(object):
 		if self.wndExpandedTaskBar:
 			self.wndExpandedTaskBar.Hide()
 
-		if app.ENABLE_BIOLOGIST_SYSTEM:
-			if self.wndBiyologWindow:
-				self.wndBiyologWindow.Hide()
-
 		if self.wndExpandedMoneyTaskBar:
 			self.wndExpandedMoneyTaskBar.Hide()
-
-		if app.ENABLE_SUNG_MAHI_TOWER:
-			if self.wndSungMahiWindow:
-				self.wndSungMahiWindow.Hide()
 
 		if app.ENABLE_RIDING_EXTENDED:
 			if self.wndMountUpGrade:
 				self.wndMountUpGrade.Hide()
 
-		if app.ENABLE_RESP_SYSTEM:
-			if self.wndResp:
-				self.wndResp.Hide()
-
 		if app.ENABLE_RENEWAL_SWITCHBOT:
 			if self.wndSwitchbot:
 				self.wndSwitchbot.Hide()
 
+		if app.ENABLE_BIOLOG_SYSTEM:
+			if self.wndBiologManager:
+				for wnd in self.wndBiologManager.values():
+					wnd.Hide()
+
 		if app.ENABLE_SPECIAL_INVENTORY:
 			if self.wndSpecialInventory:
 				self.wndSpecialInventory.Hide()
+
+		if app.ENABLE_RENEWAL_BATTLE_PASS:
+			if self.wndBattlePassExtended:
+				self.wndBattlePassExtended.Hide()
 
 		if app.ENABLE_AURA_COSTUME_SYSTEM:
 			if self.wndAura:
@@ -1977,25 +1587,11 @@ class Interface(object):
 			if self.wndHuntingReward:
 				self.wndHuntingReward.Hide()
 
-		if app.ENABLE_COLLECT_WINDOW:
-			if self.wndCollectWindow:
-				self.wndCollectWindow.Hide()
-
-		if app.ENABLE_RANKING:
-			if self.wndRanking:
-				self.wndRanking.Close()
-
 	def ShowMouseImage(self):
 		self.wndTaskBar.ShowMouseImage()
 
 	def HideMouseImage(self):
 		self.wndTaskBar.HideMouseImage()
-		
-	def ToggleExpandedMoneyButton(self):
-		if self.wndExpandedMoney.IsShow():
-			self.wndExpandedMoney.Close()
-		else:
-			self.wndExpandedMoney.Open()
 
 	def ToggleChat(self):
 		if TRUE == self.wndChat.IsEditMode():
@@ -2023,39 +1619,6 @@ class Interface(object):
 
 	def CloseRestartDialog(self):
 		self.dlgRestart.Close()
-
-	if app.ENABLE_SUNG_MAHI_TOWER:
-		def SetSungMahiRestartDialog(self):
-			self.dlgRestart.SetSungMahiRestartDialog()
-
-	if app.ENABLE_GAYA_SYSTEM:
-		def BINARY_OpenSelectItemWindowEx(self):
-			self.wndItemSelectEx.Open()
-
-		def BINARY_RefreshSelectItemWindowEx(self):
-			self.wndItemSelectEx.RefreshSlot()
-
-		def OpenGuiGem(self):
-			self.wndGemG.Open()
-
-		def GemCheck(self):
-			self.wndGemG.SucceedGem()
-
-		def OpenGuiGemMarket(self):
-			self.wndGemM.Open()
-
-		def GemMarketItems(self, vnums, gem, count):
-			self.wndGemM.Information(vnums, gem, count)
-			self.wndGemM.LoadInformation()
-
-		def GemMarketSlotsDesblock(self, slot0, slot1, slot2, slot3, slot4, slot5):
-			self.wndGemM.SlotsDesblock(slot0, slot1, slot2, slot3, slot4, slot5)
-
-		def GemMarketClear(self):
-			self.wndGemM.Clear()
-
-		def GemTime(self,time):
-			self.wndGemM.Time(time)
 
 	def ToggleSystemDialog(self):
 		if FALSE == self.dlgSystem.IsShow():
@@ -2109,7 +1672,7 @@ class Interface(object):
 			else:
 				if state == self.wndCharacter.GetState():
 					self.wndCharacter.OverOutItem()
-					if app.ENABLE_DETAILS_UI:
+					if app.ENABLE_RENEWAL_BONUS_BOARD:
 						self.wndCharacter.Close()
 					else:
 						self.wndCharacter.Hide()
@@ -2122,47 +1685,6 @@ class Interface(object):
 			self.wndCharacter.Show()
 			self.wndCharacter.SetTop()
 
-	if app.ENABLE_TITLE_SYSTEM:
-		def TitleSystemSyncReset(self):
-			if not self.wndCharacter:
-				return
-			try:
-				self.wndCharacter.titleSystemUnlockedIDs = set()
-			except:
-				pass
-			if self.wndCharacter.wndTitleSystem:
-				self.wndCharacter.wndTitleSystem.SetUnlockedTitleIDs(set())
-	
-		def TitleSystemSyncAdd(self, titleID):
-			if not self.wndCharacter:
-				return
-			try:
-				titleID = int(titleID)
-			except:
-				return
-			try:
-				if not hasattr(self.wndCharacter, "titleSystemUnlockedIDs"):
-					self.wndCharacter.titleSystemUnlockedIDs = set()
-				self.wndCharacter.titleSystemUnlockedIDs.add(titleID)
-			except:
-				return
-			if self.wndCharacter.wndTitleSystem:
-				self.wndCharacter.wndTitleSystem.SetUnlockedTitleIDs(self.wndCharacter.titleSystemUnlockedIDs)
-	
-		def TitleSystemSyncActive(self, titleID):
-			if not self.wndCharacter:
-				return
-			try:
-				titleID = int(titleID)
-			except:
-				titleID = 0
-			try:
-				self.wndCharacter.titleSystemActiveID = titleID
-			except:
-				pass
-			if self.wndCharacter.wndTitleSystem:
-				self.wndCharacter.wndTitleSystem.SetActiveTitleID(titleID)
-
 	def ToggleCharacterWindowStatusPage(self):
 		self.ToggleCharacterWindow("STATUS")
 
@@ -2171,21 +1693,9 @@ class Interface(object):
 			if FALSE == self.wndInventory.IsShow():
 				self.wndInventory.Show()
 				self.wndInventory.SetTop()
-				self.wndExpandedMoney.Show()
 			else:
 				self.wndInventory.OverOutItem()
 				self.wndInventory.Close()
-				self.wndExpandedMoney.Hide()
-
-	if app.ENABLE_COLLECTIONS_SYSTEM:
-		def ToggleCollectionsWindow(self):
-			if FALSE == player.IsObserverMode():
-				if self.wndCollections:
-					if FALSE == self.wndCollections.IsShow():
-						self.wndCollections.Show()
-						self.wndCollections.SetTop()
-					else:
-						self.wndCollections.Hide()
 
 	def ToggleExpandedButton(self):
 		if False == player.IsObserverMode():
@@ -2196,17 +1706,11 @@ class Interface(object):
 				self.wndExpandedTaskBar.Close()
 
 	def ToggleExpandedMoneyButton(self):
-		if not self.wndExpandedMoneyTaskBar:
-			return
-		if not self.wndExpandedMoneyTaskBar.IsShow():
+		if FALSE == self.wndExpandedMoneyTaskBar.IsShow():
 			self.wndExpandedMoneyTaskBar.Show()
 			self.wndExpandedMoneyTaskBar.SetTop()
 		else:
 			self.wndExpandedMoneyTaskBar.Close()
-
-	# if app.ENABLE_COLLECT_WINDOW:
-	# 	def ToggleQuest(self, id):
-	# 		self.wndCollectWindow.UpdateQuest(str(id))
 
 	if app.ENABLE_GROWTH_PET_SYSTEM:
 		def PetInformationActivate(self):
@@ -2244,13 +1748,6 @@ class Interface(object):
 		else:
 			self.wndChatLog.Show()
 
-	if app.ENABLE_COLLECT_WINDOW:
-		def ToggleCollectWindow(self):
-			if self.wndCollectWindow.IsShow():
-				self.wndCollectWindow.Close()
-			else:
-				self.wndCollectWindow.Open()
-
 	if app.ENABLE_RENEWAL_SWITCHBOT:
 		def ToggleSwitchbotWindow(self):
 			if self.wndSwitchbot.IsShow():
@@ -2265,6 +1762,23 @@ class Interface(object):
 		def RefreshSwitchbotItem(self, slot):
 			if self.wndSwitchbot and self.wndSwitchbot.IsShow():
 				self.wndSwitchbot.RefreshSwitchbotItem(slot)
+
+	if app.ENABLE_BIOLOG_SYSTEM:
+		def ToggleBiologManager(self):
+			if self.wndBiologManager["PANEL"].IsShow():
+				self.wndBiologManager["PANEL"].Close()
+			else:
+				self.wndBiologManager["PANEL"].Open()
+
+		def BiologManagerUpdate(self):
+			self.wndBiologManager["PANEL"].RecvUpdate()
+
+		def BiologManager_Alert(self):
+			self.wndBiologManager["ALERT"].RecvUpdate(5)
+
+		def BiologManagerClose(self):
+			if self.wndBiologManager["PANEL"].IsShow():
+				self.wndBiologManager["PANEL"].Close()
 
 	if app.ENABLE_SPECIAL_INVENTORY:
 		def ToggleSpecialInventoryWindow(self):
@@ -2282,6 +1796,67 @@ class Interface(object):
 					self.wndSpecialInventory.Show()
 					self.wndSpecialInventory.SetTop()
 					self.wndSpecialInventory.SetInventoryType(category)
+
+	if app.ENABLE_EVENT_MANAGER:
+		def ToggleInGameEvent(self):
+			if FALSE == player.IsObserverMode():
+				if FALSE == self.wndEventOverview.IsShow():
+					self.wndEventOverview.Open()
+				else:
+					self.wndEventOverview.Close()
+
+		def OpenInGameEvent(self):
+			if self.wndEventOverview:
+				if not self.wndEventOverview.IsShow():
+					self.wndEventOverview.Open()
+
+		def CloseInGameEvent(self):
+			if self.wndEventOverview:
+				if self.wndEventOverview.IsShow():
+					self.wndEventOverview.Close()
+
+	if app.ENABLE_RENEWAL_BATTLE_PASS:
+		def ReciveOpenExtBattlePass(self):
+			if FALSE == self.isFirstOpeningExtBattlePass:
+				self.isFirstOpeningExtBattlePass = TRUE
+				self.wndBattlePassExtended.SetPage("NORMAL")
+			if FALSE == self.wndBattlePassExtended.IsShow():
+				self.ToggleBattlePassExtended()
+			else:
+				self.wndBattlePassExtended.SetPage(self.wndBattlePassExtended.GetPage())
+
+		def ToggleBattlePassExtended(self):
+			if FALSE == self.isFirstOpeningExtBattlePass:
+				net.SendExtBattlePassAction(1)
+			if FALSE == self.wndBattlePassExtended.IsShow():
+				self.wndBattlePassExtended.Show()
+				self.wndBattlePassExtended.SetTop()
+			else:
+				self.wndBattlePassExtended.Close()
+
+		def AddExtendedBattleGeneralInfo(self, BattlePassType, BattlePassName, BattlePassID, battlePassStartTime, battlePassEndTime):
+			if self.wndBattlePassExtended:
+				self.wndBattlePassExtended.RecvGeneralInfo(BattlePassType, BattlePassName, BattlePassID, battlePassStartTime, battlePassEndTime)
+
+		def AddExtendedBattlePassMission(self, battlepassType, battlepassID, missionIndex, missionType, missionInfo1, missionInfo2, missionInfo3):
+			if self.wndBattlePassExtended:
+				self.wndBattlePassExtended.AddMission(battlepassType, battlepassID, missionIndex, missionType, missionInfo1, missionInfo2, missionInfo3)
+
+		def UpdateExtendedBattlePassMission(self, battlepassType, missionIndex, missionType, newProgress):
+			if self.wndBattlePassExtended:
+				self.wndBattlePassExtended.UpdateMission(battlepassType, missionIndex, missionType, newProgress)
+
+		def AddExtendedBattlePassMissionReward(self, battlepassType, battlepassID, missionIndex, missionType, itemVnum, itemCount):
+			if self.wndBattlePassExtended:
+				self.wndBattlePassExtended.AddMissionReward(battlepassType, battlepassID, missionIndex, missionType, itemVnum, itemCount)
+
+		def AddExtendedBattlePassReward(self, battlepassType, battlepassID, itemVnum, itemCount):
+			if self.wndBattlePassExtended:
+				self.wndBattlePassExtended.AddReward(battlepassType, battlepassID, itemVnum, itemCount)
+
+		def AddExtBattlePassRanklistEntry(self, playername, battlepassType, battlepassID, startTime, endTime):
+			if self.wndBattlePassExtended:
+				self.wndBattlePassExtended.AddRankingEntry(playername, battlepassType, battlepassID, startTime, endTime)
 
 	if app.ENABLE_RENEWAL_SPECIAL_CHAT:
 		def OnPickItem(self, item):
@@ -2308,36 +1883,6 @@ class Interface(object):
 		if self.wndGameButton:
 			self.wndGameButton.CheckGameButton()
 
-	if app.ENABLE_SUNG_MAHI_TOWER:
-		def ToggleSungMahiWindow(self):
-			if self.wndSungMahiWindow.IsShow():
-				self.wndSungMahiWindow.Close()
-			else:
-				self.wndSungMahiWindow.Open()
-				
-		def UpdateSungMahiNotice(self, noticeType, noticeText):
-			if self.wndMiniMap.sungMahiCover.IsShow():
-				if noticeType == 1:
-					self.wndMiniMap.sungMahiCover.SetLevelDescriptionText(noticeText)
-				else:
-					self.wndMiniMap.sungMahiCover.SetLevelCurseText(noticeText, noticeType)
-			
-		def SungMahiClearNotice(self, noticeType):
-			if self.wndMiniMap.sungMahiCover.IsShow():
-				self.wndMiniMap.sungMahiCover.SungMahiClearNotice(noticeType)
-			
-		def UpdateRoomLevel(self, roomLevel):
-			if self.wndMiniMap.sungMahiCover.IsShow():
-				self.wndMiniMap.sungMahiCover.SetRoomLevel(roomLevel)
-			
-		def UpdateTowerLevel(self, towerLevel):
-			if self.wndMiniMap.sungMahiCover.IsShow():
-				self.wndMiniMap.sungMahiCover.SetLevelInfo(towerLevel)
-			
-		def UpdateRoomTime(self, roomTime):
-			if self.wndMiniMap.sungMahiCover.IsShow():
-				self.wndMiniMap.sungMahiCover.UpdateRoomTime(roomTime)
-
 	def __OnClickStatusPlusButton(self):
 		self.ToggleCharacterWindow("STATUS")
 
@@ -2351,89 +1896,24 @@ class Interface(object):
 		self.BUILD_OpenWindow()
 
 	def OpenWebWindow(self, url):
-		pass
-		#self.wndWeb.Open(url)
+		self.wndWeb.Open(url)
+		self.wndChat.CloseChat()
 
-	if app.ENABLE_DUNGEON_INFO:
-		def DUNGEON_INFO_CHECK_SHOW(self):
-			if self.wndTableDungeonInfo:
-				if self.wndTableDungeonInfo.IsShow():
-					self.wndTableDungeonInfo.Close()
-				else:
-					import dungeon_info
-					dungeon_info.Open()
-		def BINARY_TABLE_DUNGEON_INFO_OPEN(self):
-			if self.wndTableDungeonInfo:
-				self.wndTableDungeonInfo.LoadDateInfo()
-				self.wndTableDungeonInfo.Show()
-
-		def BINARY_TABLE_DUNGEON_RANKING_LOAD(self):
-			if self.wndTableDungeonInfo:
-				self.wndTableDungeonInfo.LoadRanking()
-
-		def BINARY_TABLE_DUNGEON_MISION_LOAD(self):
-			if self.wndTableDungeonInfo:
-				self.wndTableDungeonInfo.LoadMision()
-
-	# show GIFT
 	def ShowGift(self):
 		self.wndTaskBar.ShowGift()
 
 	def CloseWbWindow(self):
 		self.wndWeb.Close()
 
-	if app.ENABLE_MINI_GAME_OKEY:
-		def OpenCardsInfoWindow(self):
-			self.wndCardsInfo.Open()
-
-		def OpenCardsWindow(self, safemode):
-			self.wndCards.Open(safemode)
-
-		def UpdateCardsInfo(self, hand_1, hand_1_v, hand_2, hand_2_v, hand_3, hand_3_v, hand_4, hand_4_v, hand_5, hand_5_v, cards_left, points):
-			self.wndCards.UpdateCardsInfo(hand_1, hand_1_v, hand_2, hand_2_v, hand_3, hand_3_v, hand_4, hand_4_v, hand_5, hand_5_v, cards_left, points)
-
-		def UpdateCardsFieldInfo(self, hand_1, hand_1_v, hand_2, hand_2_v, hand_3, hand_3_v, points):
-			self.wndCards.UpdateCardsFieldInfo(hand_1, hand_1_v, hand_2, hand_2_v, hand_3, hand_3_v, points)
-
-		def CardsPutReward(self, hand_1, hand_1_v, hand_2, hand_2_v, hand_3, hand_3_v, points):
-			self.wndCards.CardsPutReward(hand_1, hand_1_v, hand_2, hand_2_v, hand_3, hand_3_v, points)
-
-		def CardsShowIcon(self):
-			self.wndCardsIcon.Show()
-
 	if app.ENABLE_RENEWAL_CUBE:
 		def BINARY_CUBE_RENEWAL_OPEN(self):
 			self.wndCubeRenewal.Show()
-
-	#if app.ENABLE_BATTLE_PASS:
-	#	def Show_BattlePass(self):
-	#		self.wndGameButton.ShowPassButton()
-	#
-	#	def Hide_BattlePass(self):
-	#		self.wndGameButton.HidePassButton()
-	#
-	#	def Show_BattlePass_Premium(self):
-	#		self.wndGameButton.ShowPassButtonPremium()
-	#
-	#	def Hide_BattlePass_Premium(self):
-	#		self.wndGameButton.HidePassButtonPremium()
 
 	def OpenCubeWindow(self):
 		self.wndCube.Open()
 
 		if FALSE == self.wndInventory.IsShow():
 			self.wndInventory.Show()
-			self.wndExpandedMoney.Show()
-
-	def ShowItemFinder(self):
-		self.wndItemFinder.Show()
-
-	def AppendInfoFinder(self, index, name_monster, prob, activi, vnum, count, name_item):
-		self.wndItemFinder.AppendInfo(index, name_monster, prob, activi, vnum, count, name_item)
-
-	if app.ENABLE_HALLOWEEN_EVENT_SYSTEM:
-		def ShowHaloun(self):
-			self.wndhaloun.Show()
 
 	def UpdateCubeInfo(self, gold, itemVnum, count):
 		self.wndCube.UpdateInfo(gold, itemVnum, count)
@@ -2499,27 +1979,29 @@ class Interface(object):
 			guildDonateBoard = uiGuild.DonateGuildDialog()
 			guildDonateBoard.RefreshGuildDonateInfo()
 
-	if app.ENABLE_RESP_SYSTEM:
-		def OpenRespWindow(self):
-			if self.wndResp.IsShow():
-				self.wndResp.Hide()
-			else:
-				self.wndResp.Show()
+	if app.ENABLE_MINIGAME_OKEY_CARDS_SYSTEM:
+		def OpenCardsInfoWindow(self):
+			self.wndCardsInfo.Open()
 
-		def ClearLocationWindow(self):
-			self.wndLocationWindow.ClearData()
+		def OpenCardsWindow(self, safemode):
+			self.wndCards.Open(safemode)
 
-		def UpdateLocationWindowPos(self, position, index, posx, posy):
-			self.wndLocationWindow.AppendPosition(position, index, posx, posy)
+		def UpdateCardsInfo(self, hand_1, hand_1_v, hand_2, hand_2_v, hand_3, hand_3_v, hand_4, hand_4_v, hand_5, hand_5_v, cards_left, points):
+			self.wndCards.UpdateCardsInfo(hand_1, hand_1_v, hand_2, hand_2_v, hand_3, hand_3_v, hand_4, hand_4_v, hand_5, hand_5_v, cards_left, points)
 
-		def UpdateLocationWindowName(self, name):
-			self.wndLocationWindow.AppendName(name)
+		def UpdateCardsFieldInfo(self, hand_1, hand_1_v, hand_2, hand_2_v, hand_3, hand_3_v, points):
+			self.wndCards.UpdateCardsFieldInfo(hand_1, hand_1_v, hand_2, hand_2_v, hand_3, hand_3_v, points)
+
+		def CardsPutReward(self, hand_1, hand_1_v, hand_2, hand_2_v, hand_3, hand_3_v, points):
+			self.wndCards.CardsPutReward(hand_1, hand_1_v, hand_2, hand_2_v, hand_3, hand_3_v, points)
+
+		def CardsShowIcon(self):
+			self.wndCardsIcon.Show()
 
 	def __HideWindows(self):
 		hideWindows = self.wndTaskBar,\
 						self.wndCharacter,\
 						self.wndInventory,\
-						self.wndExpandedMoney,\
 						self.wndMiniMap,\
 						self.wndGuild,\
 						self.wndMessenger,\
@@ -2530,24 +2012,11 @@ class Interface(object):
 		if self.wndExpandedTaskBar:
 			hideWindows += self.wndExpandedTaskBar,
 
-		if app.ENABLE_GAYA_TICKET_SYSTEM:
-			if (self.wndImproveGemTicket):
-				hideWindows += self.wndImproveGemTicket,
-
-		if app.ENABLE_ZODIAC_MISSION:
-			if self.wnd12ziTimer:
-				hideWindows += self.wnd12ziTimer,
-			if self.wnd12ziReward:
-				hideWindows += self.wnd12ziReward,
-
-		if app.ENABLE_COLLECTIONS_SYSTEM:
-			hideWindows += self.wndCollections,
+		if self.wndExpandedMoneyTaskBar:
+			hideWindows += self.wndExpandedMoneyTaskBar,
 
 		if app.ENABLE_RIDING_EXTENDED and self.wndMountUpGrade:
 			hideWindows += self.wndMountUpGrade,
-
-		if app.ENABLE_RESP_SYSTEM and self.wndResp:
-			hideWindows += self.wndResp,
 
 		if app.ENABLE_RENEWAL_SWITCHBOT:
 			if self.wndSwitchbot:
@@ -2556,6 +2025,10 @@ class Interface(object):
 		if app.ENABLE_SPECIAL_INVENTORY:
 			if self.wndSpecialInventory:
 				hideWindows += self.wndSpecialInventory,
+
+		if app.ENABLE_RENEWAL_BATTLE_PASS:
+			if self.wndBattlePassExtended:
+				hideWindows += self.wndBattlePassExtended,
 
 		if app.ENABLE_GROWTH_PET_SYSTEM:
 			if self.wndPetInfoWindow:
@@ -2578,14 +2051,6 @@ class Interface(object):
 
 			if self.wndHuntingReward:
 				hideWindows += self.wndHuntingReward,
-
-		if app.ENABLE_BIOLOGIST_SYSTEM:
-			if self.wndBiyologWindow:
-				hideWindows += self.wndBiyologWindow,
-
-		if app.ENABLE_RANKING:
-			if self.wndRanking:
-				hideWindows += self.wndRanking,
 
 		hideWindows = filter(lambda x:x.IsShow(), hideWindows)
 		map(lambda x:x.Hide(), hideWindows)
@@ -2613,13 +2078,6 @@ class Interface(object):
 	def BINARY_OpenAtlasWindow(self):
 		if self.wndMiniMap:
 			self.wndMiniMap.ShowAtlas()
-
-	if app.ENABLE_COLLECTIONS_SYSTEM:
-		def ToggleCollectionWindow(self):
-			if self.wndCollections.IsShow():
-				self.wndCollections.Hide()
-			else:
-				self.wndCollections.Show()
 
 	if app.ENABLE_GUILDRENEWAL_SYSTEM:
 		def BINARY_SetObserverMode(self, flag, isbuttonshow):
@@ -2692,8 +2150,6 @@ class Interface(object):
 
 		del self.privateShopAdvertisementBoardDict[vid]
 		uiPrivateShopBuilder.DeleteADBoard(vid)
-
-	### Equipment ###
 
 	def OpenEquipmentDialog(self, vid):
 		dlg = uiEquipmentDialog.EquipmentDialog()
@@ -2830,7 +2286,6 @@ class Interface(object):
 			btn.Show()
 			if app.ENABLE_RENEWAL_QUEST:
 				break
-	### Whisper ###
 
 	def __InitWhisper(self):
 		chat.InitWhisper(self)
@@ -2916,11 +2371,6 @@ class Interface(object):
 		self.__MakeWhisperButton(name)
 
 	def ShowWhisperDialog(self, btn):
-		if app.ENABLE_WIKI_SYSTEM and btn.name == "[W?K?]":
-			self.__DestroyWhisperButton(btn)
-			self.OpenWikiWindow()
-			return
-
 		try:
 			self.__MakeWhisperDialog(btn.name)
 			dlgWhisper = self.whisperDialogDict[btn.name]
@@ -2991,35 +2441,17 @@ class Interface(object):
 
 		return dlgWhisper
 
-	def ShowWhisperToolTip(self):
-		if app.ENABLE_WHISPER_CLOSE_SHORTCUT and self.whisper_tooltip:
-			self.whisper_tooltip.SetTop()
-			self.whisper_tooltip.Show()
-
-	def HideWhisperTooltip(self):
-		if app.ENABLE_WHISPER_CLOSE_SHORTCUT and self.whisper_tooltip:
-			self.whisper_tooltip.Hide()
-
 	def __MakeWhisperButton(self, name):
 		whisperButton = uiWhisper.WhisperButton()
-		if app.ENABLE_WIKI_SYSTEM and name == "[W?K?]":
-			whisperButton.SetUpVisual("d:/ymir work/ui/game/whisper/wikipedia.tga")
-			whisperButton.SetOverVisual("d:/ymir work/ui/game/whisper/wikipedia_over.tga")
-			whisperButton.SetDownVisual("d:/ymir work/ui/game/whisper/wikipedia.tga")
-			whisperButton.SetToolTipTextWithColor(name, 0xffe7a83b)
+		whisperButton.SetUpVisual("d:/ymir work/ui/game/windows/btn_mail_up.sub")
+		whisperButton.SetOverVisual("d:/ymir work/ui/game/windows/btn_mail_up.sub")
+		whisperButton.SetDownVisual("d:/ymir work/ui/game/windows/btn_mail_up.sub")
+		if self.IsGameMasterName(name):
+			whisperButton.SetToolTipTextWithColor(name, 0xffffa200)
 		else:
-			whisperButton.SetUpVisual("d:/ymir work/ui/game/windows/btn_mail_up.sub")
-			whisperButton.SetOverVisual("d:/ymir work/ui/game/windows/btn_mail_up.sub")
-			whisperButton.SetDownVisual("d:/ymir work/ui/game/windows/btn_mail_up.sub")
-			if self.IsGameMasterName(name):
-				whisperButton.SetToolTipTextWithColor(name, 0xffffa200)
-			else:
-				whisperButton.SetToolTipText(name)
+			whisperButton.SetToolTipText(name)
 		whisperButton.ToolTipText.SetHorizontalAlignCenter()
 		whisperButton.SetEvent(ui.__mem_func__(self.ShowWhisperDialog), whisperButton)
-		if app.ENABLE_WHISPER_CLOSE_SHORTCUT:
-			whisperButton.SetOverInEvent(ui.__mem_func__(self.ShowWhisperToolTip))
-			whisperButton.SetOverOutEvent(ui.__mem_func__(self.HideWhisperTooltip))
 		whisperButton.Show()
 		whisperButton.name = name
 
@@ -3032,8 +2464,6 @@ class Interface(object):
 		button.SetEvent(0)
 		self.whisperButtonList.remove(button)
 		self.__ArrangeWhisperButton()
-		if app.ENABLE_WHISPER_CLOSE_SHORTCUT:
-			self.HideWhisperTooltip()
 
 	def HideAllWhisperButton(self):
 		for btn in self.whisperButtonList:
@@ -3140,123 +2570,6 @@ class Interface(object):
 	def BULID_ExitGuildArea(self, areaID):
 		self.wndGameButton.HideBuildButton()
 
-	if app.ENABLE_EVENT_SYSTEM:
-		def ShowEventWindowDialog(self):
-			self.wndEvent.Refresh()
-			self.wndEvent.OpenEventInfoDialog()
-			
-		def RefreshEventWindowDialog(self):
-			self.wndEvent.Refresh()
-			
-		def BossHuntersTimeStamp(self, day):
-			self.wndMiniGameAttendance.MiniGameAttendanceSetDay(day)
-			
-		def BossHuntersClearMission(self, value):
-			self.wndMiniGameAttendance.MiniGameAttendanceSetMissionClear(value)
-			
-		def OpenMiniGameAttendance(self):
-			self.wndMiniGameAttendance.MiniGameAttendanceSetShowMax(8)
-			self.wndMiniGameAttendance.Open()
-
-	if app.ENABLE_FISH_EVENT_SYSTEM:
-		def MiniGameFishUse(self, shape, useCount):
-			if self.wndEvent:
-				self.wndEvent.MiniGameFishUse(shape, useCount)
-			
-		def MiniGameFishAdd(self, pos, shape):
-			if self.wndEvent:
-				self.wndEvent.MiniGameFishAdd(pos, shape)
-			
-		def MiniGameFishReward(self, vnum):
-			if self.wndEvent:
-				self.wndEvent.MiniGameFishReward(vnum)
-				
-		def MiniGameFishCount(self, count):
-			if self.wndEvent:
-				self.wndEvent.MiniGameFishCount(count)
-	
-		def SetFishEventStatus(self, isEnable):
-			if isEnable:
-				if not self.wndEvent:
-					self.wndEvent = uiMiniGame.MiniGameWindow()
-	
-					if self.tooltipItem:
-						if self.wndEvent:
-							self.wndEvent.SetItemToolTip(self.tooltipItem)
-	
-				self.wndEvent.IntegrationMiniGame(True)
-			else:
-				if self.wndEvent:
-					self.wndEvent.IntegrationMiniGame(False)
-
-	if app.ENABLE_MINI_GAME_CATCH_KING:
-		def SetCatchKingEventStatus(self, isEnable):
-			if isEnable:
-				if not self.wndEvent:
-					self.wndEvent = uiMiniGame.MiniGameWindow()
-	
-					if self.tooltipItem:
-						if self.wndEvent:
-							self.wndEvent.SetItemToolTip(self.tooltipItem)
-	
-				self.wndEvent.IntegrationMiniGame(True)
-			else:
-				if self.wndEvent:
-					self.wndEvent.IntegrationMiniGame(False)
-
-		def MiniGameCatchKingEventStart(self, bigScore):
-			if self.wndEvent:
-				self.wndEvent.MiniGameCatchKingEventStart(bigScore)
-
-		def MiniGameCatchKingSetHandCard(self, cardNumber):
-			if self.wndEvent:
-				self.wndEvent.MiniGameCatchKingSetHandCard(cardNumber)
-
-		def MiniGameCatchKingResultField(self, score, rowType, cardPos, cardValue, keepFieldCard, destroyHandCard, getReward, isFiveNear):
-			if self.wndEvent:
-				self.wndEvent.MiniGameCatchKingResultField(score, rowType, cardPos, cardValue, keepFieldCard, destroyHandCard, getReward, isFiveNear)
-
-		def MiniGameCatchKingSetEndCard(self, cardPos, cardNumber):
-			if self.wndEvent:
-				self.wndEvent.MiniGameCatchKingSetEndCard(cardPos, cardNumber)
-
-		def MiniGameCatchKingReward(self, rewardCode):
-			if self.wndEvent:
-				self.wndEvent.MiniGameCatchKingReward(rewardCode)
-
-	if app.ENABLE_SOUL_ROULETTE_SYSTEM:
-		def Roulette_Open(self, price, soul):
-			if self.wndMiniGameRoulette:
-				self.wndMiniGameRoulette.Show(price, soul)
-		def Roulette_Close(self):
-			if self.wndMiniGameRoulette:
-				self.wndMiniGameRoulette.Hide()
-		def Roulette_TurnWheel(self, spin, i):
-			if self.wndMiniGameRoulette:
-				self.wndMiniGameRoulette.TurnWheel(spin, i)
-		def Roulette_SetIcons(self, i, vnum, count):
-			if self.wndMiniGameRoulette:
-				self.wndMiniGameRoulette.SetSlotItem(i, vnum, count)
-
-	if app.ENABLE_ATTENDANCE_EVENT:
-		def SetAttendanceEventStatus(self, isEnable):
-			if isEnable:
-				if not self.wndEvent:
-					self.wndEvent = uiMiniGame.MiniGameWindow()
-	
-					if self.tooltipItem:
-						if self.wndEvent:
-							self.wndEvent.SetItemToolTip(self.tooltipItem)
-	
-				self.wndEvent.IntegrationMiniGame(True)
-			else:
-				if self.wndEvent:
-					self.wndEvent.IntegrationMiniGame(False)
-					
-		def MiniGameAttendanceSetData(self, type, value):
-			if self.wndMiniGame:
-				self.wndMiniGame.MiniGameAttendanceSetData(type, value)
-
 	def IsEditLineFocus(self):
 		if self.ChatWindow.chatLine.IsFocus():
 			return 1
@@ -3280,24 +2593,6 @@ class Interface(object):
 
 	def EmptyFunction(self):
 		pass
-
-	if app.ENABLE_RANKING:
-		def OpenRanking(self):
-			if self.wndRanking:
-				self.wndRanking.Open()
-
-		def RankingClearData(self):
-			if self.wndRanking:
-				self.wndRanking.ClearData()
-
-		def RankingAddRank(self, position, level, points, name, realPosition):
-			if self.wndRanking:
-				self.wndRanking.AddRank(position, name, points, level, realPosition)
-
-		def RankingRefresh(self):
-			if self.wndRanking:
-				self.wndRanking.RefreshList()
-				self.wndRanking.OnScroll()
 
 	def IsShowDlgQuestionWindow(self):
 		if self.wndInventory.IsDlgQuestionShow():
@@ -3452,6 +2747,18 @@ class Interface(object):
 			self.wndPrivateShopSearch.RefreshMe()
 			self.wndPrivateShopSearch.RefreshList()
 
+	if app.ENABLE_INGAME_WIKI_SYSTEM:
+		def __MakeWiki(self):
+			if self.wndWiki == None:
+				self.wndWiki = uiWiki.EncyclopediaofGame()
+
+		def OpenWikiWindow(self):
+			self.__MakeWiki()
+			if self.wndWiki.IsShow():
+				self.wndWiki.Close()
+			else:
+				self.wndWiki.Open()
+
 	if app.ENABLE_AUTOMATIC_PICK_UP_SYSTEM:
 		def OnChangePickUPMode(self):
 			self.dlgSystem.OnChangePickUPMode()
@@ -3465,27 +2772,14 @@ class Interface(object):
 			self.wndDungeonTimer = uiDungeonTimer.Cooldown()
 			self.wndDungeonTimer.Hide()
 
-	if app.ENABLE_DUNGEON_INFO:
-		def MakeDungeonInfo(self):
-			if self.wndDungeonInfo == None:
-				self.wndDungeonInfo = uiDungeonInfo.DungeonInfo()
-
-		def OpenDungeonInfo(self):
-			self.MakeDungeonInfo()
-			if self.wndDungeonInfo.IsShow():
-				self.wndDungeonInfo.Close()
-			else:
-				self.wndDungeonInfo.Open()
-
-	if app.ENABLE_ITEMSHOP:
+	if app.ENABLE_RENEWAL_INGAME_ITEMSHOP:
 		def MakeItemShopWindow(self):
-			if not self.wndItemShop:
-				self.wndItemShop = uiItemShopNew.ItemShopWindow()
+			if self.wndItemShop == None:
+				self.wndItemShop = uiItemShop.ItemShopWindow()
+				self.wndItemShop.BindInterfaceClass(self)
 
 		def OpenItemShopWindow(self):
-			if not self.wndItemShop:
-				self.wndItemShop = uiItemShopNew.ItemShopWindow()
-
+			self.MakeItemShopWindow()
 			if self.wndItemShop.IsShow():
 				self.wndItemShop.Close()
 			else:
@@ -3510,15 +2804,9 @@ class Interface(object):
 			self.MakeItemShopWindow()
 			self.wndItemShop.UpdateItem(itemID, itemMaxSellingCount)
 
-		#USE_ITEMSHOP_RENEWED: @lldJCoins
-		def ItemShopSetDragonCoin(self, lldCoins, lldJCoins = 0):
-			if not self.wndItemShop:
-				self.wndItemShop = uiItemShopNew.ItemShopWindow()
-
-			self.wndItemShop.SetDragonCoin(lldCoins)
-
-			if app.USE_ITEMSHOP_RENEWED:
-				self.wndItemShop.SetDragonJeton(lldJCoins)
+		def ItemShopSetDragonCoin(self,dragonCoin):
+			self.MakeItemShopWindow()
+			self.wndItemShop.SetDragonCoin(dragonCoin)
 
 		def SetWheelItemData(self, cmd):
 			self.MakeItemShopWindow()
@@ -3531,38 +2819,6 @@ class Interface(object):
 		def GetWheelGiftData(self, itemVnum, itemCount):
 			self.MakeItemShopWindow()
 			self.wndItemShop.GetWheelGiftData(int(itemVnum), int(itemCount))
-
-	if app.ENABLE_WIKI_SYSTEM:
-		def OpenWikiWindow(self):
-			if self.wndWiki == None:
-				self.__MakeWiki()
-			if self.wndWiki and self.wndWiki.IsShow():
-				self.wndWiki.Close()
-			elif self.wndWiki:
-				self.wndWiki.Open()
-
-		def __MakeWiki(self):
-			if self.wndWiki == None:
-				self.wndWiki = uiWiki.EncyclopediaofGame()
-				self.wndInventory.BindWikiWindow(self.wndWiki)
-				if hasattr(self, 'wndInventoryNew') and self.wndInventoryNew:
-					self.wndInventoryNew.BindWikiWindow(self.wndWiki)
-
-		def RecvReadWiki(self):
-			name = "[W?K?]"
-			if not self.whisperDialogDict.has_key(name):
-				btn = self.__FindWhisperButton(name)
-				if 0 == btn:
-					btn = self.__MakeWhisperButton(name)
-					btn.Flash()
-					if app.ENABLE_BLINK_ALERT:
-						app.FlashApplication()
-					chat.AppendChat(chat.CHAT_TYPE_NOTICE, localeInfo.RECEIVE_MESSAGE % (name))
-				else:
-					btn.Flash()
-					if app.ENABLE_BLINK_ALERT:
-						app.FlashApplication()
-
 
 	if app.ENABLE_SLOT_MARKING_SYSTEM:
 		def MarkUnusableInvenSlotOnTopWnd(self, onTopWnd, InvenSlot):
@@ -3621,34 +2877,6 @@ class Interface(object):
 				return
 
 			self.wndAura.CloseWindow()
-
-	if app.ENABLE_ZODIAC_MISSION:
-		def __Make12ziRewardWindow(self):
-			self.wnd12ziReward = ui12zi.Reward12ziWindow()
-			self.wnd12ziReward.SetItemToolTip(self.tooltipItem)
-			self.wnd12ziReward.Hide()
-		def __Make12ziTimerWindow(self):
-			self.wnd12ziTimer = ui12zi.FloorLimitTimeWindow()
-			self.wnd12ziTimer.Hide()
-
-	if app.ENABLE_TRACK_WINDOW:
-		def TrackWindowCheckPacket(self):
-			self.wndTrackWindow.CheckPacket()
-		def MakeTrackWindow(self):
-			if self.wndTrackWindow == None:
-				self.wndTrackWindow = uiTrack.TrackWindow()
-		def OpenTrackWindow(self):
-			self.MakeTrackWindow()
-			if self.wndTrackWindow.IsShow():
-				self.wndTrackWindow.Close()
-			else:
-				self.wndTrackWindow.Open()
-		def TrackDungeonInfo(self, cmdData):
-			self.MakeTrackWindow()
-			self.wndTrackWindow.TrackDungeonInfo(cmdData)
-		def TrackBossInfo(self, bossID, bossLeftTime, bossChannel):
-			self.MakeTrackWindow()
-			self.wndTrackWindow.TrackBossInfo(int(bossID), int(bossLeftTime), int(bossChannel))
 
 	if app.ENABLE_FISH_GAME:
 		def MakeFishGameWindow(self):
@@ -3728,13 +2956,14 @@ class Interface(object):
 			else:
 				self.wndWarpWindow.Open()
 
-	if app.ENABLE_TRACK_WINDOW:
+	if app.ENABLE_DUNGEON_TRACKING_SYSTEM:
 		def TrackWindowCheckPacket(self):
 			self.wndTrackWindow.CheckPacket()
 
 		def MakeTrackWindow(self):
 			if self.wndTrackWindow == None:
 				self.wndTrackWindow = uiTrack.TrackWindow()
+				self.wndTrackWindow.BindInterfaceClass(self)
 
 		def OpenTrackWindow(self):
 			self.MakeTrackWindow()
@@ -3836,58 +3065,6 @@ class Interface(object):
 				else:
 					self.wndMountUpGrade.Close()
 
-	if app.__DUNGEON_INFO__:
-		def DungeonInfoQuestIdx(self, questIdx):
-			constInfo.dungeonInfoQuestIdx = int(questIdx)
-
-		def DungeonInfoQuestCMD(self):
-			net.SendQuestInputStringPacket(constInfo.dungeonInfoCMD)
-			constInfo.dungeonInfoCMD = ""
-
-		def OpenDungeonInfo(self):
-			try:
-				if self.wndDungeonTrack == None:
-					self.wndDungeonTrack = uiDungeonTrack.DungeonTrack()
-				if self.wndDungeonTrack.IsShow():
-					self.wndDungeonTrack.Close()
-				else:
-					self.wndDungeonTrack.Open()
-			except Exception, e:
-				import dbg
-				dbg.TraceError("OpenDungeonInfo Error: %s" % str(e))
-
-		def DungeonInfoCooldown(self, clean, data):
-			dungeonData = uiDungeonTrack.dungeonData
-			if int(clean):
-				for mobIdx, dungeonInfo in dungeonData.items():
-					dungeonInfo["server_cooldown"] = 0
-					dungeonInfo["server_completed"] = 0
-					dungeonInfo["server_fastest"] = 0
-					dungeonInfo["server_damage"] = 0
-					dungeonInfo["whisper_info"] = False
-			if data != "" and data != "-":
-				dungeonList = data[:len(data)-1].split("#")
-				for dungeonInfo in dungeonList:
-					dungeonSplitData = dungeonInfo.split("|")
-					if len(dungeonSplitData) == 5:
-						bossIdx = int(dungeonSplitData[0])
-						if dungeonData.has_key(bossIdx):
-							if dungeonData[bossIdx]["server_cooldown"] != app.GetGlobalTimeStamp() + int(dungeonSplitData[1]):
-								dungeonData[bossIdx]["whisper_info"] = False
-							dungeonData[bossIdx]["server_cooldown"] = 0 if int(dungeonSplitData[1]) <= 0 else app.GetGlobalTimeStamp() + int(dungeonSplitData[1])
-							dungeonData[bossIdx]["server_completed"] = int(dungeonSplitData[2])
-							dungeonData[bossIdx]["server_fastest"] = int(dungeonSplitData[3])
-							dungeonData[bossIdx]["server_damage"] = int(dungeonSplitData[4])
-			if self.wndDungeonManager == None:
-				self.wndDungeonManager = uiDungeonTrack.DungeonManager()
-			if self.wndDungeonTrack == None:
-				self.wndDungeonTrack = uiDungeonTrack.DungeonTrack()
-			self.wndDungeonTrack.Refresh()
-
-		def LoadServerData(self, mobIdx, rankIdx, cmd):
-			if self.wndDungeonTrack != None:
-				self.wndDungeonTrack.LoadServerData(int(mobIdx), int(rankIdx), cmd)
-
 	if app.__AUTO_HUNT__:
 		def AutoHuntStatus(self, status):
 			if self.wndAutoHunt:
@@ -3910,64 +3087,3 @@ class Interface(object):
 				self.wndAutoHunt.Close()
 			else:
 				self.wndAutoHunt.Open()
-
-	if app.ENABLE_BIOLOGIST_SYSTEM:
-		def SetBiyologMission(self, mission, missionState, givenCount, needCount, remainingTime):
-			if self.wndBiyologWindow:
-				self.wndBiyologWindow.SetMission(mission, missionState, givenCount, needCount, remainingTime)
-
-		def OpenBiyologDialog(self):
-			if self.wndBiyologWindow:
-				self.wndBiyologWindow.Open()
-
-
-	if app.ENABLE_GAYA_TICKET_SYSTEM:
-		def OpenGemTicket(self, itemPos):
-			self.wndImproveGemTicket.Open(itemPos)
-
-if __name__ == "__main__":
-
-	import app
-	import wndMgr
-	import systemSetting
-	import mouseModule
-	import grp
-	import ui
-	import localeInfo
-
-	app.SetMouseHandler(mouseModule.mouseController)
-	app.SetHairColorEnable(TRUE)
-	wndMgr.SetMouseHandler(mouseModule.mouseController)
-	wndMgr.SetScreenSize(systemSetting.GetWidth(), systemSetting.GetHeight())
-	app.Create(localeInfo.APP_TITLE, systemSetting.GetWidth(), systemSetting.GetHeight(), 1)
-	mouseModule.mouseController.Create()
-
-	class TestGame(ui.Window):
-		def __init__(self):
-			ui.Window.__init__(self)
-
-			localeInfo.LoadLocaleData()
-			player.SetItemData(0, 27001, 10)
-			player.SetItemData(1, 27004, 10)
-
-			self.interface = Interface()
-			self.interface.MakeInterface()
-			self.interface.ShowDefaultWindows()
-			self.interface.RefreshInventory()
-
-		def __del__(self):
-			ui.Window.__del__(self)
-
-		def OnUpdate(self):
-			app.UpdateGame()
-
-		def OnRender(self):
-			app.RenderGame()
-			grp.PopState()
-			grp.SetInterfaceRenderState()
-
-	game = TestGame()
-	game.SetSize(systemSetting.GetWidth(), systemSetting.GetHeight())
-	game.Show()
-
-	app.Loop()

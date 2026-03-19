@@ -2,6 +2,7 @@
 #include "PythonChat.h"
 #include "AbstractApplication.h"
 #include "PythonCharacterManager.h"
+
 #include "../eterbase/Timer.h"
 
 #ifdef ENABLE_CONFIG_MODULE
@@ -45,7 +46,7 @@ void CPythonChat::SChatLine::Delete(CPythonChat::SChatLine* pkChatLine)
 
 void CPythonChat::SChatLine::DestroySystem()
 {
-	ms_kPool.Destroy();
+	ms_kPool.Destroy();	
 }
 
 void CPythonChat::SChatLine::SetColor(DWORD dwID, DWORD dwColor)
@@ -82,7 +83,7 @@ CPythonChat::SChatLine::SChatLine()
 	for (int i = 0; i < CHAT_LINE_COLOR_ARRAY_MAX_NUM; ++i)
 		aColor[i] = 0xff0000ff;
 }
-CPythonChat::SChatLine::~SChatLine()
+CPythonChat::SChatLine::~SChatLine() 
 {
 	Instance.Destroy();
 }
@@ -985,9 +986,9 @@ void CWhisper::Delete(CWhisper* pkWhisper)
 
 void CWhisper::DestroySystem()
 {
-	ms_kPool.Destroy();
+	ms_kPool.Destroy();	
 
-	SChatLine::DestroySystem();
+	SChatLine::DestroySystem();	
 }
 
 void CWhisper::SetPosition(float fPosition)
@@ -1148,5 +1149,5 @@ void CWhisper::SChatLine::Delete(CWhisper::SChatLine* pkChatLine)
 
 void CWhisper::SChatLine::DestroySystem()
 {
-	ms_kPool.Destroy();
+	ms_kPool.Destroy();	
 }

@@ -3,12 +3,6 @@
 #include "../eterPack/EterPackManager.h"
 #include "GrpImageTexture.h"
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-#include <boost/algorithm/string.hpp>
-#include "../EterBase/DDSTextureLoader.h"
-#include <d3dx9tex.h>
-#endif
-
 bool CGraphicImageTexture::Lock(int* pRetPitch, void** ppRetPixels, int level)
 {
 	D3DLOCKED_RECT lockedRect;
@@ -48,46 +42,26 @@ bool CGraphicImageTexture::CreateDeviceObjects()
 	assert(ms_lpd3dDevice != nullptr);
 	assert(m_lpd3dTexture == nullptr);
 
-    if (m_stFileName.empty())
-    {
-#ifdef ENABLE_DIRECTX9_UPDATE
-        if (FAILED(ms_lpd3dDevice->CreateTexture(m_width
-                                                    , m_height
-                                                    , 1
-                                                    , 0
-                                                    , m_d3dFmt
-                                                    , D3DPOOL_MANAGED
-                                                    , &m_lpd3dTexture
-                                                    , nullptr)))
-#else
-        if (FAILED(ms_lpd3dDevice->CreateTexture(m_width
-                                                    , m_height
-                                                    , 1
-                                                    , 0
-                                                    , m_d3dFmt
-                                                    , D3DPOOL_MANAGED
-                                                    , &m_lpd3dTexture)))
-#endif
-        {
-            return false;
-        }
-    }
-    else
-    {
+	if (m_stFileName.empty())
+	{
+		// 폰트 텍스쳐
+		if (FAILED(ms_lpd3dDevice->CreateTexture(m_width, m_height, 1, 0, m_d3dFmt, D3DPOOL_MANAGED, &m_lpd3dTexture)))
+			return false;
+	}
+	else
+	{
 		CMappedFile	mappedFile;
 		LPCVOID		c_pvMap;
 
 		if (!CEterPackManager::Instance().Get(mappedFile, m_stFileName.c_str(), &c_pvMap))
 			return false;
 
-		//@fixme002
 		if (!CreateFromMemoryFile(mappedFile.Size(), c_pvMap, m_d3dFmt, m_dwFilter))
 		{
 			TraceError("CGraphicImageTexture::CreateDeviceObjects: CreateFromMemoryFile: texture not found(%s)", m_stFileName.c_str());
 			return false;
 		}
 		return true;
-		// return CreateFromMemoryFile(mappedFile.Size(), c_pvMap, m_d3dFmt, m_dwFilter);
 	}
 
 	m_bEmpty = false;
@@ -122,7 +96,6 @@ void CGraphicImageTexture::CreateFromTexturePointer(const CGraphicTexture * c_pS
 	m_bEmpty = false;
 }
 
-#ifndef ENABLE_DIRECTX9_UPDATE
 bool CGraphicImageTexture::CreateDDSTexture(CDXTCImage & image, const BYTE * /*c_pbBuf*/)
 {
 	int mipmapCount = image.m_dwMipMapCount == 0 ? 1 : image.m_dwMipMapCount;
@@ -233,7 +206,6 @@ bool CGraphicImageTexture::CreateDDSTexture(CDXTCImage & image, const BYTE * /*c
 
 	return true;
 }
-#endif
 
 bool CGraphicImageTexture::CreateFromMemoryFile(UINT bufSize, const void * c_pvBuf, D3DFORMAT d3dFmt, DWORD dwFilter)
 {
@@ -242,122 +214,48 @@ bool CGraphicImageTexture::CreateFromMemoryFile(UINT bufSize, const void * c_pvB
 
 	static CDXTCImage image;
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-    std::string extension = CFileNameHelper::GetExtension(m_stFileName);
-    boost::algorithm::to_lower(extension);
+	if (image.LoadHeaderFromMemory((const BYTE *) c_pvBuf))	// DDS인가 확인
+	{
+		return (CreateDDSTexture(image, (const BYTE *) c_pvBuf));
+	}
+	else
+	{
+		D3DXIMAGE_INFO imageInfo;
+		if (FAILED(D3DXCreateTextureFromFileInMemoryEx(
+					ms_lpd3dDevice,
+					c_pvBuf,
+					bufSize,
+					D3DX_DEFAULT,
+					D3DX_DEFAULT,
+					D3DX_DEFAULT,
+					0,
+					d3dFmt,
+					D3DPOOL_MANAGED,
+					dwFilter,
+					dwFilter,
+					0xffff00ff,
+					&imageInfo,
+					nullptr,
+					&m_lpd3dTexture)))
+		{
+			TraceError("CreateFromMemoryFile: Cannot create texture");
+			return false;
+		}
 
-    if (!m_stFileName.empty() && extension == "dds")
-    {
-        HRESULT hr = DirectX::CreateDDSTextureFromMemoryEx(ms_lpd3dDevice
-                                                    , (const uint8_t *)c_pvBuf
-                                                    , bufSize
-                                                    , 0
-                                                    , D3DPOOL_MANAGED
-                                                    , false
-                                                    , &m_lpd3dTexture);
+		m_width = imageInfo.Width;
+		m_height = imageInfo.Height;
 
-        if (FAILED(hr))
-        {
-            D3DXIMAGE_INFO imageInfo;
-            hr = D3DXCreateTextureFromFileInMemoryEx(ms_lpd3dDevice
-                                                        , c_pvBuf
-                                                        , bufSize
-                                                        , D3DX_DEFAULT_NONPOW2
-                                                        , D3DX_DEFAULT_NONPOW2
-                                                        , 1
-                                                        , 0
-                                                        , m_d3dFmt
-                                                        , D3DPOOL_MANAGED
-                                                        , D3DX_FILTER_NONE
-                                                        , D3DX_FILTER_NONE
-                                                        , 0xffff00ff
-                                                        , &imageInfo
-                                                        , nullptr
-                                                        , &m_lpd3dTexture);
+		D3DFORMAT format=imageInfo.Format;
+		switch(imageInfo.Format) {
+			case D3DFMT_A8R8G8B8:
+				format = D3DFMT_A4R4G4B4;
+				break;
 
-            if (FAILED(hr))
-            {
-                TraceError("%s: failed to create texture", m_stFileName);
-                return false;
-            }
-
-            m_bEmpty = false;
-            m_width = imageInfo.Width;
-            m_height = imageInfo.Height;
-            return true;
-        }
-
-        D3DSURFACE_DESC desc;
-        m_lpd3dTexture->GetLevelDesc(0, &desc);
-
-        m_width = desc.Width;
-        m_height = desc.Height;
-        m_d3dFmt = desc.Format;
-        m_bEmpty = false;
-        return true;
-    }
-#else
-    if (image.LoadHeaderFromMemory((const BYTE *) c_pvBuf))
-    {
-        return (CreateDDSTexture(image, (const BYTE *) c_pvBuf));
-    }
-#endif
-    else
-    {
-        D3DXIMAGE_INFO imageInfo;
-//#ifdef ENABLE_DIRECTX9_UPDATE
-        if (FAILED(D3DXGetImageInfoFromFileInMemory(c_pvBuf, bufSize, &imageInfo)))
-        {
-            TraceError("CreateFromMemoryFile: Cannot get image info");
-            return false;
-        }
-//#endif
-
-        if (FAILED(D3DXCreateTextureFromFileInMemoryEx(
-                    ms_lpd3dDevice,
-                    c_pvBuf,
-                    bufSize,
-//#ifdef ENABLE_DIRECTX9_UPDATE
-                    imageInfo.Width,
-                    imageInfo.Height,
-//#endif
-                    D3DX_DEFAULT,
-                    0,
-                    d3dFmt,
-                    D3DPOOL_MANAGED,
-                    dwFilter,
-                    dwFilter,
-                    0xffff00ff,
-                    &imageInfo,
-                    nullptr,
-                    &m_lpd3dTexture)))
-        {
-            TraceError("CreateFromMemoryFile: Cannot create texture");
-            return false;
-        }
-
-        m_width = imageInfo.Width;
-        m_height = imageInfo.Height;
-
-        D3DFORMAT format = imageInfo.Format;
-        switch(imageInfo.Format)
-        {
-            case D3DFMT_A8R8G8B8:
-            {
-                format = D3DFMT_A4R4G4B4;
-                break;
-            }
-            case D3DFMT_X8R8G8B8:
-            case D3DFMT_R8G8B8:
-            {
-                format = D3DFMT_A1R5G5B5;
-                break;
-            }
-            default:
-            {
-                break;
-            }
-        }
+			case D3DFMT_X8R8G8B8:
+			case D3DFMT_R8G8B8:
+				format = D3DFMT_A1R5G5B5;
+				break;
+		}
 
 		UINT uTexBias=0;
 
@@ -368,13 +266,8 @@ bool CGraphicImageTexture::CreateFromMemoryFile(UINT bufSize, const void * c_pvB
 		if (IsLowTextureMemory())
 		if (uTexBias || format!=imageInfo.Format)
 		{
-#ifdef ENABLE_DIRECTX9_UPDATE
-            IDirect3DTexture9* pkTexSrc = m_lpd3dTexture;
-            IDirect3DTexture9* pkTexDst;
-#else
-            IDirect3DTexture8* pkTexSrc = m_lpd3dTexture;
-            IDirect3DTexture8* pkTexDst;
-#endif
+			IDirect3DTexture8* pkTexSrc=m_lpd3dTexture;
+			IDirect3DTexture8* pkTexDst;
 
 			if (SUCCEEDED(D3DXCreateTexture(
 				ms_lpd3dDevice,
@@ -387,16 +280,11 @@ bool CGraphicImageTexture::CreateFromMemoryFile(UINT bufSize, const void * c_pvB
 				&pkTexDst)))
 			{
 				m_lpd3dTexture=pkTexDst;
+				
+				for(int i=0; i<imageInfo.MipLevels; ++i) {
 
-				for(int i=0; i< imageInfo.MipLevels; ++i)
-                {
-#ifdef ENABLE_DIRECTX9_UPDATE
-                    IDirect3DSurface9* ppsSrc = nullptr;
-                    IDirect3DSurface9* ppsDst = nullptr;
-#else
 					IDirect3DSurface8* ppsSrc = nullptr;
 					IDirect3DSurface8* ppsDst = nullptr;
-#endif
 
 					if (SUCCEEDED(pkTexSrc->GetSurfaceLevel(i, &ppsSrc)))
 					{

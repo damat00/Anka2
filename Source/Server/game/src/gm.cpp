@@ -21,8 +21,8 @@ void gm_new_clear()
 }
 
 void gm_new_insert( const tAdminInfo &rAdminInfo )
-{
-	sys_log( 0, "InsertGMList(account:%s, player:%s, contact_ip:%s, server_ip:%s, auth:%d)",
+{	
+	sys_log( 0, "InsertGMList(account:%s, player:%s, contact_ip:%s, server_ip:%s, auth:%d)", 
 			rAdminInfo.m_szAccount,
 			rAdminInfo.m_szName,
 			rAdminInfo.m_szContactIP,

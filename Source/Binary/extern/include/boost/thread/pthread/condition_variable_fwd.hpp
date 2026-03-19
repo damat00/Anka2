@@ -128,7 +128,7 @@ namespace boost
         }
         bool timed_wait(
             unique_lock<mutex>& m,
-            ::boost::xtime const& abs_time)
+            xtime const& abs_time)
         {
             return timed_wait(m,system_time(abs_time));
         }
@@ -194,7 +194,7 @@ namespace boost
         template<typename predicate_type>
         bool timed_wait(
             unique_lock<mutex>& m,
-            ::boost::xtime const& abs_time,predicate_type pred)
+            xtime const& abs_time,predicate_type pred)
         {
             return timed_wait(m,system_time(abs_time),pred);
         }

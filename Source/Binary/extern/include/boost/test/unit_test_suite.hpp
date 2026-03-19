@@ -32,12 +32,10 @@
 // **************    Non-auto (explicit) test case interface   ************** //
 // ************************************************************************** //
 
-#define BOOST_TEST_CASE_NAME( test_function, test_name )                   \
-boost::unit_test::make_test_case( boost::function<void ()>(test_function), \
-                                  test_name ,                              \
-                                  __FILE__, __LINE__ )
 #define BOOST_TEST_CASE( test_function )                                   \
-BOOST_TEST_CASE_NAME(test_function, BOOST_TEST_STRINGIZE( test_function) )
+boost::unit_test::make_test_case( boost::function<void ()>(test_function), \
+                                  BOOST_TEST_STRINGIZE( test_function ),   \
+                                  __FILE__, __LINE__ )
 #define BOOST_CLASS_TEST_CASE( test_function, tc_instance )                \
 boost::unit_test::make_test_case( (test_function),                         \
                                   BOOST_TEST_STRINGIZE( test_function ),   \
@@ -65,7 +63,7 @@ BOOST_AUTO_TU_REGISTRAR( suite_name )(                                  \
 #define BOOST_AUTO_TEST_SUITE_NO_DECOR( suite_name )                    \
     BOOST_AUTO_TEST_SUITE_WITH_DECOR(                                   \
         suite_name,                                                     \
-        boost::unit_test::decorator::collector_t::instance() )          \
+        boost::unit_test::decorator::collector::instance() )            \
 /**/
 
 #if BOOST_PP_VARIADICS
@@ -169,7 +167,7 @@ void test_name::test_method()                                           \
 
 #define BOOST_FIXTURE_TEST_CASE_NO_DECOR( test_name, F )                \
 BOOST_FIXTURE_TEST_CASE_WITH_DECOR( test_name, F,                       \
-    boost::unit_test::decorator::collector_t::instance() )              \
+    boost::unit_test::decorator::collector::instance() )                \
 /**/
 
 #if BOOST_PP_VARIADICS
@@ -248,7 +246,7 @@ BOOST_AUTO_TU_REGISTRAR( test_name )(                                   \
     boost::unit_test::ut_detail::template_test_case_gen<                \
         BOOST_AUTO_TC_INVOKER( test_name ),TL >(                        \
           BOOST_STRINGIZE( test_name ), __FILE__, __LINE__ ),           \
-    boost::unit_test::decorator::collector_t::instance() );             \
+    boost::unit_test::decorator::collector::instance() );               \
                                                                         \
 template<typename type_name>                                            \
 void test_name<type_name>::test_method()                                \
@@ -321,7 +319,7 @@ static boost::unit_test::ut_detail::global_fixture_impl<F> BOOST_JOIN( gf_, F ) 
 // ************************************************************************** //
 
 #define BOOST_TEST_DECORATOR( D )                                       \
-static boost::unit_test::decorator::collector_t const&                  \
+static boost::unit_test::decorator::collector const&                    \
 BOOST_TEST_APPEND_UNIQUE_ID(decorator_collector) = D;                   \
 /**/
 
@@ -345,7 +343,7 @@ typedef ::boost::unit_test::ut_detail::nil_t BOOST_AUTO_TEST_CASE_FIXTURE;
 // ************************************************************************** //
 
 // Facility for having a unique name based on __LINE__ and __COUNTER__ (later if available)
-#if defined(__COUNTER__)
+#if defined(__COUNTER__) 
   #define BOOST_TEST_INTERNAL_HAS_COUNTER
 #endif
 

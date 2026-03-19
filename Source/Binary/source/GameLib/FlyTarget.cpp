@@ -19,7 +19,7 @@ CFlyTarget::CFlyTarget(const D3DXVECTOR3& v3FlyTargetPosition)
 	__Initialize();
 
 	m_eType=TYPE_POSITION;
-	m_v3FlyTargetPosition=v3FlyTargetPosition;
+	m_v3FlyTargetPosition=v3FlyTargetPosition;	
 }
 
 CFlyTarget::CFlyTarget(const CFlyTarget& rhs)
@@ -29,15 +29,15 @@ CFlyTarget::CFlyTarget(const CFlyTarget& rhs)
 	*this = rhs;
 }
 
-CFlyTarget::~CFlyTarget()
-{
-	if (m_pFlyTarget)
+CFlyTarget::~CFlyTarget() 
+{ 
+	if (m_pFlyTarget) 
 		m_pFlyTarget->RemoveFlyTargeter(this);
 }
 
 void CFlyTarget::__Initialize()
 {
-	m_v3FlyTargetPosition=D3DXVECTOR3(0.0f,0.0f,0.0f);
+	m_v3FlyTargetPosition=D3DXVECTOR3(0.0f,0.0f,0.0f);	
 	m_pFlyTarget=NULL;
 	m_eType=TYPE_NONE;
 }
@@ -75,10 +75,10 @@ CFlyTarget::EType CFlyTarget::GetType()
 	return m_eType;
 }
 
-IFlyTargetableObject* CFlyTarget::GetFlyTarget()
+IFlyTargetableObject* CFlyTarget::GetFlyTarget() 
 {
-	assert(TYPE_OBJECT==GetType() && "CFly::GetFlyTarget");
-	return m_pFlyTarget;
+	assert(TYPE_OBJECT==GetType() && "CFly::GetFlyTarget"); 
+	return m_pFlyTarget; 
 }
 
 const D3DXVECTOR3 & CFlyTarget::GetFlyTargetPosition() const

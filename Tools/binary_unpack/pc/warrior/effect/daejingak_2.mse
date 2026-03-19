@@ -124,7 +124,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\pc\assassin\effect\amseup.dds"
+            "amseup.dds"
         }
     }
 }
@@ -383,7 +383,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\pc\shaman\effect\bottom_under.dds"
+            "bottom_under.dds"
         }
     }
 }
@@ -517,7 +517,7 @@ Group Particle
         }
         List TextureFiles
         {
-            "D:\Ymir Work\pc\sura\effect\newdaejin.dds"
+            "newdaejin.dds"
         }
     }
 }

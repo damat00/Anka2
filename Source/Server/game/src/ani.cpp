@@ -1,3 +1,10 @@
+/*********************************************************************
+ * date        : 2007.11.16
+ * file        : ani.cpp
+ * author      : mhh
+ * description :
+ */
+
 #define _ani_cpp_
 
 #include "stdafx.h"
@@ -101,7 +108,6 @@ DWORD FN_attack_speed_from_file(const char *file)
 
 ANI::ANI()
 {
-	// set default value
 	for (int race = 0; race < MAIN_RACE_MAX_NUM; ++race)
 	{
 		for (int weapon = 0; weapon < WEAPON_NUM_TYPES; ++weapon)
@@ -281,9 +287,9 @@ void ANI::print_attack_speed()
 		for (int weapon = 0; weapon < WEAPON_NUM_TYPES; ++weapon)
 		{
 			printf("[%s][%s] = %u\n",
-				FN_race_string(race),
-				FN_weapon_string(weapon),
-				attack_speed(race, weapon));
+					FN_race_string(race),
+					FN_weapon_string(weapon),
+					attack_speed(race, weapon));
 		}
 		printf("\n");
 	}

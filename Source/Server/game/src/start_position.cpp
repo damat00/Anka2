@@ -4,28 +4,28 @@
 char g_nation_name[4][32] =
 {
 	"",
-	"Shinsoo",
-	"Chunjo",
-	"Jinno",
+	"Shinsoo Kingdom",
+	"Chunjo Kingdom",
+	"Jinno Kingdom",
 };
 
 long g_start_map[4] =
 {
-	0,	// reserved
-	90,	// Kýrmýzý Ýmparatorluk
-	21,	// Sarý Ýmparatorluk
-	91	// Mavi Ýmparatorluk
+	0,
+	1,
+	21,
+	41
 };
 
 DWORD g_start_position[4][2] =
 {
-	{      0,      0 },	// reserved
-	{ 469300, 964200 },	// Kýrmýzý Ýmparatorluk
-	{  55700, 157900 },	// Sarý Ýmparatorluk
-	{ 969600, 278400 }	// Mavi Ýmparatorluk
+	{      0,      0 },
+	{ 469300, 964200 },
+	{  55700, 157900 },
+	{ 969600, 278400 }
 };
 
-// Lonca Savaþý Warp
+
 DWORD arena_return_position[4][2] =
 {
 	{       0,  0       },
@@ -34,19 +34,11 @@ DWORD arena_return_position[4][2] =
 	{   857200, 251800  }
 };
 
-// Karakter oluþturma
-DWORD g_create_position[4][2] =
-{
-	{      0,      0 },	// reserviert
-	{ 469300, 964200 },	// Kýrmýzý Ýmparatorluk
-	{  55700, 157900 },	// Sarý Ýmparatorluk
-	{ 969600, 278400 }	// Mavi Ýmparatorluk
-};
 
-DWORD g_create_position_canada[4][2] =
+DWORD g_create_position[4][2] = 
 {
-	{      0,      0 },	// reserviert
-	{ 469300, 964200 },	// Kýrmýzý Ýmparatorluk
-	{  55700, 157900 },	// Sarý Ýmparatorluk
-	{ 969600, 278400 }	// Mavi Ýmparatorluk
+	{		0,		0 },
+	{ 474800, 966000 },
+	{ 60000, 155700 },
+	{ 963700, 278400 },
 };

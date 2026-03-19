@@ -8,10 +8,9 @@
 #include <queue>
 #include <vector>
 #include <map>
-/* Client API: /usr/local/include/mysql/ altindaki mysql.h, errmsg.h, mysqld_error.h */
-#include <mysql.h>
-#include <errmsg.h>
-#include <mysqld_error.h>
+#include <mysql/mysql.h>
+#include <mysql/errmsg.h>
+#include <mysql/mysqld_error.h>
 
 #include "Semaphore.h"
 

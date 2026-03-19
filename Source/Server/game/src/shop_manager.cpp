@@ -48,7 +48,7 @@ bool CShopManager::Initialize(TShopTable * table, int size)
 	m_map_pkShop.clear();
 	m_map_pkShopByNPCVnum.clear();
 
-	int i;
+	int i; 
 
 	for (i = 0; i < size; ++i, ++table)
 	{
@@ -216,7 +216,6 @@ bool CShopManager::StartShopping(LPCHARACTER pkChr, LPCHARACTER pkChrShopKeeper,
 	if (pkChrShopKeeper->IsPC())
 		return false;
 
-	//PREVENT_TRADE_WINDOW
 	if (pkChr->IsOpenSafebox() || pkChr->GetExchange() || pkChr->GetMyShop() || pkChr->IsCubeOpen()
 #ifdef ENABLE_AURA_COSTUME_SYSTEM
 		|| pkChr->IsAuraRefineWindowOpen()
@@ -229,7 +228,6 @@ bool CShopManager::StartShopping(LPCHARACTER pkChr, LPCHARACTER pkChrShopKeeper,
 		pkChr->LocaleChatPacket(CHAT_TYPE_INFO, 74, "");
 		return false;
 	}
-	//END_PREVENT_TRADE_WINDOW
 
 #ifdef ENABLE_GROWTH_PET_SYSTEM
 	if (pkChr->GetActiveGrowthPet())
@@ -311,9 +309,7 @@ void CShopManager::DestroyPCShop(LPCHARACTER ch)
 	if (!pkShop)
 		return;
 
-	//PREVENT_ITEM_COPY;
 	ch->SetMyShopTime();
-	//END_PREVENT_ITEM_COPY
 
 	m_map_pkShopByPC.erase(ch->GetVID());
 	M2_DELETE(pkShop);
@@ -326,9 +322,7 @@ void CShopManager::StopShopping(LPCHARACTER ch)
 	if (!(shop = ch->GetShop()))
 		return;
 
-	//PREVENT_ITEM_COPY;
 	ch->SetMyShopTime();
-	//END_PREVENT_ITEM_COPY
 
 	shop->RemoveGuest(ch);
 	sys_log(0, "SHOP: END: %s", ch->GetName());
@@ -350,10 +344,7 @@ void CShopManager::Buy(LPCHARACTER ch, BYTE pos)
 
 	CShop* pkShop = ch->GetShop();
 
-
-	//PREVENT_ITEM_COPY
 	ch->SetMyShopTime();
-	//END_PREVENT_ITEM_COPY
 
 	int ret = pkShop->Buy(ch, pos);
 
@@ -469,6 +460,10 @@ void CShopManager::Sell(LPCHARACTER ch, BYTE bCell, BYTE bCount)
 	sys_log(0, "SHOP: SELL: %s item name: %s(x%d):%u price: %u", ch->GetName(), item->GetName(), bCount, item->GetID(), dwPrice);
 #endif
 
+#ifdef ENABLE_RENEWAL_BATTLE_PASS
+	ch->UpdateExtBattlePassMissionProgress(BP_ITEM_SELL, bCount, item->GetVnum());
+#endif
+
 	DBManager::instance().SendMoneyLog(MONEY_LOG_SHOP, item->GetVnum(), dwPrice);
 
 	if (bCount == item->GetCount())
@@ -504,7 +499,7 @@ bool ConvertToShopItemTable(IN CGroupNode* pNode, OUT TShopTableEx& shopTable)
 		sys_err("Group %s does not have name.", pNode->GetNodeName().c_str());
 		return false;
 	}
-
+	
 	if (shopTable.name.length() >= SHOP_TAB_NAME_MAX)
 	{
 		sys_err("Shop name length must be less than %d. Error in Group %s, name %s", SHOP_TAB_NAME_MAX, pNode->GetNodeName().c_str(), shopTable.name.c_str());
@@ -516,7 +511,7 @@ bool ConvertToShopItemTable(IN CGroupNode* pNode, OUT TShopTableEx& shopTable)
 	{
 		stCoinType = "Gold";
 	}
-
+	
 	if (boost::iequals(stCoinType, "Gold"))
 	{
 		shopTable.coinType = SHOP_COIN_TYPE_GOLD;
@@ -553,7 +548,7 @@ bool ConvertToShopItemTable(IN CGroupNode* pNode, OUT TShopTableEx& shopTable)
 			sys_err("row(%d) of group items of group %s does not have vnum column", i, pNode->GetNodeName().c_str());
 			return false;
 		}
-
+		
 		if (!pItemGroup->GetValue(i, "count", shopItems[i].count))
 		{
 			sys_err("row(%d) of group items of group %s does not have count column", i, pNode->GetNodeName().c_str());
@@ -575,7 +570,7 @@ bool ConvertToShopItemTable(IN CGroupNode* pNode, OUT TShopTableEx& shopTable)
 	{
 		std::sort(shopItems.begin(), shopItems.end(), CompareShopItemName);
 	}
-	else if (boost::iequals(stSort, "Desc"))
+	else if(boost::iequals(stSort, "Desc"))
 	{
 		std::sort(shopItems.rbegin(), shopItems.rend(), CompareShopItemName);
 	}
@@ -654,8 +649,8 @@ bool CShopManager::ReadShopTableEx(const char* stFileName)
 			sys_err("%d cannot have both original shop and extended shop", npcVnum);
 			return false;
 		}
-
-		map_npcShop.insert(TMapNPCshop::value_type(npcVnum, table));
+		
+		map_npcShop.insert(TMapNPCshop::value_type(npcVnum, table));	
 	}
 
 	for (TMapNPCshop::iterator it = map_npcShop.begin(); it != map_npcShop.end(); ++it)
@@ -668,7 +663,7 @@ bool CShopManager::ReadShopTableEx(const char* stFileName)
 			return false;
 		}
 		TShopMap::iterator shop_it = m_map_pkShopByNPCVnum.find(npcVnum);
-
+		
 		LPSHOPEX pkShopEx = NULL;
 		if (m_map_pkShopByNPCVnum.end() == shop_it)
 		{

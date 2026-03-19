@@ -57,10 +57,18 @@ class CPythonPlayerSettingsModule : public CSingleton<CPythonPlayerSettingsModul
 		void __RegisterTitleColors();
 		void __RegisterEmotionIcons();
 
+#ifdef ENABLE_TITLE_SYSTEM
+		void __RegisterTitleSystemNames();
+		void __RegisterTitleSystemColors();
+#endif
+
 	public:
 		bool RegisterGuildBuildingList(const char* filepath);
 		const char* GetLocaleString(const char* key);
 		int32_t GetCharacterTitleColor(uint8_t index);
+#ifdef ENABLE_TITLE_SYSTEM
+		int32_t GetCharacterTitleSystemColor(uint8_t index);
+#endif
 
 	private:
 		enum EGuildBuildingListToken
@@ -256,9 +264,7 @@ static const std::vector<TEffectList> vecEffectList =
 	{ CInstanceBase::EFFECT_EMPIRE + 1, "Bip01", "d:/ymir work/effect/etc/empire/empire_A.mse", true},
 	{ CInstanceBase::EFFECT_EMPIRE + 2, "Bip01", "d:/ymir work/effect/etc/empire/empire_B.mse", true},
 	{ CInstanceBase::EFFECT_EMPIRE + 3, "Bip01", "d:/ymir work/effect/etc/empire/empire_C.mse", true},
-#ifdef ENABLE_QUEEN_NETHIS
-    { CInstanceBase::EFFECT_SNAKE_REGEN, "", "d:/ymir work/effect/monster2/snake_circle_snake.mse", true },
-#endif
+
 	{ CInstanceBase::EFFECT_WEAPON + 1, "equip_right_hand", "d:/ymir work/pc/warrior/effect/geom_sword_loop.mse", true},
 	{ CInstanceBase::EFFECT_WEAPON + 2, "equip_right_hand", "d:/ymir work/pc/warrior/effect/geom_spear_loop.mse", true},
 
@@ -392,10 +398,6 @@ static const std::vector<TEffectList> vecEffectList =
 	{ CInstanceBase::EFFECT_REFINED + CInstanceBase::EFFECT_SPECIAL_BLADE_90, "PART_WEAPON", "D:/ymir work/effect/sword/piekielne.mse", true},
 #endif
 
-#ifdef ENABLE_OCHAO_TEMPLE_SYSTEM
-    { CInstanceBase::EFFECT_HEALER, "", "d:/ymir work/effect/monster2/healer/healer_effect.mse", true },
-#endif
-
 	{ CInstanceBase::EFFECT_DUST, "", "d:/ymir work/effect/etc/dust/dust.mse", true},
 	{ CInstanceBase::EFFECT_HORSE_DUST, "", "d:/ymir work/effect/etc/dust/running_dust.mse", true},
 	{ CInstanceBase::EFFECT_HIT, "", "d:/ymir work/effect/hit/blow_1/blow_1_low.mse", true},
@@ -430,51 +432,16 @@ static const std::vector<TEffectList> vecEffectList =
 	{ CInstanceBase::EFFECT_PERCENT_DAMAGE1, "", "d:/ymir work/effect/hit/percent_damage1.mse", true},
 	{ CInstanceBase::EFFECT_PERCENT_DAMAGE2, "", "d:/ymir work/effect/hit/percent_damage2.mse", true},
 	{ CInstanceBase::EFFECT_PERCENT_DAMAGE3, "", "d:/ymir work/effect/hit/percent_damage3.mse", true},
-#if defined(ENABLE_GROWTH_PET_SYSTEM) && defined(ENABLE_PVP_BALANCE)
+#ifdef ENABLE_RENEWAL_BATTLE_PASS
+	{ CInstanceBase::EFFECT_BP_NORMAL_MISSION_COMPLETED, "", "d:/ymir work/effect/battlepass/normal_mission_complete.mse", true},
+	{ CInstanceBase::EFFECT_BP_PREMIUM_MISSION_COMPLETED, "", "d:/ymir work/effect/battlepass/premium_mission_complete.mse", true},
+	{ CInstanceBase::EFFECT_BP_NORMAL_BATTLEPASS_COMPLETED, "", "d:/ymir work/effect/battlepass/normal_battlepass_complete.mse", true},
+	{ CInstanceBase::EFFECT_BP_PREMIUM_BATTLEPASS_COMPLETED, "", "d:/ymir work/effect/battlepass/premium_battlepass_complete.mse", true},
+#endif
+#ifdef ENABLE_GROWTH_PET_SYSTEM
 	{ CInstanceBase::EFFECT_GYEONGGONG_BOOM, "", "d:/ymir work/effect/hit/gyeonggong_boom.mse", true},
-	{ CInstanceBase::EFFECT_FEATHER_WALK, "", "d:/ymir work/effect/hit/gyeonggong_boom.mse", true},
 #endif
 
-#ifdef ENABLE_QUEEN_NETHIS
-    { CInstanceBase::EFFECT_SNAKE_REGEN, "", "d:/ymir work/effect/monster2/snake_circle_snake.mse", false },
-#endif
-
-#ifdef ENABLE_PASSIVE_SYSTEM
-    { CInstanceBase::EFFECT_PASSIVE, "", "d:/ymir work/effect/etc/buff/buff_passive_01.mse", true },
-#endif
-
-#ifdef ENABLE_MELEY_LAIR_DUNGEON
-    { CInstanceBase::EFFECT_AFFECT + CInstanceBase::AFFECT_STATUE1, "", "d:/ymir work/effect/monster2/redd_moojuk.mse", true },
-    { CInstanceBase::EFFECT_AFFECT + CInstanceBase::AFFECT_STATUE2, "", "d:/ymir work/effect/monster2/redd_moojuk.mse", true },
-    { CInstanceBase::EFFECT_AFFECT + CInstanceBase::AFFECT_STATUE3, "", "d:/ymir work/effect/monster2/redd_moojuk_blue.mse", true },
-    { CInstanceBase::EFFECT_AFFECT + CInstanceBase::AFFECT_STATUE4, "", "d:/ymir work/effect/monster2/redd_moojuk_green.mse", true },
-#endif
-
-#ifdef ENABLE_ZODIAC_MISSION
-    { CInstanceBase::EFFECT_AFFECT + CInstanceBase::EFFECT_SKILL_DAMAGE_ZONE, "", "d:/ymir work/effect/monster2/12_shelter_in_01.mse", true },
-    { CInstanceBase::EFFECT_AFFECT + CInstanceBase::EFFECT_SKILL_DAMAGE_ZONE_BUYUK, "", "d:/ymir work/effect/monster2/12_shelter_in_02.mse", true },
-    { CInstanceBase::EFFECT_AFFECT + CInstanceBase::EFFECT_SKILL_DAMAGE_ZONE_ORTA, "", "d:/ymir work/effect/monster2/12_shelter_in_03.mse", true },
-    { CInstanceBase::EFFECT_AFFECT + CInstanceBase::EFFECT_SKILL_DAMAGE_ZONE_KUCUK, "", "d:/ymir work/effect/monster2/12_shelter_in_04.mse", true },
-    { CInstanceBase::EFFECT_AFFECT + CInstanceBase::EFFECT_SKILL_SAFE_ZONE, "", "d:/ymir work/effect/monster2/12_shelter_in_05.mse", true },
-    { CInstanceBase::EFFECT_AFFECT + CInstanceBase::EFFECT_SKILL_SAFE_ZONE_BUYUK, "", "d:/ymir work/effect/monster2/12_shelter_in_06.mse", true },
-    { CInstanceBase::EFFECT_AFFECT + CInstanceBase::EFFECT_SKILL_SAFE_ZONE_ORTA, "", "d:/ymir work/effect/monster2/12_shelter_in_07.mse", true },
-    { CInstanceBase::EFFECT_AFFECT + CInstanceBase::EFFECT_SKILL_SAFE_ZONE_KUCUK, "", "d:/ymir work/effect/monster2/12_shelter_in_08.mse", true },
-    { CInstanceBase::EFFECT_AFFECT + CInstanceBase::EFFECT_METEOR, "", "d:/ymir work/effect/monster2/12_tiger_s3_drop.mse", true },
-    { CInstanceBase::EFFECT_AFFECT + CInstanceBase::EFFECT_BEAD_RAIN, "", "d:/ymir work/effect/monster2/12_dra_s2_drop.mse", true },
-    { CInstanceBase::EFFECT_AFFECT + CInstanceBase::EFFECT_FALL_ROCK, "", "d:/ymir work/effect/monster2/12_mon_s3_drop.mse", true },
-    { CInstanceBase::EFFECT_AFFECT + CInstanceBase::EFFECT_ARROW_RAIN, "", "d:/ymir work/effect/monster2/12_sna_s3_drop.mse", true },
-    { CInstanceBase::EFFECT_AFFECT + CInstanceBase::EFFECT_HORSE_DROP, "", "d:/ymir work/effect/monster2/12_hor_s3_drop.mse", true },
-    { CInstanceBase::EFFECT_AFFECT + CInstanceBase::EFFECT_EGG_DROP, "", "d:/ymir work/effect/monster2/12_chi_s3_drop.mse", true },
-    { CInstanceBase::EFFECT_AFFECT + CInstanceBase::EFFECT_DEAPO_BOOM, "", "d:/ymir work/effect/monster2/daepo_na_02_boom.mse", true },
-#endif
-#ifdef ENABLE_EQUIPMENT_HAND_EFFECT:
-    { CInstanceBase::EFFECT_AFFECT + CInstanceBase::AFF_DBONE_BRONZE,	"Bip01 R Hand", 	"d:/ymir work/effect/etc/buff/kemikeff/dragonbone_yeni.mse", true },
-    { CInstanceBase::EFFECT_AFFECT + CInstanceBase::AFF_DBONE_SILVER,	"Bip01 R Hand", 	"d:/ymir work/effect/etc/buff/kemikeff/dragonbone_yeni2.mse", true },
-    { CInstanceBase::EFFECT_AFFECT + CInstanceBase::AFF_DBONE_GOLD,		"Bip01 R Hand", 	"d:/ymir work/effect/etc/buff/kemikeff/dragonbone_yeni3.mse", true },
-    { CInstanceBase::EFFECT_AFFECT + CInstanceBase::AFF_DBONE_DIAMOND,	"Bip01 L Hand", 	"d:/ymir work/effect/etc/buff/kemikeff/dragonbone_yeni.mse", true },
-    { CInstanceBase::EFFECT_AFFECT + CInstanceBase::AFF_DBONE_PLATIN,	"Bip01 L Hand", 	"d:/ymir work/effect/etc/buff/kemikeff/dragonbone_yeni2.mse", true },
-    { CInstanceBase::EFFECT_AFFECT + CInstanceBase::AFF_DBONE_EMERALD,	"Bip01 L Hand", 	"d:/ymir work/effect/etc/buff/kemikeff/dragonbone_yeni3.mse", true },
-#endif
 };
 
 const constexpr uint8_t INTRO_MOTION_NUM = 3;
@@ -566,6 +533,13 @@ static const uint8_t getGuildMaterialIndex(const int32_t& vnum)
 
 static const std::array<const char*, 9> titleNameList{ "PVP_LEVEL0", "PVP_LEVEL1", "PVP_LEVEL2", "PVP_LEVEL3", "PVP_LEVEL4", "PVP_LEVEL5", "PVP_LEVEL6", "PVP_LEVEL7", "PVP_LEVEL8" };
 
+#ifdef ENABLE_TITLE_SYSTEM
+static const std::array<const char*, 21> titleSystemNameList{ 
+	"TITLE_SYSTEM_NAME_0", "TITLE_SYSTEM_NAME_1","TITLE_SYSTEM_NAME_2", "TITLE_SYSTEM_NAME_3", "TITLE_SYSTEM_NAME_4", "TITLE_SYSTEM_NAME_5", "TITLE_SYSTEM_NAME_6",
+	"TITLE_SYSTEM_NAME_7",  "TITLE_SYSTEM_NAME_8", "TITLE_SYSTEM_NAME_9", "TITLE_SYSTEM_NAME_10", "TITLE_SYSTEM_NAME_11", "TITLE_SYSTEM_NAME_12", "TITLE_SYSTEM_NAME_13",
+	"TITLE_SYSTEM_NAME_14", "TITLE_SYSTEM_NAME_15","TITLE_SYSTEM_NAME_16", "TITLE_SYSTEM_NAME_17", "TITLE_SYSTEM_NAME_18", "TITLE_SYSTEM_NAME_19", "TITLE_SYSTEM_NAME_20" };
+#endif
+
 typedef std::map<uint8_t, RGB> TCharacterColorMap;
 static const TCharacterColorMap characterNameColors
 {
@@ -588,12 +562,6 @@ static const TCharacterColorMap characterNameColors
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
 	{ CInstanceBase::NAMECOLOR_SHOP, { 255, 215, 76 }},
 #endif
-#ifdef NAMECOLOR_BOSS_CLIENT
-	{ CInstanceBase::NAMECOLOR_BOSS, { 255, 170, 76 }},
-#endif
-#ifdef ENABLE_CONQUEROR_LEVEL
-	{ CInstanceBase::NAMECOLOR_CONQUEROR, { 135, 206, 235 }},
-#endif
 };
 
 static const TCharacterColorMap characterTitleColors
@@ -608,6 +576,33 @@ static const TCharacterColorMap characterTitleColors
 	{ 7, { 227, 0, 0 }},
 	{ 8, { 255, 0, 0 }},
 };
+
+#ifdef ENABLE_TITLE_SYSTEM
+static const TCharacterColorMap characterTitleSystemColors
+{
+	{ 0, { 255, 230, 186 }},
+	{ 1, { 255, 230, 186 }},
+	{ 2, { 255, 230, 186 }},
+	{ 3, { 255, 230, 186 }},
+	{ 4, { 255, 230, 186 }},
+	{ 5, { 255, 230, 186 }},
+	{ 6, { 255, 230, 186 }},
+	{ 7, { 255, 230, 186 }},
+	{ 8, { 255, 230, 186 }},
+	{ 9, { 255, 230, 186 }},
+	{ 10, { 255, 230, 186 }},
+	{ 11, { 255, 230, 186 }},
+	{ 12, { 255, 230, 186 }},
+	{ 13, { 255, 230, 186 }},
+	{ 14, { 255, 230, 186 }},
+	{ 15, { 255, 230, 186 }},
+	{ 16, { 255, 230, 186 }},
+	{ 17, { 255, 230, 186 }},
+	{ 18, { 255, 230, 186 }},
+	{ 19, { 255, 230, 186 }},
+	{ 20, { 255, 230, 186 }},
+};
+#endif
 
 static const std::map<uint8_t, const char*> emotionIcons =
 {
@@ -664,26 +659,27 @@ static const std::map<uint8_t, const char*> emotionIcons =
 
 static const std::map<uint8_t, std::map<uint8_t, std::vector<uint8_t>>> skillIndexes{
 	{ NRaceData::JOB_WARRIOR, {
-		{1, {1, 2, 3, 4, 5, 6, 0, 0, 176, 137, 0, 138, 0, 139, 0}},
-		{2, {16, 17, 18, 19, 20, 21, 0, 0, 176, 137, 0, 138, 0, 139, 0}},
+		{1, {1, 2, 3, 4, 5, 0, 0, 0, 137, 0, 138, 0, 139, 0}},
+		{2, {16, 17, 18, 19, 20, 0, 0, 0, 137, 0, 138, 0, 139, 0}},
 	}},
 	{ NRaceData::JOB_ASSASSIN, {
-		{1, {31, 32, 33, 34, 35, 36, 0, 0, 177, 137, 0, 138, 0, 139, 0, 140}},
-		{2, {46, 47, 48, 49, 50, 51, 0, 0, 178, 137, 0, 138, 0, 139, 0, 140}},
+		{1, {31, 32, 33, 34, 35, 0, 0, 0, 137, 0, 138, 0, 139, 0, 140}},
+		{2, {46, 47, 48, 49, 50, 0, 0, 0, 137, 0, 138, 0, 139, 0, 140}},
 	}},
 	{ NRaceData::JOB_SURA, {
-		{1, {61, 62, 63, 64, 65, 66, 0, 0, 179, 137, 0, 138, 0, 139, 0}},
-		{2, {76, 77, 78, 79, 80, 81, 0, 0, 180, 137, 0, 138, 0, 139, 0}},
+		{1, {61, 62, 63, 64, 65, 66, 0, 0, 137, 0, 138, 0, 139, 0}},
+		{2, {76, 77, 78, 79, 80, 81, 0, 0, 137, 0, 138, 0, 139, 0}},
 	}},
 	{ NRaceData::JOB_SHAMAN, {
-		{1, {91, 92, 93, 94, 95, 96, 0, 0, 181, 137, 0, 138, 0, 139, 0}},
-		{2, {106, 107, 108, 109, 110, 111, 0, 0, 182, 137, 0, 138, 0, 139, 0}},
+		{1, {91, 92, 93, 94, 95, 96, 0, 0, 137, 0, 138, 0, 139, 0}},
+		{2, {106, 107, 108, 109, 110, 111, 0, 0, 137, 0, 138, 0, 139, 0}},
 	}},
 };
 
-constexpr std::array<uint8_t, 17> supportSkillIndexes =
+
+constexpr std::array<uint8_t, 12> supportSkillIndexes =
 {
-	{121, 122, 123, 124, 126, 127, 129, 128, 131, 137, 138, 139, 140, 132, 133, 134, 246},
+	{122, 123, 121, 124, 125, 129, 130, 131, 137, 138, 139, 140},
 };
 
 static const std::map < std::string, std::vector<uint8_t>> guildSkills

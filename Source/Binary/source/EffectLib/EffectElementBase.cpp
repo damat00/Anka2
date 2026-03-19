@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "EffectElementBase.h"
 
+
 void CEffectElementBase::GetPosition(float fTime, D3DXVECTOR3 & rPosition)
 {
 	if (m_TimeEventTablePosition.empty())

@@ -17,7 +17,7 @@
 
 
 #include <boost/concept_check.hpp>
-#include <boost/core/ignore_unused.hpp>
+
 
 namespace boost { namespace geometry { namespace concepts
 {
@@ -52,7 +52,8 @@ class AreaStrategy
             // 4) must implement a static method result with the following signature
             return_type r = str->result(*st);
 
-            boost::ignore_unused(r, str);
+            boost::ignore_unused_variable_warning(r);
+            boost::ignore_unused_variable_warning(str);
         }
     };
 

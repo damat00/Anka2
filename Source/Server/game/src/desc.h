@@ -57,7 +57,7 @@ class DESC
 		{
 			LPDESC desc;
 
-			desc_event_info()
+			desc_event_info() 
 			: desc(0)
 			{
 			}
@@ -88,8 +88,8 @@ class DESC
 		void			Packet(const void * c_pvData, int iSize);
 		void			LargePacket(const void * c_pvData, int iSize);
 
-		int			ProcessInput();		// returns -1 if error
-		int			ProcessOutput();	// returns -1 if error
+		int			ProcessInput();
+		int			ProcessOutput();
 
 		CInputProcessor	*	GetInputProcessor()	{ return m_pInputProcessor; }
 
@@ -103,7 +103,7 @@ class DESC
 		LPCHARACTER		GetCharacter()		{ return m_lpCharacter; }
 
 		bool			IsPhase(int phase) const	{ return m_iPhase == phase ? true : false; }
-		int				GetPhase() const	{ return m_iPhase; } //@fixme318
+		int				GetPhase() const	{ return m_iPhase; }
 
 		const struct sockaddr_in & GetAddr()		{ return m_SockAddr;	}
 
@@ -126,7 +126,6 @@ class DESC
 
 		BYTE			GetEmpire();
 
-		// for p2p
 		void			SetRelay(const char * c_pszName);
 		bool			DelayedDisconnect(int iSec);
 		void			DisconnectOfSameLogin();
@@ -155,6 +154,10 @@ class DESC
 		BYTE			GetLanguage();
 #endif
 
+#ifdef ENABLE_RENEWAL_PREMIUM_SYSTEM
+		DWORD			GetAccountId() { return m_accountTable.id; }
+#endif
+
 #ifdef ENABLE_HANDSHAKE_SESSION
 		bool			IsExpiredHandshake() const;
 		void			SetHandshakeTime(uint32_t handshake_time) { m_handshake_time = handshake_time; }
@@ -171,6 +174,7 @@ class DESC
 		CInputMain		m_inputMain;
 		CInputDead		m_inputDead;
 		CInputAuth		m_inputAuth;
+
 
 		LPFDWATCH		m_lpFdw;
 		socket_t		m_sock;
@@ -216,6 +220,7 @@ class DESC
 		BYTE                    m_bCRCMagicCubeIdx;
 		DWORD                   m_dwProcCRC;
 		DWORD                   m_dwFileCRC;
+		bool			m_bHackCRCQuery;
 
 		std::string		m_Login;
 		int				m_outtime;
@@ -228,7 +233,7 @@ class DESC
 #ifdef ENABLE_HANDSHAKE_SESSION
 		uint32_t		m_handshake_time;
 #endif
-		// Obsolete encryption stuff here
+
 		bool			m_bEncrypted;
 		DWORD			m_adwDecryptionKey[4];
 		DWORD			m_adwEncryptionKey[4];

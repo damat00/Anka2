@@ -1,20 +1,30 @@
-//
-// Copyright 2005-2007 Adobe Systems Incorporated
-//
-// Distributed under the Boost Software License, Version 1.0
-// See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt
-//
-#ifndef BOOST_GIL_RGBA_HPP
-#define BOOST_GIL_RGBA_HPP
+/*
+    Copyright 2005-2007 Adobe Systems Incorporated
+   
+    Use, modification and distribution are subject to the Boost Software License,
+    Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
+    http://www.boost.org/LICENSE_1_0.txt).
 
-#include <boost/gil/planar_pixel_iterator.hpp>
-#include <boost/gil/rgb.hpp>
+    See http://opensource.adobe.com/gil for most recent version including documentation.
+*/
+/*************************************************************************************************/
 
-#include <boost/mpl/contains.hpp>
-#include <boost/mpl/vector.hpp>
+#ifndef GIL_RGBA_H
+#define GIL_RGBA_H
+
+////////////////////////////////////////////////////////////////////////////////////////
+/// \file
+/// \brief Support for RGBA color space and variants
+/// \author Lubomir Bourdev and Hailin Jin \n
+///         Adobe Systems Incorporated
+/// \date   2005-2007 \n Last updated on October 10, 2007
+////////////////////////////////////////////////////////////////////////////////////////
 
 #include <cstddef>
+#include "gil_config.hpp"
+#include <boost/mpl/contains.hpp>
+#include "rgb.hpp"
+#include "planar_pixel_iterator.hpp"
 
 namespace boost { namespace gil {
 
@@ -41,14 +51,13 @@ inline
 typename type_from_x_iterator<planar_pixel_iterator<IC,rgba_t> >::view_t
 planar_rgba_view(std::size_t width, std::size_t height,
                  IC r, IC g, IC b, IC a,
-                 std::ptrdiff_t rowsize_in_bytes)
-{
+                 std::ptrdiff_t rowsize_in_bytes) {
     typedef typename type_from_x_iterator<planar_pixel_iterator<IC,rgba_t> >::view_t RView;
     return RView(width, height,
                  typename RView::locator(planar_pixel_iterator<IC,rgba_t>(r,g,b,a),
                                          rowsize_in_bytes));
 }
 
-}} // namespace boost::gil
+} }  // namespace boost::gil
 
 #endif

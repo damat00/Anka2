@@ -8,7 +8,7 @@ void CInstanceBase::SetAttackSpeed(UINT uAtkSpd)
 	if (uAtkSpd > 1100)
 		uAtkSpd = 0;
 
-	m_GraphicThingInstance.SetAttackSpeed(uAtkSpd/100.0f);
+	m_GraphicThingInstance.SetAttackSpeed(uAtkSpd/100.0f);	
 	m_kHorse.SetAttackSpeed(uAtkSpd);
 }
 
@@ -17,7 +17,7 @@ void CInstanceBase::SetMoveSpeed(UINT uMovSpd)
 	if (uMovSpd > 1100)
 		uMovSpd = 0;
 
-	m_GraphicThingInstance.SetMoveSpeed(uMovSpd/100.0f);
+	m_GraphicThingInstance.SetMoveSpeed(uMovSpd/100.0f);	
 	m_kHorse.SetMoveSpeed(uMovSpd);
 }
 
@@ -56,7 +56,7 @@ bool CInstanceBase::NEW_CanMoveToDestPixelPosition(const TPixelPosition& c_rkPPo
 
 	if (kPPosCur.x==c_rkPPosDst.x && kPPosCur.y==c_rkPPosDst.y)
 		return false;
-
+	
 	return true;
 }
 
@@ -75,7 +75,7 @@ float CInstanceBase_GetDegreeFromPosition(float x, float y)
 }
 
 float CInstanceBase::NEW_GetAdvancingRotationFromDirPixelPosition(const TPixelPosition& c_rkPPosDir)
-{
+{	
 	float fDirRot=CInstanceBase_GetDegreeFromPosition(c_rkPPosDir.x, -c_rkPPosDir.y);
 	float fClampDirRot=ClampDegree(fDirRot);
 
@@ -153,9 +153,6 @@ void CInstanceBase::StartWalking()
 	if (IsAffect(AFFECT_GYEONGGONG))
 	{
 		m_adwCRCAffectEffect[AFFECT_GYEONGGONG] = __EffectContainer_AttachEffect(EFFECT_AFFECT_GYEONGGONG);
-#ifdef ENABLE_PVP_BALANCE
-		__Assassin_SetGyeongGongAffect(true);
-#endif
 	}
 	else if (IsAffect(AFFECT_KWAESOK))
 	{
@@ -190,13 +187,6 @@ void CInstanceBase::EndWalkingWithoutBlending()
 
 BOOL CInstanceBase::IsWaiting()
 {
-#ifdef ENABLE_PVP_BALANCE
-	if (IsAffect(AFFECT_GYEONGGONG))
-	{
-		__Assassin_SetGyeongGongAffect(true);
-	}
-#endif
-
 	return m_GraphicThingInstance.IsWaiting();
 }
 
@@ -212,7 +202,7 @@ BOOL CInstanceBase::IsPushing()
 
 BOOL CInstanceBase::IsAttacked()
 {
-	return m_GraphicThingInstance.IsAttacked();
+	return m_GraphicThingInstance.IsAttacked();		
 }
 
 BOOL CInstanceBase::IsKnockDown()
@@ -313,17 +303,17 @@ void CInstanceBase::NEW_MoveToDirection(float fDirRot)
 
 	m_isGoing = FALSE;
 
-	SetAdvancingRotation(fDirRot);
+	SetAdvancingRotation(fDirRot);	
 
 	if (!IsWalking())
-	{
+	{ 
 		StartWalking();
 	}
 
 	TPixelPosition kPPosCur;
 	NEW_GetPixelPosition(&kPPosCur);
-
-	D3DXVECTOR3 kD3DVt3Cur(kPPosCur.x, -kPPosCur.y, kPPosCur.z);
+	
+	D3DXVECTOR3 kD3DVt3Cur(kPPosCur.x, -kPPosCur.y, kPPosCur.z);		
 	D3DXVECTOR3 kD3DVt3Dst;
 
 	D3DXVECTOR3 kD3DVt3AdvDir(0.0f, -1.0f, 0.0f);
@@ -337,7 +327,7 @@ void CInstanceBase::NEW_MoveToDirection(float fDirRot)
 	kPPosDst.x = +kD3DVt3Dst.x;
 	kPPosDst.y = -kD3DVt3Dst.y;
 	kPPosDst.z = +kD3DVt3Dst.z;
-
+	
 	NEW_SetSrcPixelPosition(kPPosCur);
 	NEW_SetDstPixelPosition(kPPosDst);
 }

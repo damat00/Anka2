@@ -1,4 +1,4 @@
-CXX	= clang++
+CXX	= clang++-devel
 
 PLATFORM = $(shell file /bin/ls | cut -d' ' -f3 | cut -d'-' -f1)
 
@@ -8,9 +8,9 @@ SVN_VERSION = $(shell svnversion -n -c . | cut -d':' -f2)
 
 BIN     = ./libsql.a
 
-IFLAGS = -I/usr/local/include -I/usr/local/include/mysql
+IFLAGS = -I/usr/local/include/
 CFLAGS  = $(IFLAGS) -m32 -Wall -w -O2 -pipe -D_THREAD_SAFE -fno-exceptions
-CFLAGS += -std=c++14
+CFLAGS += -std=c++2a
 
 LIBS =
 
@@ -27,14 +27,12 @@ $(BIN): $(OBJFILES)
 clean:
 	rm -f *.o
 	rm -f $(BIN)
-	rm -f Depend
 
 dep:
 	touch Depend
 	$(CXX) $(CFLAGS) -MM *.cpp > Depend
 
-# Pattern rule for .cpp to .o
-%.o: %.cpp
-	$(CXX) $(CFLAGS) -c $< -o $@
+$(OBJFILES):
+	$(CXX) $(CFLAGS) -c $<
 
 sinclude Depend

@@ -1,10 +1,6 @@
 #pragma once
 
-#ifdef ENABLE_DIRECTX9_UPDATE
-#include <d3dx9.h>
-#else
 #include <d3dx8.h>
-#endif
 
 class CRay
 {
@@ -16,16 +12,16 @@ class CRay
 			D3DXVec3Normalize(&m_v3Direction, &m_v3Direction);
 			m_v3End = m_v3Start + fRayRange * m_v3Direction;
 		}
-
+		
 		CRay()
 		{
 		}
-
+		
 		void SetStartPoint(const D3DXVECTOR3 & v3Start)
 		{
 			m_v3Start = v3Start;
 		}
-
+		
 		void SetDirection(const D3DXVECTOR3 & v3Dir, float fRayRange)
 		{
 			assert(fRayRange >= 0);
@@ -34,12 +30,12 @@ class CRay
 			m_fRayRange = fRayRange;
 			m_v3End = m_v3Start + m_fRayRange * m_v3Direction;
 		}
-
+		
 		void GetStartPoint(D3DXVECTOR3 * pv3Start) const
 		{
 			*pv3Start = m_v3Start;
 		}
-
+		
 		void GetDirection(D3DXVECTOR3 * pv3Dir, float * pfRayRange) const
 		{
 			*pv3Dir = m_v3Direction;
@@ -50,7 +46,7 @@ class CRay
 		{
 			*pv3End = m_v3End;
 		}
-
+		
 		const CRay & operator = (const CRay & rhs)
 		{
 			assert(rhs.m_fRayRange >= 0);
@@ -60,7 +56,7 @@ class CRay
 			D3DXVec3Normalize(&m_v3Direction, &m_v3Direction);
 			m_v3End = m_v3Start + m_fRayRange * m_v3Direction;
 		}
-
+		
 	private:
 		D3DXVECTOR3 m_v3Start;
 		D3DXVECTOR3 m_v3End;

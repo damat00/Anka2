@@ -52,7 +52,6 @@ void CPhysicsObject::Accumulate(D3DXVECTOR3 * pv3Position)
 
 void CPhysicsObject::IncreaseExternalForce(const D3DXVECTOR3 & c_rvBasePosition, float fForce)
 {
-	// Accumulate Acceleration by External Force
 	m_v3Acceleration = m_v3Direction * (fForce / m_fMass);
 	m_v3Velocity = m_v3Acceleration;
 
@@ -63,7 +62,6 @@ void CPhysicsObject::IncreaseExternalForce(const D3DXVECTOR3 & c_rvBasePosition,
 	{
 		Accumulate(&v3Movement);
 
-		// VICTIM_COLLISION_TEST
 		IPhysicsWorld* pWorld = IPhysicsWorld::GetPhysicsWorld();
 		if (pWorld)
 		{
@@ -73,11 +71,8 @@ void CPhysicsObject::IncreaseExternalForce(const D3DXVECTOR3 & c_rvBasePosition,
 				return;
 			}
 		}
-		// VICTIM_COLLISION_TEST_END
 
-		if (fabs(m_v3Velocity.x) < EPSILON &&
-			fabs(m_v3Velocity.y) < EPSILON &&
-			fabs(m_v3Velocity.z) < EPSILON )
+		if (fabs(m_v3Velocity.x) < EPSILON && fabs(m_v3Velocity.y) < EPSILON && fabs(m_v3Velocity.z) < EPSILON )
 			break;
 	}
 
@@ -125,9 +120,11 @@ float CPhysicsObject::GetYMovement()
 
 bool CPhysicsObject::isBlending()
 {
+	// NOTE : IncreaseExternalForce() 에 의해 �?리는 처리중인가?
 	if (0.0f != D3DXVec3Length(&m_v3Velocity))
 		return true;
 
+	// NOTE : SetLastPosition() 에 의해 �?리는 처리중인가?
 	if (m_xPushingPosition.isPlaying() ||
 		m_yPushingPosition.isPlaying())
 		return true;

@@ -18,7 +18,24 @@ Group Mesh
     MeshAnimationLoopCount     	5
     MeshAnimationFrameDelay    	0.012000
     
-    MeshElementCount           	0
+    MeshElementCount           	1
+    Group MeshElement00
+    {
+        BillboardType              	0
+        BlendingEnable             	1
+        BlendingSrcType            	5
+        BlendingDestType           	6
+        
+        TextureAnimationLoopEnable 	1
+        TextureAnimationFrameDelay 	0.017000
+        TextureAnimationStartFrame 	0
+        
+        ColorOperationType         	3
+        ColorFactor                	1.000000 1.000000 1.000000 1.000000
+        List TimeEventAlpha
+        {
+        }
+    }
 }
 Group Particle
 {

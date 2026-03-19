@@ -14,12 +14,11 @@ ViewState Frustum::ViewVolumeTest(const Vector3d &c_v3Center,const float c_fRadi
 		{
 			return VS_OUTSIDE;
 		}
-	}
-
+	}	
+	
 	const int count=6;
 
 	D3DXVECTOR3 center = c_v3Center;
-	//center.y *=-1;
 
 	int i;
 
@@ -27,16 +26,16 @@ ViewState Frustum::ViewVolumeTest(const Vector3d &c_v3Center,const float c_fRadi
 	for(i=0;i<count;i++)
 	{
 		distance[i] = D3DXPlaneDotCoord(&m_plane[i],&center);
-		if (distance[i]<=-c_fRadius)
+		if (distance[i]<=-c_fRadius) 
 			return VS_OUTSIDE;
 	}
 
 	for(i=0;i<count;i++)
 	{
-		if (distance[i]<=c_fRadius)
+		if (distance[i]<=c_fRadius) 
 			return VS_PARTIAL;
 	}
-
+	
 	return VS_INSIDE;
 }
 
