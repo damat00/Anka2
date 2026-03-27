@@ -1215,11 +1215,17 @@ ACMD(do_user_horse_feed)
 EVENTINFO(TimedEventInfo)
 {
 	DynamicCharacterPtr ch;
-	int subcmd;
-	int left_second;
-	char szReason[MAX_REASON_LEN];
+	int		subcmd;
+	int         	left_second;
+	char		szReason[MAX_REASON_LEN];
 
-	TimedEventInfo() : ch() , subcmd( 0 ) , left_second( 0 ) {::memset( szReason, 0, MAX_REASON_LEN );}
+	TimedEventInfo()
+	: ch()
+	, subcmd( 0 )
+	, left_second( 0 )
+	{
+		::memset( szReason, 0, MAX_REASON_LEN );
+	}
 };
 
 #ifdef ENABLE_CHANGE_CHANNEL
@@ -1239,6 +1245,12 @@ struct SendDisconnectFunc
 	{
 		if (d->GetCharacter())
 		{
+#ifdef FLUSH_AT_SHUTDOWN
+			d->GetCharacter()->SaveReal();
+			DWORD pid = d->GetCharacter()->GetPlayerID();
+			db_clientdesc->DBPacketHeader(HEADER_GD_FLUSH_CACHE, 0, sizeof(DWORD));
+			db_clientdesc->Packet(&pid, sizeof(DWORD));
+#endif			
 			if (d->GetCharacter()->GetGMLevel() == GM_PLAYER)
 				d->GetCharacter()->ChatPacket(CHAT_TYPE_COMMAND, "quit Shutdown(SendDisconnectFunc)");
 		}

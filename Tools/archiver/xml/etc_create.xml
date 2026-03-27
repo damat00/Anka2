@@ -4288,6 +4288,7 @@
 		<File ArchivedPath="d:/ymir work/ui/game/teleport/nav_image/btn_9_down.png"><![CDATA[../binary_unpack/etc/ui/game/teleport/nav_image/btn_9_down.png]]></File>
 		<File ArchivedPath="d:/ymir work/ui/game/teleport/nav_image/btn_9_normal.png"><![CDATA[../binary_unpack/etc/ui/game/teleport/nav_image/btn_9_normal.png]]></File>
 		<File ArchivedPath="d:/ymir work/ui/game/teleport/nav_image/btn_9_over.png"><![CDATA[../binary_unpack/etc/ui/game/teleport/nav_image/btn_9_over.png]]></File>
+		<File ArchivedPath="d:/ymir work/ui/game/taskbarnew/biologist.dds"><![CDATA[../binary_unpack/etc/ui/game/taskbarnew/biologist.dds]]></File>
 		<File ArchivedPath="d:/ymir work/ui/game/taskbarnew/efsun_botu_1.tga"><![CDATA[../binary_unpack/etc/ui/game/taskbarnew/efsun_botu_1.tga]]></File>
 		<File ArchivedPath="d:/ymir work/ui/game/taskbarnew/efsun_botu_2.tga"><![CDATA[../binary_unpack/etc/ui/game/taskbarnew/efsun_botu_2.tga]]></File>
 		<File ArchivedPath="d:/ymir work/ui/game/taskbarnew/efsun_botu_3.tga"><![CDATA[../binary_unpack/etc/ui/game/taskbarnew/efsun_botu_3.tga]]></File>
@@ -4303,6 +4304,9 @@
 		<File ArchivedPath="d:/ymir work/ui/game/taskbarnew/sil_1.tga"><![CDATA[../binary_unpack/etc/ui/game/taskbarnew/sil_1.tga]]></File>
 		<File ArchivedPath="d:/ymir work/ui/game/taskbarnew/sil_2.tga"><![CDATA[../binary_unpack/etc/ui/game/taskbarnew/sil_2.tga]]></File>
 		<File ArchivedPath="d:/ymir work/ui/game/taskbarnew/sil_3.tga"><![CDATA[../binary_unpack/etc/ui/game/taskbarnew/sil_3.tga]]></File>
+		<File ArchivedPath="d:/ymir work/ui/game/taskbarnew/taskbar_button_down.sub"><![CDATA[../binary_unpack/etc/ui/game/taskbarnew/taskbar_button_down.sub]]></File>
+		<File ArchivedPath="d:/ymir work/ui/game/taskbarnew/taskbar_button_hover.sub"><![CDATA[../binary_unpack/etc/ui/game/taskbarnew/taskbar_button_hover.sub]]></File>
+		<File ArchivedPath="d:/ymir work/ui/game/taskbarnew/taskbar_button_normal.sub"><![CDATA[../binary_unpack/etc/ui/game/taskbarnew/taskbar_button_normal.sub]]></File>
 		<File ArchivedPath="d:/ymir work/ui/game/taskbarnew/tpbutton1.tga"><![CDATA[../binary_unpack/etc/ui/game/taskbarnew/tpbutton1.tga]]></File>
 		<File ArchivedPath="d:/ymir work/ui/game/taskbarnew/tpbutton2.tga"><![CDATA[../binary_unpack/etc/ui/game/taskbarnew/tpbutton2.tga]]></File>
 		<File ArchivedPath="d:/ymir work/ui/game/taskbarnew/tpbutton3.tga"><![CDATA[../binary_unpack/etc/ui/game/taskbarnew/tpbutton3.tga]]></File>

@@ -311,7 +311,11 @@ bool DSManager::DragonSoulItemInitialize(LPITEM pItem)
 
 DWORD DSManager::MakeDragonSoulVnum(BYTE bType, BYTE grade, BYTE step, BYTE refine)
 {
+#ifdef __FIX_INFO_REFINE_DRAGONSOUL__	
+	return bType * 10000 + grade * 1000 + step * 100 + refine * 11;
+#else	
 	return bType * 10000 + grade * 1000 + step * 100 + refine * 10;
+#endif	
 }
 
 int DSManager::GetDuration(const LPITEM pItem) const

@@ -9092,6 +9092,21 @@ bool CHARACTER::EquipItem(LPITEM item, int iCandidateCell)
 		return false;
 	}
 
+#ifdef __FIX_COSTUM_NUNTA_PESTE_COSTUM_NORMAL__
+	if (GetWear(WEAR_BODY) && GetWear(WEAR_BODY)->GetVnum() >= 11901 && GetWear(WEAR_BODY)->GetVnum() <= 11904 && 
+		item->GetType() == ITEM_COSTUME && item->GetSubType() == COSTUME_BODY)
+    {
+        ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You cannot wear a costume as long as you have equipped a wedding costume"));
+        return false;
+    }
+   
+    if (GetWear(WEAR_COSTUME_BODY) && item->GetVnum() >= 11901 && item->GetVnum() <= 11904)
+    {
+        ChatPacket(CHAT_TYPE_INFO, LC_TEXT("You cannot equip a wedding costume as long as you have a costume on"));
+        return false;
+    }
+#endif
+
 #ifdef ENABLE_WEAPON_COSTUME_SYSTEM
 	if (iWearCell == WEAR_WEAPON)
 	{

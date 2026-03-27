@@ -1615,7 +1615,7 @@ ACMD(do_kill)
 #define BINARY  1
 #define NUMBER  2
 
-const struct set_struct 
+const struct set_struct
 {
 	const char *cmd;
 	const char type;
@@ -1849,12 +1849,12 @@ ACMD(do_respawn)
 
 	if (*arg1 && !strcasecmp(arg1, "all"))
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, "Respaw everywhere");
+		ch->ChatPacket(CHAT_TYPE_INFO, "Respawn Everywhere");
 		regen_reset(0, 0);
 	}
 	else
 	{
-		ch->ChatPacket(CHAT_TYPE_INFO, "Respaw around");
+		ch->ChatPacket(CHAT_TYPE_INFO, "Respawn Around");
 		regen_reset(ch->GetX(), ch->GetY());
 	}
 }
@@ -3977,6 +3977,23 @@ ACMD(do_flush)
 	char arg1[256];
 	one_argument(argument, arg1, sizeof(arg1));
 
+#ifdef FLUSH_AT_SHUTDOWN
+	DWORD pid = 0;
+	if(0 == arg1[0])
+	{
+		pid = ch->GetPlayerID();
+	}
+	else
+	{
+		pid = (DWORD)strtoul(arg1, NULL, 10);
+	}
+	if (pid != 0)
+	{
+		ch->SaveReal();
+		db_clientdesc->DBPacketHeader(HEADER_GD_FLUSH_CACHE, 0, sizeof(DWORD));
+		db_clientdesc->Packet(&pid, sizeof(DWORD));
+	}
+#else
 	if (0 == arg1[0])
 	{
 		ch->ChatPacket(CHAT_TYPE_INFO, "usage : /flush player_id");
@@ -3987,6 +4004,7 @@ ACMD(do_flush)
 
 	db_clientdesc->DBPacketHeader(HEADER_GD_FLUSH_CACHE, 0, sizeof(DWORD));
 	db_clientdesc->Packet(&pid, sizeof(DWORD));
+#endif
 }
 
 ACMD(do_eclipse)

@@ -2403,17 +2403,17 @@ class GameWindow(ui.ScriptWindow):
 		chat.AppendChat(chat.CHAT_TYPE_INFO, localeInfo.NOTIFY_MESSAGE[type])
 
 	if app.ENABLE_TITLE_SYSTEM:
-        def __TitleSystemSyncReset(self):
-            if self.interface:
-                self.interface.TitleSystemSyncReset()
+		def __TitleSystemSyncReset(self):
+			if self.interface:
+				self.interface.TitleSystemSyncReset()
 
-        def __TitleSystemSyncAdd(self, titleID):
-            if self.interface:
-                self.interface.TitleSystemSyncAdd(titleID)
+		def __TitleSystemSyncAdd(self, titleID):
+			if self.interface:
+				self.interface.TitleSystemSyncAdd(titleID)
 
-        def __TitleSystemSyncActive(self, titleID):
-            if self.interface:
-                self.interface.TitleSystemSyncActive(titleID)
+		def __TitleSystemSyncActive(self, titleID):
+			if self.interface:
+				self.interface.TitleSystemSyncActive(titleID)
 
 	def BINARY_Guild_EnterGuildArea(self, areaID):
 		self.interface.BULID_EnterGuildArea(areaID)

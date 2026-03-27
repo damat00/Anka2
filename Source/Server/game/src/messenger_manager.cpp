@@ -105,9 +105,9 @@ void MessengerManager::SendTeamList(MessengerManager::keyA account)
 
 	TPacketGCMessenger pack;
 
-	pack.header = HEADER_GC_MESSENGER;
-	pack.subheader = MESSENGER_SUBHEADER_GC_TEAM_LIST;
-	pack.size = sizeof(TPacketGCMessenger);
+	pack.header		= HEADER_GC_MESSENGER;
+	pack.subheader	= MESSENGER_SUBHEADER_GC_TEAM_LIST;
+	pack.size		= sizeof(TPacketGCMessenger);
 
 	TPacketGCMessengerTeamListOffline pack_offline;
 	TPacketGCMessengerTeamListOnline pack_online;

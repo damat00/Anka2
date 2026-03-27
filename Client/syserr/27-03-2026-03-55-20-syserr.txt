@@ -1,0 +1,4 @@
+0327 04:08:36485 :: CRaceManager::RegisterRacePath : RACE[60003] LOAD MSMFILE[d:/ymir work/npc2/scholar_beige_M/scholar_beige_M1.msm] ERROR. Will Find Another Path.
+0327 04:08:36485 :: CRaceManager::RegisterRacePath : RACE[60003] LOAD MSMFILE[d:/ymir work/npc_pet/scholar_beige_M/scholar_beige_M1.msm] ERROR. Will Find Another Path.
+0327 04:09:37834 :: CRaceManager::RegisterRacePath : RACE[30308] LOAD MSMFILE[d:/ymir work/npc2/postbox_npc/postbox_npc.msm] ERROR. Will Find Another Path.
+0327 04:09:37834 :: CRaceManager::RegisterRacePath : RACE[30308] LOAD MSMFILE[d:/ymir work/npc_pet/postbox_npc/postbox_npc.msm] ERROR. Will Find Another Path.

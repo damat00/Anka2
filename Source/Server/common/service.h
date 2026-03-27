@@ -244,6 +244,13 @@ enum eCommonDefines {
 #define ENABLE_TITLE_SYSTEM							// Resmi Ünvan Sistemi etkinleþtirir;
 
 /*** KRÝTÝK HATA, ÇÖKME VE AÇIK DÜZELTMELERÝ (CRASH / CORE / BUG / EXPLOIT / LEAK) ***/
+#define __FIX_TIMER_EVENT__ 						// Timer event (zamanlayýcý) gecikme ve tetiklenme hatalarýný düzeltir
+#define __FIX_SECONDARY_SKILL__ 					// Ýkincil skill (secondary skill) kullaným ve hesaplama hatalarýný düzeltir
+#define ENABLE_COUNT_MONSTER_FIX 					// Canavar sayacý (kill count) hatasýný düzeltir
+#define FLUSH_AT_SHUTDOWN							// Sunucu kapanýrken verileri zorla diske yazar (veri kaybýný önler)
+#define __FIX_INFO_REFINE_DRAGONSOUL__ 				// Ejderha taþý simyasý refine bilgi/tooltip hatasýný düzeltir
+#define __FIX_COSTUM_NUNTA_PESTE_COSTUM_NORMAL__ 	// Kostüm slot çakýþmasýný düzeltir (smokin & gelinlik kostüm normal kostümü etkilemez)
+#define FIX_BLOCK_MOB_SAFEZONE 						// Güvenli bölgede mob saldýrýsýný engeller
 #define DISABLE_STOP_RIDING_WHEN_DIE				// Karakter öldüðünde binek ve sürüþ durumunu temizler.
 #define ENABLE_STONES_STACKFIX   					// Taþ itemlerinde stack (birikme) iþlemlerindeki hatalarý düzeltmek için özel split ve ekleme mantýðýný aktif eder.
 #define ENABLE_TELEPORT_SKILL						// Her ýþýnlanmada becerilerin tekrar sönme sorununu giderir.
@@ -256,7 +263,6 @@ enum eCommonDefines {
 #define ENABLE_MULTI_AFFIX_APPLY_SYSTEM 			// Tek iþlemde birden fazla efsun (bonus) eklenmesini saðlar.
 #define ENABLE_REGEN_RENEWAL 						// Regen event’lerinin baþlatýlma zamanýný sabitleyerek rastgele gecikmeleri ortadan kaldýrýr ve daha tutarlý spawn döngüsü saðlar.
 #define STONE_REGEN_FIX 							// Metin (Stone) yaratýklarýnýn yeniden doðma sýrasýnda oluþan animasyon, konum ve stabilite problemlerini giderir.
-#define __YMIR_REGEN_FIX__ 							// Regen event’lerinin duraksama veya kilitlenme sorunlarýný gidererek yeniden doðru zamanlama ile çalýþmasýný saðlar.
 #define FIX_SyncPosition                       		// Pozisyon senkronizasyon sorunlarýný düzeltir
 #define ENABLE_PROXY_IP								// Proxy/VPN tespiti ve reverse-proxy arkasýndaki gerçek istemci IP'sinin doðru okunmasýný saðlayarak IP algýlama hatalarýný düzeltir
 #define ENABLE_UDP_BLOCK							// UDP port engellemeyi etkinleþtir;

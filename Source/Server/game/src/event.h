@@ -22,11 +22,7 @@ struct TQueueElement;
 
 struct event
 {
-	event() : func(NULL), info(NULL), q_el(NULL), ref_count(0)
-#ifdef __YMIR_REGEN_FIX__
-	, skip_event(false)
-#endif
-	{}
+	event() : func(NULL), info(NULL), q_el(NULL), ref_count(0) {}
 	~event()
 	{
 		if (info != NULL)
@@ -42,9 +38,6 @@ struct event
 	char is_processing;
 
 	size_t ref_count;
-#ifdef __YMIR_REGEN_FIX__
-	bool skip_event;
-#endif
 };
 
 extern void intrusive_ptr_add_ref(EVENT* p);

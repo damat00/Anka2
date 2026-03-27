@@ -828,7 +828,11 @@ void CHARACTER::SkillLevelUp(DWORD dwVnum, BYTE bMethod)
 			GetSkillLevel(pkSk->preSkillVnum) < pkSk->preSkillLevel)
 			return;
 
+#ifdef __FIX_SECONDARY_SKILL__
+	if (pkSk->dwType != 0 && !GetSkillGroup())
+#else
 	if (!GetSkillGroup())
+#endif
 		return;
 
 	if (bMethod == SKILL_UP_BY_POINT)

@@ -185,6 +185,11 @@ class FuncFindMobVictim
 			if (pkChr->IsDead())
 				return false;
 
+#ifdef FIX_BLOCK_MOB_SAFEZONE
+			if (pkChr->GetSectree() && pkChr->GetSectree()->IsAttr(pkChr->GetX(), pkChr->GetY(), ATTR_BANPK))
+                return false;
+#endif
+
 			if (pkChr->IsAffectFlag(AFF_EUNHYUNG) ||
 					pkChr->IsAffectFlag(AFF_INVISIBILITY) ||
 					pkChr->IsAffectFlag(AFF_REVIVE_INVISIBLE))

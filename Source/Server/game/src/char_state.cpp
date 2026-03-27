@@ -743,6 +743,15 @@ void CHARACTER::__StateIdle_Monster()
 		m_dwStateDuration = PASSES_PER_SEC(1);
 	}
 
+#ifdef FIX_BLOCK_MOB_SAFEZONE
+	if (victim && victim->GetSectree() && victim->GetSectree()->IsAttr(victim->GetX(), victim->GetY(), ATTR_BANPK)) 
+	{
+		SetVictim(NULL);
+		victim = NULL;
+		m_dwStateDuration = PASSES_PER_SEC(1);
+	}
+#endif
+
 	if (!victim || victim->IsBuilding())
 	{
 		// stone protection treatment
@@ -1071,10 +1080,17 @@ void CHARACTER::StateBattle()
 		return;
 	}
 
-	if (!victim || (victim->IsStun() && IsGuardNPC()) || victim->IsDead())
+	if (!victim || (victim->IsStun() && IsGuardNPC()) || victim->IsDead()
+#ifdef FIX_BLOCK_MOB_SAFEZONE
+		|| (victim->GetSectree() && victim->GetSectree()->IsAttr(victim->GetX(), victim->GetY(), ATTR_BANPK))
+#endif
+	)
 	{
-		if (victim && victim->IsDead() &&
-				!no_wander && IsAggressive() && (!GetParty() || GetParty()->GetLeader() == this))
+		if ((victim && victim->IsDead() && !no_wander && IsAggressive() && (!GetParty() || GetParty()->GetLeader() == this))
+#ifdef FIX_BLOCK_MOB_SAFEZONE
+			|| (victim && victim->GetSectree() && victim->GetSectree()->IsAttr(victim->GetX(), victim->GetY(), ATTR_BANPK) && !no_wander && IsAggressive() && (!GetParty() || GetParty()->GetLeader() == this))
+#endif
+		)
 		{
 			LPCHARACTER new_victim = NULL;
 #ifdef ENABLE_DEFENSAWE_SHIP

@@ -263,11 +263,12 @@ class RefineDialogNew(ui.ScriptWindow):
 			import exception
 			exception.Abort("RefineDialog.__LoadScript.BindObject")
 
+		# No embedded result tooltip; only left/right icons + materials. Full stats on hover.
 		toolTip = uiToolTip.ItemToolTip()
 		toolTip.SetParent(self)
 		toolTip.SetFollow(False)
 		toolTip.SetPosition(15, 38)
-		toolTip.Show()
+		toolTip.HideToolTip()
 		self.toolTip = toolTip
 
 		self.toolTipNext = uiToolTip.ItemToolTip()
@@ -350,6 +351,31 @@ class RefineDialogNew(ui.ScriptWindow):
 		self.children.append(thinBoard)
 		return thinBoard
 
+	def __RefineNumericCost(self):
+		try:
+			return long(self.cost)
+		except (TypeError, ValueError):
+			return 0
+
+	def __RefineNumericPercent(self):
+		try:
+			return int(self.percentage)
+		except (TypeError, ValueError):
+			return 0
+
+	def __SetRefineTextLineSafe(self, control, text):
+		# Bazi clientlarda SetText icerigi printf gibi isler; '%' -> '%%' (once gercek %% korunur).
+		if not control:
+			return
+		if text is None:
+			text = ""
+		t = text
+		ph = "\x7f\x7fREFINEPCT\x7f\x7f"
+		t = t.replace("%%", ph)
+		t = t.replace("%", "%%")
+		t = t.replace(ph, "%%")
+		control.SetText(t)
+
 	def Destroy(self):
 		self.dlgQuestion = None
 		self.board = 0
@@ -404,18 +430,37 @@ class RefineDialogNew(ui.ScriptWindow):
 		self.percentage = prob
 		self.type = type
 
+		_costVal = kformat(self.__RefineNumericCost())
+		_pctVal = self.__RefineNumericPercent()
+
 		if app.ENABLE_PITTY_REFINE:
-			if player.GetElk() >= self.cost:
+			if player.GetElk() >= self.__RefineNumericCost():
 				self.costText.SetPackedFontColor(0xFF35dDE3D)
 			else:
 				self.costText.SetPackedFontColor(0xFFFF0033)
 
-			self.costText.SetText(kformat(self.cost))
+			self.costText.SetText(_costVal)
 
-			self.wndTextPitty.SetText(localeInfo.REFINE_SUCCESS_PROBALITY)
+			_spit = localeInfo.REFINE_SUCCESS_PROBALITY
+			if "%d" in _spit:
+				_spit = _spit.replace("%d", str(_pctVal), 1)
+			self.__SetRefineTextLineSafe(self.wndTextPitty, _spit)
 		else:
-			self.costText.SetText(localeInfo.REFINE_COST % (self.cost))
-			self.probText.SetText(localeInfo.REFINE_SUCCESS_PROBALITY)
+			_fmt = localeInfo.REFINE_COST
+			if "%d" in _fmt:
+				cost_s = _fmt.replace("%d", _costVal, 1)
+			else:
+				parts = _fmt.split("0", 1)
+				if len(parts) == 2:
+					cost_s = parts[0] + _costVal + parts[1]
+				else:
+					cost_s = _fmt + " " + _costVal
+			self.__SetRefineTextLineSafe(self.costText, cost_s)
+
+			_sp = localeInfo.REFINE_SUCCESS_PROBALITY
+			if "%d" in _sp:
+				_sp = _sp.replace("%d", str(_pctVal), 1)
+			self.__SetRefineTextLineSafe(self.probText, _sp)
 
 		self.toolTip.ClearToolTip()
 		if hasattr(self, 'toolTipNext'):
@@ -430,12 +475,13 @@ class RefineDialogNew(ui.ScriptWindow):
 		attrSlot = []
 		for i in xrange(player.ATTRIBUTE_SLOT_MAX_NUM):
 			attrSlot.append(player.GetItemAttribute(targetItemPos, i))
-		self.toolTip.AddRefineItemData(nextGradeItemVnum, metinSlot, attrSlot)
-
+		# AddItemData always ends with ShowToolTip(); hide here so only top icons + materials show.
 		if hasattr(self, 'toolTipCur'):
 			self.toolTipCur.SetInventoryItem(targetItemPos)
+			self.toolTipCur.HideToolTip()
 		if hasattr(self, 'toolTipNext'):
 			self.toolTipNext.AddRefineItemData(nextGradeItemVnum, metinSlot, attrSlot)
+			self.toolTipNext.HideToolTip()
 
 		curItemIndex = player.GetItemIndex(targetItemPos)
 		if curItemIndex != 0:
@@ -448,16 +494,14 @@ class RefineDialogNew(ui.ScriptWindow):
 					dbg.TraceError("Refine.CurrentItem.LoadImage - Failed to find item data")
 
 		item.SelectItem(nextGradeItemVnum)
-		self.itemImage.LoadImage(item.GetIconImageFileName())
 		if hasattr(self, 'itemImageNext'):
 			self.itemImageNext.LoadImage(item.GetIconImageFileName())
 
-		xSlotCount, ySlotCount = item.GetItemSize()
 		for slot in self.slotList:
 			slot.Hide()
-		for i in xrange(min(3, ySlotCount)):
-			self.slotList[i].SetPosition(-35, i*32 - (ySlotCount-1)*16)
-			self.slotList[i].Show()
+		self.itemImage.Hide()
+		if hasattr(self, 'toolTip') and self.toolTip:
+			self.toolTip.HideToolTip()
 
 		if app.ENABLE_AUTO_REFINE:
 			if constInfo.AUTO_REFINE_TYPE == 2 and chr.GetVirtualNumber(constInfo.AUTO_REFINE_DATA["NPC"][0]) == 20091:
@@ -561,7 +605,7 @@ class RefineDialogNew(ui.ScriptWindow):
 				self.checkBox.SetPosition(0, 38)
 
 			self.wndTextPitty = ui.MakeTextLine(self.boardPittyBG)
-			self.wndTextPitty.SetText("100%")
+			self.__SetRefineTextLineSafe(self.wndTextPitty, "100%")
 			self.wndTextPitty.SetPosition(-42, 33)
 			self.wndTextPitty.SetPackedFontColor(0xffF2E7C1)
 
@@ -596,7 +640,11 @@ class RefineDialogNew(ui.ScriptWindow):
 				self.boardPitty.SetSize(self.boardPitty.GetWidth(), 91)
 				self.boardPittyBG.SetPosition(self.boardPittyBG.GetLocalPosition()[0], 0)
 			else:
-				self.boardPittyTitle.SetText(localeInfo.PITTY_SYSTEM_NAME % (pittyCurrent, pittyMax))
+				try:
+					_pt = localeInfo.PITTY_SYSTEM_NAME % (pittyCurrent, pittyMax)
+				except TypeError:
+					_pt = localeInfo.PITTY_SYSTEM_NAME
+				self.__SetRefineTextLineSafe(self.boardPittyTitle, _pt)
 				self.boardPittyGauge.SetPercentage(pittyCurrent, pittyMax)
 
 				self.boardPitty.SetSize(261, 91 + 44 + 8)
@@ -604,10 +652,13 @@ class RefineDialogNew(ui.ScriptWindow):
 				self.boardPittyThin.Show()
 
 			if pittyCurrent == pittyMax:
-				self.wndTextPitty.SetText("100%")
+				self.__SetRefineTextLineSafe(self.wndTextPitty, "100%")
 				self.percentage = 100
 			else:
-				self.wndTextPitty.SetText(localeInfo.REFINE_SUCCESS_PROBALITY)
+				_spp = localeInfo.REFINE_SUCCESS_PROBALITY
+				if "%d" in _spp:
+					_spp = _spp.replace("%d", str(self.__RefineNumericPercent()), 1)
+				self.__SetRefineTextLineSafe(self.wndTextPitty, _spp)
 
 			self.boardPitty.Show()
 			self.UpdateDialog()
@@ -742,8 +793,10 @@ class RefineDialogNew(ui.ScriptWindow):
 			self.UpdateDialog()
 
 	def UpdateDialog(self):
-		newWidth = self.toolTip.GetWidth() + 60
-		newHeight = self.dialogHeight + 100+10
+		newWidth = 280
+		if hasattr(self, 'slotAfter') and self.slotAfter:
+			newWidth = max(280, self.slotAfter.GetLocalPosition()[0] + self.slotAfter.GetWidth() + 30)
+		newHeight = self.dialogHeight + 100 + 10
 
 		newHeight -= 8
 
@@ -762,7 +815,8 @@ class RefineDialogNew(ui.ScriptWindow):
 					newWidth = self.boardPitty.GetWidth() + 13
 
 		self.board.SetSize(newWidth, newHeight)
-		self.toolTip.SetPosition(15 + 35, 38)
+		if hasattr(self, 'toolTip') and self.toolTip:
+			self.toolTip.SetPosition(15 + 35, 38)
 		self.titleBar.SetWidth(newWidth-15)
 		self.SetSize(newWidth, newHeight)
 

@@ -7,7 +7,6 @@
 		<File ArchivedPath="commondict.py"><![CDATA[../binary_unpack/root/commondict.py]]></File>
 		<File ArchivedPath="consolemodule.py"><![CDATA[../binary_unpack/root/consolemodule.py]]></File>
 		<File ArchivedPath="constinfo.py"><![CDATA[../binary_unpack/root/constinfo.py]]></File>
-		<File ArchivedPath="constinfo.py.bak"><![CDATA[../binary_unpack/root/constinfo.py.bak]]></File>
 		<File ArchivedPath="convert_encoding.py"><![CDATA[../binary_unpack/root/convert_encoding.py]]></File>
 		<File ArchivedPath="debuginfo.py"><![CDATA[../binary_unpack/root/debuginfo.py]]></File>
 		<File ArchivedPath="emotion.py"><![CDATA[../binary_unpack/root/emotion.py]]></File>
@@ -27,7 +26,6 @@
 		<File ArchivedPath="npclist.txt"><![CDATA[../binary_unpack/root/npclist.txt]]></File>
 		<File ArchivedPath="patch_adv.py"><![CDATA[../binary_unpack/root/patch_adv.py]]></File>
 		<File ArchivedPath="playersettingmodule.py"><![CDATA[../binary_unpack/root/playersettingmodule.py]]></File>
-		<File ArchivedPath="playersettingmodule.py.bak"><![CDATA[../binary_unpack/root/playersettingmodule.py.bak]]></File>
 		<File ArchivedPath="property.xml"><![CDATA[../binary_unpack/root/property.xml]]></File>
 		<File ArchivedPath="prototype.py"><![CDATA[../binary_unpack/root/prototype.py]]></File>
 		<File ArchivedPath="remove_encoding_declaration.py"><![CDATA[../binary_unpack/root/remove_encoding_declaration.py]]></File>
@@ -40,11 +38,11 @@
 		<File ArchivedPath="title_names.txt"><![CDATA[../binary_unpack/root/title_names.txt]]></File>
 		<File ArchivedPath="translate.py"><![CDATA[../binary_unpack/root/translate.py]]></File>
 		<File ArchivedPath="ui.py"><![CDATA[../binary_unpack/root/ui.py]]></File>
-		<File ArchivedPath="ui.py.bak"><![CDATA[../binary_unpack/root/ui.py.bak]]></File>
 		<File ArchivedPath="ui12zi.py"><![CDATA[../binary_unpack/root/ui12zi.py]]></File>
 		<File ArchivedPath="uiacce.py"><![CDATA[../binary_unpack/root/uiacce.py]]></File>
 		<File ArchivedPath="uiadvancedgameoptions.py"><![CDATA[../binary_unpack/root/uiadvancedgameoptions.py]]></File>
 		<File ArchivedPath="uiaffectshower.py"><![CDATA[../binary_unpack/root/uiaffectshower.py]]></File>
+		<File ArchivedPath="uiaffectshower.py.bak"><![CDATA[../binary_unpack/root/uiaffectshower.py.bak]]></File>
 		<File ArchivedPath="uiaramakutusujordi.py"><![CDATA[../binary_unpack/root/uiaramakutusujordi.py]]></File>
 		<File ArchivedPath="uiattachbonus.py"><![CDATA[../binary_unpack/root/uiattachbonus.py]]></File>
 		<File ArchivedPath="uiattachbonuslist.py"><![CDATA[../binary_unpack/root/uiattachbonuslist.py]]></File>
@@ -62,7 +60,6 @@
 		<File ArchivedPath="uicandidate.py"><![CDATA[../binary_unpack/root/uicandidate.py]]></File>
 		<File ArchivedPath="uichangelook.py"><![CDATA[../binary_unpack/root/uichangelook.py]]></File>
 		<File ArchivedPath="uicharacter.py"><![CDATA[../binary_unpack/root/uicharacter.py]]></File>
-		<File ArchivedPath="uicharacter.py.bak"><![CDATA[../binary_unpack/root/uicharacter.py.bak]]></File>
 		<File ArchivedPath="uicharacterdetails.py"><![CDATA[../binary_unpack/root/uicharacterdetails.py]]></File>
 		<File ArchivedPath="uicharactertitle.py"><![CDATA[../binary_unpack/root/uicharactertitle.py]]></File>
 		<File ArchivedPath="uichat.py"><![CDATA[../binary_unpack/root/uichat.py]]></File>
@@ -207,6 +204,7 @@
 		<File ArchivedPath="uiscript/exchangedialog.py"><![CDATA[../binary_unpack/root/uiscript/exchangedialog.py]]></File>
 		<File ArchivedPath="uiscript/expandedmoneytaskbar.py"><![CDATA[../binary_unpack/root/uiscript/expandedmoneytaskbar.py]]></File>
 		<File ArchivedPath="uiscript/expandedtaskbar.py"><![CDATA[../binary_unpack/root/uiscript/expandedtaskbar.py]]></File>
+		<File ArchivedPath="uiscript/expandedtaskbar.py.bak"><![CDATA[../binary_unpack/root/uiscript/expandedtaskbar.py.bak]]></File>
 		<File ArchivedPath="uiscript/fishinggamewindow.py"><![CDATA[../binary_unpack/root/uiscript/fishinggamewindow.py]]></File>
 		<File ArchivedPath="uiscript/fishingwindow.py"><![CDATA[../binary_unpack/root/uiscript/fishingwindow.py]]></File>
 		<File ArchivedPath="uiscript/floorinfo.py"><![CDATA[../binary_unpack/root/uiscript/floorinfo.py]]></File>

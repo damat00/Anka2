@@ -151,8 +151,8 @@ class SpeedButtonWindow(ui.ScriptWindow):
 				chat.AppendChat(chat.CHAT_TYPE_INFO, localeInfo.INFORMATION_TIME_CLICK % (Button1_TimerInfo))
 		elif int(arg) == 2:
 			if app.GetTime() > self.Button2_Timer:
-				if app.ENABLE_BATTLEPASS and self.interface:
-					self.interface.ToggleBattlePass()
+				if self.interface and hasattr(self.interface, 'wndMiniMap'):
+					self.interface.wndMiniMap.OpenBattlePassMenu()
 				self.Button2_Timer = app.GetTime() + 2
 			else:
 				Button2_TimerInfo = self.Button2_Timer - app.GetTime()

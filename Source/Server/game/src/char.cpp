@@ -710,13 +710,6 @@ void CHARACTER::Destroy()
 		{
 			if (is_valid_regen(m_pkRegen))
 				--m_pkRegen->count;
-#ifdef __YMIR_REGEN_FIX__
-				if (m_pkRegen->event)
-				{
-					m_pkRegen->event->skip_event = false;
-					event_reset_time(m_pkRegen->event, PASSES_PER_SEC(m_pkRegen->time));
-				}
-#endif
 		}
 #ifdef ENABLE_REGEN_RENEWAL
 		m_pkRegen->nextRespawn = m_pkRegen->time ? time(0) + m_pkRegen->time : 0;
@@ -4884,7 +4877,7 @@ void CHARACTER::PointChange(BYTE type, int amount, bool bAmount, bool bBroadcast
 			val = GetGold();
 		}
 		break;
-	
+
 #ifdef ENABLE_COINS_INVENTORY
 		case POINT_COINS:
 			{
@@ -4893,19 +4886,19 @@ void CHARACTER::PointChange(BYTE type, int amount, bool bAmount, bool bBroadcast
 			}
 			break;
 #endif
-	
+
 #ifdef ENABLE_GAYA_SYSTEM
 		case POINT_GEM:
 		{
 			const int64_t nTotalGem = static_cast<int64_t>(GetGem()) + static_cast<long long>(amount);
-	
+
 			if (GEM_MAX <= nTotalGem)
 			{
 				sys_err("[OVERFLOW_GEM] OriGem %d AddedGem %lld id %u Name %s ", GetGem(), amount, GetPlayerID(), GetName());
 				LogManager::instance().CharLog(this, GetGem() + amount, "OVERFLOW_GEM", "");
 				return;
 			}
-	
+
 			SetGem(GetGem() + amount);
 			val = GetGem();
 		}
@@ -4928,17 +4921,18 @@ void CHARACTER::PointChange(BYTE type, int amount, bool bAmount, bool bBroadcast
 				val = GetSoulPoint();
 			}
 			break;
+
 		case POINT_SOUL_RE:
 			{
 				const int64_t nTotalSoulRe = static_cast<int64_t>(GetSoulRePoint()) + static_cast<int64_t>(amount);
-	
+
 				if (SOUL_RE_MAX <= nTotalSoulRe)
 				{
 					sys_err("[OVERFLOW_SOULPOINTRE] OriSoul %d AddedSoulRe %d id %u Name %s ", GetSoulRePoint(), amount, GetPlayerID(), GetName());
 					LogManager::instance().CharLog(this, GetSoulRePoint() + amount, "OVERFLOW_SOULPOINTRE", "");
 					return;
 				}
-	
+
 				SetSoulRePoint(GetSoulRePoint() + amount);
 				val = GetSoulRePoint();
 			}
@@ -4949,7 +4943,7 @@ void CHARACTER::PointChange(BYTE type, int amount, bool bAmount, bool bBroadcast
 		case POINT_HALOUNLV:
 			{
 				const long long nTotalvar1 = static_cast<int16_t>(GetHalounLv()) + static_cast<int16_t>(amount);
-	
+
 				if (20 <= nTotalvar1)
 				{
 					sys_err("Haloun Variable1 %d Added %d id %u Name %s ", GetHalounLv(), amount, GetPlayerID(), GetName());
@@ -5075,14 +5069,10 @@ void CHARACTER::PointChange(BYTE type, int amount, bool bAmount, bool bBroadcast
 		case POINT_ATTBONUS_ASSASSIN:
 		case POINT_ATTBONUS_WARRIOR:
 		case POINT_ATTBONUS_SHAMAN:
-#ifdef ENABLE_WOLFMAN_CHARACTER
-		case POINT_ATTBONUS_WOLFMAN:
-#endif
+
 
 		case POINT_POISON_PCT:
-#ifdef ENABLE_WOLFMAN_CHARACTER
-		case POINT_BLEEDING_PCT:
-#endif
+
 		case POINT_STUN_PCT:
 		case POINT_SLOW_PCT:
 
@@ -5107,9 +5097,7 @@ void CHARACTER::PointChange(BYTE type, int amount, bool bAmount, bool bBroadcast
 		case POINT_RESIST_BELL:
 		case POINT_RESIST_FAN:
 		case POINT_RESIST_BOW:
-#ifdef ENABLE_WOLFMAN_CHARACTER
-		case POINT_RESIST_CLAW:
-#endif
+
 		case POINT_RESIST_FIRE:
 		case POINT_RESIST_ELEC:
 		case POINT_RESIST_MAGIC:
@@ -5120,9 +5108,6 @@ void CHARACTER::PointChange(BYTE type, int amount, bool bAmount, bool bBroadcast
 		case POINT_REFLECT_MELEE:	// 67
 		case POINT_REFLECT_CURSE:	// 68
 		case POINT_POISON_REDUCE:	// 69
-#ifdef ENABLE_WOLFMAN_CHARACTER
-		case POINT_BLEEDING_REDUCE:
-#endif
 		case POINT_KILL_SP_RECOVER:	// 70
 		case POINT_KILL_HP_RECOVERY:	// 75
 		case POINT_HIT_HP_RECOVERY:
@@ -5157,9 +5142,6 @@ void CHARACTER::PointChange(BYTE type, int amount, bool bAmount, bool bBroadcast
 		case POINT_ATTBONUS_BELL:
 		case POINT_ATTBONUS_FAN:
 		case POINT_ATTBONUS_BOW:
-#ifdef ENABLE_WOLFMAN_CHARACTER
-		case POINT_ATTBONUS_CLAW:
-#endif
 		case POINT_RESIST_MOUNT_FALL:
 		case POINT_RESIST_HUMAN:
 			SetPoint(type, GetPoint(type) + amount);
@@ -5191,9 +5173,7 @@ void CHARACTER::PointChange(BYTE type, int amount, bool bAmount, bool bBroadcast
 		case POINT_RESIST_ASSASSIN:
 		case POINT_RESIST_SURA:
 		case POINT_RESIST_SHAMAN:
-#ifdef ENABLE_WOLFMAN_CHARACTER
-		case POINT_RESIST_WOLFMAN:
-#endif
+
 			SetPoint(type, GetPoint(type) + amount);
 			val = GetPoint(type);
 			break;
@@ -5460,9 +5440,7 @@ void CHARACTER::ApplyPoint (BYTE bApplyType, int iVal)
 		case APPLY_HP_REGEN:
 		case APPLY_SP_REGEN:
 		case APPLY_POISON_PCT:
-#ifdef ENABLE_WOLFMAN_CHARACTER
-		case APPLY_BLEEDING_PCT:
-#endif
+
 		case APPLY_STUN_PCT:
 		case APPLY_SLOW_PCT:
 		case APPLY_CRITICAL_PCT:
@@ -5477,9 +5455,7 @@ void CHARACTER::ApplyPoint (BYTE bApplyType, int iVal)
 		case APPLY_ATTBONUS_ASSASSIN:	// 60
 		case APPLY_ATTBONUS_SURA:		// 61
 		case APPLY_ATTBONUS_SHAMAN:		// 62
-#ifdef ENABLE_WOLFMAN_CHARACTER
-		case APPLY_ATTBONUS_WOLFMAN:
-#endif
+
 		case APPLY_ATTBONUS_MONSTER:	// 63
 		case APPLY_STEAL_HP:
 		case APPLY_STEAL_SP:
@@ -5493,9 +5469,7 @@ void CHARACTER::ApplyPoint (BYTE bApplyType, int iVal)
 		case APPLY_RESIST_BELL:
 		case APPLY_RESIST_FAN:
 		case APPLY_RESIST_BOW:
-#ifdef ENABLE_WOLFMAN_CHARACTER
-		case APPLY_RESIST_CLAW:
-#endif
+
 		case APPLY_RESIST_FIRE:
 		case APPLY_RESIST_ELEC:
 		case APPLY_RESIST_MAGIC:
@@ -5508,9 +5482,7 @@ void CHARACTER::ApplyPoint (BYTE bApplyType, int iVal)
 		case APPLY_ANTI_CRITICAL_PCT:
 		case APPLY_ANTI_PENETRATE_PCT:
 		case APPLY_POISON_REDUCE:
-#ifdef ENABLE_WOLFMAN_CHARACTER
-		case APPLY_BLEEDING_REDUCE:
-#endif
+
 		case APPLY_KILL_SP_RECOVER:
 		case APPLY_EXP_DOUBLE_BONUS:
 		case APPLY_GOLD_DOUBLE_BONUS:
@@ -5543,9 +5515,7 @@ void CHARACTER::ApplyPoint (BYTE bApplyType, int iVal)
 		case APPLY_RESIST_ASSASSIN:
 		case APPLY_RESIST_SURA:
 		case APPLY_RESIST_SHAMAN:
-#ifdef ENABLE_WOLFMAN_CHARACTER
-		case APPLY_RESIST_WOLFMAN:
-#endif
+
 		case APPLY_ENERGY:					// 82
 		case APPLY_DEF_GRADE:				// 83
 		case APPLY_COSTUME_ATTR_BONUS:		// 84
@@ -5572,9 +5542,7 @@ void CHARACTER::ApplyPoint (BYTE bApplyType, int iVal)
 		case APPLY_ATTBONUS_BELL:
 		case APPLY_ATTBONUS_FAN:
 		case APPLY_ATTBONUS_BOW:
-#ifdef ENABLE_WOLFMAN_CHARACTER
-	case APPLY_ATTBONUS_CLAW:
-#endif
+
 		case APPLY_RESIST_MOUNT_FALL:
 		case APPLY_RESIST_HUMAN:
 		case APPLY_MOUNT:
@@ -5599,6 +5567,7 @@ void CHARACTER::ApplyPoint (BYTE bApplyType, int iVal)
 		case APPLY_ATTBONUS_PVM_STR:
 		case APPLY_ATTBONUS_PVM_BERSERKER:
 			PointChange (aApplyInfo[bApplyType].bPointType, iVal);
+			
 			break;
 
 		default:
@@ -6904,21 +6873,7 @@ void CHARACTER::OnMove(bool bIsAttack)
 		{
 			ClearAffectedEunhyung();
 		}
-		// @fixme229 START //Canavarlar guvenli alana giremez.
-		SECTREE* sectree = GetSectree();
-		if (sectree && sectree->IsAttr(GetX(), GetY(), ATTR_BANPK) && IsMonster())
-			//Return();
-		{
-			M2_DESTROY_CHARACTER(this); // Canavarlari siler.
-		}
-		// @fixme229 END
-
-		/*if (IsAffectFlag(AFF_JEONSIN))
-		  RemoveAffect(SKILL_JEONSINBANGEO);*/
 	}
-
-	/*if (IsAffectFlag(AFF_GUNGON))
-	  RemoveAffect(SKILL_GUNGON);*/
 
 	// MINING
 	mining_cancel();
@@ -12987,22 +12942,29 @@ void CHARACTER::ClearEnemyNPCs()
 
 void CHARACTER::NotifyEnemyNPCs()
 {
-	if (m_set_dwEnemyNPCVID.empty())
-		return;
+    if (m_set_dwEnemyNPCVID.empty())
+        return;
 
-	std::vector<DWORD> vecToRemove;
-	for (const auto& dwNPCVID : m_set_dwEnemyNPCVID)
-	{
-		LPCHARACTER pkNPC = CHARACTER_MANAGER::Instance().Find(dwNPCVID);
-		if (pkNPC)
-		{
-			extern bool __CHARACTER_GotoNearTarget(LPCHARACTER self, LPCHARACTER victim);
-			__CHARACTER_GotoNearTarget(pkNPC, this);
-		}
-		else
-			vecToRemove.push_back(dwNPCVID);
-	}
-	for (DWORD dwNPCVID : vecToRemove)
-		RemoveEnemyNPC(dwNPCVID);
+    std::vector<DWORD> vecCurrentNPCs(m_set_dwEnemyNPCVID.begin(), m_set_dwEnemyNPCVID.end());
+    std::vector<DWORD> vecToRemove;
+
+    for (const auto& dwNPCVID : vecCurrentNPCs)
+    {
+        LPCHARACTER pkNPC = CHARACTER_MANAGER::Instance().Find(dwNPCVID);
+        if (pkNPC)
+        {
+            extern bool __CHARACTER_GotoNearTarget(LPCHARACTER self, LPCHARACTER victim);
+            __CHARACTER_GotoNearTarget(pkNPC, this);
+        }
+        else
+        {
+            vecToRemove.push_back(dwNPCVID);
+        }
+    }
+
+    for (DWORD dwNPCVID : vecToRemove)
+    {
+        RemoveEnemyNPC(dwNPCVID);
+    }
 }
 #endif

@@ -97,10 +97,7 @@ int event_process(int pulse)
 		new_time = pElem->iKey;
 
 		LPEVENT the_event = pElem->pvData;
-#ifdef __YMIR_REGEN_FIX__
-		if (the_event->skip_event)
-			continue;
-#endif
+
 		if(!the_event)
 			return 0;
 		int processing_time = 0;//event_processing_time(the_event);
@@ -161,10 +158,7 @@ int event_process(int pulse)
 		new_time = pElem->iKey;
 
 		LPEVENT the_event = pElem->pvData;
-#ifdef __YMIR_REGEN_FIX__
-		if (the_event->skip_event)
-			continue;
-#endif
+
 		long processing_time = event_processing_time(the_event);
 		cxx_q.Delete(pElem);
 

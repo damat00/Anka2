@@ -825,11 +825,11 @@ class AffectShower(ui.Window):
 			if affect != chr.NEW_AFFECT_AUTO_SP_RECOVERY and affect != chr.NEW_AFFECT_AUTO_HP_RECOVERY:
 				# description bir string veya fonksiyon olabilir
 				if isinstance(description, str) or isinstance(description, unicode):
-					# Eðer description bir string ise, format string olarak kullan
+					# E?er description bir string ise, format string olarak kullan
 					try:
 						# Format placeholder kontrolü (%d, %s, %f, %%, vb.)
 						if '%' in description:
-							# Placeholder sayýsýný kontrol et
+							# Placeholder say?s?n? kontrol et
 							placeholder_count = description.count('%') - description.count('%%')
 							if placeholder_count > 0:
 								description = description % float(value)
@@ -840,10 +840,10 @@ class AffectShower(ui.Window):
 							# Format placeholder yoksa, value'yu ekle
 							description = description + " " + str(float(value))
 					except (TypeError, ValueError):
-						# Format hatasý olursa, sadece string'i kullan
+						# Format hatas? olursa, sadece string'i kullan
 						description = str(description)
 				else:
-					# Eðer description bir fonksiyon ise çaðýr
+					# E?er description bir fonksiyon ise ça??r
 					description = description(float(value))
 
 			try:

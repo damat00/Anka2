@@ -2576,6 +2576,7 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 		}
 	}
 #endif
+
 	if (!pAttacker)
 		return false;
 
@@ -2587,12 +2588,6 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
         SetHP(30000);
     }
 #endif
-
-	if (IsPC() && IsObserverMode() && IsDead()) // @fixme204
-		return false;
-
-	if (!GetSectree() || GetSectree()->IsAttr(GetX(), GetY(), ATTR_BANPK))
-		return false;
 
 #ifdef ENABLE_SUNG_MAHI_TOWER
 	if (pAttacker && pAttacker->IsPC())

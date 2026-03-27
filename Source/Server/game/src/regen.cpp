@@ -355,11 +355,6 @@ static void regen_spawn(LPREGEN regen, bool bOnce)
 
 	num = (regen->max_count - regen->count);
 
-#ifdef __YMIR_REGEN_FIX__
-	if(regen->event)
-		regen->event->skip_event = true;
-#endif
-
 	if (!num)
 		return;
 
@@ -641,12 +636,12 @@ EVENTFUNC(regen_event)
 	regen_event_info* info = dynamic_cast<regen_event_info*>( event->info );
 
 	if ( info == NULL )
-	{
+    {
 		sys_err( "regen_event> <Factor> Null pointer" );
 		return 0;
-	}
+    }
 
-	LPREGEN	regen = info->regen;
+	LPREGEN    regen = info->regen;
 
 #ifdef ENABLE_REGEN_RENEWAL
 	if (!regen)
@@ -655,11 +650,6 @@ EVENTFUNC(regen_event)
 
 	if (!is_valid_regen(regen))
 		return 0;
-
-#ifndef __YMIR_REGEN_FIX__
-	if (regen->time == 0)
-		regen->event = NULL;
-#endif
 
 #ifdef ENABLE_REGEN_RENEWAL
 	if (regen->nextRespawn)
@@ -670,18 +660,10 @@ EVENTFUNC(regen_event)
 	else
 		regen_spawn(regen, false);
 
-#ifdef __YMIR_REGEN_FIX__
 	return PASSES_PER_SEC(60 * 60 * 24);
 #else
-	return PASSES_PER_SEC(1);
-#endif
-#else
-	regen_spawn(regen, false);
-#ifdef __YMIR_REGEN_FIX__
+    regen_spawn(regen, false);
 	return PASSES_PER_SEC(60 * 60 * 24);
-#else
-	return PASSES_PER_SEC(regen->time);
-#endif
 #endif
 }
 
@@ -816,15 +798,33 @@ bool regen_load(const char* filename, long lMapIndex, int base_x, int base_y)
 #ifdef STONE_REGEN_FIX
 void regen_event_create(LPREGEN regen)
 {
-	if (!regen)
+	if (!regen || regen->type != REGEN_TYPE_STONE)
 		return;
 
-	if (regen->time != 0 && regen->type == REGEN_TYPE_STONE)
+	long delayPasses = 0;
+
+	if (regen->time != 0)
 	{
-		regen_event_info* info = AllocEventInfo<regen_event_info>();
-		info->regen = regen;
-		regen->event = event_create(regen_event, info, PASSES_PER_SEC(regen->time));
+#ifdef ENABLE_REGEN_RENEWAL
+		delayPasses = PASSES_PER_SEC(1);
+#else
+		delayPasses = PASSES_PER_SEC(number(0, 16)) + PASSES_PER_SEC(regen->time);
+#endif
 	}
+	else
+	{
+		const CMob* pMob = CMobManager::instance().Get(regen->vnum);
+		int sec = (pMob && pMob->m_table.bRegenCycle > 0) ? (int)pMob->m_table.bRegenCycle : 60;
+		if (sec < 1)
+			sec = 1;
+		delayPasses = PASSES_PER_SEC(sec);
+	}
+
+	event_cancel(&regen->event);
+
+	regen_event_info* info = AllocEventInfo<regen_event_info>();
+	info->regen = regen;
+	regen->event = event_create(regen_event, info, delayPasses);
 }
 #endif
 

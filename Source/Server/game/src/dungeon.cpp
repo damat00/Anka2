@@ -1,7 +1,4 @@
 #include "stdafx.h"
-
-#include "../../common/service.h"
-
 #include "dungeon.h"
 #include "char.h"
 #include "char_manager.h"
@@ -16,7 +13,6 @@
 #include "item_manager.h"
 #include "utils.h"
 #include "questmanager.h"
-
 #ifdef ENABLE_DUNGEON_INFO
 	#include "dungeon_info.h"
 #endif
@@ -1092,7 +1088,12 @@ struct FCountMonster
 		if (ent->IsType(ENTITY_CHARACTER))
 		{
 			LPCHARACTER ch = (LPCHARACTER) ent;
+			
+#ifdef ENABLE_COUNT_MONSTER_FIX
 			if (ch->IsMonster() || ch->IsStone())
+#else
+			if (!ch->IsPC())
+#endif
 				n++;
 		}
 	}
