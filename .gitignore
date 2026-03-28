@@ -94,3 +94,11 @@ Thumbs.db
 #############################################
 # Client büyük assetleri LFS ile kullanıyorsan burayı açma
 # Client/
+/Client/pack
+Client/lib/respdialop.pcl
+Client/metin2.cfg
+Client/lib/emoji.cfg
+/Client/syserr
+/Files
+Source/Binary/binary/Client.lnk
+/Source/Binary/extern/include/boost
