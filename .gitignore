@@ -102,3 +102,7 @@ Client/lib/emoji.cfg
 /Files
 Source/Binary/binary/Client.lnk
 /Source/Binary/extern/include/boost
+/Client/lib
+/Client/syserr
+/Source/Binary/extern/include/boost
+/Source/Binary/extern/include/rapidjson
