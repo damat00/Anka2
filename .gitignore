@@ -1,60 +1,27 @@
-#############################################
-# PREREQUISITES
-#############################################
 *.d
-
-#############################################
-# OBJECT FILES
-#############################################
 *.slo
 *.lo
 *.o
 *.obj
-
-#############################################
-# PRECOMPILED HEADERS
-#############################################
 *.gch
 *.pch
-
-#############################################
-# DYNAMIC LIBRARIES
-#############################################
 *.so
 *.dylib
 *.dll
-
-#############################################
-# STATIC LIBRARIES
-#############################################
 *.lai
 *.la
 *.a
 *.lib
-
-# ÖZEL: FoxFS lib'leri hariç
 !FoxFS_Src/**/*.lib
-
-#############################################
-# EXECUTABLES
-#############################################
 *.exe
 *.out
 *.app
-
-#############################################
-# DEBUG / BUILD FILES (KRİTİK)
-#############################################
 *.pdb
 *.ilk
 *.exp
 *.idb
 *.iobj
 *.ipdb
-
-#############################################
-# BUILD FOLDERS
-#############################################
 Debug/
 Release/
 x64/
@@ -62,10 +29,6 @@ x86/
 build/
 bin/
 obj/
-
-#############################################
-# VISUAL STUDIO
-#############################################
 .vs/
 *.ipch
 *.db
@@ -75,34 +38,17 @@ obj/
 *.opensdf
 *.db-shm
 *.db-wal
-
-#############################################
-# LOG / CACHE
-#############################################
 *.log
 *.cache
 *.tmp
-
-#############################################
-# SYSTEM FILES
-#############################################
 Thumbs.db
 .DS_Store
-
-#############################################
-# OPTIONAL (isteğe bağlı aç/kapat)
-#############################################
-# Client büyük assetleri LFS ile kullanıyorsan burayı açma
-# Client/
 /Client/pack
 Client/lib/respdialop.pcl
 Client/metin2.cfg
 Client/lib/emoji.cfg
-/Client/syserr
+/Client/syserr/*.txt
 /Files
 Source/Binary/binary/Client.lnk
-/Source/Binary/extern/include/boost
-/Client/lib
-/Client/syserr
 /Source/Binary/extern/include/boost
 /Source/Binary/extern/include/rapidjson
