@@ -1,0 +1,318 @@
+# ============================================================================
+# Anka2 Locale_inc.h Makro Kullanım Tarayıcısı
+# Tüm makroların hangi dosyalarda kullanıldığını bulur
+# ============================================================================
+
+$projectPath = "E:\Anka2\Source"
+$outputFile = "E:\Anka2\MacroUsage.txt"
+
+# Locale_inc.h dosyasındaki tüm makrolar
+$macros = @(
+    "LSS_SECURITY_KEY",
+    "CLIENT_VERSION",
+    "APP_TITLE",
+    "DEFAULT_DEFINE_YMIR",
+    "LOCALE_SERVICE_EUROPE",
+    "ENABLE_ENERGY_SYSTEM",
+    "ENABLE_COSTUME_SYSTEM",
+    "ENABLE_DRAGON_SOUL_SYSTEM",
+    "ENABLE_NEW_EQUIPMENT_SYSTEM",
+    "ENABLE_FOG_FIX",
+    "ENABLE_ENB_MODE",
+    "ENABLE_ANTI_EXP",
+    "ENABLE_MOB_SCALE",
+    "ENABLE_LEVEL_INT",
+    "ENABLE_GOLD_LIMIT",
+    "ENABLE_MDE_EFFECT",
+    "ENABLE_PET_SYSTEM",
+    "ENABLE_DISCORD_RPC",
+    "ENABLE_AUTO_REFINE",
+    "ENABLE_DICE_SYSTEM",
+    "ENABLE_BLINK_ALERT",
+    "ENABLE_STACK_LIMIT",
+    "ENABLE_RENEWAL_CUBE",
+    "ENABLE_FIX_MOBS_LAG",
+    "ENABLE_MAP_TELEPORT",
+    "ENABLE_MOUNT_SYSTEM",
+    "ENABLE_OBJ_SCALLING",
+    "ENABLE_FOXFS_ENCRYPT",
+    "ENABLE_SHOW_MOB_INFO",
+    "ENABLE_RENEWAL_QUEST",
+    "ENABLE_CONFIG_MODULE",
+    "ENABLE_HAIR_SPECULAR",
+    "ENABLE_MOB_DROP_INFO",
+    "ENABLE_CHANGE_CHANNEL",
+    "ENABLE_MOUNT_PET_SKIN",
+    "ENABLE_PENDANT_SYSTEM",
+    "ENABLE_ATTBONUS_METIN",
+    "ENABLE_TEXTLINE_EMOJI",
+    "ENABLE_MESSENGER_TEAM",
+    "ENABLE_DESTROY_DIALOG",
+    "ENABLE_SORT_INVENTORY",
+    "ENABLE_GRAPHIC_ON_OFF",
+    "ENABLE_PARTY_POSITION",
+    "ENABLE_RENEWAL_SHOPEX",
+    "ENABLE_INSTANT_PICKUP",
+    "ENABLE_VIEW_CHEST_DROP",
+    "ENABLE_ATLAS_MARK_INFO",
+    "ENABLE_QUICK_SELL_ITEM",
+    "ENABLE_MESSENGER_BLOCK",
+    "ENABLE_COINS_INVENTORY",
+    "ENABLE_EXTENDED_SAFEBOX",
+    "ENABLE_RENEWAL_SWITCHBOT",
+    "ENABLE_RENEWAL_BOOK_NAME",
+    "ENABLE_GUILD_RANK_SYSTEM",
+    "ENABLE_LOAD_INDEX_BINARY",
+    "ENABLE_CLIENT_PERFORMANCE",
+    "ENABLE_ETERPACK_OBSCURING",
+    "ENABLE_RENEWAL_DEAD_PACKET",
+    "__BL__DETAILS_UI__",
+    "ENABLE_KILL_STATISTICS",
+    "ENABLE_RENEWAL_SERVER_LIST",
+    "ENABLE_HIDE_COSTUME_SYSTEM",
+    "ENABLE_ACCE_COSTUME_SYSTEM",
+    "ENABLE_RENEWAL_MINIMAP_MARK",
+    "ENABLE_TELEPORT_TO_A_FRIEND",
+    "ENABLE_METIN_STONES_MINIMAP",
+    "ENABLE_MULTI_LANGUAGE_SYSTEM",
+    "ENABLE_WEAPON_COSTUME_SYSTEM",
+    "ENABLE_VIEW_TARGET_PLAYER_HP",
+    "ENABLE_VIEW_TARGET_DECIMAL_HP",
+    "ENABLE_RENEWAL_CLIENT_VERSION",
+    "ENABLE_CANSEEHIDDENTHING_FOR_GM",
+    "ENABLE_EXTENDED_WHISPER_DETAILS",
+    "ENABLE_ENVIRONMENT_EFFECT_OPTION",
+    "ENABLE_EXTEND_TIME_COSTUME_SYSTEM",
+    "ENABLE_FOV_OPTION",
+    "ENABLE_RENDER_TARGET",
+    "ENABLE_ATTBONUS_BOSS",
+    "ENABLE_HUMAN_RESIST_PVP",
+    "ENABLE_EVENT_MANAGER",
+    "ENABLE_MULTI_TEXTLINE",
+    "ENABLE_RENEWAL_AFFECT",
+    "ENABLE_OFFLINE_MESSAGE",
+    "ENABLE_RESTART_INSTANT",
+    "ENABLE_RENEWAL_OX_EVENT",
+    "ENABLE_MULTI_FARM_BLOCK",
+    "ENABLE_SPECIAL_INVENTORY",
+    "ENABLE_STONE_SCALE_OPTION",
+    "ENABLE_MAINTENANCE_SYSTEM",
+    "ENABLE_WIKI_SYSTEM",
+    "ENABLE_PICKUP_ITEM_EFFECT",
+    "ENABLE_RENEWAL_OFFLINESHOP",
+    "ENABLE_RENEWAL_TEAM_AFFECT",
+    "ENABLE_RENEWAL_TEXT_SHADOW",
+    "ENABLE_SLOT_MARKING_SYSTEM",
+    "ENABLE_RENEWAL_SKILL_SELECT",
+    "ENABLE_BONUS_COSTUME_SYSTEM",
+    "ENABLE_RENEWAL_SPECIAL_CHAT",
+    "ENABLE_LARGE_DYNAMIC_PACKET",
+    "ENABLE_CLIENT_LOCALE_STRING",
+    "ENABLE_GUILD_LEADER_TEXTAIL",
+    "ENABLE_BOSS_EFFECT_OVER_HEAD",
+    "ENABLE_MONSTER_TARGET_ELEMENT",
+    "ENABLE_AUTOMATIC_PICK_UP_SYSTEM",
+    "ENABLE_OFFLINESHOP_SEARCH_SYSTEM",
+    "ENABLE_PYTHON_DYNAMIC_MODULE_NAME",
+    "ENABLE_SKILL_COLOR_SYSTEM",
+    "ENABLE_5LAYER_SKILL_COLOR",
+    "ENABLE_CLIP_MASKING",
+    "ENABLE_UTF8_ENCODING",
+    "ENABLE_NPC_WEAR_ITEM",
+    "ENABLE_HUNTING_SYSTEM",
+    "ENABLE_EMOTICONS_SYSTEM",
+    "ENABLE_GROWTH_PET_SYSTEM",
+    "ENABLE_UPBRINGING_PET_CONQUEROR_LEVEL",
+    "ENABLE_CHANGE_LOOK_SYSTEM",
+    "ENABLE_AURA_COSTUME_SYSTEM",
+    "ENABLE_PYTHON_EVENT_FUNCTIONS",
+    "ENABLE_RENEWAL_TELEPORT_SYSTEM",
+    "ENABLE_INVENTORY_EXPANSION_SYSTEM",
+    "ENABLE_MORE_FPS",
+    "ENABLE_GM_INV_EFFECT",
+    "ENABLE_MINIMAP_SMOOTH_ZOOM",
+    "ENABLE_OFFICAL_FEATURES",
+    "WJ_SHOW_NPC_QUEST_NAME",
+    "ENABLE_ATLAS_SCALE",
+    "ENABLE_FALLING_EFFECT_SYSTEM",
+    "ENABLE_STANDING_MOUNT",
+    "STANDING_MOUNT_VNUM_1",
+    "STANDING_MOUNT_VNUM_2",
+    "STANDING_MOUNT_VNUM_3",
+    "SURFBOARD",
+    "ENABLE_RIDING_EXTENDED",
+    "ENABLE_SPIRIT_STONE_READING",
+    "ENABLE_SKILL_BOOK_READING",
+    "__AUTO_HUNT__",
+    "ENABLE_AUTO_SELL_SYSTEM",
+    "ENABLE_STYLE_ATTRIBUTE_SYSTEM",
+    "ENABLE_GM_MOB_VNUM_DISPLAY",
+    "ENABLE_RENDERING_ONLY_IN_AREA",
+    "ENABLE_RENDERING_ONLY_IN_AREA_V2",
+    "ENABLE_NEW_SHINING_EFFEKT",
+    "ENABLE_LVL115_ARMOR_EFFECT",
+    "ENABLE_LVL96_WEAPON_EFFECT",
+    "ENABLE_LVL96_ARMOR_EFFECT",
+    "USE_WEAPON_COSTUME_WITH_EFFECT",
+    "USE_BODY_COSTUME_WITH_EFFECT",
+    "ENABLE_PITTY_REFINE",
+    "ENABLE_HYPERLINK_ITEM_ICON",
+    "ENABLE_DIRECTX9_UPDATE",
+    "FPS_APPLICATON_DEVICE_LIMITATION",
+    "RENDER_MAX_FPS",
+    "ENABLE_ITEMSHOP",
+    "USE_ITEMSHOP_RENEWED",
+    "ENABLE_BIOLOGIST_SYSTEM",
+    "ENABLE_YOHARA_SYSTEM",
+    "ENABLE_CONQUEROR_LEVEL",
+    "ENABLE_CONQUEROR_LEVEL_UPDATE",
+    "ENABLE_PASSIVE_SYSTEM",
+    "ENABLE_NINETH_SKILL",
+    "ENABLE_PVP_BALANCE",
+    "ENABLE_DUNGEON_RENEWAL_SYSTEM",
+    "ENABLE_DUNGEON_INFO",
+    "__DUNGEON_INFO__",
+    "ENABLE_NEW_DUNGEON_LIB",
+    "ENABLE_TRACK_WINDOW",
+    "ENABLE_ULTIMATE_REGEN",
+    "ENABLE_DUNGEON_MAPS_SYSTEM",
+    "ENABLE_SUNG_MAHI_TOWER",
+    "ENABLE_WHITE_DRAGON",
+    "ENABLE_WHITE_DRAGON_EX",
+    "ENABLE_QUEEN_NETHIS",
+    "ENABLE_MELEY_LAIR_DUNGEON",
+    "MELEY_LAIR_DUNGEON_STATUE",
+    "ENABLE_ZODIAC_MISSION",
+    "ENABLE_DEFENSAWESHIP",
+    "ENABLE_OCHAO_TEMPLE_SYSTEM",
+    "INSIDE_RENDER",
+    "ENABLE_BATTLE_PASS",
+    "ENABLE_WHISPER_CLOSE_SHORTCUT",
+    "ENABLE_AFFECT_BUFF_REMOVE",
+    "LINK_IN_CHAT",
+    "ENABLE_REMOTE_SHOP_SYSTEM",
+    "NAMECOLOR_BOSS_CLIENT",
+    "ENABLE_ADVANCED_GAME_OPTIONS",
+    "ENABLE_EQUIPMENT_HAND_EFFECT",
+    "ENABLE_RESP_SYSTEM",
+    "ENABLE_COLLECT_WINDOW",
+    "ENABLE_COLLECTIONS_SYSTEM",
+    "ENABLE_NEW_ITEM_TYPE_GACHA",
+    "ENABLE_GAYA_SYSTEM",
+    "ENABLE_RANKING",
+    "ENABLE_MAGIC_REDUCTION_SYSTEM",
+    "ENABLE_NEW_BONUS_SYSTEM",
+    "ENABLE_AVG_PVM",
+    "ENABLE_EXPRESSING_EMOTION",
+    "ENABLE_STATUS_UP_RENEWAL",
+    "ENABLE_BINARY_SERVERINFO",
+    "ENABLE_TITLE_SYSTEM",
+    "ENABLE_UI_DEBUG_WINDOW",
+    "ENABLE_WOLFMAN_CHARACTER",
+    "DISABLE_WOLFMAN_ON_CREATE",
+    "ENABLE_EVENT_SYSTEM",
+    "ENABLE_MINI_GAME_OKEY",
+    "ENABLE_EVENT_BANNER_FLAG",
+    "ENABLE_SOUL_ROULETTE_SYSTEM",
+    "ENABLE_FISH_GAME",
+    "ENABLE_FISH_EVENT_SYSTEM",
+    "ENABLE_MINI_GAME",
+    "ENABLE_ATTENDANCE_EVENT",
+    "ENABLE_MINI_GAME_CATCH_KING",
+    "ENABLE_HALLOWEEN_EVENT_SYSTEM",
+    "ENABLE_STONE_EVENT",
+    "ENABLE_SOCCER_BALL_EVENT",
+    "ENABLE_WORD_GAME_EVENT",
+    "ENABLE_GUILDRENEWAL_SYSTEM",
+    "ENABLE_GUILD_MARK_RENEWAL",
+    "ENABLE_SECOND_GUILDRENEWAL_SYSTEM",
+    "ENABLE_NEW_WAR_OPTIONS",
+    "ENABLE_EXTENDED_GUILD_LEVEL",
+    "ENABLE_MEDAL_OF_HONOR",
+    "ENABLE_GUILD_DONATE_ATTENDANCE",
+    "ENABLE_GUILD_WAR_SCORE",
+    "ENABLE_GUILD_LAND_INFO",
+    "ENABLE_GUILDBANK_LOG",
+    "ENABLE_EXTENDED_RENEWAL_FEATURES",
+    "ENABLE_GUILDWAR_BUTTON",
+    "ENABLE_GUILD_REQUEST",
+    "ENABLE_NEW_WORLD_GUILDRENEWAL",
+    "ENABLE_GUILD_RANKING",
+    "ENABLE_GUILDSTORAGE_SYSTEM",
+    "__ENABLE_STEALTH_FIX__",
+    "MULTIPLE_DAMAGE_DISPLAY_SYSTEM",
+    "ENABLE_DAMAGE_EFFECT_ACCUMULATION_FIX",
+    "ENABLE_BOSS_FALLING_FIX",
+    "ENABLE_CLIENT_UNEXPECTED_CLOSE_FIX",
+    "ENABLE_INVISIBLE_MODE_EFFECT_FIX",
+    "ENABLE_LENS_RENDER_FIX",
+    "ENABLE_AUTO_ATTACK_ARCHER_NINJA_FIX",
+    "ENABLE_TEXTURE_SCALE_FIX",
+    "ENABLE_TIMESTAMPED_EXCEPTION_DUMP",
+    "ENABLE_NEW_STOP_ON_BLOCK",
+    "ENABLE_ABORT_TRACEBACK_WITH_LINE",
+    "ENABLE_EXTENDED_SYSERR",
+    "DISABLE_BACKGROUND_DARKENING",
+    "ENABLE_SYSERR_BY_PIB"
+)
+
+Write-Host "=== Makro Tarama Başlandı ===" -ForegroundColor Cyan
+Write-Host "Proje Yolu: $projectPath" -ForegroundColor Gray
+Write-Host "Toplam Makro Sayısı: $($macros.Count)" -ForegroundColor Gray
+Write-Host "Tarama işlemi başlatılıyor...`n" -ForegroundColor Yellow
+
+# Sonuç dosyasını temizle
+if (Test-Path $outputFile) {
+    Remove-Item $outputFile
+}
+
+$counter = 0
+$foundMacros = 0
+$notFoundMacros = 0
+
+foreach ($macro in $macros) {
+    $counter++
+    $percentComplete = ($counter / $macros.Count) * 100
+    Write-Progress -Activity "Makro Taranıyor" -Status "$macro" -PercentComplete $percentComplete -CurrentOperation "$counter/$($macros.Count)"
+    
+    # .cpp ve .h dosyalarında ara
+    $results = Get-ChildItem -Path $projectPath -Recurse -Include "*.cpp", "*.h" | 
+        Select-String -Pattern "#ifdef\s+$macro|#if\s+defined\s*\(\s*$macro\s*\)|#ifndef\s+$macro" -List
+    
+    if ($results) {
+        $foundMacros++
+        
+        # Makro başlığını yaz
+        Add-Content $outputFile -Value "================================================================================"
+        Add-Content $outputFile -Value "MAKRO: $macro"
+        Add-Content $outputFile -Value "================================================================================"
+        
+        # Dosya yollarını al ve düzenle
+        $files = $results | ForEach-Object {
+            $_.Path -replace [regex]::Escape($projectPath), "" -replace "^\\", ""
+        } | Sort-Object -Unique
+        
+        foreach ($file in $files) {
+            Add-Content $outputFile -Value $file
+        }
+        
+        Add-Content $outputFile -Value ""
+        
+        Write-Host "✓ $macro - $($files.Count) dosyada bulundu" -ForegroundColor Green
+    }
+    else {
+        $notFoundMacros++
+        Write-Host "✗ $macro - Bulunamadı" -ForegroundColor Red
+    }
+}
+
+Write-Progress -Activity "Makro Taranıyor" -Completed
+
+Write-Host "`n=== Tarama Tamamlandı ===" -ForegroundColor Cyan
+Write-Host "Bulunan Makrolar: $foundMacros" -ForegroundColor Green
+Write-Host "Bulunamayan Makrolar: $notFoundMacros" -ForegroundColor Red
+Write-Host "Çıkış Dosyası: $outputFile" -ForegroundColor Yellow
+Write-Host "Dosya otomatik olarak açılıyor..." -ForegroundColor Gray
+
+# Sonuç dosyasını aç
+Start-Process $outputFile
