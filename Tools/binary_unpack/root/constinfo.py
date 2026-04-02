@@ -182,7 +182,7 @@ CONSOLE_ENABLE = 0
 
 if app.ENABLE_UI_DEBUG_WINDOW:
     # Debug: UI outline boxes (PythonWindow.cpp: g_bOutlineBoxEnable)
-    OUTLINE_DEBUG_ENABLE = 0    #0 yaparsan kapanır 1 yaparsan debug penceresi açılır
+    OUTLINE_DEBUG_ENABLE = 1    #0 yaparsan kapanır 1 yaparsan debug penceresi açılır
 
     def SetOutlineDebug(flag):
         global OUTLINE_DEBUG_ENABLE
