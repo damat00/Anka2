@@ -154,6 +154,7 @@
     <ClInclude Include="..\..\source\UserInterface\InstanceBase.h" />
     <ClInclude Include="..\..\source\UserInterface\InsultChecker.h" />
     <ClInclude Include="..\..\source\UserInterface\Locale.h" />
+    <ClInclude Include="..\..\source\UserInterface\Locale_inc.h" />
     <ClInclude Include="..\..\source\UserInterface\MarkImage.h" />
     <ClInclude Include="..\..\source\UserInterface\MarkManager.h" />
     <ClInclude Include="..\..\source\UserInterface\NetworkActorManager.h" />

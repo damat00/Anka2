@@ -42,7 +42,6 @@
 		<File ArchivedPath="uiacce.py"><![CDATA[../binary_unpack/root/uiacce.py]]></File>
 		<File ArchivedPath="uiadvancedgameoptions.py"><![CDATA[../binary_unpack/root/uiadvancedgameoptions.py]]></File>
 		<File ArchivedPath="uiaffectshower.py"><![CDATA[../binary_unpack/root/uiaffectshower.py]]></File>
-		<File ArchivedPath="uiaffectshower.py.bak"><![CDATA[../binary_unpack/root/uiaffectshower.py.bak]]></File>
 		<File ArchivedPath="uiaramakutusujordi.py"><![CDATA[../binary_unpack/root/uiaramakutusujordi.py]]></File>
 		<File ArchivedPath="uiattachbonus.py"><![CDATA[../binary_unpack/root/uiattachbonus.py]]></File>
 		<File ArchivedPath="uiattachbonuslist.py"><![CDATA[../binary_unpack/root/uiattachbonuslist.py]]></File>
@@ -204,7 +203,6 @@
 		<File ArchivedPath="uiscript/exchangedialog.py"><![CDATA[../binary_unpack/root/uiscript/exchangedialog.py]]></File>
 		<File ArchivedPath="uiscript/expandedmoneytaskbar.py"><![CDATA[../binary_unpack/root/uiscript/expandedmoneytaskbar.py]]></File>
 		<File ArchivedPath="uiscript/expandedtaskbar.py"><![CDATA[../binary_unpack/root/uiscript/expandedtaskbar.py]]></File>
-		<File ArchivedPath="uiscript/expandedtaskbar.py.bak"><![CDATA[../binary_unpack/root/uiscript/expandedtaskbar.py.bak]]></File>
 		<File ArchivedPath="uiscript/fishinggamewindow.py"><![CDATA[../binary_unpack/root/uiscript/fishinggamewindow.py]]></File>
 		<File ArchivedPath="uiscript/fishingwindow.py"><![CDATA[../binary_unpack/root/uiscript/fishingwindow.py]]></File>
 		<File ArchivedPath="uiscript/floorinfo.py"><![CDATA[../binary_unpack/root/uiscript/floorinfo.py]]></File>
