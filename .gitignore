@@ -53,3 +53,7 @@ Source/Binary/binary/Client.lnk
 /Source/Binary/extern/include/boost
 /Source/Binary/extern/include/rapidjson
 Client/Metin2Release.map
+Client/Metin2Debug.bsc
+Client/log.txt
+Client/channel.inf
+Tools/archiver/xml/root_create.xml
