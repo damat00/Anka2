@@ -1,5 +1,5 @@
-#ifndef __MSL_FILE_PTR_H__
-#define __MSL_FILE_PTR_H__
+#ifndef MSL_FILE_PTR_H__
+#define MSL_FILE_PTR_H__
 ///////////////////////////////////////////////////////////////////////////////
 //
 // Copyright (c) 2018 martysama0134. All rights reserved.
@@ -17,37 +17,66 @@
 ///////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+#include <clocale>
 #include <cstdio>
-#include <string>
 #include <cstring>
+#include <cwchar>
+#include <format>
+#include <ios>
+#include <optional>
+#include <span>
+#include <string>
+#include <string_view>
+#include <utility>
 #include <vector>
+
+//#define MSL_FILE_PTR_ENABLE_IMPLICIT_CONVERSION
+//#define MSL_FILE_PTR_ENABLE_WIDE_STRING
+#define MSL_FILE_PTR_ENABLE_STORE_FILENAME
 
 namespace msl
 {
+
 class file_ptr
 {
 	std::FILE * m_ptr_{nullptr};
+	#ifdef MSL_FILE_PTR_ENABLE_STORE_FILENAME
+	std::string m_filename_;
+	#ifdef MSL_FILE_PTR_ENABLE_WIDE_STRING
+	std::wstring m_wfilename_;
+	#endif
+	#endif
 
 public:
 	// constructor
 	file_ptr() = default;
-	explicit file_ptr(const std::string & fn, const char * mode = "r") : file_ptr(fn.c_str(), mode){};
-	explicit file_ptr(const char * filename, const char * mode = "r") { open(filename, mode); }
-#ifdef _WIN32
-	explicit file_ptr(const std::wstring& fn, const wchar_t* mode = L"r") : file_ptr(fn.c_str(), mode) {};
-	explicit file_ptr(const wchar_t * filename, const wchar_t * mode = L"r") { open(filename, mode); }
-#endif
+	explicit file_ptr(const std::string_view & filename, const std::string_view & mode = "r") { open(filename, mode); }
+	#ifdef MSL_FILE_PTR_ENABLE_WIDE_STRING
+	explicit file_ptr(const std::wstring_view & filename, const std::wstring_view & mode = L"r") { open(filename, mode); }
+	#endif
 	explicit file_ptr(std::FILE * ptr) { m_ptr_ = ptr; }
 	// move constructor
-	file_ptr(file_ptr && fp) noexcept
+	file_ptr(file_ptr && fp) noexcept :
+		m_ptr_(std::exchange(fp.m_ptr_, nullptr))
+		#ifdef MSL_FILE_PTR_ENABLE_STORE_FILENAME
+		, m_filename_(std::move(fp.m_filename_))
+		#ifdef MSL_FILE_PTR_ENABLE_WIDE_STRING
+		, m_wfilename_(std::move(fp.m_wfilename_))
+		#endif
+		#endif
 	{
-		reset(fp.m_ptr_);
-		fp.m_ptr_ = nullptr;
 	}
+	// move assignment
 	file_ptr & operator=(file_ptr && fp) noexcept
 	{
-		reset(fp.m_ptr_);
-		fp.m_ptr_ = nullptr;
+		reset();
+		m_ptr_ = std::exchange(fp.m_ptr_, nullptr);
+		#ifdef MSL_FILE_PTR_ENABLE_STORE_FILENAME
+		m_filename_ = std::move(fp.m_filename_);
+		#ifdef MSL_FILE_PTR_ENABLE_WIDE_STRING
+		m_wfilename_ = std::move(fp.m_wfilename_);
+		#endif
+		#endif
 		return *this;
 	}
 	// copy constructor
@@ -64,10 +93,13 @@ public:
 	std::FILE * operator->() const { return m_ptr_; }
 	//! @brief if (ptr)
 	explicit operator bool() const { return m_ptr_; }
-#ifdef MSL_FILE_PTR_ENABLE_IMPLICIT_CONVERSION
+
+	#ifdef MSL_FILE_PTR_ENABLE_IMPLICIT_CONVERSION
 	//! @brief implicit std::FILE ptr conversion
 	operator std::FILE *() const { return m_ptr_; }
-#endif
+	#else
+	operator std::FILE *() const = delete;
+	#endif
 
 	//! @brief get the file ptr
 	std::FILE * get() const { return m_ptr_; }
@@ -78,40 +110,89 @@ public:
 	//! @brief get the file ptr pointer
 	std::FILE ** get_ptr() { return &m_ptr_; }
 
-	//! @brief close the file ptr and reset it
-	void open(const std::string & fn, const char * mode = "r") { open(fn.c_str(), mode); }
+	#ifdef MSL_FILE_PTR_ENABLE_STORE_FILENAME
+	std::string filename() { return m_filename_; }
+	#ifdef MSL_FILE_PTR_ENABLE_WIDE_STRING
+	std::wstring wfilename() { return m_wfilename_; }
+	#endif
+	#endif
 
 	//! @brief close the file ptr and reset it
-	void open(const char * filename, const char * mode = "r")
+	void open(const std::string_view & filename, const std::string_view & mode = "r")
 	{
-#ifdef _WIN32
-		fopen_s(&m_ptr_, filename, mode);
-#else
-		m_ptr_ = std::fopen(filename, mode);
-#endif
+		reset();
+		const std::string filename_str(filename);
+		const std::string mode_str(mode);
+		#ifdef _WIN32
+		fopen_s(&m_ptr_, filename_str.c_str(), mode_str.c_str());
+		#else
+		m_ptr_ = std::fopen(filename_str.c_str(), mode_str.c_str());
+		#endif
+		#ifdef MSL_FILE_PTR_ENABLE_STORE_FILENAME
+		m_filename_ = filename;
+		#endif
 	}
 
-#ifdef _WIN32
-	//! @brief close the file ptr and reset it
-	void open(const std::wstring& fn, const wchar_t* mode = L"r") { open(fn.c_str(), mode); }
+	#ifdef MSL_FILE_PTR_ENABLE_WIDE_STRING
+	inline static std::optional<std::string> w2s(const std::wstring_view & wcstr)
+	{
+		// on Windows, UTF-16 is internal Unicode encoding (UCS2 before WinXP)
+		// on Linux, UCS4 is internal Unicode encoding
+		// on BSD, UCS4 is internal Unicode encoding
+		setlocale(LC_ALL, "en_US.UTF-8");
+		const wchar_t * wcs = wcstr.data(); // implicit conversion for compatibility
+		auto s = std::mbstate_t();
+
+		#if _WIN32
+		size_t target_char_count{};
+		if (wcsrtombs_s(&target_char_count, nullptr, 0, &wcs, 0, &s) != 0)
+			return {};
+		#else
+		auto target_char_count = std::wcsrtombs(nullptr, &wcs, 0, &s);
+		if (target_char_count == static_cast<std::size_t>(-1))
+			return {};
+		target_char_count++; // +1 because std::string adds a null terminator which isn't part of size
+		#endif
+
+		auto str = std::string(target_char_count, '\0');
+		#if _WIN32
+		wcsrtombs_s(&target_char_count, str.data(), str.size(), &wcs, str.size(), &s);
+		#else
+		std::wcsrtombs(str.data(), &wcs, str.size(), &s);
+		#endif
+		return str;
+	}
 
 	//! @brief close the file ptr and reset it
-	void open(const wchar_t* filename, const wchar_t* mode = L"r")
+	void open(const std::wstring_view & filename, const std::wstring_view & mode = L"r")
 	{
-		_wfopen_s(&m_ptr_, filename, mode);
+		reset();
+		const std::wstring filename_str(filename);
+		const std::wstring mode_str(mode);
+		#ifdef _WIN32
+		_wfopen_s(&m_ptr_, filename_str.c_str(), mode_str.c_str());
+		#else
+		auto fn2 = w2s(filename_str);
+		auto mode2 = w2s(mode_str);
+		if (!fn2 || !mode2)
+		{
+			printf("failed open conversion of %ls %ls\n", filename_str.c_str(), mode_str.c_str());
+			return;
+		}
+		m_ptr_ = std::fopen(fn2->c_str(), mode2->c_str());
+		#endif
+		#ifdef MSL_FILE_PTR_ENABLE_STORE_FILENAME
+		m_wfilename_ = filename;
+		#endif
 	}
 
 	//! @brief reset and reopen new file
-	void reset(const std::wstring& fn, const wchar_t* mode = L"r") { reset(fn.c_str(), mode); }
-
-	//! @brief reset and reopen new file
-	void reset(const wchar_t* filename, const wchar_t* mode = L"r")
+	void reset(const std::wstring_view & filename, const std::wstring_view & mode = L"r")
 	{
 		reset();
 		open(filename, mode);
 	}
-
-#endif
+	#endif
 
 	//! @brief alias of reset()
 	void close() { reset(); }
@@ -120,10 +201,7 @@ public:
 	void swap(file_ptr & fp) noexcept { std::swap(m_ptr_, fp.m_ptr_); }
 
 	//! @brief reset and reopen new file
-	void reset(const std::string & fn, const char * mode = "r") { reset(fn.c_str(), mode); }
-
-	//! @brief reset and reopen new file
-	void reset(const char * filename, const char * mode = "r")
+	void reset(const std::string_view & filename, const std::string_view & mode = "r")
 	{
 		reset();
 		open(filename, mode);
@@ -143,6 +221,12 @@ public:
 		{
 			std::fclose(m_ptr_);
 			m_ptr_ = nullptr;
+			#ifdef MSL_FILE_PTR_ENABLE_STORE_FILENAME
+			m_filename_ = {};
+			#ifdef MSL_FILE_PTR_ENABLE_WIDE_STRING
+			m_wfilename_ = {};
+			#endif
+			#endif
 		}
 	}
 
@@ -169,25 +253,37 @@ public:
 	//! @brief return the file size from the current position; alias of size(true)
 	std::size_t remain_size() const { return size(true); }
 
-	//! @brief write into the file from stream
-	template<class... Args>
-	void write(const char* _Format, Args&&... args) const { std::fprintf(m_ptr_, _Format, std::forward<Args>(args)...); }
+	//! @brief write into the file from printf format string (legacy-compatible)
+	template <class... Args>
+	void write(const char * format, Args&&... args) const
+	{
+		std::fprintf(m_ptr_, format, std::forward<Args>(args)...);
+	}
+
+	//! @brief write into the file from std::format string
+	template <class... Args>
+	void write_fmt(std::format_string<Args...> fmt, Args&&... args) const
+	{
+		const auto formatted = std::format(fmt, std::forward<Args>(args)...);
+		(void)string_write(formatted);
+	}
 	//! @brief write into the file from byte vector
-	std::size_t write(const std::vector<char> & vec) const { return std::fwrite(vec.data(), vec.size(), 1, m_ptr_); }
+	std::size_t write(const std::vector<char> & vec) const { return std::fwrite(vec.data(), 1, vec.size(), m_ptr_); }
 	//! @brief write into the file from c array
-	std::size_t write(const void * buf, size_t size) const { return std::fwrite(buf, size, 1, m_ptr_); }
+	std::size_t write(const void * buf, std::size_t size) const { return std::fwrite(buf, 1, size, m_ptr_); }
+	//! @brief write into the file from span
+	template <typename T> std::size_t write(std::span<const T> buffer) const
+	{
+		return std::fwrite(buffer.data(), sizeof(T), buffer.size(), m_ptr_) * sizeof(T);
+	}
 
 	//! @brief write into the file from string
-	std::size_t string_write(const std::string & str) const { return std::fwrite(str.data(), str.size(), 1, m_ptr_); }
-	//! @brief write into the file from zstring
-	std::size_t string_write(const char * str) const { return std::fwrite(str, std::strlen(str), 1, m_ptr_); }
+	std::size_t string_write(const std::string_view & str) const { return std::fwrite(str.data(), 1, str.size(), m_ptr_); }
 
-#ifdef _WIN32
+	#ifdef MSL_FILE_PTR_ENABLE_WIDE_STRING
 	//! @brief write into the file from wstring
-	void string_write(const std::wstring& str) const { std::fwrite(str.data(), str.size(), 1, m_ptr_); }
-	//! @brief write into the file from wchar
-	void string_write(const wchar_t* str) const { std::fwrite(str, std::wcslen(str), 1, m_ptr_); }
-#endif
+	void string_write(const std::wstring_view& str) const { std::fwrite(str.data(), str.size(), 1, m_ptr_); }
+	#endif
 
 	//! @brief read the file from the current position as byte stream returning a vector
 	std::vector<char> read(std::size_t n = 0) const
@@ -195,7 +291,8 @@ public:
 		if (n == 0) // 0 implies reading the whole remaining file
 			n = this->remain_size();
 		std::vector<char> buf(n);
-		std::fread(buf.data(), 1, buf.size(), m_ptr_);
+		const auto read_bytes = std::fread(buf.data(), 1, buf.size(), m_ptr_);
+		buf.resize(read_bytes);
 		return buf;
 	}
 
@@ -211,6 +308,26 @@ public:
 		if (n == 0) // 0 implies reading the whole remaining file
 			n = this->remain_size();
 		return std::fread(buf, 1, n, m_ptr_);
+	}
+
+	//! @brief read the file as byte stream using a span
+	template <typename T> std::size_t read(std::span<T> buffer) const
+	{
+		return std::fread(buffer.data(), sizeof(T), buffer.size(), m_ptr_);
+	}
+
+	//! @brief read the next line from the current position as string
+	std::optional<std::string> getline(char delim = '\n') const
+	{
+		std::string ret;
+		int buf;
+		while ((buf = std::fgetc(m_ptr_)) != EOF)
+		{
+			if (buf == delim) // if newline, return the current line
+				return ret;
+			ret += static_cast<char>(buf);
+		}
+		return (ret.empty()) ? std::nullopt : std::optional<std::string>{ret};
 	}
 
 	//! @brief tell the file
@@ -229,24 +346,41 @@ public:
 	std::string string_read(const std::size_t n = 0) const
 	{
 		auto vec = this->read(n);
-		if (!vec.empty() && vec[vec.size() - 1] != '\0') // append EOS at the end of vector
+		if (vec.empty())
+			return {};
+		if (!vec.empty() && vec.back() != '\0') // append EOS at the end of vector
 			vec.emplace_back('\0');
-		return std::string(vec.begin(), vec.end()); // convert vector to string
+		return std::string(vec.data()); // convert vector to string
 	}
 
 	//! @brief read the file from the current position using a null-terminated string buffer
 	void string_read(char buf[], const std::size_t n = 0) const
 	{
-		this->read(buf, n);
-		if (buf[n - 1] != '\0')
-			buf[n - 1] = '\0';
+		if (n == 0)
+			return;
+
+		if (n == 1)
+		{
+			buf[0] = '\0';
+			return;
+		}
+
+		const auto read_bytes = this->read(buf, n - 1);
+		buf[read_bytes] = '\0';
 	}
 
 	//! @brief move unwritten memory buffer data to the target file.
-    void flush() const
-    {
-        std::fflush(m_ptr_);
-    }
-};
+	void flush() const
+	{
+		std::fflush(m_ptr_);
+	}
+
+	//! @brief check if the opened file stream has errors
+	[[nodiscard]] bool error() const noexcept { return std::ferror(m_ptr_) != 0; }
+
+	//! @brief check if the opened file reached EOF
+	[[nodiscard]] bool eof() const noexcept { return std::feof(m_ptr_) != 0; }
+}; // file_ptr
+
 } // namespace msl
-#endif
+#endif // MSL_FILE_PTR_H__

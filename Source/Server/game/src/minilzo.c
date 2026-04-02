@@ -39,7 +39,24 @@ http://www.oberhumer.com/opensource/lzo/
 
 #define __LZO_IN_MINILZO
 #define LZO_BUILD
+#include <iostream>
+#include <cstdlib>
 
+#ifdef assert
+#undef assert
+#endif
+
+// Kendi basit ve bağımsız assert makromuz
+#define assert(expr) \
+    do { \
+        if (!(expr)) { \
+            std::cerr << "Assertion failed: (" << #expr << "), function " \
+                      << __FUNCTION__ << ", file " << __FILE__ << ", line " \
+                      << __LINE__ << "." << std::endl; \
+            std::abort(); \
+        } \
+    } while (0)
+		
 #ifdef MINILZO_HAVE_CONFIG_H
 #  include <config.h>
 #endif

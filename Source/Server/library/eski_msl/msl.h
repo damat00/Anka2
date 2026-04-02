@@ -1,5 +1,5 @@
-#ifndef MSL_MSL_H__
-#define MSL_MSL_H__
+#ifndef __MSL_MSL_H__
+#define __MSL_MSL_H__
 ///////////////////////////////////////////////////////////////////////////////
 //
 // Copyright (c) 2018 martysama0134. All rights reserved.
@@ -19,14 +19,9 @@
 
 #include "bench.h"
 #include "cast.h"
-#include "assert.h"
+#include "check_assert.h"
 #include "file_ptr.h"
-#include "macro.h"
-#include "pool.h"
-#include "ptr.h"
 #include "random.h"
 #include "range.h"
-#include "traits.h"
 #include "utils.h"
-
-#endif // MSL_MSL_H__
+#endif

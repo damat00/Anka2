@@ -1,8 +1,23 @@
 #ifndef _fsm_state_h
 #define _fsm_state_h
 
-// System Includes
+#include <iostream>
+#include <cstdlib>
 
+#ifdef assert
+#undef assert
+#endif
+
+// Kendi basit ve bağımsız assert makromuz
+#define assert(expr) \
+    do { \
+        if (!(expr)) { \
+            std::cerr << "Assertion failed: (" << #expr << "), function " \
+                      << __FUNCTION__ << ", file " << __FILE__ << ", line " \
+                      << __LINE__ << "." << std::endl; \
+            std::abort(); \
+        } \
+    } while (0)
 //==================================================================================================
 // CState
 

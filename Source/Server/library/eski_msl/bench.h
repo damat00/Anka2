@@ -1,5 +1,5 @@
-#ifndef MSL_MSL_H__
-#define MSL_MSL_H__
+#ifndef __MSL_BENCH_H__
+#define __MSL_BENCH_H__
 ///////////////////////////////////////////////////////////////////////////////
 //
 // Copyright (c) 2018 martysama0134. All rights reserved.
@@ -17,16 +17,22 @@
 ///////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "bench.h"
-#include "cast.h"
-#include "assert.h"
-#include "file_ptr.h"
-#include "macro.h"
-#include "pool.h"
-#include "ptr.h"
-#include "random.h"
-#include "range.h"
-#include "traits.h"
-#include "utils.h"
+#include <chrono>
+#include <iostream>
+namespace msl
+{
+template <class F> auto evaluate(F && func, const std::size_t tries = 1)
+{
+	const auto start = std::chrono::steady_clock::now();
+	for (std::size_t i = 0; i < tries; i++)
+		func();
+	return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start);
+}
 
-#endif // MSL_MSL_H__
+template <class F> void bench(F && func, const std::size_t tries = 10000)
+{
+	std::cout << "Elapsed time: " << evaluate(func, tries).count() << "ms\n";
+}
+
+} // namespace msl
+#endif

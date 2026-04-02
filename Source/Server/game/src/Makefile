@@ -28,13 +28,15 @@ endif
 LIBS = -lm -lmd
 
 # >> DERLEYICI BAYRAKLARI <<
-CFLAGS = -m32 -g -w -Ofast -pipe -fexceptions -Wno-enum-constexpr-conversion -std=c++2a -static-libstdc++ -pthread -D_THREAD_SAFE -DNDEBUG
+CFLAGS = -m32 -g -Wall -O2 -Wno-invalid-source-encoding -Wno-deprecated-declarations -Wno-unknown-pragmas -Wno-unused-variable -Ofast -pipe -fexceptions -Wno-enum-constexpr-conversion -fno-strict-aliasing -std=c++20 -static-libstdc++ -pthread -D_THREAD_SAFE -DNDEBUG
 
 # >> GUVENLIK OZELLIKLERI <<
 CFLAGS += -fstack-protector-all
 
 # >> VERSIYON VE SISTEM BILGISI <<
 CFLAGS += -D__USER__=\"$(USER)\" -D__HOSTNAME__=\"$(HOSTNAME)\" -D__PWD__=\"$(PWD)\" -D__GAME_VERSION__=\"$(GAME_VERSION)\"
+
+CFLAGS += -Wno-deprecated-declarations -Wno-invalid-offsetof
 
 # >> HARICI KUTUPHANE AYARLARI <<
 
@@ -50,7 +52,7 @@ LIBS += -lIL -lpng -ltiff -lmng -ljpeg
 
 # MySQL Veritabani
 INCDIR += -I/usr/local/include/mysql
-LIBS += /usr/local/lib/mysql/libmariadbclient.a /usr/lib/libz.a
+LIBS += -L/usr/local/lib/mysql -lmysqlclient -lz
 
 # >> PROJE KUTUPHANELERI <<
 INCDIR += -I/usr/local/include
@@ -61,7 +63,10 @@ INCDIR += -I../../library/msl
 INCDIR += -I../../library
 INCDIR += -I../../library/nlohmann
 LIBDIR += -L../../library/libthecore/lib -L../../library/libpoly -L../../library/libsql -L../../library/libgame/lib -L../../library/liblua/lib
-LIBS += -lthecore -lpoly -llua -llualib -lsql -lgame
+LIBS += -lthecore -lpoly -llualib -llua -lsql -lgame
+
+#MSL (Marty Support Library) Entegrasyonu
+INCDIR += -I/usr/local/include/msl
 
 # >> HEDEF DOSYA <<
 TARGET = $(BINDIR)/game

@@ -1,8 +1,8 @@
-#ifndef MSL_MSL_H__
-#define MSL_MSL_H__
+#ifndef MSL_UTIL_H__
+#define MSL_UTIL_H__
 ///////////////////////////////////////////////////////////////////////////////
 //
-// Copyright (c) 2018 martysama0134. All rights reserved.
+// Copyright (c) 2026 martysama0134. All rights reserved.
 //
 // This code is licensed under the MIT License (MIT).
 //
@@ -17,16 +17,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "bench.h"
-#include "cast.h"
-#include "assert.h"
-#include "file_ptr.h"
-#include "macro.h"
-#include "pool.h"
-#include "ptr.h"
-#include "random.h"
-#include "range.h"
-#include "traits.h"
 #include "utils.h"
 
-#endif // MSL_MSL_H__
+#endif // MSL_UTIL_H__

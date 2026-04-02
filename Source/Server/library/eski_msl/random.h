@@ -1,5 +1,5 @@
-#ifndef MSL_RANDOM_H__
-#define MSL_RANDOM_H__
+#ifndef __MSL_RANDOM_H__
+#define __MSL_RANDOM_H__
 ///////////////////////////////////////////////////////////////////////////////
 //
 // Copyright (c) 2022 martysama0134 & IkarusDeveloper. All rights reserved.
@@ -19,9 +19,6 @@
 
 #include <cstdint>
 #include <chrono>
-#include <iterator>
-#include <limits>
-#include <optional>
 #include <random>
 #include <type_traits>
 
@@ -29,15 +26,6 @@ namespace msl
 {
 	namespace details
 	{
-		template <typename T>
-		inline constexpr T max_val = (std::numeric_limits<T>::max)();
-
-		template <typename T>
-		inline constexpr T min_val = (std::numeric_limits<T>::min)();
-
-		template <typename T>
-		inline constexpr bool is_number_v = std::is_integral_v<T> || std::is_floating_point_v<T>;
-
 		inline std::default_random_engine& get_def_random_engine()
 		{
 			thread_local std::default_random_engine re;
@@ -45,9 +33,7 @@ namespace msl
 			if (!init)
 			{
 				init = true;
-				std::random_device rd;
-				std::uniform_int_distribution<uint32_t> dist(min_val<uint32_t>, max_val<uint32_t>);
-				re.seed(dist(rd));
+				re.seed(static_cast<uint32_t>(time(nullptr)));
 			}
 			return re;
 		}
@@ -61,6 +47,15 @@ namespace msl
 		{
 			using dist_type = std::uniform_real_distribution<U>;
 		};
+
+		template <typename T>
+		inline constexpr T max_val = (std::numeric_limits<T>::max)();
+
+		template <typename T>
+		inline constexpr T min_val = (std::numeric_limits<T>::min)();
+
+		template <typename T>
+		inline constexpr bool is_number_v = std::is_integral_v<T> || std::is_floating_point_v<T>;
 	}
 
 	//! @brief gen_random_number(min, max)
@@ -84,13 +79,11 @@ namespace msl
 
 	private:
 		typename distribution_deduce<T>::dist_type m_dist;
-	}; // gen_random_number
-
-	// Type aliases for gen_random_number
+	};
 	using gen_random_int = gen_random_number<int>;
 	using gen_random_real = gen_random_number<double>;
 
-	//! @brief random_int(min, max) for integral type numbers
+	//! @brief random_int(min, max)
 	template<typename T> std::enable_if_t<std::is_integral_v<T>, T>
 	random_int(T min = details::min_val<T>, T max = details::max_val<T>)
 	{
@@ -98,7 +91,7 @@ namespace msl
 		return d(details::get_def_random_engine());
 	}
 
-	//! @brief random_real(min, max) for floating type numbers
+	//! @brief random_real(min, max)
 	template<typename T> std::enable_if_t<std::is_floating_point_v<T>, T>
 	random_real(T min = details::min_val<T>, T max = details::max_val<T>)
 	{
@@ -106,7 +99,6 @@ namespace msl
 		return d(details::get_def_random_engine());
 	}
 
-	//! @brief random_number(min, max) autodeducing float/integral type
 	template<typename T, typename = std::enable_if_t<details::is_number_v<T>>>
 	T random_number(T min = details::min_val<T>, T max = details::max_val<T>)
 	{
@@ -114,24 +106,15 @@ namespace msl
 		return dist(details::get_def_random_engine());
 	}
 
-	//! @brief random_from(container) for any standard-supported container
 	template<typename T>
 	decltype(auto) random_from(const T& container) {
-		if (std::empty(container))
-			return std::end(container);
 		using size_type = decltype(std::size(container));
+		if(std::empty(container))
+			return std::end(container);
 		auto iter = std::begin(container);
 		std::advance(iter, random_number<size_type>(0, std::size(container) - 1));
 		return iter;
 	}
-
-	//! @brief random_element(container) returns an optional copy of a random element
-	template<typename T>
-	auto random_element(const T& container) -> std::optional<typename T::value_type> {
-		if (std::empty(container))
-			return std::nullopt;
-		return *random_from(container);
-	}
-
 } // namespace msl
-#endif // MSL_RANDOM_H__
+
+#endif

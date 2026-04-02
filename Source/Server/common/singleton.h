@@ -1,7 +1,23 @@
 #ifndef __INC_SINGLETON_H__
 #define __INC_SINGLETON_H__
 
-#include <assert.h>
+#include <iostream>
+#include <cstdlib>
+
+#ifdef assert
+#undef assert
+#endif
+
+// Kendi basit ve baðýmsýz assert makromuz
+#define assert(expr) \
+    do { \
+        if (!(expr)) { \
+            std::cerr << "Assertion failed: (" << #expr << "), function " \
+                      << __FUNCTION__ << ", file " << __FILE__ << ", line " \
+                      << __LINE__ << "." << std::endl; \
+            std::abort(); \
+        } \
+    } while (0)
 
 template <typename T> class singleton
 {

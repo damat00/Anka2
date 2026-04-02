@@ -25,7 +25,7 @@ DEPFILE = Depend
 endif
 
 # >> DERLEYICI BAYRAKLARI <<
-CFLAGS = -m32 -g -w -Ofast -pipe -fno-rtti -fno-exceptions -std=c++14 -static-libstdc++ -Wno-long-long -pthread -D_THREAD_SAFE
+CFLAGS = -m32 -g -Wall -O2 -pipe -fno-rtti -fno-exceptions -std=c++20 -static-libstdc++ -pthread -D_THREAD_SAFE -fno-strict-aliasing -Wno-enum-constexpr-conversion -Wno-unused-variable -Wno-unused-function -Wno-deprecated-declarations -Wno-unknown-pragmas
 
 # >> VERSIYON VE SISTEM BILGISI <<
 CFLAGS += -D__USER__=\"$(USER)\" -D__HOSTNAME__=\"$(HOSTNAME)\" -D__PWD__=\"$(PWD)\" -D__DB_VERSION__=\"$(DB_VERSION)\"

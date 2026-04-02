@@ -53,6 +53,7 @@
 #include "DragonLair.h"
 #include "skill_power.h"
 #include "DragonSoul.h"
+#include "maintenance.h"
 
 #ifdef ENABLE_RENEWAL_SWITCHBOT
 	#include "switchbot_manager.h"
@@ -421,6 +422,7 @@ int main(int argc, char **argv)
 #ifdef ENABLE_EVENT_SYSTEM
 	CGameEventsManager	gameEventsManager;
 #endif
+	MaintenanceManager maintenance_manager;
 
 	if (!start(argc, argv))
 	{

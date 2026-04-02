@@ -2,8 +2,8 @@ CXX	= clang++
 BIN_DIR = ../lib
 BIN = $(BIN_DIR)/libgame.a
 
-CFLAGS  = -m32 -Wall -w -O2 -pipe -fno-exceptions -I../include
-CFLAGS += -std=c++14
+CFLAGS  = -m32 -Wall -O2 -pipe -fno-exceptions -I../include
+CFLAGS += -std=c++20 -fno-strict-aliasing -Wno-enum-constexpr-conversion
 
 LIBS =
 
@@ -26,7 +26,10 @@ dep:
 	touch Depend
 	$(CXX) $(CFLAGS) -MM *.cc > Depend
 
-$(OBJFILES):
+.cpp.o:
+	$(CXX) $(CFLAGS) -c $<
+
+.cc.o:
 	$(CXX) $(CFLAGS) -c $<
 
 include Depend

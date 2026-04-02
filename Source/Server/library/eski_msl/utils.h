@@ -1,5 +1,5 @@
-#ifndef MSL_UTILS_H__
-#define MSL_UTILS_H__
+#ifndef __MSL_UTILS_H__
+#define __MSL_UTILS_H__
 ///////////////////////////////////////////////////////////////////////////////
 //
 // Copyright (c) 2018 martysama0134. All rights reserved.
@@ -17,41 +17,15 @@
 ///////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include <algorithm>
-#include <cmath>
-#include <concepts>
-#include <cstdint>
-#include <iterator>
-#include <limits>
-#include <ranges>
 #include <string>
-#include <string_view>
-#include <type_traits>
 #include <vector>
 
 namespace msl
 {
-
-namespace details
-{
-template <typename T>
-concept string_like =
-	std::convertible_to<T, std::string_view> ||
-	std::same_as<std::remove_cvref_t<T>, char>;
-
-template <typename T> inline void append_string_like(std::string & target, T && value)
-{
-	if constexpr (std::same_as<std::remove_cvref_t<T>, char>)
-		target += value;
-	else
-		target += std::string_view(value);
-}
-} // namespace details
-
 //! @brief string_split split a string into a vector by providing a single delim character
 template <class T = std::vector<std::string>> T string_split(const std::string & str, char tok = ' ')
 {
-	T vec{};
+	T vec;
 	std::size_t prev = 0;
 	auto cur = str.find(tok);
 	while (cur != std::string::npos)
@@ -67,13 +41,7 @@ template <class T = std::vector<std::string>> T string_split(const std::string &
 //! @brief string_split split a string into a vector by providing the delim string
 template <class T = std::vector<std::string>> T string_split(const std::string & str, const std::string & tok = " ")
 {
-	T vec{};
-	if (tok.empty())
-	{
-		vec.emplace_back(str);
-		return vec;
-	}
-
+	T vec;
 	std::size_t prev = 0;
 	auto cur = str.find(tok);
 	while (cur != std::string::npos)
@@ -89,7 +57,7 @@ template <class T = std::vector<std::string>> T string_split(const std::string &
 //! @brief string_split_any split a string into a vector by providing any of the single delim characters
 template <class T = std::vector<std::string>> T string_split_any(const std::string & str, const std::string & toks = " ")
 {
-	T vec{};
+	T vec;
 	std::size_t prev = 0;
 	auto cur = str.find_first_of(toks);
 	while (cur != std::string::npos)
@@ -102,52 +70,30 @@ template <class T = std::vector<std::string>> T string_split_any(const std::stri
 	return vec;
 }
 
-//! @brief string_join joins a string-like range into a string by uniting elements with tok char
-template <std::ranges::input_range Range>
-requires details::string_like<std::remove_cvref_t<std::ranges::range_reference_t<Range>>>
-std::string string_join(const Range & vec, const char tok = ' ')
+//! @brief string_join join a vector into a string by uniting them with tok char
+template <class T = std::vector<std::string>> std::string string_join(const T & vec, const char tok = ' ')
 {
 	std::string str;
-	bool first = true;
-	for (const auto & elem : vec)
+	for (auto & elem : vec)
 	{
-		if (!first)
+		if (!str.empty())
 			str += tok;
-		first = false;
-		details::append_string_like(str, elem);
+		str += elem;
 	}
 	return str;
 }
 
-//! @brief string_join joins a string-like range into a string by uniting elements with tok string
-template <std::ranges::input_range Range>
-requires details::string_like<std::remove_cvref_t<std::ranges::range_reference_t<Range>>>
-std::string string_join(const Range & vec, const std::string & tok = " ")
+//! @brief string_join join a vector into a string by uniting them with tok string
+template <class T = std::vector<std::string>> std::string string_join(const T & vec, const std::string & tok = " ")
 {
 	std::string str;
-	bool first = true;
-	for (const auto & elem : vec)
+	for (auto & elem : vec)
 	{
-		if (!first)
+		if (!str.empty())
 			str += tok;
-		first = false;
-		details::append_string_like(str, elem);
+		str += elem;
 	}
 	return str;
-}
-
-//! @brief string_join with std::initializer_list (braced-init-list support)
-template <details::string_like T>
-std::string string_join(std::initializer_list<T> list, const char tok = ' ')
-{
-	return string_join<std::initializer_list<T>>(list, tok);
-}
-
-//! @brief string_join with std::initializer_list (braced-init-list support)
-template <details::string_like T>
-std::string string_join(std::initializer_list<T> list, const std::string & tok = " ")
-{
-	return string_join<std::initializer_list<T>>(list, tok);
 }
 
 //! @brief string_replace_in_place replace all char instances of 'from' to 'to' from the input string
@@ -185,53 +131,6 @@ inline std::string string_replace(std::string str, const std::string & from, con
 {
 	string_replace_in_place(str, from, to);
 	return str;
-}
-
-//! @brief to_lower_in_place converts ASCII uppercase characters to lowercase in place
-inline void to_lower_in_place(std::string & str)
-{
-	for (char & c : str)
-	{
-		if (c >= 'A' && c <= 'Z')
-			c = static_cast<char>(c + ('a' - 'A'));
-	}
-}
-
-//! @brief to_lower converts ASCII uppercase characters to lowercase and returns by copy
-inline std::string to_lower(std::string str)
-{
-	to_lower_in_place(str);
-	return str;
-}
-
-//! @brief format_grouped_number formats integral values with a grouping separator each three digits
-inline std::string format_grouped_number(long long value, char separator = '.')
-{
-	const bool negative = value < 0;
-	const std::uint64_t magnitude = negative
-		? static_cast<std::uint64_t>(-(value + 1)) + 1
-		: static_cast<std::uint64_t>(value);
-
-	const std::string digits = std::to_string(magnitude);
-	std::string grouped;
-	grouped.reserve(digits.size() + digits.size() / 3 + (negative ? 1 : 0));
-
-	int count = 0;
-	for (auto it = digits.rbegin(); it != digits.rend(); ++it)
-	{
-		grouped.push_back(*it);
-		++count;
-		if (count == 3 && (it + 1) != digits.rend())
-		{
-			grouped.push_back(separator);
-			count = 0;
-		}
-	}
-
-	std::reverse(grouped.begin(), grouped.end());
-	if (negative)
-		grouped.insert(grouped.begin(), '-');
-	return grouped;
 }
 
 //! @brief whitespaces returns a string containing the default ascii spaces
@@ -281,54 +180,25 @@ inline std::string trim(std::string str, const char * chars = whitespaces())
 //! @brief refill for c arrays (set default value)
 template <class _Ty, std::size_t _Size> constexpr void refill(_Ty (&_Array)[_Size]) noexcept
 {
-	std::ranges::fill(_Array, _Ty());
+	std::fill(std::begin(_Array), std::end(_Array), _Ty());
 }
 
 //! @brief refill for c arrays (set custom value)
 template <class _Ty, std::size_t _Size> constexpr void refill(_Ty (&_Array)[_Size], _Ty _Elem) noexcept
 {
-	std::ranges::fill(_Array, _Elem);
+	std::fill(std::begin(_Array), std::end(_Array), _Elem);
 }
 
 //! @brief refill for std containers (set default value)
 template <class _Container> constexpr void refill(_Container & _Cont)
 {
-	std::ranges::fill(_Cont, typename _Container::value_type());
+	std::fill(std::begin(_Cont), std::end(_Cont), typename _Container::value_type());
 }
 
 //! @brief refill for std containers (set custom value)
 template <class _Container, class _Ty> constexpr void refill(_Container & _Cont, _Ty _Elem)
 {
-	std::ranges::fill(_Cont, _Elem);
+	std::fill(std::begin(_Cont), std::end(_Cont), _Elem);
 }
-
-//! @brief get the percentage between current and max
-template <typename T> constexpr std::enable_if_t<std::is_integral_v<T>, double> calculate_percentage(T current, T max)
-{
-	if (max == 0)
-		return 0.0;
-	return static_cast<double>(current) / static_cast<double>(max) * 100.0;
-}
-
-//! @brief get the percentage between current and max
-template <typename T> constexpr std::enable_if_t<std::is_floating_point_v<T>, T> calculate_percentage(T current, T max)
-{
-	if (max == 0 || std::abs(max) < std::numeric_limits<T>::epsilon())
-		return static_cast<T>(0);
-	return (current * static_cast<T>(100)) / max;
-}
-
-//! @brief get the value from the percentage pct of amount
-template <typename T> constexpr std::enable_if_t<std::is_integral_v<T>, double> value_from_percentage(T amount, T pct)
-{
-	return static_cast<double>(amount) * (static_cast<double>(pct) / 100.0);
-}
-
-//! @brief get the value from the percentage pct of amount
-template <typename T> constexpr std::enable_if_t<std::is_floating_point_v<T>, T> value_from_percentage(T amount, T pct)
-{
-	return amount * (pct / static_cast<T>(100));
-}
-
 } // namespace msl
-#endif // MSL_UTILS_H__
+#endif

@@ -6,7 +6,7 @@
 #include "../../common/singleton.h"
 #include "../../common/utils.h"
 #include "../../common/service.h"
-
+#include <cassert>
 #include <algorithm>
 #include <math.h>
 #include <list>
@@ -14,15 +14,6 @@
 #include <set>
 #include <queue>
 #include <string>
-// stdafx.h içinde bulun ve þu þekilde güncelleyin:
-#include <assert.h>
-
-// Eðer hala hata alýyorsanýz, sistemin hatalý tanýmlamasýný engellemek için 
-// aþaðýdakini assert.h satýrýnýn hemen altýna ekleyebilirsiniz:
-#undef assert
-#define assert(expr) ((void)0) // Geçici olarak devre dýþý býrakmak için
-// VEYA standart tanýmý zorlamak için:
-#define assert(expr) (static_cast<void>(0))
 #include <vector>
 #include <inttypes.h>
 
