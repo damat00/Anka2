@@ -501,11 +501,49 @@ bool CPythonApplication::Process()
 	m_dwCurUpdateTime = ELTimer_GetMSec() - dwStart;
 
 	bool canRender = true;
+#ifdef ENABLE_PERFORMANCE_OPTIMIZATION
+	static bool s_isBackgroundMode = false;
+	if (m_isMinimizedWnd || GetForegroundWindow() != m_hWnd)
+	{
+		canRender = false;
+
+		if (!s_isBackgroundMode)
+		{
+			CSoundManager::Instance().SetMusicVolume(0.0f);
+			CSoundManager::Instance().SetSoundVolumeRatio(0.0f);
+			s_isBackgroundMode = true;
+		}
+
+		Sleep(100);
+	}
+	else
+	{
+		if (s_isBackgroundMode)
+		{
+			const auto* pConfig = CPythonSystem::Instance().GetConfig();
+
+			CSoundManager::Instance().SetMusicVolume(pConfig->music_volume);
+
+			float fSoundRatio = static_cast<float>(pConfig->voice_volume) / 5.0f;
+			CSoundManager::Instance().SetSoundVolumeRatio(fSoundRatio);
+
+			s_isBackgroundMode = false;
+		}
+	}
+
+
+	if (!canRender)
+	{
+		CEffectManager::Instance().Update();
+		SkipRenderBuffering(RENDER_SKIP_BUFFER_MS);
+	}
+#else
 	if (m_isMinimizedWnd)
 	{
 		canRender = false;
 		CEffectManager::Instance().Update();
 	}
+#endif
 	else
 	{
 #ifdef ENABLE_FIX_MOBS_LAG

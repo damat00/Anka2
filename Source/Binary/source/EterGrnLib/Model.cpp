@@ -117,7 +117,7 @@ bool CGrannyModel::LoadPNTVertices()
 
 	assert(m_meshs != nullptr);
 
-	if (!m_pntVtxBuf.Create(m_rigidVtxCount, m_dwFvF, D3DUSAGE_WRITEONLY, D3DPOOL_MANAGED))
+	if (!m_pntVtxBuf.Create(m_rigidVtxCount, m_dwFvF, D3DUSAGE_WRITEONLY, D3DPOOL_MANAGED_EX_FIX))
 		return false;
 
 	void* vertices;
@@ -376,8 +376,12 @@ bool CGrannyModel::__LoadVertices()
 
 //	assert((m_dwFvF & (D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1)) == m_dwFvF);
 
-//	if (!m_pntVtxBuf.Create(m_rigidVtxCount, D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1, D3DUSAGE_WRITEONLY, D3DPOOL_MANAGED))
-	if (!m_pntVtxBuf.Create(m_rigidVtxCount, m_dwFvF, D3DUSAGE_WRITEONLY, D3DPOOL_MANAGED))
+//	if (!m_pntVtxBuf.Create(m_rigidVtxCount, D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1, D3DUSAGE_WRITEONLY, D3DPOOL_MANAGED_EX_FIX))
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+	if (!m_pntVtxBuf.Create(m_rigidVtxCount, m_dwFvF, D3DUSAGE_WRITEONLY | D3DUSAGE_DYNAMIC, D3DPOOL_DEFAULT))
+#else
+	if (!m_pntVtxBuf.Create(m_rigidVtxCount, m_dwFvF, D3DUSAGE_WRITEONLY, D3DPOOL_MANAGED_EX_FIX))
+#endif
 		return false;
 
 	void* vertices;

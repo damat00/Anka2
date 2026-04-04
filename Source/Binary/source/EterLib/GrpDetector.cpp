@@ -4,11 +4,19 @@
 
 struct FIsEqualD3DDisplayMode
 {
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+	FIsEqualD3DDisplayMode(D3DDISPLAYMODEEX* pkD3DDMChk)
+	{
+		m_pkD3DDMChk = pkD3DDMChk;
+	}
+	BOOL operator() (D3DDISPLAYMODEEX& rkD3DDMTest)
+#else
 	FIsEqualD3DDisplayMode(D3DDISPLAYMODE* pkD3DDMChk)
 	{
 		m_pkD3DDMChk=pkD3DDMChk;
 	}
 	BOOL operator() (D3DDISPLAYMODE& rkD3DDMTest)
+#endif
 	{
 		if (rkD3DDMTest.Width!=m_pkD3DDMChk->Width)
 			return FALSE;
@@ -21,14 +29,22 @@ struct FIsEqualD3DDisplayMode
 
 		return TRUE;
 	}
-
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+	D3DDISPLAYMODEEX* m_pkD3DDMChk;
+#else
 	D3DDISPLAYMODE* m_pkD3DDMChk;
+#endif
 };
 
 static int CompareD3DDisplayModeOrder( const VOID* arg1, const VOID* arg2 )
 {
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+	D3DDISPLAYMODEEX* p1 = (D3DDISPLAYMODEEX*)arg1;
+	D3DDISPLAYMODEEX* p2 = (D3DDISPLAYMODEEX*)arg2;
+#else
     D3DDISPLAYMODE* p1 = (D3DDISPLAYMODE*)arg1;
     D3DDISPLAYMODE* p2 = (D3DDISPLAYMODE*)arg2;
+#endif
 
     if( p1->Format > p2->Format )   return -1;
     if( p1->Format < p2->Format )   return +1;
@@ -54,8 +70,11 @@ UINT D3D_CAdapterDisplayModeList::GetPixelFormatNum()
 	return m_uD3DFmtNum;
 }
 
-
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+const D3DDISPLAYMODEEX& D3D_CAdapterDisplayModeList::GetDisplayModer(UINT iD3DDM)
+#else
 const D3DDISPLAYMODE&	D3D_CAdapterDisplayModeList::GetDisplayModer(UINT iD3DDM)
+#endif
 {
 	assert(iD3DDM<m_uD3DDMNum);
 	return m_akD3DDM[iD3DDM];
@@ -68,12 +87,20 @@ const D3DFORMAT&		D3D_CAdapterDisplayModeList::GetPixelFormatr(UINT iD3DFmt)
 }
 
 #ifdef ENABLE_DIRECTX9_UPDATE
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+VOID D3D_CAdapterDisplayModeList::Build(IDirect3D9Ex& rkD3D, D3DFORMAT eD3DFmtDefault, UINT iD3DAdapterInfo)
+#else
 VOID D3D_CAdapterDisplayModeList::Build(IDirect3D9& rkD3D, D3DFORMAT eD3DFmtDefault, UINT iD3DAdapterInfo)
+#endif
 #else
 VOID D3D_CAdapterDisplayModeList::Build(IDirect3D8& rkD3D, D3DFORMAT eD3DFmtDefault, UINT iD3DAdapterInfo)
 #endif
 {
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+	D3DDISPLAYMODEEX* akD3DDM = m_akD3DDM;
+#else
 	D3DDISPLAYMODE* akD3DDM=m_akD3DDM;
+#endif
 	D3DFORMAT* aeD3DFmt=m_aeD3DFmt;
 
 	UINT uD3DDMNum=0;
@@ -82,32 +109,54 @@ VOID D3D_CAdapterDisplayModeList::Build(IDirect3D8& rkD3D, D3DFORMAT eD3DFmtDefa
 	aeD3DFmt[uD3DFmtNum++]=eD3DFmtDefault;
 
 #ifdef ENABLE_DIRECTX9_UPDATE
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+	D3DDISPLAYMODEFILTER filter = {};
+	filter.Size = sizeof(D3DDISPLAYMODEFILTER);
+	filter.Format = eD3DFmtDefault;
+	UINT uAdapterModeNum = rkD3D.GetAdapterModeCountEx(iD3DAdapterInfo, &filter);
+#else
     UINT uAdapterModeNum = rkD3D.GetAdapterModeCount(iD3DAdapterInfo, eD3DFmtDefault);
+#endif
 #else
     UINT uAdapterModeNum = rkD3D.GetAdapterModeCount(iD3DAdapterInfo);
 #endif
 
 	for (UINT iD3DAdapterInfoMode=0; iD3DAdapterInfoMode<uAdapterModeNum; iD3DAdapterInfoMode++)
 	{
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+		D3DDISPLAYMODEEX kD3DDMCur;
+		kD3DDMCur.Size = sizeof(D3DDISPLAYMODEEX);
+		rkD3D.EnumAdapterModesEx(iD3DAdapterInfo, &filter, iD3DAdapterInfoMode, &kD3DDMCur);
+#else
 		D3DDISPLAYMODE kD3DDMCur;
 #ifdef ENABLE_DIRECTX9_UPDATE
         rkD3D.EnumAdapterModes(iD3DAdapterInfo, eD3DFmtDefault, iD3DAdapterInfoMode, &kD3DDMCur);
 #else
         rkD3D.EnumAdapterModes(iD3DAdapterInfo, iD3DAdapterInfoMode, &kD3DDMCur);
 #endif
-
+#endif
 		// IsFilterOutLowResolutionMode
 		if( kD3DDMCur.Width  < FILTEROUT_LOWRESOLUTION_WIDTH || kD3DDMCur.Height < FILTEROUT_LOWRESOLUTION_HEIGHT )
 			continue;
 
 		// FindDisplayMode
-		D3DDISPLAYMODE* pkD3DDMEnd=akD3DDM+uD3DDMNum;
-		D3DDISPLAYMODE* pkD3DDMFind=std::find_if(akD3DDM, pkD3DDMEnd, FIsEqualD3DDisplayMode(&kD3DDMCur));
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+		D3DDISPLAYMODEEX* pkD3DDMEnd = akD3DDM + uD3DDMNum;
+		D3DDISPLAYMODEEX* pkD3DDMFind = std::find_if(akD3DDM, pkD3DDMEnd, FIsEqualD3DDisplayMode(&kD3DDMCur));
+#else
+		D3DDISPLAYMODE* pkD3DDMEnd = akD3DDM + uD3DDMNum;
+		D3DDISPLAYMODE* pkD3DDMFind = std::find_if(akD3DDM, pkD3DDMEnd, FIsEqualD3DDisplayMode(&kD3DDMCur));
+#endif
 
 		// IsNewDisplayMode
+		if (pkD3DDMFind == pkD3DDMEnd && uD3DDMNum < D3DDISPLAYMODE_MAX)
 		if (pkD3DDMFind==pkD3DDMEnd && uD3DDMNum<D3DDISPLAYMODE_MAX)
 		{
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+			D3DDISPLAYMODEEX& rkD3DDMNew = akD3DDM[uD3DDMNum++];
+#else
 			D3DDISPLAYMODE& rkD3DDMNew=akD3DDM[uD3DDMNum++];
+#endif
 			rkD3DDMNew.Width=kD3DDMCur.Width;
 			rkD3DDMNew.Height=kD3DDMCur.Height;
 			rkD3DDMNew.Format=kD3DDMCur.Format;
@@ -123,8 +172,11 @@ VOID D3D_CAdapterDisplayModeList::Build(IDirect3D8& rkD3D, D3DFORMAT eD3DFmtDefa
 			}
 		}
 	}
-
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+	qsort(akD3DDM, uD3DDMNum, sizeof(D3DDISPLAYMODEEX), CompareD3DDisplayModeOrder);
+#else
 	qsort(akD3DDM, uD3DDMNum, sizeof(D3DDISPLAYMODE), CompareD3DDisplayModeOrder);
+#endif
 
 	m_uD3DFmtNum=uD3DFmtNum;
 	m_uD3DDMNum=uD3DDMNum;
@@ -192,7 +244,11 @@ D3D_SModeInfo* D3D_CDeviceInfo::GetD3DModeInfop(UINT iD3D_SModeInfo)
 }
 
 #ifdef ENABLE_DIRECTX9_UPDATE
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+BOOL D3D_CDeviceInfo::FindDepthStencilFormat(IDirect3D9Ex& rkD3D, UINT iD3DAdapterInfo, D3DDEVTYPE DeviceType, D3DFORMAT TargetFormat, D3DFORMAT* pDepthStencilFormat)
+#else
 BOOL D3D_CDeviceInfo::FindDepthStencilFormat(IDirect3D9& rkD3D, UINT iD3DAdapterInfo, D3DDEVTYPE DeviceType, D3DFORMAT TargetFormat, D3DFORMAT* pDepthStencilFormat)
+#endif
 #else
 BOOL D3D_CDeviceInfo::FindDepthStencilFormat(IDirect3D8& rkD3D, UINT iD3DAdapterInfo, D3DDEVTYPE DeviceType, D3DFORMAT TargetFormat, D3DFORMAT* pDepthStencilFormat)
 #endif
@@ -288,7 +344,11 @@ BOOL D3D_CDeviceInfo::FindDepthStencilFormat(IDirect3D8& rkD3D, UINT iD3DAdapter
 }
 
 #ifdef ENABLE_DIRECTX9_UPDATE
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+BOOL D3D_CDeviceInfo::Build(IDirect3D9Ex& rkD3D, UINT iD3DAdapterInfo, UINT iDevType, D3D_CAdapterDisplayModeList& rkD3DADMList, BOOL(*pfnConfirmDevice) (D3DCAPS9& rkD3DCaps, UINT uBehavior, D3DFORMAT eD3DFmt))
+#else
 BOOL D3D_CDeviceInfo::Build(IDirect3D9& rkD3D, UINT iD3DAdapterInfo, UINT iDevType, D3D_CAdapterDisplayModeList& rkD3DADMList, BOOL(*pfnConfirmDevice)(D3DCAPS9& rkD3DCaps, UINT uBehavior, D3DFORMAT eD3DFmt))
+#endif
 #else
 BOOL D3D_CDeviceInfo::Build(IDirect3D8& rkD3D, UINT iD3DAdapterInfo, UINT iDevType, D3D_CAdapterDisplayModeList& rkD3DADMList, BOOL(*pfnConfirmDevice)(D3DCAPS8& rkD3DCaps, UINT uBehavior, D3DFORMAT eD3DFmt))
 #endif
@@ -427,7 +487,11 @@ BOOL D3D_CDeviceInfo::Build(IDirect3D8& rkD3D, UINT iD3DAdapterInfo, UINT iDevTy
 
 		for (UINT iD3DDM=0; iD3DDM<uD3DDMNum; ++iD3DDM)
 		{
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+			const D3DDISPLAYMODEEX& c_rkD3DDM = rkD3DADMList.GetDisplayModer(iD3DDM);
+#else
 			const D3DDISPLAYMODE& c_rkD3DDM=rkD3DADMList.GetDisplayModer(iD3DDM);
+#endif
 			for (DWORD iFmt=0; iFmt<uD3DFmtNum; ++iFmt)
 			{
 				if (rkD3DADMList.GetPixelFormatr(iFmt)==c_rkD3DDM.Format)
@@ -527,7 +591,18 @@ VOID D3D_CDeviceInfo::GetString(std::string* pstEnumList)
 }
 
 /////////////////////////////////////////////////////////////////////////////
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+D3DDISPLAYMODEEX& D3D_CAdapterInfo::GetDesktopD3DDisplayModer()
+{
+	return m_kD3DDMDesktop;
+}
 
+D3DDISPLAYMODEEX* D3D_CAdapterInfo::GetDesktopD3DDisplayModep()
+{
+	return &m_kD3DDMDesktop;
+}
+
+#else
 D3DDISPLAYMODE&	D3D_CAdapterInfo::GetDesktopD3DDisplayModer()
 {
 	return m_kD3DDMDesktop;
@@ -537,7 +612,7 @@ D3DDISPLAYMODE*	D3D_CAdapterInfo::GetDesktopD3DDisplayModep()
 {
 	return &m_kD3DDMDesktop;
 }
-
+#endif
 D3D_CDeviceInfo* D3D_CAdapterInfo::GetD3DDeviceInfop(UINT iD3DDevInfo)
 {
 	if (iD3DDevInfo >= m_uD3DDevInfoNum)
@@ -571,7 +646,22 @@ BOOL D3D_CAdapterInfo::Find(UINT uScrWidth, UINT uScrHeight, UINT uScrDepthBits,
 	}
 	return FALSE;
 }
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+BOOL D3D_CAdapterInfo::Build(IDirect3D9Ex& rkD3D, UINT iD3DAdapterInfo, PFNCONFIRMDEVICE pfnConfirmDevice)
+{
+	D3DDISPLAYMODEEX modeEx = {};
+	modeEx.Size = sizeof(D3DDISPLAYMODEEX);
+	if (FAILED(rkD3D.GetAdapterDisplayModeEx(iD3DAdapterInfo, &modeEx, NULL)))
+	{
+		return FALSE;
+	}
 
+	D3DDISPLAYMODEEX& rkD3DDMDesktop = m_kD3DDMDesktop;
+	rkD3DDMDesktop.Width = modeEx.Width;
+	rkD3DDMDesktop.Height = modeEx.Height;
+	rkD3DDMDesktop.Format = modeEx.Format;
+	rkD3DDMDesktop.RefreshRate = modeEx.RefreshRate;
+#else
 #ifdef ENABLE_DIRECTX9_UPDATE
 BOOL D3D_CAdapterInfo::Build(IDirect3D9& rkD3D, UINT iD3DAdapterInfo, PFNCONFIRMDEVICE pfnConfirmDevice)
 #else
@@ -581,6 +671,7 @@ BOOL D3D_CAdapterInfo::Build(IDirect3D8& rkD3D, UINT iD3DAdapterInfo, PFNCONFIRM
 	D3DDISPLAYMODE& rkD3DDMDesktop=m_kD3DDMDesktop;
 	if (FAILED(rkD3D.GetAdapterDisplayMode(iD3DAdapterInfo, &rkD3DDMDesktop)))
 		return FALSE;
+#endif
 
 #ifdef ENABLE_DIRECTX9_UPDATE
     rkD3D.GetAdapterIdentifier(iD3DAdapterInfo, D3DENUM_WHQL_LEVEL, &m_kD3DAdapterIdentifier);
@@ -672,7 +763,11 @@ BOOL D3D_CDisplayModeAutoDetector::Find(UINT uScrWidth, UINT uScrHeight, UINT uS
 }
 
 #ifdef ENABLE_DIRECTX9_UPDATE
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+BOOL D3D_CDisplayModeAutoDetector::Build(IDirect3D9Ex& rkD3D, PFNCONFIRMDEVICE pfnConfirmDevice)
+#else
 BOOL D3D_CDisplayModeAutoDetector::Build(IDirect3D9& rkD3D, PFNCONFIRMDEVICE pfnConfirmDevice)
+#endif
 #else
 BOOL D3D_CDisplayModeAutoDetector::Build(IDirect3D8& rkD3D, PFNCONFIRMDEVICE pfnConfirmDevice)
 #endif

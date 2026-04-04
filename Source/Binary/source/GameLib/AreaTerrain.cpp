@@ -786,8 +786,13 @@ LPDIRECT3DTEXTURE8 CTerrain::AddTexture32(BYTE byImageNum, BYTE * pbyImage, long
 	UINT uiNewWidth = 256;
 	UINT uiNewHeight = 256;
 	hr = ms_lpd3dDevice->CreateTexture(
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+		uiNewWidth, uiNewHeight, 5, D3DUSAGE_DYNAMIC,
+		format, D3DPOOL_DEFAULT, & pkTex, nullptr);
+#else
 		uiNewWidth, uiNewHeight, 5, 0, 
-		format, D3DPOOL_MANAGED, &pkTex, NULL);
+		format, D3DPOOL_MANAGED_EX_FIX, &pkTex, NULL);
+#endif
 #else
 	IDirect3DTexture8* pkTex=NULL;
 
@@ -795,7 +800,7 @@ LPDIRECT3DTEXTURE8 CTerrain::AddTexture32(BYTE byImageNum, BYTE * pbyImage, long
 	UINT uiNewHeight = 256;
 	hr = ms_lpd3dDevice->CreateTexture(
 		uiNewWidth, uiNewHeight, 5, 0, 
-		format, D3DPOOL_MANAGED, &pkTex);
+		format, D3DPOOL_MANAGED_EX_FIX, &pkTex);
 #endif
 	if (FAILED(hr))
 	{
@@ -1166,9 +1171,13 @@ void CTerrain::AllocateMarkedSplats(BYTE * pbyAlphaMap)
 	do
 	{
 #ifdef ENABLE_DIRECTX9_UPDATE
-		hr = ms_lpd3dDevice->CreateTexture(ATTRMAP_XSIZE, ATTRMAP_YSIZE, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &m_lpMarkedTexture, NULL);
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+		hr = ms_lpd3dDevice->CreateTexture(ATTRMAP_XSIZE, ATTRMAP_YSIZE, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_lpMarkedTexture, nullptr);
 #else
-		hr = ms_lpd3dDevice->CreateTexture(ATTRMAP_XSIZE, ATTRMAP_YSIZE, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &m_lpMarkedTexture);
+		hr = ms_lpd3dDevice->CreateTexture(ATTRMAP_XSIZE, ATTRMAP_YSIZE, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED_EX_FIX, &m_lpMarkedTexture, NULL);
+#endif
+#else
+		hr = ms_lpd3dDevice->CreateTexture(ATTRMAP_XSIZE, ATTRMAP_YSIZE, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED_EX_FIX, &m_lpMarkedTexture);
 #endif
 	} while(FAILED(hr));
 

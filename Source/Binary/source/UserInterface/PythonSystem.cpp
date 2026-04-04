@@ -28,7 +28,34 @@ void CPythonSystem::GetDisplaySettings()
 #ifdef ENABLE_DIRECTX9_UPDATE
 	memset(m_ResolutionList, 0, sizeof(TResolution) * RESOLUTION_MAX_NUM);
 	m_ResolutionCount = 0;
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+	LPDIRECT3D9EX lpD3D = CPythonGraphic::Instance().GetD3D();
 
+	D3DADAPTER_IDENTIFIER9 d3dAdapterIdentifier;
+	D3DDISPLAYMODEEX d3ddmDesktop = {};
+	d3ddmDesktop.Size = sizeof(D3DDISPLAYMODEEX);
+
+	lpD3D->GetAdapterIdentifier(D3DADAPTER_DEFAULT, D3DENUM_WHQL_LEVEL, &d3dAdapterIdentifier);
+	lpD3D->GetAdapterDisplayModeEx(D3DADAPTER_DEFAULT, &d3ddmDesktop, nullptr);
+
+	D3DDISPLAYMODEFILTER filter = {};
+	filter.Size = sizeof(D3DDISPLAYMODEFILTER);
+	filter.Format = d3ddmDesktop.Format;
+
+	DWORD dwNumAdapterModes = lpD3D->GetAdapterModeCountEx(D3DADAPTER_DEFAULT, &filter);
+
+
+	for (UINT iMode = 0; iMode < dwNumAdapterModes; iMode++)
+	{
+		D3DDISPLAYMODEFILTER filter = {};
+		filter.Size = sizeof(D3DDISPLAYMODEFILTER);
+		filter.Format = d3ddmDesktop.Format;
+
+		D3DDISPLAYMODEEX DisplayMode = {};
+		DisplayMode.Size = sizeof(D3DDISPLAYMODEEX);
+
+		lpD3D->EnumAdapterModesEx(D3DADAPTER_DEFAULT, &filter, iMode, &DisplayMode);
+#else
 	LPDIRECT3D9 lpD3D = CPythonGraphic::Instance().GetD3D();
 
 	D3DADAPTER_IDENTIFIER9 d3dAdapterIdentifier;
@@ -43,6 +70,7 @@ void CPythonSystem::GetDisplaySettings()
 	{
 		D3DDISPLAYMODE DisplayMode;
 		lpD3D->EnumAdapterModes(0, d3ddmDesktop.Format, iMode, &DisplayMode);
+#endif
 #else
 	memset(m_ResolutionList, 0, sizeof(TResolution) * RESOLUTION_MAX_NUM);
 	m_ResolutionCount = 0;

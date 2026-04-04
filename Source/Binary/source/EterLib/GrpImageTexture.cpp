@@ -50,22 +50,38 @@ bool CGraphicImageTexture::CreateDeviceObjects()
 
     if (m_stFileName.empty())
     {
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+		DWORD usage = 0;
+		if (m_d3dFmt == D3DFMT_A8R8G8B8 || m_d3dFmt == D3DFMT_A4R4G4B4)
+			usage = D3DUSAGE_DYNAMIC;
+#endif
 #ifdef ENABLE_DIRECTX9_UPDATE
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+		if (FAILED(ms_lpd3dDevice->CreateTexture(m_width
+													, m_height
+													, 1
+													, usage
+													, m_d3dFmt
+													, D3DPOOL_DEFAULT
+													, & m_lpd3dTexture
+													, nullptr)))
+#else
         if (FAILED(ms_lpd3dDevice->CreateTexture(m_width
                                                     , m_height
                                                     , 1
-                                                    , 0
-                                                    , m_d3dFmt
-                                                    , D3DPOOL_MANAGED
+													, 0
+													, m_d3dFmt
+                                                    , D3DPOOL_MANAGED_EX_FIX
                                                     , &m_lpd3dTexture
                                                     , nullptr)))
+#endif
 #else
         if (FAILED(ms_lpd3dDevice->CreateTexture(m_width
                                                     , m_height
                                                     , 1
                                                     , 0
                                                     , m_d3dFmt
-                                                    , D3DPOOL_MANAGED
+                                                    , D3DPOOL_MANAGED_EX_FIX
                                                     , &m_lpd3dTexture)))
 #endif
         {
@@ -129,7 +145,7 @@ bool CGraphicImageTexture::CreateDDSTexture(CDXTCImage & image, const BYTE * /*c
 
 	D3DFORMAT format;
 	LPDIRECT3DTEXTURE8 lpd3dTexture;
-	D3DPOOL pool = ms_bSupportDXT ? D3DPOOL_MANAGED : D3DPOOL_SCRATCH;;
+	D3DPOOL pool = ms_bSupportDXT ? D3DPOOL_MANAGED_EX_FIX : D3DPOOL_SCRATCH;;
 
 	if(image.m_CompFormat == PF_DXT5)
 		format = D3DFMT_DXT5;
@@ -199,7 +215,11 @@ bool CGraphicImageTexture::CreateDDSTexture(CDXTCImage & image, const BYTE * /*c
 		}
 
 		if (FAILED(D3DXCreateTexture(	ms_lpd3dDevice, imgWidth, imgHeight,
-										mipmapCount, 0, format, D3DPOOL_MANAGED, &m_lpd3dTexture)))
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+										mipmapCount, D3DUSAGE_DYNAMIC, format, D3DPOOL_DEFAULT, & lpd3dTexture)))
+#else
+										mipmapCount, 0, format, D3DPOOL_MANAGED_EX_FIX, &m_lpd3dTexture)))
+#endif
 		{
 				TraceError("CreateDDSTexture: Cannot creatre texture");
 				return false;
@@ -252,7 +272,7 @@ bool CGraphicImageTexture::CreateFromMemoryFile(UINT bufSize, const void * c_pvB
                                                     , (const uint8_t *)c_pvBuf
                                                     , bufSize
                                                     , 0
-                                                    , D3DPOOL_MANAGED
+                                                    , D3DPOOL_MANAGED_EX_FIX
                                                     , false
                                                     , &m_lpd3dTexture);
 
@@ -267,7 +287,7 @@ bool CGraphicImageTexture::CreateFromMemoryFile(UINT bufSize, const void * c_pvB
                                                         , 1
                                                         , 0
                                                         , m_d3dFmt
-                                                        , D3DPOOL_MANAGED
+                                                        , D3DPOOL_MANAGED_EX_FIX
                                                         , D3DX_FILTER_NONE
                                                         , D3DX_FILTER_NONE
                                                         , 0xffff00ff
@@ -313,6 +333,24 @@ bool CGraphicImageTexture::CreateFromMemoryFile(UINT bufSize, const void * c_pvB
         }
 //#endif
 
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+		if (FAILED(D3DXCreateTextureFromFileInMemoryEx(
+					ms_lpd3dDevice,
+					c_pvBuf,
+					bufSize,
+					imageInfo.Width,
+					imageInfo.Height,
+					D3DPOOL_DEFAULT,
+					0,
+					d3dFmt,
+					D3DPOOL_MANAGED_EX_FIX,
+					dwFilter,
+					dwFilter,
+					0xffff00ff,
+					& imageInfo,
+					nullptr,
+					& m_lpd3dTexture)))
+#else
         if (FAILED(D3DXCreateTextureFromFileInMemoryEx(
                     ms_lpd3dDevice,
                     c_pvBuf,
@@ -324,13 +362,14 @@ bool CGraphicImageTexture::CreateFromMemoryFile(UINT bufSize, const void * c_pvB
                     D3DX_DEFAULT,
                     0,
                     d3dFmt,
-                    D3DPOOL_MANAGED,
+                    D3DPOOL_MANAGED_EX_FIX,
                     dwFilter,
                     dwFilter,
                     0xffff00ff,
                     &imageInfo,
                     nullptr,
                     &m_lpd3dTexture)))
+#endif
         {
             TraceError("CreateFromMemoryFile: Cannot create texture");
             return false;
@@ -383,7 +422,7 @@ bool CGraphicImageTexture::CreateFromMemoryFile(UINT bufSize, const void * c_pvB
 				imageInfo.MipLevels,
 				0,
 				format,
-				D3DPOOL_MANAGED,
+				D3DPOOL_MANAGED_EX_FIX,
 				&pkTexDst)))
 			{
 				m_lpd3dTexture=pkTexDst;

@@ -28,8 +28,13 @@ HWND CGraphicBase::ms_hWnd;
 HDC CGraphicBase::ms_hDC;
 
 #ifdef ENABLE_DIRECTX9_UPDATE
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+LPDIRECT3D9EX           CGraphicBase::ms_lpd3d = nullptr;
+LPDIRECT3DDEVICE9EX     CGraphicBase::ms_lpd3dDevice = nullptr;
+#else
 LPDIRECT3D9 CGraphicBase::ms_lpd3d = nullptr;
 LPDIRECT3DDEVICE9 CGraphicBase::ms_lpd3dDevice = nullptr;
+#endif
 #else
 LPDIRECT3D8 CGraphicBase::ms_lpd3d = nullptr;
 LPDIRECT3DDEVICE8 CGraphicBase::ms_lpd3dDevice = nullptr;

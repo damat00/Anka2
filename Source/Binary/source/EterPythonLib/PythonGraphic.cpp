@@ -10,7 +10,11 @@ void CPythonGraphic::Destroy()
 }
 
 #ifdef ENABLE_DIRECTX9_UPDATE
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+LPDIRECT3D9EX CPythonGraphic::GetD3D()
+#else
 LPDIRECT3D9 CPythonGraphic::GetD3D()
+#endif
 #else
 LPDIRECT3D8 CPythonGraphic::GetD3D()
 #endif

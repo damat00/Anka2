@@ -19,7 +19,11 @@ class CPythonGraphic : public CScreen, public CSingleton<CPythonGraphic>
 		void PopState();
 
 #ifdef ENABLE_DIRECTX9_UPDATE
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+		LPDIRECT3D9EX GetD3D();
+#else
 		LPDIRECT3D9 GetD3D();
+#endif
 #else
 		LPDIRECT3D8 GetD3D();
 #endif

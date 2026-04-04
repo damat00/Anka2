@@ -119,17 +119,26 @@ bool CGraphicIndexBuffer::Create(int faceCount, TFace* faces)
 bool CGraphicIndexBuffer::CreateDeviceObjects()
 {
 #ifdef ENABLE_DIRECTX9_UPDATE
-    if (FAILED(ms_lpd3dDevice->CreateIndexBuffer(m_dwBufferSize
-                                                    , D3DUSAGE_WRITEONLY
-                                                    , m_d3dFmt
-                                                    , D3DPOOL_MANAGED
-                                                    , &m_lpd3dIdxBuf
-                                                    , nullptr)))
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+	if (FAILED(ms_lpd3dDevice->CreateIndexBuffer(m_dwBufferSize
+													, D3DUSAGE_WRITEONLY
+													, m_d3dFmt
+													, D3DPOOL_DEFAULT
+													, & m_lpd3dIdxBuf
+													, nullptr)))
 #else
     if (FAILED(ms_lpd3dDevice->CreateIndexBuffer(m_dwBufferSize
                                                     , D3DUSAGE_WRITEONLY
                                                     , m_d3dFmt
-                                                    , D3DPOOL_MANAGED
+                                                    , D3DPOOL_MANAGED_EX_FIX
+                                                    , &m_lpd3dIdxBuf
+                                                    , nullptr)))
+#endif
+#else
+    if (FAILED(ms_lpd3dDevice->CreateIndexBuffer(m_dwBufferSize
+                                                    , D3DUSAGE_WRITEONLY
+                                                    , m_d3dFmt
+                                                    , D3DPOOL_MANAGED_EX_FIX
                                                     , &m_lpd3dIdxBuf)))
 #endif
     {

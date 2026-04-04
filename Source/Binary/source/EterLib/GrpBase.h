@@ -262,8 +262,13 @@ class CGraphicBase
 		static HDC						ms_hDC;
 
 #ifdef ENABLE_DIRECTX9_UPDATE
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+		static LPDIRECT3D9EX			ms_lpd3d;
+		static LPDIRECT3DDEVICE9EX		ms_lpd3dDevice;
+#else
 		static LPDIRECT3D9				ms_lpd3d;
 		static LPDIRECT3DDEVICE9		ms_lpd3dDevice;
+#endif
 #else
         static LPDIRECT3D8				ms_lpd3d;
         static LPDIRECT3DDEVICE8		ms_lpd3dDevice;

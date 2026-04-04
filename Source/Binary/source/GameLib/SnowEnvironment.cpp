@@ -387,17 +387,26 @@ bool CSnowEnvironment::__CreateGeometry()
     }
 
 #ifdef ENABLE_DIRECTX9_UPDATE
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+	if (FAILED(ms_lpd3dDevice->CreateIndexBuffer(sizeof(WORD) * m_dwParticleMaxNum * 6
+													, D3DUSAGE_WRITEONLY
+													, D3DFMT_INDEX16
+													, D3DPOOL_DEFAULT
+													, & m_pIB
+													, nullptr)))
+#else
     if (FAILED(ms_lpd3dDevice->CreateIndexBuffer(sizeof(WORD) * m_dwParticleMaxNum * 6
                                                     , D3DUSAGE_WRITEONLY
                                                     , D3DFMT_INDEX16
-                                                    , D3DPOOL_MANAGED
+                                                    , D3DPOOL_MANAGED_EX_FIX
                                                     , &m_pIB
                                                     , nullptr)))
+#endif
 #else
 	if (FAILED(ms_lpd3dDevice->CreateIndexBuffer(sizeof(WORD)*m_dwParticleMaxNum*6,
 										   D3DUSAGE_WRITEONLY,
 										   D3DFMT_INDEX16,
-										   D3DPOOL_MANAGED,
+										   D3DPOOL_MANAGED_EX_FIX,
 										   &m_pIB)))
 #endif
     {

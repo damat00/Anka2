@@ -3,7 +3,11 @@
 
 bool CStaticVertexBuffer::Create(int vtxCount, DWORD fvf, bool /*isManaged*/)
 {
-	return CGraphicVertexBuffer::Create(vtxCount, fvf, D3DUSAGE_WRITEONLY, D3DPOOL_MANAGED);
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+	return CGraphicVertexBuffer::Create(vtxCount, fvf, D3DUSAGE_WRITEONLY, D3DPOOL_DEFAULT);
+#else
+	return CGraphicVertexBuffer::Create(vtxCount, fvf, D3DUSAGE_WRITEONLY, D3DPOOL_MANAGED_EX_FIX);
+#endif
 }
 
 CStaticVertexBuffer::CStaticVertexBuffer()

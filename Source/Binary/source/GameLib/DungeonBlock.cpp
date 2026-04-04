@@ -237,7 +237,7 @@ bool CDungeonBlock::Load(const char * c_szFileName)
 			dwVertexCount,
 			D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1,
 			D3DUSAGE_WRITEONLY,
-			D3DPOOL_MANAGED);
+			D3DPOOL_MANAGED_EX_FIX);
 		m_ModelInstanceContainer.push_back(pModelInstance);
 	}
 

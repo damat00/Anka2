@@ -233,9 +233,12 @@ void CGrannyModelInstance::__CreateDynamicVertexBuffer()
 
 	if (0 != vtxCount)
 	{
-		if (!m_kLocalDeformableVertexBuffer.Create(vtxCount,
-									   D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1,									   
-									   D3DUSAGE_WRITEONLY, D3DPOOL_MANAGED
+		if (!m_kLocalDeformableVertexBuffer.Create(vtxCount,D3DFVF_XYZ|D3DFVF_NORMAL|D3DFVF_TEX1,
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+										D3DUSAGE_WRITEONLY | D3DUSAGE_DYNAMIC, D3DPOOL_DEFAULT
+#else
+										D3DUSAGE_WRITEONLY, D3DPOOL_MANAGED_EX_FIX
+#endif
 		))
 			return;
 	}

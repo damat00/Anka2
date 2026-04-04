@@ -806,7 +806,11 @@ BOOL CScreen::IsLostDevice()
     }
 
 #ifdef ENABLE_DIRECTX9_UPDATE
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+	IDirect3DDevice9Ex& rkD3DDev = *ms_lpd3dDevice;
+#else
     IDirect3DDevice9& rkD3DDev = *ms_lpd3dDevice;
+#endif
 #else
     IDirect3DDevice8& rkD3DDev = *ms_lpd3dDevice;
 #endif
@@ -830,8 +834,13 @@ BOOL CScreen::RestoreDevice()
     UINT iD3DAdapterInfo = ms_iD3DAdapterInfo;
 
 #ifdef ENABLE_DIRECTX9_UPDATE
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+	IDirect3D9Ex& rkD3D = *ms_lpd3d;
+	IDirect3DDevice9Ex& rkD3DDev = *ms_lpd3dDevice;
+#else
     IDirect3D9& rkD3D = *ms_lpd3d;
     IDirect3DDevice9& rkD3DDev = *ms_lpd3dDevice;
+#endif
 #else
     IDirect3D8& rkD3D = *ms_lpd3d;
     IDirect3DDevice8& rkD3DDev = *ms_lpd3dDevice;
@@ -855,7 +864,18 @@ BOOL CScreen::RestoreDevice()
             {
                 return FALSE;
             }
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+			D3DDISPLAYMODEEX d3dDisplayModeEx = {};
+			d3dDisplayModeEx.Size = sizeof(D3DDISPLAYMODEEX);
 
+			if (FAILED(rkD3D.GetAdapterDisplayModeEx(iD3DAdapterInfo, &d3dDisplayModeEx, NULL)))
+			{
+				return FALSE;
+			}
+
+			rkD3DPP.BackBufferFormat = d3dDisplayModeEx.Format;
+
+#else
             D3DDISPLAYMODE & rkD3DDMDesktop = pkD3DAdapterInfo->GetDesktopD3DDisplayModer();
             if (FAILED(rkD3D.GetAdapterDisplayMode(iD3DAdapterInfo, &rkD3DDMDesktop)))
             {
@@ -863,7 +883,7 @@ BOOL CScreen::RestoreDevice()
             }
 
             rkD3DPP.BackBufferFormat = rkD3DDMDesktop.Format;
-
+#endif
             HRESULT hrReset = rkD3DDev.Reset(&rkD3DPP);
             if (FAILED(hrReset))
             {

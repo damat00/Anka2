@@ -391,6 +391,18 @@ bool CGraphicDevice::Reset()
 {
     HRESULT hr;
 #ifdef ENABLE_FIX_MOBS_LAG
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+    D3DDISPLAYMODEEX displayMode = {};
+    displayMode.Size = sizeof(D3DDISPLAYMODEEX);
+    displayMode.Width = ms_d3dPresentParameter.BackBufferWidth;
+    displayMode.Height = ms_d3dPresentParameter.BackBufferHeight;
+    displayMode.Format = ms_d3dPresentParameter.BackBufferFormat;
+    displayMode.RefreshRate = ms_d3dPresentParameter.FullScreen_RefreshRateInHz;
+    displayMode.ScanLineOrdering = D3DSCANLINEORDERING_PROGRESSIVE;
+
+    hr = ms_lpd3dDevice->ResetEx(&ms_d3dPresentParameter, &displayMode);
+    return SUCCEEDED(hr);
+#else
     if (FAILED(hr = ms_lpd3dDevice->TestCooperativeLevel()))
     {
         if (hr == D3DERR_DEVICELOST)
@@ -415,6 +427,19 @@ bool CGraphicDevice::Reset()
     }
 
     return true;
+#endif
+#else
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+    D3DDISPLAYMODEEX displayMode = {};
+    displayMode.Size = sizeof(D3DDISPLAYMODEEX);
+    displayMode.Width = ms_d3dPresentParameter.BackBufferWidth;
+    displayMode.Height = ms_d3dPresentParameter.BackBufferHeight;
+    displayMode.Format = ms_d3dPresentParameter.BackBufferFormat;
+    displayMode.RefreshRate = ms_d3dPresentParameter.FullScreen_RefreshRateInHz;
+    displayMode.ScanLineOrdering = D3DSCANLINEORDERING_PROGRESSIVE;
+
+    hr = ms_lpd3dDevice->ResetEx(&ms_d3dPresentParameter, &displayMode);
+    return SUCCEEDED(hr);
 #else
     if (FAILED(hr = ms_lpd3dDevice->Reset(&ms_d3dPresentParameter)))
     {
@@ -422,6 +447,7 @@ bool CGraphicDevice::Reset()
     }
 
     return true;
+#endif
 #endif
 }
 
@@ -548,7 +574,13 @@ int CGraphicDevice::Create(HWND hWnd, int iHres, int iVres, bool Windowed, int /
 
     ms_hWnd = hWnd;
     ms_hDC = GetDC(hWnd);
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+    ms_lpd3d = nullptr;
+    HRESULT hrEx = Direct3DCreate9Ex(D3D_SDK_VERSION, &ms_lpd3d);
 
+    if (FAILED(hrEx) || !ms_lpd3d)
+
+#else
 #ifdef ENABLE_DIRECTX9_UPDATE
     ms_lpd3d = Direct3DCreate9(D3D_SDK_VERSION);
 #else
@@ -556,6 +588,7 @@ int CGraphicDevice::Create(HWND hWnd, int iHres, int iVres, bool Windowed, int /
 #endif
 
     if (!ms_lpd3d)
+#endif
     {
         return CREATE_NO_DIRECTX;
     }
@@ -656,7 +689,9 @@ RETRY:
 #endif
         ms_d3dPresentParameter.BackBufferFormat = pkD3DModeInfo->m_eD3DFmtPixel;
     }
-
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+    ms_d3dPresentParameter.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+#endif
 #ifndef ENABLE_DIRECTX9_UPDATE
     ms_d3dPresentParameter.Flags = D3DPRESENTFLAG_LOCKABLE_BACKBUFFER;
 #endif
@@ -668,14 +703,58 @@ RETRY:
 #endif
     ms_dwD3DBehavior = pkD3DModeInfo->m_dwD3DBehavior;
 
-	if (FAILED(ms_hLastResult = ms_lpd3d->CreateDevice(
-				ms_iD3DAdapterInfo,
-				D3DDEVTYPE_HAL,
-				hWnd,
-				pkD3DModeInfo->m_dwD3DBehavior,
-				&ms_d3dPresentParameter,
-				&ms_lpd3dDevice)))
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+    D3DDISPLAYMODEEX fmEx;
+    ZeroMemory(&fmEx, sizeof(fmEx));
+    if (!Windowed)
+    {
+        fmEx.Size = sizeof(D3DDISPLAYMODEEX);
+        fmEx.Width = iHres;
+        fmEx.Height = iVres;
+        fmEx.RefreshRate = iReflashRate;
+        fmEx.Format = pkD3DModeInfo->m_eD3DFmtPixel;
+        fmEx.ScanLineOrdering = D3DSCANLINEORDERING_PROGRESSIVE;
+    }
+
+    // Use CreateDeviceEx when available
+    ms_hLastResult = ms_lpd3d->CreateDeviceEx(
+        ms_iD3DAdapterInfo,
+        D3DDEVTYPE_HAL,
+        hWnd,
+        pkD3DModeInfo->m_dwD3DBehavior,
+        &ms_d3dPresentParameter,
+        Windowed ? nullptr : &fmEx,
+        &ms_lpd3dDevice);
+#else
+    // Fallback to CreateDevice for non-Ex builds
+    ms_hLastResult = ms_lpd3d->CreateDevice(
+        ms_iD3DAdapterInfo,
+        D3DDEVTYPE_HAL,
+        hWnd,
+        pkD3DModeInfo->m_dwD3DBehavior,
+        &ms_d3dPresentParameter,
+        &ms_lpd3dDevice);
+#endif
+
+    if (FAILED(ms_hLastResult))
 	{
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+        switch (ms_hLastResult)
+        {
+        case D3DERR_INVALIDCALL:
+            Tracen("IDirect3DDevice.CreateDeviceEx - ERROR D3DERR_INVALIDCALL\nThe method call is invalid. For example, a method's parameter may have an invalid value.");
+            break;
+        case D3DERR_NOTAVAILABLE:
+            Tracen("IDirect3DDevice.CreateDeviceEx - ERROR D3DERR_NOTAVAILABLE\nThis device does not support the queried technique. ");
+            break;
+        case D3DERR_OUTOFVIDEOMEMORY:
+            Tracen("IDirect3DDevice.CreateDeviceEx - ERROR D3DERR_OUTOFVIDEOMEMORY\nDirect3D does not have enough display memory to perform the operation");
+            break;
+        default:
+            Tracenf("IDirect3DDevice.CreateDeviceEx - ERROR %d", ms_hLastResult);
+            break;
+        }
+#else
 		switch (ms_hLastResult)
 		{
 			case D3DERR_INVALIDCALL:
@@ -691,7 +770,7 @@ RETRY:
 				Tracenf("IDirect3DDevice.CreateDevice - ERROR %d", ms_hLastResult);
 				break;
 		}
-
+#endif
 		if (ErrorCorrection)
 			return CREATE_DEVICE;
 
@@ -935,7 +1014,7 @@ bool CGraphicDevice::__CreateDefaultIndexBuffer(UINT eDefIB, UINT uIdxCount, con
     if (FAILED(ms_lpd3dDevice->CreateIndexBuffer(sizeof(WORD)*uIdxCount
                                                     , D3DUSAGE_WRITEONLY
                                                     , D3DFMT_INDEX16
-                                                    , D3DPOOL_MANAGED
+                                                    , D3DPOOL_MANAGED_EX_FIX
                                                     , &ms_alpd3dDefIB[eDefIB]
                                                     , nullptr)))
     {
@@ -954,7 +1033,7 @@ bool CGraphicDevice::__CreateDefaultIndexBuffer(UINT eDefIB, UINT uIdxCount, con
     if (FAILED(ms_lpd3dDevice->CreateIndexBuffer(sizeof(WORD) * uIdxCount
                                                     , D3DUSAGE_WRITEONLY
                                                     , D3DFMT_INDEX16
-                                                    , D3DPOOL_MANAGED
+                                                    , D3DPOOL_MANAGED_EX_FIX
                                                     , &ms_alpd3dDefIB[eDefIB])))
     {
         return false;

@@ -868,8 +868,11 @@ bool CPythonMiniMap::Create()
 	LPMINIMAPVERTEX lpMiniMapVertex;
 	LPMINIMAPVERTEX lpOrigMiniMapVertex;
 #pragma pack(pop)
-
-	if (!m_VertexBuffer.Create(36, D3DFVF_XYZ | D3DFVF_TEX1, D3DUSAGE_WRITEONLY, D3DPOOL_MANAGED) )
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+	if (!m_VertexBuffer.Create(36, D3DFVF_XYZ | D3DFVF_TEX1, D3DUSAGE_WRITEONLY, D3DPOOL_DEFAULT))
+#else
+	if (!m_VertexBuffer.Create(36, D3DFVF_XYZ | D3DFVF_TEX1, D3DUSAGE_WRITEONLY, D3DPOOL_MANAGED_EX_FIX) )
+#endif
 	{
 		return false;
 	}

@@ -39,15 +39,22 @@ class D3D_CAdapterDisplayModeList
 		~D3D_CAdapterDisplayModeList() {}
 
 #ifdef ENABLE_DIRECTX9_UPDATE
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+		VOID Build (IDirect3D9Ex& rkD3D, D3DFORMAT eD3DFmtDefault, UINT iAdapter);
+#else
 		VOID Build(IDirect3D9& rkD3D, D3DFORMAT eD3DFmtDefault, UINT iAdapter);
+#endif
 #else
 		VOID Build(IDirect3D8& rkD3D, D3DFORMAT eD3DFmtDefault, UINT iAdapter);
 #endif
 
 		UINT GetDisplayModeNum();
 		UINT GetPixelFormatNum();
-
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+		const D3DDISPLAYMODEEX&	GetDisplayModer(UINT iD3DDM);
+#else
 		const D3DDISPLAYMODE&	GetDisplayModer(UINT iD3DDM);
+#endif
 		const D3DFORMAT&		GetPixelFormatr(UINT iD3DFmt);
 
 	protected:
@@ -61,7 +68,11 @@ class D3D_CAdapterDisplayModeList
 		};
 
 	protected:
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+		D3DDISPLAYMODEEX m_akD3DDM[D3DDISPLAYMODE_MAX];
+#else
 		D3DDISPLAYMODE m_akD3DDM[D3DDISPLAYMODE_MAX];
+#endif
 		D3DFORMAT m_aeD3DFmt[D3DFORMAT_MAX];
 
 		UINT m_uD3DDMNum;
@@ -76,7 +87,11 @@ class D3D_CDeviceInfo
 		~D3D_CDeviceInfo() {}
 
 #ifdef ENABLE_DIRECTX9_UPDATE
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+		BOOL Build(IDirect3D9Ex& rkD3D, UINT iAdapter, UINT iDevType, D3D_CAdapterDisplayModeList& rkD3DADMList, PFNCONFIRMDEVICE pfnConfirmDevice);
+#else
 		BOOL Build(IDirect3D9& rkD3D, UINT iAdapter, UINT iDevType, D3D_CAdapterDisplayModeList& rkD3DADMList, PFNCONFIRMDEVICE pfnConfirmDevice);
+#endif
 #else
 		BOOL Build(IDirect3D8& rkD3D, UINT iAdapter, UINT iDevType, D3D_CAdapterDisplayModeList& rkD3DADMList, PFNCONFIRMDEVICE pfnConfirmDevice);
 #endif
@@ -88,7 +103,11 @@ class D3D_CDeviceInfo
 		VOID GetString(std::string* pstEnumList);
 
 #ifdef ENABLE_DIRECTX9_UPDATE
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+		BOOL FindDepthStencilFormat(IDirect3D9Ex& rkD3D, UINT iAdapter, D3DDEVTYPE DeviceType, D3DFORMAT TargetFormat, D3DFORMAT* pDepthStencilFormat);
+#else
 		BOOL FindDepthStencilFormat(IDirect3D9& rkD3D, UINT iAdapter, D3DDEVTYPE DeviceType, D3DFORMAT TargetFormat, D3DFORMAT* pDepthStencilFormat);
+#endif
 #else
 		BOOL FindDepthStencilFormat(IDirect3D8& rkD3D, UINT iAdapter, D3DDEVTYPE DeviceType, D3DFORMAT TargetFormat, D3DFORMAT* pDepthStencilFormat);
 #endif
@@ -138,7 +157,11 @@ class D3D_CAdapterInfo
 		BOOL Find(UINT uScrWidth, UINT uScrHeight, UINT uScrDepthBits, BOOL isWindowed, UINT* piD3DModeInfo, UINT* piD3DDevInfo);
 
 #ifdef ENABLE_DIRECTX9_UPDATE
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+		BOOL Build(IDirect3D9Ex& rkD3D, UINT iAdapter, PFNCONFIRMDEVICE pfnConfirmDevice);
+#else
 		BOOL Build(IDirect3D9& rkD3D, UINT iAdapter, PFNCONFIRMDEVICE pfnConfirmDevice);
+#endif
 #else
 		BOOL Build(IDirect3D8& rkD3D, UINT iAdapter, PFNCONFIRMDEVICE pfnConfirmDevice);
 #endif
@@ -153,9 +176,14 @@ class D3D_CAdapterInfo
 		{
 			return m_kD3DAdapterIdentifier;
 		}
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+		D3DDISPLAYMODEEX& GetDesktopD3DDisplayModer();
+		D3DDISPLAYMODEEX* GetDesktopD3DDisplayModep();
 
+#else
 		D3DDISPLAYMODE&	GetDesktopD3DDisplayModer();
 		D3DDISPLAYMODE*	GetDesktopD3DDisplayModep();
+#endif
 
 		D3D_CDeviceInfo*	GetD3DDeviceInfop(UINT iD3DDevInfo);
 		D3D_SModeInfo*		GetD3DModeInfop(UINT iD3DDevInfo, UINT iD3DModeInfo);
@@ -173,7 +201,11 @@ class D3D_CAdapterInfo
 #else
 		D3DADAPTER_IDENTIFIER8	m_kD3DAdapterIdentifier;
 #endif
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+		D3DDISPLAYMODEEX        m_kD3DDMDesktop;
+#else
 		D3DDISPLAYMODE			m_kD3DDMDesktop;
+#endif
 
 		UINT			m_iCurD3DDevInfo;
 		UINT			m_uD3DDevInfoNum;
@@ -190,7 +222,11 @@ class D3D_CDisplayModeAutoDetector
 		BOOL Find(UINT uScrWidth, UINT uScrHeight, UINT uScrDepthBits, BOOL isWindowed, UINT* piD3DModeInfo, UINT* piD3DDevInfo, UINT* piD3DAdapterInfo);
 
 #ifdef ENABLE_DIRECTX9_UPDATE
+#ifdef ENABLE_DIRECTX9EX_UPDATE
+		BOOL Build(IDirect3D9Ex& rkD3D, PFNCONFIRMDEVICE pfnConfirmDevice);
+#else
 		BOOL Build(IDirect3D9& rkD3D, PFNCONFIRMDEVICE pfnConfirmDevice);
+#endif
 #else
 		BOOL Build(IDirect3D8& rkD3D, PFNCONFIRMDEVICE pfnConfirmDevice);
 #endif

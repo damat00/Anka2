@@ -165,7 +165,7 @@ bool CBlockTexture::Create(CGraphicDib * pDIB, const RECT & c_rRect, DWORD dwWid
                                                 , 0
                                                 , 0
                                                 , D3DFMT_A8R8G8B8
-                                                , D3DPOOL_MANAGED
+                                                , D3DPOOL_MANAGED_EX_FIX
                                                 , &m_lpd3dTexture
                                                 , nullptr)))
 #else
@@ -174,7 +174,7 @@ bool CBlockTexture::Create(CGraphicDib * pDIB, const RECT & c_rRect, DWORD dwWid
                                                 , 0
                                                 , 0
                                                 , D3DFMT_A8R8G8B8
-                                                , D3DPOOL_MANAGED
+                                                , D3DPOOL_MANAGED_EX_FIX
                                                 , &m_lpd3dTexture)))
 #endif
 	{
