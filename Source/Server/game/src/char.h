@@ -2155,6 +2155,9 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 
 		int GetQuestFlag(const std::string& flag) const;
 		void SetQuestFlag(const std::string& flag, int value);
+#ifdef MARTYSAMA0134_FIXLERI_159
+		int LastStatResetUse;
+#endif
 
 		void ConfirmWithMsg(const char* szMsg, int iTimeout, DWORD dwRequestPID);
 
@@ -2162,9 +2165,6 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		DWORD m_dwQuestNPCVID;
 		DWORD m_dwQuestByVnum;
 		DWORD m_dwQuestItemVID{};
-#ifdef MARTYSAMA0134_FIXLERI_159
-		int LastStatResetUse;
-#endif
 
 	public:
 		bool StartStateMachine(int iPulse = 1);

@@ -5829,6 +5829,7 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 						break;
 
 					case USE_POTION:
+					{
 #ifdef MARTYSAMA0134_FIXLERI_57
 						if (FindAffect(AFFECT_ITEM_BLOCK))
 						{
@@ -5850,35 +5851,35 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								LocaleChatPacket(CHAT_TYPE_INFO, 400, "");
 								return false;
 							}
-						
+
 							switch (item->GetVnum())
 							{
-								case 27001 :
-								case 27002 :
-								case 27003 :
-								case 27004 :
-								case 27005 :
-								case 27006 :
-									if (quest::CQuestManager::instance().GetEventFlag("arena_potion_limit_count") < 10000)
+							case 27001:
+							case 27002:
+							case 27003:
+							case 27004:
+							case 27005:
+							case 27006:
+								if (quest::CQuestManager::instance().GetEventFlag("arena_potion_limit_count") < 10000)
+								{
+									if (m_nPotionLimit <= 0)
 									{
-										if (m_nPotionLimit <= 0)
-										{
-											LocaleChatPacket(CHAT_TYPE_INFO, 432, "");
-											return false;
-										}
+										LocaleChatPacket(CHAT_TYPE_INFO, 432, "");
+										return false;
 									}
-									break;
+								}
+								break;
 
-								default :
-									LocaleChatPacket(CHAT_TYPE_INFO, 400, "");
-									return false;
+							default:
+								LocaleChatPacket(CHAT_TYPE_INFO, 400, "");
+								return false;
 							}
 						}
 
 #ifdef MARTYSAMA0134_FIXLERI_57
 						bool potion_used = false;
 #endif
-						
+
 						if (item->GetValue(1) != 0)
 						{
 							if (GetPoint(POINT_SP_RECOVERY) + GetSP() >= GetMaxSP())
@@ -5925,8 +5926,8 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 #endif
 
 						m_nPotionLimit--;
+					}
 						break;
-
 					case USE_POTION_CONTINUE:
 						{
 #ifdef MARTYSAMA0134_FIXLERI_57
