@@ -231,7 +231,9 @@ bool CHARACTER::Attack(LPCHARACTER pkVictim, BYTE bType)
 	// @fixme131
 	if (!battle_is_attackable(this, pkVictim))
 		return false;
-
+#ifdef MARTYSAMA0134_FIXLERI_128
+	SetMyShopTime();
+#endif
 	DWORD dwCurrentTime = get_dword_time();
 
 	if (IsPC()
@@ -2580,6 +2582,9 @@ bool CHARACTER::Damage(LPCHARACTER pAttacker, int dam, EDamageType type) // retu
 	if (!pAttacker)
 		return false;
 
+#ifdef MARTYSAMA0134_FIXLERI_128
+	SetMyShopTime();
+#endif
 #ifdef ENABLE_BOT_PLAYER
     // Bot oyuncular için MaxHP'nin asla 0 olmamasýný garanti et (divide by zero korumasý)
     if (IsBotCharacter() && GetMaxHP() <= 0)

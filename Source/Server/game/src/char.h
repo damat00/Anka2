@@ -2162,6 +2162,9 @@ class CHARACTER : public CEntity, public CFSM, public CHorseRider
 		DWORD m_dwQuestNPCVID;
 		DWORD m_dwQuestByVnum;
 		DWORD m_dwQuestItemVID{};
+#ifdef MARTYSAMA0134_FIXLERI_159
+		int LastStatResetUse;
+#endif
 
 	public:
 		bool StartStateMachine(int iPulse = 1);

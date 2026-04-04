@@ -5206,10 +5206,18 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 								break;
 
 							case ITEM_GIVE_STAT_RESET_COUNT_VNUM:
+#ifdef MARTYSAMA0134_FIXLERI_159
+								if (get_dword_time() - LastStatResetUse < 60000) // 60 saniye bekle
 								{
+									ChatPacket(CHAT_TYPE_INFO, "Stat reset yaptýktan sonra hemen Won kullanamazsýnýz.");
+									return false;
+								}
+								PointChange(POINT_STAT_RESET_COUNT, 1);
+								item->SetCount(item->GetCount() - 1);
+#else
 									PointChange(POINT_STAT_RESET_COUNT, 1);
 									item->SetCount(item->GetCount()-1);
-								}
+#endif
 								break;
 
 							case 50107:
@@ -5712,6 +5720,13 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 					case USE_POTION_NODELAY:
 						{
+#ifdef MARTYSAMA0134_FIXLERI_57
+						if (FindAffect(AFFECT_ITEM_BLOCK))
+						{
+							ChatPacket(CHAT_TYPE_INFO, "Bu iksiri biraz sonra kullanabilirsiniz.");
+							return false;
+						}
+#endif
 #ifdef ENABLE_SUNG_MAHI_TOWER
 							if (!IS_SUNG_MAHI_ENABLE_ITEM(GetMapIndex(), item->GetVnum()))
 							{
@@ -5794,6 +5809,9 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 							if (used)
 							{
+#ifdef MARTYSAMA0134_FIXLERI_57
+								AddAffect(AFFECT_ITEM_BLOCK, POINT_NONE, 0, 0, MARTYSAMA0134_FIXLERI_57_ORAN, 0, true, false); //@sadeceoyun57
+#endif
 								if (item->GetVnum() == 50085 || item->GetVnum() == 50086)
 									SetUseSeedOrMoonBottleTime();
 
@@ -5811,6 +5829,13 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 						break;
 
 					case USE_POTION:
+#ifdef MARTYSAMA0134_FIXLERI_57
+						if (FindAffect(AFFECT_ITEM_BLOCK))
+						{
+							ChatPacket(CHAT_TYPE_INFO, "Bu iksiri biraz sonra kullanabilirsiniz.");
+							return false;
+						}
+#endif
 #ifdef ENABLE_SUNG_MAHI_TOWER
 						if (!IS_SUNG_MAHI_ENABLE_ITEM(GetMapIndex(), item->GetVnum()))
 						{
@@ -5849,6 +5874,10 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 									return false;
 							}
 						}
+
+#ifdef MARTYSAMA0134_FIXLERI_57
+						bool potion_used = false;
+#endif
 						
 						if (item->GetValue(1) != 0)
 						{
@@ -5860,6 +5889,9 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							PointChange(POINT_SP_RECOVERY, item->GetValue(1) * MIN(200, (100 + GetPoint(POINT_POTION_BONUS))) / 100);
 							StartAffectEvent();
 							EffectPacket(SE_SPUP_BLUE);
+#ifdef MARTYSAMA0134_FIXLERI_57
+							potion_used = true;
+#endif
 						}
 
 						if (item->GetValue(0) != 0)
@@ -5872,8 +5904,14 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							PointChange(POINT_HP_RECOVERY, item->GetValue(0) * MIN(200, (100 + GetPoint(POINT_POTION_BONUS))) / 100);
 							StartAffectEvent();
 							EffectPacket(SE_HPUP_RED);
+#ifdef MARTYSAMA0134_FIXLERI_57
+							potion_used = true;
+#endif
 						}
-
+#ifdef MARTYSAMA0134_FIXLERI_57
+						if (potion_used)
+							AddAffect(AFFECT_ITEM_BLOCK, POINT_NONE, 0, 0, MARTYSAMA0134_FIXLERI_57_ORAN, 0, true, false);
+#endif
 						if (GetDungeon())
 							GetDungeon()->UsePotion(this);
 
@@ -5891,6 +5929,13 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 
 					case USE_POTION_CONTINUE:
 						{
+#ifdef MARTYSAMA0134_FIXLERI_57
+							if (FindAffect(AFFECT_ITEM_BLOCK))
+							{
+								ChatPacket(CHAT_TYPE_INFO, "Bu iksiri biraz sonra kullanabilirsiniz.");
+								return false;
+							}
+#endif
 							if (item->GetValue(0) != 0)
 							{
 								AddAffect(AFFECT_HP_RECOVER_CONTINUE, POINT_HP_RECOVER_CONTINUE, item->GetValue(0), 0, item->GetValue(2), 0, true);
@@ -5901,6 +5946,9 @@ bool CHARACTER::UseItemEx(LPITEM item, TItemPos DestCell)
 							}
 							else
 								return false;
+#ifdef MARTYSAMA0134_FIXLERI_57
+							AddAffect(AFFECT_ITEM_BLOCK, POINT_NONE, 0, 0, MARTYSAMA0134_FIXLERI_57_ORAN, 0, true, false);
+#endif
 						}
 
 						if (GetDungeon())
@@ -9057,7 +9105,11 @@ bool CHARACTER::EquipItem(LPITEM item, int iCandidateCell)
 	}
 
 #ifdef ENABLE_ANTI_EQUIP_FLOOD
+#ifdef MARTYSAMA0134_FIXLERI_46
+	if (IsPC() && !IsGM())
+#else
 	if (!IsGM())
+#endif
 	{
 		if (thecore_pulse() > GetEquipAntiFloodPulse() + PASSES_PER_SEC(1))
 		{

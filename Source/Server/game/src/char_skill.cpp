@@ -473,11 +473,16 @@ bool CHARACTER::LearnSkillByBook(DWORD dwSkillVnum, BYTE bProb)
 
 	if (FN_should_check_exp(this))
 	{
+#ifdef MARTYSAMA0134_FIXLERI_19
+		if (GetLevel() >= PLAYER_MAX_LEVEL_CONST) { need_exp = 0; } //@sadeceoyun19 - Max level'da exp kontrolü yapma
+		else if (GetLevel() < PLAYER_MAX_LEVEL_CONST) { need_exp = 0; } // @fixme186
+#else
 		if (GetLevel() < PLAYER_MAX_LEVEL_CONST) { need_exp = 0; }// @fixme186
+#endif
 
 		if (GetExp() < need_exp)
 		{
-			LocaleChatPacket(CHAT_TYPE_INFO, 237, "");
+			LocaleChatPacket(CHAT_TYPE_INFO, 237, "Yetersiz EXP.");
 			return false;
 		}
 	}
@@ -964,7 +969,11 @@ void CHARACTER::ResetSkill()
 		const std::pair<DWORD, TPlayerSkill>& pair = *(iter++);
 		m_pSkillLevels[pair.first] = pair.second;
 	}
-
+#ifdef MARTYSAMA0134_FIXLERI_161
+	RemoveAffect(SKILL_GEOMKYUNG);
+	RemoveAffect(SKILL_GWIGEOM);
+	RemoveAffect(SKILL_MUYEONG);
+#endif
 	ComputePoints();
 	SkillLevelPacket();
 }

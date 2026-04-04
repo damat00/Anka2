@@ -6,6 +6,7 @@
 #include <cstring>
 
 #include "AsyncSQL.h"
+#include "../../common/service.h"
 
 #ifndef __WIN32__
 #define MUTEX_LOCK(mtx) pthread_mutex_lock(mtx)
@@ -147,7 +148,9 @@ bool CAsyncSQL::Connect()
 	// Therefore, even though the character set cannot be determined because the locale is not known when making the first connection,
 	// This part is commented out as it is forced to set the character set to euckr.
 	// (If you unpack the comments below, you cannot access the db without euckr installed in mysql.)
-	//while (!QueryLocaleSet());
+#ifdef	MARTYSAMA0134_FIXLERI_191
+	while (!QueryLocaleSet()) sleep(1);
+#endif
 	m_ulThreadID = mysql_thread_id(&m_hDB);
 
 	m_bConnected = true;

@@ -107,7 +107,17 @@ void CHorseRider::EnterHorse()
 
 	if (GetHorseHealth() <= 0)
 		return;
-
+#ifdef MARTYSAMA0134_FIXLERI_56
+	if (IsHorseRiding())
+	{
+		StopRiding();
+	}
+	else
+	{
+		StartRiding();
+		StartStaminaConsumeEvent();
+	}
+#else
 	if (IsHorseRiding())
 	{
 		m_Horse.bRiding = !m_Horse.bRiding;
@@ -117,6 +127,7 @@ void CHorseRider::EnterHorse()
 	{
 		StartStaminaRegenEvent();
 	}
+#endif
 	CheckHorseHealthDropTime(false);
 }
 

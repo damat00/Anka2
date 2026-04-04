@@ -1500,8 +1500,11 @@ ACMD(do_cmd)
 			ch->LocaleChatPacket(CHAT_TYPE_INFO, 293, "");
 			break;
 	}
-
+#ifdef MARTYSAMA0134_FIXLERI_83
+	int nExitLimitTime = MARTYSAMA0134_FIXLERI_83_ORAN;
+#else
 	int nExitLimitTime = 10;
+#endif
 
 	if (ch->IsHack(false, true, nExitLimitTime) && (!ch->GetWarMap() || ch->GetWarMap()->GetType() == GUILD_WAR_TYPE_FLAG))
 		return;
@@ -1516,9 +1519,13 @@ ACMD(do_cmd)
 
 				{
 					if (ch->IsPosition(POS_FIGHTING))
+#ifdef MARTYSAMA0134_FIXLERI_84
+						info->left_second = MARTYSAMA0134_FIXLERI_84_ORAN;
+#else
 						info->left_second = 10;
 					else
 						info->left_second = 3;
+#endif
 				}
 
 				info->ch = ch;
@@ -1742,6 +1749,9 @@ ACMD(do_restart)
 
 ACMD(do_stat_reset)
 {
+#ifdef MARTYSAMA0134_FIXLERI_159
+	ch->LastStatResetUse = get_dword_time();
+#endif
 	ch->PointChange(POINT_STAT_RESET_COUNT, 12 - ch->GetPoint(POINT_STAT_RESET_COUNT));
 }
 
@@ -3324,9 +3334,13 @@ ACMD(do_change_channel)
 
 		{
 			if (ch->IsPosition(POS_FIGHTING))
+#ifdef MARTYSAMA0134_FIXLERI_84
+				info->left_second = MARTYSAMA0134_FIXLERI_84_ORAN;
+#else
 				info->left_second = 10;
 			else
 				info->left_second = 3;
+#endif
 		}
 
 		info->ch = ch;

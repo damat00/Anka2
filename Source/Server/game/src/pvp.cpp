@@ -14,6 +14,9 @@
 #include "sectree_manager.h"
 #include "buffer_manager.h"
 #include "locale_service.h"
+#ifdef MARTYSAMA0134_FIXLERI_141
+#include "skill.h"
+#endif
 
 using namespace std;
 
@@ -212,6 +215,29 @@ void CPVPManager::Insert(LPCHARACTER pkChr, LPCHARACTER pkVictim)
 	{
 		pkVictimDesc->LocaleWhisperPacket(WHISPER_TYPE_SYSTEM, 124, pkChr->GetName(), "%s", pkChr->GetName());
 	}
+#ifdef MARTYSAMA0134_FIXLERI_141
+
+	LPDESC pkVictimDesc = pkVictim->GetDesc();
+
+	if (pkVictimDesc)
+	{
+		pkVictimDesc->LocaleWhisperPacket(WHISPER_TYPE_SYSTEM, 124, pkChr->GetName(), "%s", pkChr->GetName());
+	}
+
+	if (pkChr->IsPC())
+	{
+		pkChr->RemoveAffect(SKILL_MUYEONG);
+		pkChr->RemoveAffect(SKILL_GWIGEOM);
+		pkChr->RemoveAffect(SKILL_GEOMKYUNG);
+	}
+
+	if (pkVictim->IsPC())
+	{
+		pkVictim->RemoveAffect(SKILL_MUYEONG);
+		pkVictim->RemoveAffect(SKILL_GWIGEOM);
+		pkVictim->RemoveAffect(SKILL_GEOMKYUNG);
+	}
+#endif
 }
 
 void CPVPManager::ConnectEx(LPCHARACTER pkChr, bool bDisconnect)

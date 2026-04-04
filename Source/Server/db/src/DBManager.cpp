@@ -122,7 +122,9 @@ int CDBManager::Connect(int iSlot, const char * db_address, const int db_port, c
 		Clear();
 		return false;
 	}
-
+#ifdef MARTYSAMA0134_FIXLERI_191
+	sleep(1);
+#endif
 	return true;
 }
 

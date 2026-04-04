@@ -95,7 +95,9 @@
 #ifdef ENABLE_RESP_SYSTEM
 	#include "resp_manager.h"
 #endif
-
+#ifdef MARTYSAMA0134_FIXLERI_176
+	#include "../../libgame/include/grid.h"
+#endif
 
 extern const BYTE g_aBuffOnAttrPoints;
 extern bool RaceToJob(unsigned race, unsigned *ret_job);
@@ -313,7 +315,6 @@ void CHARACTER::Initialize()
 #else
 	m_dwLastAttackTime = get_dword_time() - 20000;
 #endif
-
 	m_bAddChrState = 0;
 
 	m_pkChrStone = NULL;
@@ -371,6 +372,9 @@ void CHARACTER::Initialize()
 	m_dwQuestNPCVID = 0;
 	m_dwQuestByVnum = 0;
 	m_dwQuestItemVID = 0;
+#ifdef MARTYSAMA0134_FIXLERI_159
+	LastStatResetUse = 0;
+#endif
 
 	m_dwUnderGuildWarInfoMessageTime = get_dword_time() - 60000;
 
@@ -3230,6 +3234,9 @@ void CHARACTER::ComputePoints()
 #ifdef ENABLE_COMPUTE_POINT_FIX
 	m_pointsInstant.computed = false;
 #endif
+#ifdef MARTYSAMA0134_FIXLERI_159
+	LastStatResetUse = 0;
+#endif
 	memset(m_pointsInstant.points, 0, sizeof(m_pointsInstant.points));
 	BuffOnAttr_ClearAll();
 	m_SkillDamageBonus.clear();
@@ -5863,7 +5870,11 @@ bool CHARACTER::IsNearWater() const
 	{
 		for (int y = -1; y <= 1; ++y)
 		{
+#ifdef MARTYSAMA0134_FIXLERI_125
+			if (GetSectree() && IS_SET(GetSectree()->GetAttribute(GetX() + x * 100, GetY() + y * 100), ATTR_WATER))
+#else
 			if (IS_SET(GetSectree()->GetAttribute(GetX() + x * 100, GetY() + y * 100), ATTR_WATER))
+#endif
 				return true;
 		}
 	}
@@ -8888,7 +8899,11 @@ EVENTFUNC(warp_npc_event)
 	}
 
 	FuncCheckWarp f(ch);
+#ifdef MARTYSAMA0134_FIXLERI_125
+	if (f.Valid() && ch->GetSectree())
+#else
 	if (f.Valid())
+#endif
 		ch->GetSectree()->ForEachAround(f);
 
 	return passes_per_sec / 2;
