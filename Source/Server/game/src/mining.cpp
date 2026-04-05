@@ -423,8 +423,11 @@ namespace mining
 		ch->PayRefineFee(iCost);
 
 		if (metinstone_item)
+#ifdef MARTYSAMA0134_FIXLERI_23
+			metinstone_item->SetCount(metinstone_item->GetCount() - 1);
+#else
 			ITEM_MANAGER::instance().RemoveItem(metinstone_item, "REMOVE (MELT)");
-
+#endif
 		if (number(1, 100) <= pct)
 		{
 			ch->AutoGiveItem(dwRefinedVnum, 1);

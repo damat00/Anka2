@@ -84,6 +84,9 @@ std::set<std::pair<DWORD, DWORD> > s_emotion_set;
 
 ACMD(do_emotion_allow)
 {
+#ifdef MARTYSAMA0134_FIXLERI_42
+	if (!ch) return;
+#endif
 	if (ch->GetArena())
 	{
 		ch->LocaleChatPacket(CHAT_TYPE_INFO, 192, "");
@@ -126,6 +129,9 @@ bool CHARACTER_CanEmotion(CHARACTER& rch)
 
 ACMD(do_emotion)
 {
+#ifdef MARTYSAMA0134_FIXLERI_42
+	if (!ch) return;
+#endif
 	int i;
 	{
 		if (ch->IsRiding())

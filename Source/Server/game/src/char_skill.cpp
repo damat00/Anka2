@@ -2727,7 +2727,13 @@ int CHARACTER::ComputeSkill(DWORD dwVnum, LPCHARACTER pkVictim, BYTE bSkillLevel
 			}
 		}
 #endif
-
+#ifdef MARTYSAMA0134_FIXLERI_180
+		if (dwVnum == 109) {
+			if (pkVictim != this) {
+				pkVictim->SpecificEffectPacket("d:/ymir work/pc/shaman/effect/2jeongeop_upgrade.mse");
+			}
+		}
+#endif
 		return BATTLE_NONE;
 	}
 }

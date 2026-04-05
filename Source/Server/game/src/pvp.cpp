@@ -338,6 +338,18 @@ bool CPVPManager::Dead(LPCHARACTER pkChr, DWORD dwKillerPID)
 			{
 				pkPVP->SetLastFightTime();
 				pkPVP->Win(dwKillerPID);
+#ifdef MARTYSAMA0134_FIXLERI_175
+				LPCHARACTER tch = CHARACTER_MANAGER::instance().FindByPID(dwKillerPID);
+				if (tch)
+				{
+					if (pkChr->GetMapIndex() == 1 || pkChr->GetMapIndex() == 3 ||
+						pkChr->GetMapIndex() == 21 || pkChr->GetMapIndex() == 23 ||
+						pkChr->GetMapIndex() == 41)
+					{
+						tch->PointChange(POINT_HP, tch->GetMaxHP() - tch->GetHP());
+					}
+				}
+#endif
 				found = true;
 				break;
 			}

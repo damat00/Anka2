@@ -338,8 +338,17 @@ enum eCommonDefines {
 #define ENABLE_SAFE_LEVEL_CHANGE_FIX  				// Seviye değişiminde PointChange senkronizasyon hatalarını ve exploit riskini önler.
 #define MARTYSAMA0134_FIXLERI_TOPLU					// Martysama0134 tarafından bildirilen ve düzeltilen çeşitli hata düzeltmeleri
 #ifdef MARTYSAMA0134_FIXLERI_TOPLU
+	#define MARTYSAMA0134_FIXLERI_04				// Oyuncu partideyken bayrak (empire) değiştirebiliyordu.
 	#define MARTYSAMA0134_FIXLERI_11				// Bu kontrol eklenince oyuncular pazar NPC'lerine saldıramaz
+	#define MARTYSAMA0134_FIXLERI_12				// Lonca savaşı sırasında lonca dağıtma engel
+	#define MARTYSAMA0134_FIXLERI_14				// Okçu ve şaman için saldırı mesafesi 1.5 kat arttırıldı
+#ifdef MARTYSAMA0134_FIXLERI_14
+		#define MARTYSAMA0134_FIXLERI_14_GENEL_ORAN 250			// fHitRange genel vuruş menzili
+		#define MARTYSAMA0134_FIXLERI_14_SAMAN_NINJA_ORAN 500	// şaman ve ninjanın vuruş menzili
+#endif
 	#define MARTYSAMA0134_FIXLERI_19				// Max levele ulaşan oyuncunun Beceri Kitabı okuyamama sorunu fixlemesi
+	#define MARTYSAMA0134_FIXLERI_23				// Oyuncunun envanterinde 50 tane metin taşı varsa, hepsi siliniyor.
+	#define MARTYSAMA0134_FIXLERI_42				// ch NULL kontrolü yok.
 	#define MARTYSAMA0134_FIXLERI_46				// Anti-equip flood koruması sadece gerçek oyuncular için çalışır, GM'ler zaten hariç, ek olarak non-PC karakterler de hariç tutulur
 	#define MARTYSAMA0134_FIXLERI_55				// {100, 100, 100, 100, 100, 0, 0} -> Tüm 5 efsun slotu %100 şansla geçer
 		#ifdef MARTYSAMA0134_FIXLERI_55
@@ -358,17 +367,22 @@ enum eCommonDefines {
 		#ifdef MARTYSAMA0134_FIXLERI_84
 		#define MARTYSAMA0134_FIXLERI_84_ORAN 3		// Yazılan oranda oyuncu POS_FIGHTING Respawn süresi aktif olur
 		#endif
+	#define MARTYSAMA0134_FIXLERI_100				// ACMD(do_stat_minus) HT (Vitality) azalınca HP'yi, IQ (Intelligence) azalınca SP'yi güncelle:
 	#define MARTYSAMA0134_FIXLERI_125				// Karakter güvenli alan sınırlarına yaklaştığında GetSectree() NULL dönebilir. Bu durumda sectree metodları çağrıldığında core crash oluşur.
 	#define MARTYSAMA0134_FIXLERI_128				// Bu, saldırı anında oyuncunun eşya/pazar işlemlerini geçici olarak bloklar, dupe exploit'ini engeller.
 //	#define MARTYSAMA0134_FIXLERI_141				// Düello (PVP) başladığında, Ateş Hayaleti(SKILL_MUYEONG), Büyülü Silah(SKILL_GWIGEOM) ve Hava Kılıcı(SKILL_GEOMKYUNG) gibi bufflar temizlenir
 	#define MARTYSAMA0134_FIXLERI_159				// Bu değişken olmadan oyuncular stat reset yapıp hemen Won/Kim kullanarak kopyalama yapabilir.
 	#define MARTYSAMA0134_FIXLERI_161				// SKILL_GEOMKYUNG (4): Güçlü Beden, SKILL_GWIGEOM (63): Hava Kılıcı, SKILL_MUYEONG (78): Ateş Hayaleti Bu affect'ler temizlenmezse karakter skill'i sıfırlansa bile buff'lar devam eder ve stat/exploit bug'ı oluşur
+	#define MARTYSAMA0134_FIXLERI_174				// Aynı pointType affect'i zaten varsa, eski değer ile yeni değer toplanır, eski affect silinir ve yeni toplam değerle eklenir. Bu, biyolog görevlerinde aynı bonusun üst üste binmesini önler.
+	#define MARTYSAMA0134_FIXLERI_175				// Oyuncuyu öldüren oyuncunun HP'si fullenir.	
 	#define MARTYSAMA0134_FIXLERI_176				// grid.h include'u olmadan CGrid sınıfı char.cpp'de tanınsız kalır.
+	#define MARTYSAMA0134_FIXLERI_180				// Şaman'ın Grup Kutsama skill'i (vnum 109) başka bir oyuncuya kullanıldığında, hedef oyuncuda özel bir iyileşme efekti gösterilir. Sadece görsel bir iyileştirme.
 	#define MARTYSAMA0134_FIXLERI_186				// Aksesuar Socket İçine Cevher Koyma (PUT_INTO_ACCESSORY_SOCKET)
 		#ifdef MARTYSAMA0134_FIXLERI_186
 		#define MARTYSAMA0134_FIXLERI_186_ORAN 100	// Yazılan oran Aksesuar Socket İçine Cevher Koyma şansı olarak işlenir
 		#endif
 	#define MARTYSAMA0134_FIXLERI_191				// Bağlantı kurulduktan sonra kısa bir sleep(1) ile DB'nin stabilize olması beklenir
+	#define MARTYSAMA0134_FIXLERI_197				// RemoveAttributeType(BYTE) → RemoveAttributeType(int) çağırıyor Sonsuz döngü → Stack overflow → Core crash!
 #endif
 
 

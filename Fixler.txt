@@ -2,15 +2,23 @@ ID,Açıklama,Durum
 #01,Yeşil/mor pot tekrar kullanım engeli,✅ MEVCUT
 #02,Büyülü Silah/Hava Kılıcı silahsız kullanım engeli,✅ MEVCUT
 #03,Beceri sıfırlamada güçlendirme temizleme,✅ MEVCUT
+#04,ChangeEmpire fonksiyonunda party kontrolü ✅ MEVCUT
 #05,Karakter adı uzunluk kontrolü,✅ MEVCUT
+#06	Level atlayınca pot verme	✅ Zaten uygulanmış
+#07	Büyük-küçük harf komut	✅ Zaten uygulanmış
 #08,Ateş hayaleti RemoveGoodAffect'e eklendi,✅ MEVCUT
 #09,0 yang eşya alınmama fixi,✅ MEVCUT
 #10,İzleyici modunda/sersemleme saldırı engeli,✅ MEVCUT
 #11,Pazara vurulma hatası,✅ MEVCUT
+#12,Lonca savaşı sırasında lonca dağıtma engel✅ MEVCUT
 #13,Party bug fix,✅ MEVCUT
+#14 — Otomatik ataktaki okçu ninja fix✅ MEVCUT
 #17,Cube buffer overflow,✅ Kabul edilebilir
 #18,Blend memory leak fix,✅ MEVCUT
 #19,Max level skill book,✅ MEVCUT
+#20 — pc.select fonksiyonunda ch kontrolü [ENABLE_CH_CRASH_CORE_FIX ]✅ MEVCUT
+#21	Kostüm + cinsiyet değiştirme ✅ Zaten uygulanmış
+#23	İstiflenen taşlar silinme ✅ MEVCUT
 #25,CHARACTER_NAME_MAX_LEN,✅ 48 Yeterli 64e çıkartmaya gerek yok
 #27,Savaş tipi negatif değer çökme fixi,✅ MEVCUT
 #27,Guild war validation,✅ MEVCUT
@@ -22,26 +30,37 @@ ID,Açıklama,Durum
 #40,pDungeon null check,✅ MEVCUT
 #41,Pet/binek/pazar düşman görünmeme,✅ MEVCUT
 #43,AutoGiveItem eşya kaybolma fixi,char_item.cpp✅ MEVCUT
+#44	Hatalı ;	✅ Sorun yok
+#45	NULL item core	✅ Zaten uygulanmış
 #46,IsPC() && !IsGM() check,✅ MEVCUT IsPC() eksik
 #49,Boost warning fix,✅ MEVCUT
 #55,Efsun atma şansı %100,✅ MEVCUT
 #56,Hızlı at/bin fix,✅ MEVCUT
 #57,Otopot hızlı aç/kapa fix,"affect.h, char_item.cpp"✅ MEVCUT
 #59,%100 canla doğma,✅ MEVCUT
+#66	Karakter silme	✅ Sistem zaten gelişmiş
 #68,Yere Yang Atma Fix,✅ MEVCUT [#define ENABLE_DROP_GOLD]
 #70,Sınırsız yeşil pot,✅ MEVCUT
 #72,Taş/elmas basma %100,✅ MEVCUT
 #76,PvP serbest alma engel,✅ MEVCUT
 #80,Bayrak konuşma ortak,✅ MEVCUT
+#82 — Ticaretten sonra süre engeli kaldırma (İtem dupe riski taşıdığı için kullanılmıyor)
 #83,Logout timer,⚠️ 10sn (Referans: 0)✅ MEVCUT
 #84,Respawn timer,⚠️ Değişken (Referans: 0)✅ MEVCUT
 #89,set align derece hesaplama fixi,✅ MEVCUT
 #99,Görev eşya kopyalama bug fix,✅ MEVCUT
+#100	Kan Hapı bug	✅ Zaten uygulanmış
+#102 item dosyalarının VNUM ile okunmasını sağlar. ✅ Zaten uygulanmış
 #103,Dupe fix,✅ MEVCUT [ENABLE_ITEM_DUPE_FIX ]
+#104 Gelinlik/Smokin + Kostüm ✅ Zaten uygulanmış
+#105 Giyili item depoya koyma ✅ Zaten uygulanmış
+#106 Görev pc.select fix ✅ Zaten uygulanmış
+#107 Lonca Bug Fix ✅ Zaten uygulanmış
 #108,Lonca yang fix,✅ MEVCUT [ENABLE_GUILD_YANG_ACCOUNTING_FIX ]
 #111,No affect while dead,✅ MEVCUT
 #114,Bakımda eşya kaybolması fixi,✅ MEVCUT
 #115,Karakter ölüyken affect eklenmeme,✅ MEVCUT
+#116 Depo açma mesafesi	✅ Server'da zaten mesafe kısıtlaması yok
 #122,Seviye başı random HP fix,✅ MEVCUT
 #125,Güvenli alan yakını core fix,"char.cpp, char_skill.cpp"✅ MEVCUT
 #128,Agresif item düşürme dupe fix,char_battle.cpp✅ MEVCUT
@@ -55,12 +74,18 @@ ID,Açıklama,Durum
 #154,CTRL+Q Görev Gelmeme Sorunu Fix,✅ MEVCUT
 #155,Yay Core Crash Fix,✅ MEVCUT
 #156,İzleyici Modu Hasar Fixi,✅ MEVCUT
+#157 QuickSlot item koyma ✅ Sistem zaten var
+#158 QuickSlot Bug Fix ✅ Sistem zaten var
 #159,Won/Kim kopyalama fixi,"char.cpp, char.h, char_item.cpp"✅ MEVCUT
+#160 GM UpdateAlignment	✅ Zaten uygulanmış
 #161,Beceri sıfırlama Hava Kılıcı/G.Beden bug fix,✅ MEVCUT
 #163,GM yetkileri GM_IMPLEMENTOR'a bağlandı,✅ MEVCUT
 #173,Beceri seçilmemişken kitap okunmama,✅ MEVCUT
+#174 Affectler bonus biyolog✅ MEVCUT
+#175Rakip öldürünce can fulleme	✅ MEVCUT Yeni özellik (fix değil)
 #176,Nesne Market Deposu (Grid sistemi),✅ MEVCUT
 #179,GetOriginalVnum kullanımı,✅ MEVCUT
+#180 Grup kutsama iyileştirme✅ MEVCUT
 #182-185,Sınırsız efsun/arttırma/elmas/cevher,✅ MEVCUT
 #186,Cevher geçme oranı %100,✅ MEVCUT
 #187,Süresiz cevher güncellemesi,✅ MEVCUT
@@ -68,9 +93,11 @@ ID,Açıklama,Durum
 #191,DBManager sleep/locale fix,✅ MEVCUT
 #193,Lonca ve Grup CoreDowner Fix,✅ MEVCUT
 #194,Maden damarı syserr fix,✅ MEVCUT
+#197 RemoteAttributeType✅ MEVCUT
 #198,Guild leave delay devre dışı,✅ MEVCUT
 #199,Eski lonca arazilerini silme,✅ MEVCUT
 #202,SQL Injection Fix,✅ MEVCUT
+#206 Menzil kısaltma✅ MEVCUT
 
 #########################################################################################################
 MARTYFİXLER TAM LİSTE
@@ -79,4 +106,3 @@ FIXES sadeceoyun01 = Yeşil ve mor pot aktifken tekrar kullanılması engellendi
 Metin2Hub is the world largest Metin2 forum. Source: https://metin2hub.com/threads/martysama-5-4-full-fix.1813/
 
 #########################################################################################################
-#16, #33, #51, #52, #53, #58, #61, #64, #67, #73-75, #77-79, #85-88, #91-93, #95-98, #111, #117-121, #124, #131-137, #142, #143, #146-152, #162, #164, #165, #167-172, #177, #181, #189, #190, #192, #200, #201, #203, #204, #205	Client tarafı, eklenmedi, veya files'a özel	🚫

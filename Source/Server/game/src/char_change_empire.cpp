@@ -88,7 +88,17 @@ int CHARACTER::ChangeEmpire(BYTE empire)
 				return 3;
 		}
 	}
-
+#ifdef MARTYSAMA0134_FIXLERI_04
+	{
+		if (GetParty())
+		{
+			GetParty()->Quit(GetPlayerID());
+			GetParty()->SendPartyInfoOneToAll();
+			GetParty()->SendPartyInfoOneToAll();
+			ChatPacket(CHAT_TYPE_INFO, "Bayrak değiştirmek için party'den çıkarıldınız.");
+		}
+	}
+#endif
 	{
 		snprintf(szQuery, sizeof(szQuery), "UPDATE player_index%s SET empire=%u WHERE pid1=%u OR pid2=%u OR pid3=%u OR pid4=%u OR pid5=%u AND empire=%u",
 				get_table_postfix(), empire, GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetPlayerID(), GetEmpire());

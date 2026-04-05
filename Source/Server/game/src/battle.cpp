@@ -49,8 +49,16 @@ bool battle_distance_valid_by_xy(const CHARACTER* ch, const CHARACTER * victim)
 		return false;
 
 	const auto distance = DISTANCE_APPROX(ch->GetX() - victim->GetX(), ch->GetY() - victim->GetY());
-	float fHitRange = 300;
-
+	float fHitRange = MARTYSAMA0134_FIXLERI_14_GENEL_ORAN;
+#ifdef MARTYSAMA0134_FIXLERI_14
+	if (ch->IsPC())
+	{
+		if (ch->GetJob() == JOB_ASSASSIN || ch->GetJob() == JOB_SHAMAN)
+		{
+			fHitRange = MARTYSAMA0134_FIXLERI_14_SAMAN_NINJA_ORAN;
+		}
+	}
+#endif
 	if (distance > fHitRange)
 		return false;
 

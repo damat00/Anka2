@@ -1047,6 +1047,29 @@ bool CGuild::OfferExp(LPCHARACTER ch, int amount)
 
 void CGuild::Disband()
 {
+#ifdef MARTYSAMA0134_FIXLERI_12
+	for (TGuildMemberOnlineContainer::iterator it = m_memberOnline.begin(); it != m_memberOnline.end(); ++it)
+	{
+		LPCHARACTER ch = *it;
+		if (ch->GetWarMap())
+		{
+			ch->LocaleChatPacket(CHAT_TYPE_INFO, "Lonca savaþý sýrasýnda lonca daðýtýlamaz.");
+			return;
+		}
+	}
+
+	// Düþman loncalarla savaþ kontrolü
+	for (auto it = m_EnemyGuild.begin(); it != m_EnemyGuild.end(); ++it)
+	{
+		if (it->second.state == GUILD_WAR_ON_WAR)
+		{
+			LPCHARACTER ch = *m_memberOnline.begin();
+			if (ch)
+				ch->LocaleChatPacket(CHAT_TYPE_INFO, "Aktif lonca savaþý varken lonca daðýtýlamaz.");
+			return;
+		}
+	}
+#endif
 	sys_log(0, "GUILD: Disband %s:%u", GetName(), GetID());
 
 	for (TGuildMemberOnlineContainer::iterator it = m_memberOnline.begin(); it != m_memberOnline.end(); ++it)

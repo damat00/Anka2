@@ -342,7 +342,11 @@ bool CItem::RemoveAttributeAt(int index)
 bool CItem::RemoveAttributeType(BYTE bType)
 {
 	int index = FindAttribute(bType);
+#ifdef MARTYSAMA0134_FIXLERI_197
+	return index != -1 && RemoveAttributeAt(index);
+#else
 	return index != -1 && RemoveAttributeType(index);
+#endif
 }
 
 void CItem::SetAttributes(const TPlayerItemAttribute* c_pAttribute)

@@ -1825,11 +1825,17 @@ ACMD(do_stat_minus) // Fix
 	ch->SetPoint(idx, ch->GetPoint(idx) - vlaxc);
 	ch->ComputePoints();
 	ch->PointChange(idx, 0);
-
+#ifdef MARTYSAMA0134_FIXLERI_100
+	if (idx == POINT_HT)
+		ch->PointChange(POINT_MAX_HP, 0);
+	else if (idx == POINT_IQ)
+		ch->PointChange(POINT_MAX_SP, 0);
+#else
 	if (idx == POINT_IQ)
 		ch->PointChange(POINT_MAX_HP, 0);
 	else if (idx == POINT_HT)
 		ch->PointChange(POINT_MAX_SP, 0);
+#endif
 
 	ch->PointChange(POINT_STAT, + vlaxc);
 	ch->PointChange(POINT_STAT_RESET_COUNT, - vlaxc);

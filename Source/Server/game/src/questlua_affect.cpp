@@ -239,8 +239,26 @@ namespace quest
 			
 			long value = (long) lua_tonumber(L, 2);
 			long duration = (long) lua_tonumber(L, 3);
-			
+#ifdef MARTYSAMA0134_FIXLERI_174
+			//@sadeceoyun174
+			const BYTE pointType = aApplyInfo[applyOn].bPointType;
+			const CAffect* pkAff = ch->FindAffect(AFFECT_COLLECT, pointType);
+
+			if (pkAff != NULL)
+			{
+				DWORD pointVal = pkAff->lApplyValue;
+				DWORD newVal = pointVal + value;
+				ch->RemoveAffect(const_cast<CAffect*>(pkAff));
+				ch->AddAffect(AFFECT_COLLECT, pointType, newVal, 0, duration, 0, false);
+			}
+			else
+			{
+				ch->AddAffect(AFFECT_COLLECT, pointType, value, 0, duration, 0, false);
+			}
+			//@sadeceoyun174
+#else
 			ch->AddAffect(AFFECT_COLLECT, aApplyInfo[applyOn].bPointType, value, 0, duration, 0, false);
+#endif
 		}
 		else
 		{
