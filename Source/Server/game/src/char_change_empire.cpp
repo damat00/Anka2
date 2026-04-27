@@ -8,8 +8,9 @@
 #include "marriage.h"
 #include "../../common/service.h"
 #include "desc.h"
-
-
+#ifdef MARTYSAMA0134_FIXLERI_04
+#include "party.h"
+#endif
 int CHARACTER::ChangeEmpire(BYTE empire)
 {
 	if (GetEmpire() == empire)
@@ -93,8 +94,8 @@ int CHARACTER::ChangeEmpire(BYTE empire)
 		if (GetParty())
 		{
 			GetParty()->Quit(GetPlayerID());
-			GetParty()->SendPartyInfoOneToAll();
-			GetParty()->SendPartyInfoOneToAll();
+			GetParty()->SendPartyInfoOneToAll(this);
+			GetParty()->SendPartyInfoOneToAll(this);
 			ChatPacket(CHAT_TYPE_INFO, "Bayrak değiştirmek için party'den çıkarıldınız.");
 		}
 	}

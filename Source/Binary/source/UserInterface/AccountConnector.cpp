@@ -133,11 +133,17 @@ bool CAccountConnector::__AuthState_RecvPhase()
 
 		TPacketCGLogin3 LoginPacket;
 		LoginPacket.header = HEADER_CG_LOGIN3;
-
+#ifdef PAKET_ESITLEME
+		strncpy(LoginPacket.login, m_strID.c_str(), ID_MAX_NUM);
+		strncpy(LoginPacket.pwd, m_strPassword.c_str(), PASS_MAX_NUM);
+		LoginPacket.login[ID_MAX_NUM] = '\0';
+		LoginPacket.pwd[PASS_MAX_NUM] = '\0';
+#else
 		strncpy(LoginPacket.name, m_strID.c_str(), ID_MAX_NUM);
 		strncpy(LoginPacket.pwd, m_strPassword.c_str(), PASS_MAX_NUM);
 		LoginPacket.name[ID_MAX_NUM] = '\0';
 		LoginPacket.pwd[PASS_MAX_NUM] = '\0';
+#endif
 
 		ClearLoginInfo();
 #ifdef ENABLE_RENEWAL_CLIENT_VERSION

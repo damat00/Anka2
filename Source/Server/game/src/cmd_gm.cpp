@@ -883,8 +883,11 @@ ACMD(do_mob_ld)
 	}
 
 	int dir = 1;
+#ifdef BUILD_LOG_TEMIZLIGI
+	long x = 0, y = 0;
+#else
 	long x, y;
-
+#endif
 	if (*arg2)
 		str_to_number(x, arg2);
 	if (*arg3)

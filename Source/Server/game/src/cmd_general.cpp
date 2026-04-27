@@ -3827,8 +3827,11 @@ ACMD (do_sort_special_storage)
 
 			if (dwCount > 0)
 			{
+#ifdef BUILD_LOG_TEMIZLIGI
+				int cell = -1;  // -1 geçersiz slot anlamýna gelir, 0 yanlýþ slot olabilir
+#else
 				int cell;
-
+#endif
 				if (sortedItem->IsSkillBook())
 					cell = ch->GetEmptySkillBookInventory(sortedItem->GetSize());
 				else if (sortedItem->IsUpgradeItem())
@@ -3840,7 +3843,14 @@ ACMD (do_sort_special_storage)
 				else if(sortedItem->IsChanger())
 					cell = ch->GetEmptyChangersInventory(sortedItem->GetSize());
 
+#ifdef BUILD_LOG_TEMIZLIGI
+				if (cell != -1)
+					sortedItem->AddToCharacter(ch, TItemPos(INVENTORY, cell));
+				else
+					sys_err("do_sort_inventory: cannot find empty slot for item vnum %d", sortedItem->GetVnum());
+#else
 				sortedItem->AddToCharacter(ch, TItemPos(INVENTORY, cell));
+#endif
 			}
 		}
 	}

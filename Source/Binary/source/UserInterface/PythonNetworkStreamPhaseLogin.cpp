@@ -226,11 +226,19 @@ bool CPythonNetworkStream::SendLoginPacket(const char *c_szName, const char *c_s
 	TPacketCGLogin LoginPacket;
 	LoginPacket.header = HEADER_CG_LOGIN;
 
-	strncpy(LoginPacket.name, c_szName, sizeof(LoginPacket.name)-1);
+#ifdef PAKET_ESITLEME
+	strncpy(LoginPacket.login, c_szName, sizeof(LoginPacket.login)-1);
 	strncpy(LoginPacket.pwd, c_szPassword, sizeof(LoginPacket.pwd)-1);
 
-	LoginPacket.name[ID_MAX_NUM]='\0';
+	LoginPacket.login[ID_MAX_NUM]='\0';
 	LoginPacket.pwd[PASS_MAX_NUM]='\0';
+#else
+	strncpy(LoginPacket.name, c_szName, sizeof(LoginPacket.name) - 1);
+	strncpy(LoginPacket.pwd, c_szPassword, sizeof(LoginPacket.pwd) - 1);
+
+	LoginPacket.name[ID_MAX_NUM] = '\0';
+	LoginPacket.pwd[PASS_MAX_NUM] = '\0';
+#endif
 
 	if (!Send(sizeof(LoginPacket), &LoginPacket))
 	{
@@ -247,9 +255,13 @@ bool CPythonNetworkStream::SendLoginPacketNew(const char *c_szName, const char *
 	LoginPacket.header = HEADER_CG_LOGIN2;
 	LoginPacket.login_key = m_dwLoginKey;
 
-	strncpy(LoginPacket.name, c_szName, sizeof(LoginPacket.name)-1);
-	LoginPacket.name[ID_MAX_NUM]='\0';
-
+#ifdef PAKET_ESITLEME
+	strncpy(LoginPacket.login, c_szName, sizeof(LoginPacket.login)-1);
+	LoginPacket.login[ID_MAX_NUM]='\0';
+#else
+	strncpy(LoginPacket.name, c_szName, sizeof(LoginPacket.name) - 1);
+	LoginPacket.name[ID_MAX_NUM] = '\0';
+#endif
 	extern DWORD g_adwEncryptKey[4];
 	extern DWORD g_adwDecryptKey[4];
 	for (DWORD i = 0; i < 4; ++i)

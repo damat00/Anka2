@@ -385,6 +385,15 @@ enum eCommonDefines {
 	#define MARTYSAMA0134_FIXLERI_197				// RemoveAttributeType(BYTE) → RemoveAttributeType(int) çağırıyor Sonsuz döngü → Stack overflow → Core crash!
 #endif
 
+#define PAKET_ESITLEME										// [EKSIK], [BOYUT FARKI], [TIP FARKI], [ISIM FARKI], [TIP+ISIM FARKI], kategorilerinde paketleri inceleyerek eşler
+#ifdef PAKET_ESITLEME
+	#define SPacketCGPetHatch_Paketi PET_NAME_MAX_SIZE
+	#define TPacketGCCharacterUpdate_Paketi ESkillColorLength::MAX_SKILL_COUNT + ESkillColorLength::MAX_BUFF_COUNT
+	#define TPacketGCCharacterAdditionalInfo_Paketi ESkillColorLength::MAX_SKILL_COUNT + ESkillColorLength::MAX_BUFF_COUNT
+	#define ID_MAX_NUM_LOGIN_MAX_LEN_Paketleri LOGIN_MAX_LEN
+
+#endif
+#define BUILD_LOG_TEMIZLIGI
 
 /*** KRİTİK HATA, ÇÖKME VE AÇIK DÜZELTMELERİ (CRASH / CORE / BUG / EXPLOIT / LEAK) ***/
 

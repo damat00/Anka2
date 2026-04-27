@@ -670,7 +670,11 @@ void CGrowthPet::SendLevelUpEffect()
 	struct packet_point_change pack;
 	pack.header = HEADER_GC_CHARACTER_POINT_CHANGE;
 	pack.dwVID = m_pGrowthPet->GetVID();
+#ifdef PAKET_ESITLEME
+	pack.Type = POINT_LEVEL;
+#else
 	pack.type = POINT_LEVEL;
+#endif
 	pack.value = GetPetPoint(POINT_UPBRINGING_PET_LEVEL);
 	pack.amount = 0;
 
@@ -686,7 +690,11 @@ void CGrowthPet::SendLevelStepEffect()
 
 	pack.header = HEADER_GC_CHARACTER_POINT_CHANGE;
 	pack.dwVID = m_pGrowthPet->GetVID();
+#ifdef PAKET_ESITLEME
+	pack.Type = POINT_LEVEL_STEP;
+#else
 	pack.type = POINT_LEVEL_STEP;
+#endif
 	pack.value = 0;
 	pack.amount = 0;
 

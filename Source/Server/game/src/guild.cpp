@@ -1053,7 +1053,7 @@ void CGuild::Disband()
 		LPCHARACTER ch = *it;
 		if (ch->GetWarMap())
 		{
-			ch->LocaleChatPacket(CHAT_TYPE_INFO, "Lonca savaþý sýrasýnda lonca daðýtýlamaz.");
+			ch->ChatPacket(CHAT_TYPE_INFO, "Lonca savaþý sýrasýnda lonca daðýtýlamaz.");
 			return;
 		}
 	}
@@ -1065,7 +1065,7 @@ void CGuild::Disband()
 		{
 			LPCHARACTER ch = *m_memberOnline.begin();
 			if (ch)
-				ch->LocaleChatPacket(CHAT_TYPE_INFO, "Aktif lonca savaþý varken lonca daðýtýlamaz.");
+				ch->ChatPacket(CHAT_TYPE_INFO, "Aktif lonca savaþý varken lonca daðýtýlamaz.");
 			return;
 		}
 	}

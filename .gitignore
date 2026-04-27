@@ -57,3 +57,4 @@ Client/Metin2Debug.bsc
 Client/log.txt
 Client/channel.inf
 Tools/archiver/xml/root_create.xml
+*.tlog

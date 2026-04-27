@@ -486,12 +486,19 @@ bool CPythonNetworkStream::RecvCharacterDeletePacket()
 		TraceError("CPythonNetworkStream::RecvCharacterDeletePacket - Recv Error");
 		return false;
 	}
-
+#ifdef PAKET_ESITLEME
+	m_rokNetActorMgr->RemoveActor(chrDelPacket.id);
+#else
 	m_rokNetActorMgr->RemoveActor(chrDelPacket.dwVID);
+#endif
 
 	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME],
 		"BINARY_PrivateShop_Disappear",
+#ifdef PAKET_ESITLEME
+		Py_BuildValue("(i)", chrDelPacket.id)
+#else
 		Py_BuildValue("(i)", chrDelPacket.dwVID)
+#endif
 	);
 
 	return true;

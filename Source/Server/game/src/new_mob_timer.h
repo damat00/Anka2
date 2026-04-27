@@ -44,11 +44,11 @@ typedef struct SNewRegen
 	BYTE days_range;
 	BYTE hours_range;
 	BYTE minute_range;
-	LPCHARACTER	bossPtr;
 	bool blockAttack;
 	bool p2pAlive;
 	int leftTime;
-	bool sent30SecNotice;  // 30 sn uyarisi sadece bir kez gonderilsin (2501 Mxxx spam onleme)
+	bool sent30SecNotice;
+	LPCHARACTER	bossPtr;
 } TNewRegen;
 
 class CNewMobTimer : public singleton<CNewMobTimer>

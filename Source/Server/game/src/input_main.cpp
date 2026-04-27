@@ -1800,7 +1800,14 @@ void CInputMain::Exchange(LPCHARACTER ch, const char * data)
 		}
 	}
 
-	sys_log(0, "CInputMain()::Exchange()  SubHeader %d ", pinfo->sub_header);
+	sys_log(0, "CInputMain()::Exchange()  SubHeader %d ", 
+
+#ifdef PAKET_ESITLEME
+		pinfo->subheader
+#else
+		pinfo->sub_header
+#endif
+	);
 
 	if (iPulse - ch->GetSafeboxLoadTime() < PASSES_PER_SEC(g_nPortalLimitTime))
 	{
@@ -1808,7 +1815,11 @@ void CInputMain::Exchange(LPCHARACTER ch, const char * data)
 		return;
 	}
 
+#ifdef PAKET_ESITLEME
+	switch (pinfo->subheader)
+#else
 	switch (pinfo->sub_header)
+#endif
 	{
 		case EXCHANGE_SUBHEADER_CG_START:
 			if (!ch->GetExchange())

@@ -150,8 +150,11 @@ bool CPythonNetworkStream::RecvSafeBoxMoneyChangePacket()
 	TPacketGCSafeboxMoneyChange kMoneyChange;
 	if (!Recv(sizeof(kMoneyChange), &kMoneyChange))
 		return false;
-
+#ifdef PAKET_ESITLEME
+	CPythonSafeBox::Instance().SetMoney(kMoneyChange.lMoney);
+#else
 	CPythonSafeBox::Instance().SetMoney(kMoneyChange.dwMoney);
+#endif
 	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "RefreshSafeboxMoney", Py_BuildValue("()"));
 
 	return true;

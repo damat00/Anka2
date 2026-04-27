@@ -6,7 +6,7 @@
 
 enum PacketHeaderCG
 {
-	HEADER_CG_LOGIN							= 1, // unused - to be removed
+	HEADER_CG_LOGIN							= 1,
 	HEADER_CG_ATTACK						= 2,
 	HEADER_CG_CHAT							= 3,
 	HEADER_CG_CHARACTER_CREATE				= 4,
@@ -19,7 +19,6 @@ enum PacketHeaderCG
 	HEADER_CG_ITEM_USE						= 11,
 	HEADER_CG_ITEM_DROP						= 12,
 	HEADER_CG_ITEM_MOVE						= 13,
-	//HEADER_CG_EMPTY						= 14,
 	HEADER_CG_ITEM_PICKUP					= 15,
 	HEADER_CG_QUICKSLOT_ADD					= 16,
 	HEADER_CG_QUICKSLOT_DEL					= 17,
@@ -33,46 +32,31 @@ enum PacketHeaderCG
 #ifdef ENABLE_DESTROY_DIALOG
 	HEADER_CG_ITEM_DESTROY					= 23,
 #endif
-	//HEADER_CG_EMPTY						= 24,
-	//HEADER_CG_EMPTY						= 25,
-
 	HEADER_CG_ON_CLICK						= 26,
 	HEADER_CG_EXCHANGE						= 27,
 	HEADER_CG_CHARACTER_POSITION			= 28,
 	HEADER_CG_SCRIPT_ANSWER					= 29,
 	HEADER_CG_QUEST_INPUT_STRING			= 30,
 	HEADER_CG_QUEST_CONFIRM					= 31,
-	//HEADER_CG_EMPTY						= 32,
 #ifdef ENABLE_RENEWAL_OX_EVENT
 	HEADER_CG_QUEST_INPUT_LONG_STRING		= 33,
 #endif
 #ifdef ENABLE_RESP_SYSTEM
-	HEADER_CG_RESP 							= 34,
+	HEADER_CG_RESP							= 34,
 #endif
 #ifdef ENABLE_ATTENDANCE_EVENT
-	HEADER_CG_ATTENDANCE_REWARD 			= 35,
+	HEADER_CG_ATTENDANCE_REWARD				= 35,
 #endif
 #ifdef ENABLE_FISH_EVENT
-	HEADER_CG_FISH_EVENT_SEND 				= 36,
+	HEADER_CG_FISH_EVENT_SEND				= 36,
 #endif
 #ifdef ENABLE_SOUL_ROULETTE_SYSTEM
 	HEADER_CG_SOUL_ROULETTE					= 37,
 #endif
 #ifdef ENABLE_MINI_GAME_CATCH_KING
-	HEADER_CG_MINI_GAME_CATCH_KING 			= 38,
+	HEADER_CG_MINI_GAME_CATCH_KING			= 38,
 #endif
-	//HEADER_CG_EMPTY						= 38,
-	//HEADER_CG_EMPTY						= 39,
-	//HEADER_CG_EMPTY						= 40,
 	HEADER_CG_PVP							= 41,
-	//HEADER_CG_EMPTY						= 42,
-	//HEADER_CG_EMPTY						= 43,
-	//HEADER_CG_EMPTY						= 44,
-	//HEADER_CG_EMPTY						= 45,
-	//HEADER_CG_EMPTY						= 46,
-	//HEADER_CG_EMPTY						= 47,
-	//HEADER_CG_EMPTY						= 48,
-	//HEADER_CG_EMPTY						= 49,
 	HEADER_CG_SHOP							= 50,
 	HEADER_CG_FLY_TARGETING					= 51,
 	HEADER_CG_USE_SKILL						= 52,
@@ -90,16 +74,13 @@ enum PacketHeaderCG
 	HEADER_CG_TARGET_INFO_LOAD				= 59,
 #endif
 	HEADER_CG_ITEM_USE_TO_ITEM				= 60,
-	HEADER_CG_TARGET			 			= 61,
+	HEADER_CG_TARGET						= 61,
 #ifdef ENABLE_OFFLINESHOP_SEARCH_SYSTEM
 	HEADER_CG_SHOP_SEARCH					= 62,
 #endif
-	//HEADER_CG_EMPTY						= 63,
-	//HEADER_CG_EMPTY						= 64,
 	HEADER_CG_WARP							= 65,
 	HEADER_CG_SCRIPT_BUTTON					= 66,
 	HEADER_CG_MESSENGER						= 67,
-	//HEADER_CG_EMPTY						= 68,
 	HEADER_CG_MALL_CHECKOUT					= 69,
 	HEADER_CG_SAFEBOX_CHECKIN				= 70,
 	HEADER_CG_SAFEBOX_CHECKOUT				= 71,
@@ -110,28 +91,15 @@ enum PacketHeaderCG
 	HEADER_CG_PARTY_USE_SKILL				= 76,
 	HEADER_CG_SAFEBOX_ITEM_MOVE				= 77,
 	HEADER_CG_PARTY_PARAMETER				= 78,
-	//HEADER_CG_EMPTY						= 79,
 	HEADER_CG_GUILD							= 80,
 	HEADER_CG_ANSWER_MAKE_GUILD				= 81,
 	HEADER_CG_FISHING						= 82,
 	HEADER_CG_ITEM_GIVE						= 83,
-	//HEADER_CG_EMPTY						= 84,
-	//HEADER_CG_EMPTY						= 85,
-	//HEADER_CG_EMPTY						= 86,
-	//HEADER_CG_EMPTY						= 87,
-	//HEADER_CG_EMPTY						= 88,
-	//HEADER_CG_EMPTY						= 89,
 	HEADER_CG_EMPIRE						= 90,
-	//HEADER_CG_EMPTY						= 91,
-	//HEADER_CG_EMPTY						= 92,
 #ifdef ENABLE_ITEMSHOP
-	HEADER_GC_ITEMSHOP 						= 93,
+	HEADER_GC_ITEMSHOP						= 93,
 #endif
-	//HEADER_CG_EMPTY						= 94,
-	//HEADER_CG_EMPTY						= 95,
 	HEADER_CG_REFINE						= 96,
-	//HEADER_CG_EMPTY						= 97,
-	//HEADER_CG_EMPTY						= 98,
 #ifdef ENABLE_HUNTING_SYSTEM
 	HEADER_CG_SEND_HUNTING_ACTION			= 99,
 #endif
@@ -142,8 +110,6 @@ enum PacketHeaderCG
 	HEADER_CG_MARK_IDXLIST					= 104,
 	HEADER_CG_HACK							= 105,
 	HEADER_CG_CHANGE_NAME					= 106,
-	//HEADER_CG_EMPTY						= 107,
-	//HEADER_CG_EMPTY						= 108,
 	HEADER_CG_LOGIN2						= 109,
 	HEADER_CG_DUNGEON						= 110,
 	HEADER_CG_LOGIN3						= 111,
@@ -151,13 +117,8 @@ enum PacketHeaderCG
 	HEADER_CG_SYMBOL_CRC					= 113,
 	HEADER_CG_SCRIPT_SELECT_ITEM			= 114,
 #ifdef ENABLE_STYLE_ATTRIBUTE_SYSTEM
-	HEADER_CG_ITEM_USE_NEW_ATTRIBUTE 		= 115,
+	HEADER_CG_ITEM_USE_NEW_ATTRIBUTE		= 115,
 #endif
-	//HEADER_CG_EMPTY						= 116,
-	//HEADER_CG_EMPTY						= 117,
-	//HEADER_CG_EMPTY						= 118,
-	//HEADER_CG_EMPTY						= 119,
-
 #ifdef ENABLE_EXTENDED_WHISPER_DETAILS
 	HEADER_CG_WHISPER_DETAILS				= 120,
 #endif
@@ -178,140 +139,34 @@ enum PacketHeaderCG
 	HEADER_CG_PET_DELETE_SKILL				= 132,
 	HEADER_CG_PET_DELETE_ALL_SKILL			= 133,
 #endif
-	//HEADER_CG_EMPTY						= 134,
-	//HEADER_CG_EMPTY						= 135,
-	//HEADER_CG_EMPTY						= 136,
-	//HEADER_CG_EMPTY						= 137,
-	//HEADER_CG_EMPTY						= 138,
-	//HEADER_CG_EMPTY						= 139,
-	//HEADER_CG_EMPTY						= 140,
-	//HEADER_CG_EMPTY						= 141,
-	//HEADER_CG_EMPTY						= 142,
-	//HEADER_CG_EMPTY						= 143,
-	//HEADER_CG_EMPTY						= 144,
-	//HEADER_CG_EMPTY						= 145,
-	//HEADER_CG_EMPTY						= 146,
-	//HEADER_CG_EMPTY						= 147,
-	//HEADER_CG_EMPTY						= 148,
-	//HEADER_CG_EMPTY						= 149,
-	//HEADER_CG_EMPTY						= 150,
-	//HEADER_CG_EMPTY						= 151,
-	//HEADER_CG_EMPTY						= 152,
-	//HEADER_CG_EMPTY						= 153,
-	//HEADER_CG_EMPTY						= 154,
-	//HEADER_CG_EMPTY						= 155,
-	//HEADER_CG_EMPTY						= 156,
-	//HEADER_CG_EMPTY						= 157,
-	//HEADER_CG_EMPTY						= 158,
-	//HEADER_CG_EMPTY						= 159,
-	//HEADER_CG_EMPTY						= 160,
-	//HEADER_CG_EMPTY						= 161,
-	//HEADER_CG_EMPTY						= 162,
-	//HEADER_CG_EMPTY						= 163,
-	//HEADER_CG_EMPTY						= 164,
-	//HEADER_CG_EMPTY						= 165,
-	//HEADER_CG_EMPTY						= 166,
-	//HEADER_CG_EMPTY						= 167,
-	//HEADER_CG_EMPTY						= 168,
-	//HEADER_CG_EMPTY						= 169,
-	//HEADER_CG_EMPTY						= 170,
 #ifdef ENABLE_RENEWAL_SWITCHBOT
 	HEADER_CG_SWITCHBOT						= 171,
 #endif
-	//HEADER_CG_EMPTY						= 172,
-	//HEADER_CG_EMPTY						= 173,
-	//HEADER_CG_EMPTY						= 174,
-	//HEADER_CG_EMPTY						= 175,
-	//HEADER_CG_EMPTY						= 176,
-	//HEADER_CG_EMPTY						= 177,
-	//HEADER_CG_EMPTY						= 178,
-	//HEADER_CG_EMPTY						= 179,
-	//HEADER_CG_EMPTY						= 180,
-	//HEADER_CG_EMPTY						= 181,
-	//HEADER_CG_EMPTY						= 182,
-	//HEADER_CG_EMPTY						= 183,
-	//HEADER_CG_EMPTY						= 184,
-	//HEADER_CG_EMPTY						= 185,
-	//HEADER_CG_EMPTY						= 186,
-	//HEADER_CG_EMPTY						= 187,
-	//HEADER_CG_EMPTY						= 188,
-	//HEADER_CG_EMPTY						= 189,
-	//HEADER_CG_EMPTY						= 190,
-	//HEADER_CG_EMPTY						= 191,
-	//HEADER_CG_EMPTY						= 192,
-	//HEADER_CG_EMPTY						= 193,
-	//HEADER_CG_EMPTY						= 194,
-	//HEADER_CG_EMPTY						= 195,
-	//HEADER_CG_EMPTY						= 196,
-	//HEADER_CG_EMPTY						= 197,
-	//HEADER_CG_EMPTY						= 198,
-	//HEADER_CG_EMPTY						= 199,
-	//HEADER_CG_EMPTY						= 200,
 #ifdef ENABLE_AUTO_SELL_SYSTEM
-    HEADER_CG_AUTO_SELL_ADD 				= 201,
-    HEADER_CG_AUTO_SELL_REMOVE 				= 202,
-    HEADER_CG_AUTO_SELL_STATUS 				= 203,
+	HEADER_CG_AUTO_SELL_ADD					= 201,
+	HEADER_CG_AUTO_SELL_REMOVE				= 202,
+	HEADER_CG_AUTO_SELL_STATUS				= 203,
 #endif
 #ifdef ENABLE_RIDING_EXTENDED
-	HEADER_CG_MOUNT_UP_GRADE 				= 204,
+	HEADER_CG_MOUNT_UP_GRADE				= 204,
 #endif
 	HEADER_CG_DRAGON_SOUL_REFINE			= 205,
-	//HEADER_CG_EMPTY						= 207,
-	//HEADER_CG_EMPTY						= 208,
-	//HEADER_CG_EMPTY						= 209,
-	//HEADER_CG_EMPTY						= 210,
-	//HEADER_CG_EMPTY						= 212,
 #ifdef ENABLE_DUNGEON_INFO
-	HEADER_CG_DUNGEON_INFO_SYSTEM 			= 213,
+	HEADER_CG_DUNGEON_INFO_SYSTEM			= 213,
 #endif
-	//HEADER_CG_EMPTY						= 214,
-	//HEADER_CG_EMPTY						= 215,
-	//HEADER_CG_EMPTY						= 216,
-	//HEADER_CG_EMPTY						= 217,
 #ifdef ENABLE_RENEWAL_CUBE
 	HEADER_CG_CUBE_RENEWAL					= 218,
 #endif
-	//HEADER_CG_EMPTY						= 219,
-	//HEADER_CG_EMPTY						= 220,
-	//HEADER_CG_EMPTY						= 221,
-	//HEADER_CG_EMPTY						= 222,
-	//HEADER_CG_EMPTY						= 223,
-	//HEADER_CG_EMPTY						= 224,
-	//HEADER_CG_EMPTY						= 225,
-	//HEADER_CG_EMPTY						= 226,
-	//HEADER_CG_EMPTY						= 227,
 #ifdef ENABLE_CHANGE_LOOK_SYSTEM
 	HEADER_CG_TRANSMUTATION					= 228,
 #endif
-	//HEADER_CG_EMPTY						= 229,
 #ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
 	HEADER_CG_CHANGE_LANGUAGE				= 230,
 #endif
 #ifdef ENABLE_AURA_COSTUME_SYSTEM
 	HEADER_CG_AURA							= 231,
 #endif
-	//HEADER_CG_EMPTY						= 232,
-	//HEADER_CG_EMPTY						= 233,
-	//HEADER_CG_EMPTY						= 234,
-	//HEADER_CG_EMPTY						= 235,
-	//HEADER_CG_EMPTY						= 236,
-	//HEADER_CG_EMPTY						= 237,
-	//HEADER_CG_EMPTY						= 238,
-	//HEADER_CG_EMPTY						= 239,
-	//HEADER_CG_EMPTY						= 240,
-	//HEADER_CG_EMPTY						= 241,
-	//HEADER_CG_EMPTY						= 242,
-	//HEADER_CG_EMPTY						= 243,
-	//HEADER_CG_EMPTY						= 244,
-	//HEADER_CG_EMPTY						= 245,
-	//HEADER_CG_EMPTY						= 246,
-	//HEADER_CG_EMPTY						= 247,
-	//HEADER_CG_EMPTY						= 248,
-	//HEADER_CG_EMPTY						= 249,
-	//HEADER_CG_EMPTY						= 250,
-	//HEADER_CG_EMPTY						= 251,
 	HEADER_CG_TIME_SYNC						= 0xfc,
-	//HEADER_CG_EMPTY						= 253,
 	HEADER_CG_PONG							= 0xfe,
 	HEADER_CG_HANDSHAKE						= 0xff,
 };
@@ -341,7 +196,6 @@ enum PacketHeaderGC
 	HEADER_GC_ITEM_SET								= 21,
 	HEADER_GC_ITEM_USE								= 22,
 	HEADER_GC_ITEM_DROP								= 23,
-	//HEADER_GC_EMPTY								= 24,
 	HEADER_GC_ITEM_UPDATE							= 25,
 	HEADER_GC_ITEM_GROUND_ADD						= 26,
 	HEADER_GC_ITEM_GROUND_DEL						= 27,
@@ -350,9 +204,7 @@ enum PacketHeaderGC
 	HEADER_GC_QUICKSLOT_SWAP						= 30,
 	HEADER_GC_ITEM_OWNERSHIP						= 31,
 	HEADER_GC_LOGIN_SUCCESS_NEWSLOT					= 32,
-	//HEADER_GC_EMPTY								= 33,
 	HEADER_GC_WHISPER								= 34,
-	//HEADER_GC_EMPTY								= 35,
 	HEADER_GC_MOTION								= 36,
 	HEADER_GC_PARTS									= 37,
 	HEADER_GC_SHOP									= 38,
@@ -364,15 +216,12 @@ enum PacketHeaderGC
 	HEADER_GC_PING									= 44,
 	HEADER_GC_SCRIPT								= 45,
 	HEADER_GC_QUEST_CONFIRM							= 46,
-
-	//HEADER_CG_EMPTY								= 47,
-
 	HEADER_GC_GUILDMARK_PASS						= 48,
 #ifdef ENABLE_RESP_SYSTEM
-	HEADER_GC_RESP 									= 49,
+	HEADER_GC_RESP									= 49,
 #endif
 #ifdef ENABLE_FISH_EVENT
-	HEADER_GC_FISH_EVENT_INFO 						= 50,
+	HEADER_GC_FISH_EVENT_INFO						= 50,
 #endif
 #ifdef ENABLE_RENEWAL_OFFLINESHOP
 	HEADER_GC_OFFLINE_SHOP							= 51,
@@ -385,9 +234,9 @@ enum PacketHeaderGC
 	HEADER_GC_SOUL_ROULETTE							= 54,
 #endif
 #ifdef ENABLE_ATTENDANCE_EVENT
-	HEADER_GC_HIT_COUNT_INFO 						= 55,
-	HEADER_GC_ATTENDANCE_EVENT 						= 56,
-	HEADER_GC_ATTENDANCE_EVENT_INFO 				= 57,
+	HEADER_GC_HIT_COUNT_INFO						= 55,
+	HEADER_GC_ATTENDANCE_EVENT						= 56,
+	HEADER_GC_ATTENDANCE_EVENT_INFO					= 57,
 #endif
 #ifdef ENABLE_MOB_DROP_INFO
 	HEADER_GC_TARGET_INFO							= 58,
@@ -396,20 +245,18 @@ enum PacketHeaderGC
 	HEADER_GC_PICKUP_ITEM_SC						= 59,
 #endif
 #ifdef ENABLE_MINI_GAME_CATCH_KING
-	HEADER_GC_MINI_GAME_CATCH_KING 					= 60,
+	HEADER_GC_MINI_GAME_CATCH_KING					= 60,
 #endif
 	HEADER_GC_MOUNT									= 61,
 	HEADER_GC_OWNERSHIP								= 62,
-	HEADER_GC_TARGET			 					= 63,
+	HEADER_GC_TARGET								= 63,
 #ifdef ENABLE_STONE_EVENT_SYSTEM
-	HEADER_GC_STONE_EVENT 							= 64,
+	HEADER_GC_STONE_EVENT							= 64,
 #endif
 	HEADER_GC_WARP									= 65,
 #ifdef ENABLE_KILL_STATISTICS
-	HEADER_GC_KILL_STATISTICS 						= 66,
+	HEADER_GC_KILL_STATISTICS						= 66,
 #endif
-	//HEADER_GC_EMPTY								= 67,
-	//HEADER_GC_EMPTY								= 68,
 	HEADER_GC_ADD_FLY_TARGETING						= 69,
 	HEADER_GC_CREATE_FLY							= 70,
 	HEADER_GC_FLY_TARGETING							= 71,
@@ -434,8 +281,6 @@ enum PacketHeaderGC
 	HEADER_GC_EMPIRE								= 90,
 	HEADER_GC_PARTY_LINK							= 91,
 	HEADER_GC_PARTY_UNLINK							= 92,
-	//HEADER_GC_EMPTY								= 93,
-	//HEADER_GC_EMPTY								= 94,
 	HEADER_GC_REFINE_INFORMATION_OLD				= 95,
 	HEADER_GC_OBSERVER_ADD							= 96,
 	HEADER_GC_OBSERVER_REMOVE						= 97,
@@ -444,20 +289,14 @@ enum PacketHeaderGC
 	HEADER_GC_MARK_BLOCK							= 100,
 	HEADER_GC_MARK_DIFF_DATA						= 101,
 	HEADER_GC_MARK_IDXLIST							= 102,
-	//HEADER_GC_EMPTY								= 103,
-	//HEADER_GC_EMPTY								= 104,
-	//HEADER_GC_EMPTY								= 105,
 	HEADER_GC_TIME									= 106,
 	HEADER_GC_CHANGE_NAME							= 107,
-	//HEADER_GC_EMPTY								= 108,
-	//HEADER_GC_EMPTY								= 109,
 	HEADER_GC_DUNGEON								= 110,
 	HEADER_GC_WALK_MODE								= 111,
 	HEADER_GC_SKILL_GROUP							= 112,
 	HEADER_GC_MAIN_CHARACTER						= 113,
 	HEADER_GC_SEPCIAL_EFFECT						= 114,
 	HEADER_GC_NPC_POSITION							= 115,
-	//HEADER_GC_EMPTY								= 116,
 	HEADER_GC_CHARACTER_UPDATE2						= 117,
 	HEADER_GC_LOGIN_KEY								= 118,
 	HEADER_GC_REFINE_INFORMATION					= 119,
@@ -487,42 +326,21 @@ enum PacketHeaderGC
 	HEADER_GC_HUNTING_UPDATE						= 142,
 	HEADER_GC_HUNTING_RECIVE_RAND_ITEMS				= 143,
 #endif
-	//HEADER_GC_EMPTY								= 144,
-	//HEADER_GC_EMPTY								= 145,
-	//HEADER_GC_EMPTY								= 146,
-	//HEADER_GC_EMPTY								= 147,
-	//HEADER_GC_EMPTY								= 148,
-	//HEADER_GC_EMPTY								= 149,
 	HEADER_GC_AUTH_SUCCESS							= 150,
 #ifdef ENABLE_CLIENT_LOCALE_STRING
 	HEADER_GC_LOCALE_CHAT							= 151,
 	HEADER_GC_LOCALE_WHISPER						= 152,
 #endif
-	//HEADER_GC_EMPTY								= 153,
-	//HEADER_GC_EMPTY								= 154,
 #ifdef ENABLE_RIDING_EXTENDED
-	HEADER_GC_MOUNT_UP_GRADE 						= 155,
-	HEADER_GC_MOUNT_UP_GRADE_CHAT 					= 156,
+	HEADER_GC_MOUNT_UP_GRADE						= 155,
+	HEADER_GC_MOUNT_UP_GRADE_CHAT					= 156,
 #endif
 #ifdef ENABLE_COLLECT_WINDOW
 	HEADER_GC_COLLECT								= 157,
 #endif
-	//HEADER_GC_EMPTY								= 158,
-	//HEADER_GC_EMPTY								= 159,
 #ifdef ENABLE_EXTENDED_WHISPER_DETAILS
 	HEADER_GC_WHISPER_DETAILS						= 160,
 #endif
-
-	//HEADER_GC_EMPTY								= 162,
-
-	//HEADER_GC_EMPTY								= 163,
-	//HEADER_GC_EMPTY								= 164,
-	//HEADER_GC_EMPTY								= 165,
-	//HEADER_GC_EMPTY								= 166,
-	//HEADER_GC_EMPTY								= 167,
-	//HEADER_GC_EMPTY								= 168,
-	//HEADER_GC_EMPTY								= 169,
-	//HEADER_GC_EMPTY								= 170,
 #ifdef ENABLE_RENEWAL_SWITCHBOT
 	HEADER_GC_SWITCHBOT								= 171,
 #endif
@@ -531,7 +349,6 @@ enum PacketHeaderGC
 	HEADER_GC_PET_SET								= 174,
 	HEADER_GC_PET_SET_EXCHANGE						= 175,
 	HEADER_GC_PET_DEL								= 176,
-	//HEADER_GC_EMPTY								= 177,
 	HEADER_GC_PET_SUMMON							= 178,
 	HEADER_GC_PET_POINT_CHANGE						= 179,
 	HEADER_GC_PET_NAME_CHANGE_RESULT				= 180,
@@ -541,40 +358,16 @@ enum PacketHeaderGC
 	HEADER_GC_PET_SKILL_COOLTIME					= 184,
 #endif
 #ifdef ENABLE_CONQUEROR_LEVEL
-	HEADER_GC_SUNGMA_ATTR_UPDATE 					= 185,
+	HEADER_GC_SUNGMA_ATTR_UPDATE					= 185,
 #endif
-	//HEADER_GC_EMPTY								= 186,
-	//HEADER_GC_EMPTY								= 187,
-	//HEADER_GC_EMPTY								= 188,
-	//HEADER_GC_EMPTY								= 189,
-	//HEADER_GC_EMPTY								= 190,
-	//HEADER_GC_EMPTY								= 191,
-	//HEADER_GC_EMPTY								= 192,
-	//HEADER_GC_EMPTY								= 193,
-	//HEADER_GC_EMPTY								= 194,
-	//HEADER_GC_EMPTY								= 195,
-	//HEADER_GC_EMPTY								= 196,
-	//HEADER_GC_EMPTY								= 197,
-	//HEADER_GC_EMPTY								= 198,
-	//HEADER_GC_EMPTY								= 199,
-	//HEADER_GC_EMPTY								= 200,
-	//HEADER_GC_EMPTY								= 201,
-	//HEADER_GC_EMPTY								= 202,
-	//HEADER_GC_EMPTY								= 203,
-	//HEADER_GC_EMPTY								= 204,
-	//HEADER_GC_EMPTY								= 205,
-	//HEADER_GC_EMPTY								= 206,
-	//HEADER_GC_EMPTY								= 207,
 	HEADER_GC_SPECIFIC_EFFECT						= 208,
 	HEADER_GC_DRAGON_SOUL_REFINE					= 209,
 	HEADER_GC_RESPOND_CHANNELSTATUS					= 210,
-	//HEADER_GC_EMPTY								= 212,
 #ifdef ENABLE_EVENT_SYSTEM
 	HEADER_GC_EVENT_INFO							= 213,
 #endif
-	//HEADER_GC_EMPTY								= 214,
 #ifdef ENABLE_PARTY_POSITION
-	HEADER_GC_PARTY_POSITION_INFO 					= 215,
+	HEADER_GC_PARTY_POSITION_INFO					= 215,
 #endif
 #ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
 	HEADER_GC_REQUEST_CHANGE_LANGUAGE				= 216,
@@ -582,22 +375,14 @@ enum PacketHeaderGC
 #ifdef ENABLE_RENEWAL_CUBE
 	HEADER_GC_CUBE_RENEWAL							= 218,
 #endif
-
-	//HEADER_CG_EMPTY								= 219,
-	//HEADER_CG_EMPTY								= 220,
-	//HEADER_CG_EMPTY								= 221,
-	//HEADER_CG_EMPTY								= 222,
-	//HEADER_CG_EMPTY								= 223,
-
 #ifdef ENABLE_AURA_COSTUME_SYSTEM
 	HEADER_GC_AURA									= 224,
 #endif
 #ifdef ENABLE_DUNGEON_INFO
-	HEADER_GC_DUNGEON_INFO_SYSTEM 					= 225,
+	HEADER_GC_DUNGEON_INFO_SYSTEM					= 225,
 #endif
-	//HEADER_CG_EMPTY								= 226,
 #ifdef ENABLE_RANKING
-	HEADER_GC_RANKING_SEND 							= 227,
+	HEADER_GC_RANKING_SEND							= 227,
 #endif
 #ifdef ENABLE_CHANGE_LOOK_SYSTEM
 	HEADER_GC_TRANSMUTATION_SET						= 228,
@@ -605,26 +390,6 @@ enum PacketHeaderGC
 	HEADER_GC_TRANSMUTATION_FREE_SET				= 230,
 	HEADER_GC_TRANSMUTATION_FREE_DEL				= 231,
 #endif
-	//HEADER_GC_EMPTY								= 232,
-	//HEADER_GC_EMPTY								= 233,
-	//HEADER_GC_EMPTY								= 234,
-	//HEADER_GC_EMPTY								= 235,
-	//HEADER_GC_EMPTY								= 236,
-	//HEADER_GC_EMPTY								= 237,
-	//HEADER_GC_EMPTY								= 238,
-	//HEADER_GC_EMPTY								= 239,
-	//HEADER_GC_EMPTY								= 240,
-	//HEADER_GC_EMPTY								= 241,
-	//HEADER_GC_EMPTY								= 242,
-	//HEADER_GC_EMPTY								= 243,
-	//HEADER_GC_EMPTY								= 244,
-	//HEADER_GC_EMPTY								= 245,
-	//HEADER_GC_EMPTY								= 246,
-	//HEADER_GC_EMPTY								= 247,
-	//HEADER_GC_EMPTY								= 248,
-	//HEADER_GC_EMPTY								= 249,
-	//HEADER_GC_EMPTY								= 250,
-	//HEADER_GC_EMPTY								= 251,
 	HEADER_GC_TIME_SYNC								= 0xfc,
 	HEADER_GC_PHASE									= 0xfd,
 	HEADER_GC_BINDUDP								= 0xfe,
@@ -674,10 +439,10 @@ enum PacketHeaderGG
 #ifdef ENABLE_ULTIMATE_REGEN
 	HEADER_GG_NEW_REGEN						= 29,
 #endif
-	HEADER_GG_PLAYER_RANK 					= 30,
-	HEADER_GG_PLAYER_RANK_RELOAD 			= 31,
+	HEADER_GG_PLAYER_RANK					= 30,
+	HEADER_GG_PLAYER_RANK_RELOAD			= 31,
 #ifdef ENABLE_RELOAD_COMMAND_ALL_CORES
-	HEADER_GG_RELOAD_COMMAND 				= 32,
+	HEADER_GG_RELOAD_COMMAND				= 32,
 #endif
 #ifdef ENABLE_STONE_EVENT_SYSTEM
 	HEADER_GG_STONE_EVENT					= 33,
@@ -852,9 +617,9 @@ typedef struct SPacketGGBlockChat
 #ifdef ENABLE_EVENT_SYSTEM
 typedef struct SPacketGGEventInfo
 {
-	BYTE	header;
-	BYTE	event_id;
-	DWORD	event_time;
+	BYTE header;
+	BYTE event_id;
+	DWORD event_time;
 } TPacketGGEventInfo;
 #endif
 
@@ -874,14 +639,22 @@ typedef struct command_handshake
 typedef struct command_login
 {
 	BYTE header;
+#ifdef PAKET_ESITLEME
+	char login[ID_MAX_NUM_LOGIN_MAX_LEN_Paketleri + 1];
+#else
 	char login[LOGIN_MAX_LEN + 1];
+#endif
 	char passwd[PASSWD_MAX_LEN + 1];
 } TPacketCGLogin;
 
 typedef struct command_login2
 {
 	BYTE header;
+#ifdef PAKET_ESITLEME
+	char login[ID_MAX_NUM_LOGIN_MAX_LEN_Paketleri + 1];
+#else
 	char login[LOGIN_MAX_LEN + 1];
+#endif
 	DWORD dwLoginKey;
 	DWORD adwClientKey[4];
 } TPacketCGLogin2;
@@ -889,7 +662,11 @@ typedef struct command_login2
 typedef struct command_login3
 {
 	BYTE header;
+#ifdef PAKET_ESITLEME
+	char login[ID_MAX_NUM_LOGIN_MAX_LEN_Paketleri + 1];
+#else
 	char login[LOGIN_MAX_LEN + 1];
+#endif
 	char passwd[PASSWD_MAX_LEN + 1];
 	DWORD adwClientKey[4];
 #ifdef ENABLE_MULTI_LANGUAGE_SYSTEM
@@ -1172,7 +949,11 @@ enum
 typedef struct command_exchange
 {
 	BYTE header;
+#ifdef PAKET_ESITLEME
+	BYTE subheader;
+#else
 	BYTE sub_header;
+#endif
 #ifdef ENABLE_GOLD_LIMIT
 	long long arg1;
 #else
@@ -1376,7 +1157,7 @@ typedef struct packet_char_additional_info
 	BYTE bLanguage2;
 #endif
 #ifdef ENABLE_SKILL_COLOR_SYSTEM
-	DWORD dwSkillColor[ESkillColorLength::MAX_SKILL_COUNT + ESkillColorLength::MAX_BUFF_COUNT][ESkillColorLength::MAX_EFFECT_COUNT];
+	DWORD dwSkillColor[TPacketGCCharacterAdditionalInfo_Paketi][ESkillColorLength::MAX_EFFECT_COUNT];
 #endif
 #ifdef ENABLE_GUILD_LEADER_TEXTAIL
 	BYTE dwGuildLeader;
@@ -1390,14 +1171,11 @@ typedef struct packet_update_char
 {
 	BYTE header;
 	DWORD dwVID;
-
 	WORD awPart[CHR_EQUIPPART_NUM];
 	BYTE bMovingSpeed;
 	BYTE bAttackSpeed;
-
 	BYTE bStateFlag;
 	DWORD dwAffectFlag[2];
-
 	DWORD dwGuildID;
 	short sAlignment;
 #ifdef ENABLE_CONQUEROR_LEVEL
@@ -1410,7 +1188,7 @@ typedef struct packet_update_char
 	BYTE bLanguage2;
 #endif
 #ifdef ENABLE_SKILL_COLOR_SYSTEM
-	DWORD dwSkillColor[ESkillColorLength::MAX_SKILL_COUNT + ESkillColorLength::MAX_BUFF_COUNT][ESkillColorLength::MAX_EFFECT_COUNT];
+	DWORD dwSkillColor[TPacketGCCharacterUpdate_Paketi][ESkillColorLength::MAX_EFFECT_COUNT];
 #endif
 #ifdef ENABLE_GUILD_LEADER_TEXTAIL
 	BYTE dwGuildLeader;
@@ -1506,7 +1284,11 @@ typedef struct packet_point_change
 {
 	int header;
 	DWORD dwVID;
+#ifdef PAKET_ESITLEME
+	BYTE Type;
+#else
 	BYTE type;
+#endif
 #ifdef ENABLE_GOLD_LIMIT
 	long long amount;
 	long long value;
@@ -1535,7 +1317,7 @@ enum EReviveTypes
 typedef struct packet_dead
 {
 #ifdef ENABLE_RENEWAL_DEAD_PACKET
-	packet_dead() {	memset(&t_d, 0, sizeof(t_d)); }
+	packet_dead() { memset(&t_d, 0, sizeof(t_d)); }
 #endif
 	BYTE header;
 	DWORD vid;
@@ -1817,7 +1599,7 @@ typedef struct packet_shop_update_item
 	BYTE pos;
 	struct packet_shop_item item;
 } TPacketGCShopUpdateItem;
-
+#ifndef PAKET_ESITLEME
 typedef struct packet_shop_update_price
 {
 #ifdef ENABLE_GOLD_LIMIT
@@ -1826,7 +1608,7 @@ typedef struct packet_shop_update_price
 	int iPrice;
 #endif
 } TPacketGCShopUpdatePrice;
-
+#endif
 typedef struct packet_shop
 {
 	BYTE header;
@@ -2853,14 +2635,23 @@ typedef struct packet_sungma_attr_update
 
 typedef struct packet_lover_info
 {
+#ifdef PAKET_ESITLEME
+	BYTE bHeader;
+#else
 	BYTE header;
+#endif
 	char name[CHARACTER_NAME_MAX_LEN + 1];
 	BYTE love_point;
 } TPacketGCLoverInfo;
 
 typedef struct packet_love_point_update
 {
+
+#ifdef PAKET_ESITLEME
+	BYTE bHeader;
+#else
 	BYTE header;
+#endif
 	BYTE love_point;
 } TPacketGCLovePointUpdate;
 
@@ -3048,7 +2839,6 @@ enum
 	CUBE_RENEWAL_SUB_HEADER_CLEAR_DATES_RECEIVE,
 	CUBE_RENEWAL_SUB_HEADER_DATES_RECEIVE,
 	CUBE_RENEWAL_SUB_HEADER_DATES_LOADING,
-
 	CUBE_RENEWAL_SUB_HEADER_MAKE_ITEM,
 	CUBE_RENEWAL_SUB_HEADER_CLOSE,
 };
@@ -3066,35 +2856,25 @@ typedef struct dates_cube_renewal
 {
 	DWORD npc_vnum;
 	DWORD index;
-
 	DWORD vnum_reward;
 	int count_reward;
-
 	bool item_reward_stackable;
-
 	DWORD vnum_material_1;
 	int count_material_1;
-
 	DWORD vnum_material_2;
 	int count_material_2;
-
 	DWORD vnum_material_3;
 	int count_material_3;
-
 	DWORD vnum_material_4;
 	int count_material_4;
-
 	DWORD vnum_material_5;
 	int count_material_5;
-
 	int gold;
 #ifdef ENABLE_GAYA_SYSTEM
 	int gem;
 #endif
 	int percent;
-
 	bool allowCopyAttr;
-
 	char category[100];
 } TInfoDateCubeRenewal;
 
@@ -3148,7 +2928,6 @@ typedef struct packet_target_info
 	DWORD dwVID;
 	DWORD race;
 	DWORD dwVnum;
-
 #ifdef ENABLE_STACK_LIMIT
 	WORD count;
 #else
@@ -3423,7 +3202,11 @@ typedef struct SPacketGCPetSet
 	BYTE header;
 	DWORD dwID;
 	DWORD dwSummonItemVnum;
+#ifdef PAKET_ESITLEME
+	char szName[SPacketCGPetHatch_Paketi + 1];
+#else
 	char szName[PET_NAME_MAX_SIZE + 1];
+#endif
 	TPetSkill aSkill[PET_SKILL_COUNT_MAX];
 	DWORD dwPoints[POINT_UPBRINGING_MAX_NUM];
 } TPacketGCPetSet;
@@ -3492,16 +3275,23 @@ typedef struct SPacketGCPetNameChangeResult
 	BYTE header;
 	BYTE subheader;
 	DWORD dwID;
+#ifdef PAKET_ESITLEME
+	char szName[SPacketCGPetHatch_Paketi];
+#else
 	char szName[PET_NAME_MAX_SIZE + 1];
+#endif
 } TPacketGCPetNameChangeResult;
 
 typedef struct SPacketCGPetHatch
 {
 	BYTE header;
+#ifdef PAKET_ESITLEME
+	char name[SPacketCGPetHatch_Paketi];
+#else
 	char name[PET_NAME_MAX_SIZE + 1];
+#endif
 	TItemPos eggPos;
 } TPacketCGPetHatch;
-
 typedef struct SPacketCGPetWindow
 {
 	BYTE header;
@@ -3570,6 +3360,15 @@ typedef struct SPacketCGPetAllDeleteSkill
 	TItemPos deleteAllSkillPos;
 } TPacketCGPetDeleteAllSkill;
 
+#ifdef PAKET_ESITLEME
+typedef struct SPacketCGPetNameChange
+{
+	BYTE header;
+	char name[SPacketCGPetHatch_Paketi];
+	TItemPos changeNamePos;
+	TItemPos upBringingPos;
+} TPacketCGPetNameChange;
+#else
 typedef struct SPacketCGPetNameChange
 {
 	BYTE header;
@@ -3577,6 +3376,7 @@ typedef struct SPacketCGPetNameChange
 	TItemPos changeNamePos;
 	TItemPos upBringingPos;
 } TPacketCGPetNameChange;
+#endif
 #endif
 
 #ifdef ENABLE_ULTIMATE_REGEN
@@ -3720,27 +3520,27 @@ typedef struct SPacketGCMountUpGradeChat
 #ifdef ENABLE_AUTO_SELL_SYSTEM
 typedef struct packet_auto_sell_add
 {
-	BYTE		header;
-	DWORD		vnum;
+	BYTE header;
+	DWORD vnum;
 } TPacketCGAutoSellAdd;
 
 typedef struct packet_auto_sell_remove
 {
-	BYTE		header;
-	DWORD		vnum;
+	BYTE header;
+	DWORD vnum;
 } TPacketCGAutoSellRemove;
 
 typedef struct packet_auto_sell_status
 {
-	BYTE		header;
-	BYTE		status;
+	BYTE header;
+	BYTE status;
 } TPacketCGAutoSellStatus;
 #endif
 
 #ifdef ENABLE_STYLE_ATTRIBUTE_SYSTEM
 typedef struct command_item_new_attribute
 {
-	BYTE  header;
+	BYTE header;
 	TItemPos source_pos;
 	TItemPos target_pos;
 	BYTE bValues[4 + 1];
@@ -3750,11 +3550,11 @@ typedef struct command_item_new_attribute
 #ifdef ENABLE_ITEMSHOP
 typedef struct SPacketGCItemShop
 {
-	BYTE	header;
+	BYTE header;
 #ifdef ENABLE_LARGE_DYNAMIC_PACKETS
-	int		size;
+	int size;
 #else
-	WORD	size;
+	WORD size;
 #endif
 } TPacketGCItemShop;
 #endif
@@ -3784,7 +3584,7 @@ typedef struct packet_send_dungeon_info_system
 {
 	BYTE header;
 	BYTE subheader;
-	int  index;
+	int index;
 
 } TPacketCGDungeonInfoSend;
 
@@ -3792,13 +3592,11 @@ typedef struct SPacketGCDungeonInfoReceive
 {
 	SPacketGCDungeonInfoReceive() : header(HEADER_GC_DUNGEON_INFO_SYSTEM)
 	{}
-
 	BYTE header;
 	BYTE bSubType;
-
-	SFDateInfoPacket 	dateinfo;
-	SFDateRanking 		dateinfo_ranking;
-	SFDateMision		dateinfom;
+	SFDateInfoPacket dateinfo;
+	SFDateRanking dateinfo_ranking;
+	SFDateMision dateinfom;
 
 } TPacketGCDungeonInfoReceive;
 #endif
@@ -3806,26 +3604,26 @@ typedef struct SPacketGCDungeonInfoReceive
 #ifdef ENABLE_KILL_STATISTICS
 typedef struct command_kill_statistics_packet
 {
-	BYTE	bHeader;
-	int	iJinnoKills;
-	int	iShinsooKills;
-	int	iChunjoKills;
+	BYTE bHeader;
+	int iJinnoKills;
+	int iShinsooKills;
+	int iChunjoKills;
 	int iTotalKills;
 	int iTotalDeaths;
 	int iDuelsWon;
 	int iDuelsLost;
-	int	iBossesKills;
-	int	iStonesKills;
-	int	iMobsKills;
-	int	top_damage;
+	int iBossesKills;
+	int iStonesKills;
+	int iMobsKills;
+	int top_damage;
 } TPacketGCKillStatistics;
 #endif
 
 #ifdef ENABLE_RELOAD_COMMAND_ALL_CORES
 typedef struct SPacketGGReloadCommand
 {
-	BYTE	header;
-	char	argument[10];
+	BYTE header;
+	char argument[10];
 } TPacketGGReloadCommand;
 #endif
 
@@ -3847,15 +3645,15 @@ enum ERespConfig
 
 typedef struct SPacketGCRespHeader
 {
-	uint8_t	header;
-	uint16_t	size;
-	uint8_t	subheader;
+	uint8_t header;
+	uint16_t size;
+	uint8_t subheader;
 } TPacketGCRespHeader;
 
 typedef struct SPacketCGRespHeader
 {
-	uint8_t	header;
-	uint8_t	subheader;
+	uint8_t header;
+	uint8_t subheader;
 } TPacketCGRespHeader;
 
 typedef struct SPacketGCRespData
@@ -3869,64 +3667,64 @@ typedef struct SPacketGCRespData
 
 typedef struct SPacketGCRespGold
 {
-	uint32_t	minGold;
-	uint32_t	maxGold;
+	uint32_t minGold;
+	uint32_t maxGold;
 } TPacketGCRespGold;
 
 typedef struct SPacketGCRespItem
 {
-	uint32_t	vnum;
-	uint8_t	minCount;
-	uint8_t	maxCount;
+	uint32_t vnum;
+	uint8_t minCount;
+	uint8_t maxCount;
 } TPacketGCRespItem;
 
 typedef struct SPacketGCMapData
 {
-	uint8_t	mobCount;
-	uint32_t	currentMetinCount;
-	uint32_t	maxMetinCount;
-	uint32_t	currentBossCount;
-	uint32_t	maxBossCount;
+	uint8_t mobCount;
+	uint32_t currentMetinCount;
+	uint32_t maxMetinCount;
+	uint32_t currentBossCount;
+	uint32_t maxBossCount;
 } TPacketGCMapData;
 
 typedef struct SPacketGCRespRefresh
 {
-	size_t	id;
-	uint32_t	vnum;
-	time_t	nextRespTime;
-	uint32_t	x;
-	uint32_t	y;
+	size_t id;
+	uint32_t vnum;
+	time_t nextRespTime;
+	uint32_t x;
+	uint32_t y;
 } TPacketGCRespRefresh;
 #endif
 
 #ifdef ENABLE_COLLECT_WINDOW
 typedef struct SPacketGCCollectWindow
 {
-	BYTE	bHeader;
-	BYTE	bWindowType;
-	DWORD	dwTime;
-	DWORD	bCount;
-	DWORD	dwItemVnum;
-	DWORD	bCountTotal;
-	BYTE	bChance;
-	DWORD	bRenderTargetID;
-	DWORD	bQuestIndex;
-	DWORD	RequiredLevel;
+	BYTE bHeader;
+	BYTE bWindowType;
+	DWORD dwTime;
+	DWORD bCount;
+	DWORD dwItemVnum;
+	DWORD bCountTotal;
+	BYTE bChance;
+	DWORD bRenderTargetID;
+	DWORD bQuestIndex;
+	DWORD RequiredLevel;
 } TPacketGCCollectWindow;
 #endif
 
 #ifdef ENABLE_SOUL_ROULETTE_SYSTEM
 typedef struct command_cgroulette
 {
-	BYTE	header;
-	BYTE 	option;
+	BYTE header;
+	BYTE option;
 } TPacketCGSoulRoulette;
 typedef struct command_gcroulette
 {
-	BYTE	header;
-	BYTE 	option;
-	int		yang;
-	int		soul;
+	BYTE header;
+	BYTE option;
+	int yang;
+	int soul;
 	struct {
 		DWORD vnum;
 		BYTE count;
@@ -3935,15 +3733,15 @@ typedef struct command_gcroulette
 #endif
 
 #ifdef ENABLE_ATTENDANCE_EVENT
+#ifndef PAKET_ESITLEME
 enum
 {
 	//HEADER_CG_ATTENDANCE_REWARD = 220,
-
 	//HEADER_GC_HIT_COUNT_INFO = 232,
 	//HEADER_GC_ATTENDANCE_EVENT = 233,
 	//HEADER_GC_ATTENDANCE_EVENT_INFO = 234,
 };
-
+#endif
 typedef struct SHitCountInfo
 {
 	SHitCountInfo(){ dwVid = dwCount = 0;}
@@ -3952,8 +3750,8 @@ typedef struct SHitCountInfo
 		dwVid = vid;
 		dwCount = count;
 	}
-	DWORD	dwVid;
-	DWORD	dwCount;
+	DWORD dwVid;
+	DWORD dwCount;
 } THitCountInfo;
 
 typedef struct SRewardItem
@@ -3964,34 +3762,35 @@ typedef struct SRewardItem
 } TRewardItem;
 
 typedef struct SPacketGCHitCountInfo {
-	BYTE	bHeader;
-	DWORD	dwVid;
-	DWORD	dwCount;
+	BYTE bHeader;
+	DWORD dwVid;
+	DWORD dwCount;
 } TPacketGCHitCountInfo;
 
 typedef struct SPacketGCAttendanceEventInfo {
-	BYTE	bHeader;
-	WORD	wSize;
-	bool	bIsEnable;
-	BYTE	bDay;
-	BYTE	bClear;
-	BYTE	bReward;
+	BYTE bHeader;
+	WORD wSize;
+	bool bIsEnable;
+	BYTE bDay;
+	BYTE bClear;
+	BYTE bReward;
 } TPacketGCAttendanceEventInfo;
 
 typedef struct SPacketGCAttendanceEvent {
-	BYTE	bHeader;
-	BYTE	bType;
-	BYTE	bValue;
+	BYTE bHeader;
+	BYTE bType;
+	BYTE bValue;
 } TPacketGCAttendanceEvent;
 #endif
 
 #ifdef ENABLE_MINI_GAME_CATCH_KING
+#ifndef PAKET_ESITLEME
 enum
 {
 	//HEADER_CG_MINI_GAME_CATCH_KING = 226,
 	//HEADER_GC_MINI_GAME_CATCH_KING = 238,
 };
-
+#endif
 enum
 {
 	SUBHEADER_GC_CATCH_KING_EVENT_INFO,
@@ -4016,55 +3815,56 @@ typedef struct SCatchKingCard
 } TCatchKingCard;
 
 typedef struct SPacketCGMiniGameCatchKing {
-	BYTE	bHeader;
-	BYTE	bSubheader;
-	BYTE	bSubArgument;
+	BYTE bHeader;
+	BYTE bSubheader;
+	BYTE bSubArgument;
 } TPacketCGMiniGameCatchKing;
 
 typedef struct SPacketGCMiniGameCatchKing {
-	BYTE	bHeader;
-	WORD	wSize;
-	BYTE	bSubheader;
+	BYTE bHeader;
+	WORD wSize;
+	BYTE bSubheader;
 } TPacketGCMiniGameCatchKing;
 
 typedef struct SPacketGCMiniGameCatchKingResult {
-	DWORD	dwPoints;
-	BYTE	bRowType;
-	BYTE	bCardPos;
-	BYTE	bCardValue;
-	bool	bKeepFieldCard;
-	bool	bDestroyHandCard;
-	bool	bGetReward;
-	bool 	bIsFiveNearBy;
+	DWORD dwPoints;
+	BYTE bRowType;
+	BYTE bCardPos;
+	BYTE bCardValue;
+	bool bKeepFieldCard;
+	bool bDestroyHandCard;
+	bool bGetReward;
+	bool bIsFiveNearBy;
 } TPacketGCMiniGameCatchKingResult;
 
 typedef struct SPacketGCMiniGameCatchKingSetEndCard {
-	BYTE	bCardPos;
-	BYTE	bCardValue;
+	BYTE bCardPos;
+	BYTE bCardValue;
 } TPacketGCMiniGameCatchKingSetEndCard;
 #endif
 
 #ifdef ENABLE_STONE_EVENT_SYSTEM
 typedef struct packet_stone_event
 {
-	BYTE	header;
-	int		stone_point;
+	BYTE header;
+	int stone_point;
 } TPacketGCStoneEvent;
 
 typedef struct packet_stone_event_p2p
 {
-	BYTE	header;
-	DWORD	pid;
+	BYTE header;
+	DWORD pid;
 } TPacketGGStoneEvent;
 #endif
 
 #ifdef ENABLE_FISH_EVENT
+#ifndef PAKET_ESITLEME
 enum
 {
 	//HEADER_CG_FISH_EVENT_SEND = 222,
 	//HEADER_GC_FISH_EVENT_INFO = 223,
 };
-
+#endif
 enum
 {
 	FISH_EVENT_SUBHEADER_BOX_USE,
@@ -4074,25 +3874,25 @@ enum
 };
 
 typedef struct SPacketGCFishEvent {
-	BYTE	bHeader;
-	BYTE	bSubheader;
+	BYTE bHeader;
+	BYTE bSubheader;
 } TPacketCGFishEvent;
 
 typedef struct SPacketGCFishEventInfo {
-	BYTE	bHeader;
-	BYTE	bSubheader;
-	DWORD	dwFirstArg;
-	DWORD	dwSecondArg;
+	BYTE bHeader;
+	BYTE bSubheader;
+	DWORD dwFirstArg;
+	DWORD dwSecondArg;
 } TPacketGCFishEventInfo;
 #endif
 
 #ifdef ENABLE_EVENT_SYSTEM
 typedef struct packet_event_info
 {
-	BYTE		bHeader;
-	BYTE		event_id;
-	bool		isActivate;
-	DWORD		event_time;
+	BYTE bHeader;
+	BYTE event_id;
+	bool isActivate;
+	DWORD event_time;
 } TPacketGCEventInfo;
 #endif
 
@@ -4104,17 +3904,17 @@ enum
 
 typedef struct SPacketGCList
 {
-	int		iPosition, iRealPosition, iLevel;
-	long long	iPoints;
-	char	szName[CHARACTER_NAME_MAX_LEN + 1];
+	int iPosition, iRealPosition, iLevel;
+	long long iPoints;
+	char szName[CHARACTER_NAME_MAX_LEN + 1];
 } TPacketGCList;
 
 typedef struct SPacketGCRankingTable
 {
 	SPacketGCRankingTable() : bHeader(HEADER_GC_RANKING_SEND)
 	{}
-	BYTE 			bHeader;
-	TPacketGCList	list[MAX_RANKING_LIST];
+	BYTE bHeader;
+	TPacketGCList list[MAX_RANKING_LIST];
 } TPacketGCRankingTable;
 #endif
 

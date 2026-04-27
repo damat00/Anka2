@@ -292,6 +292,14 @@
 #define ENABLE_EXTENDED_SYSERR								// Standart syserr.txt günlüðünü geniþleterek daha fazla hata baðlamý, zaman damgasý ve yýðýn izleme bilgisi kaydeden geliþmiþ hata kayýt sistemini etkinleþtirir;	"EterBase; Debug.cpp"
 #define DISABLE_BACKGROUND_DARKENING						// Oyun arka planýnda menü veya diyalog açýldýðýnda uygulanan ekran karartma efektini devre dýþý býrakýr;
 // #define ENABLE_SYSERR_BY_PID								// [Debug.cpp] syserr.txt yerine her iþlem için ayrý syserr-{pid}.txt oluþturur (kapalý);
+#define PAKET_ESITLEME										// [EKSIK], [BOYUT FARKI], [TIP FARKI], [ISIM FARKI], [TIP+ISIM FARKI], kategorilerinde paketleri inceleyerek eþler
+#ifdef PAKET_ESITLEME
+	#define SPacketCGPetHatch_Paketi CItemData::PET_NAME_MAX_SIZE
+	#define TPacketGCCharacterUpdate_Paketi ESkillColorLength::MAX_SKILL_COUNT+MAX_BUFF_COUNT
+	#define TPacketGCCharacterAdditionalInfo_Paketi ESkillColorLength::MAX_SKILL_COUNT + MAX_BUFF_COUNT
+	#define ID_MAX_NUM_LOGIN_MAX_LEN_Paketleri ID_MAX_NUM
+
+#endif
 /*** DÜZELTMELER ***/
 
 /*<----Bilgilendirme---->*/

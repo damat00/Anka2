@@ -1542,7 +1542,11 @@ bool CPythonNetworkStream::SendChatPacket(const char *c_szChat, BYTE byType)
 	int iTextLen = strlen(c_szChat) + 1;
 	TPacketCGChat ChatPacket;
 	ChatPacket.header = HEADER_CG_CHAT;
+#ifdef PAKET_ESITLEME
+	ChatPacket.size = sizeof(ChatPacket) + iTextLen;
+#else
 	ChatPacket.length = sizeof(ChatPacket) + iTextLen;
+#endif
 	ChatPacket.type = byType;
 
 	if (!Send(sizeof(ChatPacket), &ChatPacket))
@@ -3403,8 +3407,11 @@ bool CPythonNetworkStream::SendAttackPacket(UINT uMotAttack, DWORD dwVIDVictim)
 		return true;
 
 	TPacketCGAttack kPacketAtk;
-
+#ifdef PAKET_ESITLEME
+	kPacketAtk.bHeader = HEADER_CG_ATTACK;
+#else
 	kPacketAtk.header = HEADER_CG_ATTACK;
+#endif
 	kPacketAtk.bType = uMotAttack;
 	kPacketAtk.dwVictimVID = dwVIDVictim;
 
@@ -3847,7 +3854,11 @@ bool CPythonNetworkStream::SendPartyInviteAnswerPacket(DWORD dwLeaderVID, BYTE b
 {
 	TPacketCGPartyInviteAnswer kPartyInviteAnswerPacket;
 	kPartyInviteAnswerPacket.header = HEADER_CG_PARTY_INVITE_ANSWER;
+#ifdef PAKET_ESITLEME
+	kPartyInviteAnswerPacket.leader_vid = dwLeaderVID;
+#else
 	kPartyInviteAnswerPacket.leader_pid = dwLeaderVID;
+#endif
 	kPartyInviteAnswerPacket.accept = byAnswer;
 
 	if (!Send(sizeof(kPartyInviteAnswerPacket), &kPartyInviteAnswerPacket))
@@ -3933,6 +3944,17 @@ bool CPythonNetworkStream::RecvPartyInvite()
 	if (!Recv(sizeof(kPartyInvitePacket), &kPartyInvitePacket))
 		return false;
 
+#ifdef PAKET_ESITLEME
+	CInstanceBase* pInstance = CPythonCharacterManager::Instance().GetInstancePtr(kPartyInvitePacket.leader_vid);
+	if (!pInstance)
+	{
+		TraceError(" CPythonNetworkStream::RecvPartyInvite - Failed to find leader instance [%d]\n", kPartyInvitePacket.leader_vid);
+		return true;
+	}
+
+	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "RecvPartyInviteQuestion", Py_BuildValue("(is)", kPartyInvitePacket.leader_vid, pInstance->GetNameString()));
+	Tracef(" >> RecvPartyInvite : %d, %s\n", kPartyInvitePacket.leader_vid, pInstance->GetNameString());
+#else
 	CInstanceBase * pInstance = CPythonCharacterManager::Instance().GetInstancePtr(kPartyInvitePacket.leader_pid);
 	if (!pInstance)
 	{
@@ -3942,7 +3964,7 @@ bool CPythonNetworkStream::RecvPartyInvite()
 
 	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "RecvPartyInviteQuestion", Py_BuildValue("(is)", kPartyInvitePacket.leader_pid, pInstance->GetNameString()));
 	Tracef(" >> RecvPartyInvite : %d, %s\n", kPartyInvitePacket.leader_pid, pInstance->GetNameString());
-
+#endif
 	return true;
 }
 
@@ -3971,7 +3993,11 @@ bool CPythonNetworkStream::RecvPartyUpdate()
 
 	BYTE byOldState = pPartyMemberInfo->byState;
 
+#ifdef PAKET_ESITLEME
+	CPythonPlayer::Instance().UpdatePartyMemberInfo(kPartyUpdatePacket.pid, kPartyUpdatePacket.role, kPartyUpdatePacket.percent_hp);
+#else
 	CPythonPlayer::Instance().UpdatePartyMemberInfo(kPartyUpdatePacket.pid, kPartyUpdatePacket.state, kPartyUpdatePacket.percent_hp);
+#endif
 	for (int i = 0; i < PARTY_AFFECT_SLOT_MAX_NUM; ++i)
 	{
 		CPythonPlayer::Instance().UpdatePartyMemberAffect(kPartyUpdatePacket.pid, i, kPartyUpdatePacket.affects[i]);
@@ -3979,10 +4005,14 @@ bool CPythonNetworkStream::RecvPartyUpdate()
 
 	PyCallClassMemberFunc(m_apoPhaseWnd[PHASE_WINDOW_GAME], "UpdatePartyMemberInfo", Py_BuildValue("(i)", kPartyUpdatePacket.pid));
 
-	// 만약 리더가 바뀌었다면, TargetBoard 의 버튼을 업데이트 한다.
 	DWORD dwVID;
 	if (CPythonPlayer::Instance().PartyMemberPIDToVID(kPartyUpdatePacket.pid, &dwVID))
+
+#ifdef PAKET_ESITLEME
+	if (byOldState != kPartyUpdatePacket.role)
+#else
 	if (byOldState != kPartyUpdatePacket.state)
+#endif
 	{
 		__RefreshTargetBoardByVID(dwVID);
 	}

@@ -5350,7 +5350,11 @@ void CHARACTER::PointChange(BYTE type, int amount, bool bAmount, bool bBroadcast
 
 		pack.header = HEADER_GC_CHARACTER_POINT_CHANGE;
 		pack.dwVID = m_vid;
+#ifdef PAKET_ESITLEME
+		pack.Type = type;
+#else
 		pack.type = type;
+#endif
 		pack.value = val;
 
 		if (bAmount)

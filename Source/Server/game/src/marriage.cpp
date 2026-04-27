@@ -39,7 +39,11 @@ namespace marriage
 	{
 		TPacketGCLoverInfo p;
 
+#ifdef PAKET_ESITLEME
+		p.bHeader = HEADER_GC_LOVER_INFO;
+#else
 		p.header = HEADER_GC_LOVER_INFO;
+#endif
 		strlcpy(p.name, lover_name.c_str(), sizeof(p.name));
 		p.love_point = love_point;
 		ch->GetDesc()->Packet(&p, sizeof(p));
@@ -309,7 +313,11 @@ namespace marriage
 		{
 			byLastLovePoint = GetMarriagePoint();
 			TPacketGCLovePointUpdate p;
+#ifdef PAKET_ESITLEME
+			p.bHeader = HEADER_GC_LOVE_POINT_UPDATE;
+#else
 			p.header = HEADER_GC_LOVE_POINT_UPDATE;
+#endif
 			p.love_point = byLastLovePoint;
 
 			ch1->GetDesc()->Packet(&p, sizeof(p));

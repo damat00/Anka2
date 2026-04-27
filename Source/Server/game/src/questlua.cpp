@@ -78,7 +78,23 @@ namespace quest
 		if (pPC)
 			pPC->SetFlag(flagname, value);
 	}
+#ifdef BUILD_LOG_TEMIZLIGI
+	bool FPartyCheckFlagLt::operator() (LPCHARACTER ch)
+	{
+		if (!ch->IsPC())
+			return false;
 
+		PC* pPC = CQuestManager::instance().GetPCForce(ch->GetPlayerID());
+
+		if (pPC)
+		{
+			int flagValue = pPC->GetFlag(flagname);
+			return value > flagValue;  // if/else yerine direkt return
+		}
+
+		return false;  // pPC null ise false döndür
+	}
+#else
 	bool FPartyCheckFlagLt::operator() (LPCHARACTER ch)
 	{
 		if (!ch->IsPC())
@@ -97,7 +113,7 @@ namespace quest
 
 		return returnBool;
 	}
-
+#endif
 	FPartyChat::FPartyChat(int ChatType, const char* str) : iChatType(ChatType), str(str)
 	{
 	}

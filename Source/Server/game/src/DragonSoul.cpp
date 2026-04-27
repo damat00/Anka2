@@ -864,8 +864,11 @@ bool DSManager::DoRefineStrength(LPCHARACTER ch, TItemPos (&aItemPoses)[DRAGON_S
 		}
 	}
 
+#ifdef BUILD_LOG_TEMIZLIGI
+	BYTE bType = 0, bGrade = 0, bStep = 0, bStrength = 0;
+#else
 	BYTE bType, bGrade, bStep, bStrength;
-	
+#endif
 	if (!pDragonSoul || !pRefineStone)
 	{
 		SendRefineResultPacket(ch, DS_SUB_HEADER_REFINE_FAIL_NOT_ENOUGH_MATERIAL, NPOS);

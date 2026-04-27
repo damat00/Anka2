@@ -1,6 +1,0 @@
-0327 00:44:07454 :: CRaceManager::RegisterRacePath : RACE[30308] LOAD MSMFILE[d:/ymir work/npc2/postbox_npc/postbox_npc.msm] ERROR. Will Find Another Path.
-0327 00:44:07454 :: CRaceManager::RegisterRacePath : RACE[30308] LOAD MSMFILE[d:/ymir work/npc_pet/postbox_npc/postbox_npc.msm] ERROR. Will Find Another Path.
-0327 00:52:16021 :: CRaceManager::RegisterRacePath : RACE[60003] LOAD MSMFILE[d:/ymir work/npc2/scholar_beige_M/scholar_beige_M1.msm] ERROR. Will Find Another Path.
-0327 00:52:16021 :: CRaceManager::RegisterRacePath : RACE[60003] LOAD MSMFILE[d:/ymir work/npc_pet/scholar_beige_M/scholar_beige_M1.msm] ERROR. Will Find Another Path.
-0327 02:02:15165 :: CRaceManager::RegisterRacePath : RACE[20470] LOAD MSMFILE[d:/ymir work/npc/npc_turtlestone/npc_turtlestone_01.msm] ERROR. Will Find Another Path.
-0327 02:02:15165 :: CRaceManager::RegisterRacePath : RACE[20470] LOAD MSMFILE[d:/ymir work/npc_mount/npc_turtlestone/npc_turtlestone_01.msm] ERROR. Will Find Another Path.
