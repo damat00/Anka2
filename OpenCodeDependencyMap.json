@@ -1,0 +1,4042 @@
+{
+  "Home": {
+    "dependencies": [
+      "liblua",
+      "libthecore"
+    ],
+    "files": [
+      {
+        "path": "E:\\\\Anka2\\\\home\\main\\auth\\packet_info.txt",
+        "function": "packet_info"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\main\\auth\\version.txt",
+        "function": "version"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\main\\channels\\channel1\\core1\\packet_info.txt",
+        "function": "packet_info"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\main\\channels\\channel1\\core1\\version.txt",
+        "function": "version"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\main\\channels\\channel1\\core2\\version.txt",
+        "function": "version"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\main\\channels\\channel1\\core3\\version.txt",
+        "function": "version"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\main\\channels\\channel99\\version.txt",
+        "function": "version"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\main\\db\\conf.txt",
+        "function": "conf"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\main\\db\\item_names.txt",
+        "function": "item_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\main\\db\\item_proto.txt",
+        "function": "item_proto"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\main\\db\\mob_names.txt",
+        "function": "mob_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\main\\db\\mob_proto.txt",
+        "function": "mob_proto"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\main\\db\\version.txt",
+        "function": "version"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\conf\\item_names.txt",
+        "function": "item_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\conf\\item_proto.txt",
+        "function": "item_proto"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\conf\\mob_names.txt",
+        "function": "mob_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\conf\\mob_proto.txt",
+        "function": "mob_proto"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\devilcatacomb\\dc_1f_regen.txt",
+        "function": "dc_1f_regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\devilcatacomb\\dc_2f_regen.txt",
+        "function": "dc_2f_regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\devilcatacomb\\dc_3f_regen.txt",
+        "function": "dc_3f_regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\devilcatacomb\\dc_4f_regen.txt",
+        "function": "dc_4f_regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\devilcatacomb\\dc_5f_regen.txt",
+        "function": "dc_5f_regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\devilcatacomb\\dc_6f_regen.txt",
+        "function": "dc_6f_regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\devilcatacomb\\dc_7f_regen.txt",
+        "function": "dc_7f_regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\devilcatacomb\\devilcatacomb_floor4_regen1.txt",
+        "function": "devilcatacomb_floor4_regen1"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\devilcatacomb\\devilcatacomb_floor4_regen2.txt",
+        "function": "devilcatacomb_floor4_regen2"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\devilcatacomb\\devilcatacomb_floor4_regen3.txt",
+        "function": "devilcatacomb_floor4_regen3"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\devilcatacomb\\devilcatacomb_floor4_regen4.txt",
+        "function": "devilcatacomb_floor4_regen4"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\devilcatacomb\\devilcatacomb_floor4_regen5.txt",
+        "function": "devilcatacomb_floor4_regen5"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\deviltower\\deviltower2_regen.txt",
+        "function": "deviltower2_regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\deviltower\\deviltower3_regen.txt",
+        "function": "deviltower3_regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\deviltower\\deviltower4_regen.txt",
+        "function": "deviltower4_regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\deviltower\\deviltower5_regen.txt",
+        "function": "deviltower5_regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\deviltower\\deviltower6_regen.txt",
+        "function": "deviltower6_regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\deviltower\\deviltower7_regen.txt",
+        "function": "deviltower7_regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\deviltower\\deviltower8_regen.txt",
+        "function": "deviltower8_regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\deviltower\\deviltower9_regen.txt",
+        "function": "deviltower9_regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\dragonlair\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\flame_dungeon\\fd_a.txt",
+        "function": "fd_a"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\flame_dungeon\\fd_b.txt",
+        "function": "fd_b"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\flame_dungeon\\fd_c.txt",
+        "function": "fd_c"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\flame_dungeon\\fd_d.txt",
+        "function": "fd_d"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\flame_dungeon\\fd_e.txt",
+        "function": "fd_e"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\flame_dungeon\\fd_f.txt",
+        "function": "fd_f"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\flame_dungeon\\fd_fild_boss.txt",
+        "function": "fd_fild_boss"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\flame_dungeon\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\hydra\\dumen.txt",
+        "function": "dumen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\hydra\\final.txt",
+        "function": "final"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\hydra\\first.txt",
+        "function": "first"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\hydra\\hidra.txt",
+        "function": "hidra"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\hydra\\sandik.txt",
+        "function": "sandik"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\hydra\\second.txt",
+        "function": "second"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\hydra\\spawn1.txt",
+        "function": "spawn1"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\hydra\\spawn2.txt",
+        "function": "spawn2"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\hydra\\spawn3.txt",
+        "function": "spawn3"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\hydra\\wall.txt",
+        "function": "wall"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\ice_dungeon\\zone_1.txt",
+        "function": "zone_1"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\ice_dungeon\\zone_2.txt",
+        "function": "zone_2"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\ice_dungeon\\zone_3.txt",
+        "function": "zone_3"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\ice_dungeon\\zone_4.txt",
+        "function": "zone_4"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\ice_dungeon\\zone_5.txt",
+        "function": "zone_5"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\ice_dungeon\\zone_6.txt",
+        "function": "zone_6"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\ice_dungeon\\zone_7.txt",
+        "function": "zone_7"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\ice_dungeon\\zone_8.txt",
+        "function": "zone_8"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\ice_dungeon\\zone_9.txt",
+        "function": "zone_9"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\ice_dungeon\\zone_boss.txt",
+        "function": "zone_boss"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\meley\\first_regen.txt",
+        "function": "first_regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\meley\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\meley\\stone.txt",
+        "function": "stone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\monkey\\monkey1.txt",
+        "function": "monkey1"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\monkey\\monkey2.txt",
+        "function": "monkey2"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\dungeon\\monkey\\monkey3.txt",
+        "function": "monkey3"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\event\\boss_event_regen_type_1.txt",
+        "function": "boss_event_regen_type_1"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\event\\boss_event_regen_type_2.txt",
+        "function": "boss_event_regen_type_2"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\event\\golden_frog_event_regen_type_0.txt",
+        "function": "golden_frog_event_regen_type_0"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\event\\metin_event_regen_type_1.txt",
+        "function": "metin_event_regen_type_1"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\event\\metin_event_regen_type_2.txt",
+        "function": "metin_event_regen_type_2"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\event\\mining_event_regen_type_0.txt",
+        "function": "mining_event_regen_type_0"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\event\\tanaka_event_regen_type_0.txt",
+        "function": "tanaka_event_regen_type_0"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\alchemist\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\arms\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\auntie\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\ayuka\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\baby_and_mom\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\backchon\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\bank\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\barbarian_boss\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\barbarian_bow\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\barbarian_infantry\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\barbarian_knight\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\barbarian_soldier\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\bear\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\bear_young1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\beggar\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\bkarcher\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\bkboss\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\bkfourth\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\bkknight\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\bksecond\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\bksoldier\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\bkthird\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\blacksmith\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\blue_dragon\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\blue_dragon_young1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\boar\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\boar_2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\bookworm\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\bou\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\ceramist\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\chagirap\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\chaos_ghost\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\chick\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\christmas_2015_reindeer_female\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\christmas_2015_reindeer_male\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\christmas_2016_goblin\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\christmas_2016_mammoth\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\christmas_2017_penguin\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\christmas_2017_sleddog\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\christmas_2018_horse\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\christmas_2018_nutcracker\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\christmas_2019_horse\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\christmas_2019_santa\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\christmas_2020_alpaca\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\christmas_2020_tree\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\christmas_2021_bear\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\christmas_2021_wolf\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\christmas_pet1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\christmas_pet2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\chuhen\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\ch_bowman\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\ch_footman\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\ch_general\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\ch_magician\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\ch_officer\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\crustacean_boss\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\crustacean_boss2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\crustacean_bow\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\crustacean_general\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\crustacean_officer\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\crustacean_soldier\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\crustacean_soldier2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\cyclops_boss\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\cyclops_boss2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\cyclops_general\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\cyclops_magic\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\cyclops_officer\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\cyclops_soldier\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\cyclops_soldier2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\defence\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\defensewave_hydra_boss\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\defensewave_hydra_boss_left\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\defensewave_hydra_boss_right\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\defensewave_hydra_pet\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\defensewave_medusa\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\defensewave_minihydra\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\defensewave_naga\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\defensewave_pawn\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\defensewave_sail\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\defensewave_watersoul\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\dinosaur\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\doctor\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\dog_god\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\dog_god_2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\dog_young1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\easter_2017_rabbit\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\easter_2018_rabbit\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\easter_2019_peacock\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\easter_2020_cow\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\easter_2021_rabbit\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\egg_pet\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\elemental_pet_pawn_1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\ent_black\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\ent_elder\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\ent_guru\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\ent_hu\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\ent_huge\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\ent_red\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\ent_trent\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\eojiryu\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\evil_eye\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\fennec_fox\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\firegolem_boss\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\firegolem_general\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\firegolem_magician\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\firegolem_soldier\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\fire_dragon\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\fire_ghost\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\fire_king\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\fire_knight\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\fire_man\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\fire_tiger\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\fire_tiger_2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\fire_tiger_boss\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\fire_tiger_young\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\flame_door_npc\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\fox_ninetail\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\gangyo_patrol_bow\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\gangyo_patrol_spear\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\giant_boss\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\giant_boss2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\giant_desert_turtle\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\giant_general\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\giant_magic\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\giant_officer\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\giant_scorpion\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\giant_soldier\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\giant_soldier2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\gilaso\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\girl_lost_elder_brother\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\gnoll_boss\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\gnoll_boss2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\gnoll_bow\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\gnoll_general\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\gnoll_magic\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\gnoll_soldier\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\gnoll_soldier2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\goblin_leafhead\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\god_monkey\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\gold_monkey\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\golem_1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\golem_2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\golem_3\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\goods\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\greenfrog_general\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\greenfrog_soldier\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\guard_leader\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\gupae\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\halloween1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\halloween_2016_dragon\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\halloween_2016_gangsi\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\halloween_2017_ghost\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\halloween_2017_volcano_beast\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\halloween_2018_cerberos\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\halloween_2018_witch\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\halloween_2019_3eyecat\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\halloween_2019_bat\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\halloween_2020_crow\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\halloween_2020_mummy\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\halloween_2021_fenfire\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\halloween_2021_ninetail\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\halloween_bet_pet1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\halloween_bonedog1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\halloween_broom\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\halloween_pumpkin_pet\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\handaup\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\hanma_boss\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\hanma_young1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\historian\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\horse\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\horse2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\horse_event1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\horse_halloween1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\hotel_grandfa\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\hotel_grandma\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\hunter\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\hydra_chest\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\icegolem_boss\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\icegolem_general\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\icegolem_magician\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\icegolem_soldier\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\ice_snow_dog\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\ice_snow_giant_man\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\ice_snow_golem\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\ice_snow_insect\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\ice_snow_man\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\ice_snow_monster\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\ice_snow_whale\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\ice_snow_witch\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\immotal_ghost\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\japanese_pirate\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\jinmoo\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\jinno_patrol_bow\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\jinno_patrol_spear\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\lamb_pet\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\leechung\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\lemures_boss\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\lemures_boss2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\lemures_general\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\lemures_magic\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\lemures_officer\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\lemures_soldier\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\lemures_soldier2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\leopard\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\leopard_young1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\lion\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\lion_2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\lion_white\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\lion_young1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\luck_sheep_young1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\maenghwan\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\manticore_boss\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\manticore_boss2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\manticore_general\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\manticore_magic\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\manticore_officer\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\manticore_soldier\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\manticore_soldier2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\metinstone\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\metinstone_02\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\metinstone_defensewave\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\metinstone_egg\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\milgyo_executor\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\milgyo_founder\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\milgyo_monster1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\milgyo_monster2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\milgyo_nahan1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\milgyo_nahan2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\milgyo_nahan_general\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\milgyo_religionist\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\mineral\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\mineral2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\mirinae_brother\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\misterious_diseased_boss\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\misterious_diseased_bosshost\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\misterious_diseased_bow\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\misterious_diseased_dog\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\misterious_diseased_egg\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\misterious_diseased_host\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\misterious_diseased_infector\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\misterious_diseased_kid\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\misterious_diseased_spear\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\misterious_diseased_sword\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\monkey\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\monkey\\motlist_range.txt",
+        "function": "motlist_range"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\monkey_young1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\mountain_dog_god\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\mr_restaurant\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\musician\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\mutant_1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\mutant_2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\mutant_3\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\naoki\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\nersluck_1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\nersluck_2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\nersluck_3\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\okey_npc\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\oldster\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\old_pirate\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\orc_bigblack\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\orc_black\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\orc_general\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\orc_knight\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\orc_lord\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\orc_magician\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\orc_scouter\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\orc_soldier\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\outlaw\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\panda\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\panda_young1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\peddler\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\pet_ice_snow_insect\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\pet_otherworld_bird\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\phoenix1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\phoenix2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\pig_young1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\plant_researcher\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\plechi_shadow_beholder1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\plechi_shadow_bigboss\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\plechi_shadow_bigboss2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\plechi_shadow_boss1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\plechi_shadow_boss2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\plechi_shadow_boss3\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\plechi_shadow_bow\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\plechi_shadow_chaosghost\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\plechi_shadow_dem1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\plechi_shadow_dem2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\plechi_shadow_demdog\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\plechi_shadow_dragmob\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\plechi_shadow_god\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\plechi_shadow_god2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\plechi_shadow_golem\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\plechi_shadow_immotalghost\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\plechi_shadow_kid\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\plechi_shadow_king\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\plechi_shadow_magician\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\plechi_shadow_mut\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\plechi_shadow_mutzom\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\plechi_shadow_scythe\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\plechi_shadow_spear\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\plechi_shadow_spiteghost\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\plechi_shadow_unsin\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\plechi_shadow_wizard\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\pony\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\privateshop\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\privateshop_1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\privateshop_1\\syserr.txt",
+        "function": "syserr"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\privateshop_2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\privateshop_3\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\privateshop_4\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\privateshop_5\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\privateshop_6\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\privateshop_7\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\pve_dragon_young\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\pwahuang1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\rabbit\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\rabbit_pet\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\ramadan_2017_camel\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\ramadan_2018_karim\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\ramadan_2019_camel\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\ramadan_2020_sphinx\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\ramadan_2021_anubis\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\ramadan_pet\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\recycle_monster\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\reddragon_fly\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\reddragon_human\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\redthief2_boss\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\redthief2_boss2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\redthief2_bow\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\redthief2_general\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\redthief2_magic\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\redthief2_officer\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\redthief2_officer_young1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\redthief2_soldier2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\redthief_boss\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\redthief_boss2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\redthief_bow\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\redthief_general\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\redthief_magic\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\redthief_officer\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\redthief_soldier2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\red_dragon_young1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\reindeer_female\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\reindeer_male\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\reindeer_young\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\rice_cake_seller\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\sailor\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\samahi\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\santa\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\scholar_beige_m\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\scorpionman_bow\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\scorpionman_sword\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\seal_stone\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\sinseon\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\sinsu_patrol_bow\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\sinsu_patrol_spear\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\skeleton_bigboss\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\skeleton_general\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\skeleton_god\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\skeleton_king\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\skeleton_magician\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\skeleton_soldier_bow\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\skeleton_soldier_scythe\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\skeleton_soldier_spear\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\skeleton_wizard\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\skipia_general_young1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\snakeman_bow\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\snakeman_sword\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\spider_king\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\spider_nipper\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\spider_poison\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\spider_queen\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\spider_redpoison\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\spider_redpoison_young1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\spider_soldier\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\spider_spawn\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\spider_young\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\spite_ghost\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\spy1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\starveling\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\stone_door\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\stone_monkey\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\stray_dog\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\sugu_general\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\summer_2020_crustacean\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\summer_2021_whale\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\suraghost\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\ten_warrior_pet\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\terabithia_shop_1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\terabithia_shop_2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\terabithia_shop_3\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\terabithia_shop_5\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\terabithia_shop_6\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\terabithia_shop_7\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\terabithia_shop_8\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\thief1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\thief2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\thief3\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\thiefboss1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\thiefboss2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\thiefboss3\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\tiger\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\tiger_young1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\timid_boy\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\triton_boss\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\triton_boss2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\triton_general\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\triton_magic\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\triton_officer\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\triton_soldier\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\triton_soldier2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\turkey\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\unicorn\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\valentine_2016_bear_f\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\valentine_2016_bear_m\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\valentine_2020_dog\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\valentine_2022_dragon\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\valentine_angel\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\valentine_heart\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\visal\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\visamun\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\warp\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\warriorghost\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\whitedragon_fly\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\whitedragon_pet\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\widow\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\wild_boar\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\wild_boar_god\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\wolf\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\wondaim\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\woodcutter\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\wooden_door\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\worldcup_2018_wolfman\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\yamachun_boss\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\yamachun_young1\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\yejin\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\yellow_tigerman\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\young_merchant\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\yu_hwa_rang\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\zombie_bigboss\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\zombie_bigboss2\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\zombie_diseased_boss\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\zombie_diseased_bow\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\zombie_diseased_dog\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\zombie_diseased_infector\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\zombie_diseased_kid\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\zombie_diseased_spear\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\zombie_diseased_sword\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\zombie_general\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\zombie_ghost\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\zombie_ghost_door\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\zombie_god\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\zombie_god_stone\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\zombie_key_stone\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\zombie_king\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\zombie_magician\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\zombie_security_stone\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\zombie_soldier_bow\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\zombie_soldier_scythe\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\zombie_soldier_spear\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\data\\monster\\zshop_griffon\\motlist.txt",
+        "function": "motlist"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\blend.txt",
+        "function": "blend"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\BlueDragon.lua",
+        "function": "bluedragon"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\charset.txt",
+        "function": "charset"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\common_drop_item.txt",
+        "function": "common_drop_item"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\cube.txt",
+        "function": "cube"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\dragon_soul_table.txt",
+        "function": "dragon_soul_table"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\drop_item_group.txt",
+        "function": "drop_item_group"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\etc_drop_item.txt",
+        "function": "etc_drop_item"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\fishing.txt",
+        "function": "fishing"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\group.txt",
+        "function": "group"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\group_group.txt",
+        "function": "group_group"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\locale.lua",
+        "function": "Locale mapping"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\mob_drop_item.txt",
+        "function": "mob_drop_item"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\monkey_dungeon.lua",
+        "function": "monkey_dungeon"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\newregen.txt",
+        "function": "newregen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\ori_to_new_table.txt",
+        "function": "ori_to_new_table"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\oxquiz.lua",
+        "function": "oxquiz"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\restart_city_pos.lua",
+        "function": "restart_city_pos"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\settings.lua",
+        "function": "Locale service settings"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\skill_power.txt",
+        "function": "skill_power"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\special_item_group.txt",
+        "function": "special_item_group"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\translate.lua",
+        "function": "translate"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\translate_global.lua",
+        "function": "translate_global"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\battlepass\\normal.txt",
+        "function": "normal"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\battlepass\\premium.txt",
+        "function": "premium"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\bot_player\\bot_name.txt",
+        "function": "bot_name"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\bot_player\\bot_player_chat.txt",
+        "function": "bot_player_chat"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\cz\\item_names.txt",
+        "function": "item_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\cz\\locale_quest.txt",
+        "function": "Locale quest data"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\cz\\mob_names.txt",
+        "function": "mob_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\cz\\skill_names.txt",
+        "function": "skill_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\cz\\translate.lua",
+        "function": "translate"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\de\\item_names.txt",
+        "function": "item_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\de\\locale_quest.txt",
+        "function": "Locale quest data"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\de\\mob_names.txt",
+        "function": "mob_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\de\\skill_names.txt",
+        "function": "skill_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\de\\translate.lua",
+        "function": "translate"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\en\\item_names.txt",
+        "function": "item_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\en\\locale_quest.txt",
+        "function": "Locale quest data"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\en\\mob_names.txt",
+        "function": "mob_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\en\\skill_names.txt",
+        "function": "skill_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\en\\translate.lua",
+        "function": "translate"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\es\\item_names.txt",
+        "function": "item_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\es\\locale_quest.txt",
+        "function": "Locale quest data"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\es\\mob_names.txt",
+        "function": "mob_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\es\\skill_names.txt",
+        "function": "skill_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\es\\translate.lua",
+        "function": "translate"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\fr\\item_names.txt",
+        "function": "item_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\fr\\locale_quest.txt",
+        "function": "Locale quest data"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\fr\\mob_names.txt",
+        "function": "mob_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\fr\\skill_names.txt",
+        "function": "skill_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\fr\\translate.lua",
+        "function": "translate"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\hu\\item_names.txt",
+        "function": "item_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\hu\\locale_quest.txt",
+        "function": "Locale quest data"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\hu\\mob_names.txt",
+        "function": "mob_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\hu\\skill_names.txt",
+        "function": "skill_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\hu\\translate.lua",
+        "function": "translate"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\it\\item_names.txt",
+        "function": "item_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\it\\locale_quest.txt",
+        "function": "Locale quest data"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\it\\mob_names.txt",
+        "function": "mob_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\it\\skill_names.txt",
+        "function": "skill_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\it\\translate.lua",
+        "function": "translate"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\pl\\item_names.txt",
+        "function": "item_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\pl\\locale_quest.txt",
+        "function": "Locale quest data"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\pl\\mob_names.txt",
+        "function": "mob_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\pl\\skill_names.txt",
+        "function": "skill_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\pl\\translate.lua",
+        "function": "translate"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\pt\\item_names.txt",
+        "function": "item_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\pt\\locale_quest.txt",
+        "function": "Locale quest data"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\pt\\mob_names.txt",
+        "function": "mob_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\pt\\skill_names.txt",
+        "function": "skill_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\pt\\translate.lua",
+        "function": "translate"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\ro\\item_names.txt",
+        "function": "item_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\ro\\locale_quest.txt",
+        "function": "Locale quest data"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\ro\\mob_names.txt",
+        "function": "mob_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\ro\\skill_names.txt",
+        "function": "skill_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\ro\\translate.lua",
+        "function": "translate"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\tr\\item_names.txt",
+        "function": "item_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\tr\\locale_quest.txt",
+        "function": "Locale quest data"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\tr\\mob_names.txt",
+        "function": "mob_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\tr\\skill_names.txt",
+        "function": "skill_names"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\tr\\translate.lua",
+        "function": "translate"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\country\\tr\\translate2.lua",
+        "function": "translate2"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\defensawe_hydra\\boss.txt",
+        "function": "boss"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\defensawe_hydra\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\defensawe_hydra\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\defensawe_hydra\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\defensawe_hydra\\stone.txt",
+        "function": "stone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\defensawe_hydra\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\gm_guild_build\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\gm_guild_build\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\gm_guild_build\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\map_n_snowm_01\\boss.txt",
+        "function": "boss"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\map_n_snowm_01\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\map_n_snowm_01\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\map_n_snowm_01\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\map_n_snowm_01\\stone.txt",
+        "function": "stone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\map_n_snowm_01\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\map_n_threeway\\boss.txt",
+        "function": "boss"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\map_n_threeway\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\map_n_threeway\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\map_n_threeway\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\map_n_threeway\\stone.txt",
+        "function": "stone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\map_n_threeway\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_guild_village_01\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_guild_village_01\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_guild_village_01\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_guild_village_02\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_guild_village_02\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_guild_village_02\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_guild_village_03\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_guild_village_03\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_guild_village_03\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_a1\\boss.txt",
+        "function": "boss"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_a1\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_a1\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_a1\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_a1\\stone.txt",
+        "function": "stone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_a1\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_a3\\boss.txt",
+        "function": "boss"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_a3\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_a3\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_a3\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_a3\\stone.txt",
+        "function": "stone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_a3\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_b1\\boss.txt",
+        "function": "boss"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_b1\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_b1\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_b1\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_b1\\stone.txt",
+        "function": "stone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_b1\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_b3\\boss.txt",
+        "function": "boss"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_b3\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_b3\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_b3\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_b3\\stone.txt",
+        "function": "stone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_b3\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_bayblacksand\\boss.txt",
+        "function": "boss"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_bayblacksand\\MapProperty.txt",
+        "function": "mapproperty"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_bayblacksand\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_bayblacksand\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_bayblacksand\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_bayblacksand\\stone.txt",
+        "function": "stone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_bayblacksand\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_c1\\boss.txt",
+        "function": "boss"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_c1\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_c1\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_c1\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_c1\\stone.txt",
+        "function": "stone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_c1\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_c3\\boss.txt",
+        "function": "boss"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_c3\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_c3\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_c3\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_c3\\stone.txt",
+        "function": "stone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_c3\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_capedragonhead\\boss.txt",
+        "function": "boss"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_capedragonhead\\MapProperty.txt",
+        "function": "mapproperty"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_capedragonhead\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_capedragonhead\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_capedragonhead\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_capedragonhead\\stone.txt",
+        "function": "stone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_capedragonhead\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_dawnmistwood\\boss.txt",
+        "function": "boss"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_dawnmistwood\\MapProperty.txt",
+        "function": "mapproperty"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_dawnmistwood\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_dawnmistwood\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_dawnmistwood\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_dawnmistwood\\stone.txt",
+        "function": "stone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_dawnmistwood\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_devilcatacomb\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_devilcatacomb\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_devilcatacomb\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_deviltower1\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_deviltower1\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_deviltower1\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_deviltower1\\stone.txt",
+        "function": "stone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_deviltower1\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_deviltower2\\boss.txt",
+        "function": "boss"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_deviltower2\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_deviltower2\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_deviltower2\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_deviltower2\\stone.txt",
+        "function": "stone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_deviltower2\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_duel\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_duel\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_empirewar01\\MapProperty.txt",
+        "function": "mapproperty"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_empirewar01\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_empirewar01\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_empirewar01\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_empirewar01\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_empirewar02\\MapProperty.txt",
+        "function": "mapproperty"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_empirewar02\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_empirewar02\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_empirewar02\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_empirewar02\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_empirewar03\\MapProperty.txt",
+        "function": "mapproperty"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_empirewar03\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_empirewar03\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_empirewar03\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_empirewar03\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_event\\boss.txt",
+        "function": "boss"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_event\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_event\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_event\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_event\\stone.txt",
+        "function": "stone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_event\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_fielddungeon\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_fielddungeon\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_fielddungeon\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_guild_01\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_guild_01\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_guild_01\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_guild_01\\stone.txt",
+        "function": "stone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_guild_01\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_guild_02\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_guild_02\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_guild_02\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_guild_02\\stone.txt",
+        "function": "stone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_guild_02\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_guild_03\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_guild_03\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_guild_03\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_guild_03\\stone.txt",
+        "function": "stone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_guild_03\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_milgyo\\boss.txt",
+        "function": "boss"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_milgyo\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_milgyo\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_milgyo\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_milgyo\\stone.txt",
+        "function": "stone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_milgyo\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_monkey_dungeon\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_monkey_dungeon\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_monkey_dungeon\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_monkey_dungeon2\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_monkey_dungeon2\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_monkey_dungeon2\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_monkey_dungeon2\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_monkey_dungeon3\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_monkey_dungeon3\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_monkey_dungeon3\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_monkey_dungeon3\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_monkey_dungeon_11\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_monkey_dungeon_11\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_monkey_dungeon_11\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_monkey_dungeon_11\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_monkey_dungeon_12\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_monkey_dungeon_12\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_monkey_dungeon_12\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_monkey_dungeon_12\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_monkey_dungeon_13\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_monkey_dungeon_13\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_monkey_dungeon_13\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_monkey_dungeon_13\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_mt_thunder\\boss.txt",
+        "function": "boss"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_mt_thunder\\MapProperty.txt",
+        "function": "mapproperty"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_mt_thunder\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_mt_thunder\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_mt_thunder\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_mt_thunder\\stone.txt",
+        "function": "stone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_mt_thunder\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_nusluck01\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_nusluck01\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_nusluck01\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_nusluck01\\stone.txt",
+        "function": "stone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_nusluck01\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_n_desert_01\\boss.txt",
+        "function": "boss"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_n_desert_01\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_n_desert_01\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_n_desert_01\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_n_desert_01\\stone.txt",
+        "function": "stone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_n_desert_01\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_n_flame_01\\boss.txt",
+        "function": "boss"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_n_flame_01\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_n_flame_01\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_n_flame_01\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_n_flame_01\\stone.txt",
+        "function": "stone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_n_flame_01\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_n_flame_dungeon_01\\MapProperty.txt",
+        "function": "mapproperty"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_n_flame_dungeon_01\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_n_flame_dungeon_01\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_n_flame_dungeon_01\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_n_flame_dungeon_01\\stone.txt",
+        "function": "stone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_n_flame_dungeon_01\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_n_snow_dungeon_01\\MapProperty.txt",
+        "function": "mapproperty"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_n_snow_dungeon_01\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_n_snow_dungeon_01\\settings.txt",
+        "function": "settings"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_n_snow_dungeon_01\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_oxevent\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_oxevent\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_oxevent\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_resources_zon\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_resources_zon\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_skipia_dungeon_01\\boss.txt",
+        "function": "boss"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_skipia_dungeon_01\\MapProperty.txt",
+        "function": "mapproperty"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_skipia_dungeon_01\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_skipia_dungeon_01\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_skipia_dungeon_01\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_skipia_dungeon_01\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_skipia_dungeon_02\\boss.txt",
+        "function": "boss"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_skipia_dungeon_02\\MapProperty.txt",
+        "function": "mapproperty"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_skipia_dungeon_02\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_skipia_dungeon_02\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_skipia_dungeon_02\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_skipia_dungeon_02\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_skipia_dungeon_boss\\instance_regen.txt",
+        "function": "instance_regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_skipia_dungeon_boss\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_skipia_dungeon_boss\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_skipia_dungeon_boss\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_skipia_dungeon_boss\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_spiderdungeon\\boss.txt",
+        "function": "boss"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_spiderdungeon\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_spiderdungeon\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_spiderdungeon\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_spiderdungeon\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_spiderdungeon_02\\boss.txt",
+        "function": "boss"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_spiderdungeon_02\\MapProperty.txt",
+        "function": "mapproperty"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_spiderdungeon_02\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_spiderdungeon_02\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_spiderdungeon_02\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_spiderdungeon_02\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_spiderdungeon_03\\boss.txt",
+        "function": "boss"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_spiderdungeon_03\\MapProperty.txt",
+        "function": "mapproperty"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_spiderdungeon_03\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_spiderdungeon_03\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_spiderdungeon_03\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_spiderdungeon_03\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_t1\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_t1\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_t1\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_t1\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_t2\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_t2\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_t3\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_t3\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_t4\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_t4\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_trade\\boss.txt",
+        "function": "boss"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_trade\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_trade\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_trade\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_trade\\stone.txt",
+        "function": "stone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_trade\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_trent\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_trent\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_trent\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_trent\\stone.txt",
+        "function": "stone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_trent\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_trent02\\boss.txt",
+        "function": "boss"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_trent02\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_trent02\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_trent02\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_trent02\\stone.txt",
+        "function": "stone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_trent02\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_wedding_01\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_wedding_01\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_wedding_01\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_WL_01\\MonsterArrange.txt",
+        "function": "monsterarrange"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_WL_01\\npc.txt",
+        "function": "npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_WL_01\\regen.txt",
+        "function": "regen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_WL_01\\Setting.txt",
+        "function": "setting"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\map\\metin2_map_WL_01\\Town.txt",
+        "function": "town"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\locale.lua",
+        "function": "Locale mapping"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\questcategory.txt",
+        "function": "questcategory"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\questing.lua",
+        "function": "questing"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\questlib.lua",
+        "function": "Quest library and binding"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\questnpc.txt",
+        "function": "questnpc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_alldungeons\\devilcatacomb_zone.lua",
+        "function": "devilcatacomb_zone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_alldungeons\\deviltower_zone.lua",
+        "function": "deviltower_zone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_alldungeons\\dragonlair.lua",
+        "function": "dragonlair"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_alldungeons\\flame_dungeon.lua",
+        "function": "flame_dungeon"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_alldungeons\\shipdefense.lua",
+        "function": "shipdefense"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_alldungeons\\snow_dungeon.lua",
+        "function": "snow_dungeon"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_alldungeons\\spider_dungeon.lua",
+        "function": "spider_dungeon"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_eventsystems\\boss_event.lua",
+        "function": "boss_event"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_eventsystems\\cards_drop_event.lua",
+        "function": "cards_drop_event"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_eventsystems\\event_panel.lua",
+        "function": "event_panel"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_eventsystems\\fishing_event.lua",
+        "function": "fishing_event"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_eventsystems\\golden_frog_event.lua",
+        "function": "golden_frog_event"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_eventsystems\\hexegonal_drop_event.lua",
+        "function": "hexegonal_drop_event"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_eventsystems\\hide_seek_event.lua",
+        "function": "hide_seek_event"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_eventsystems\\metin_event.lua",
+        "function": "metin_event"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_eventsystems\\mining_event.lua",
+        "function": "mining_event"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_eventsystems\\moonlight_drop_event.lua",
+        "function": "moonlight_drop_event"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_eventsystems\\tanaka_event.lua",
+        "function": "tanaka_event"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_gamemaster\\adminpanel.lua",
+        "function": "adminpanel"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_gamemaster\\entry_event_map.quest",
+        "function": "entry_event_map"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_gamemaster\\mapindex.quest",
+        "function": "mapindex"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_gamemaster\\message_level.lua",
+        "function": "message_level"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_gamemaster\\mob_kill_notice.lua",
+        "function": "mob_kill_notice"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_guildsystems\\change_guild_master.quest",
+        "function": "change_guild_master"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_guildsystems\\guild_building.quest",
+        "function": "guild_building"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_guildsystems\\guild_building_alter_of_power.quest",
+        "function": "guild_building_alter_of_power"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_guildsystems\\guild_building_melt.quest",
+        "function": "guild_building_melt"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_guildsystems\\guild_building_npc.quest",
+        "function": "guild_building_npc"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_guildsystems\\guild_manage.lua",
+        "function": "guild_manage"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_guildsystems\\guild_manage.quest",
+        "function": "guild_manage"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_guildsystems\\guild_ranking.lua",
+        "function": "guild_ranking"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_guildsystems\\guild_ranking.quest",
+        "function": "guild_ranking"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_guildsystems\\guild_war_bet.quest",
+        "function": "guild_war_bet"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_guildsystems\\guild_war_join.quest",
+        "function": "guild_war_join"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_guildsystems\\guild_war_observer.quest",
+        "function": "guild_war_observer"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_guildsystems\\priv_empire.quest",
+        "function": "priv_empire"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_horsesystems\\horse_exchange_ticket.quest",
+        "function": "horse_exchange_ticket"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_horsesystems\\horse_guard.quest",
+        "function": "horse_guard"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_horsesystems\\horse_levelup.quest",
+        "function": "horse_levelup"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_horsesystems\\horse_menu.quest",
+        "function": "horse_menu"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_horsesystems\\horse_revive.quest",
+        "function": "horse_revive"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_horsesystems\\horse_ride.quest",
+        "function": "horse_ride"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_horsesystems\\horse_summon.quest",
+        "function": "horse_summon"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_horsesystems\\horse_upgrade.quest",
+        "function": "horse_upgrade"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_horsesystems\\mount_up_grade.lua",
+        "function": "mount_up_grade"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_horsesystems\\ride_system.quest",
+        "function": "ride_system"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_horsesystems\\take_horse.lua",
+        "function": "take_horse"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_npc_talk_mission\\blacksmith.quest",
+        "function": "blacksmith"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_npc_talk_mission\\change_empire.quest",
+        "function": "change_empire"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_npc_talk_mission\\change_name.lua",
+        "function": "change_name"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_npc_talk_mission\\check_trans_ticket.quest",
+        "function": "check_trans_ticket"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_npc_talk_mission\\couple_ring.quest",
+        "function": "couple_ring"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_npc_talk_mission\\diary_pages.quest",
+        "function": "diary_pages"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_npc_talk_mission\\ejderha_tilsimi.quest",
+        "function": "ejderha_tilsimi"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_npc_talk_mission\\emotions.quest",
+        "function": "emotions"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_npc_talk_mission\\fisher.quest",
+        "function": "fisher"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_npc_talk_mission\\flame_dungeon_pass.quest",
+        "function": "flame_dungeon_pass"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_npc_talk_mission\\forked_road.quest",
+        "function": "forked_road"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_npc_talk_mission\\fortune_telling.quest",
+        "function": "fortune_telling"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_npc_talk_mission\\ghost_story.quest",
+        "function": "ghost_story"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_npc_talk_mission\\goto_empire_castle.quest",
+        "function": "goto_empire_castle"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_npc_talk_mission\\hair.quest",
+        "function": "hair"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_npc_talk_mission\\hair_shop.quest",
+        "function": "hair_shop"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_npc_talk_mission\\item_change_sex.quest",
+        "function": "item_change_sex"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_npc_talk_mission\\map_warp.quest",
+        "function": "map_warp"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_npc_talk_mission\\marriage_manage.quest",
+        "function": "marriage_manage"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_npc_talk_mission\\move_ring.quest",
+        "function": "move_ring"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_npc_talk_mission\\neutral_warp.quest",
+        "function": "neutral_warp"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_npc_talk_mission\\npc_talk.quest",
+        "function": "npc_talk"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_npc_talk_mission\\oxevent_manager.lua",
+        "function": "oxevent_manager"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_npc_talk_mission\\reset_scroll.quest",
+        "function": "reset_scroll"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_npc_talk_mission\\reset_status.quest",
+        "function": "reset_status"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_npc_talk_mission\\socket_clean_stone_plus.lua",
+        "function": "socket_clean_stone_plus"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_npc_talk_mission\\upgrade_refine_scroll.quest",
+        "function": "upgrade_refine_scroll"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_npc_talk_mission\\welcome.lua",
+        "function": "NPC welcome dialogue"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_openwindow\\acce_mission.lua",
+        "function": "acce_mission"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_openwindow\\arboreal_craft.lua",
+        "function": "arboreal_craft"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_openwindow\\mining.lua",
+        "function": "mining"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_openwindow\\theovahdan_1.lua",
+        "function": "theovahdan_1"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_openwindow\\theovahdan_2.lua",
+        "function": "theovahdan_2"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_openwindow\\theovahdan_3.lua",
+        "function": "theovahdan_3"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_skillsystems\\bkguiopen.quest",
+        "function": "bkguiopen"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_skillsystems\\perfectgui.quest",
+        "function": "perfectgui"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_skillsystems\\pyuzuk.lua",
+        "function": "pyuzuk"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_skillsystems\\pyuzuk2.lua",
+        "function": "pyuzuk2"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_skillsystems\\rainbow_stone.lua",
+        "function": "rainbow_stone"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_skillsystems\\skill_group.quest",
+        "function": "Skill group quest definition"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_skillsystems\\skill_reset.quest",
+        "function": "Skill reset quest definition"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\home\\share\\locale\\europe\\quest\\quest_tr\\_skillsystems\\training_grandmaster_skill.lua",
+        "function": "Turkish grandmaster skill training"
+      }
+    ]
+  },
+  "Client": {
+    "dependencies": [
+      "server protocol",
+      "locale_config"
+    ],
+    "files": [
+      {
+        "path": "E:\\\\Anka2\\\\Client\\locale.cfg",
+        "function": "Client locale configuration"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\Client\\log.txt",
+        "function": "Client runtime log"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\Client\\metin2.cfg",
+        "function": "Client startup config"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\Client\\mouse.cfg",
+        "function": "client_asset"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\Client\\title_state.txt",
+        "function": "client_asset"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\Client\\lib\\emoji.cfg",
+        "function": "client_asset"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\Client\\syserr\\27-04-2026-03-22-14-syserr.txt",
+        "function": "client_asset"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\Client\\syserr\\27-04-2026-03-33-13-syserr.txt",
+        "function": "client_asset"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\Client\\syserr\\27-04-2026-03-34-42-syserr.txt",
+        "function": "client_asset"
+      },
+      {
+        "path": "E:\\\\Anka2\\\\Client\\syserr\\27-04-2026-03-35-13-syserr.txt",
+        "function": "client_asset"
+      }
+    ]
+  }
+}

@@ -1,0 +1,815 @@
+{
+  "cpp_count": 980,
+  "py_count": 1697,
+  "cpp_lines": 557322,
+  "py_lines": 618839,
+  "largest_files": [
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\pydoc_data\\topics.py",
+      "size": 410525,
+      "ext": ".py"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\binary_unpack\\root\\ui.py",
+      "size": 365396,
+      "ext": ".py"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Server\\game\\src\\char_item.cpp",
+      "size": 312541,
+      "ext": ".cpp"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Server\\game\\src\\char.cpp",
+      "size": 311923,
+      "ext": ".cpp"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\decimal.py",
+      "size": 227193,
+      "ext": ".py"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\source\\UserInterface\\PythonNetworkStreamPhaseGame.cpp",
+      "size": 226005,
+      "ext": ".cpp"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Server\\game\\src\\cmd_general.cpp",
+      "size": 197685,
+      "ext": ".cpp"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\binary_unpack\\root\\uitooltip.py",
+      "size": 174348,
+      "ext": ".py"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\binary_unpack\\root\\uiguild.py",
+      "size": 168886,
+      "ext": ".py"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\test\\test_descr.py",
+      "size": 165040,
+      "ext": ".py"
+    }
+  ],
+  "todos": [
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\extern\\include\\cryptopp\\cast.cpp",
+      "line": 214,
+      "text": "// TODO: add a SecBlock workspace to the class when the ABI can change"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\extern\\include\\cryptopp\\chacha_avx.cpp",
+      "line": 39,
+      "text": "// VS2017 and global optimization bug. TODO, figure out when"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\extern\\include\\cryptopp\\donna_32.cpp",
+      "line": 934,
+      "text": "// TODO: enable this code path once we can test and benchmark it."
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\extern\\include\\cryptopp\\donna_64.cpp",
+      "line": 756,
+      "text": "// TODO: enable this code path once we can test and benchmark it."
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\extern\\include\\cryptopp\\eccrypto.cpp",
+      "line": 488,
+      "text": "// TODO: this fails in practice. Should it throw?"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\extern\\include\\cryptopp\\esign.cpp",
+      "line": 6,
+      "text": "// TODO: fix the C4589 warnings"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\extern\\include\\cryptopp\\files.cpp",
+      "line": 175,
+      "text": "// TODO: figure out what happens on cin"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\extern\\include\\cryptopp\\filters.cpp",
+      "line": 1103,
+      "text": "CRYPTOPP_ASSERT(size != 0);\t// TODO: handle recoverable signature scheme"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\extern\\include\\cryptopp\\gfpcrypt.cpp",
+      "line": 6,
+      "text": "// TODO: fix the C4589 warnings"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\extern\\include\\cryptopp\\integer.cpp",
+      "line": 397,
+      "text": "// TODO: When NATIVE_DWORD is in effect, we access high and low, which are inactive"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\extern\\include\\cryptopp\\poly1305.cpp",
+      "line": 169,
+      "text": "// TODO: No longer needed. Remove at next major version bump"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\extern\\include\\cryptopp\\poly1305.cpp",
+      "line": 176,
+      "text": "// TODO: No longer needed. Remove at next major version bump"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\extern\\include\\cryptopp\\rijndael.cpp",
+      "line": 91,
+      "text": "// VS2017 and global optimization bug. TODO, figure out when"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\extern\\include\\cryptopp\\rijndael.cpp",
+      "line": 430,
+      "text": "// TODO: Add non-SSE4.1 variant for low-end Atoms. The low-end"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\extern\\include\\cryptopp\\strciphr.cpp",
+      "line": 200,
+      "text": "// TODO: Figure out what is happening on ARM A-32. x86, Aarch64 and PowerPC are OK."
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\extern\\include\\cryptopp\\test.cpp",
+      "line": 940,
+      "text": "// TODO: we need to group these tests like benchmarks..."
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\extern\\include\\cryptopp\\validat6.cpp",
+      "line": 353,
+      "text": "#if 1\t// TODO: turn this back on when I make EC2N faster for pentanomial basis"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\extern\\include\\cryptopp\\validat8.cpp",
+      "line": 180,
+      "text": "// TODO: fix this after name is standardized"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\extern\\include\\cryptopp\\zinflate.cpp",
+      "line": 363,
+      "text": "Output(0, NULLPTR, 0, GetAutoSignalPropagation(), true);\t// TODO: non-blocking"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\source\\EterLib\\StdAfx.cpp",
+      "line": 7,
+      "text": "// TODO: reference any additional headers you need in STDAFX.H"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\source\\EterPythonLib\\PythonGridSlotWindow.cpp",
+      "line": 267,
+      "text": "// FIXME :     ã - [levites]"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\source\\GameLib\\ActorInstanceMotionEvent.cpp",
+      "line": 381,
+      "text": "// FIXME : TMotionWarpEventData   - [levites]"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\source\\GameLib\\GameType.cpp",
+      "line": 181,
+      "text": "// TODO DELETEME FIXME"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\source\\GameLib\\GameUtil.cpp",
+      "line": 102,
+      "text": "// FIXME  üũ ƴϴ"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\source\\UserInterface\\GuildMarkDownloader.cpp",
+      "line": 30,
+      "text": "m_dwTodo=TODO_RECV_MARK;"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\source\\UserInterface\\GuildMarkDownloader.cpp",
+      "line": 40,
+      "text": "m_dwTodo=TODO_RECV_SYMBOL;"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\source\\UserInterface\\GuildMarkDownloader.cpp",
+      "line": 87,
+      "text": "m_dwTodo=TODO_RECV_NONE;"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\source\\UserInterface\\GuildMarkDownloader.cpp",
+      "line": 246,
+      "text": "case TODO_RECV_NONE:"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\source\\UserInterface\\GuildMarkDownloader.cpp",
+      "line": 251,
+      "text": "case TODO_RECV_MARK:"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Binary\\source\\UserInterface\\GuildMarkDownloader.cpp",
+      "line": 257,
+      "text": "case TODO_RECV_SYMBOL:"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\DumpProto\\lzo\\stdafx.cpp",
+      "line": 7,
+      "text": "// TODO: ʿ ߰"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\FoxFS_Src\\Extern\\include\\cryptopp\\cast.cpp",
+      "line": 214,
+      "text": "// TODO: add a SecBlock workspace to the class when the ABI can change"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\FoxFS_Src\\Extern\\include\\cryptopp\\chacha_avx.cpp",
+      "line": 39,
+      "text": "// VS2017 and global optimization bug. TODO, figure out when"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\FoxFS_Src\\Extern\\include\\cryptopp\\donna_32.cpp",
+      "line": 934,
+      "text": "// TODO: enable this code path once we can test and benchmark it."
+    },
+    {
+      "path": "E:\\Anka2\\Source\\FoxFS_Src\\Extern\\include\\cryptopp\\donna_64.cpp",
+      "line": 756,
+      "text": "// TODO: enable this code path once we can test and benchmark it."
+    },
+    {
+      "path": "E:\\Anka2\\Source\\FoxFS_Src\\Extern\\include\\cryptopp\\eccrypto.cpp",
+      "line": 488,
+      "text": "// TODO: this fails in practice. Should it throw?"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\FoxFS_Src\\Extern\\include\\cryptopp\\esign.cpp",
+      "line": 6,
+      "text": "// TODO: fix the C4589 warnings"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\FoxFS_Src\\Extern\\include\\cryptopp\\files.cpp",
+      "line": 173,
+      "text": "// TODO: figure out what happens on cin"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\FoxFS_Src\\Extern\\include\\cryptopp\\filters.cpp",
+      "line": 1103,
+      "text": "CRYPTOPP_ASSERT(size != 0);\t// TODO: handle recoverable signature scheme"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\FoxFS_Src\\Extern\\include\\cryptopp\\gfpcrypt.cpp",
+      "line": 6,
+      "text": "// TODO: fix the C4589 warnings"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\FoxFS_Src\\Extern\\include\\cryptopp\\integer.cpp",
+      "line": 397,
+      "text": "// TODO: When NATIVE_DWORD is in effect, we access high and low, which are inactive"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\FoxFS_Src\\Extern\\include\\cryptopp\\lsh256.cpp",
+      "line": 792,
+      "text": "// TODO: determine if LSH256 supports truncated hashes. See the code"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\FoxFS_Src\\Extern\\include\\cryptopp\\lsh512.cpp",
+      "line": 868,
+      "text": "// TODO: determine if LSH512 supports truncated hashes. See the code"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\FoxFS_Src\\Extern\\include\\cryptopp\\poly1305.cpp",
+      "line": 169,
+      "text": "// TODO: No longer needed. Remove at next major version bump"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\FoxFS_Src\\Extern\\include\\cryptopp\\poly1305.cpp",
+      "line": 176,
+      "text": "// TODO: No longer needed. Remove at next major version bump"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\FoxFS_Src\\Extern\\include\\cryptopp\\rijndael.cpp",
+      "line": 91,
+      "text": "// VS2017 and global optimization bug. TODO, figure out when"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\FoxFS_Src\\Extern\\include\\cryptopp\\rijndael.cpp",
+      "line": 430,
+      "text": "// TODO: Add non-SSE4.1 variant for low-end Atoms. The low-end"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\FoxFS_Src\\Extern\\include\\cryptopp\\strciphr.cpp",
+      "line": 3,
+      "text": "// TODO: Figure out what is happening in ProcessData. The issue surfaced for"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\FoxFS_Src\\Extern\\include\\cryptopp\\test.cpp",
+      "line": 940,
+      "text": "// TODO: we need to group these tests like benchmarks..."
+    },
+    {
+      "path": "E:\\Anka2\\Source\\FoxFS_Src\\Extern\\include\\cryptopp\\validat6.cpp",
+      "line": 353,
+      "text": "#if 1\t// TODO: turn this back on when I make EC2N faster for pentanomial basis"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\FoxFS_Src\\Extern\\include\\cryptopp\\validat8.cpp",
+      "line": 435,
+      "text": "// TODO: fix this after name is standardized"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\FoxFS_Src\\Extern\\include\\cryptopp\\zinflate.cpp",
+      "line": 363,
+      "text": "Output(0, NULLPTR, 0, GetAutoSignalPropagation(), true);\t// TODO: non-blocking"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Server\\db\\src\\ClientManager.cpp",
+      "line": 1128,
+      "text": "// FIXME share with game"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Server\\game\\src\\char.cpp",
+      "line": 6224,
+      "text": "/* TODO:"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Server\\game\\src\\char_battle.cpp",
+      "line": 4460,
+      "text": "// TODO shudder with multiple people"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Server\\game\\src\\char_skill.cpp",
+      "line": 1345,
+      "text": "// Damage type according to TODO skill must be recorded."
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Server\\game\\src\\char_state.cpp",
+      "line": 997,
+      "text": "// TODO Change direction and be less stupid!"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Server\\game\\src\\char_state.cpp",
+      "line": 1269,
+      "text": "if (!Attack(victim)) // What if the attack fails? Why did it fail? TODO"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Server\\game\\src\\dungeon.cpp",
+      "line": 462,
+      "text": "// <Factor> TODO: Change id assignment, or drop it"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Server\\game\\src\\guild.cpp",
+      "line": 88,
+      "text": "// TODO if error occur?"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Server\\game\\src\\guild.cpp",
+      "line": 114,
+      "text": "// TODO GUILD_NAME"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Server\\game\\src\\questlua_target.cpp",
+      "line": 136,
+      "text": "{ \"npc\",\t\t\ttarget_vid\t\t}, // TODO: delete this"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Server\\game\\src\\questlua_target.cpp",
+      "line": 137,
+      "text": "{ \"pc\",\t\t\ttarget_vid\t\t}, // TODO: delete this"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\collect_code_metrics.py",
+      "line": 34,
+      "text": "if 'TODO' in line or 'FIXME' in line:"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\collect_code_metrics.py",
+      "line": 46,
+      "text": "if 'TODO' in line or 'FIXME' in line:"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\getopt.py",
+      "line": 24,
+      "text": "# TODO for gnu_getopt():"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\gettext.py",
+      "line": 37,
+      "text": "# TODO:"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\imputil.py",
+      "line": 630,
+      "text": "# TODO"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\numbers.py",
+      "line": 6,
+      "text": "TODO: Fill out more detailed documentation on the operators.\"\"\""
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\smtpd.py",
+      "line": 65,
+      "text": "# TODO:"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\subprocess.py",
+      "line": 960,
+      "text": "# a subclass of OSError.  FIXME: We should really"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\xmlrpclib.py",
+      "line": 91,
+      "text": "# TODO: sort out True/False/boolean issues for Python 2.3"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\xmlrpclib.py",
+      "line": 624,
+      "text": "# FIXME: the xml-rpc specification allows us to leave out"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\xmlrpclib.py",
+      "line": 804,
+      "text": "# FIXME: assert standalone == 1 ???"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\xmlrpclib.py",
+      "line": 1481,
+      "text": "# FIXME: mostly untested"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\bsddb\\dbobj.py",
+      "line": 19,
+      "text": "# TODO it would be *really nice* to have an automatic shadow class populator"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\bsddb\\dbobj.py",
+      "line": 128,
+      "text": "# TODO are there other dict methods that need to be overridden?"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\bsddb\\dbtables.py",
+      "line": 271,
+      "text": "# TODO verify more of the database's metadata?"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\bsddb\\__init__.py",
+      "line": 114,
+      "text": "# FIXME-20031102-greg: race condition.  cursor could"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\bsddb\\__init__.py",
+      "line": 132,
+      "text": "# FIXME-20031101-greg: race condition.  cursor could"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\bsddb\\__init__.py",
+      "line": 157,
+      "text": "# FIXME-20031102-greg: race condition.  cursor could"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\bsddb\\__init__.py",
+      "line": 175,
+      "text": "# FIXME-20031101-greg: race condition.  cursor could"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\bsddb\\__init__.py",
+      "line": 201,
+      "text": "# FIXME-20031101-greg: I believe there is still the potential"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\bsddb\\__init__.py",
+      "line": 208,
+      "text": "# TODO: A test case demonstrating the problem needs to be written."
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\bsddb\\test\\test_join.py",
+      "line": 72,
+      "text": "# FIXME: jCursor doesn't properly hold a reference to its"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\distutils\\tests\\support.py",
+      "line": 168,
+      "text": "# FIXME when run from regrtest, srcdir seems to be '.', which does not help"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\idlelib\\ColorDelegator.py",
+      "line": 73,
+      "text": "\"TODO\": {'background':None,'foreground':None},"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\idlelib\\ColorDelegator.py",
+      "line": 97,
+      "text": "self.tag_add(\"TODO\", index1, index2)"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\idlelib\\ColorDelegator.py",
+      "line": 162,
+      "text": "if self.allow_colorizing and self.tag_nextrange(\"TODO\", \"1.0\"):"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\idlelib\\ColorDelegator.py",
+      "line": 173,
+      "text": "item = self.tag_nextrange(\"TODO\", next)"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\idlelib\\ColorDelegator.py",
+      "line": 245,
+      "text": "self.tag_add(\"TODO\", next)"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\idlelib\\EditorWindow.py",
+      "line": 1175,
+      "text": "return self.text.tag_prevrange(\"TODO\", text_index) or \\"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\idlelib\\ParenMatch.py",
+      "line": 30,
+      "text": "TODO:"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\idlelib\\PyShell.py",
+      "line": 333,
+      "text": "self.tag_remove(\"TODO\", \"1.0\", \"iomark\")"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib-tk\\Tix.py",
+      "line": 539,
+      "text": "# FIXME: It should inherit -superclass tixShell"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib-tk\\Tix.py",
+      "line": 590,
+      "text": "# FIXME: It should inherit -superclass tixLabelWidget"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib-tk\\Tix.py",
+      "line": 634,
+      "text": "# FIXME: It should inherit -superclass tixLabelWidget"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib-tk\\Tix.py",
+      "line": 665,
+      "text": "# FIXME: It should inherit -superclass tixScrolledHList"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib-tk\\Tix.py",
+      "line": 687,
+      "text": "# FIXME: It should inherit -superclass tixScrolledHList"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib-tk\\Tix.py",
+      "line": 759,
+      "text": "# FIXME: It should inherit -superclass tixDialogShell"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib-tk\\Tix.py",
+      "line": 782,
+      "text": "# FIXME: It should inherit -superclass tixDialogShell"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib-tk\\Tix.py",
+      "line": 830,
+      "text": "# FIXME: It should inherit -superclass tixStdDialogShell"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib-tk\\Tix.py",
+      "line": 854,
+      "text": "# FIXME: It should inherit -superclass tixLabelWidget"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib-tk\\Tix.py",
+      "line": 865,
+      "text": "# FIXME: return python object"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib-tk\\Tix.py",
+      "line": 1192,
+      "text": "# FIXME: This is dangerous to expose to be called on its own."
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib-tk\\Tix.py",
+      "line": 1278,
+      "text": "# FIXME: It should inherit -superclass tixShell"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib-tk\\Tix.py",
+      "line": 1320,
+      "text": "# FIXME: It should inherit -superclass tixScrolledWidget"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib-tk\\Tix.py",
+      "line": 1331,
+      "text": "# FIXME: It should inherit -superclass tixScrolledWidget"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib-tk\\Tix.py",
+      "line": 1341,
+      "text": "# FIXME: It should inherit -superclass tixScrolledWidget"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib-tk\\Tix.py",
+      "line": 1351,
+      "text": "# FIXME: It should inherit -superclass tixScrolledWidget"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib-tk\\Tix.py",
+      "line": 1362,
+      "text": "# FIXME: It should inherit -superclass tixScrolledWidget"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib-tk\\Tix.py",
+      "line": 1375,
+      "text": "# FIXME: It should inherit -superclass tixLabelWidget"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib-tk\\Tix.py",
+      "line": 1407,
+      "text": "# FIXME: It should inherit from  Shell"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib-tk\\Tix.py",
+      "line": 1527,
+      "text": "# FIXME: It should inherit -superclass tixScrolledWidget"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib-tk\\Tix.py",
+      "line": 1574,
+      "text": "# FIXME: It should inherit -superclass tixTree"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib-tk\\Tix.py",
+      "line": 1787,
+      "text": "# FIXME: It should inherit -superclass tixScrolledWidget"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib-tk\\Tix.py",
+      "line": 1963,
+      "text": "# FIXME: It should inherit -superclass tixScrolledWidget"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib-tk\\tkCommonDialog.py",
+      "line": 19,
+      "text": "# FIXME: should this be placed on the module level instead?"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib-tk\\tkFileDialog.py",
+      "line": 141,
+      "text": "# FIXME: are the following  perhaps a bit too convenient?"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib-tk\\tkFont.py",
+      "line": 5,
+      "text": "# FIXME: should add 'displayof' option where relevant (actual, families,"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib2to3\\btm_utils.py",
+      "line": 222,
+      "text": "#TODO: handle {min, max} repeaters"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib2to3\\fixes\\fix_except.py",
+      "line": 69,
+      "text": "#TODO(cwinter) suite-cleanup"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib2to3\\fixes\\fix_except.py",
+      "line": 82,
+      "text": "#TODO(cwinter) stopgap until children becomes a smart list"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib2to3\\fixes\\fix_except.py",
+      "line": 91,
+      "text": "#TODO(cwinter) fix this when children becomes a smart list"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib2to3\\fixes\\fix_tuple_params.py",
+      "line": 54,
+      "text": "# TODO(cwinter): suite-cleanup"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib2to3\\fixes\\fix_tuple_params.py",
+      "line": 91,
+      "text": "# TODO(cwinter) get rid of this when children becomes a smart list"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\lib2to3\\fixes\\fix_tuple_params.py",
+      "line": 95,
+      "text": "# TODO(cwinter) suite-cleanup"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\test\\mapping_tests.py",
+      "line": 196,
+      "text": "# FIXME: Doesn't work with UserDict"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\test\\mapping_tests.py",
+      "line": 455,
+      "text": "# FIXME: the following won't work with UserDict, because it's an old style class"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\test\\mapping_tests.py",
+      "line": 462,
+      "text": "# FIXME: the following won't work with UserDict, because it's an old style class"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\test\\test_ast.py",
+      "line": 177,
+      "text": "# TODO: expr_context, slice, boolop, operator, unaryop, cmpop, comprehension"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\test\\test_codecs.py",
+      "line": 1591,
+      "text": "if encoding == \"idna\": # FIXME: See SF bug #1163178"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\test\\test_complex.py",
+      "line": 104,
+      "text": "# FIXME: The following currently crashes on Alpha"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\test\\test_fcntl.py",
+      "line": 18,
+      "text": "# TODO - Write tests for flock() and lockf()."
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\test\\test_gettext.py",
+      "line": 10,
+      "text": "# TODO:"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\test\\test_multiprocessing.py",
+      "line": 2227,
+      "text": "# TODO: add more tests for deliver/answer challenge."
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\test\\test_smtplib.py",
+      "line": 507,
+      "text": "#TODO: add tests for correct AUTH method fallback now that the"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\test\\test_sys.py",
+      "line": 68,
+      "text": "# FIXME: testing the code for a lost or replaced excepthook in"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\test\\test_tarfile.py",
+      "line": 1201,
+      "text": "# All *UnicodeTests FIXME"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\test\\test_with.py",
+      "line": 247,
+      "text": "# FIXME: In the future, we'll try to keep the bound names from leaking"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\xml\\etree\\ElementPath.py",
+      "line": 135,
+      "text": "# FIXME: raise error if .. is applied at toplevel?"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\xml\\etree\\ElementPath.py",
+      "line": 147,
+      "text": "# FIXME: replace with real parser!!! refs:"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\xml\\etree\\ElementPath.py",
+      "line": 217,
+      "text": "# FIXME: what if the selector is \"*\" ?"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\xml\\etree\\ElementPath.py",
+      "line": 250,
+      "text": "path = path + \"*\" # implicit all (FIXME: keep this?)"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\xml\\etree\\ElementTree.py",
+      "line": 151,
+      "text": "# FIXME: not sure about this; might be a better idea to look"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\xml\\etree\\ElementTree.py",
+      "line": 797,
+      "text": "# FIXME: raise an ImportError for c14n if ElementC14N is missing?"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\xml\\etree\\ElementTree.py",
+      "line": 863,
+      "text": "# FIXME: can this be handled in XML 1.0?"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\xml\\etree\\ElementTree.py",
+      "line": 988,
+      "text": "# FIXME: handle boolean attributes"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\xml\\etree\\ElementTree.py",
+      "line": 1148,
+      "text": "# FIXME: merge small fragments into larger parts"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\xml\\sax\\expatreader.py",
+      "line": 213,
+      "text": "# FIXME: when to invoke error()?"
+    },
+    {
+      "path": "E:\\Anka2\\Tools\\archiver\\tools\\Python27\\Lib\\xml\\sax\\expatreader.py",
+      "line": 393,
+      "text": "return 0  # FIXME: save error info here?"
+    }
+  ]
+}

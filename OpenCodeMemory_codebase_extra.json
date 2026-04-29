@@ -1,0 +1,60 @@
+{
+  "codebase_report": [
+    {
+      "path": "E:\\Anka2\\Source\\Server\\game\\src\\battle.cpp",
+      "category": "Server Game Core",
+      "description": "Battle dynamics and combat resolution logic.",
+      "dependencies": ["libthecore", "dragon", "monster"],
+      "status": "known"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Server\\game\\src\\guild.cpp",
+      "category": "Server Game Core",
+      "description": "Guild (lonca) data structures and logic.",
+      "dependencies": ["libthecore", "db"],
+      "status": "known"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Server\\game\\src\\shop.cpp",
+      "category": "Server Game Core",
+      "description": "Shop interactions for NPCs and players.",
+      "dependencies": ["libthecore"],
+      "status": "known"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Server\\game\\src\\mob_manager.cpp",
+      "category": "Server Game Core",
+      "description": "Mob (NPC/monster) management and state tracking.",
+      "dependencies": ["libthecore"],
+      "status": "known"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Server\\game\\src\\questmanager.cpp",
+      "category": "Server Game Core",
+      "description": "Quest lifecycle management and orchestration.",
+      "dependencies": ["liblua", "questlua"],
+      "status": "known"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Server\\db\\src\\ClientManager.cpp",
+      "category": "Server DB Layer",
+      "description": "Bridge between server and client data (client session handling).",
+      "dependencies": ["libsql", "db"],
+      "status": "known"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Server\\game\\src\\quest.cpp",
+      "category": "Server Game Core",
+      "description": "Generic quest handling entry for multiple quest types.",
+      "dependencies": ["liblua"],
+      "status": "known"
+    },
+    {
+      "path": "E:\\Anka2\\Source\\Server\\game\\src\\shop_manager.cpp",
+      "category": "Server Game Core",
+      "description": "Shop manager: manages multiple shop instances and inventories.",
+      "dependencies": ["db", "npc"],
+      "status": "known"
+    }
+  ]
+}

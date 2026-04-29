@@ -1,0 +1,22 @@
+{
+  "version": "2026-04-27",
+  "description": "Initial blacklist for search/indexing to speed up analysis",
+  "ignore": [
+    ".git",
+    "Files",
+    "Tools/dump_proto",
+    "Tools/dump_proto/*",
+    "*.dll",
+    "*.exe",
+    "*.tar.gz",
+    "*.zip",
+    "node_modules",
+    "__pycache__",
+    "dist",
+    "build",
+    ".DS_Store",
+    "Thumbs.db",
+    "E:\\Anka2\\home",
+    "E:\\Anka2\\Client"
+  ]
+}
