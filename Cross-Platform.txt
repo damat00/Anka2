@@ -1,0 +1,24 @@
+Android'e Geçiş Planı ve Yol Haritası (Eylem Planı)
+Sistemde Android APK'sı üretebilmek için şu sıralamayı Windows üzerinde uygulayarak projeyi yavaş yavaş cross-platform hale getirmeliyiz:
+
+Adım 1: Modernizasyon ve Bağımlılık Temizliği (CMake)
+
+Visual Studio çözümünü bırakıp projeyi tamamen CMake yapısına geçirmek.
+Granny 3D kaynak kodunu projenin içine dahil ederek statik bir CMake kütüphanesi (target) olarak derlemek.
+Adım 2: Platform Değişimi (Pencere ve Ses)
+
+EterLib içerisindeki Win32 ve DirectInput kodlarını sökerek SDL2 entegre etmek. (Oyun hala DirectX kullanırken bile pencere SDL2 ile açılabilir.)
+MilesLib klasörünü tamamen yeniden yazıp OpenAL ve Ogg/Vorbis ses sistemine geçirmek.
+EterBase/MappedFile.cpp dosyasını mmap() (POSIX) destekleyecek şekilde refactor etmek.
+Adım 3: Render Motoru Soyutlama (Büyük Refactoring)
+
+Kodun her yerine saçılmış olan <d3d9.h> tanımlarını ve LPDIRECT3D pointerlarını temizlemek.
+EterLib içerisinde CRenderDevice, CTexture, CShader adında yepyeni bir donanım-bağımsız soyutlama katmanı (Hardware Abstraction Layer) yazmak.
+DirectX 9 kodlarını bu soyutlamanın "Backend" kısmına almak.
+Hemen ardından ikinci bir Backend olarak OpenGL ES 3.0 (Android uyumlu) veya Vulkan render kodlarını yazmak.
+Adım 4: Android NDK Derlemesi (Son Aşama)
+
+Windows üzerinde çalışan CMake + SDL2 + OpenGL ES projesini, Android NDK ile (ARM64 için) çapraz derlemeye (Cross-Compile) sokmak.
+Python ve Boost'un Android uyumlu derlenmiş dosyalarını projeye dahil etmek.
+Python UserInterface dosyalarına dokunmatik ekranlar için Sanal Joystick (Virtual D-Pad) kodlamak.
+APK paketlemesi yapmak.
