@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Solution>
+	<Configurations>
+		<BuildType Name="Debug"/>
+		<BuildType Name="Release"/>
+		<Platform Name="Win32"/>
+	</Configurations>
+	<Project Path="ALL_BUILD.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="10edc10f-ef95-32a9-a849-35f567870f8a" DefaultStartup="true">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="granny2_static.vcxproj"/>
+		<Build Solution="Debug|*" Project="false"/>
+		<Build Solution="Release|*" Project="false"/>
+	</Project>
+	<Project Path="ZERO_CHECK.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="b56d6958-3eff-3b4e-ad63-2fa1a8db0353"/>
+	<Project Path="granny2_static.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="a3b0cfcd-1835-355d-b3f2-2d4adf468cac">
+		<BuildDependency Project="ZERO_CHECK.vcxproj"/>
+	</Project>
+</Solution>

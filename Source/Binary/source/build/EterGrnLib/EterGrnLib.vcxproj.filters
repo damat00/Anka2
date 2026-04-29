@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterGrnLib\LODController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterGrnLib\Material.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterGrnLib\Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterGrnLib\Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterGrnLib\ModelInstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterGrnLib\ModelInstanceCollisionDetection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterGrnLib\ModelInstanceModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterGrnLib\ModelInstanceMotion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterGrnLib\ModelInstanceRender.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterGrnLib\ModelInstanceUpdate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterGrnLib\Motion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterGrnLib\StdAfx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterGrnLib\Thing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterGrnLib\ThingInstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterGrnLib\Util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterGrnLib\LODController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterGrnLib\Material.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterGrnLib\Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterGrnLib\Model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterGrnLib\ModelInstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterGrnLib\Motion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterGrnLib\StdAfx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterGrnLib\Thing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterGrnLib\ThingInstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterGrnLib\Util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="E:\Anka2\Source\Binary\source\EterGrnLib\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{E3F4D3CA-E7D6-3F43-9529-65517DD69453}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{119B1FF6-B365-3DC9-95E9-3DDCFF1CEA69}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

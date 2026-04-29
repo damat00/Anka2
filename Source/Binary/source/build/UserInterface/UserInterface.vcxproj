@@ -1,0 +1,439 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{2C1EAAD1-F725-3577-8F78-E76F44D8C489}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+    <Platform>Win32</Platform>
+    <ProjectName>UserInterface</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">E:\Anka2\Source\Binary\source\build\UserInterface\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">UserInterface.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">UserInterface</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">E:\Anka2\Source\Binary\source\build\UserInterface\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">UserInterface.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">UserInterface</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>E:\Anka2\Source\Binary\source;E:\Anka2\Source\Binary\source\..\..\Granny-3D-SDK-main\include;E:\Anka2\Source\Binary\source\..\extern\include;E:\Anka2\Source\Binary\source\UserInterface;E:\Anka2\Source\Binary\source\UserInterface\..\EterBase;E:\Anka2\Source\Binary\source\UserInterface\..\EterPack;E:\Anka2\Source\Binary\source\UserInterface\..\EterLib;E:\Anka2\Source\Binary\source\UserInterface\..\EterGrnLib;E:\Anka2\Source\Binary\source\UserInterface\..\MilesLib;E:\Anka2\Source\Binary\source\UserInterface\..\GameLib;E:\Anka2\Source\Binary\source\UserInterface\..\ScriptLib;E:\Anka2\Source\Binary\source\UserInterface\..\EterPythonLib;E:\Anka2\Source\Binary\source\UserInterface\..\SpeedTreeLib;E:\Anka2\Source\Binary\source\UserInterface\..\PRTerrainLib;E:\Anka2\Source\Binary\source\UserInterface\..\SphereLib;E:\Anka2\Source\Binary\source\UserInterface\..\EffectLib;E:\Anka2\Source\Binary\source\GameLib;E:\Anka2\Source\Binary\source\GameLib\..\EterBase;E:\Anka2\Source\Binary\source\GameLib\..\EterPack;E:\Anka2\Source\Binary\source\GameLib\..\EterLib;E:\Anka2\Source\Binary\source\GameLib\..\EterGrnLib;E:\Anka2\Source\Binary\source\GameLib\..\MilesLib;E:\Anka2\Source\Binary\source\EterPythonLib;E:\Anka2\Source\Binary\source\EterPythonLib\..\EterBase;E:\Anka2\Source\Binary\source\EterPythonLib\..\EterPack;E:\Anka2\Source\Binary\source\EterPythonLib\..\EterLib;E:\Anka2\Source\Binary\source\EterPythonLib\..\ScriptLib;E:\Anka2\Source\Binary\source\EffectLib;E:\Anka2\Source\Binary\source\EffectLib\..\EterBase;E:\Anka2\Source\Binary\source\EffectLib\..\EterPack;E:\Anka2\Source\Binary\source\EffectLib\..\EterLib;E:\Anka2\Source\Binary\source\EffectLib\..\EterGrnLib;E:\Anka2\Source\Binary\source\EffectLib\..\MilesLib;E:\Anka2\Source\Binary\source\EffectLib\..\ScriptLib;E:\Anka2\Source\Binary\source\ScriptLib;E:\Anka2\Source\Binary\source\ScriptLib\..\EterBase;E:\Anka2\Source\Binary\source\ScriptLib\..\EterPack;E:\Anka2\Source\Binary\source\ScriptLib\..\EterLib;E:\Anka2\Source\Binary\source\SpeedTreeLib;E:\Anka2\Source\Binary\source\SpeedTreeLib\..\EterBase;E:\Anka2\Source\Binary\source\SpeedTreeLib\..\EterPack;E:\Anka2\Source\Binary\source\SpeedTreeLib\..\EterLib;E:\Anka2\Source\Binary\source\PRTerrainLib;E:\Anka2\Source\Binary\source\PRTerrainLib\..\EterBase;E:\Anka2\Source\Binary\source\SphereLib;E:\Anka2\Source\Binary\source\SphereLib\..\EterBase;E:\Anka2\Source\Binary\source\SphereLib\..\EterPack;E:\Anka2\Source\Binary\source\SphereLib\..\EterLib;E:\Anka2\Source\Binary\source\EterGrnLib;E:\Anka2\Source\Binary\source\EterGrnLib\..\EterBase;E:\Anka2\Source\Binary\source\EterGrnLib\..\EterPack;E:\Anka2\Source\Binary\source\EterGrnLib\..\EterLib;E:\Anka2\Source\Binary\source\EterLib;E:\Anka2\Source\Binary\source\EterLib\..\EterBase;E:\Anka2\Source\Binary\source\EterLib\..\EterPack;E:\Anka2\Source\Binary\source\MilesLib;E:\Anka2\Source\Binary\source\MilesLib\..\EterBase;E:\Anka2\Source\Binary\source\MilesLib\..\EterPack;E:\Anka2\Source\Binary\source\MilesLib\..\EterLib;E:\Anka2\Source\Binary\source\EterPack;E:\Anka2\Source\Binary\source\EterPack\..\EterBase;E:\Anka2\Source\Binary\source\EterBase;E:\Anka2\Source\Binary\source\EterBase\Poly;E:\Anka2\Source\Granny-3D-SDK-main\source\winxx;E:\Anka2\Source\Granny-3D-SDK-main\source\winxx\win32;E:\Anka2\Source\Granny-3D-SDK-main\source\..\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>E:\Anka2\Source\Binary\source;E:\Anka2\Source\Binary\source\..\..\Granny-3D-SDK-main\include;E:\Anka2\Source\Binary\source\..\extern\include;E:\Anka2\Source\Binary\source\UserInterface;E:\Anka2\Source\Binary\source\UserInterface\..\EterBase;E:\Anka2\Source\Binary\source\UserInterface\..\EterPack;E:\Anka2\Source\Binary\source\UserInterface\..\EterLib;E:\Anka2\Source\Binary\source\UserInterface\..\EterGrnLib;E:\Anka2\Source\Binary\source\UserInterface\..\MilesLib;E:\Anka2\Source\Binary\source\UserInterface\..\GameLib;E:\Anka2\Source\Binary\source\UserInterface\..\ScriptLib;E:\Anka2\Source\Binary\source\UserInterface\..\EterPythonLib;E:\Anka2\Source\Binary\source\UserInterface\..\SpeedTreeLib;E:\Anka2\Source\Binary\source\UserInterface\..\PRTerrainLib;E:\Anka2\Source\Binary\source\UserInterface\..\SphereLib;E:\Anka2\Source\Binary\source\UserInterface\..\EffectLib;E:\Anka2\Source\Binary\source\GameLib;E:\Anka2\Source\Binary\source\GameLib\..\EterBase;E:\Anka2\Source\Binary\source\GameLib\..\EterPack;E:\Anka2\Source\Binary\source\GameLib\..\EterLib;E:\Anka2\Source\Binary\source\GameLib\..\EterGrnLib;E:\Anka2\Source\Binary\source\GameLib\..\MilesLib;E:\Anka2\Source\Binary\source\EterPythonLib;E:\Anka2\Source\Binary\source\EterPythonLib\..\EterBase;E:\Anka2\Source\Binary\source\EterPythonLib\..\EterPack;E:\Anka2\Source\Binary\source\EterPythonLib\..\EterLib;E:\Anka2\Source\Binary\source\EterPythonLib\..\ScriptLib;E:\Anka2\Source\Binary\source\EffectLib;E:\Anka2\Source\Binary\source\EffectLib\..\EterBase;E:\Anka2\Source\Binary\source\EffectLib\..\EterPack;E:\Anka2\Source\Binary\source\EffectLib\..\EterLib;E:\Anka2\Source\Binary\source\EffectLib\..\EterGrnLib;E:\Anka2\Source\Binary\source\EffectLib\..\MilesLib;E:\Anka2\Source\Binary\source\EffectLib\..\ScriptLib;E:\Anka2\Source\Binary\source\ScriptLib;E:\Anka2\Source\Binary\source\ScriptLib\..\EterBase;E:\Anka2\Source\Binary\source\ScriptLib\..\EterPack;E:\Anka2\Source\Binary\source\ScriptLib\..\EterLib;E:\Anka2\Source\Binary\source\SpeedTreeLib;E:\Anka2\Source\Binary\source\SpeedTreeLib\..\EterBase;E:\Anka2\Source\Binary\source\SpeedTreeLib\..\EterPack;E:\Anka2\Source\Binary\source\SpeedTreeLib\..\EterLib;E:\Anka2\Source\Binary\source\PRTerrainLib;E:\Anka2\Source\Binary\source\PRTerrainLib\..\EterBase;E:\Anka2\Source\Binary\source\SphereLib;E:\Anka2\Source\Binary\source\SphereLib\..\EterBase;E:\Anka2\Source\Binary\source\SphereLib\..\EterPack;E:\Anka2\Source\Binary\source\SphereLib\..\EterLib;E:\Anka2\Source\Binary\source\EterGrnLib;E:\Anka2\Source\Binary\source\EterGrnLib\..\EterBase;E:\Anka2\Source\Binary\source\EterGrnLib\..\EterPack;E:\Anka2\Source\Binary\source\EterGrnLib\..\EterLib;E:\Anka2\Source\Binary\source\EterLib;E:\Anka2\Source\Binary\source\EterLib\..\EterBase;E:\Anka2\Source\Binary\source\EterLib\..\EterPack;E:\Anka2\Source\Binary\source\MilesLib;E:\Anka2\Source\Binary\source\MilesLib\..\EterBase;E:\Anka2\Source\Binary\source\MilesLib\..\EterPack;E:\Anka2\Source\Binary\source\MilesLib\..\EterLib;E:\Anka2\Source\Binary\source\EterPack;E:\Anka2\Source\Binary\source\EterPack\..\EterBase;E:\Anka2\Source\Binary\source\EterBase;E:\Anka2\Source\Binary\source\EterBase\Poly;E:\Anka2\Source\Granny-3D-SDK-main\source\winxx;E:\Anka2\Source\Granny-3D-SDK-main\source\winxx\win32;E:\Anka2\Source\Granny-3D-SDK-main\source\..\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>E:\Anka2\Source\Binary\source;E:\Anka2\Source\Binary\source\..\..\Granny-3D-SDK-main\include;E:\Anka2\Source\Binary\source\..\extern\include;E:\Anka2\Source\Binary\source\UserInterface;E:\Anka2\Source\Binary\source\UserInterface\..\EterBase;E:\Anka2\Source\Binary\source\UserInterface\..\EterPack;E:\Anka2\Source\Binary\source\UserInterface\..\EterLib;E:\Anka2\Source\Binary\source\UserInterface\..\EterGrnLib;E:\Anka2\Source\Binary\source\UserInterface\..\MilesLib;E:\Anka2\Source\Binary\source\UserInterface\..\GameLib;E:\Anka2\Source\Binary\source\UserInterface\..\ScriptLib;E:\Anka2\Source\Binary\source\UserInterface\..\EterPythonLib;E:\Anka2\Source\Binary\source\UserInterface\..\SpeedTreeLib;E:\Anka2\Source\Binary\source\UserInterface\..\PRTerrainLib;E:\Anka2\Source\Binary\source\UserInterface\..\SphereLib;E:\Anka2\Source\Binary\source\UserInterface\..\EffectLib;E:\Anka2\Source\Binary\source\GameLib;E:\Anka2\Source\Binary\source\GameLib\..\EterBase;E:\Anka2\Source\Binary\source\GameLib\..\EterPack;E:\Anka2\Source\Binary\source\GameLib\..\EterLib;E:\Anka2\Source\Binary\source\GameLib\..\EterGrnLib;E:\Anka2\Source\Binary\source\GameLib\..\MilesLib;E:\Anka2\Source\Binary\source\EterPythonLib;E:\Anka2\Source\Binary\source\EterPythonLib\..\EterBase;E:\Anka2\Source\Binary\source\EterPythonLib\..\EterPack;E:\Anka2\Source\Binary\source\EterPythonLib\..\EterLib;E:\Anka2\Source\Binary\source\EterPythonLib\..\ScriptLib;E:\Anka2\Source\Binary\source\EffectLib;E:\Anka2\Source\Binary\source\EffectLib\..\EterBase;E:\Anka2\Source\Binary\source\EffectLib\..\EterPack;E:\Anka2\Source\Binary\source\EffectLib\..\EterLib;E:\Anka2\Source\Binary\source\EffectLib\..\EterGrnLib;E:\Anka2\Source\Binary\source\EffectLib\..\MilesLib;E:\Anka2\Source\Binary\source\EffectLib\..\ScriptLib;E:\Anka2\Source\Binary\source\ScriptLib;E:\Anka2\Source\Binary\source\ScriptLib\..\EterBase;E:\Anka2\Source\Binary\source\ScriptLib\..\EterPack;E:\Anka2\Source\Binary\source\ScriptLib\..\EterLib;E:\Anka2\Source\Binary\source\SpeedTreeLib;E:\Anka2\Source\Binary\source\SpeedTreeLib\..\EterBase;E:\Anka2\Source\Binary\source\SpeedTreeLib\..\EterPack;E:\Anka2\Source\Binary\source\SpeedTreeLib\..\EterLib;E:\Anka2\Source\Binary\source\PRTerrainLib;E:\Anka2\Source\Binary\source\PRTerrainLib\..\EterBase;E:\Anka2\Source\Binary\source\SphereLib;E:\Anka2\Source\Binary\source\SphereLib\..\EterBase;E:\Anka2\Source\Binary\source\SphereLib\..\EterPack;E:\Anka2\Source\Binary\source\SphereLib\..\EterLib;E:\Anka2\Source\Binary\source\EterGrnLib;E:\Anka2\Source\Binary\source\EterGrnLib\..\EterBase;E:\Anka2\Source\Binary\source\EterGrnLib\..\EterPack;E:\Anka2\Source\Binary\source\EterGrnLib\..\EterLib;E:\Anka2\Source\Binary\source\EterLib;E:\Anka2\Source\Binary\source\EterLib\..\EterBase;E:\Anka2\Source\Binary\source\EterLib\..\EterPack;E:\Anka2\Source\Binary\source\MilesLib;E:\Anka2\Source\Binary\source\MilesLib\..\EterBase;E:\Anka2\Source\Binary\source\MilesLib\..\EterPack;E:\Anka2\Source\Binary\source\MilesLib\..\EterLib;E:\Anka2\Source\Binary\source\EterPack;E:\Anka2\Source\Binary\source\EterPack\..\EterBase;E:\Anka2\Source\Binary\source\EterBase;E:\Anka2\Source\Binary\source\EterBase\Poly;E:\Anka2\Source\Granny-3D-SDK-main\source\winxx;E:\Anka2\Source\Granny-3D-SDK-main\source\winxx\win32;E:\Anka2\Source\Granny-3D-SDK-main\source\..\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>..\GameLib\Debug\GameLib.lib;..\EterPythonLib\Debug\EterPythonLib.lib;..\EffectLib\Debug\EffectLib.lib;..\ScriptLib\Debug\ScriptLib.lib;..\SpeedTreeLib\Debug\SpeedTreeLib.lib;..\PRTerrainLib\Debug\PRTerrainLib.lib;..\SphereLib\Debug\SphereLib.lib;..\EterGrnLib\Debug\EterGrnLib.lib;..\EterLib\Debug\EterLib.lib;..\MilesLib\Debug\MilesLib.lib;..\EterPack\Debug\EterPack.lib;..\EterBase\Debug\EterBase.lib;..\granny\Debug\granny2_static.lib;d3d8.lib;d3dx8.lib;dinput8.lib;dxguid.lib;winmm.lib;ws2_32.lib;imm32.lib;imagehlp.lib;version.lib;E:\Anka2\Source\Binary\source\UserInterface\..\..\extern\library\cryptopp.lib;E:\Anka2\Source\Binary\source\UserInterface\..\..\extern\library\DevIL.lib;E:\Anka2\Source\Binary\source\UserInterface\..\..\extern\library\ILU.lib;E:\Anka2\Source\Binary\source\UserInterface\..\..\extern\library\ILUT.lib;E:\Anka2\Source\Binary\source\UserInterface\..\..\extern\library\libjpeg-6b.lib;E:\Anka2\Source\Binary\source\UserInterface\..\..\extern\library\python27.lib;E:\Anka2\Source\Binary\source\UserInterface\..\..\extern\library\lz4.lib;E:\Anka2\Source\Binary\source\UserInterface\..\..\extern\library\mss32.lib;E:\Anka2\Source\Binary\source\UserInterface\..\..\extern\library\SpeedTreeRT.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:X86</AdditionalOptions>
+      <DataExecutionPrevention></DataExecutionPrevention>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
+      <ImportLibrary>E:/Anka2/Source/Binary/source/build/UserInterface/Debug/UserInterface.lib</ImportLibrary>
+      <LinkErrorReporting></LinkErrorReporting>
+      <ProgramDataBaseFile>E:/Anka2/Source/Binary/source/build/UserInterface/Debug/UserInterface.pdb</ProgramDataBaseFile>
+      <RandomizedBaseAddress></RandomizedBaseAddress>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>E:\Anka2\Source\Binary\source;E:\Anka2\Source\Binary\source\..\..\Granny-3D-SDK-main\include;E:\Anka2\Source\Binary\source\..\extern\include;E:\Anka2\Source\Binary\source\UserInterface;E:\Anka2\Source\Binary\source\UserInterface\..\EterBase;E:\Anka2\Source\Binary\source\UserInterface\..\EterPack;E:\Anka2\Source\Binary\source\UserInterface\..\EterLib;E:\Anka2\Source\Binary\source\UserInterface\..\EterGrnLib;E:\Anka2\Source\Binary\source\UserInterface\..\MilesLib;E:\Anka2\Source\Binary\source\UserInterface\..\GameLib;E:\Anka2\Source\Binary\source\UserInterface\..\ScriptLib;E:\Anka2\Source\Binary\source\UserInterface\..\EterPythonLib;E:\Anka2\Source\Binary\source\UserInterface\..\SpeedTreeLib;E:\Anka2\Source\Binary\source\UserInterface\..\PRTerrainLib;E:\Anka2\Source\Binary\source\UserInterface\..\SphereLib;E:\Anka2\Source\Binary\source\UserInterface\..\EffectLib;E:\Anka2\Source\Binary\source\GameLib;E:\Anka2\Source\Binary\source\GameLib\..\EterBase;E:\Anka2\Source\Binary\source\GameLib\..\EterPack;E:\Anka2\Source\Binary\source\GameLib\..\EterLib;E:\Anka2\Source\Binary\source\GameLib\..\EterGrnLib;E:\Anka2\Source\Binary\source\GameLib\..\MilesLib;E:\Anka2\Source\Binary\source\EterPythonLib;E:\Anka2\Source\Binary\source\EterPythonLib\..\EterBase;E:\Anka2\Source\Binary\source\EterPythonLib\..\EterPack;E:\Anka2\Source\Binary\source\EterPythonLib\..\EterLib;E:\Anka2\Source\Binary\source\EterPythonLib\..\ScriptLib;E:\Anka2\Source\Binary\source\EffectLib;E:\Anka2\Source\Binary\source\EffectLib\..\EterBase;E:\Anka2\Source\Binary\source\EffectLib\..\EterPack;E:\Anka2\Source\Binary\source\EffectLib\..\EterLib;E:\Anka2\Source\Binary\source\EffectLib\..\EterGrnLib;E:\Anka2\Source\Binary\source\EffectLib\..\MilesLib;E:\Anka2\Source\Binary\source\EffectLib\..\ScriptLib;E:\Anka2\Source\Binary\source\ScriptLib;E:\Anka2\Source\Binary\source\ScriptLib\..\EterBase;E:\Anka2\Source\Binary\source\ScriptLib\..\EterPack;E:\Anka2\Source\Binary\source\ScriptLib\..\EterLib;E:\Anka2\Source\Binary\source\SpeedTreeLib;E:\Anka2\Source\Binary\source\SpeedTreeLib\..\EterBase;E:\Anka2\Source\Binary\source\SpeedTreeLib\..\EterPack;E:\Anka2\Source\Binary\source\SpeedTreeLib\..\EterLib;E:\Anka2\Source\Binary\source\PRTerrainLib;E:\Anka2\Source\Binary\source\PRTerrainLib\..\EterBase;E:\Anka2\Source\Binary\source\SphereLib;E:\Anka2\Source\Binary\source\SphereLib\..\EterBase;E:\Anka2\Source\Binary\source\SphereLib\..\EterPack;E:\Anka2\Source\Binary\source\SphereLib\..\EterLib;E:\Anka2\Source\Binary\source\EterGrnLib;E:\Anka2\Source\Binary\source\EterGrnLib\..\EterBase;E:\Anka2\Source\Binary\source\EterGrnLib\..\EterPack;E:\Anka2\Source\Binary\source\EterGrnLib\..\EterLib;E:\Anka2\Source\Binary\source\EterLib;E:\Anka2\Source\Binary\source\EterLib\..\EterBase;E:\Anka2\Source\Binary\source\EterLib\..\EterPack;E:\Anka2\Source\Binary\source\MilesLib;E:\Anka2\Source\Binary\source\MilesLib\..\EterBase;E:\Anka2\Source\Binary\source\MilesLib\..\EterPack;E:\Anka2\Source\Binary\source\MilesLib\..\EterLib;E:\Anka2\Source\Binary\source\EterPack;E:\Anka2\Source\Binary\source\EterPack\..\EterBase;E:\Anka2\Source\Binary\source\EterBase;E:\Anka2\Source\Binary\source\EterBase\Poly;E:\Anka2\Source\Granny-3D-SDK-main\source\winxx;E:\Anka2\Source\Granny-3D-SDK-main\source\winxx\win32;E:\Anka2\Source\Granny-3D-SDK-main\source\..\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>E:\Anka2\Source\Binary\source;E:\Anka2\Source\Binary\source\..\..\Granny-3D-SDK-main\include;E:\Anka2\Source\Binary\source\..\extern\include;E:\Anka2\Source\Binary\source\UserInterface;E:\Anka2\Source\Binary\source\UserInterface\..\EterBase;E:\Anka2\Source\Binary\source\UserInterface\..\EterPack;E:\Anka2\Source\Binary\source\UserInterface\..\EterLib;E:\Anka2\Source\Binary\source\UserInterface\..\EterGrnLib;E:\Anka2\Source\Binary\source\UserInterface\..\MilesLib;E:\Anka2\Source\Binary\source\UserInterface\..\GameLib;E:\Anka2\Source\Binary\source\UserInterface\..\ScriptLib;E:\Anka2\Source\Binary\source\UserInterface\..\EterPythonLib;E:\Anka2\Source\Binary\source\UserInterface\..\SpeedTreeLib;E:\Anka2\Source\Binary\source\UserInterface\..\PRTerrainLib;E:\Anka2\Source\Binary\source\UserInterface\..\SphereLib;E:\Anka2\Source\Binary\source\UserInterface\..\EffectLib;E:\Anka2\Source\Binary\source\GameLib;E:\Anka2\Source\Binary\source\GameLib\..\EterBase;E:\Anka2\Source\Binary\source\GameLib\..\EterPack;E:\Anka2\Source\Binary\source\GameLib\..\EterLib;E:\Anka2\Source\Binary\source\GameLib\..\EterGrnLib;E:\Anka2\Source\Binary\source\GameLib\..\MilesLib;E:\Anka2\Source\Binary\source\EterPythonLib;E:\Anka2\Source\Binary\source\EterPythonLib\..\EterBase;E:\Anka2\Source\Binary\source\EterPythonLib\..\EterPack;E:\Anka2\Source\Binary\source\EterPythonLib\..\EterLib;E:\Anka2\Source\Binary\source\EterPythonLib\..\ScriptLib;E:\Anka2\Source\Binary\source\EffectLib;E:\Anka2\Source\Binary\source\EffectLib\..\EterBase;E:\Anka2\Source\Binary\source\EffectLib\..\EterPack;E:\Anka2\Source\Binary\source\EffectLib\..\EterLib;E:\Anka2\Source\Binary\source\EffectLib\..\EterGrnLib;E:\Anka2\Source\Binary\source\EffectLib\..\MilesLib;E:\Anka2\Source\Binary\source\EffectLib\..\ScriptLib;E:\Anka2\Source\Binary\source\ScriptLib;E:\Anka2\Source\Binary\source\ScriptLib\..\EterBase;E:\Anka2\Source\Binary\source\ScriptLib\..\EterPack;E:\Anka2\Source\Binary\source\ScriptLib\..\EterLib;E:\Anka2\Source\Binary\source\SpeedTreeLib;E:\Anka2\Source\Binary\source\SpeedTreeLib\..\EterBase;E:\Anka2\Source\Binary\source\SpeedTreeLib\..\EterPack;E:\Anka2\Source\Binary\source\SpeedTreeLib\..\EterLib;E:\Anka2\Source\Binary\source\PRTerrainLib;E:\Anka2\Source\Binary\source\PRTerrainLib\..\EterBase;E:\Anka2\Source\Binary\source\SphereLib;E:\Anka2\Source\Binary\source\SphereLib\..\EterBase;E:\Anka2\Source\Binary\source\SphereLib\..\EterPack;E:\Anka2\Source\Binary\source\SphereLib\..\EterLib;E:\Anka2\Source\Binary\source\EterGrnLib;E:\Anka2\Source\Binary\source\EterGrnLib\..\EterBase;E:\Anka2\Source\Binary\source\EterGrnLib\..\EterPack;E:\Anka2\Source\Binary\source\EterGrnLib\..\EterLib;E:\Anka2\Source\Binary\source\EterLib;E:\Anka2\Source\Binary\source\EterLib\..\EterBase;E:\Anka2\Source\Binary\source\EterLib\..\EterPack;E:\Anka2\Source\Binary\source\MilesLib;E:\Anka2\Source\Binary\source\MilesLib\..\EterBase;E:\Anka2\Source\Binary\source\MilesLib\..\EterPack;E:\Anka2\Source\Binary\source\MilesLib\..\EterLib;E:\Anka2\Source\Binary\source\EterPack;E:\Anka2\Source\Binary\source\EterPack\..\EterBase;E:\Anka2\Source\Binary\source\EterBase;E:\Anka2\Source\Binary\source\EterBase\Poly;E:\Anka2\Source\Granny-3D-SDK-main\source\winxx;E:\Anka2\Source\Granny-3D-SDK-main\source\winxx\win32;E:\Anka2\Source\Granny-3D-SDK-main\source\..\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>E:\Anka2\Source\Binary\source;E:\Anka2\Source\Binary\source\..\..\Granny-3D-SDK-main\include;E:\Anka2\Source\Binary\source\..\extern\include;E:\Anka2\Source\Binary\source\UserInterface;E:\Anka2\Source\Binary\source\UserInterface\..\EterBase;E:\Anka2\Source\Binary\source\UserInterface\..\EterPack;E:\Anka2\Source\Binary\source\UserInterface\..\EterLib;E:\Anka2\Source\Binary\source\UserInterface\..\EterGrnLib;E:\Anka2\Source\Binary\source\UserInterface\..\MilesLib;E:\Anka2\Source\Binary\source\UserInterface\..\GameLib;E:\Anka2\Source\Binary\source\UserInterface\..\ScriptLib;E:\Anka2\Source\Binary\source\UserInterface\..\EterPythonLib;E:\Anka2\Source\Binary\source\UserInterface\..\SpeedTreeLib;E:\Anka2\Source\Binary\source\UserInterface\..\PRTerrainLib;E:\Anka2\Source\Binary\source\UserInterface\..\SphereLib;E:\Anka2\Source\Binary\source\UserInterface\..\EffectLib;E:\Anka2\Source\Binary\source\GameLib;E:\Anka2\Source\Binary\source\GameLib\..\EterBase;E:\Anka2\Source\Binary\source\GameLib\..\EterPack;E:\Anka2\Source\Binary\source\GameLib\..\EterLib;E:\Anka2\Source\Binary\source\GameLib\..\EterGrnLib;E:\Anka2\Source\Binary\source\GameLib\..\MilesLib;E:\Anka2\Source\Binary\source\EterPythonLib;E:\Anka2\Source\Binary\source\EterPythonLib\..\EterBase;E:\Anka2\Source\Binary\source\EterPythonLib\..\EterPack;E:\Anka2\Source\Binary\source\EterPythonLib\..\EterLib;E:\Anka2\Source\Binary\source\EterPythonLib\..\ScriptLib;E:\Anka2\Source\Binary\source\EffectLib;E:\Anka2\Source\Binary\source\EffectLib\..\EterBase;E:\Anka2\Source\Binary\source\EffectLib\..\EterPack;E:\Anka2\Source\Binary\source\EffectLib\..\EterLib;E:\Anka2\Source\Binary\source\EffectLib\..\EterGrnLib;E:\Anka2\Source\Binary\source\EffectLib\..\MilesLib;E:\Anka2\Source\Binary\source\EffectLib\..\ScriptLib;E:\Anka2\Source\Binary\source\ScriptLib;E:\Anka2\Source\Binary\source\ScriptLib\..\EterBase;E:\Anka2\Source\Binary\source\ScriptLib\..\EterPack;E:\Anka2\Source\Binary\source\ScriptLib\..\EterLib;E:\Anka2\Source\Binary\source\SpeedTreeLib;E:\Anka2\Source\Binary\source\SpeedTreeLib\..\EterBase;E:\Anka2\Source\Binary\source\SpeedTreeLib\..\EterPack;E:\Anka2\Source\Binary\source\SpeedTreeLib\..\EterLib;E:\Anka2\Source\Binary\source\PRTerrainLib;E:\Anka2\Source\Binary\source\PRTerrainLib\..\EterBase;E:\Anka2\Source\Binary\source\SphereLib;E:\Anka2\Source\Binary\source\SphereLib\..\EterBase;E:\Anka2\Source\Binary\source\SphereLib\..\EterPack;E:\Anka2\Source\Binary\source\SphereLib\..\EterLib;E:\Anka2\Source\Binary\source\EterGrnLib;E:\Anka2\Source\Binary\source\EterGrnLib\..\EterBase;E:\Anka2\Source\Binary\source\EterGrnLib\..\EterPack;E:\Anka2\Source\Binary\source\EterGrnLib\..\EterLib;E:\Anka2\Source\Binary\source\EterLib;E:\Anka2\Source\Binary\source\EterLib\..\EterBase;E:\Anka2\Source\Binary\source\EterLib\..\EterPack;E:\Anka2\Source\Binary\source\MilesLib;E:\Anka2\Source\Binary\source\MilesLib\..\EterBase;E:\Anka2\Source\Binary\source\MilesLib\..\EterPack;E:\Anka2\Source\Binary\source\MilesLib\..\EterLib;E:\Anka2\Source\Binary\source\EterPack;E:\Anka2\Source\Binary\source\EterPack\..\EterBase;E:\Anka2\Source\Binary\source\EterBase;E:\Anka2\Source\Binary\source\EterBase\Poly;E:\Anka2\Source\Granny-3D-SDK-main\source\winxx;E:\Anka2\Source\Granny-3D-SDK-main\source\winxx\win32;E:\Anka2\Source\Granny-3D-SDK-main\source\..\source;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>..\GameLib\Release\GameLib.lib;..\EterPythonLib\Release\EterPythonLib.lib;..\EffectLib\Release\EffectLib.lib;..\ScriptLib\Release\ScriptLib.lib;..\SpeedTreeLib\Release\SpeedTreeLib.lib;..\PRTerrainLib\Release\PRTerrainLib.lib;..\SphereLib\Release\SphereLib.lib;..\EterGrnLib\Release\EterGrnLib.lib;..\EterLib\Release\EterLib.lib;..\MilesLib\Release\MilesLib.lib;..\EterPack\Release\EterPack.lib;..\EterBase\Release\EterBase.lib;..\granny\Release\granny2_static.lib;d3d8.lib;d3dx8.lib;dinput8.lib;dxguid.lib;winmm.lib;ws2_32.lib;imm32.lib;imagehlp.lib;version.lib;E:\Anka2\Source\Binary\source\UserInterface\..\..\extern\library\cryptopp.lib;E:\Anka2\Source\Binary\source\UserInterface\..\..\extern\library\DevIL.lib;E:\Anka2\Source\Binary\source\UserInterface\..\..\extern\library\ILU.lib;E:\Anka2\Source\Binary\source\UserInterface\..\..\extern\library\ILUT.lib;E:\Anka2\Source\Binary\source\UserInterface\..\..\extern\library\libjpeg-6b.lib;E:\Anka2\Source\Binary\source\UserInterface\..\..\extern\library\python27.lib;E:\Anka2\Source\Binary\source\UserInterface\..\..\extern\library\lz4.lib;E:\Anka2\Source\Binary\source\UserInterface\..\..\extern\library\mss32.lib;E:\Anka2\Source\Binary\source\UserInterface\..\..\extern\library\SpeedTreeRT.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:X86</AdditionalOptions>
+      <DataExecutionPrevention></DataExecutionPrevention>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
+      <ImportLibrary>E:/Anka2/Source/Binary/source/build/UserInterface/Release/UserInterface.lib</ImportLibrary>
+      <LinkErrorReporting></LinkErrorReporting>
+      <ProgramDataBaseFile>E:/Anka2/Source/Binary/source/build/UserInterface/Release/UserInterface.pdb</ProgramDataBaseFile>
+      <RandomizedBaseAddress></RandomizedBaseAddress>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="E:\Anka2\Source\Binary\source\UserInterface\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Custom Rule E:/Anka2/Source/Binary/source/UserInterface/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+"C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SE:/Anka2/Source/Binary/source -BE:/Anka2/Source/Binary/source/build --check-stamp-file E:/Anka2/Source/Binary/source/build/UserInterface/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">E:\Anka2\Source\Binary\source\build\UserInterface\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building Custom Rule E:/Anka2/Source/Binary/source/UserInterface/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+"C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SE:/Anka2/Source/Binary/source -BE:/Anka2/Source/Binary/source/build --check-stamp-file E:/Anka2/Source/Binary/source/build/UserInterface/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">E:\Anka2\Source\Binary\source\build\UserInterface\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\AccountConnector.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\AffectFlagContainer.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\CameraProcedure.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\GameType.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\GuildMarkDownloader.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\GuildMarkUploader.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\InstanceBase.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\InstanceBaseBattle.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\InstanceBaseEffect.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\InstanceBaseEvent.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\InstanceBaseMotion.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\InstanceBaseMovement.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\InstanceBaseTransform.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\InsultChecker.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\Locale.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\MarkImage.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\MarkManager.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\NetworkActorManager.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\ProcessCRC.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\ProcessScanner.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonAcce.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonApplication.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonApplicationCamera.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonApplicationCursor.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonApplicationEvent.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonApplicationLogo.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonApplicationModule.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonApplicationProcedure.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonApplicationWebPage.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonBackground.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonBackgroundModule.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonBiologManager.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonBiologManagerModule.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonCharacterManager.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonCharacterManagerModule.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonCharacterModule.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonChat.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonChatModule.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonConfig.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonConfigModule.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonCubeRenewal.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonDungeonInfo.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonDynamicModuleNames.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonEffectModule.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonEventManager.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonEventManagerMoudle.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonExceptionSender.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonExchange.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonExchangeModule.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonFlyModule.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonGameEventManager.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonGameEventManagerModule.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonGameEvents.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonGuild.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonGuildRanking.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonIME.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonIMEModule.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonItem.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonItemModule.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonMessenger.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonMiniMap.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonMiniMapModule.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonMountUpGrade.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkDatagram.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkDatagramModule.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkStream.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkStreamCommand.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkStreamEvent.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkStreamModule.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkStreamPhaseGame.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkStreamPhaseGameActor.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkStreamPhaseGameItem.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkStreamPhaseHandShake.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkStreamPhaseLoading.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkStreamPhaseLogin.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkStreamPhaseOffline.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkStreamPhaseSelect.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNonPlayer.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNonPlayerModule.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonPackModule.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonPlayer.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonPlayerEventHandler.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonPlayerInput.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonPlayerInputKeyboard.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonPlayerInputMouse.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonPlayerModule.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonPlayerSettingsModule.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonPlayerSkill.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonPrivateShopSearch.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonProfilerModule.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonQuest.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonRenderTargetModule.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonSafeBox.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonShop.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonSkill.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonSoundManagerModule.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonSwitchbot.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonSystem.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonSystemModule.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonTextTail.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonTextTailModule.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonWiki.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\ServerStateChecker.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\ServerStateCheckerModule.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\StdAfx.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\UserInterface.cpp" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\AbstractApplication.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\AbstractCharacterManager.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\AbstractChat.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\AbstractPlayer.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\AbstractSingleton.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\AccountConnector.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\AffectFlagContainer.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\AlphaAddSpecular.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\Discord.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\GameType.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\GuildMarkDownloader.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\GuildMarkUploader.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\InstanceBase.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\InsultChecker.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\Locale.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\Locale_inc.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\MarkImage.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\MarkManager.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\NetworkActorManager.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\Packet.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\ProcessCRC.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\ProcessScanner.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonAcce.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonApplication.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonBackground.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonBiologManager.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonCharacterManager.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonChat.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonConfig.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonCubeRenewal.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonDungeonInfo.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonDynamicModuleNames.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonEventManager.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonExceptionSender.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonExchange.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonGameEventManager.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonGameEvents.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonGuild.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonGuildRanking.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonIME.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonItem.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonMessenger.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonMiniMap.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonMountUpGrade.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkDatagram.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkStream.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNonPlayer.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonPlayer.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonPlayerEventHandler.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonPlayerSettingsModule.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonPrivateShopSearch.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonQuest.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonSafeBox.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonShop.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonSkill.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonSwitchbot.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonSystem.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonTextTail.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonWiki.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\ServerStateChecker.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\StdAfx.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\Version.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\dx8todx9.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\resource.h" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="E:\Anka2\Source\Binary\source\build\ZERO_CHECK.vcxproj">
+      <Project>{393379CB-D2CD-3C7B-A5F1-D7C2880CAF65}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="E:\Anka2\Source\Binary\source\build\EffectLib\EffectLib.vcxproj">
+      <Project>{6BCB9EF1-8450-3499-8228-C123608A6E08}</Project>
+      <Name>EffectLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="E:\Anka2\Source\Binary\source\build\EterBase\EterBase.vcxproj">
+      <Project>{FDC8AAED-BE72-3045-914B-2BF77F909444}</Project>
+      <Name>EterBase</Name>
+    </ProjectReference>
+    <ProjectReference Include="E:\Anka2\Source\Binary\source\build\EterGrnLib\EterGrnLib.vcxproj">
+      <Project>{E4628EF0-506B-327E-A7D7-F5AED2BA24E9}</Project>
+      <Name>EterGrnLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="E:\Anka2\Source\Binary\source\build\EterLib\EterLib.vcxproj">
+      <Project>{8E6342A9-680B-38B8-8575-6370883815F1}</Project>
+      <Name>EterLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="E:\Anka2\Source\Binary\source\build\EterPack\EterPack.vcxproj">
+      <Project>{175F02BD-AAB1-3259-A2FF-9671951B6C25}</Project>
+      <Name>EterPack</Name>
+    </ProjectReference>
+    <ProjectReference Include="E:\Anka2\Source\Binary\source\build\EterPythonLib\EterPythonLib.vcxproj">
+      <Project>{3C8CE844-B711-3F9B-8466-E8BC03BF0F85}</Project>
+      <Name>EterPythonLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="E:\Anka2\Source\Binary\source\build\GameLib\GameLib.vcxproj">
+      <Project>{69A2EC94-1F57-3D29-B7C4-FF0B70A680BE}</Project>
+      <Name>GameLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="E:\Anka2\Source\Binary\source\build\MilesLib\MilesLib.vcxproj">
+      <Project>{49D7A7AF-0BDE-3F79-8E29-B5BA1E8F804A}</Project>
+      <Name>MilesLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="E:\Anka2\Source\Binary\source\build\PRTerrainLib\PRTerrainLib.vcxproj">
+      <Project>{46ACEE80-9408-3298-9B53-09D3961A0F30}</Project>
+      <Name>PRTerrainLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="E:\Anka2\Source\Binary\source\build\ScriptLib\ScriptLib.vcxproj">
+      <Project>{79B9A480-175E-3D22-986A-26931BC6C0E1}</Project>
+      <Name>ScriptLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="E:\Anka2\Source\Binary\source\build\SpeedTreeLib\SpeedTreeLib.vcxproj">
+      <Project>{BFD01770-04EF-3CA2-9658-A41F16BFE681}</Project>
+      <Name>SpeedTreeLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="E:\Anka2\Source\Binary\source\build\SphereLib\SphereLib.vcxproj">
+      <Project>{0B618FAB-C9F2-3BF4-8215-0078348BE502}</Project>
+      <Name>SphereLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="E:\Anka2\Source\Binary\source\build\granny\granny2_static.vcxproj">
+      <Project>{E07A449B-0CDF-3F1E-849F-A47A1D530438}</Project>
+      <Name>granny2_static</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

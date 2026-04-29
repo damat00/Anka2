@@ -1,0 +1,528 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\AccountConnector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\AffectFlagContainer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\CameraProcedure.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\GameType.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\GuildMarkDownloader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\GuildMarkUploader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\InstanceBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\InstanceBaseBattle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\InstanceBaseEffect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\InstanceBaseEvent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\InstanceBaseMotion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\InstanceBaseMovement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\InstanceBaseTransform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\InsultChecker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\Locale.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\MarkImage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\MarkManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\NetworkActorManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\ProcessCRC.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\ProcessScanner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonAcce.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonApplication.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonApplicationCamera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonApplicationCursor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonApplicationEvent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonApplicationLogo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonApplicationModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonApplicationProcedure.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonApplicationWebPage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonBackground.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonBackgroundModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonBiologManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonBiologManagerModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonCharacterManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonCharacterManagerModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonCharacterModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonChat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonChatModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonConfigModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonCubeRenewal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonDungeonInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonDynamicModuleNames.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonEffectModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonEventManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonEventManagerMoudle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonExceptionSender.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonExchange.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonExchangeModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonFlyModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonGameEventManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonGameEventManagerModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonGameEvents.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonGuild.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonGuildRanking.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonIME.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonIMEModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonItemModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonMessenger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonMiniMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonMiniMapModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonMountUpGrade.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkDatagram.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkDatagramModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkStream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkStreamCommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkStreamEvent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkStreamModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkStreamPhaseGame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkStreamPhaseGameActor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkStreamPhaseGameItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkStreamPhaseHandShake.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkStreamPhaseLoading.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkStreamPhaseLogin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkStreamPhaseOffline.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkStreamPhaseSelect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNonPlayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNonPlayerModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonPackModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonPlayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonPlayerEventHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonPlayerInput.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonPlayerInputKeyboard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonPlayerInputMouse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonPlayerModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonPlayerSettingsModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonPlayerSkill.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonPrivateShopSearch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonProfilerModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonQuest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonRenderTargetModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonSafeBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonShop.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonSkill.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonSoundManagerModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonSwitchbot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonSystemModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonTextTail.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonTextTailModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\PythonWiki.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\ServerStateChecker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\ServerStateCheckerModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\StdAfx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\UserInterface\UserInterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\AbstractApplication.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\AbstractCharacterManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\AbstractChat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\AbstractPlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\AbstractSingleton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\AccountConnector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\AffectFlagContainer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\AlphaAddSpecular.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\Discord.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\GameType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\GuildMarkDownloader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\GuildMarkUploader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\InstanceBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\InsultChecker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\Locale.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\Locale_inc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\MarkImage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\MarkManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\NetworkActorManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\Packet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\ProcessCRC.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\ProcessScanner.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonAcce.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonApplication.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonBackground.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonBiologManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonCharacterManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonChat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonCubeRenewal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonDungeonInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonDynamicModuleNames.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonEventManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonExceptionSender.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonExchange.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonGameEventManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonGameEvents.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonGuild.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonGuildRanking.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonIME.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonMessenger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonMiniMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonMountUpGrade.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkDatagram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNetworkStream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonNonPlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonPlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonPlayerEventHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonPlayerSettingsModule.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonPrivateShopSearch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonQuest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonSafeBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonShop.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonSkill.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonSwitchbot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonTextTail.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\PythonWiki.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\ServerStateChecker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\StdAfx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\Version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\dx8todx9.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\UserInterface\resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="E:\Anka2\Source\Binary\source\UserInterface\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{E3F4D3CA-E7D6-3F43-9529-65517DD69453}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{119B1FF6-B365-3DC9-95E9-3DDCFF1CEA69}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

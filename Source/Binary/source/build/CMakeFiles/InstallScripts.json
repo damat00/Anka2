@@ -1,0 +1,21 @@
+{
+	"InstallScripts" : 
+	[
+		"E:/Anka2/Source/Binary/source/build/cmake_install.cmake",
+		"E:/Anka2/Source/Binary/source/build/granny/cmake_install.cmake",
+		"E:/Anka2/Source/Binary/source/build/EterBase/cmake_install.cmake",
+		"E:/Anka2/Source/Binary/source/build/EterPack/cmake_install.cmake",
+		"E:/Anka2/Source/Binary/source/build/EterLib/cmake_install.cmake",
+		"E:/Anka2/Source/Binary/source/build/EterGrnLib/cmake_install.cmake",
+		"E:/Anka2/Source/Binary/source/build/MilesLib/cmake_install.cmake",
+		"E:/Anka2/Source/Binary/source/build/GameLib/cmake_install.cmake",
+		"E:/Anka2/Source/Binary/source/build/ScriptLib/cmake_install.cmake",
+		"E:/Anka2/Source/Binary/source/build/EterPythonLib/cmake_install.cmake",
+		"E:/Anka2/Source/Binary/source/build/SpeedTreeLib/cmake_install.cmake",
+		"E:/Anka2/Source/Binary/source/build/PRTerrainLib/cmake_install.cmake",
+		"E:/Anka2/Source/Binary/source/build/SphereLib/cmake_install.cmake",
+		"E:/Anka2/Source/Binary/source/build/EffectLib/cmake_install.cmake",
+		"E:/Anka2/Source/Binary/source/build/UserInterface/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

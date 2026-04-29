@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\ScriptLib\PythonDebugModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\ScriptLib\PythonLauncher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\ScriptLib\PythonMarshal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\ScriptLib\PythonUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\ScriptLib\Resource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\ScriptLib\StdAfx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\ScriptLib\PythonDebugModule.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\ScriptLib\PythonLauncher.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\ScriptLib\PythonMarshal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\ScriptLib\PythonUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\ScriptLib\Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\ScriptLib\StdAfx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="E:\Anka2\Source\Binary\source\ScriptLib\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{E3F4D3CA-E7D6-3F43-9529-65517DD69453}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{119B1FF6-B365-3DC9-95E9-3DDCFF1CEA69}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

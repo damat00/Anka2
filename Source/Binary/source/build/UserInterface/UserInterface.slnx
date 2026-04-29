@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Solution>
+	<Configurations>
+		<BuildType Name="Debug"/>
+		<BuildType Name="Release"/>
+		<Platform Name="Win32"/>
+	</Configurations>
+	<Project Path="ALL_BUILD.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="f56bb608-2bba-3d1b-809f-ba377d630cd4" DefaultStartup="true">
+		<BuildDependency Project="UserInterface.vcxproj"/>
+		<BuildDependency Project="../ZERO_CHECK.vcxproj"/>
+		<Build Solution="Debug|*" Project="false"/>
+		<Build Solution="Release|*" Project="false"/>
+	</Project>
+	<Project Path="../EffectLib/EffectLib.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="6bcb9ef1-8450-3499-8228-c123608a6e08">
+		<BuildDependency Project="../ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="../EterBase/EterBase.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="fdc8aaed-be72-3045-914b-2bf77f909444">
+		<BuildDependency Project="../ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="../EterGrnLib/EterGrnLib.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="e4628ef0-506b-327e-a7d7-f5aed2ba24e9">
+		<BuildDependency Project="../ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="../EterLib/EterLib.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="8e6342a9-680b-38b8-8575-6370883815f1">
+		<BuildDependency Project="../ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="../EterPack/EterPack.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="175f02bd-aab1-3259-a2ff-9671951b6c25">
+		<BuildDependency Project="../ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="../EterPythonLib/EterPythonLib.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="3c8ce844-b711-3f9b-8466-e8bc03bf0f85">
+		<BuildDependency Project="../ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="../GameLib/GameLib.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="69a2ec94-1f57-3d29-b7c4-ff0b70a680be">
+		<BuildDependency Project="../ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="../MilesLib/MilesLib.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="49d7a7af-0bde-3f79-8e29-b5ba1e8f804a">
+		<BuildDependency Project="../ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="../PRTerrainLib/PRTerrainLib.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="46acee80-9408-3298-9b53-09d3961a0f30">
+		<BuildDependency Project="../ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="../ScriptLib/ScriptLib.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="79b9a480-175e-3d22-986a-26931bc6c0e1">
+		<BuildDependency Project="../ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="../SpeedTreeLib/SpeedTreeLib.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="bfd01770-04ef-3ca2-9658-a41f16bfe681">
+		<BuildDependency Project="../ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="../SphereLib/SphereLib.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="0b618fab-c9f2-3bf4-8215-0078348be502">
+		<BuildDependency Project="../ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="UserInterface.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="2c1eaad1-f725-3577-8f78-e76f44d8c489">
+		<BuildDependency Project="../EffectLib/EffectLib.vcxproj"/>
+		<BuildDependency Project="../EterBase/EterBase.vcxproj"/>
+		<BuildDependency Project="../EterGrnLib/EterGrnLib.vcxproj"/>
+		<BuildDependency Project="../EterLib/EterLib.vcxproj"/>
+		<BuildDependency Project="../EterPack/EterPack.vcxproj"/>
+		<BuildDependency Project="../EterPythonLib/EterPythonLib.vcxproj"/>
+		<BuildDependency Project="../GameLib/GameLib.vcxproj"/>
+		<BuildDependency Project="../MilesLib/MilesLib.vcxproj"/>
+		<BuildDependency Project="../PRTerrainLib/PRTerrainLib.vcxproj"/>
+		<BuildDependency Project="../ScriptLib/ScriptLib.vcxproj"/>
+		<BuildDependency Project="../SpeedTreeLib/SpeedTreeLib.vcxproj"/>
+		<BuildDependency Project="../SphereLib/SphereLib.vcxproj"/>
+		<BuildDependency Project="../ZERO_CHECK.vcxproj"/>
+		<BuildDependency Project="../granny/granny2_static.vcxproj"/>
+	</Project>
+	<Project Path="../ZERO_CHECK.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="393379cb-d2cd-3c7b-a5f1-d7c2880caf65"/>
+	<Project Path="../granny/granny2_static.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="e07a449b-0cdf-3f1e-849f-a47a1d530438">
+		<BuildDependency Project="../ZERO_CHECK.vcxproj"/>
+	</Project>
+</Solution>

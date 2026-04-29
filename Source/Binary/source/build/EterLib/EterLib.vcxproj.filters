@@ -1,0 +1,489 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\AttributeData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\AttributeInstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\BlockTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\CollisionData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\ColorTransitionHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\CullingManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\Decal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\DibBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\EnvironmentMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\FileLoaderThread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpCollisionObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpColor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpColorInstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpD3DXBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpDIB.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpDetector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpDevice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpExpandedImageInstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpFontTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpImage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpImageInstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpImageTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpIndexBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpLightManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpMarkInstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpMath.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpObjectInstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpPixelShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpRatioInstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpRenderTargetTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpScreen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpShadowTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpSubImage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpText.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpTextInstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpVertexBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpVertexBufferDynamic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpVertexBufferStatic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\GrpVertexShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\IME.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\Input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\JpegFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\LensFlare.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\MSApplication.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\MSWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\Mutex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\NetAddress.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\NetDatagram.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\NetDatagramReceiver.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\NetDatagramSender.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\NetDevice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\NetPacketHeaderMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\NetStream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\PathStack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\ReferenceObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\RenderTarget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\RenderTargetManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\Resource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\ResourceManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\ScreenFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\SkyBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\StateManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\StdAfx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\TargaResource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\TextBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\TextFileLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\TextTag.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\Thread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\Util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\lineintersect_utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\EterLib\parser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\AttributeData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\AttributeInstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\BlockTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\CollisionData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\ColorTransitionHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\CullingManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\Decal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\DibBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\Dimm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\Dynamic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\EnvironmentMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\Event.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\FileLoaderThread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\FuncObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpCollisionObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpColor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpColorInstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpD3DXBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpDIB.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpDetector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpDevice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpExpandedImageInstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpFontTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpImage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpImageInstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpImageTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpIndexBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpLightManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpMarkInstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpMath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpObjectInstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpPixelShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpRatioInstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpRenderTargetTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpScreen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpShadowTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpSubImage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpText.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpTextInstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpVertexBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpVertexBufferDynamic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpVertexBufferStatic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\GrpVertexShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\IME.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\Input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\JpegFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\LensFlare.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\MSApplication.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\MSWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\Mutex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\NetAddress.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\NetDatagram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\NetDatagramReceiver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\NetDatagramSender.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\NetDevice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\NetPacketHeaderMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\NetStream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\PathStack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\Pool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\Profiler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\Ray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\Ref.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\ReferenceObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\RenderTarget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\RenderTargetManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\ResourceManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\ScreenFilter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\SkyBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\StateManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\StdAfx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\TargaResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\TextBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\TextFileLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\TextTag.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\Thread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\Util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\lineintersect_utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\msctf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\EterLib\parser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="E:\Anka2\Source\Binary\source\EterLib\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{E3F4D3CA-E7D6-3F43-9529-65517DD69453}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{119B1FF6-B365-3DC9-95E9-3DDCFF1CEA69}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

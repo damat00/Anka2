@@ -1,0 +1,284 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{69A2EC94-1F57-3D29-B7C4-FF0B70A680BE}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+    <Platform>Win32</Platform>
+    <ProjectName>GameLib</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v145</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">E:\Anka2\Source\Binary\source\build\GameLib\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">GameLib.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">GameLib</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">E:\Anka2\Source\Binary\source\build\GameLib\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">GameLib.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">GameLib</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>E:\Anka2\Source\Binary\source;E:\Anka2\Source\Binary\source\..\..\Granny-3D-SDK-main\include;E:\Anka2\Source\Binary\source\..\extern\include;E:\Anka2\Source\Binary\source\GameLib;E:\Anka2\Source\Binary\source\GameLib\..\EterBase;E:\Anka2\Source\Binary\source\GameLib\..\EterPack;E:\Anka2\Source\Binary\source\GameLib\..\EterLib;E:\Anka2\Source\Binary\source\GameLib\..\EterGrnLib;E:\Anka2\Source\Binary\source\GameLib\..\MilesLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;_LIB;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;_LIB;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>E:\Anka2\Source\Binary\source;E:\Anka2\Source\Binary\source\..\..\Granny-3D-SDK-main\include;E:\Anka2\Source\Binary\source\..\extern\include;E:\Anka2\Source\Binary\source\GameLib;E:\Anka2\Source\Binary\source\GameLib\..\EterBase;E:\Anka2\Source\Binary\source\GameLib\..\EterPack;E:\Anka2\Source\Binary\source\GameLib\..\EterLib;E:\Anka2\Source\Binary\source\GameLib\..\EterGrnLib;E:\Anka2\Source\Binary\source\GameLib\..\MilesLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>E:\Anka2\Source\Binary\source;E:\Anka2\Source\Binary\source\..\..\Granny-3D-SDK-main\include;E:\Anka2\Source\Binary\source\..\extern\include;E:\Anka2\Source\Binary\source\GameLib;E:\Anka2\Source\Binary\source\GameLib\..\EterBase;E:\Anka2\Source\Binary\source\GameLib\..\EterPack;E:\Anka2\Source\Binary\source\GameLib\..\EterLib;E:\Anka2\Source\Binary\source\GameLib\..\EterGrnLib;E:\Anka2\Source\Binary\source\GameLib\..\MilesLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:X86</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>E:\Anka2\Source\Binary\source;E:\Anka2\Source\Binary\source\..\..\Granny-3D-SDK-main\include;E:\Anka2\Source\Binary\source\..\extern\include;E:\Anka2\Source\Binary\source\GameLib;E:\Anka2\Source\Binary\source\GameLib\..\EterBase;E:\Anka2\Source\Binary\source\GameLib\..\EterPack;E:\Anka2\Source\Binary\source\GameLib\..\EterLib;E:\Anka2\Source\Binary\source\GameLib\..\EterGrnLib;E:\Anka2\Source\Binary\source\GameLib\..\MilesLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BufferSecurityCheck></BufferSecurityCheck>
+      <CallingConvention></CallingConvention>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel></FloatingPointModel>
+      <ForceConformanceInForLoopScope></ForceConformanceInForLoopScope>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <MinimalRebuild></MinimalRebuild>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RemoveUnreferencedCodeData></RemoveUnreferencedCodeData>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <SupportJustMyCode></SupportJustMyCode>
+      <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>E:\Anka2\Source\Binary\source;E:\Anka2\Source\Binary\source\..\..\Granny-3D-SDK-main\include;E:\Anka2\Source\Binary\source\..\extern\include;E:\Anka2\Source\Binary\source\GameLib;E:\Anka2\Source\Binary\source\GameLib\..\EterBase;E:\Anka2\Source\Binary\source\GameLib\..\EterPack;E:\Anka2\Source\Binary\source\GameLib\..\EterLib;E:\Anka2\Source\Binary\source\GameLib\..\EterGrnLib;E:\Anka2\Source\Binary\source\GameLib\..\MilesLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>E:\Anka2\Source\Binary\source;E:\Anka2\Source\Binary\source\..\..\Granny-3D-SDK-main\include;E:\Anka2\Source\Binary\source\..\extern\include;E:\Anka2\Source\Binary\source\GameLib;E:\Anka2\Source\Binary\source\GameLib\..\EterBase;E:\Anka2\Source\Binary\source\GameLib\..\EterPack;E:\Anka2\Source\Binary\source\GameLib\..\EterLib;E:\Anka2\Source\Binary\source\GameLib\..\EterGrnLib;E:\Anka2\Source\Binary\source\GameLib\..\MilesLib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:X86</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="E:\Anka2\Source\Binary\source\GameLib\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Custom Rule E:/Anka2/Source/Binary/source/GameLib/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+"C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SE:/Anka2/Source/Binary/source -BE:/Anka2/Source/Binary/source/build --check-stamp-file E:/Anka2/Source/Binary/source/build/GameLib/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">E:\Anka2\Source\Binary\source\build\GameLib\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building Custom Rule E:/Anka2/Source/Binary/source/GameLib/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+"C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SE:/Anka2/Source/Binary/source -BE:/Anka2/Source/Binary/source/build --check-stamp-file E:/Anka2/Source/Binary/source/build/GameLib/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">E:\Anka2\Source\Binary\source\build\GameLib\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstance.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstanceAttach.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstanceBattle.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstanceBlend.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstanceCollisionDetection.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstanceData.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstanceEvent.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstanceFly.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstanceMotion.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstanceMotionEvent.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstancePosition.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstanceRender.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstanceRotation.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstanceSync.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstanceWeaponTrace.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\Area.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\AreaLoaderThread.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\AreaTerrain.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\DungeonBlock.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\FlyTarget.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\FlyTrace.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\FlyingData.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\FlyingInstance.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\FlyingObjectManager.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\GameEventManager.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\GameType.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\GameUtil.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ItemData.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ItemManager.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\MapBase.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\MapManager.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\MapOutdoor.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\MapOutdoorCharacterShadow.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\MapOutdoorIndexBuffer.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\MapOutdoorLoad.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\MapOutdoorQuadtree.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\MapOutdoorRender.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\MapOutdoorRenderHTP.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\MapOutdoorRenderSTP.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\MapOutdoorUpdate.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\MapOutdoorWater.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\MapType.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\MapUtil.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\MonsterAreaInfo.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\PhysicsObject.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\Property.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\PropertyLoader.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\PropertyManager.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\RaceData.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\RaceDataFile.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\RaceManager.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\RaceMotionData.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\SnowEnvironment.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\SnowParticle.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\StdAfx.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\TerrainDecal.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\TerrainPatch.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\TerrainQuadtree.cpp" />
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\WeaponTrace.cpp" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstance.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstanceInterface.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\Area.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\AreaLoaderThread.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\AreaTerrain.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\DungeonBlock.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\FlyHandler.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\FlyTarget.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\FlyTrace.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\FlyingData.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\FlyingInstance.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\FlyingObjectManager.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\GameEventManager.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\GameLibDefines.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\GameType.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\GameUtil.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\Interface.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\ItemData.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\ItemManager.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\MapBase.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\MapManager.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\MapOutdoor.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\MapType.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\MapUtil.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\MonsterAreaInfo.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\PhysicsObject.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\Property.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\PropertyLoader.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\PropertyManager.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\RaceData.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\RaceManager.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\RaceMotionData.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\RaceMotionDataEvent.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\SnowEnvironment.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\SnowParticle.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\StdAfx.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\TerrainDecal.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\TerrainPatch.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\TerrainQuadtree.h" />
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\WeaponTrace.h" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="E:\Anka2\Source\Binary\source\build\ZERO_CHECK.vcxproj">
+      <Project>{393379CB-D2CD-3C7B-A5F1-D7C2880CAF65}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

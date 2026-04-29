@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Solution>
+	<Configurations>
+		<BuildType Name="Debug"/>
+		<BuildType Name="Release"/>
+		<Platform Name="Win32"/>
+	</Configurations>
+	<Project Path="ALL_BUILD.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="f56bb608-2bba-3d1b-809f-ba377d630cd4" DefaultStartup="true">
+		<BuildDependency Project="EterPythonLib.vcxproj"/>
+		<BuildDependency Project="../ZERO_CHECK.vcxproj"/>
+		<Build Solution="Debug|*" Project="false"/>
+		<Build Solution="Release|*" Project="false"/>
+	</Project>
+	<Project Path="EterPythonLib.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="3c8ce844-b711-3f9b-8466-e8bc03bf0f85">
+		<BuildDependency Project="../ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="../ZERO_CHECK.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="393379cb-d2cd-3c7b-a5f1-d7c2880caf65"/>
+</Solution>

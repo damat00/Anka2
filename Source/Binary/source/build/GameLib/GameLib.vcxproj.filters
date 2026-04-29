@@ -1,0 +1,315 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstanceAttach.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstanceBattle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstanceBlend.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstanceCollisionDetection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstanceData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstanceEvent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstanceFly.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstanceMotion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstanceMotionEvent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstancePosition.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstanceRender.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstanceRotation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstanceSync.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstanceWeaponTrace.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\Area.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\AreaLoaderThread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\AreaTerrain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\DungeonBlock.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\FlyTarget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\FlyTrace.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\FlyingData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\FlyingInstance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\FlyingObjectManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\GameEventManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\GameType.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\GameUtil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ItemData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\ItemManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\MapBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\MapManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\MapOutdoor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\MapOutdoorCharacterShadow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\MapOutdoorIndexBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\MapOutdoorLoad.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\MapOutdoorQuadtree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\MapOutdoorRender.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\MapOutdoorRenderHTP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\MapOutdoorRenderSTP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\MapOutdoorUpdate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\MapOutdoorWater.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\MapType.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\MapUtil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\MonsterAreaInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\PhysicsObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\Property.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\PropertyLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\PropertyManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\RaceData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\RaceDataFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\RaceManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\RaceMotionData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\SnowEnvironment.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\SnowParticle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\StdAfx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\TerrainDecal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\TerrainPatch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\TerrainQuadtree.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\Anka2\Source\Binary\source\GameLib\WeaponTrace.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\ActorInstanceInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\Area.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\AreaLoaderThread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\AreaTerrain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\DungeonBlock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\FlyHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\FlyTarget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\FlyTrace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\FlyingData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\FlyingInstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\FlyingObjectManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\GameEventManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\GameLibDefines.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\GameType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\GameUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\Interface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\ItemData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\ItemManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\MapBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\MapManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\MapOutdoor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\MapType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\MapUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\MonsterAreaInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\PhysicsObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\Property.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\PropertyLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\PropertyManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\RaceData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\RaceManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\RaceMotionData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\RaceMotionDataEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\SnowEnvironment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\SnowParticle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\StdAfx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\TerrainDecal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\TerrainPatch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\TerrainQuadtree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\Anka2\Source\Binary\source\GameLib\WeaponTrace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="E:\Anka2\Source\Binary\source\GameLib\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{E3F4D3CA-E7D6-3F43-9529-65517DD69453}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{119B1FF6-B365-3DC9-95E9-3DDCFF1CEA69}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

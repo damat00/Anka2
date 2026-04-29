@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="E:\Anka2\Source\Granny-3D-SDK-main\build\CMakeFiles\7bd0e378d617936294685180f20e3b24\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{BEFE1C60-F0C8-360E-8785-F08FB7017E2F}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

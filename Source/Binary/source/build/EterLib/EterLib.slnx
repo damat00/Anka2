@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Solution>
+	<Configurations>
+		<BuildType Name="Debug"/>
+		<BuildType Name="Release"/>
+		<Platform Name="Win32"/>
+	</Configurations>
+	<Project Path="ALL_BUILD.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="f56bb608-2bba-3d1b-809f-ba377d630cd4" DefaultStartup="true">
+		<BuildDependency Project="EterLib.vcxproj"/>
+		<BuildDependency Project="../ZERO_CHECK.vcxproj"/>
+		<Build Solution="Debug|*" Project="false"/>
+		<Build Solution="Release|*" Project="false"/>
+	</Project>
+	<Project Path="EterLib.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="8e6342a9-680b-38b8-8575-6370883815f1">
+		<BuildDependency Project="../ZERO_CHECK.vcxproj"/>
+	</Project>
+	<Project Path="../ZERO_CHECK.vcxproj" Type="8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942" Id="393379cb-d2cd-3c7b-a5f1-d7c2880caf65"/>
+</Solution>
